@@ -34,7 +34,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -60,14 +59,40 @@ public abstract class Utils extends Object {
             "java.lang.Exception");
     public static final Class<?> JAVA_LANG_THROWABLE = silentForName(
             "java.lang.Throwable");
-    public static final String STUB_DEFAULT_PREFIX = "Stub_";
-    public static final String STUB_DEFAULT_PACKAGE = "pa.stub.";
 
-    // stub on generic types are generated in a different package
-    public static final String STUB_GENERICS_PACKAGE = "parameterized.";
+    /**
+     * The char used to escaped "meta" information in generated classname.
+     */
+    public static final char STUB_ESCAPE_CHAR = '_';
+    public static final String STUB_ESCAPE = "" + STUB_ESCAPE_CHAR +
+        STUB_ESCAPE_CHAR;
+
+    /**
+     * Used to replace '.'
+     */
+    public static final char STUB_PACKAGE_SEPARATOR_CHAR = 'P';
+    public static final String STUB_PACKAGE_SEPARATOR = "" + STUB_ESCAPE_CHAR +
+        STUB_PACKAGE_SEPARATOR_CHAR;
+
+    /**
+     * Separate many Type classname in case of parameterizing Type.
+     */
+    public static final char STUB_GENERICS_SEPARATOR_CHAR = 'D';
+    public static final String STUB_GENERICS_SEPARATOR = "" + STUB_ESCAPE_CHAR +
+        STUB_GENERICS_SEPARATOR_CHAR;
+
+    //prefix and suffix
+    public static final String STUB_DEFAULT_PREFIX = STUB_ESCAPE_CHAR + "Stub";
 
     // stub on generic types are generated with a suffix that indicates the parameterizing types
-    public static final String STUB_GENERICS_SUFFIX = "_Generics_";
+    public static final String STUB_GENERICS_SUFFIX = STUB_ESCAPE_CHAR +
+        "Generics";
+
+    //  packages
+    public static final String STUB_DEFAULT_PACKAGE = "pa.stub.";
+
+    //  stub on generic types are generated in a different package
+    public static final String STUB_GENERICS_PACKAGE = "parameterized.";
 
     /**
      * Static methods
@@ -446,25 +471,30 @@ public abstract class Utils extends Object {
         if (classname.length() == 0) {
             return classname;
         }
-        int n = classname.lastIndexOf('.');
-        String genericsDifferentiator = (((genericParameters == null) ||
-            (genericParameters.length == 0)) ? ""
-                                             : (STUB_GENERICS_SUFFIX +
-            Arrays.deepToString(genericParameters).replace('.', '_')
-                  .replace("class ", "").replace(" ", "").replace(",", "%")));
-        if (n == -1) {
-            // no package
-            return STUB_DEFAULT_PACKAGE +
-            (((genericParameters == null) || (genericParameters.length == 0))
-            ? "" : STUB_GENERICS_PACKAGE) + STUB_DEFAULT_PREFIX + classname +
-            genericsDifferentiator;
-        } else {
-            return STUB_DEFAULT_PACKAGE +
-            (((genericParameters == null) || (genericParameters.length == 0))
-            ? "" : STUB_GENERICS_PACKAGE) + classname.substring(0, n + 1) +
-            STUB_DEFAULT_PREFIX + classname.substring(n + 1) +
-            genericsDifferentiator;
+        String packageName = getPackageName(classname);
+        if (!packageName.equals("")) {
+            packageName += ".";
         }
+        packageName = STUB_DEFAULT_PACKAGE +
+            (((genericParameters == null) || (genericParameters.length == 0))
+            ? "" : STUB_GENERICS_PACKAGE) + packageName;
+
+        String genericsDifferentiator = "";
+        if (genericParameters != null) {
+            for (Class gClassName : genericParameters) {
+                if (!genericsDifferentiator.equals("")) {
+                    genericsDifferentiator += STUB_GENERICS_SEPARATOR;
+                }
+                genericsDifferentiator += escapeClassName(gClassName.getName());
+            }
+            if (!genericsDifferentiator.equals("")) {
+                genericsDifferentiator = STUB_GENERICS_SUFFIX +
+                    genericsDifferentiator;
+            }
+        }
+
+        return packageName + STUB_DEFAULT_PREFIX +
+        escapeClassName(getSimpleName(classname)) + genericsDifferentiator;
     }
 
     public static boolean isStubClassName(String classname) {
@@ -472,8 +502,8 @@ public abstract class Utils extends Object {
             // Extracts the simple name from the fully-qualified class name
             int index = classname.lastIndexOf(".");
             if (index != -1) {
-                return classname.substring(index + 1)
-                                .startsWith(Utils.STUB_DEFAULT_PREFIX);
+                return classname.startsWith(Utils.STUB_DEFAULT_PREFIX, index +
+                    1);
             } else {
                 return classname.startsWith(Utils.STUB_DEFAULT_PREFIX);
             }
@@ -483,64 +513,163 @@ public abstract class Utils extends Object {
     }
 
     public static String convertStubClassNameToClassName(String stubclassname) {
-        if (isStubClassName(stubclassname)) {
-            String temp = "";
-            if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE +
-                        Utils.STUB_GENERICS_PACKAGE)) {
-                // remove generics stuff
-                temp = stubclassname.substring((Utils.STUB_DEFAULT_PACKAGE +
-                        Utils.STUB_GENERICS_PACKAGE).length());
-            } else {
-                temp = stubclassname.substring(Utils.STUB_DEFAULT_PACKAGE.length());
-            }
-            String packageName = Utils.getPackageName(temp);
-            String stubClassSimpleName = Utils.getSimpleName(temp);
-
-            String classsimplename = stubClassSimpleName.substring(Utils.STUB_DEFAULT_PREFIX.length());
-
-            // remove generics stuff
-            if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE +
-                        Utils.STUB_GENERICS_PACKAGE)) {
-                classsimplename = classsimplename.substring(0,
-                        classsimplename.lastIndexOf(Utils.STUB_GENERICS_SUFFIX));
-            }
-
-            // consider the "no package" case
-            String result;
-            if (packageName.equals("")) {
-                //no package
-                result = classsimplename;
-            } else {
-                result = packageName + "." + classsimplename;
-            }
-
-            //	     System.out.println ("CONVERT "+stubclassname+" -> "+result);
-            return result;
-        } else {
-            return stubclassname;
-        }
+        return unEscapeStubClassesName(stubclassname, false).get(0).toString();
     }
 
-    // TODO manage existing delimiters in user class names
     public static String[] getNamesOfParameterizingTypesFromStubClassName(
         String stubClassName) {
         if (!isStubClassName(stubClassName)) {
             return new String[] {  };
         }
-        String temp = "";
-        if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE +
+        if (!stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE +
                     Utils.STUB_GENERICS_PACKAGE)) {
-            // remove generics prefix
-            temp = stubClassName.substring(stubClassName.lastIndexOf(
-                        Utils.STUB_GENERICS_SUFFIX) +
-                    Utils.STUB_GENERICS_SUFFIX.length(), stubClassName.length());
-        } else {
             // no generics
             return new String[] {  };
         }
+        List<CharSequence> classesName = unEscapeStubClassesName(stubClassName,
+                true);
+        classesName.remove(0);
+        String[] result = new String[classesName.size()];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = classesName.get(i).toString();
+        }
+        return result;
+    }
 
-        // remove brackets and split
-        return temp.replace("[", "").replace("]", "").split("%");
+    /**
+     * Escape some char ('.', Utils.STUB_ESCAPE_CHAR) to do a valid String usable as part of a stub classname.
+     *
+     * @param className
+     * @return
+     */
+    private static String escapeClassName(String className) {
+        StringBuilder sb = new StringBuilder(className.length() * 2);
+        for (int i = 0; i < className.length(); i++) {
+            switch (className.charAt(i)) {
+            case '.':
+                sb.append(STUB_PACKAGE_SEPARATOR);
+                break;
+            case STUB_ESCAPE_CHAR:
+                sb.append(STUB_ESCAPE);
+                break;
+            default:
+                sb.append(className.charAt(i));
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Gives all the real classname contains in a Stub classname.
+     * The First element of the result is the classname and next the parameterizings types.
+     * @param stubClassName
+     * @return the list of elements containing in the given stubClassName
+     * @throws IllegalArgumentException if the given escapedClassesName isn't well escaped
+     */
+    private static List<CharSequence> unEscapeStubClassesName(
+        String stubClassName, boolean withParameterizingTypes)
+        throws IllegalArgumentException {
+        ArrayList<CharSequence> result = new ArrayList<CharSequence>();
+        StringBuilder sb = new StringBuilder(stubClassName.length());
+        boolean stubFlag = false;
+        boolean genericFlag = false;
+        boolean genericPackage = false;
+
+        if (isStubClassName(stubClassName)) {
+            String temp = "";
+            if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE +
+                        Utils.STUB_GENERICS_PACKAGE)) {
+                genericPackage = true;
+                // remove generics stuff
+                temp = stubClassName.substring((Utils.STUB_DEFAULT_PACKAGE +
+                        Utils.STUB_GENERICS_PACKAGE).length());
+            } else {
+                temp = stubClassName.substring(Utils.STUB_DEFAULT_PACKAGE.length());
+            }
+            temp = Utils.getPackageName(temp);
+            if (temp.length() != 0) {
+                sb.append(temp);
+                sb.append('.');
+            }
+
+            //a Stub classe is necessary under a package i.e. Utils.STUB_DEFAULT_PACKAGE
+            int begin = stubClassName.lastIndexOf('.');
+            if (begin == -1) {
+                begin = 0;
+            }
+            for (int i = begin + 1; i < stubClassName.length(); i++) {
+                char c = stubClassName.charAt(i);
+                if (c != STUB_ESCAPE_CHAR) {
+                    sb.append(c);
+                } else {
+                    i++;
+                    switch (stubClassName.charAt(i)) {
+                    // one char Flags : 'STUB_ESCAPE_CHAR''a_char' 
+                    case STUB_PACKAGE_SEPARATOR_CHAR:
+                        sb.append('.');
+                        break;
+                    case STUB_ESCAPE_CHAR:
+                        sb.append(STUB_ESCAPE_CHAR);
+                        ;
+                        break;
+                    case STUB_GENERICS_SEPARATOR_CHAR:
+                        result.add(sb);
+                        sb = new StringBuilder(stubClassName.length());
+                        break;
+
+                    // multiple char Flags <=> 'STUB_ESCAPE_CHAR'"a_string"
+                    case 'S':
+                        if (stubClassName.startsWith(STUB_DEFAULT_PREFIX, i -
+                                    1)) { //Stub
+                            if (stubFlag) {
+                                throw new IllegalArgumentException(
+                                    "The escapedClassesName is not a well formed escaped string at index " +
+                                    i + ", the flag STUB_DEFAULT_PREFIX (" +
+                                    STUB_DEFAULT_PREFIX +
+                                    ") are present twice : " + stubClassName);
+                            }
+                            stubFlag = true;
+                            i += (STUB_DEFAULT_PREFIX.length() - 2); // 2 char _S
+                        }
+                        break;
+                    case 'G':
+                        if (stubClassName.startsWith(STUB_GENERICS_SUFFIX, i -
+                                    1)) { //Generics
+                            if (genericFlag || !genericPackage) {
+                                throw new IllegalArgumentException(
+                                    "The escapedClassesName is not a well formed escaped string at index " +
+                                    i + ", the flag STUB_GENERICS_SUFFIX (" +
+                                    STUB_GENERICS_SUFFIX +
+                                    ") are present twice  or this class is not in the STUB_GENERICS_PACKAGE (" +
+                                    STUB_DEFAULT_PACKAGE +
+                                    STUB_GENERICS_PACKAGE + "): " +
+                                    stubClassName);
+                            }
+                            genericFlag = true;
+                            i += (STUB_GENERICS_SUFFIX.length() - 2); // 2 char _G
+
+                            result.add(sb);
+                            if (!withParameterizingTypes) {
+                                return result;
+                            } else {
+                                sb = new StringBuilder(stubClassName.length());
+                            }
+                        }
+                        break;
+                    default:
+                        //ERROR
+                        throw new IllegalArgumentException(
+                            "The escapedClassesName is not a well formed escaped string at index " +
+                            i + " : " + stubClassName);
+                    }
+                }
+            }
+            result.add(sb);
+            return result;
+        } else {
+            result.add(stubClassName);
+            return result;
+        }
     }
 
     /**

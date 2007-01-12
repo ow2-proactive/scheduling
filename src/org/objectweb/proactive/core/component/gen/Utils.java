@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.gen;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -54,15 +55,49 @@ import org.objectweb.proactive.core.util.ClassDataCache;
  *
  */
 public class Utils {
-    public static final String GENERATED_DEFAULT_PREFIX = "Generated_";
-    public static final String REPRESENTATIVE_DEFAULT_SUFFIX = "_representative";
-    public static final String GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX = "_gathercastItfProxy";
-    public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = "_composite";
-    public static final String OUTPUT_INTERCEPTOR_SUFFIX = "_outputInterceptor";
+
+    /**
+     * The char used to escaped "meta" information in generated classname.
+     */
+    public static final char GEN_ESCAPE_CHAR = 'C';
+    public static final String GEN_ESCAPE = "" + GEN_ESCAPE_CHAR +
+        GEN_ESCAPE_CHAR;
+
+    /**
+     * Used to replace '.'
+     */
+    public static final char GEN_PACKAGE_SEPARATOR_CHAR = 'P';
+    public static final String GEN_PACKAGE_SEPARATOR = "" + GEN_ESCAPE_CHAR +
+        GEN_PACKAGE_SEPARATOR_CHAR;
+
+    /**
+     * Separate many interface name.
+     */
+    public static final char GEN_ITF_NAME_SEPARATOR_CHAR = 'I';
+    public static final String GEN_ITF_NAME_SEPARATOR = "" + GEN_ESCAPE_CHAR +
+        GEN_ITF_NAME_SEPARATOR_CHAR;
+
+    /**
+     * Separate the signature part (a classname, ...) and the name part of an interface.
+     */
+    public static final char GEN_MIDDLE_SEPARATOR_CHAR = 'O';
+    public static final String GEN_MIDDLE_SEPARATOR = "" + GEN_ESCAPE_CHAR +
+        GEN_MIDDLE_SEPARATOR_CHAR;
+
+    // prefix and suffix
+    public static final String GENERATED_DEFAULT_PREFIX = GEN_ESCAPE_CHAR +
+        "generated";
+    public static final String REPRESENTATIVE_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR +
+        "representative";
+    public static final String GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR +
+        "gathercastItfProxy";
+    public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = GEN_ESCAPE_CHAR +
+        "composite";
+    public static final String OUTPUT_INTERCEPTOR_SUFFIX = GEN_ESCAPE_CHAR +
+        "outputInterceptor";
+
+    // packages
     public static final String STUB_DEFAULT_PACKAGE = null;
-    public static final String GEN_PACKAGE_SEPARATOR = "_P_";
-    public static final String GEN_ITF_NAME_SEPARATOR = "_I_";
-    public static final String GEN_MIDDLE_SEPARATOR = "_O_";
 
     public static boolean isRepresentativeClassName(String classname) {
         return (classname.startsWith(GENERATED_DEFAULT_PREFIX) &&
@@ -78,16 +113,19 @@ public class Utils {
         classname.endsWith(GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX));
     }
 
+    /**
+     * Parse a representative classname and rebuild the interface signature i.e. the Java interface name.
+     * @param className
+     * @return the interface signature
+     */
     public static String getInterfaceSignatureFromRepresentativeClassName(
         String className) {
         if (!isRepresentativeClassName(className)) {
             return null;
         }
-        String tmp = className.replaceAll(GENERATED_DEFAULT_PREFIX, "");
-        tmp = tmp.replaceAll(REPRESENTATIVE_DEFAULT_SUFFIX, "");
-        tmp = tmp.substring(0, tmp.indexOf(GEN_MIDDLE_SEPARATOR));
-        tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-")
-                 .replace(GEN_PACKAGE_SEPARATOR, ".");
+        String tmp = className.replaceAll("^" + GENERATED_DEFAULT_PREFIX, "");
+        tmp = tmp.replaceAll(REPRESENTATIVE_DEFAULT_SUFFIX + "$", "");
+        tmp = unEscapeClassesName(tmp, false).get(0).toString();
 
         return tmp;
     }
@@ -97,12 +135,10 @@ public class Utils {
         if (!isRepresentativeClassName(className)) {
             return null;
         }
-        String tmp = className.replaceAll(GENERATED_DEFAULT_PREFIX, "");
-        tmp = tmp.replaceAll(REPRESENTATIVE_DEFAULT_SUFFIX, "");
-        tmp = tmp.substring(tmp.indexOf(GEN_MIDDLE_SEPARATOR) +
-                GEN_MIDDLE_SEPARATOR.length(), tmp.length());
-        tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-")
-                 .replace(GEN_PACKAGE_SEPARATOR, ".");
+        String tmp = className.replaceAll("^" + GENERATED_DEFAULT_PREFIX, "");
+        tmp = tmp.replaceAll(REPRESENTATIVE_DEFAULT_SUFFIX + "$", "");
+        tmp = unEscapeClassesName(tmp, true).get(1).toString();
+
         return tmp;
     }
 
@@ -111,21 +147,20 @@ public class Utils {
         if (!isGathercastProxyClassName(className)) {
             return null;
         }
-        String tmp = className.replaceAll(GENERATED_DEFAULT_PREFIX, "");
-        tmp = tmp.replaceAll(GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX, "");
-        tmp = tmp.substring(0, tmp.indexOf(GEN_MIDDLE_SEPARATOR));
-        tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-")
-                 .replace(GEN_PACKAGE_SEPARATOR, ".");
+        String tmp = className.replaceAll("^" + GENERATED_DEFAULT_PREFIX, "");
+        tmp = tmp.replaceAll(GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX + "$", "");
+        tmp = unEscapeClassesName(tmp, false).get(0).toString();
+
         return tmp;
     }
 
     public static String getMetaObjectClassName(
         String functionalInterfaceName, String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ? ... but readable)
-        return (GENERATED_DEFAULT_PREFIX +
-        javaInterfaceName.replace(".", GEN_PACKAGE_SEPARATOR) +
+        return (GENERATED_DEFAULT_PREFIX + escapeString(javaInterfaceName) +
         GEN_MIDDLE_SEPARATOR +
-        functionalInterfaceName.replaceAll("-", GEN_ITF_NAME_SEPARATOR));
+        escapeString(functionalInterfaceName)
+        );
     }
 
     public static String getMetaObjectComponentRepresentativeClassName(
@@ -222,5 +257,99 @@ public class Utils {
         }
 
         return null;
+    }
+
+    /**
+     * Escape classname, interface name and definition to use it in generated classname and retrieve allinformation.
+     * @param str a name
+     * @return an escaped String
+     */
+    private static String escapeString(String str) {
+        StringBuilder sb = new StringBuilder(str.length() * 2);
+        for (int i = 0; i < str.length(); i++) {
+            switch (str.charAt(i)) {
+            case GEN_ESCAPE_CHAR:
+                sb.append(GEN_ESCAPE);
+                break;
+            case '.':
+                sb.append(GEN_PACKAGE_SEPARATOR);
+                break;
+            case '-':
+                sb.append(GEN_ITF_NAME_SEPARATOR);
+                break;
+            default:
+                sb.append(str.charAt(i));
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Gives all the real classname contains in a Stub classname.
+     * The First element of the result is the classname of the
+     * @param generatedClassName
+     * @return
+     * @throws IllegalArgumentException if the given escapedClassesName aren't well escaped
+     */
+    private static ArrayList<CharSequence> unEscapeClassesName(
+        String generatedClassName, boolean withItfName)
+        throws IllegalArgumentException {
+        ArrayList<CharSequence> result = new ArrayList<CharSequence>();
+        StringBuilder sb = new StringBuilder(generatedClassName.length());
+        boolean middleFlag = false;
+
+        // if (isStubClassName(generatedClassName)) {
+        int begin;
+        if ((begin = generatedClassName.lastIndexOf('.')) == -1) {
+            begin = 0;
+        }
+        for (int i = begin; i < generatedClassName.length(); i++) {
+            char c = generatedClassName.charAt(i);
+            if (c != GEN_ESCAPE_CHAR) {
+                sb.append(c);
+            } else {
+                i++;
+                switch (generatedClassName.charAt(i)) {
+                // one char Flags : 'GEN_ESCAPE_CHAR''a_char' 
+                case GEN_ESCAPE_CHAR:
+                    sb.append(GEN_ESCAPE_CHAR);
+                    ;
+                    break;
+                case GEN_PACKAGE_SEPARATOR_CHAR:
+                    sb.append('.');
+                    break;
+                case GEN_ITF_NAME_SEPARATOR_CHAR:
+                    if (!middleFlag) {
+                        throw new IllegalArgumentException(
+                            "The generatedClassName is not a well formed escaped string at index " +
+                            i + ", the flag GEN_ITF_NAME_SEPARATOR (" +
+                            GEN_ITF_NAME_SEPARATOR +
+                            ") is present whereasthis is not the interface name part : " +
+                            generatedClassName);
+                    }
+                    sb.append('-');
+                    break;
+                case GEN_MIDDLE_SEPARATOR_CHAR:
+                    result.add(sb);
+                    middleFlag = true;
+                    if (!withItfName) {
+                        return result;
+                    }
+                    sb = new StringBuilder(generatedClassName.length());
+                    break;
+                default:
+                    //ERROR
+                    throw new IllegalArgumentException(
+                        "The generatedClassName is not a well formed escaped string at index " +
+                        i + " : " + generatedClassName);
+                }
+            }
+        }
+        result.add(sb);
+        return result;
+        //            } else {
+        //                result.add(generatedClassName);
+        //                return result;
+        //            }
     }
 }
