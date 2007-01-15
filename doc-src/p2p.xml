@@ -1385,7 +1385,7 @@ p2pNodeLookup.killAllNodes();</programlisting>
     		<para>
 			The seminal paper
 			<citation>
-				<xref linkend="p2p" endterm="p2p.abbrev" />
+				<xref linkend="p2p_article" endterm="p2p.abbrev" />
 			</citation>
 			.
 		</para>
