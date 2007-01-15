@@ -83,8 +83,11 @@ public class Communicator {
      */
     public static void main(String[] args) {
         // TODO Auto-generated method stub	
-        String schedulerURL = args[0];
-        new Communicator(schedulerURL);
+    	if (args.length == 1) {		
+    		String schedulerURL = args[0];
+    		new Communicator(schedulerURL);
+    	}
+    	System.err.println("Usage <java_command> Scheduler_URL");
     }
 
     /**
