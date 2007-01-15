@@ -2,6 +2,20 @@
 echo. 
 echo --- Compile ---------------------------------------------
 
+rem --- Verifying current directory
+SET COMMAND=%0
+IF NOT "%COMMAND:~-4%" == ".bat" (
+ SET COMMAND=%0.bat
+)
+ 
+SET OK=0
+FOR /F %%i in ('dir /b') do IF "%%i" == "%COMMAND%" SET OK=1
+
+IF %OK% == 0 (
+echo scripts must be started in the same directory as the script.
+goto end
+)
+
 if "%1" == "" goto usage
 if NOT DEFINED JAVA_HOME goto javahome
 if "%JAVA_HOME%" == "" goto javahome
@@ -44,13 +58,13 @@ cd ..\..\src
 
 
 set PROACTIVE=..\.
-call %PROACTIVE%\scripts\windows\init.bat
+call "%PROACTIVE%\scripts\windows\init.bat"
 
 echo CLASSPATH=%CLASSPATH%
 
 echo compiling 
 echo %FILES_LIST%
-%JAVA_HOME%\bin\javac.exe -d ..\classes %FILES_LIST%
+"%JAVA_HOME%\bin\javac.exe" -d ..\classes %FILES_LIST%
 popd
 ENDLOCAL
 goto end

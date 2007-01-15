@@ -1,6 +1,6 @@
 @echo off
-echo. 
-echo --- FlowShop ----------------------------------------
+echo
+echo --- Communicator ----------------------------------------------
 
 rem --- Verifying current directory
 SET COMMAND=%0
@@ -20,17 +20,22 @@ goto doit
 
 :usage
 echo. 
-echo flowshop.bat 
 goto end
 
 
 :doit
+
+IF  "%1" == "" (
+  SET SCHEDULER_URL=//localhost:1234/SchedulerNode
+ ) ELSE (
+  SET SCHEDULER_URL=%1
+)
+
 SETLOCAL
-call init.bat
+IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
+call "%PROACTIVE%\scripts\windows\init.bat"
 
-%JAVA_CMD% org.objectweb.proactive.examples.flowshop.Main -bench ..\..\src\org\objectweb\proactive\examples\flowshop\taillard\test_10_10.txt -desc ..\..\descriptors\Workers.xml
-
-ENDLOCAL
+%JAVA_CMD% -Dproactive.rmi.port=1234 org.objectweb.proactive.examples.scheduler.LaunchC3DRenderer %SCHEDULER_URL%
 
 :end
 echo. 

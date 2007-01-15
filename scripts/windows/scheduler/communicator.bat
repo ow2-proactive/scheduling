@@ -1,6 +1,6 @@
 @echo off
-echo.
-echo --- StartP2PService -------------------------------------
+echo
+echo --- Communicator ----------------------------------------------
 
 rem --- Verifying current directory
 SET COMMAND=%0
@@ -24,14 +24,19 @@ goto end
 
 
 :doit
-SETLOCAL enabledelayedexpansion
-IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 
+IF  "%1" == "" (
+  SET SCHEDULER_URL=//localhost:1234/SchedulerNode
+ ) ELSE (
+  SET SCHEDULER_URL=%1
+)
+
+SETLOCAL
+IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
+%JAVA_CMD% -Dproactive.rmi.port=1234 org.objectweb.proactive.scheduler.Communicator %SCHEDULER_URL%
 
-%JAVA_CMD% org.objectweb.proactive.p2p.service.StartP2PService %*
-
-echo.
-
+:end
+echo. 
 echo ---------------------------------------------------------
