@@ -25,7 +25,7 @@
     <para>The P2P infrastructure works as an overlay network. It works with a
     <emphasis role="bold">P2P Service</emphasis> which is a peer which in turn
     is in computational node. The P2P Service is implemented with a ProActive
-    JVM and few Active Objects. The next figure shows an example of a network
+    Runtime and few Active Objects. The next figure shows an example of a network
     of hosts where some JVMs are running and several of them are running the
     P2P Service.</para>
 
@@ -715,8 +715,13 @@
     </sect2>
 
     <sect2  id="mozTocId586812">
-      <title> IC2D Screen shot</title>
+      <title>Monitoring: IC2D </title>
 
+	<para>IC2D hides all P2P internal object by default, in order to monitor the
+	infrastructure itself we invite you to check the IC2D documentation <xref linkend="IC2D_EclipsePlugin"/> to set
+	the right option.</para>
+	
+	
       <para>A screen shot made with IC2D. You can see 3 P2P services which are
       sharing 2 nodes (bi-processors machines). Inside the nodes there are
       some active Domain objects from the nBody application which is deployed
@@ -1330,9 +1335,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.p2p.core.service.P2PService;
-import org.objectweb.proactive.p2p.core.service.StartP2PService;
-import org.objectweb.proactive.p2p.core.service.node.P2PNodeLookup;
+import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.StartP2PService;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 ...
 // This constructor uses a file with address of peers
 // See the Javadoc to choose different parameters
@@ -1368,9 +1373,25 @@ p2pNodeLookup.killAllNodes();</programlisting>
 
     <itemizedlist>
       <listitem>
-        <para>Plug technical services, such as Fault-tolerance schemes or Load
+        <para>Plug technical services (<xref linkend="technicalService"/>), such as Fault-tolerance schemes or Load
         Balancing, for each application at the deployment time.</para>
       </listitem>
     </itemizedlist>
+  </sect1>
+  
+   <sect1  id="p2p_research">
+    <title>Research Work</title>
+
+    		<para>
+			The seminal paper
+			<citation>
+				<xref linkend="p2p" endterm="p2p.abbrev" />
+			</citation>
+			.
+		</para>
+		    <para>Further research information is available 
+    at <ulink url="http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/"/>.</para>
+		
+		
   </sect1>
 </chapter>

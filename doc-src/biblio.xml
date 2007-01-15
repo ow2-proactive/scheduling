@@ -364,6 +364,28 @@
 			</publisher>
 		</biblioset>
 	</biblioentry>
+  
+<biblioentry role="article" id="p2p">
+	<abbrev id="p2p.abbrev">CCMPARCO07</abbrev>
+	<biblioset role="article">
+		<authorgroup>
+			<author>
+       			<firstname>Denis</firstname><surname>Caromel</surname>
+       		</author>
+       		<author>
+       			<firstname>Alexandre</firstname><surname>di Costanzo</surname>
+       		</author>
+       		<author>
+       			<firstname>Clement</firstname><surname>Mathieu</surname>
+       		</author>
+		</authorgroup>
+		<title>Peer-to-Peer for Computational Grids: Mixing Clusters and Desktop Machines</title>
+	</biblioset>
+	<biblioset role="journal">
+		<title>Parallel Computing Journal on Large Scale Grid</title>
+		<pubdate>2007</pubdate>
+	</biblioset>
+</biblioentry>
 	
 	<biblioentry role="thesis" id="M06">
 		<abbrev id="PhD-thesis-Morel.abbrev">PhD-Morel</abbrev>
