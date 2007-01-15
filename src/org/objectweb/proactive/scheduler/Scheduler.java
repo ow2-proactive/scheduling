@@ -242,8 +242,7 @@ public class Scheduler implements java.io.Serializable, SchedulerConstants {
                 return null;
             }
         } catch (Exception e) {
-        	e.printStackTrace();
-            logger.error("error connecting the scheduler service");
+            logger.error("error connecting the scheduler service:" + e);
             return null;
         }
     }
