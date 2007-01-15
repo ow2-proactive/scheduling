@@ -43,7 +43,6 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.components.adl = DEBUG, CONSOLE
 #log4j.logger.proactive.components.gui = DEBUG, CONSOLE
 
-
 #log4j.logger.proactive.p2p = DEBUG, CONSOLE
 #log4j.logger.proactive.p2p.startservice = DEBUG, CONSOLE
 #log4j.logger.proactive.p2p.vn = DEBUG, CONSOLE
@@ -73,6 +72,14 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.skeletons.structure = DEBUG, CONSOLE
 #log4j.logger.proactive.skeletons.manager = DEBUG, CONSOLE
 #log4j.logger.proactive.skeletons.application = DEBUG, CONSOLE
+
+#log4j.logger.proactive.scheduler = DEBUG, CONSOLE
+#log4j.logger.proactive.taskscheduler = DEBUG, CONSOLE
+#log4j.logger.proactive.scheduler.commandlistener = DEBUG, CONSOLE
+#log4j.logger.proactive.scheduler.jobTemplate = DEBUG, CONSOLE
+#log4j.logger.proactive.scheduler.ressourceManager = DEBUG, CONSOLE
+#log4j.logger.proactive.scheduler.ressourceListener = DEBUG, CONSOLE
+#log4j.logger.proactive.scheduler.jobManager = DEBUG, CONSOLE
 
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender

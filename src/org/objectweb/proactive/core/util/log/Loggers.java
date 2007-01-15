@@ -132,6 +132,7 @@ public interface Loggers {
     // Scheduler loggers
     public static final String SCHEDULER = "proactive.scheduler";
     public static final String SCHEDULER_COMMAND_LISTENER = SCHEDULER + ".commandlistener";
+    public static final String TASK_SCHEDULER = "proactive.taskscheduler";
     public static final String JOB_TEMPLATE = SCHEDULER + ".jobTemplate";
     public static final String RESSOURCE_MANAGER = SCHEDULER + ".ressourceManager";
     public static final String RESSOURCE_LISTENER = SCHEDULER + ".ressourceListener";
