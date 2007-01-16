@@ -14,7 +14,7 @@ then
 echo "Compiling source file..."
 /usr/bin/mpicc $EXAMPLES/jacobi.c -lm -o $EXAMPLES/jacobi
 else
-echo "ERROR: you need \"mpicc\" to compile MPI\C source file"
+echo "ERROR: you need \"/usr/bin/mpicc\" to compile MPI\C source file"
 exit 127
 fi
 if [ -f /usr/bin/lamboot ]
@@ -26,7 +26,7 @@ fi
 
 XMLDESCRIPTOR=$PROACTIVE/descriptors/MPI-descriptor.xml
 
-$JAVACMD -classpath $CLASSPATH -Dlog4j.configuration=file:$PROACTIVE/compile/proactive-log4j -Dproactive.rmi.port=6099 org.objectweb.proactive.examples.mpi.Jacobi  $XMLDESCRIPTOR 
+$JAVACMD -Dlog4j.configuration=file:$PROACTIVE/scripts/proactive-log4j -Dproactive.rmi.port=6099 org.objectweb.proactive.examples.mpi.Jacobi  $XMLDESCRIPTOR 
 
 echo "Killing lam daemon..."
 killall lamd
