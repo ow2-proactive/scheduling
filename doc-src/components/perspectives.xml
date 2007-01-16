@@ -48,15 +48,15 @@
 
     <orderedlist>
       <listitem>
-        Behavioral information on components can be specified in extended ADL files.
+        <para>Behavioral information on components can be specified in extended ADL files.</para>
       </listitem>
 
       <listitem>
-        Automatas can be generated from behavioral information and structural description.
+        <para>Automatas can be generated from behavioral information and structural description.</para>
       </listitem>
 
       <listitem>
-        Model checking tools are used to verify the automatas
+        <para>Model checking tools are used to verify the automatas.</para>
       </listitem>
     </orderedlist>
 
@@ -110,9 +110,8 @@
     capabilities of IC2D: we would get a structural view of the application in
     the Fractal GUI, and a topological view in the standard IC2D.</para>
 
-    <para></para>
-
     <sect2>
+      <title>Howto use it</title>
       <para>If you want to try out the extended Fractal GUI for ProActive (for
       versions of ProActive &lt; 3.2):</para>
 
@@ -183,7 +182,7 @@
       </listitem>
 
       <listitem>
-         packaging: a bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition of deployment that needs to be addressed. 
+         <para>packaging: a bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition of deployment that needs to be addressed.</para>
       </listitem>
 
       <listitem>

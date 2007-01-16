@@ -140,7 +140,7 @@
       an descriptor. The user can attach policy to these virtual nodes.
       Virtual Nodes are used within application code to structure it. By
       example, an object which will be used as a server will be set inside a
-      virtual node named <filename>"Server_VN"</filename>, client objects will
+      virtual node named "Server_VN", client objects will
       be set inside "Client_VN". The user expresses policy between server and
       client object inside a descriptor file. The mapping between Virtual
       Nodes and Nodes is done when the application starts.</para>

@@ -37,25 +37,25 @@
 			JMX defines a 3 layers management architecture :
 			<itemizedlist>
 				<listitem>
-					<emphasis>The instrumentation level</emphasis>
+					<para><emphasis>The instrumentation level</emphasis>
 					contains MBeans and their manageable resources. A
 					Mbean is a Java Object implementing a specific
 					interface and pattern. They contain and define the
 					manageable attributes, the management operations
 					that can be performed onto resources and the
-					notifications that can be emitted by the resources.
+					notifications that can be emitted by the resources.</para>
 				</listitem>
 				<listitem>
-					<emphasis>The Agent Level</emphasis>
+					<para><emphasis>The Agent Level</emphasis>
 					The agent acts as a MBeans containers (the
 					MBeanServer) and controls them. This level
 					represents the main part in the JMX specification :
 					because it give access to the managed resources to
 					the clients, the agent is the architecture central
-					point.
+					point.</para>
 				</listitem>
 				<listitem>
-					<emphasis>The Distributed Level</emphasis>
+					<para><emphasis>The Distributed Level</emphasis>
 					The distributed Level enables the remote management
 					of Java applications. In order to access remotely to
 					managed application, JMX specification defines two
@@ -66,7 +66,7 @@
 					components that ensure binding between a specific
 					protocol (for example for SNMP or Http) and thre
 					managed resources. Indeed, they enable Mbeans to be
-					accessed by existing approches.
+					accessed by existing approches.</para>
 				</listitem>
 			</itemizedlist>
 
@@ -98,6 +98,8 @@
 				throws InstanceNotFoundException, MBeanException,
 				ReflectionException, IOException;
 			</programlisting>
+			
+		</para>
 			<para>
 				We extended the API in order to provide asynchronous
 				acces thanks to additionnal reifiable methods. The
@@ -114,7 +116,6 @@
 				active object requests queue and a future object is
 				returned to the client.
 			</para>
-		</para>
 	</sect1>
 
 	<sect1>
@@ -246,7 +247,9 @@
 		</para>
 		<para>
 			By choosing a specific domain, the console will show the
-			Mbeans registered in this domain :
+			Mbeans registered in this domain.
+			
+		</para>
 			<para>
 				The console shows the domains list, for example :
 				<programlisting>
@@ -263,7 +266,6 @@
 				If you wish to get informations about Memory, choose 0,
 				and the console will show the whole information about
 				this MBean.
-			</para>
 	</para>
 	</sect1>
 </chapter>
