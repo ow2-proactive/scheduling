@@ -40,7 +40,7 @@
 
           <para>If you want only to compile only parts of ProActive, 
            you should try <literal>build</literal>, with no arguments. 
-           As of version v3.2 Beta, the result is: </para>
+           As of version v3.2, the result is: </para>
           
           <screen>/home/bob/ProActive/compile/$ build
            Buildfile: ./proactive.xml

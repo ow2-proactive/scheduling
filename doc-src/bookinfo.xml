@@ -13,14 +13,14 @@
     <corpauthor/>
 
     <copyright>
-      <year>2001-2006</year>
+      <year>2001-2007</year>
       <holder>INRIA</holder>
     </copyright>
 
     <legalnotice id="LegalNotice">
       <para>ProActive is a GRID Java middleware, with source code under <ulink
       url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>.
-      </para><para>Copyright INRIA 2001-2006.</para>
+      </para><para>Copyright INRIA 2001-2007.</para>
     </legalnotice>
 
     <mediaobject>
@@ -31,8 +31,8 @@
    
     <revhistory>  
         <revision>
-        <revnumber>3.2 Beta</revnumber>
-        <date>2006-11-03</date>
+        <revnumber>3.2</revnumber>
+        <date>2007-01-16</date>
     </revision>
     <revision>
         <revnumber>3.1</revnumber>
@@ -46,7 +46,6 @@
   
     <abstract>
       <title>Disclaimer</title>
-    <para><emphasis role="bold">New features are not fully documented yet.</emphasis></para>
       <para><emphasis role="bold">ProActive</emphasis> is a <emphasis
       role="bold">GRID</emphasis> middleware Java library for <emphasis
       role="bold">parallel</emphasis>, <emphasis
