@@ -126,8 +126,8 @@
           one or several Virtual Node. He gets back a set of Nodes
           corresponding to the remote available hosts for the MPI Job
           execution. For more details (or usage example) about resources
-          booking, have a look at <xref linkend="Using_the_Infrastructure"
-          role="bold" /><emphasis role="bold">.</emphasis></para>
+          booking, have a look at <xref linkend="Using_the_Infrastructure" />
+           <emphasis role="bold">.</emphasis></para>
         </listitem>
 
         <listitem>
