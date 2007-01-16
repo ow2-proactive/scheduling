@@ -5,14 +5,17 @@ echo --- MPI deployment example ---------------------------------------------
 
 echo " --- RUNNING JACOBI ON LOCALHOST ---"
 
+MPICC=$(which mpicc 2> /dev/null || echo "mpicc Not Found!" >&2 )
+[[ -z $MPICC ]] && exit 1
 workingDir=`dirname $0`
 . $workingDir/env.sh
 PROACTIVE=$workingDir/../..
 EXAMPLES=$PROACTIVE/src/org/objectweb/proactive/examples/mpi
+
 if [ -f /usr/bin/mpicc ]
 then
 echo "Compiling source file..."
-/usr/bin/mpicc $EXAMPLES/jacobi.c -lm -o $EXAMPLES/jacobi
+$MPICC $EXAMPLES/jacobi.c -lm -o $EXAMPLES/jacobi
 else
 echo "ERROR: you need \"/usr/bin/mpicc\" to compile MPI\C source file"
 exit 127
