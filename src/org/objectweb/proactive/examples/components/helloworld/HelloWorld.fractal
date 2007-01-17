@@ -4,7 +4,6 @@
 <definition name="org.objectweb.proactive.examples.components.helloworld.HelloWorld">
   <interface name="m" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Main"/>
   <component name="client" definition="org.objectweb.proactive.examples.components.helloworld.ClientImpl"/>
-  </component>
   <component name="server">
     <interface name="s" role="server" signature="org.objectweb.proactive.examples.components.helloworld.Service"/>
     <content class="ServerImpl"/>
