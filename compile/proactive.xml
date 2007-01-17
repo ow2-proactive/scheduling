@@ -19,8 +19,8 @@
 	<property name="docs.mainFile" value="PA_index.xml" />
 
 	<property name="name" value="ProActive" />
-	<property name="version" value="3.2 Beta" />
-	<property name="version_" value="3_2_Beta" />
+	<property name="version" value="3.2" />
+	<property name="version_" value="3_2" />
 	<property name="debug" value="on" />
 	<property name="source" value="1.5" />
 	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/" />
@@ -797,10 +797,11 @@
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath" />
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
+			<jvmarg value="-Dlog4j.configuration=file:${base}/scripts/proactive-log4j-chainsaw.xml" />
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml" />
 			<jvmarg value="-Xdebug" />
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
+			<arg value="/nonregressiontest/testsuiteSingle.xml"/>
 		</java>
 	</target>
 
@@ -870,7 +871,7 @@
 	<!-- ================================================================ -->
 	<!--   Tests coverage : need clover license in user.home directory    -->
 	<!-- ================================================================ -->
-	<!-- Commented for the release
+	<!-- Commented for the release-->
     <property name="coverage.dir" value="${base}/compile/coverage"/>
     
     <path id="coverage.classpath">
@@ -898,8 +899,8 @@
     </target>
     
     <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
-    <delete file="${base}/compile/tests.log"/>-->
-	<!-- classloader test needs clover tasks as specified in deployment-coverage.xml file 
+    <delete file="${base}/compile/tests.log"/>
+	<!-- classloader test needs clover tasks as specified in deployment-coverage.xml file -->
     <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
     <java classname="nonregressiontest.MainManager" fork="true">
     <classpath refid="coverage.classpath"/>
@@ -912,7 +913,7 @@
     <format type="html"/>
     </current>
     </clover-report>
-    </target> -->
+    </target> 
 
 
 	<!-- ==================================================================== -->

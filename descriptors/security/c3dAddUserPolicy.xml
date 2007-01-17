@@ -8,7 +8,6 @@
 		<Certificate />
 	</CertificationAuthority>
 	<TrustedCertificationAuthority />
-
 	<Rules>
 		<Rule>
 			<From>
