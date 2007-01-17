@@ -797,7 +797,7 @@
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath" />
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:${base}/scripts/proactive-log4j" />
+			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml" />
 			<jvmarg value="-Xdebug" />
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
