@@ -7,4 +7,4 @@ then
 else
   args=$@
 fi
-$JAVA_HOME/bin/java -Xmx256000000 -classpath $JAVA_HOME/lib/tools.jar:$currentDir/ant.jar:$currentDir/ant-launcher.jar:$currentDir/xercesImpl.jar:$currentDir/xml-apis.jar: org.apache.tools.ant.Main -emacs -buildfile $currentDir/proactive.xml $args
+$JAVA_HOME/bin/java -Xmx256000000 -classpath $JAVA_HOME/lib/tools.jar:$currentDir/ant.jar:$currentDir/ant-launcher.jar:$currentDir/../lib/xercesImpl.jar:$currentDir/../lib/ws/xml-apis.jar: org.apache.tools.ant.Main -emacs -buildfile $currentDir/proactive.xml $args

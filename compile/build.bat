@@ -7,7 +7,7 @@ if "%1" == "" goto projecthelp
 
 :build
 SETLOCAL
-set CLASSPATH=%JAVA_HOME%\lib\tools.jar;ant.jar;ant-launcher.jar;xercesImpl.jar;xml-apis.jar;doclet.jar;%CLASSPATH%
+set CLASSPATH=%JAVA_HOME%\lib\tools.jar;ant.jar;ant-launcher.jar;..\lib\xercesImpl.jar;..\lib\ws\xml-apis.jar;doclet.jar;%CLASSPATH%
 echo %CLASSPATH%
 "%JAVA_HOME%\bin\java" -Xmx256000000 org.apache.tools.ant.Main -buildfile proactive.xml %1 %2 %3 %4 %5 %WHEN_NO_ARGS%
 ENDLOCAL
