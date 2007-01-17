@@ -40,15 +40,6 @@ import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTi
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
-
-/**
- * @author rquilici
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
- */
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
             "/nonregressiontest/loadbalancing/LoadBalancing.xml").getPath();

@@ -30,13 +30,6 @@
  */ 
 package org.objectweb.proactive.core.util;
 
-
-/**
- * @author fhuet
- *
- * To change this generated comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
- */
 public class IbisProperties {
     public static final String IBIS_DEFAULT_NAME_SERVER = "name_server";
     public static final String IBIS_DEFAULT_NAME_SERVER_POOL = "name_server_pool";
