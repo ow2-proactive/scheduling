@@ -797,7 +797,7 @@
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath" />
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:${base}/scripts/proactive-log4j-chainsaw.xml" />
+			<jvmarg value="-Dlog4j.configuration=file:${base}/scripts/proactive-log4j" />
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml" />
 			<jvmarg value="-Xdebug" />
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
@@ -871,7 +871,7 @@
 	<!-- ================================================================ -->
 	<!--   Tests coverage : need clover license in user.home directory    -->
 	<!-- ================================================================ -->
-	<!-- Commented for the release-->
+	<!-- Commented for the release
     <property name="coverage.dir" value="${base}/compile/coverage"/>
     
     <path id="coverage.classpath">
@@ -899,8 +899,9 @@
     </target>
     
     <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
-    <delete file="${base}/compile/tests.log"/>
+    <delete file="${base}/compile/tests.log"/> -->
 	<!-- classloader test needs clover tasks as specified in deployment-coverage.xml file -->
+	<!-- 
     <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
     <java classname="nonregressiontest.MainManager" fork="true">
     <classpath refid="coverage.classpath"/>
@@ -913,7 +914,7 @@
     <format type="html"/>
     </current>
     </clover-report>
-    </target> 
+    </target> -->
 
 
 	<!-- ==================================================================== -->
