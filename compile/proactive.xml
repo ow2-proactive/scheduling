@@ -801,7 +801,6 @@
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml" />
 			<jvmarg value="-Xdebug" />
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
-			<arg value="/nonregressiontest/testsuiteSingle.xml"/>
 		</java>
 	</target>
 
