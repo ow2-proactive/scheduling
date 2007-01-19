@@ -89,6 +89,14 @@ public class VNObject extends AbstractDataObject {
 		return jobID;
 	}
 	
+	@Override
+	public void removeChild(AbstractDataObject child) {
+		super.removeChild(child);
+		if(monitoredChildren.isEmpty()){
+			((WorldObject)getParent()).removeVNChild(this);
+		}
+	}
+	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//

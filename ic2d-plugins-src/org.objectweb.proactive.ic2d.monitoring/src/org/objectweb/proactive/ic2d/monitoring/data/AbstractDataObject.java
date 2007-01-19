@@ -255,7 +255,7 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	public void removeChild(AbstractDataObject child) {
 		monitoredChildren.remove(child.getKey());
-		this.parent.skippedChildren.put(getKey(), this);
+		skippedChildren.put(child.getKey(), child);
 		setChanged();
 		notifyObservers();
 	}

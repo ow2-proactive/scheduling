@@ -81,20 +81,24 @@ public class VMObject extends AbstractDataObject {
 	public void explore(){
 
 		// Enable or not the P2P Node monitoring
-		boolean hideP2PNode = new Boolean(System.getProperty(
-				P2PConstants.HIDE_P2PNODE_MONITORING)).booleanValue();
-
+		boolean hideP2PNode = getWorld().isP2PHidden();
+		
 		String[] namesOfNodes = null;
 		try {
 			namesOfNodes = runtime.getLocalNodeNames();
 		} catch (ProActiveException e) {
-			e.printStackTrace();
+			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		}
 		for (int i = 0; i < namesOfNodes.length; ++i) {
 			String nodeName = namesOfNodes[i];
 			// Enable or not the P2P Node monitoring
 			if (hideP2PNode &&
 					(nodeName.compareTo(P2PConstants.P2P_NODE_NAME) == 0)) {
+				AbstractDataObject node = getWorld().getAllMonitoredObjects().get(nodeName);
+				if(node!=null){
+					node.stopMonitoring(false);
+					this.skippedChildren.remove(nodeName);
+				}
 				continue;
 			}
 			if (nodeName.indexOf("SpyListenerNode") == -1) {

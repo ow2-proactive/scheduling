@@ -72,7 +72,6 @@ public class Spy implements RunActive, ProActiveInternalObject {
 	}
 	
 	public Spy(SpyListener spyListener) {
-		System.out.println("[IC2D] Spy created");
 		this.spyListener = spyListener;
 	}
 	

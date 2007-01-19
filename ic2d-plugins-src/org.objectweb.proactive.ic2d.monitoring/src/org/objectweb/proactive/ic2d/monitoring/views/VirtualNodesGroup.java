@@ -1,6 +1,7 @@
 package org.objectweb.proactive.ic2d.monitoring.views;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -18,26 +19,27 @@ import org.eclipse.swt.widgets.Group;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.VNColors;
 
 public class VirtualNodesGroup implements Observer {
-	
+
 	private Group group;
 
 	private Map<Button, VNObject> buttons = new HashMap<Button, VNObject>();
-	
+
 	private Map<VNObject, Button> virtualNodes = new HashMap<VNObject, Button>();
-	
+
 	private VNColors vnColors;
-	
+
 	//
 	// -- CONSTRUCTOR -----------------------------------------------
 	//
 
 	public VirtualNodesGroup(Composite parent) {
-		
+
 		vnColors = new VNColors();
-		
+
 		group = new Group(parent, SWT.NONE);
 		group.setText("Virtual nodes");
 
@@ -57,32 +59,49 @@ public class VirtualNodesGroup implements Observer {
 	//
 	// -- PUBLIC METHOD -----------------------------------------------
 	//
-	
 
-	
 	public void update(Observable o, Object arg) {
-		//System.out.println("VirtualNodesGroup.update()");
-		if(arg instanceof VNObject) {
-			final VNObject vn = (VNObject)arg;
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run () {
-					Button b = new Button(group, SWT.CHECK);
-					b.setForeground(vnColors.getColor(vn.getKey())); //DOESN'T WORK !!!
-					b.setText(vn.getFullName());
-					b.addSelectionListener(new VirtualNodeButtonListener());
-					buttons.put(b, vn);
-					virtualNodes.put(vn, b);
-					group.pack(true);
+		// <"Message",VNObject>
+		if(arg instanceof Hashtable){//<"Add a virtual node",VNObject>
+			Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) arg;
+			final VNObject vnAdded = table.get(WorldObject.ADD_VN_MESSAGE);
+			if(vnAdded!=null){
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						Button b = new Button(group, SWT.CHECK);
+						b.setForeground(vnColors.getColor(vnAdded.getKey())); //DOESN'T WORK !!!
+						b.setText(vnAdded.getFullName());
+						b.addSelectionListener(new VirtualNodeButtonListener());
+						buttons.put(b, vnAdded);
+						virtualNodes.put(vnAdded, b);
+						group.pack(true);
+					}
+				});
+			}
+			else{//<"Remove a virtual node",VNObject>
+				final VNObject vnRemoved = table.get(WorldObject.REMOVE_VN_MESSAGE);
+				if(vnRemoved!=null){
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run () {
+							Button b = virtualNodes.get(vnRemoved);
+							virtualNodes.remove(vnRemoved);
+							buttons.remove(b);
+							if(!b.isDisposed())
+								b.dispose();
+							if(!group.isDisposed())
+								group.pack();
+						}
+					});
 				}
-			});
+			}
 		}
 	}
-	
+
 	public Group getGroup() {
 		return group;
 	}
-	
-	
+
+
 	public Color getColor(VNObject vn) {
 		Button b = virtualNodes.get(vn);
 		if(b == null)
@@ -91,7 +110,7 @@ public class VirtualNodesGroup implements Observer {
 			return null;
 		return vnColors.getColor(vn.getKey());
 	}
-	
+
 	//
 	// -- INNER CLASSES -----------------------------------------------
 	//

@@ -66,6 +66,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewViewAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.P2PAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshJVMAction;
@@ -286,8 +287,13 @@ public class MonitoringView extends ViewPart {
 		RefreshAction toolBarRefresh = new RefreshAction(world.getMonitorThread());
 		toolBarManager.add(toolBarRefresh);
 
+		// Adds enable/disable monitoring action to the view's toolbar
 		EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(world);
 		toolBarManager.add(toolBarEnableDisableMonitoring);
+		
+		// Adds enable/disable monitoring action to the view's toolbar
+		P2PAction toolBarP2P = new P2PAction(world);
+		toolBarManager.add(toolBarP2P);
 		
 		toolBarManager.add(new Separator());
 
@@ -335,6 +341,11 @@ public class MonitoringView extends ViewPart {
 		return this.dnd;
 	}
 
+	@Override
+    public void dispose() {
+		world.stopMonitoring(true);
+    }
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */

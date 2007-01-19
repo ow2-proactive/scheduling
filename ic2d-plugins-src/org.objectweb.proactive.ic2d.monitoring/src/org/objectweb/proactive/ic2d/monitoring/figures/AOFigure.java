@@ -97,9 +97,6 @@ public class AOFigure extends AbstractFigure{
 	/** All connections whose source is this and target is the key */
 	private Map<AOFigure, Connection> targetConnections;
 
-	/** Optimizes the GUI, the arrows are not drawn during a time. */
-	private GUIManager manager;
-
 	private MouseListener mouseListener;
 
 	//
@@ -115,8 +112,6 @@ public class AOFigure extends AbstractFigure{
 		this.requestQueueLength = 0;
 		this.sourceConnections = new Hashtable<AOFigure, Connection>();
 		this.targetConnections = new Hashtable<AOFigure, Connection>();
-
-		this.manager = new GUIManager(this);
 	}
 
 	/**
@@ -145,7 +140,7 @@ public class AOFigure extends AbstractFigure{
 	 */
 	@Override
 	public void paintIC2DFigure(Graphics graphics){
-		
+
 		// Inits
 		Rectangle bounds = this.getBounds().getCopy().resize(-1, -2);
 		// Shadow

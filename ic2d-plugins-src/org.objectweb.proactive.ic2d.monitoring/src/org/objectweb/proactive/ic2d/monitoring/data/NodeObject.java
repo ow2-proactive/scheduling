@@ -208,6 +208,7 @@ public class NodeObject extends AbstractDataObject{
 	@Override
 	public void stopMonitoring(boolean log) {
 		destroySpy();
+		this.vnParent.removeChild(this);
 		super.stopMonitoring(log);
 	}
 
@@ -243,12 +244,12 @@ public class NodeObject extends AbstractDataObject{
 			SpyListenerImpl spyListener = new SpyListenerImpl(spyEventListener);
 			this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener,SPY_LISTENER_NODE);
 			this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] { activeSpyListener }, node);
-		} 
-		catch(NodeException e) { 
+		}
+		catch(NodeException e) {
 			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		}
 		catch(ActiveObjectCreationException e) {
-			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+			Console.getInstance(Activator.CONSOLE_NAME).debug("Cannot create the spy on node " + this.getURL());
 		}
 	}
 

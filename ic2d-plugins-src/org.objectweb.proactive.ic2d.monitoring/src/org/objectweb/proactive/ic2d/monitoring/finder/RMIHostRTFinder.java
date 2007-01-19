@@ -93,14 +93,8 @@ public class RMIHostRTFinder implements HostRTFinder{
 					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
 					runtimes.add(proActiveRuntime);
 				} catch(Exception e) {
-					if(e instanceof ProActiveException) {
-						VMObject vm = (VMObject)host.getChild(names[i]);
-						if(vm == null)
-							console.logException(e);
-						else {
-							console.debug(e);
-							((VMObject)host.getChild(names[i])).notResponding();
-						}
+					if(e instanceof ProActiveException){
+						console.debug("Serial Version UID is incompatible");
 					}
 					else
 						console.logException(e);
