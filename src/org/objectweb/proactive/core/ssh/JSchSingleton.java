@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.ssh;
 
 import java.io.File;
@@ -87,28 +87,40 @@ public class JSchSingleton {
                 InputStream is = new FileInputStream(hostfile);
                 _jsch.setKnownHosts(is);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.fatal("SSH known_hosts, " +
+                    SshParameters.getSshKnownHostsFile() +
+                    ", file cannot be opened, SSH will not work", e);
             }
             try {
                 String keydir = SshParameters.getSshKeyDirectory();
                 logger.debug("read key dir: " + keydir);
                 File parent = new File(keydir);
-                String[] children = parent.list();
-                for (int i = 0; i < children.length; i++) {
-                    String filename = children[i];
-                    if (filename.endsWith(".pub")) {
-                        String privKeyFilename = filename.substring(0,
-                                filename.length() - 4);
-                        File privKeyFile = new File(parent, privKeyFilename);
-                        if (privKeyFile.canRead()) {
-                            try {
-                                logger.debug("adding identity " +
-                                    privKeyFile.getPath());
-                                _jsch.addIdentity(privKeyFile.getPath(), (String)null);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                if (!parent.exists() || !parent.isDirectory()) {
+                    logger.fatal("SSH key_directory, " + keydir +
+                        ", cannot be opened. SSH will not work");
+                } else {
+                    String[] children = parent.list();
+                    for (int i = 0; i < children.length; i++) {
+                        String filename = children[i];
+                        if (filename.endsWith(".pub")) {
+                            String privKeyFilename = filename.substring(0,
+                                    filename.length() - 4);
+                            File privKeyFile = new File(parent, privKeyFilename);
+                            if (privKeyFile.isFile() && privKeyFile.canRead()) {
+                                try {
+                                    logger.debug("adding identity " +
+                                        privKeyFile.getPath());
+                                    _jsch.addIdentity(privKeyFile.getPath(),
+                                        (String) null);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
+                    }
+                    if (_jsch.getIdentityNames().size() == 0) {
+                        logger.info("No SSH private key found in " +
+                            SshParameters.getSshKeyDirectory());
                     }
                 }
             } catch (Exception e) {
