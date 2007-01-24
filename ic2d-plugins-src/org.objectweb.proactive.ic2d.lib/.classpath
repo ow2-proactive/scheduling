@@ -14,7 +14,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/components/SVGGraphics.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/asm.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bouncycastle.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsch.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
@@ -61,9 +60,15 @@
 	<classpathentry exported="true" kind="lib" path="lib/ws/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/xml-apis.jar"/>
 	<classpathentry exported="true" sourcepath="/ProActive" kind="lib" path="ProActive.jar"/>
-	<classpathentry kind="lib" path="lib/jung/colt.jar"/>
-	<classpathentry kind="lib" path="lib/jung/commons-collections-3.2.jar"/>
-	<classpathentry kind="lib" path="lib/jung/concurrent.jar"/>
-	<classpathentry kind="lib" path="lib/jung/jung-1.7.4.jar"/>
+	<classpathentry kind="lib" path="lib/components/asm-2.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/timit/batik-awt-util.jar"/>
+	<classpathentry kind="lib" path="lib/timit/batik-dom.jar"/>
+	<classpathentry kind="lib" path="lib/timit/batik-svggen.jar"/>
+	<classpathentry kind="lib" path="lib/timit/batik-util.jar"/>
+	<classpathentry kind="lib" path="lib/timit/batik-xml.jar"/>
+	<classpathentry kind="lib" path="lib/timit/commons-cli-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/timit/jcommon-1.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/timit/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/timit/jfreechart-1.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
