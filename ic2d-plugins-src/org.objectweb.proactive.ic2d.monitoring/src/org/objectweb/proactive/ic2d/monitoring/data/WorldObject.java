@@ -47,8 +47,6 @@ import org.objectweb.proactive.ic2d.monitoring.Activator;
  */
 public class WorldObject extends AbstractDataObject {
 
-	private static WorldObject instance;
-
 	public static boolean HIDE_P2PNODE_MONITORING = true;
 	public static boolean DEFAULT_ENABLE_AUTO_RESET = false;
 
@@ -109,13 +107,6 @@ public class WorldObject extends AbstractDataObject {
 	//
 	// -- PUBLIC METHODS ---------------------------------------------
 	//
-
-	//TODO It is used by the Job monitoring, so resolve and delete this methode.
-	public static WorldObject getInstance() {
-		if(instance == null)
-			instance = new WorldObject();
-		return instance;
-	}
 
 	@Override
 	public String getKey() {
