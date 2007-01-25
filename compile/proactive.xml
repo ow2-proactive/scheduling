@@ -13,6 +13,7 @@
 	<property name="test.classes.dir" value="${base}/test-classes" />
 	<property name="classlibs.dir" value="${base}/classlibs" />
 	<property name="dist.dir" value="${base}/dist" />
+	<property name="PAdist.dir" value="${dist.dir}/ProActive" />
 	<property name="doc.src" value="${base}/doc-src" />
 	<property name="docs.dir" value="${base}/docs" />
 	<property name="docs.tmp" value="${docs.dir}/tmp" />
@@ -439,9 +440,8 @@
 	<!-- ================================================================ -->
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
-	<target name="proActiveJar" depends="ext,tools, bnb, p2p, calcium" description="Create the ProActive jar, to be used for instance on a distant host">
-		<mkdir dir="${dist.dir}/ProActive" />
-		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
+	<target name="proActiveJar" depends="dist-mk-dir,ext,tools, bnb, p2p, calcium" description="Create the ProActive jar, to be used for instance on a distant host">
+		<jar jarfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/core/descriptor/xml/DescriptorSchema.xsd"/>
 				<include name="${proactive.dir}/**" />
@@ -453,7 +453,7 @@
 
 
 	<!-- ================================================================ -->
-	<!--                    Create ProActiveBundle.jar                    -->
+	<!--                    Create OSGI ProActiveBundle.jar                    -->
 	<!--  =============================================================== -->
 	<target name="proActiveBundle" depends="proActiveJar">
 		<mkdir dir="${bundle.dir}" />
@@ -477,7 +477,7 @@
 
 
 	<!-- ================================================================ -->
-	<!--                  Create helloWorlBundle.jar                      -->
+	<!--                  Create OSGI helloWorlBundle.jar                      -->
 	<!--  =============================================================== -->
 	<target name="helloWorldBundle" depends="proActiveJar">
 		<mkdir dir="${bundle.dir}" />
@@ -493,64 +493,98 @@
 	<!-- ================================================================ -->
 	<!--                  Create  distribution bin                        -->
 	<!--  =============================================================== -->
-	<target name="dist" depends="compile, docs" description="Create the distribution binary">
-		<!-- Create the distribution directory -->
+
+	<target name="dist-mk-dir" description="Make distribution directories">
 		<delete dir="${dist.dir}" />
 		<mkdir dir="${dist.dir}" />
-		<property name="PAdist.dir" value="${dist.dir}/ProActive" />
 		<mkdir dir="${PAdist.dir}" />
-		<antcall target="proActiveJar"/>
-		
-		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**" />
-		<jar jarfile="${PAdist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**" />
+	</target>
+	
+	<target name="dist-cp-files" depends="dist-mk-dir, configurationCopy" 
+		description="Copy files for the release">
 		<!--        copy docs / scripts / src / compile / lib      -->
 		<copy todir="${PAdist.dir}" includeEmptyDirs="no">
 			<fileset dir="${base}">
 				<include name="README.html" />
 				<include name="docs/**" />
+				<include name="doc-src/**" />
 				<include name="scripts/**" />
-				<exclude name="scripts/unix/grid5000/**" />
-				<exclude name="scripts/unix/gridexperiment/**" />
 				<include name="src/org/**" />
 				<include name="compile/**" />
 				<include name="lib/**" />
 				<include name="descriptors/**" />
 				<include name="p2p/**" />
-				<exclude name="p2p/config/inria/**" />
+				<include name="ic2d-plugins-src/**" />
+				
+				<exclude name="p2p/config/**" />
 				<exclude name="**/.svn" />
+				<exclude name="scripts/unix/grid5000/**" />
+				<exclude name="scripts/unix/gridexperiment/**" />
 			</fileset>
 		</copy>		
-		
+		<!-- set right files permissions -->
 		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh" />
 		<chmod file="${PAdist.dir}/compile/build" perm="755" />
-		<!--  create zip version of ProActive without source  -->
-		<zip zipfile="${dist.dir}/ProActive_${version_}.zip">
+	</target>
+	
+	<target name="dist-examples_ic2d-jar" 
+		depends="dist-mk-dir, compile, proActiveJar, dist-cp-files">
+		<!-- Build the examples Jar -->
+		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" 
+			basedir="${classes.dir}" 
+			includes="${proactive.dir}/examples/**" />
+		<!-- Build ic2d (NOT ECLIPSE version) Jar -->
+		<jar jarfile="${PAdist.dir}/ic2d.jar" basedir="${classes.dir}"
+			includes="${proactive.dir}/ic2d/**" />
+	</target>
+		
+	<target name="dist-bin"
+		depends="dist-examples_ic2d-jar"
+		description="Create zip with only jars">
+		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
+		<zip zipfile="${dist.dir}/ProActive-bin-${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="src/**" />
 				<exclude name="compile/**" />
+				<exclude name="doc-src/**" />
+				<exclude name="p2p/**" />
+				<exclude name="docs/**" />
+				<exclude name="README.html" />
+				<exclude name="ic2d-plugins-src/**" />
 			</zipfileset>
 		</zip>
-		<!--  create zip version of ProActive with source   -->
-		<zip zipfile="${dist.dir}/ProActive-src_${version_}.zip">
-			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" />
-		</zip>
-		<!--  create zip version of all ProActive docs    -->
-		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
+	</target>
+	
+	<target name="dist-doc" depends="dist-mk-dir, docs, dist-cp-files"
+		description="Create zip with only doc">
+		<zip zipfile="${dist.dir}/ProActive-doc-${version_}.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs" />
 		</zip>
-		<!--  create zip versions of ProActive Manual    -->
-		<zip zipfile="${dist.dir}/ProActiveManualPdf.zip">
-			<zipfileset dir="${docs.dir}/pdf/" includes="ProActiveManual.pdf" prefix="ProActive/docs/pdf" />
-		</zip>
-		<zip zipfile="${dist.dir}/ProActiveManualMultipleHtml.zip">
-			<zipfileset dir="${docs.dir}/html/" excludes="ProActiveManual.html" prefix="ProActive/docs/html" />
-		</zip>
-		<zip zipfile="${dist.dir}/ProActiveManualSingleHtml.zip">
-			<zipfileset dir="${docs.dir}/html/" includes="**/*" excludes="**/*.html" prefix="ProActive/docs/html" />
-			<zipfileset dir="${docs.dir}/html/" includes="ProActiveManual.html" prefix="ProActive/docs/html" />
+	</target>
+	
+	<target name="dist-src" depends="dist-mk-dir, dist-cp-files"
+		description="Create zip with only sources and libs">
+		<zip zipfile="${dist.dir}/ProActive-src-${version_}.zip">
+			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" >
+				<exclude name="docs/**"/>
+				<exclude name="ProActive_examples.jar" />
+				<exclude name="ic2d.jar" />
+				<exclude name="ProActive.jar" />
+			</zipfileset>
 		</zip>
 	</target>
-
+	
+	<target name="dist-bundle" depends="dist-mk-dir, compile, proActiveJar, dist-examples_ic2d-jar, docs, dist-cp-files"
+		description="Create a zip with everythings">
+		<zip zipfile="${dist.dir}/ProActive-bundle-${version_}.zip">
+			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
+				<exclude name="doc-src/**" />
+			</zipfileset>
+		</zip>
+	</target>
+	
+	<target name="dist" depends="dist-doc, dist-bin, dist-src, dist-bundle" 
+		description="Create zips for release"/>
 
 	<!-- ================================================================ -->
 	<!--        Add Copyright and format source files                     -->
