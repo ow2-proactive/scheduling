@@ -151,6 +151,136 @@
 			</sect3><!-- Monitor a new host -->
 			
 			<sect3>
+				<title>The Monitoring buttons</title>
+				<para>
+					Here the buttons proposed in the monitoring view:
+				</para>
+				
+				<figure id="monitornewhostbutton">
+					<title>Monitor a new host</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/monitorNewHostButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<para>
+					Display the "Monitor a new host" dialog in order to monitor a new host.
+				</para>
+				
+				<figure id="setdepthcontrolbutton">
+					<title>Set depth control</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/SetDepthControlButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<para>
+					Display the "Set Depth Control" dialog in order to change the depth variable.
+					For example: We have 3 hosts: 'A' 'B' and 'C'. And on A there is an active object
+					'aoA' which communicates with another active object 'aoB' which is on B.
+					This one communicates with an active object 'aoC' on C, and aoA don't communicate with aoC.
+					Then if we monitor A, and if the depth is 1, we will not see aoC. 
+				</para>
+				
+				<figure id="settimetorefreshbutton">
+					<title>Set time to refresh</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/SetTimeRefreshButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<para>
+					Display the "Set Time to Refresh" dialog in order to change the time to refresh the model.
+					And find the new added objects.
+				</para>
+				
+				<figure id="refreshbutton">
+					<title>Refresh</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/RefreshButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<para>
+					Refreh the model.
+				</para>
+				
+				<figure id="enablemonitoringbutton">
+					<title>Enable/Disable Monitoring</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/EnableMonitoringButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<para>
+					When the eye is opened the monitoring is activated.
+				</para>
+				
+				<figure id="p2pbutton">
+					<title>Show P2P objects</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/P2PButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<para>
+					Allows to see or not the P2P objects.
+				</para>
+				
+				<figure id="zoominbutton">
+					<title>Zoom In</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/ZoomInButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<figure id="zoomoutbutton">
+					<title>Zoom out</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/ZoomOutButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<figure id="newmonitoringviewbutton">
+					<title>New Monitoring View</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/NewMonitoringViewButton.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<para>
+					Open a new Monitoring view. This button can be used in any perspective. The new created view will be named 'Monitoring#number_of_this_view'
+				</para>
+				
+			</sect3><!-- Monitoring icons -->
+			
+			<sect3>
 				
 				<title>The Virtual Nodes list</title>
 				
@@ -182,19 +312,22 @@
 				</para>
 				<orderedlist>
 					<listitem><para>
+						<emphasis role="bold">Auto Reset</emphasis>: Automatic reset of communications, you can specify the auto reset time
+					</para></listitem>
+					<listitem><para>
 						<emphasis role="bold">Display topology</emphasis>: show/hide communications
 					</para></listitem>
 					<listitem><para>
 						<emphasis role="bold">Proportional</emphasis>: arrows thickness is proportional to the number of requests
 					</para></listitem>
 					<listitem><para>
-						<emphasis role="bold">Ratio</emphasis>: ???
+						<emphasis role="bold">Ratio</emphasis>: arrows thickness uses a ratio of the number of requests
 					</para></listitem>
 					<listitem><para>
-						<emphasis role="bold">Filaire</emphasis>: arrows always have the same thickness whatever the number of communications
+						<emphasis role="bold">Fixed</emphasis>: arrows always have the same thickness whatever the number of communications
 					</para></listitem>
 					<listitem><para>
-						<emphasis role="bold">Reset topology</emphasis>: erase all communications
+						<emphasis role="bold">Topology</emphasis>: show/hide communications, and erase all communications
 					</para></listitem>
 					<listitem><para>
 						<emphasis role="bold">Monitoring enable</emphasis>: listen or not communications between active objects
@@ -204,19 +337,18 @@
 			</sect3><!-- The management of the communications display -->
 			
 			<sect3>
-			<title> Example </title>
-			<para>
-				The <xref linkend="monitoring"/> shows an example where 3 hosts are monitored.
-				The applications running are philosophers
-				and C3D (<xref linkend="C3D_example"/>). 
-			</para>
+				<title> Example </title>
+				<para>
+					The <xref linkend="monitoring"/> shows an example where 3 hosts are monitored.
+					The applications running are philosophers
+					and C3D (<xref linkend="C3D_example"/>). 
+				</para>
 			</sect3>
 		</sect2> <!-- The Monitoring plugin -->
 		
 		<sect2>
 			
 			<title>The Job Monitoring plugin</title>
-			
 			
 			<para>
 				To look at the <emphasis role="bold">tree representation</emphasis>
@@ -240,18 +372,46 @@
 			</figure>
 			
 			<para>
+				Then, select the model that you want to monitor. Each name corresponds to a monitoring view.
+				You can also monitor a new host.
+			</para>
+			
+			<figure id="jobmonitoringbutton">
+				<title>Select the Monitoring model</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="ic2d/images/features/jobMonitoringButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			
+			<figure id="monitoringviews">
+				<title>The monitoring views</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="ic2d/images/features/monitoringadded.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			
+			
+			<para>
 				One can see in the <xref linkend="monitoring"/> an example of a tree representation of some monitored objects.
 			</para>
-
-		<figure id="monitoring">
-			<title>Monitoring of 2 applications</title>
-			<mediaobject>
-				<imageobject>
-					<imagedata
-						fileref="ic2d/images/features/RunMonitoring3.png" format="PNG" />
-				</imageobject>
-			</mediaobject>
-		</figure>
+			
+			<figure id="monitoring">
+				<title>Monitoring of 2 applications</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="ic2d/images/features/RunMonitoring3.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
 			
 		</sect2><!-- The Job Monitoring plugin -->
 		
