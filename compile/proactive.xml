@@ -542,7 +542,7 @@
 		depends="dist-examples_ic2d-jar"
 		description="Create zip with only jars">
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
-		<zip zipfile="${dist.dir}/ProActive-bin-${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-bin_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="src/**" />
 				<exclude name="compile/**" />
@@ -557,14 +557,14 @@
 	
 	<target name="dist-doc" depends="dist-mk-dir, docs, dist-cp-files"
 		description="Create zip with only doc">
-		<zip zipfile="${dist.dir}/ProActive-doc-${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-doc_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs" />
 		</zip>
 	</target>
 	
 	<target name="dist-src" depends="dist-mk-dir, dist-cp-files"
 		description="Create zip with only sources and libs">
-		<zip zipfile="${dist.dir}/ProActive-src-${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-src_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" >
 				<exclude name="docs/**"/>
 				<exclude name="ProActive_examples.jar" />
@@ -576,7 +576,7 @@
 	
 	<target name="dist-bundle" depends="dist-mk-dir, compile, proActiveJar, dist-examples_ic2d-jar, docs, dist-cp-files"
 		description="Create a zip with everythings">
-		<zip zipfile="${dist.dir}/ProActive-bundle-${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-bundle_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="doc-src/**" />
 			</zipfileset>
