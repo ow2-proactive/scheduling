@@ -679,7 +679,7 @@
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
 			<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
 		</javadoc>
-		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive ${version} - IC2D" bottom="&lt;i>Copyright 2001-2006 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
+		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive ${version} - IC2D" bottom="&lt;i>Copyright 2001-2007 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
 			<classpath refid="project.classpath" />
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*" />
 		</javadoc>
