@@ -60,7 +60,6 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
     }
 
     static public ProActiveTypeFactoryImpl instance() {
-
         if (instance == null) {
             instance = new ProActiveTypeFactoryImpl();
         }
@@ -72,14 +71,12 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
      * @see org.objectweb.fractal.api.type.TypeFactory#createFcItfType(String, String, boolean, boolean, boolean)
      */
     public InterfaceType createFcItfType(String name, String signature,
-                                         boolean isClient, boolean isOptional,
-                                         boolean isCollection)
-                                  throws InstantiationException {
+        boolean isClient, boolean isOptional, boolean isCollection)
+        throws InstantiationException {
         return new ProActiveInterfaceTypeImpl(name, signature, isClient,
-                                              isOptional,
-                                              (isCollection
-                                               ? ProActiveTypeFactory.COLLECTION_CARDINALITY
-                                               : ProActiveTypeFactory.SINGLETON_CARDINALITY));
+            isOptional,
+            (isCollection ? ProActiveTypeFactory.COLLECTION_CARDINALITY
+                          : ProActiveTypeFactory.SINGLETON_CARDINALITY));
     }
 
     /*
@@ -90,7 +87,7 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
 
         /*
          * Workaround for null component types.
-         * AOKell and Fractive assumes a component type is non null, whereas Julia envisions
+         * AOKell and ProActive/Fractal assumes a component type is non null, whereas Julia envisions
          * situations where this can be the case. To preserve a kind of
          * compatibility, we bypass null component types with empty arrays of
          * interface types.
@@ -105,10 +102,9 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
      * @see org.objectweb.proactive.core.component.type.ProActiveTypeFactory#createFcItfType(java.lang.String, java.lang.String, boolean, boolean, java.lang.String)
      */
     public InterfaceType createFcItfType(String name, String signature,
-                                         boolean isClient, boolean isOptional,
-                                         String cardinality)
-                                  throws InstantiationException {
+        boolean isClient, boolean isOptional, String cardinality)
+        throws InstantiationException {
         return new ProActiveInterfaceTypeImpl(name, signature, isClient,
-                                              isOptional, cardinality);
+            isOptional, cardinality);
     }
 }
