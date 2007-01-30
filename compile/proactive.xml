@@ -52,6 +52,7 @@
 			<include name="*.jar" />
 			<include name="components/*.jar" />
 		</fileset>
+		<pathelement location="${base}/dev/lib/junit-4.1.jar"/>
 	</path>
 		
 	<path id="project.classpath">
