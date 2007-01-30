@@ -364,6 +364,12 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         try {
             // instantiate the component metaobject factory with parameters of
             // the component
+        	
+            // type must be a component type
+            if (!(type instanceof ComponentType)) {
+                throw new InstantiationException(
+                    "Argument type must be an instance of ComponentType");
+            } 
             ComponentParameters componentParameters = new ComponentParameters((ComponentType) type,
                     controllerDesc);
             if (contentDesc.getFactory() == null) {

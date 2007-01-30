@@ -86,7 +86,18 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
      * @see org.objectweb.fractal.api.type.TypeFactory#createFcType(InterfaceType[])
      */
     public ComponentType createFcType(InterfaceType[] interfaceTypes)
-                               throws InstantiationException {
+        throws InstantiationException {
+
+        /*
+         * Workaround for null component types.
+         * AOKell and Fractive assumes a component type is non null, whereas Julia envisions
+         * situations where this can be the case. To preserve a kind of
+         * compatibility, we bypass null component types with empty arrays of
+         * interface types.
+         */
+        if (interfaceTypes == null) {
+            interfaceTypes = new InterfaceType[] {  };
+        }
         return new ProActiveComponentTypeImpl(interfaceTypes);
     }
 
