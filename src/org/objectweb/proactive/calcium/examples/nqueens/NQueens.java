@@ -59,7 +59,7 @@ public class NQueens implements Serializable{
 		
 		NQueens nq = new NQueens();
 		if(args.length != 5){
-			nq.start(16,13,20,NQueens.class.getResource("LocalDescriptor.xml").getPath(),"local");
+			nq.start(16,13,10,NQueens.class.getResource("LocalDescriptor.xml").getPath(),"local");
 		}
 		else{
 			nq.start(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]), args[3], args[4] );
@@ -86,9 +86,9 @@ public class NQueens implements Serializable{
 		
 		ResourceManager manager= 
 			//new MonoThreadedManager();
-			new MultiThreadedManager(10);
+			//new MultiThreadedManager(10);
 		 	//new ProActiveThreadedManager(descriptor, virtualNode);
-			//new ProActiveManager(descriptor, virtualNode);
+			new ProActiveManager(descriptor, virtualNode);
 
 		Calcium calcium = new Calcium(manager);
 		Monitor monitor= new SimpleLogMonitor(calcium, 5);

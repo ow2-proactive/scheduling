@@ -1,6 +1,7 @@
 package org.objectweb.proactive.ext.scilab.test;
 
 import java.io.Serializable;
+import java.util.Vector;
 
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
@@ -10,6 +11,7 @@ import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.futures.Future;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
@@ -39,7 +41,7 @@ public class SciTestCalcium implements Serializable{
 		this.descriptorPath = descriptorPath;
 	}
 	
-	public void solve(){
+	public void solve() throws Exception{
 		ResourceManager manager= new ProActiveManager(descriptorPath, nameVN);
 		//ResourceManager manager= new MultiThreadedManager(1);
 		
@@ -49,7 +51,7 @@ public class SciTestCalcium implements Serializable{
 
 		
 		SciTask sciTask;
-		
+		Vector<Future<SciTask>> futures= new Vector<Future<SciTask>>(10);
 		for(int i=0; i<10; i++){
 			sciTask = new SciTask("ScilabTask" + i);
 			SciDoubleMatrix sciMatrix = new SciDoubleMatrix("M", 1, 1, new double[]{i});
@@ -57,25 +59,20 @@ public class SciTestCalcium implements Serializable{
 			sciTask.addDataIn(sciMatrix);
 			sciTask.addDataOut(sciMatrix);
 			sciTask.setJob(sciMatrix.getName() + "=" +  sciMatrix.getName() + "* 2;");
-			stream.input(sciTask);
+			futures.add(stream.input(sciTask));
 		}
 		
 		calcium.boot();
 
 		try {
-			SciTask res = stream.getResult();
-			while(res != null){
+			for(Future<SciTask> future:futures){
+				SciTask res = future.get();
 				for(int i=0; i< res.getListDataOut().size(); i++){
 					SciData sciData = (SciData) res.getListDataOut().get(i);
 					System.out.println(sciData.toString());
 				}
-				res = stream.getResult();
 			}
-			
-			
-		} catch (MuscleException e) {
-			e.printStackTrace();
-		} catch (PanicException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		calcium.shutdown();
@@ -83,7 +80,7 @@ public class SciTestCalcium implements Serializable{
 		System.out.println(stats);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception{
 		if(args.length !=2){
 			System.out.println("Invalid number of parameter : " + args.length);
 			return;
