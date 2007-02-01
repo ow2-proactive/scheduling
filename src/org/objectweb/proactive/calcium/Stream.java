@@ -27,15 +27,15 @@
  */
 package org.objectweb.proactive.calcium;
 
-import java.util.Hashtable;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.futures.Future;
+import org.objectweb.proactive.calcium.futures.FutureImpl;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
-import org.objectweb.proactive.calcium.statistics.Stats;
+
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -46,77 +46,50 @@ public class Stream<T>{
 	private int streamId;
 	private Facade facade;
 	private Skeleton<T> skeleton;
-	private int pendingTasks;
+	private int lastPriority;
 	
-	private Hashtable<T, Stats> taskStats;
 	protected Stream(Facade facade,  Skeleton<T> skeleton){
 		
 		this.streamId=(int)(Math.random()*Integer.MAX_VALUE);
 		this.skeleton=skeleton;
 		this.facade=facade;
-		this.taskStats = new Hashtable<T, Stats>();
-		this.pendingTasks=0;
+		this.lastPriority=0;
 	}
 
 	/**
 	 * Inputs a new T to be computed.
 	 * @param param The T to be computed.
+	 * @throws PanicException 
+	 * @throws InterruptedException 
 	 */
-	public void input(T param){
-		Vector<T> paramV= new Vector<T>(1);
-		paramV.add(param);
-		input(paramV);
+	public Future<T> input(T param) throws InterruptedException, PanicException{
+		
+		//Put the parameters in a Task container
+		Task<T> task = new Task<T>(param);
+
+		Vector<Instruction<T>> instructionStack = (Vector<Instruction<T>>) skeleton.getInstructionStack();
+		task.setStack(instructionStack);
+		task.setStreamId(streamId);
+		task.setPriority(lastPriority--);
+		
+		FutureImpl<T> future = new FutureImpl<T>(task.getId());
+		facade.putTask(task, future);
+
+		return (Future<T>)future;
 	}
 	
 	/**
 	 * Inputs a vector of T to be computed.
 	 * @param paramV A vector containing the T.
+	 * @throws PanicException 
+	 * @throws InterruptedException 
 	 */
-	public void input(Vector<T> paramV){
+	public Vector<Future<T>> input(Vector<T> paramV) throws InterruptedException, PanicException{
 		
-		Vector<Instruction<T>> v = (Vector<Instruction<T>>) skeleton.getInstructionStack();
-
-		//Put the parameters in a Task container
-		for(T param:paramV){
-			Task<T> task = new Task<T>(param);
-			task.setStack(v);
-			task.setStreamId(streamId);
-			facade.putTask(task); //add them to the ready queue in the kernel
-			pendingTasks++;
-		}
-	}
-	
-	/**
-	 * This method returns the result of the computation for
-	 * every inputed parameter. If no parameter is yet available
-	 * this method will block. 
-	 * 
-	 * @return The result of the computation on a parameter, or null if there are no more
-	 * parameters being computed.
-	 * @throws PanicException Is thrown if a unrecoverable error takes place inside the framework.
-	 * @throws MuscleException Is thrown if a functional exception happens during the execution
-	 * of the skeleton's muscle.
-	 */
-	@SuppressWarnings("unchecked")
-	public T getResult() throws PanicException, MuscleException{
-		if(pendingTasks==0) return null; //waiting for no results
-	
-		Task<T> task =  (Task<T>) facade.getResult(streamId);
-		T res= task.getObject();
+		Vector<Future<T>> vector= new Vector<Future<T>>(paramV.size());
+		for(T param:paramV)
+			vector.add(input(param));
 		
-		taskStats.put(res,task.getStats());
-		pendingTasks--;
-		
-		return res;
-	}
-
-	/**
-	 * After a T has been computed and obtained through getResult(),
-	 * this method retrieves the statistics for this T.
-	 * @param res The T obtained through getResult().
-	 * @return The statistics of this T, or null if the parameter is unknown.
-	 */
-	public Stats getStats(T res) {
-		return this.taskStats.get(res);
+		return vector;
 	}
 }

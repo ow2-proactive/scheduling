@@ -82,7 +82,7 @@ public class MultiThreadedManager extends ResourceManager{
 			
 			while(task!=null){
 				task = super.interpret(task);
-				skernel.putTask(task);
+				skernel.putProcessedTask(task);
 				task = skernel.getReadyTask(DEFAULT_GET_READY_TASK_TIMEOUT);
 			}
 			return task;

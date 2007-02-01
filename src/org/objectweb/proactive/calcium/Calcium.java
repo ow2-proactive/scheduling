@@ -54,7 +54,7 @@ public class Calcium {
 	
 	public Calcium(ResourceManager manager){
 		this.skernel=new Skernel();
-		this.facade = new Facade(skernel);
+		this.facade = new Facade();
 		this.manager=manager;
 	}
 	
@@ -77,8 +77,9 @@ public class Calcium {
 	}
 
 	public void boot() {
+
 		skernel=manager.boot(skernel);
-		facade.boot(skernel);
+		facade.setSkernel(skernel);
 	}
 
 	public void shutdown() {

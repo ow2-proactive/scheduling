@@ -45,7 +45,7 @@ public class ActiveObjectInterpreter {
 				break;
 			}
 			task=interp.interpret(task);
-			aom.putTask(task);
+			aom.putProcessedTask(task);
 		}
 	}
 }

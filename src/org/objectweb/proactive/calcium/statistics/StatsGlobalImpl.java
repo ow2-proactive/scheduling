@@ -40,15 +40,16 @@ import org.objectweb.proactive.calcium.Task;
  */
 public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 
-	private int processingQueueLength, waitingQueueLength, readyQueueLength, resultsQueueLength;
+	private int processingQueueLength, waitingQueueLength, readyNewQueueLength, readyQueueLength, resultsQueueLength;
 	private int solvedNumberTasks, solvedRootTasks;
 	private long processingTime, waitingTime, readyTime, resultsTime, wallclockTime,computationTime;
 	
 	public StatsGlobalImpl(){
-		solvedNumberTasks=solvedRootTasks=readyQueueLength=0;
+		solvedNumberTasks=solvedRootTasks=readyQueueLength=readyNewQueueLength=0;
 	}
 	
-	public void setQueueLengths(int readyQ, int processingQ, int waitingQ, int resultsQ){
+	public void setQueueLengths(int readQNew,int readyQ, int processingQ, int waitingQ, int resultsQ){
+		this.readyNewQueueLength=readQNew;
 		this.readyQueueLength=readyQ;
 		this.processingQueueLength=processingQ;
 		this.waitingQueueLength=waitingQ;
@@ -75,10 +76,12 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 		String ls=System.getProperty("line.separator");
 		
 		return 
-		"Queue Lengths:  "+readyQueueLength+"R "+processingQueueLength+"P "+waitingQueueLength+"W "+resultsQueueLength+"F"+ls+
+		"Queue Lengths:  "+readyNewQueueLength+"/"+readyQueueLength+"R "+processingQueueLength+"P "+waitingQueueLength+"W "+resultsQueueLength+"F"+ls+
+		/*
 		"Average Times:  "+getAverageReadyTime()+"R "+getAverageProcessingTime()+"P "+
 		getAverageWaitingTime()+"W "+getAverageResultsTime()+"F "+
 		getAverageWallClockTime()+"L "+getAverageComputationTime()+"C [ms]"+ls+
+		*/
 		
 		"Computed Tasks: "+getSolvedNumberOfRootTasks() +"[Root] " + getSolvedNumberOfTasks()+"[Total]";
 	}

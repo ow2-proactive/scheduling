@@ -128,7 +128,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		
 		if(childObjects.size()<=0){
 			String msg="Parameter was divided into less than 1 part.";
-			logger.debug(msg);
+			logger.error(msg);
 			throw new MuscleException(msg);
 		}
 		

@@ -29,6 +29,7 @@ package org.objectweb.proactive.calcium.proactive;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.calcium.Skernel;
+import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
@@ -44,7 +45,6 @@ public class ProActiveManager extends AbstractProActiveManager {
 	
 	public ProActiveManager(String descriptorPath, String virtualNodeName){
 		super(descriptorPath,virtualNodeName);
-
 	}
 	
 	@Override
@@ -60,10 +60,10 @@ public class ProActiveManager extends AbstractProActiveManager {
 		}
 
 		//copy already inputted tasks
-		while(!skernel.hasReadyTask()){
-			aom.putTask(skernel.getReadyTask(0));
+		while(skernel.hasReadyTask()){
+			aom.addReadyTask(skernel.getReadyTask(0));
 		}
-		
+
 		try {
 			if(logger.isDebugEnabled()){
 				logger.debug("Creating Active Object Interpreters");

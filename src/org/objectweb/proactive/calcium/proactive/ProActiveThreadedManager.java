@@ -97,7 +97,7 @@ public class ProActiveThreadedManager extends AbstractProActiveManager {
 				
 				ProActive.waitFor(task); //Wait for the future
 
-				skernel.putTask(task);
+				skernel.putProcessedTask(task);
 
 				task = skernel.getReadyTask(0);
 			}

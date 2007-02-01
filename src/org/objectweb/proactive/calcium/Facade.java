@@ -27,119 +27,98 @@
  */
 package org.objectweb.proactive.calcium;
 
-import java.io.Serializable;
-import java.util.Hashtable;
-import java.util.Vector;
 
+import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.calcium.Skernel;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.futures.FutureImpl;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class provides a Facade access to the kernel.
  * Since the kernel handles tasks for multiple streams at the same
  * time, this class is in charge of redirecting:
  *  -Tasks from streams into the kernel
- *  -Tasks comming from the kernel into their respective streams.
+ *  -Tasks comming out from the kernel into their respective streams.
  *  
  * @author The ProActive Team (mleyton)
  */
-public class Facade {
 
+public class Facade {
+	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
+	
 	private Skernel skernel;
-	private TaskStreamQueue results;
+	private FutureUpdateThread results;
+	private PanicException panic;
 	
-	public Facade(Skernel skernel){
-		this.skernel=skernel;
-		this.results = new TaskStreamQueue();
+	public Facade(){
+		this.skernel=null;
+		this.results=null;
+		this.panic=null;
 	}
 	
-	public synchronized void putTask(Task<?> task){	
-		skernel.putTask(task);
-	}
-	
-	public void boot(Skernel skernel){
-		this.skernel=skernel;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public synchronized <T> Task<T> getResult(int streamId) throws PanicException{
-			
-		//Get new tasks from the skernel
-		try {
-			while(results.isEmpty(streamId)){
-				wait(1000);
-				loadResultsFromSkernel();
-			}
-		} catch (InterruptedException e) {		 
-			e.printStackTrace();
-			return null;
+	public synchronized void putTask(Task<?> task, FutureImpl<?> future)  throws InterruptedException, PanicException{
+		
+		while(skernel==null){
+			wait();
 		}
 		
-		return (Task<T>)results.get(streamId);
+		skernel.addReadyTask(task);
+		results.put(future);
 	}
 	
-	private synchronized void loadResultsFromSkernel() throws PanicException{
-		while(skernel.hasResults()){
-			Task<?> taskResult =  (Task<?>) skernel.getResult();
-
-			//TODO Temporary ProActive generics bug workaround 
-			//This is the supelec trick
-			taskResult=(Task<?>)ProActive.getFutureValue(taskResult);
-			results.put(taskResult);
-		}
+	public synchronized void setSkernel(Skernel skernel){
+		this.skernel=skernel;
+		this.results = new FutureUpdateThread();
+		results.start();
+		notifyAll();
 	}
 
 	/**
-	 * This class stores tasks indexed by a the stream identifier.
-	 * It is used for storing the solved tasks and delivering them
-	 * to the user once they are updated.
+	 * This class stores references to the futures, and updates
+	 * the references once the results are available. 
 	 * 
 	 * @author mleyton
 	 */
-	class TaskStreamQueue implements Serializable{
+	class FutureUpdateThread extends Thread{
 		
-		Hashtable<Integer, Vector<Task<?>>> results;
-		int size;
+		Hashtable<Integer, FutureImpl<?>> pending;
+
 		
-		public TaskStreamQueue(){
-			results = new Hashtable<Integer, Vector<Task<?>>>();
-			size=0;
+		public FutureUpdateThread(){
+			pending = new Hashtable<Integer, FutureImpl<?>>();
+
 		}
 		
 		/**
-		 * Stores a task in the queue.
+		 * Stores a future in the strucutre.
 		 * The stream id must be stored inside the task before storing it.
 		 * @param task The task to store.
 		 */
-		public synchronized void put(Task<?> task){
-			int streamId=task.getStreamId();
+		public synchronized void put(FutureImpl<?> future){
+			int taskId=future.getTaskId();
 
-			if(!results.containsKey(streamId)){
-				results.put(streamId, new Vector<Task<?>>());
+			if(pending.containsKey(taskId)){
+				logger.error("Future already registered for task="+taskId);
+				return;
 			}
 			
-			Vector<Task<?>> vector=results.get(streamId);
-			
-			vector.add(task);
-			size++;
+			pending.put(taskId, future);
 		}
 		
-		/**
-		 * Retrieves a task stored in this queue. The
-		 * task retrieved correspons to the oldest one for
-		 * the specified stream id.
-		 * @param streamId The stream id that will be retrieved.
-		 * @return A task or null if no tasks are available for this stream.
-		 */
-		public synchronized Task<?> get(int streamId){
-			if(isEmpty(streamId)) return null;
-			 
-			Vector<Task<?>> vector=results.get(streamId);
-			if(vector.size()==0) return null;
-			if(vector.size()==1) results.remove(streamId);
-			size--;
-			return vector.remove(0);
+		public synchronized void updateFuture(Task<?> task){
+						 
+			if(!pending.containsKey(task.getId())){
+				logger.error("No future is waiting for task:"+task.getId());
+				return;
+			}
+			
+			FutureImpl<?> future=pending.remove(task.getId());
+			future.setFinishedTask(task);
 		}
 		
 		/**
@@ -149,25 +128,36 @@ public class Facade {
 		 * @return True if there is a task available, false otherwise.
 		 */
 		public synchronized boolean isEmpty(int streamId){
-			return !results.containsKey(streamId);
+			return !pending.containsKey(streamId);
 		}
 		
 		/**
-		 * @return The number of total elements on this queue.
+		 * @return The number of total elements on this structure.
 		 */
 		public synchronized int size(){
-			return size;
+			return pending.size();
 		}
 		
-		/**
-		 * 
-		 * @param streamId The stream we whant to get.
-		 * @return The number of elements in this queue for the given stream.
-		 */
-		public synchronized int size(int streamId){
-			if(isEmpty(streamId)) return 0;
-			Vector<Task<?>> vector=results.get(streamId);
-			return vector.size();
+		public void run(){
+			//TODO add terminatino condition
+			while(panic==null){
+				Task<?> taskResult=null;
+				try{
+					taskResult=  (Task<?>) skernel.getResult();
+				}catch(PanicException ex){
+					//logger.error("Facade has encounterd skernel panic! Stopping future update thread");
+					ex.printStackTrace();
+					panic=ex;
+					//TODO update all the remaining future with the panic exception
+					return;
+				}
+				
+				
+				//TODO Temporary ProActive generics bug workaround 
+				//This is the supelec trick
+				taskResult=(Task<?>)ProActive.getFutureValue(taskResult);
+				results.updateFuture(taskResult);
+			}
 		}
 	}
 }

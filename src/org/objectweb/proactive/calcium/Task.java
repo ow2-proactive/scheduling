@@ -279,7 +279,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	 * @param child The sub task.
 	 */
 	public synchronized void addReadyChild(Task<T> child){
-		child.setPriority(getPriority()+1);
+		child.setPriority(getPriority()+1); //child has better priority than parent
 		child.setParent(getId());
 		child.setFamily(getFamilyId());
 		this.childrenReady.add(child);

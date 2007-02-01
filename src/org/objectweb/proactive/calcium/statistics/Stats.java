@@ -53,7 +53,7 @@ public interface Stats extends Serializable{
 	public long getComputationTime();
 	
 	/**
-	 * The processing time represents the time this node was asigned to some
+	 * The processing time represents the time this task was asigned to some
 	 * resource for computation. This time includes the time the node took to
 	 * travel through the network.
 	 * @return Returns the time spent by this node in processing state.
@@ -61,19 +61,19 @@ public interface Stats extends Serializable{
 	public long getProcessingTime();
 
 	/**
-	 * The waiting time represent the time this node spent waiting for other
+	 * The waiting time represent the time this task spent waiting for other
 	 * related nodes to finish. In particular for sub-nodes spawned from this one.
 	 * @return Returns the time this node spent in waiting state.
 	 */
 	public long getWaitingTime();
 	
 	/**
-	 * The ready time represents the time this node was ready for execution waiting
+	 * The ready time represents the time this task was ready for execution waiting
 	 * for an available resource.
 	 * @return Returns the time spent by this node in ready state.
 	 */
 	public long getReadyTime();
-	
+		
 	/**
 	 * The results time represents the time since the task is considered finished,
 	 * and the time the client actually asks (and gets) the result.

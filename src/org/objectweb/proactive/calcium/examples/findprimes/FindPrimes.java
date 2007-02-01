@@ -28,12 +28,15 @@
 package org.objectweb.proactive.calcium.examples.findprimes;
 
 import java.io.Serializable;
+import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.Stream;
+import org.objectweb.proactive.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.futures.Future;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.proactive.ProActiveThreadedManager;
 import org.objectweb.proactive.calcium.skeletons.DaC;
@@ -45,7 +48,7 @@ public class FindPrimes implements Serializable{
 	public Skeleton<Challenge> root;
 
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException, PanicException {
 		
 		FindPrimes st = new FindPrimes();
 		st.solve();
@@ -59,7 +62,7 @@ public class FindPrimes implements Serializable{
 				new ConquerChallenge());
 	}
 	
-	public void solve(){
+	public void solve() throws InterruptedException, PanicException{
 
 		String descriptor=
 				FindPrimes.class.getResource("LocalDescriptor.xml")
@@ -75,25 +78,23 @@ public class FindPrimes implements Serializable{
 		
 		Stream<Challenge> stream = calcium.newStream(root);
 		
-		stream.input(new Challenge(1,6400,300));
-		stream.input(new Challenge(1,100,20));
-		stream.input(new Challenge(1,640,64));
+		Vector<Future<Challenge>> futures = new Vector<Future<Challenge>>(3);
+		futures.add(stream.input(new Challenge(1,6400,300)));
+		futures.add(stream.input(new Challenge(1,100,20)));
+		futures.add(stream.input(new Challenge(1,640,64)));
 		
 		calcium.boot();
 		
 		try {
-			for(Challenge res = stream.getResult(); 
-			res != null; res = stream.getResult()){
-				
+			for(Future<Challenge> future:futures){
+				Challenge res=future.get();		
 				for(Integer i: res.primes){
 					System.out.print(i+" ");
 				}
 				System.out.println();
-				System.out.println(stream.getStats(res));
+				System.out.println(future.getStats());
 			}
 		} catch (MuscleException e) {
-			e.printStackTrace();
-		} catch (PanicException e) {
 			e.printStackTrace();
 		} catch (Exception e){
 			e.printStackTrace();

@@ -28,6 +28,7 @@
 package org.objectweb.proactive.calcium;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.PriorityQueue;
@@ -55,7 +56,8 @@ public class Skernel implements Serializable{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
 	
 	//State Queues
-	private PriorityQueue<Task<?>> ready; //Tasks ready for execution
+	private ReadyQueue ready; //Tasks ready for execution
+		
 	private Hashtable<Task<?>,Task<?>> waiting; //Tasks waiting for subtasks completition
 	private Vector<Task<?>> results; //Finished root-tasks
 	private Hashtable<Task<?>,Task<?>> processing; //Tasks being processed at this moment
@@ -64,7 +66,7 @@ public class Skernel implements Serializable{
 	private StatsGlobalImpl stats; 	//Statistics
 	
 	public Skernel(){
-		this.ready= new PriorityQueue<Task<?>>();
+		this.ready= new ReadyQueue();
 		this.waiting=new Hashtable<Task<?>,Task<?>>();
 		this.results = new Vector<Task<?>>();
 		this.processing=new Hashtable<Task<?>,Task<?>>();
@@ -96,18 +98,9 @@ public class Skernel implements Serializable{
 		
 		stats.increaseSolvedTasks(resultTask);
 		
-		if(resultTask.hasException()){
-			//Only runtime exception can be found here
-			throw (RuntimeException)resultTask.getException(); 
-		}
-		
 		return resultTask;
 	}
-/*
-	public synchronized Task<?> getReadyTask(){
-		return getReadyTask(0);
-	}
-	*/
+
 	/**
 	 * This method is gets a task ready for execution.
 	 * If there are no ready tasks, then this method can do two things:
@@ -151,18 +144,38 @@ public class Skernel implements Serializable{
 		return task;
 	}
 	
-	public synchronized void putTask(Task<?> task){
-		
-		//TODO think about throwing an exception here!
+	
+	/**
+	 * Adds new root tasks to the task pool
+	 * @param task The root task that will be added
+	 */
+	public synchronized void addReadyTask(Task<?> task){
+		//TODO uncomment this !
 		//if(isPaniqued()) throw panicException;
 		
-		Task<?> processingTask=processing.remove(task);
-		if(processingTask==null && logger.isDebugEnabled()){
-			logger.debug("Enqueing new taskId="+task);
-		} else if( logger.isDebugEnabled()){
-			logger.debug("Updating taskId="+task);
+		if(processing.contains(task) || ready.contains(task)) {
+			logger.error("Dropping duplicated taskId="+task.getId());
 		}
 		
+		if(logger.isDebugEnabled()){
+			logger.debug("Enqueing new root taskId="+task);
+		}
+		
+		ready.addRoot(task);
+		notifyAll();
+	}
+	
+	public synchronized void putProcessedTask(Task<?> task) {
+		
+		Task<?> processingTask=processing.remove(task);
+		if(processingTask==null){
+			logger.error("Dropping Task, since it was not being processed taskId="+task);
+		} 
+		
+		if(logger.isDebugEnabled()){
+			logger.debug("Updating taskId="+task);
+		}
+
 		//The task can be tainted by exceptions on other family members
 		if(processingTask!=null && processingTask.isTainted()){
 			if(logger.isDebugEnabled()){
@@ -250,6 +263,7 @@ public class Skernel implements Serializable{
 				logger.debug("Adding to results task="+task);
 			}
 			results.add(task);
+			notifyAll();
 		}
 		else{ //task is a subtask
 			stats.increaseSolvedTasks(task);
@@ -276,7 +290,7 @@ public class Skernel implements Serializable{
 					logger.error("Error, parent not waiting when it should have been.");
 				}
 				parent.getStats().exitWaitingState();
-				ready.add(parent);
+				ready.addSubs(parent);
 			}
 		}
 	}//if its a child task, we update it as a finished task
@@ -290,7 +304,7 @@ public class Skernel implements Serializable{
 				if(logger.isDebugEnabled()){
 					logger.debug("Child taskId="+child.getId() +" is ready");
 				}
-				ready.add(child); //child will have more priority than uncles
+				ready.addSubs(child); //child will have more priority than uncles
 			}
 			if(logger.isDebugEnabled()){
 				logger.debug("Parent Task taskId="+task.getId() +" is waiting");
@@ -298,20 +312,9 @@ public class Skernel implements Serializable{
 			waiting.put(task,task); //the parent task will wait for it's subtasks
 			return;
 		}
-		else{
-			if(logger.isDebugEnabled()){
-				logger.debug("Task taskId="+task.getId() +" is ready");
-			}
-			ready.add(task);
-		}
+		
 	}//method
 	
-	/*
-	public synchronized boolean isFinished(){
-
-		return ready.isEmpty() && processing.isEmpty();
-	} 
-    */
 	public synchronized boolean hasResults(){
 		return !results.isEmpty();
 	}
@@ -325,7 +328,7 @@ public class Skernel implements Serializable{
 	}
 	
 	public synchronized StatsGlobalImpl getStatsGlobal() {
-		stats.setQueueLengths(ready.size(), processing.size(), 
+		stats.setQueueLengths(ready.newRoots.size(),ready.old.size(), processing.size(), 
 								waiting.size(), results.size());
 		return stats;
 	}
@@ -344,12 +347,7 @@ public class Skernel implements Serializable{
 		}
 		
 		//2. Delete ready family tasks
-		for(Task<?> task:ready){
-			if(task.getFamilyId()==blackSheepTask.getFamilyId()){
-				ready.remove(task);
-				task.getStats().exitReadyState();
-			}
-		}
+		ready.deleteFamily(blackSheepTask);
 		
 		//3. Delete waiting family tasks
 		Enumeration<Task<?>> enumeration = waiting.elements();
@@ -401,22 +399,11 @@ public class Skernel implements Serializable{
 					+task.getFamilyId()+" found in processing queue");
 		}
 		
-		for(Task<?> r:ready){
-			if(r.getId()==task.getFamilyId()){
-				throw new PanicException("Error, root taskId="
-						+task.getFamilyId()+" found in ready queue");
-			}
+		if(ready.contains(task.getFamilyId())){
+			throw new PanicException("Error, root taskId="
+					+task.getFamilyId()+" found in ready queue");
 		}
-		
-		/*
-		for(Task<?> r:results){
-			if(r.getId()==task.getFamilyId()){
-				throw new PanicException("Error, root taskId="
-						+task.getFamilyId()+" found in results queue");
-			}	
-		}
-		*/
-		
+
 		return null;
 	}
 	
@@ -425,5 +412,58 @@ public class Skernel implements Serializable{
 		this.panicException=e;
 		
 		notifyAll();
+	}
+	
+	class ReadyQueue implements Serializable{
+		
+		PriorityQueue<Task<?>> newRoots, old;
+		
+		public ReadyQueue(){
+			newRoots = new PriorityQueue<Task<?>> ();
+			old = new PriorityQueue<Task<?>> ();
+		}
+
+		public boolean remove(Task<?> task) {
+			return newRoots.remove(task) || old.remove(task);
+		}
+
+		public int size() {
+			return newRoots.size()+old.size();
+		}
+
+		public void addRoot(Task<?> task){
+			newRoots.add(task);
+		}
+		
+		public void addSubs(Task<?> task) {
+			old.add(task);
+		}
+
+		public boolean contains(Task<?> task) {
+			return newRoots.contains(task) || old.contains(task);
+		}
+
+		public boolean contains(int taskId) {
+			return newRoots.contains(taskId) || old.contains(taskId);
+		}
+		
+		public Task<?> poll() {
+			if(!old.isEmpty()) return old.poll();
+			return newRoots.poll();
+		}
+
+		public boolean isEmpty() {
+			return newRoots.isEmpty() && old.isEmpty();
+		}
+		
+		public void deleteFamily(Task<?> blackSheep){
+					
+			for(Task<?> task:old){
+				if(task.getFamilyId()==blackSheep.getFamilyId()){
+					old.remove(task);
+					task.getStats().exitReadyState();
+				}
+			}
+		}
 	}
 }//class

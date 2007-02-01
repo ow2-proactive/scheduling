@@ -46,7 +46,7 @@ public class ActiveObjectSkernel<T> extends Skernel implements RunActive, Serial
 		super();
 		
 		while(skernel.getReadyQueueLength() >0){
-			this.putTask(skernel.getReadyTask(0));
+			this.addReadyTask(skernel.getReadyTask(0));
 		}
 	}
 
@@ -55,7 +55,7 @@ public class ActiveObjectSkernel<T> extends Skernel implements RunActive, Serial
 		Service service = new Service(body);
 		
 		while(true){
-			String allowedMethodNames="getStats|putTask|getReadyQueueLength|hasResults|isFinished|isPaniqued|getStatsGlobal";
+			String allowedMethodNames="getStats|addReadyTask|putProcessedTask|getReadyQueueLength|hasResults|isFinished|isPaniqued|getStatsGlobal";
 			
 			if(getReadyQueueLength() > 0 ) allowedMethodNames +="getReadyTask|";
 			if(hasResults()) allowedMethodNames += "getResult|";

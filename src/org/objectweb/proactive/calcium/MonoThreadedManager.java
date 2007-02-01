@@ -46,7 +46,7 @@ public class MonoThreadedManager extends ResourceManager{
 		while(skernel.hasReadyTask()){
 			Task<?> task=skernel.getReadyTask(0); //get a new task ready for execution
 			task=interp.interpret(task); 		 //interpreter this new task
-			skernel.putTask(task);				 //return the interpreter result to the kernel
+			skernel.putProcessedTask(task);				 //return the interpreter result to the kernel
 		}
 		
 		return skernel;

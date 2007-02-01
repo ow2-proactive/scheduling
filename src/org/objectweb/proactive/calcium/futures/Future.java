@@ -25,45 +25,19 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.skeletons;
+package org.objectweb.proactive.calcium.futures;
 
-import org.objectweb.proactive.calcium.Task;
-import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.calcium.interfaces.Conquer;
-import org.objectweb.proactive.calcium.interfaces.Divide;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
+import org.objectweb.proactive.calcium.statistics.Stats;
 
-/**
- * Map is only a special case of Divide and Conquer, and therfore
- * represents data parallelism.
- * 
- * A taks is Divided once into subtaks (without evaluating a condition),
- * the subtasks are then executed using the child skeleton, and then the 
- * results are conquered using the Conquer object.
- * 
- * @author The ProActive Team (mleyton)
- *
- */
-public class Map<T> extends DaC<T> {
+public interface Future<T>{
+
+	//public boolean cancel(boolean mayInterruptIfRunning);
+	//public boolean isCancelled();
+	public boolean isDone();
+	//public T get(long timeout, TimeUnit unit) throws InterruptedException, MuscleException, TimeoutException;
+	public T get() throws InterruptedException, MuscleException;
 	
-	public Map(Divide<T> div, Skeleton<T> child, Conquer<T> conq){
-		
-		super(div, null,child,conq);
-	}
-	
-	//Override parent method to avoid using the condition
-	public Task<T> compute(Task<T> t) throws EnvironmentException {
-		
-		//Split the task if not already splitted
-		if(!t.hasFinishedChild()){
-			return divide(t);
-		}
-		
-		//else conquer the subtask
-		return conquer(t);
-	}
-
-	public String toString(){
-		return "Map";
-	}
+	public Stats getStats() throws InterruptedException;
+	//public Stats getStatus();
 }

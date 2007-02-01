@@ -41,6 +41,7 @@ import org.objectweb.proactive.calcium.skeletons.DaC;
 import org.objectweb.proactive.calcium.skeletons.Pipe;
 import org.objectweb.proactive.calcium.skeletons.Seq;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
+import org.objectweb.proactive.calcium.futures.Future;
 
 
 public class Blast {
@@ -71,7 +72,7 @@ public class Blast {
         			
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
     	BlastParameters param = new BlastParameters(
     			new File("/tmp/blast.query"), 
     			new File("/tmp/blast.db"), true, 100*1024);
@@ -80,7 +81,7 @@ public class Blast {
         blast.start(param);
     }
 
-    private void start(BlastParameters parameters) {
+    private void start(BlastParameters parameters) throws InterruptedException, PanicException {
         String descriptor = NQueens.class.getResource("LocalDescriptor.xml")
                                          .getPath();
 
@@ -93,18 +94,15 @@ public class Blast {
 
         Calcium calcium = new Calcium(manager);
         Stream<BlastParameters> stream = calcium.newStream(root);
-        stream.input(parameters);
+        Future<BlastParameters> future=stream.input(parameters);
         calcium.boot();
 
 		try {
-			for(BlastParameters res = stream.getResult(); 	res != null; res = stream.getResult()){
-				File outPutFile=res.getOutPutFile();
-				System.out.println("Result in:"+outPutFile.getAbsolutePath()+ +outPutFile.length() + " [bytes]");
-				System.out.println(stream.getStats(res));
-			}
+			BlastParameters res= future.get();
+			File outPutFile=res.getOutPutFile();
+			System.out.println("Result in:"+outPutFile.getAbsolutePath()+ +outPutFile.length() + " [bytes]");
+			System.out.println(future.getStats());
 		} catch (MuscleException e) {
-			e.printStackTrace();
-		} catch (PanicException e) {
 			e.printStackTrace();
 		}
         
