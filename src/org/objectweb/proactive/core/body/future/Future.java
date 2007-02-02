@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.UniqueID;
  * An object implementing this interface if a place holder object for an upcomming result yet
  * to come.
  * </p><p>
- * <b>see <a href="../../../doc-files/FutureObjectCreation.html">active object creation doumentation</a></b>
+ * <b>see <a href="../../../../html/ActiveObjectCreation.html#FutureObjectCreation">active object creation doumentation</a></b>
  * </p>
  *
  * @author  ProActive Team

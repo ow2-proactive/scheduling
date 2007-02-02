@@ -113,7 +113,7 @@ import ibis.rmi.RemoteException;
  * Provides static methods to manipulate or use Active Objects(creation, exception handling, migration,...), futures,
  * deployment descritpors, components, groups.
  * This class is the central point of the library.
- * <p><a href="doc-files/ActiveObjectCreation.html">Active Object Creation</a>
+ * <p><a href="../../../../html/ActiveObjectCreation.html">Active Object Creation</a>
  * <pre>
  * newActive(...)
  * turnActive(...)
@@ -130,7 +130,7 @@ import ibis.rmi.RemoteException;
  * setImmediateService(...)
  * </pre>
  * </p>
- * <p><a href="doc-files/FutureObjectCreation.html">Synchronization, Futures</a>
+ * <p><a href="../../../../html/ActiveObjectCreation.html#FutureObjectCreation">Synchronization, Futures</a>
  * <pre>
  * isAwaited(Object)
  * waitFor(Object)
@@ -145,22 +145,22 @@ import ibis.rmi.RemoteException;
  * isException(Object)
  * </pre>
  * </p>
- * <p><a href="doc-files/TypedGroupCommunication.html">Groups Creation</a>
+ * <p><a href="../../../../html/TypedGroupCommunication.html">Groups Creation</a>
  * <pre>
  * newActiveAsGroup(...)
  * </pre>
  * </p>
- * <p><a href="doc-files/components/intro.html">Components</a>
+ * <p><a href="../../../../html/components/intro.html">Components</a>
  * <pre>
  * newActiveComponent(...)
  * </pre>
  * </p>
- * <p><a href="doc-files/Descriptor.html">XML Descritpors</a>
+ * <p><a href="../../../../html/XML_Descriptors.html">XML Descritpors</a>
  * <pre>
  * getProactiveDescriptor(String)
  * </pre>
  * </p>
- * <p><a href="doc-files/exceptions.html">Non Functionnal Exceptions</a>
+ * <p><a href="../../../../html/exceptions.html">Non Functionnal Exceptions</a>
  * <pre>
  * addNFEListenerOnAO(Object, NFEListener)
  * addNFEListenerOnJVM(NFEListener)
@@ -170,7 +170,7 @@ import ibis.rmi.RemoteException;
  * removeNFEListenerOnProxy(Object, NFEListener)
  * </pre>
  * </p>
- * <p><a href="doc-files/exceptions.html">Functionnal Exceptions</a>
+ * <p><a href="../../../../html/exceptions.html">Functionnal Exceptions</a>
  * <pre>
  * tryWithCatch(Class)
  * removeTryWithCatch()
@@ -178,13 +178,13 @@ import ibis.rmi.RemoteException;
  * throwArrivedException()
  * </pre>
  * </p>
- * <p><a href="doc-files/AC.html">Automatic Continuations</a>
+ * <p><a href="../../../../html/ActiveObjectCreation.html#AC">Automatic Continuations</a>
  * <pre>
  * enableAC(Object)
  * disableAC(Object)
  * </pre>
  * </p>
- * <p><a href="doc-files/WSDoc.html">Web Services</a>
+ * <p><a href="../../../../html/WSDoc.html">Web Services</a>
  * <pre>
  * exposeAsWebService(Object, String, String, String[])
  * exposeComponentAsWebService(Component, String, String)

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.ProActiveException;
  *
  * An exception thrown when a problem occurs during the creation of an ActiveObject
  * </p><p>
- * <b>see <a href="doc-files/ActiveObjectCreation.html">active object creation documentation</a></b>
+ * <b>see <a href="../../../../html/ActiveObjectCreation.html">active object creation documentation</a></b>
  * </p>
  *
  * @author  ProActive Team
