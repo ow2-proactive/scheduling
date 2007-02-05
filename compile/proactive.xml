@@ -18,10 +18,11 @@
 	<property name="docs.dir" value="${base}/docs" />
 	<property name="docs.tmp" value="${docs.dir}/tmp" />
 	<property name="docs.mainFile" value="PA_index.xml" />
+	<property name="dev.dir" value="${base}/dev" />
 
 	<property name="name" value="ProActive" />
-	<property name="version" value="3.2" />
-	<property name="version_" value="3_2" />
+	<property name="version" value="$$%%ProActiveVersion%%$$" />
+	<property name="version_" value="$$%%ProActiveUnderscoreVersion%%$$" />
 	<property name="debug" value="on" />
 	<property name="source" value="1.5" />
 	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/" />
@@ -592,10 +593,21 @@
 	<!--  =============================================================== -->
 	<target name="copyright_format" depends="copyright, format" />
 
-	<target name="copyright" depends="util">
-		<java classname="util.AddCopyright" fork="true">
+	<!-- ================================================================ -->
+	<!--        Update Copyright and Version in every text files          -->
+	<!--  =============================================================== -->
+	<target name="update_copyright_and_version" depends="util">
+		<java classname="util.UpdateCopyrightAndVersion" fork="true">
 			<classpath refid="project.classpath" />
-			<arg value="${src.dir}/org/objectweb/proactive" />
+			<!--  base dir -->
+			<arg value="${base}" />
+			<!--  exclude dirs -->
+			<arg value="${docs.dir}" />
+			<arg value="${dist.dir}" />
+			<arg value="${classes.dir}" />
+			<arg value="${test-classes.dir}" />
+			<arg value="${lib}" />
+			<arg value="${dev.dir}" />
 		</java>
 	</target>
 
@@ -676,7 +688,7 @@
 			<classpath refid="project.classpath" />
 			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 			<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright 2001-2007 INRIA All Rights Reserved.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright $$%%CopyrightYears%%$$ INRIA All Rights Reserved.</i>]]></bottom>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
 			<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
 			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
@@ -693,8 +705,10 @@
 			<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
 			<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
 		</javadoc>
-		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive ${version} - IC2D" bottom="&lt;i>Copyright 2001-2007 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
+		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API"  breakiterator="yes">
 			<classpath refid="project.classpath" />
+			<doctitle><![CDATA[ProActive ${version} - IC2D]]></doctitle>
+			<bottom><![CDATA[<i>Copyright $$%%CopyrightYears%%$$ INRIA All Rights Reserved.</i>]]></bottom>
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*" />
 		</javadoc>
 

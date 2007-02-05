@@ -13,14 +13,14 @@
     <corpauthor/>
 
     <copyright>
-      <year>2001-2007</year>
+      <year>$$%%CopyrightYears%%$$</year>
       <holder>INRIA</holder>
     </copyright>
 
     <legalnotice id="LegalNotice">
       <para>ProActive is a GRID Java middleware, with source code under <ulink
       url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>.
-      </para><para>Copyright INRIA 2001-2007.</para>
+      </para><para>Copyright INRIA $$%%CopyrightYears%%$$.</para>
     </legalnotice>
 
     <mediaobject>
