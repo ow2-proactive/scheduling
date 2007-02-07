@@ -428,28 +428,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public ProActiveSecurityManager getProActiveSecurityManager()
-        throws java.io.IOException, SecurityNotAvailableException {
-        try {
-            enterInThreadStore();
-            if (isSecurityOn) {
-                if (internalBodySecurity.isLocalBody()) {
-                    //	System.out.println("getProActiveSecurityManager on demande un security manager a " + ProActive.getBodyOnThis());
-                    // if (psm == null) {
-                    //    startDefaultProActiveSecurityManager();
-                    // }
-                    return psm;
-                } else {
-                    //ProActiveSecurityManager plop = internalBodySecurity.getProActiveSecurityManager();
-                    //return plop;
-                    return null;
-                }
-            } else {
-                throw new SecurityNotAvailableException();
-            }
-        } finally {
-            exitFromThreadStore();
-        }
+    public ProActiveSecurityManager getProActiveSecurityManager() {
+    	if (isSecurityOn && internalBodySecurity.isLocalBody()) {
+    		return psm;
+    	}
+
+    	return null;
     }
 
     public ProActiveSPMDGroupManager getProActiveSPMDGroupManager() {

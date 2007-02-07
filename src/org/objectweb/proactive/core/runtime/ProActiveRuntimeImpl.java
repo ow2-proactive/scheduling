@@ -589,18 +589,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         Body localBody = (Body) bodyConstructorCall.execute();
 
         // SECURITY
-        try {
-            ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody).getProActiveSecurityManager();
+        ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody).getProActiveSecurityManager();
 
-            if (objectSecurityManager != null) {
-                ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName).getSecurityManager();
-                objectSecurityManager.setParent(nodeSecurityManager);
-            }
-        } catch (SecurityNotAvailableException e) {
-            // well nothing to do
-        } catch (IOException e) {
-            // should never happen normally
-            e.printStackTrace();
+        if (objectSecurityManager != null) {
+            ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName).getSecurityManager();
+            objectSecurityManager.setParent(nodeSecurityManager);
         }
 
         ProActiveLogger.getLogger(Loggers.RUNTIME).debug("nodeName " +
@@ -629,15 +622,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String, Body)
      */
     public UniversalBody receiveBody(String nodeName, Body body) {
-        try {
-            ((AbstractBody) body).getProActiveSecurityManager()
-             .setParent(this.nodeMap.get(nodeName).getSecurityManager());
-        } catch (SecurityNotAvailableException e) {
-            // an exception here means that the body and its associated application
-            // have not been started with a security policy
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    	ProActiveSecurityManager psm = ((AbstractBody) body).getProActiveSecurityManager();
+    	if (psm != null) {
+    		psm.setParent(this.nodeMap.get(nodeName).getSecurityManager());
+    	}
 
         registerBody(nodeName, body);
 

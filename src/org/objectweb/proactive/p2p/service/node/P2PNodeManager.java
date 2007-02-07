@@ -275,16 +275,12 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private Node createNewNode()
         throws NodeException, ProActiveException, AlreadyBoundException {
         // security 
+    	ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
         ProActiveSecurityManager newNodeSecurityManager = null;
-
-        try {
-            newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
-                                      .generateSiblingCertificate(P2PConstants.VN_NAME);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SecurityNotAvailableException e) {
-            // well nothing to do except maybe log it
-            ProActiveLogger.getLogger(Loggers.SECURITY_NODE).debug("Node created without security manager");
+        if (psm != null) {
+        	newNodeSecurityManager = psm.generateSiblingCertificate(P2PConstants.VN_NAME);
+        } else {
+        	ProActiveLogger.getLogger(Loggers.SECURITY_NODE).debug("Node created without security manager");
         }
 
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +

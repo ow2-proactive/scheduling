@@ -244,12 +244,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                         creatorID);
                 if ((bodiesToContinue != null) &&
                         (bodiesToContinue.size() != 0)) {
-                    ProActiveSecurityManager psm = null;
-                    try {
-                        psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
-                    } catch (SecurityNotAvailableException e) {
-                        psm = null;
-                    }
+                    ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
                     
                     // lazy creation of the AC thread
                     if (this.queueAC==null){

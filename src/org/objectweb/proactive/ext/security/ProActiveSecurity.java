@@ -528,14 +528,12 @@ public class ProActiveSecurity {
     }
 
     public static X509Certificate getMyCertificate() {
-        try {
-            return ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
-                    .getCertificate();
-        } catch (SecurityNotAvailableException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
+    	ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+    	if (psm != null) {
+    		return psm.getCertificate();
         }
+    	
+    	return null;
     }
 
     public static X509Certificate[] getMyCertificateChain() {

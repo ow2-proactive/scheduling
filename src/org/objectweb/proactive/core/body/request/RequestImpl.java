@@ -269,14 +269,7 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     protected Reply createReply(Body targetBody, FutureResult result) {
-        ProActiveSecurityManager psm = null;
-        try {
-            psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        } catch (SecurityNotAvailableException e) {
-            // do nothing
-        }
+        ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
 
         return new ReplyImpl(targetBody.getID(), sequenceNumber, methodName,
             result, psm);
@@ -325,11 +318,9 @@ public class RequestImpl extends MessageImpl implements Request,
 
     protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException {
-        try {
-            this.crypt(((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager(),
-                destinationBody);
-        } catch (SecurityNotAvailableException e) {
-            //todo remove SecurityNotAvalaible e.printStackTrace();
+    	ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+    	if (psm != null) {
+            this.crypt(psm, destinationBody);
         }
 
         int ftres = FTManager.NON_FT;
