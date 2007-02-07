@@ -589,9 +589,9 @@
 		description="Create zips for release"/>
 
 	<!-- ================================================================ -->
-	<!--        Add Copyright and format source files                     -->
+	<!--        Same as below + format source files                       -->
 	<!--  =============================================================== -->
-	<target name="copyright_format" depends="copyright, format" />
+	<target name="copyright_format" depends="update_copyright_and_version, format" />
 
 	<!-- ================================================================ -->
 	<!--        Update Copyright and Version in every text files          -->
