@@ -1276,23 +1276,18 @@
 				type="FileTransferStructureType" minOccurs="0" maxOccurs="1" />
 		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
-			fixed="org.objectweb.proactive.core.process.glite.GLiteProcess" />
+                      fixed="org.objectweb.proactive.core.process.glite.GLiteProcess" />
 		<xs:attribute name="hostname" type="xs:string" />
-		<xs:attribute name="virtualOrganisation" type="xs:string"
-			use="required" />
-		<xs:attribute name="JDLFileName" type="xs:string"
-			use="required" />
+		<xs:attribute name="virtualOrganisation" type="xs:string" use="required" />
+		<xs:attribute name="JDLFileName" type="xs:string" use="required" />
 		<xs:attribute name="Type" type="xs:string" default="job" />
-		<xs:attribute name="executable" type="xs:string"
-			default="/bin/sh" />
-		<xs:attribute name="stdOutput" type="xs:string"
-			default="output.log" />
-		<xs:attribute name="stdInput" type="xs:string"
-			default="input.log" />
-		<xs:attribute name="stdError" type="xs:string"
-			default="error.log" />
+        <xs:attribute name="executable" type="xs:string" default="/bin/sh" />
+        <xs:attribute name="jobType" type="xs:string" default="normal" />
+        <xs:attribute name="stdOutput" type="xs:string" default="output.log" />
+        <xs:attribute name="stdError" type="xs:string" default="error.log" />
+        <xs:attribute name="stdInput" type="xs:string" />
 		<xs:attribute name="outputse" type="xs:string" />
-		<xs:attribute name="retryCount" type="xs:string" />
+        <xs:attribute name="retryCount" type="xs:string" />
 		<xs:attribute name="myProxyServer" type="xs:string" />
 		<xs:attribute name="nodeNumber" type="xs:string" />
 	</xs:complexType>

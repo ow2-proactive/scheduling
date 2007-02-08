@@ -100,7 +100,7 @@
 
             
             <processDefinition id="gLiteProcess"> 
-                <gLiteProcess class="org.objectweb.proactive.core.process.glite.GLiteProcess" virtualOrganisation="proactive"  executable="/usr/java/jdk1.5.0_08/bin/java" JDLFileName="job.jdl" Type="job" stdError="error.log" stdOutput="stdout.log" retryCount="3" >
+                <gLiteProcess class="org.objectweb.proactive.core.process.glite.GLiteProcess" virtualOrganisation="proactive"  executable="/usr/java/jdk1.5.0_08/bin/java" JDLFileName="job.jdl" Type="job" stdError="error.log" stdOutput="stdout.log" jobType="normal" retryCount="3" >
                     <processReference refid="ceJVM"/> 
 	                <requirements>other.GlueCEUniqueID == "grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj"</requirements>
                     <rank>-other.GlueCEStateEstimatedResponseTime</rank>
