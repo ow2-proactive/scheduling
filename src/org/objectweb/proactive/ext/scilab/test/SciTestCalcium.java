@@ -23,7 +23,7 @@ import org.objectweb.proactive.ext.scilab.SciResult;
 import org.objectweb.proactive.ext.scilab.SciTask;
 
 public class SciTestCalcium implements Serializable{
-
+/*
 	private Skeleton<SciTask> root;
 	private String descriptorPath;
 	private String nameVN;
@@ -90,5 +90,5 @@ public class SciTestCalcium implements Serializable{
 		st.solve();
 	}
 	
-
+*/
 }

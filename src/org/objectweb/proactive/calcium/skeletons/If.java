@@ -44,20 +44,20 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  *
  * @param <T>
  */
-public class If<T> implements Skeleton<T>, Instruction<T> {
+public class If<T> implements Skeleton<T,T>, Instruction<T,T> {
 
 	Condition<T> cond;
-	Skeleton<T> ifChild, elseChild;
-	public If(Condition<T> cond, Skeleton<T> ifChild, Skeleton<T> elseChild){
+	Skeleton<T,?> ifChild, elseChild;
+	public <R> If(Condition<T> cond, Skeleton<T,R> ifChild, Skeleton<T,R> elseChild){
 	
 		this.cond=cond;
 		this.ifChild=ifChild;
 		this.elseChild=elseChild;
 	}
 	
-	public Vector<Instruction<T>> getInstructionStack() {
+	public Vector<Instruction<?,?>> getInstructionStack() {
 
-		Vector<Instruction<T>> v = new Vector<Instruction<T>>();
+		Vector<Instruction<?,?>> v = new Vector<Instruction<?,?>>();
 		v.add(this);
 		return v;
 	}
@@ -65,7 +65,7 @@ public class If<T> implements Skeleton<T>, Instruction<T> {
 	
 	public Task<T> compute(Task<T> t) throws Exception{
 		
-		Vector<Instruction<T>> childStack;
+		Vector<Instruction<?,?>> childStack;
 		Timer timer = new Timer();
 		boolean evalCondition= cond.evalCondition(t.getObject());
 		timer.stop();
@@ -77,11 +77,15 @@ public class If<T> implements Skeleton<T>, Instruction<T> {
 			childStack= elseChild.getInstructionStack();
 		}
 		
-		Vector<Instruction<T>> taskStack = t.getStack();
+		Vector<Instruction<?,?>> taskStack = t.getStack();
 		taskStack.addAll(childStack);
 		t.setStack(taskStack);
 		t.getStats().getWorkout().track(cond, timer);
 		
 		return t;
+	}
+	
+	public Task<?> computeUnknown(Task<?> t) throws Exception {
+		return compute((Task<T>) t);
 	}
 }

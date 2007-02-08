@@ -33,18 +33,18 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 
-public class For<T> implements Instruction<T>, Skeleton<T> {
+public class For<T> implements Instruction<T,T>, Skeleton<T,T> {
 
-	Skeleton<T> child;
+	Skeleton<T,T> child;
 	int times;
 	
-	public For(int times, Skeleton<T> child){
+	public For(int times, Skeleton<T,T> child){
 		this.child=child;
 		this.times=times;
 	}
 	
-	public Vector<Instruction<T>> getInstructionStack() {
-		Vector<Instruction<T>> v = new Vector<Instruction<T>>();
+	public Vector<Instruction<?,?>> getInstructionStack() {
+		Vector<Instruction<?,?>> v = new Vector<Instruction<?,?>>();
 		v.add(this);
 		return v;
 	}
@@ -53,15 +53,19 @@ public class For<T> implements Instruction<T>, Skeleton<T> {
 		
 		if(times > 0){
 			//Get Child stack
-			Vector<Instruction<T>> childStack=child.getInstructionStack();
+			Vector<Instruction<?,?>> childStack=child.getInstructionStack();
 			
 			//Add the For with one less time to execute
 			childStack.add(0,new For<T>(times-1,child)); 
 			
-			Vector<Instruction<T>> taskStack = task.getStack();
+			Vector<Instruction<?,?>> taskStack = task.getStack();
 			taskStack.addAll(childStack);
 			task.setStack(taskStack);
 		}
 		return task;
+	}
+
+	public Task<?> computeUnknown(Task<?> t) throws Exception {
+		return compute((Task<T>) t);
 	}
 }

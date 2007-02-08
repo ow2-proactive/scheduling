@@ -61,7 +61,7 @@ public class Interpreter implements Serializable {
 	public Interpreter(){
 	}
 	
-	public <T> Task<T> interpret(Task<T> task){
+	public Task<?> interpret(Task<?> task){
 		
 		Timer timer=new Timer(true);
 		while(task.hasInstruction()){
@@ -74,13 +74,13 @@ public class Interpreter implements Serializable {
 			}
 
 			//Take the top instruction
-			Instruction<T> inst = task.popInstruction();
+			Instruction<?,?> inst = task.popInstruction();
 
 			//Compute the instruction
 			int oldId=task.getId();
 			
 			try {
-				task=inst.compute(task);
+				task= inst.computeUnknown(task);
 			} catch (Exception e) {  		//If an exception happend, we report the exception in the task
 				task.pushInstruction(inst); //we put back the instruction that generated the exception
 				task.setException(e);		//then we add the exception to the task

@@ -37,7 +37,7 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 
-public class ActiveObjectSkernel<T> extends Skernel implements RunActive, Serializable {
+public class ActiveObjectSkernel extends Skernel implements RunActive, Serializable {
 
 	public ActiveObjectSkernel(){
 	}
@@ -68,7 +68,7 @@ public class ActiveObjectSkernel<T> extends Skernel implements RunActive, Serial
 	public Task<?> getReadyTask(){
 		Task<?> task= super.getReadyTask(0);
 		if(task==null){    //ProActive doesn't handle null
-			task= new Task<T>();
+			task= new Task<Object>();
 			task.setDummy();
 			return task;   //return dummy task
 		}

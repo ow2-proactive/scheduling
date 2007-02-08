@@ -53,12 +53,12 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  *
  * @param <T>
  */
-public class DaC<T> implements Skeleton<T>, Instruction<T> {
+public class DaC<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 
 	Divide<T> div;
-	Conquer<T> conq;
+	Conquer<R> conq;
 	Condition<T> cond;
-	Skeleton<T> child;
+	Skeleton<T,R> child;
 	
 	/**
 	 * Creates a Divide and Conquer skeleton structure
@@ -67,7 +67,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 	 * @param child The skeleton that should be applied to the subtasks.
 	 * @param conq Conqueres the computed subtasks into a single task.
 	 */
-	public DaC(Divide<T> div, Condition<T> cond, Skeleton<T> child, Conquer<T> conq){
+	public DaC(Divide<T> div, Condition<T> cond, Skeleton<T,R> child, Conquer<R> conq){
 	
 		this.div=div;
 		this.cond=cond;
@@ -75,107 +75,136 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		this.conq=conq;
 	}
 	
-	public Vector<Instruction<T>> getInstructionStack() {
+	public Vector<Instruction<?,?>> getInstructionStack() {
 
-		Vector<Instruction<T>> v= new Vector<Instruction<T>>();
+		Vector<Instruction<?,?>> v= new Vector<Instruction<?,?>>();
 		v.add(this);
 		
 		return v;
 	}
 
 	public Task<T> compute(Task<T> t) throws EnvironmentException{
-		
-		//Conquer if children are present
-		if(t.hasFinishedChild()){
-			return conquer(t);
-		}
-		
-		//Else no children are present
 
-		//Split the task if required
 		Timer timer = new Timer();
 		boolean evalCondition=cond.evalCondition(t.getObject());
 		timer.stop();
 		t.getStats().getWorkout().track(cond, timer);
 		
-		if(evalCondition){
-			return divide(t);
+		if(evalCondition){ //Split the task if required
+			t.pushInstruction(new ConquerInst(conq));
+			t.pushInstruction(new DivideInst(div, this));
+			return t;
 		}
-		//else solve the tasks
-		else{
-			return execute(t);
+		else{ //else execute the child skeleton
+			//Append the child skeleton code to the stack
+			Vector<Instruction<?,?>> currentStack = t.getStack();
+			currentStack.addAll(child.getInstructionStack());
+			t.setStack(currentStack);
 		}
-	}
-	
-	protected Task<T> execute(Task<T> t){
-		//Append the child skeleton code to the stack
-		Vector<Instruction<T>> currentStack = t.getStack();
-		currentStack.addAll(child.getInstructionStack());
-		t.setStack(currentStack);
 		return t;
 	}
 	
-	protected Task<T> divide(Task<T> parent) throws EnvironmentException{
-		
-		/*
-		 * We pass the t.object to the div. Each result
-		 * of divide will be then encapsulated by a Task, and 
-		 * the Tasks will be held in an array  
-		 */	
-		Timer timer = new Timer();
-		Vector<T> childObjects=div.divide(parent.getObject());
-		timer.stop();
-		
-		if(childObjects.size()<=0){
-			String msg="Parameter was divided into less than 1 part.";
-			logger.error(msg);
-			throw new MuscleException(msg);
-		}
-		
-		for(T o:childObjects){
-			Task<T> child = new Task<T>(o);
-			child.pushInstruction(this); //To do divide or execute in the child
-			parent.addReadyChild(child); //parent holds it's children
-		}
-
-		//Now we put a DaC (conquer) on the instruction stack of the parent 
-		parent.pushInstruction(this);
-		parent.getStats().getWorkout().track(div, timer);
-		return parent;
-	}
-	
-	protected Task<T> conquer(Task<T> parent) throws EnvironmentException {
-		
-		/**
-		 * We get the result objects from the child
-		 * and then we execute the conquer.
-		 * Finally, we create a rebirth task
-		 * of the parent with the result of the conquer.
-		 */
-		Vector<T> childObjects = new Vector<T>();
-		
-		while(parent.hasFinishedChild()){
-			
-			Task<T> child = parent.getFinishedChild();
-			childObjects.add(child.getObject());
-		}
-
-		if(childObjects.size() <=0 ){
-			String msg="Can't conquer less than one child parameter!";
-			logger.error(msg);
-			throw new MuscleException(msg);
-		}
-		
-		Timer timer = new Timer();
- 		T resultObject=conq.conquer(parent.getObject(), childObjects);
- 		timer.stop();
- 		Task<T> resultTask=parent.reBirth(resultObject);
- 		
- 		resultTask.getStats().getWorkout().track(conq, timer);
-		return resultTask;
-	}
-
 	public String toString(){
 		return "D&C";
+	}
+	
+	public Task<?> computeUnknown(Task<?> t) throws Exception {
+		return compute((Task<T>) t);
+	}
+	
+	static class ConquerInst<R> implements Instruction<R,R> {
+
+		private Conquer<R> conq;
+
+		public ConquerInst(Conquer<R> conq) {
+			this.conq = conq;
+		}
+		
+		public Task<R> compute(Task<R> parent) throws Exception {
+			/**
+			 * We get the result objects from the child
+			 * and then we execute the conquer.
+			 * Finally, we create a rebirth task
+			 * of the parent with the result of the conquer.
+			 */
+			Vector<R> childResults = new Vector<R>();
+			
+			while(parent.hasFinishedChild()){
+				
+				Task<R> child = parent.getFinishedChild();
+				childResults.add(child.getObject());
+			}
+
+			if(childResults.size() <=0 ){
+				String msg="Can't conquer less than one child parameter!";
+				logger.error(msg);
+				throw new MuscleException(msg);
+			}
+			
+			Timer timer = new Timer();
+	 		R resultObject=conq.conquer(childResults);
+	 		timer.stop();
+	 		Task<R> resultTask=parent.reBirth(resultObject);
+	 		
+	 		resultTask.getStats().getWorkout().track(conq, timer);
+			return resultTask;
+		}
+
+		public Task<?> computeUnknown(Task<?> t) throws Exception {
+			return compute((Task<R>) t);
+		}	
+	}
+	
+	/**
+	 * This class is an instruction that will perform a divition of one task,
+	 * and return the task with its correponding subtasks.
+	 * 
+	 * @author The ProActive Team (fviale)
+	 *
+	 * @param <T> The type of the parameter held by the tasks.
+	 */
+	static class DivideInst<T> implements Instruction<T,T> {
+		
+		private Divide<T> div;
+		private Skeleton<T,?> skel;
+
+		public DivideInst(Divide<T> div, Skeleton<T, ?> skel) {
+			this.div = div;
+			this.skel=skel;
+		}
+
+		public Task<T> compute(Task<T> parent) throws Exception {
+			/*
+			 * We pass the t.object to the div. Each result
+			 * of divide will be then encapsulated by a Task, and 
+			 * the Tasks will be held in an array  
+			 */	
+			Timer timer = new Timer();
+			Vector<T> childObjects=div.divide(parent.getObject());
+			timer.stop();
+			
+			if(childObjects.size()<=0){
+				String msg="Parameter was divided into less than 1 part.";
+				logger.error(msg);
+				throw new MuscleException(msg);
+			}
+			
+			for(T o:childObjects){
+				Task<T> child = new Task<T>(o);
+				child.setStack(skel.getInstructionStack()); //To do divide or execute in the child
+				parent.addReadyChild(child); //parent holds it's children
+			}
+
+			if(logger.isDebugEnabled()){
+				logger.debug("Task "+parent+" divided into "+childObjects.size()+" parts");
+			}
+			
+			parent.getStats().getWorkout().track(div, timer);
+			return parent;
+		}
+
+		public Task<?> computeUnknown(Task<?> t) throws Exception {
+			return compute((Task<T>) t);
+		}
 	}
 }

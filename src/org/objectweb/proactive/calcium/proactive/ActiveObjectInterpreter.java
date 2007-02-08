@@ -40,7 +40,7 @@ public class ActiveObjectInterpreter {
 		
 		Interpreter interp = new Interpreter();
 		while(true){
-			Task<?> task = aom.getReadyTask();
+			Task<?> task = aom.getReadyTask(0);
 			if(task.isDummy()){
 				break;
 			}

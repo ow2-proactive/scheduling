@@ -32,7 +32,7 @@ import java.io.File;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 
-public class CleanBlast implements Execute<BlastParameters> {
+public class CleanBlast implements Execute<BlastParameters,BlastParameters> {
 
 	public BlastParameters execute(BlastParameters param) throws RuntimeException, EnvironmentException {
 		

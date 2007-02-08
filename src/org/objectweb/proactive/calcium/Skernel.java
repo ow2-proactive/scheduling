@@ -28,7 +28,6 @@
 package org.objectweb.proactive.calcium;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.PriorityQueue;
@@ -50,7 +49,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * 
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
  */
 public class Skernel implements Serializable{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);

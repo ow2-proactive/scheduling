@@ -36,7 +36,7 @@ import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class ExecuteFormatDB extends AbstractExecuteCommand implements Execute<BlastParameters> {
+public class ExecuteFormatDB extends AbstractExecuteCommand implements Execute<BlastParameters,BlastParameters> {
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 	
 	public BlastParameters execute(BlastParameters param) throws EnvironmentException {

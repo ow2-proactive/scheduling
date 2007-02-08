@@ -27,11 +27,17 @@
  */
 package org.objectweb.proactive.calcium.skeletons;
 
+import java.util.Vector;
+
 import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Conquer;
 import org.objectweb.proactive.calcium.interfaces.Divide;
+import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.skeletons.DaC.ConquerInst;
+import org.objectweb.proactive.calcium.skeletons.DaC.DivideInst;
+import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
  * Map is only a special case of Divide and Conquer, and therfore
@@ -44,9 +50,9 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
  * @author The ProActive Team (mleyton)
  *
  */
-public class Map<T> extends DaC<T> {
+public class Map<T,R> extends DaC<T,R> {
 	
-	public Map(Divide<T> div, Skeleton<T> child, Conquer<T> conq){
+	public Map(Divide<T> div, Skeleton<T,R> child, Conquer<R> conq){
 		
 		super(div, null,child,conq);
 	}
@@ -54,13 +60,9 @@ public class Map<T> extends DaC<T> {
 	//Override parent method to avoid using the condition
 	public Task<T> compute(Task<T> t) throws EnvironmentException {
 		
-		//Split the task if not already splitted
-		if(!t.hasFinishedChild()){
-			return divide(t);
-		}
-		
-		//else conquer the subtask
-		return conquer(t);
+		t.pushInstruction(new ConquerInst(conq));
+		t.pushInstruction(new DivideInst(div,child));
+		return t;
 	}
 
 	public String toString(){

@@ -31,16 +31,17 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.interfaces.Conquer;
 
-public class ConquerBoard implements Conquer<Board>{
+public class ConquerBoard implements Conquer<Result>{
 	
-	public Board conquer(Board parent, Vector<Board> boards) {
+	public Result conquer(Vector<Result> result) {
 
-		for(Board b:boards){
-			for(int i=0;i<parent.n;i++){
-				parent.solutions[i]+=b.solutions[i];
+		Result r = new Result(result.get(0).n);
+		for(Result b:result){
+			for(int i=0;i<r.n;i++){
+				r.solutions[i]+=b.solutions[i];
 			}	
 		}
 
-		return parent;
+		return r;
 	}
 }

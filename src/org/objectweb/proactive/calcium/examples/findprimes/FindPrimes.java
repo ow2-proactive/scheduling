@@ -45,7 +45,7 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 public class FindPrimes implements Serializable{
 
-	public Skeleton<Challenge> root;
+	public Skeleton<Challenge,Primes> root;
 
 	
 	public static void main(String[] args) throws InterruptedException, PanicException {
@@ -56,9 +56,9 @@ public class FindPrimes implements Serializable{
 	
 	public FindPrimes(){
 		
-		root= new DaC<Challenge>( new ChallengeDivide(),
+		root= new DaC<Challenge, Primes>( new ChallengeDivide(),
 				new ChallengeDivideCondition(), 
-				new Seq<Challenge>(new SolveChallenge()),
+				new Seq<Challenge, Primes>(new SolveChallenge()),
 				new ConquerChallenge());
 	}
 	
@@ -76,9 +76,9 @@ public class FindPrimes implements Serializable{
 		
 		Calcium calcium = new Calcium(manager);
 		
-		Stream<Challenge> stream = calcium.newStream(root);
+		Stream<Challenge,Primes> stream = calcium.newStream(root);
 		
-		Vector<Future<Challenge>> futures = new Vector<Future<Challenge>>(3);
+		Vector<Future<Primes>> futures = new Vector<Future<Primes>>(3);
 		futures.add(stream.input(new Challenge(1,6400,300)));
 		futures.add(stream.input(new Challenge(1,100,20)));
 		futures.add(stream.input(new Challenge(1,640,64)));
@@ -86,8 +86,8 @@ public class FindPrimes implements Serializable{
 		calcium.boot();
 		
 		try {
-			for(Future<Challenge> future:futures){
-				Challenge res=future.get();		
+			for(Future<Primes> future:futures){
+				Primes res=future.get();		
 				for(Integer i: res.primes){
 					System.out.print(i+" ");
 				}

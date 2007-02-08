@@ -44,18 +44,18 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  *
  * @param <T>
  */
-public class While<T> implements Instruction<T>, Skeleton<T> {
+public class While<T> implements Instruction<T,T>, Skeleton<T,T> {
 
 	Condition<T> cond;
-	Skeleton<T> child;
+	Skeleton<T,T> child;
 	
-	public While(Condition<T> cond, Skeleton<T> child){
+	public While(Condition<T> cond, Skeleton<T,T> child){
 		this.cond=cond;
 		this.child=child;
 	}
 	
-	public Vector<Instruction<T>> getInstructionStack() {
-		Vector<Instruction<T>> v = new Vector<Instruction<T>>();
+	public Vector<Instruction<?,?>> getInstructionStack() {
+		Vector<Instruction<?,?>> v = new Vector<Instruction<?,?>>();
 		v.add(this);
 		return v;
 	}
@@ -68,17 +68,21 @@ public class While<T> implements Instruction<T>, Skeleton<T> {
 		
 		if(evalCondition){
 			//Get Child stack
-			Vector<Instruction<T>> childStack=child.getInstructionStack();
+			Vector<Instruction<?,?>> childStack=child.getInstructionStack();
 			
 			//Add me to evaluate while condition after executing child
 			childStack.add(0,this); 
 			
 			//Add new elements to the task's stack
-			Vector<Instruction<T>> taskStack=task.getStack();
+			Vector<Instruction<?,?>> taskStack=task.getStack();
 			taskStack.addAll(childStack);
 			task.setStack(taskStack);
 		}
 
 		return task;
+	}
+
+	public Task<?> computeUnknown(Task<?> t) throws Exception {
+		return compute((Task<T>) t);
 	}
 }

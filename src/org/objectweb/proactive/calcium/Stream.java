@@ -40,15 +40,15 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class Stream<T>{
+public class Stream<T,R>{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
 	
 	private int streamId;
 	private Facade facade;
-	private Skeleton<T> skeleton;
+	private Skeleton<T,R> skeleton;
 	private int lastPriority;
 	
-	protected Stream(Facade facade,  Skeleton<T> skeleton){
+	protected Stream(Facade facade,  Skeleton<T,R> skeleton){
 		
 		this.streamId=(int)(Math.random()*Integer.MAX_VALUE);
 		this.skeleton=skeleton;
@@ -62,20 +62,20 @@ public class Stream<T>{
 	 * @throws PanicException 
 	 * @throws InterruptedException 
 	 */
-	public Future<T> input(T param) throws InterruptedException, PanicException{
+	public Future<R> input(T param) throws InterruptedException, PanicException{
 		
 		//Put the parameters in a Task container
 		Task<T> task = new Task<T>(param);
 
-		Vector<Instruction<T>> instructionStack = (Vector<Instruction<T>>) skeleton.getInstructionStack();
+		Vector<Instruction<?,?>> instructionStack = (Vector<Instruction<?,?>>) skeleton.getInstructionStack();
 		task.setStack(instructionStack);
 		task.setStreamId(streamId);
 		task.setPriority(lastPriority--);
 		
-		FutureImpl<T> future = new FutureImpl<T>(task.getId());
+		FutureImpl<R> future = new FutureImpl<R>(task.getId());
 		facade.putTask(task, future);
 
-		return (Future<T>)future;
+		return (Future<R>)future;
 	}
 	
 	/**
@@ -84,9 +84,9 @@ public class Stream<T>{
 	 * @throws PanicException 
 	 * @throws InterruptedException 
 	 */
-	public Vector<Future<T>> input(Vector<T> paramV) throws InterruptedException, PanicException{
+	public Vector<Future<R>> input(Vector<T> paramV) throws InterruptedException, PanicException{
 		
-		Vector<Future<T>> vector= new Vector<Future<T>>(paramV.size());
+		Vector<Future<R>> vector= new Vector<Future<R>>(paramV.size());
 		for(T param:paramV)
 			vector.add(input(param));
 		

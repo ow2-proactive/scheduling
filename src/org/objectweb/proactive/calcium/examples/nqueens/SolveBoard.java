@@ -3,7 +3,7 @@ package org.objectweb.proactive.calcium.examples.nqueens;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 
 
-abstract public class SolveBoard implements Execute<Board> {
+abstract public class SolveBoard implements Execute<Board,Result> {
 	
     protected int n1,n2;
     
@@ -34,27 +34,27 @@ abstract public class SolveBoard implements Execute<Board> {
         }
     }
     */
-    protected Board mixBoard(Board board, int n1, int n2){
+    protected Result mixBoard(Result res, int n1, int n2){
         int i;
         // mix the solutions to find the final ones
-        if ((board.n % 2) == 0) {
+        if ((res.n % 2) == 0) {
             // n is even
             for (i = 0; i <= ((n1) / 2); i++) {
-                board.solutions[i] += board.solutions[n1 - i];
+                res.solutions[i] += res.solutions[n1 - i];
             }
-            for (i = n1; i >= (board.n / 2); i--) {
-                board.solutions[i] = board.solutions[n1 - i];
+            for (i = n1; i >= (res.n / 2); i--) {
+                res.solutions[i] = res.solutions[n1 - i];
             }
         } else {
             // n is odd
-            for (i = 0; i <= (board.n / 2); i++) {
-                board.solutions[i] += board.solutions[n1 - i];
+            for (i = 0; i <= (res.n / 2); i++) {
+                res.solutions[i] += res.solutions[n1 - i];
             }
-            for (i = n1; i > (board.n / 2); i--) {
-                board.solutions[i] = board.solutions[n1 - i];
+            for (i = n1; i > (res.n / 2); i--) {
+                res.solutions[i] = res.solutions[n1 - i];
             }
         }
-        return board;
+        return res;
     }
     
     // prints the board

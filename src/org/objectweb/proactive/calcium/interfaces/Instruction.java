@@ -39,7 +39,10 @@ import org.objectweb.proactive.calcium.Task;
  *
  * @param <T>
  */
-public interface Instruction<T> extends Serializable{
+public interface Instruction<T,R> extends Serializable{
 
-	public Task<T> compute(Task<T> t) throws Exception;
+	public Task<R> compute(Task<T> t) throws Exception;
+	
+	public Task<?> computeUnknown(Task<?> t) throws Exception;
+	
 }

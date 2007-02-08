@@ -33,8 +33,6 @@ import java.util.Vector;
 class Challenge implements Serializable{
 
 	public int max, min, solvableSize;
-	
-	public Vector<Integer> primes;
 
 	/**
 	 * Creates a new finding primes challenge.
@@ -45,8 +43,7 @@ class Challenge implements Serializable{
 	public Challenge(int min, int max, int solvableSize){
 		this.min=min;
 		this.max=max;
-		this.solvableSize=solvableSize;
-		primes=new Vector<Integer>();
+		this.solvableSize=solvableSize;;
 	}
 	
 	public String toString(){

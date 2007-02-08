@@ -41,18 +41,30 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
  * 
  * @author The ProActive Team (mleyton)
  */
-public class Pipe<T> implements Skeleton<T> {
+public class Pipe<T,R> implements Skeleton<T,R> {
 	
-	Vector<Skeleton<T>> stages;
+	Vector<Skeleton<?,?>> stages;
 	
-	public Pipe(Skeleton<T> child1, Skeleton<T> child2){
+	public <X> Pipe(Skeleton<T,X> child1, Skeleton<X,R> child2){
 		
-		stages = new Vector<Skeleton<T>>();
+		stages = new Vector<Skeleton<?,?>>();
+		
 		stages.add(child1);
 		stages.add(child2);
 	}
+	
+	public <X,Y,Z> Pipe(Skeleton<T,X> child1, Skeleton<X,Y> child2, Skeleton<Y,Z> child3, Skeleton<Z,R> child4){
+		
+		stages = new Vector<Skeleton<?,?>>();
+		
+		stages.add(child1);
+		stages.add(child2);
+		stages.add(child3);
+		stages.add(child4);
+	}
+	
 
-	public Pipe(Skeleton<T>... args){
+	/*public Pipe(Skeleton<T>... args){
 		this(Arrays.asList(args));
 	}
 	
@@ -62,11 +74,11 @@ public class Pipe<T> implements Skeleton<T> {
 		}
 		this.stages = new Vector<Skeleton<T>>();
 		this.stages.addAll(stages);
-	}	
+	}	*/
 	
-	public Vector<Instruction<T>> getInstructionStack() {
+	public Vector<Instruction<?,?>> getInstructionStack() {
 
-		Vector<Instruction<T>> instruction = new Vector<Instruction<T>>();
+		Vector<Instruction<?,?>> instruction = new Vector<Instruction<?,?>>();
 		
 		//the last go into the stack first
 		for(int i=stages.size()-1;i>=0;i--){

@@ -57,11 +57,11 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  *
  * @param <T>
  */
-public class Fork<T> implements Skeleton<T>, Instruction<T> {
+public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 
 	Divide<T> div;
-	Conquer<T> conq;
-	Vector<Skeleton<T>> stages;
+	Conquer<R> conq;
+	Vector<Skeleton<T,R>> stages;
 	
 	/**
 	 * Creates a Fork skeleton structure. The default divition of the parameters
@@ -73,7 +73,7 @@ public class Fork<T> implements Skeleton<T>, Instruction<T> {
 	 * @param conq The conquering (reduction) used to consolidate the results
 	 * of the sub-skeletons into a single result.
 	 * @param stages The sub-skeletons that can be computed in parallel.	 */
-	public Fork(Conquer<T> conq, Skeleton<T>... args){
+	public Fork(Conquer<R> conq, Skeleton<T,R>... args){
 		this(null,conq, Arrays.asList(args));
 		this.div=new ForkDefaultDivide<T>(args.length);
 	}
@@ -89,20 +89,20 @@ public class Fork<T> implements Skeleton<T>, Instruction<T> {
 	 * of the sub-skeletons into a single result.
 	 * @param stages The sub-skeletons that can be computed in parallel.
 	 */
-	public Fork(Divide<T> div, Conquer<T> conq, List<Skeleton<T>> stages){
+	public Fork(Divide<T> div, Conquer<R> conq, List<Skeleton<T,R>> stages){
 		if(stages.size() <=0 ) {
-			throw new IllegalArgumentException("Parallel must have at least one stage");
+			throw new IllegalArgumentException("Fork must have at least one stage");
 		}
 		
 		this.div=div;
 		this.conq=conq;
-		this.stages = new Vector<Skeleton<T>>();
+		this.stages = new Vector<Skeleton<T,R>>();
 		this.stages.addAll(stages);
 	}	
 	
-	public Vector<Instruction<T>> getInstructionStack() {
+	public Vector<Instruction<?,?>> getInstructionStack() {
 
-		Vector<Instruction<T>> v= new Vector<Instruction<T>>();
+		Vector<Instruction<?,?>> v= new Vector<Instruction<?,?>>();
 		v.add(this);
 		
 		return v;
@@ -110,68 +110,10 @@ public class Fork<T> implements Skeleton<T>, Instruction<T> {
 
 	public Task<T> compute(Task<T> t) throws EnvironmentException{
 		
-		//Conquer if children are present
-		if(t.hasFinishedChild()){
-			return conquer(t);
-		}
-
-		return divide(t);
-	}
-	
-	protected Task<T> divide(Task<T> parent) throws EnvironmentException{
+		t.pushInstruction(new DaC.ConquerInst(conq));
+		t.pushInstruction(new DivideInst(div,stages));
 		
-		Timer timer = new Timer();
-		Vector<T> childObjects= div.divide(parent.getObject());
-		timer.stop();
-		
-		if(childObjects.size()!=stages.size()){
-			String msg="Divided Parameter("+childObjects.size()+
-			           ") and number stages("+stages.size()+") don't match.";
-			logger.error(msg);
-			throw new MuscleException(msg);
-		}
-		
-		for(int i=0;i<stages.size(); i++){
-			Task<T> child = new Task<T>(childObjects.elementAt(i));
-			child.setStack(stages.elementAt(i).getInstructionStack()); //Each child task executes a different sub-skeleton
-			parent.addReadyChild(child); //parent remebers it's children
-		}
-
-		//Now we put this instruction to perform a conquer when returning 
-		parent.pushInstruction(this);
-		parent.getStats().getWorkout().track(div, timer);
-		return parent;
-	}
-	
-	protected Task<T> conquer(Task<T> parent) throws EnvironmentException {
-		
-		/**
-		 * We get the result objects from the child
-		 * and then we execute the conquer.
-		 * Finally, we create a rebirth task
-		 * of the parent with the result of the conquer.
-		 */
-		Vector<T> childObjects = new Vector<T>();
-		
-		while(parent.hasFinishedChild()){
-			
-			Task<T> child = parent.getFinishedChild();
-			childObjects.add(child.getObject());
-		}
-
-		if(childObjects.size() <=0 ){
-			String msg="Can't conquer less than one child parameter!";
-			logger.error(msg);
-			throw new MuscleException(msg);
-		}
-		
-		Timer timer = new Timer();
- 		T resultObject=conq.conquer(parent.getObject(), childObjects);
- 		timer.stop();
- 		Task<T> resultTask=parent.reBirth(resultObject);
- 		
- 		resultTask.getStats().getWorkout().track(conq, timer);
-		return resultTask;
+		return t;
 	}
 
 	public String toString(){
@@ -183,7 +125,7 @@ public class Fork<T> implements Skeleton<T>, Instruction<T> {
 	 * It simply deep copies the parameters N times.
 	 * @author The ProActive Team (mleyton)
 	 */
-	class ForkDefaultDivide<T> implements Divide<T>{
+	static class ForkDefaultDivide<T> implements Divide<T>{
 
 		int number;
 		
@@ -225,5 +167,48 @@ public class Fork<T> implements Skeleton<T>, Instruction<T> {
 
 			return vector;
 		}
+	}
+	
+    static class DivideInst<T> implements Instruction<T,T> {
+		
+		private Divide<T> div;
+		private Vector<Skeleton<T, ?>> stages;
+
+		public DivideInst(Divide<T> div, Vector<Skeleton<T, ?>> stages) {
+			this.div = div;
+			this.stages=stages;
+		}
+
+		public Task<T> compute(Task<T> parent) throws Exception {
+			
+			Timer timer = new Timer();
+			Vector<T> childObjects= div.divide(parent.getObject());
+			timer.stop();
+			
+			if(childObjects.size()!=stages.size()){
+				String msg="Divided Parameter("+childObjects.size()+
+				           ") and number stages("+stages.size()+") don't match.";
+				logger.error(msg);
+				throw new MuscleException(msg);
+			}
+			
+			for(int i=0;i<stages.size(); i++){
+				Task<T> child = new Task<T>(childObjects.elementAt(i));
+				child.setStack(stages.elementAt(i).getInstructionStack()); //Each child task executes a different sub-skeleton
+				parent.addReadyChild(child); //parent remebers it's children
+			}
+
+			//Now we put this instruction to perform a conquer when returning 
+			parent.getStats().getWorkout().track(div, timer);
+			return parent;
+		}
+
+		public Task<?> computeUnknown(Task<?> t) throws Exception {
+			return compute((Task<T>) t);
+		}
+	}
+
+	public Task<?> computeUnknown(Task<?> t) throws Exception {
+		return compute((Task<T>) t);
 	}
 }

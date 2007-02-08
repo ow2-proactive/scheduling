@@ -39,15 +39,15 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
  * @author The ProActive Team (mleyton)
  *
  */
-public class Farm<T> implements Skeleton<T>{
+public class Farm<T,R> implements Skeleton<T,R>{
 
-	Skeleton<T> child;
+	Skeleton<T,R> child;
 	
-	public Farm(Skeleton<T> child){
+	public Farm(Skeleton<T,R> child){
 		this.child =child;
 	}
 
-	public Vector<Instruction<T>> getInstructionStack() {
+	public Vector<Instruction<?,?>> getInstructionStack() {
 		
 		return child.getInstructionStack();
 	}

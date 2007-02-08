@@ -32,17 +32,17 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.interfaces.Conquer;
 
-public class ConquerChallenge implements Conquer<Challenge>{
+public class ConquerChallenge implements Conquer<Primes>{
 	
-	public Challenge conquer(Challenge parent, Vector<Challenge> p) {
-			
-		for(Challenge param:p){
-			parent.max=Math.max(parent.max, param.max);
-			parent.min=Math.min(parent.min, param.min);
-			parent.primes.addAll(param.primes);
+	public Primes conquer(Vector<Primes> p) {
+		
+		Primes conquered = new Primes();
+		
+		for(Primes param:p){
+			conquered.primes.addAll(param.primes);
 		}
 
-		Collections.sort(parent.primes);
-		return parent;
+		Collections.sort(conquered.primes);
+		return conquered;
 	}
 }

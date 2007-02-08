@@ -41,8 +41,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team (mleyton)
  *
  */
-public interface Skeleton<T> extends Serializable{
+public interface Skeleton<T,R> extends Serializable{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
 
-	public Vector<Instruction<T>> getInstructionStack();
+	public Vector<Instruction<?,?>> getInstructionStack();
 }

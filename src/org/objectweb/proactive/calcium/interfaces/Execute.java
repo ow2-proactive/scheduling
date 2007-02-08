@@ -38,7 +38,7 @@ import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
  *
  * @param <T>
  */
-public interface Execute<T> extends Muscle{
+public interface Execute<T,R> extends Muscle{
 
-	public T execute(T param) throws RuntimeException, EnvironmentException;
+	public R execute(T param) throws RuntimeException, EnvironmentException;
 }

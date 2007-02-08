@@ -29,15 +29,20 @@ package org.objectweb.proactive.calcium.examples.findprimes;
 
 import org.objectweb.proactive.calcium.interfaces.Execute;
 
-public class SolveChallenge implements Execute<Challenge>{
-	public Challenge execute(Challenge param) {
+public class SolveChallenge implements Execute<Challenge,Primes>{
+	
+	
+	public Primes execute(Challenge param) {
+		
+		Primes primes = new Primes();
+		
 		for(int i=param.min;i<=param.max;i++){
 			if(isPrime(i)){
-				param.primes.add(new Integer(i));
+				primes.primes.add(new Integer(i));
 			}
 		}
 		
-		return param;
+		return primes;
 	}
 	
 	private boolean isPrime(int p){

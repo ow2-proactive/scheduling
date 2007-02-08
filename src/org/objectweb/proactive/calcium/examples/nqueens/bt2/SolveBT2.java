@@ -27,19 +27,21 @@
  */
 package org.objectweb.proactive.calcium.examples.nqueens.bt2;
 import org.objectweb.proactive.calcium.examples.nqueens.Board;
+import org.objectweb.proactive.calcium.examples.nqueens.Result;
 import org.objectweb.proactive.calcium.examples.nqueens.SolveBoard;
 
 public class SolveBT2 extends SolveBoard{
 	
-	public Board execute(Board board){
+	public Result execute(Board board){
 	       n1 = board.n - 1;
 	       n2 = n1 - 1;
 	       BoardBT2 boardBT2=(BoardBT2)board;
-	       backtrack2((BoardBT2)board, boardBT2.row, boardBT2.left, boardBT2.down, boardBT2.right);
-	       return mixBoard(board, n1, n2);
+	       Result res=new Result(board.n);
+	       backtrack2(res,(BoardBT2)board, boardBT2.row, boardBT2.left, boardBT2.down, boardBT2.right);
+	       return mixBoard(res, n1, n2);
 	}
 	
-    private void check(BoardBT2 board) {
+    private void check(Result res, BoardBT2 board) {
     	int own,you,bit,ptn, firstColumn, lastColumn;
     	
         /* 90-degree rotation */
@@ -59,7 +61,7 @@ public class SolveBT2 extends SolveBoard{
             }
             if (own > n1) {
                 //count2();
-                board.solutions[position(board.board[0])]++;
+            	res.solutions[position(board.board[0])]++;
                 //display();
                 return;
             }
@@ -82,11 +84,11 @@ public class SolveBT2 extends SolveBoard{
             }
             if (own > n1) {
                 //count4();
-                board.solutions[position(board.board[0])]++;
+            	res.solutions[position(board.board[0])]++;
                 for (firstColumn = 1; (board.board[firstColumn] & 1) == 0;
                         firstColumn++)
                     ;
-                board.solutions[firstColumn]++;
+                res.solutions[firstColumn]++;
 
                 //display();
                 return;
@@ -112,20 +114,20 @@ public class SolveBT2 extends SolveBoard{
         }
 
         //count8();
-        board.solutions[position(board.board[0])]++;
-        board.solutions[position(board.board[n1])]++;
+        res.solutions[position(board.board[0])]++;
+        res.solutions[position(board.board[n1])]++;
         for (firstColumn = 1; (board.board[firstColumn] & 1) == 0;
                 firstColumn++)
             ;
         for (lastColumn = 1; (board.board[lastColumn] & board.topbit) == 0;
                 lastColumn++)
             ;
-        board.solutions[firstColumn]++;
-        board.solutions[lastColumn]++;
+        res.solutions[firstColumn]++;
+        res.solutions[lastColumn]++;
         //display();
     }
 
-    private void backtrack2(BoardBT2 board, int y, int left, int down, int right) {
+    private void backtrack2(Result res, BoardBT2 board, int y, int left, int down, int right) {
         int bitmap = board.mask & ~(left | down | right);
         int bit;
         
@@ -133,7 +135,7 @@ public class SolveBT2 extends SolveBoard{
             if (bitmap != 0) {
                 if ((bitmap & board.lastmask) == 0) {
                     board.board[y] = bitmap;
-                    check(board);
+                    check(res,board);
                 }
             }
         } else {
@@ -150,7 +152,7 @@ public class SolveBT2 extends SolveBoard{
             }
             while (bitmap != 0) {
                 bitmap ^= (board.board[y] = bit = -bitmap & bitmap);
-                backtrack2(board, y + 1, (left | bit) << 1, down | bit,
+                backtrack2(res,board, y + 1, (left | bit) << 1, down | bit,
                     (right | bit) >> 1);
             }
         }

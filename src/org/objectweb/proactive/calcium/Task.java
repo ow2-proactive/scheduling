@@ -60,7 +60,8 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	//Rebirth preserved parameters
 	private int familyId; //Id of the root task
 	private int parentId;
-	private T object;
+	private T param;
+	
 	private int id;
 	private int priority; //higher number, higher priority
 	private boolean isTainted;
@@ -69,7 +70,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	private int streamId;
 	
 	//The program stack. Higher indexed elements are served first (LIFO).
-	private Vector<Instruction<T>> stack;
+	private Vector<Instruction<?,?>> stack;
 	
 	/*
 	 * Children (sub task) state queues (not preserved by Rebirth)
@@ -85,7 +86,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	}
 	
 	private Task(T object, int id, int priority, int parentId,  int familyId, int streamId) {
-		this.object = object;
+		this.param = object;
 		this.id = id;
 		this.priority = priority;
 		this.parentId= parentId;
@@ -94,7 +95,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		
 		isDummy=false;
 		stats = new StatsImpl();
-		stack=new Vector<Instruction<T>>();
+		stack=new Vector<Instruction<?,?>>();
 		
 		childrenReady=new Vector<Task<T>>();
 		childrenWaiting=new Hashtable<Task<?>,Task<T>>();
@@ -108,6 +109,8 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		this.familyId=this.id; //Root task, head of the family
 	}
 	
+	
+	
 	/**
 	 * Makes a new task that represents a rebirth of the current one.
 	 * All parameters like: id, priority, parentId, computationTime, and current 
@@ -117,8 +120,20 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	 * @param object The new object to be hold in this task.
 	 * @return A new birth of the current task containting object
 	 */
-	public Task<T> reBirth(T object){
-		Task<T> newMe = new Task<T>(object,id, priority,parentId, familyId,streamId);
+	/*public Task<T,R> reBirth(T object){
+		Task<T,R> newMe = new Task<T,R>(object,id, priority,parentId, familyId,streamId);
+		newMe.setStack(this.stack);
+		
+		newMe.isDummy=this.isDummy;
+		newMe.isTainted=this.isTainted;
+		
+		newMe.stats=this.stats;
+		
+		return newMe;
+	}*/
+	
+	public <R> Task<R> reBirth(R object){
+		Task<R> newMe = new Task<R>(object,id, priority,parentId, familyId,streamId);
 		newMe.setStack(this.stack);
 		
 		newMe.isDummy=this.isDummy;
@@ -155,7 +170,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	 * stack objects will be reflected. 
 	 * @return
 	 */
-	public Vector<Instruction<T>> getStack(){
+	public Vector<Instruction<?,?>> getStack(){
 		return getVector(stack);
 	}
 	
@@ -165,7 +180,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	 * But, modifications on the stack values will be modified.
 	 * @param v
 	 */
-	public void setStack(Vector<Instruction<T>> v){		
+	public void setStack(Vector<Instruction<?,?>> v){		
 		setVector(stack, v);
 	}
 	
@@ -215,28 +230,28 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		return !childrenReady.isEmpty();
 	}
 	
-	public Instruction<T> popInstruction(){
+	public Instruction<?,?> popInstruction(){
 		
-		Instruction<T> c = stack.remove(stack.size()-1);
+		Instruction<?,?> c = stack.remove(stack.size()-1);
 
 		return c;
 	}
 	
-	public Instruction<T> peekInstruction(){
+	public Instruction<?,?> peekInstruction(){
 		
 		return stack.get(stack.size()-1);
 	}
 	
-	public void pushInstruction(Instruction<T> inst){
+	public void pushInstruction(Instruction<?,?> inst){
 		stack.add(inst);
 	}
 		
 	public T getObject(){
-		return object;	
+		return param;	
 	}
 	
 	public void setObject(T object){
-		this.object=object;
+		this.param=object;
 	}
 
 	/**
@@ -363,6 +378,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	 * @param exception The exception to set.
 	 */
 	public void setException(Exception exception) {
+		exception.printStackTrace();
 		this.exception = exception;
 	}
 	

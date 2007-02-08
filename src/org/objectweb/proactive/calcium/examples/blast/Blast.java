@@ -45,7 +45,7 @@ import org.objectweb.proactive.calcium.futures.Future;
 
 
 public class Blast {
-    Skeleton<BlastParameters> root;
+    Skeleton<BlastParameters,BlastParameters> root;
 
     public Blast() {
 
@@ -56,16 +56,18 @@ public class Blast {
          * 2.3 Blast the database
          * 2.4 Cleanup
          */
-        Pipe<BlastParameters> blastPipe = new Pipe<BlastParameters>(new Seq<BlastParameters>(new ExecuteFormatDB()),
-        						  new Seq<BlastParameters>(new ExecuteFormatQuery()),
-                				  new Seq<BlastParameters>(new ExecuteBlast()),
-                				  new Seq<BlastParameters>(new CleanBlast())
+       Pipe<BlastParameters,BlastParameters> blastPipe = new Pipe<BlastParameters,BlastParameters>(
+    		   					  new Seq<BlastParameters,BlastParameters>(new ExecuteFormatDB()),
+        						  new Seq<BlastParameters,BlastParameters>(new ExecuteFormatQuery()),
+                				  new Seq<BlastParameters,BlastParameters>(new ExecuteBlast()),
+                				  new Seq<BlastParameters,BlastParameters>(new CleanBlast())
                 				  );
 
+    	
         /* 1   Divide the database
          * 2   Blast the database with the query
          * 3   Conquer the query results  */
-        root = new DaC<BlastParameters>(new DivideDB(), 
+        root = new DaC<BlastParameters,BlastParameters>(new DivideDB(), 
         								new DivideDBCondition(),
         								blastPipe, 
         								new ConquerResults());
@@ -93,7 +95,7 @@ public class Blast {
             //new ProActiveManager(descriptor, "local");
 
         Calcium calcium = new Calcium(manager);
-        Stream<BlastParameters> stream = calcium.newStream(root);
+        Stream<BlastParameters,BlastParameters> stream = calcium.newStream(root);
         Future<BlastParameters> future=stream.input(parameters);
         calcium.boot();
 

@@ -28,6 +28,7 @@
 package org.objectweb.proactive.calcium.examples.nqueens.bt1;
 
 import org.objectweb.proactive.calcium.examples.nqueens.Board;
+import org.objectweb.proactive.calcium.examples.nqueens.Result;
 
 public class SolveBT1 extends org.objectweb.proactive.calcium.examples.nqueens.SolveBoard{
 
@@ -35,23 +36,25 @@ public class SolveBT1 extends org.objectweb.proactive.calcium.examples.nqueens.S
 		super();
 	}
 
-	public Board execute(Board board){
+	public Result execute(Board board){
        n1 = board.n - 1;
        n2 = n1 - 1;
        BoardBT1 boardBT1=(BoardBT1)board;
-       backtrack1(boardBT1, boardBT1.row, boardBT1.left, boardBT1.down, boardBT1.right);
-       return mixBoard(board, n1, n2);
+       Result res=new Result(board.n);
+       backtrack1(res,boardBT1, boardBT1.row, boardBT1.left, boardBT1.down, boardBT1.right);
+       return mixBoard(res, n1, n2);
 	}
 	
 	/**
      * Metodo que calcula las tareas de tipo BT1
+	 * @param res 
      * @param y
      * @param left
      * @param down
      * @param right
      * @return
      */
-    private void backtrack1(BoardBT1 board, int y, int left, int down, int right) {
+    private void backtrack1(Result res, BoardBT1 board, int y, int left, int down, int right) {
         int bitmap = board.mask & ~(left | down | right);
         int bit,firstColumn, lastColumn;
         
@@ -59,8 +62,8 @@ public class SolveBT1 extends org.objectweb.proactive.calcium.examples.nqueens.S
             if (bitmap != 0) {
                 board.board[y] = bitmap;
                 //count8();
-                board.solutions[position(board.board[0])]++;
-                board.solutions[position(board.board[n1])]++;
+                res.solutions[position(board.board[0])]++;
+                res.solutions[position(board.board[n1])]++;
                 for (firstColumn = 0; (board.board[firstColumn] & 1) == 0;
                         firstColumn++)
                     ;
@@ -68,8 +71,8 @@ public class SolveBT1 extends org.objectweb.proactive.calcium.examples.nqueens.S
                         (board.board[lastColumn] & board.topbit) == 0;
                         lastColumn++)
                     ;
-                board.solutions[firstColumn]++;
-                board.solutions[lastColumn]++;
+                res.solutions[firstColumn]++;
+                res.solutions[lastColumn]++;
             }
         } else {
             if (y < board.bound1) {
@@ -77,7 +80,7 @@ public class SolveBT1 extends org.objectweb.proactive.calcium.examples.nqueens.S
             }
             while (bitmap != 0) {
                 bitmap ^= (board.board[y] = bit = -bitmap & bitmap);
-                backtrack1(board, y + 1, (left | bit) << 1, down | bit,
+                backtrack1(res,board, y + 1, (left | bit) << 1, down | bit,
                     (right | bit) >> 1);
             }
         }

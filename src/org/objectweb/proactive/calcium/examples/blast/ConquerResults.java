@@ -44,17 +44,19 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ConquerResults implements Conquer<BlastParameters> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public BlastParameters conquer(BlastParameters parent, Vector<BlastParameters> param) {
+    public BlastParameters conquer(Vector<BlastParameters> param) {
         try {
 
             BufferedWriter bw;
-
+            //TODO check param.get used to be parent
+            BlastParameters bp=new BlastParameters(null, null, false, 0);
+            
             if (logger.isDebugEnabled()) {
                 logger.debug("Conquering results into File: " +
-                    parent.getOutPutFile().getAbsolutePath());
+                    param.get(0).getOutPutFile().getAbsolutePath());
             }
 
-            bw = new BufferedWriter(new FileWriter(parent.getOutPutFile()));
+            bw = new BufferedWriter(new FileWriter(param.get(0).getOutPutFile()));
 
             for (BlastParameters p : param) {
                 appendTo(bw, p.getOutPutFile());
@@ -63,7 +65,7 @@ public class ConquerResults implements Conquer<BlastParameters> {
             }
 
             bw.close();
-            return parent;
+            return bp;
         } catch (Exception e) {
             throw new MuscleException(e);
         }

@@ -40,7 +40,7 @@ import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
  *
  * @param <T>
  */
-public interface Conquer<T> extends Muscle{
+public interface Conquer<R> extends Muscle{
 
-	public T conquer(T parent, Vector<T> param) throws RuntimeException, EnvironmentException;
+	public R conquer(Vector<R> param) throws RuntimeException, EnvironmentException;
 }

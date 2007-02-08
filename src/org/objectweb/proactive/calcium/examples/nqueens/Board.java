@@ -35,7 +35,7 @@ public class Board implements java.io.Serializable {
 	public int solvableSize;
 		
 	//solutions vector
-	public long solutions[];
+	//public long solutions[];
 
 	// the board
 	public int board[];
@@ -53,12 +53,7 @@ public class Board implements java.io.Serializable {
 		this.n=n;
 		this.solvableSize=solvableSize;
 		
-		this.solutions = new long[n];
 		this.board = new int[n];
-		
-		for(int i=0;i<n;i++){
-			solutions[i]=0;
-		}
 	}
 	
 	public Board(int n, int solvableSize, int row, int left, int down, int right,

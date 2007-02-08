@@ -46,39 +46,45 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  *
  * @param <T>
  */
-public class Seq<T> implements Skeleton<T>, Instruction<T> {
+public class Seq<T,R> implements Skeleton<T,R>, Instruction<T,R> {
 
-	Execute<T> secCode;
+	Execute<T,R> secCode;
 	int muscleId;
 	
-	public Seq(Execute<T> secCode){
+	public Seq(Execute<T,R> secCode){
 		this.secCode=secCode;
 		muscleId=0;
 	}
 	
-	public Vector<Instruction<T>> getInstructionStack() {
+	public Vector<Instruction<?,?>> getInstructionStack() {
 		
-		Vector<Instruction<T>> v=new Vector<Instruction<T>>();
+		Vector<Instruction<?,?>> v=new Vector<Instruction<?,?>>();
 		v.add(this);
 		return v;
 	}
 
-	public Task<T> compute(Task<T> t) throws RuntimeException, EnvironmentException {
+	public Task<R> compute(Task<T> t) throws RuntimeException, EnvironmentException {
 		
 		Timer timer = new Timer();
-		T resultObject=secCode.execute(t.getObject());
+		R resultObject= secCode.execute(t.getObject());
 		timer.stop();
 		
 		//Task<T> resultTask= t.reBirth(resultObject);
 		//resultTask.getStats().trackWorkout(secCode, timer);
 		//return resultTask;
 		
-		t.setObject(resultObject);
+		Task<R> newtask = t.reBirth(resultObject); 
+		
+		//t.setResult(resultObject);
 		t.getStats().getWorkout().track(secCode,timer);
-		return t;
+		return newtask;
 	}
 
 	public String toString(){
 		return "Seq("+this.secCode.getClass()+")";
+	}
+
+	public Task<?> computeUnknown(Task<?> t) throws Exception {
+		return compute((Task<T>) t);
 	}
 }

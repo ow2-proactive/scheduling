@@ -71,9 +71,9 @@ public class Calcium {
 	 * be executed for each T inputted into the stream.
 	 * @return A Stream that can input and output T from the framework.
 	 */
-	public <T> Stream<T> newStream(Skeleton<T> root){
+	public <T,R> Stream<T,R> newStream(Skeleton<T,R> root){
 		
-		return new Stream<T>(facade, root);
+		return new Stream<T,R>(facade, root);
 	}
 
 	public void boot() {

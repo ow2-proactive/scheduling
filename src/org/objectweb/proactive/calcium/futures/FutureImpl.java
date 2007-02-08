@@ -32,9 +32,9 @@ import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.statistics.Stats;
 
-public class FutureImpl<T> implements Future<T> {
+public class FutureImpl<R> implements Future<R> {
 
-	Task<T> task;
+	Task<R> task;
 	int taskId;
 		
 	public FutureImpl(int taskId){
@@ -66,7 +66,7 @@ public class FutureImpl<T> implements Future<T> {
 	 * @throws MuscleException Is thrown if a functional exception happens during the execution
 	 * of the skeleton's muscle.
 	 */
-	public synchronized T get() throws InterruptedException, MuscleException{
+	public synchronized R get() throws InterruptedException, MuscleException{
 		while(!isDone()){
 			wait();
 		}
@@ -86,7 +86,7 @@ public class FutureImpl<T> implements Future<T> {
 	
 	@SuppressWarnings("unchecked")
 	public synchronized void setFinishedTask(Task<?> task){
-		this.task=(Task<T>)task;
+		this.task=(Task<R>)task;
 		
 		notifyAll();
 	}
