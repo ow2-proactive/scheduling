@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ProActive Unmodified" default="compile" basedir=".">
+<project name="ProActive" default="compile" basedir=".">
 	<property environment="env" />
 	<property name="base" value=".." />
 	<property name="lib" value="${base}/lib" />
