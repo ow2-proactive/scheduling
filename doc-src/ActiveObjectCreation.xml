@@ -916,7 +916,9 @@ ProActive.turnActive(
       invoke methods on the returned object, in which case the calling thread
       is automatically blocked if the result of the method invocation is not
       yet available. Below are shown the different cases that can lead to an
-      asynchronous call.</para>
+      asynchronous call. Note that this table does not apply when using the
+      tryWithCatch anotators to deal with asynchronous exceptions. See <xref
+      linkend="exceptions" />.</para>
 
       <table>
         <title>Future creation, and asynchronous calls depending on return
@@ -941,7 +943,7 @@ ProActive.turnActive(
             <row>
               <entry><para>void</para></entry>
 
-              <entry><para>-</para></entry>
+              <entry><para>No</para></entry>
 
               <entry><para>No</para></entry>
 
@@ -959,7 +961,7 @@ ProActive.turnActive(
             </row>
 
             <row>
-              <entry><para>Reifiable Object</para></entry>
+              <entry><para>-</para></entry>
 
               <entry><para>Yes</para></entry>
 
