@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ProActive" default="compile" basedir=".">
+<project name="ProActive Unmodified" default="compile" basedir=".">
 	<property environment="env" />
 	<property name="base" value=".." />
 	<property name="lib" value="${base}/lib" />
@@ -8,7 +8,6 @@
 	<property name="proactive.dir" value="org/objectweb/proactive" />
 	<property name="proactive.core.dir" value="${proactive.dir}/core" />
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext" />
-	<property name="proactive.tools.dir" value="${proactive.dir}/tools" />
 	<property name="classes.dir" value="${base}/classes" />
 	<property name="test.classes.dir" value="${base}/test-classes" />
 	<property name="classlibs.dir" value="${base}/classlibs" />
@@ -162,17 +161,6 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 			<include name="${proactive.ext.dir}/**/*.java" />
-		</javac>
-	</target>
-
-
-	<!-- ================================================================ -->
-	<!--                           Compile Tools                          -->
-	<!--  =============================================================== -->
-	<target name="tools" depends="core">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-			<include name="${proactive.tools.dir}/**/*.java" />
 		</javac>
 	</target>
 
@@ -442,7 +430,7 @@
 	<!-- ================================================================ -->
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
-	<target name="proActiveJar" depends="dist-mk-dir,ext,tools, bnb, p2p, calcium" description="Create the ProActive jar, to be used for instance on a distant host">
+	<target name="proActiveJar" depends="dist-mk-dir,ext, bnb, p2p, calcium" description="Create the ProActive jar, to be used for instance on a distant host">
 		<jar jarfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/core/descriptor/xml/DescriptorSchema.xsd"/>
