@@ -253,7 +253,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 			}
 		}
 
-		logger.debug("Using XML shema: " + schemaURLcandidate);
+		logger.debug("Using XML schema: " + schemaURLcandidate);
 
 		org.objectweb.proactive.core.xml.io.StreamReader sr = null;
 
