@@ -365,15 +365,6 @@
 		</javac>
 	</target>
 
-
-	<!-- ================================================================ -->
-	<!--                      Compile Migration                           -->
-	<!--  =============================================================== -->
-	<target name="migration" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="migration/**" deprecation="on" source="${source}" debug="${debug}" />
-	</target>
-
-
 	<!-- ================================================================ -->
 	<!--                      Compile JMX Connector                       -->
 	<!--  =============================================================== -->
