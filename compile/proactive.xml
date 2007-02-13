@@ -1159,41 +1159,30 @@
 		</copy>
 	</target>
 	
-	<target name="jdepend_core" description="JDepend report (core only)" depends="core" >
-		<jdepend format="xml" outputfile="${base}/jdepend_core.xml">	
-			<classespath>
-				<pathelement location="${classes.dir}/${proactive.core.dir}" />
-			</classespath>
-		</jdepend>
-
-		<xslt includes="jdepend_core.xml" basedir="${base}" destdir="${base}" style="jdepend.xsl" />
+	<target name="jdepend"  depends="compile" description="JDepend report">
+		 <macrodef name="jdependMacro">
+	        <attribute name="outputfile" />
+	    	<attribute name="classesdir" />
+	        <sequential>
+				<jdepend format="xml" outputfile="${base}/@{outputfile}.xml">	
+	        		<classespath>
+	        			<pathelement location="@{classesdir}" />
+	        		</classespath>
+	        	</jdepend>
+				<xslt includes="@{outputfile}.xml" basedir="${base}" destdir="${base}" style="jdepend.xsl" />
+	        	<delete>
+	        		<fileset dir="${base}">
+	        		    <include name="@{outputfile}.xml"/>
+	        		</fileset>
+	        	</delete>
+	        	<echo> --> JDepend report available: ${base}/@{outputfile}.html</echo>
+	        </sequential>
+	    </macrodef>
 		
-		<delete>
-			<fileset dir="${base}">
-			    <include name="jdepend_core.xml"/>
-			</fileset>
-		</delete>
+		<jdependMacro outputfile="jdepend_core" classesdir="${classes.dir}/${proactive.core.dir}" />
+		<jdependMacro outputfile="jdepend_all"  classesdir="${classes.dir}/${proactive.dir}"/>
 	</target>
 	
-	<target name="jdepend_all" description="JDepend report" depends="compile" >
-		<jdepend format="xml" outputfile="${base}/jdepend_all.xml">	
-			<classespath>
-				<pathelement location="${classes.dir}/${proactive.core.dir}" />
-			</classespath>
-		</jdepend>
-
-		<xslt includes="jdepend_all.xml" basedir="${base}" destdir="${base}" style="jdepend.xsl" />
-		
-		<delete>
-			<fileset dir="${base}">
-			    <include name="jdepend_all.xml"/>
-			</fileset>
-		</delete>
-	</target>
-	
-	
-
-	<target name="jdepend" description="JDepend reports" depends="jdepend_all,jdepend_core" />
 	
 	<!-- ==================================================================== -->
 	<!-- Compile native MicroTimer                                                    -->
