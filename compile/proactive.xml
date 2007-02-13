@@ -812,39 +812,44 @@
 	<!-- ================================================================ -->
 	<!--       Run non regression test with TestSuite API                  -->
 	<!-- ================================================================ -->
-	<target name="runTests" depends="testsuite, nonregressiontest, proActiveJar" description="Run all non regression tests">
-		<java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="test.classpath" />
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
-		</java>
+	
+	<macrodef name="runTestsMacro">
+        <attribute name="nodeDescriptor" />
+		<element name="jvmargs" optional="yes" />
+        <sequential>
+        	<delete dir="${base}/compile/log" />
+            <java classname="nonregressiontest.MainManager" fork="true">
+            	<classpath refid="test.classpath"/>
+    			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+    			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
+            	<jvmarg value="-Xdebug" />
+            	<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
+            	<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=@{nodeDescriptor}" />
+            	<jvmargs/>
+            </java>
+        </sequential>
+    </macrodef>
+
+	<target name="runTests" depends="nonregressiontest, proActiveJar" description="Run all non regression tests">
+		<runTestsMacro nodeDescriptor="/nonregressiontest/descriptor/defaultnodes/Nodes.xml" />
 	</target>
 
-	<target name="runTestsLocal" depends="testsuite, nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
-		<delete dir="${base}/compile/log" />
-		<java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="test.classpath" />
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
-			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml" />
-			<jvmarg value="-Xdebug" />
-			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
-		</java>
+	<target name="runTestsLocal" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
+		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
 
-	<target name="runTestsLocalIbis" depends="testsuite, nonregressiontest, proActiveJar">
-		<java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="test.classpath" />
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-			<jvmarg value="-Dproactive.rmi=ibis" />
-			<jvmarg value="-Dibis.serialization=sun" />
-			<jvmarg value="-Dibis.name_server.host=localhost" />
-			<jvmarg value="-Dibis.name_server.pool=rutget" />
-			<jvmarg value="-Dibis.pool_host_number=1" />
-			<jvmarg value="-Dibis.name_server.key=12" />
-			<jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties" />
-			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml" />
-		</java>
+	<target name="runTestsLocalIbis" depends="nonregressiontest, proActiveJar">
+		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml">
+			<jvmargs>
+				<jvmarg value="-Dproactive.rmi=ibis" />
+				<jvmarg value="-Dibis.serialization=sun" />
+				<jvmarg value="-Dibis.name_server.host=localhost" />
+				<jvmarg value="-Dibis.name_server.pool=rutget" />
+				<jvmarg value="-Dibis.pool_host_number=1" />
+				<jvmarg value="-Dibis.name_server.key=12" />
+				<jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties" />
+			</jvmargs>
+		</runTestsMacro>
 	</target>
 
 	<!-- ================================================================ -->
