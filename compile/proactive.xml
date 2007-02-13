@@ -99,9 +99,10 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p,loadbalancing, scheduler, timit, examples, trywithcatch, stub_wrapper, scilab, osgi,jmx, mpi" description="build the class files" />
+	<target name="compile" depends="addons, ic2d, p2p, scheduler, timit, examples, trywithcatch, stub_wrapper, mpi" description="build the class files" />
 
-
+	<target name="addons" depends="bnb, calcium, jmx, loadbalancing, osgi, scilab, webservices"/>
+	
 	<!-- ================================================================ -->
 	<!--                   Compile ProActive Core                         -->
 	<!--  =============================================================== -->
@@ -128,6 +129,15 @@
 			<classpath refid="project.classpath" />
 			<include name="${proactive.dir}/*.java" />
 			<include name="${proactive.core.dir}/**/*.java" />
+			<exclude name="${proactive.dir}/branchnbound/**"/>
+			<exclude name="${proactive.dir}/calcium/**"/>
+			<exclude name="${proactive.dir}/examples/**"/>
+			<exclude name="${proactive.dir}/ic2d/**"/>
+			<exclude name="${proactive.dir}/jmx/**"/>
+			<exclude name="${proactive.dir}/loadbalancing/**"/>
+			<exclude name="${proactive.dir}/osgi/**"/>
+			<exclude name="${proactive.dir}/ext/scilab/**"/>
+			<exclude name="${proactive.dir}/ext/**"/>
 		</javac>
 
 		<rmic classname="org.objectweb.proactive.core.body.jini.JiniRemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
@@ -155,20 +165,9 @@
 
 
 	<!-- ================================================================ -->
-	<!--                        Compile Extensions                        -->
-	<!--  =============================================================== -->
-	<target name="ext" depends="core">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-			<include name="${proactive.ext.dir}/**/*.java" />
-		</javac>
-	</target>
-
-
-	<!-- ================================================================ -->
 	<!--                      Compile Branch and Bound                    -->
 	<!--  =============================================================== -->
-	<target name="bnb" depends="core">
+	<target name="bnb" depends="core, stubGenerator">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 			<include name="${proactive.dir}/branchnbound/**/*.java" />
@@ -209,7 +208,7 @@
 	<!-- ================================================================ -->
 	<!--                      Compile Calcium Stubs                       -->
 	<!--  =============================================================== -->
-	<target name="calcium" depends="core">
+	<target name="calcium" depends="core, stubGenerator">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 			<include name="${proactive.dir}/calcium/**/*.java" />
@@ -255,7 +254,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile ic2d                            -->
 	<!--  =============================================================== -->
-	<target name="ic2d" depends="ext" description="Compile the IC2D Tool">
+	<target name="ic2d" depends="core" description="Compile the IC2D Tool">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/ic2d/**/*.java" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
@@ -271,7 +270,11 @@
 	<!-- ================================================================ -->
 	<!--                          Compile scilab                            -->
 	<!--  =============================================================== -->
-	<target name="scilab" depends="ext" description="Compile the SCILAB Tool">
+	<target name="scilab" depends="core" description="Compile the SCILAB Tool">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/ext/scilab/**/*.java" />
+		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/ext/scilab/gui/img" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/${proactive.dir}/ext/scilab/gui/img" />
 		</copy>
@@ -280,10 +283,20 @@
 	<!-- ================================================================ -->
 	<!--                      Compile LoadBalancing                       -->
 	<!--  =============================================================== -->
-	<target name="loadbalancing" depends="ext">
+	<target name="loadbalancing" depends="core">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 			<include name="${proactive.dir}/loadbalancing/**/*.java" />
+		</javac>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!--                      Compile WebServices                         -->
+	<!--  =============================================================== -->
+	<target name="webservices" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/ext/webservices/**/*.java" />
 		</javac>
 	</target>
 
@@ -291,7 +304,7 @@
 	<!-- ================================================================ -->
 	<!--                      Compile P2P                                 -->
 	<!--  =============================================================== -->
-	<target name="p2p" depends="ext">
+	<target name="p2p" depends="core">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/p2p/**/*.java" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
@@ -313,7 +326,7 @@
 	<!--                      Compile Examples                            -->
 	<!--  =============================================================== -->
 
-	<target name="examples" depends="ext" description="Compile all the examples">
+	<target name="examples" depends="core, addons" description="Compile all the examples">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" excludes="${proactive.dir}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="examples.classpath" />
 		</javac>
@@ -322,22 +335,20 @@
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
-		<antcall target="nbody3d" />
+		
+		<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
+		<available classname="com.sun.j3d.utils.behaviors.mouse.MouseWheelZoom" property="java3d_present"/>	
+		<if name="java3d_present">
+			<echo message="Info: Java3D installed." />
+			<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}">
+				<classpath refid="examples.classpath" />
+			</javac>
+			<else>
+				<echo message="Info: Java 3D dependencies were not resolved." />			
+			</else>
+		</if>
 	</target>
-
-	<available property="java3d_present" classname="com.sun.j3d.utils.behaviors.mouse.MouseWheelZoom" />
-
-	<target name="check_java3d" unless="java3d_present" depends="init">
-		<echo message="Info: Java 3D dependencies were not resolved." />
-	</target>
-
-	<target name="nbody3d" depends="check_java3d" if="java3d_present">
-		<echo message="Info: Java3D installed." />
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="examples.classpath" />
-		</javac>
-	</target>
-
+	
 
 	<!-- ================================================================ -->
 	<!--                      Compile Test Suite                         -->
@@ -684,11 +695,15 @@
 	<!-- ================================================================ -->
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
-	<target name="stub_dir" unless="stub.classdir">
-		<property name="stub.classdir" value="${basedir}${file.separator}..${file.separator}classes" />
+	<target name="stubGenerator">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/ext/util/StubGenerator.java" />
+		</javac>
 	</target>
-
-	<target name="stub" depends="stub_dir">
+	
+	<target name="stub" depends="stubGenerator, compile">
+		<property name="stub.classdir" value="${basedir}${file.separator}..${file.separator}classes" />
 		<echo message="${stub.classdir}" />
 		<path id="classDir">
 			<pathelement path="${stub.classdir}" />
@@ -720,7 +735,7 @@
 	<!-- ================================================================ -->
 	<!--            primitive type wrapper stubs generation               -->
 	<!-- ================================================================ -->
-	<target name="stub_wrapper" depends="ext">
+	<target name="stub_wrapper" depends="stubGenerator">
 		<echo message="Java primitive type wrapper stubs generating..." />
 		<property name="stub_wrapper.classdir" value="${basedir}/../classes" />
 		<path id="wrapperClassDir">
