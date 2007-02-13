@@ -340,11 +340,11 @@
 
 
 	<!-- ================================================================ -->
-	<!--             Copy various files to classes directory              -->
+	<!--                      Compile Test Suite                         -->
 	<!--  =============================================================== -->
-	<target name="copyDivers">
-		<copy toDir="${classes.dir}">
-			<fileset dir="${src.dir}">
+	<target name="testsuite" depends="compile">
+		<copy toDir="${test.classes.dir}">
+			<fileset dir="${src.dir}/testsuite">
 				<include name="**/*.properties" />
 				<include name="**/*.css" />
 				<include name="**/*.xml" />
@@ -352,13 +352,6 @@
 				<include name="**/*.xsd" />
 			</fileset>
 		</copy>
-	</target>
-
-
-	<!-- ================================================================ -->
-	<!--                      Compile Test Suite                         -->
-	<!--  =============================================================== -->
-	<target name="testsuite" depends="ext, copyDivers">
 		<mkdir dir="${test.classes.dir}"/>
 		<javac srcdir="${src.dir}" destdir="${test.classes.dir}" includes="testsuite/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
