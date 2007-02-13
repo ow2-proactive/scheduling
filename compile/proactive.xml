@@ -342,7 +342,7 @@
 	<!-- ================================================================ -->
 	<!--                      Compile Test Suite                         -->
 	<!--  =============================================================== -->
-	<target name="testsuite" depends="compile">
+	<target name="testsuite">
 		<copy toDir="${test.classes.dir}">
 			<fileset dir="${src.dir}/testsuite">
 				<include name="**/*.properties" />
@@ -408,7 +408,7 @@
 	<!-- ================================================================ -->
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
-	<target name="proActiveJar" depends="dist-mk-dir,ext, bnb, p2p, calcium" description="Create the ProActive jar, to be used for instance on a distant host">
+	<target name="proActiveJar" depends="dist-mk-dir, compile" description="Create the ProActive jar, to be used for instance on a distant host">
 		<jar jarfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/core/descriptor/xml/DescriptorSchema.xsd"/>
