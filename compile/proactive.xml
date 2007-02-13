@@ -1193,7 +1193,7 @@
 	<!-- ==================================================================== -->
 	<!-- Compile native MicroTimer                                                    -->
 	<!-- ==================================================================== -->
-	<target name="microTimer" depends="testsuite">
+	<target name="microTimer">
 		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="g++" os="Linux">
 			<arg line=" -shared -o libMicroTimer.so  MicroTimer.cc" />
 		</exec>
