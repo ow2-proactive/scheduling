@@ -401,7 +401,7 @@
 	<!-- ================================================================ -->
 	<!--                      All the junk targets                        -->
 	<!--  =============================================================== -->
-	<target name="alljunk" depends="compile, migration, nonregressiontest" />
+	<target name="alljunk" depends="compile, nonregressiontest" />
 
 
 	<!-- ================================================================ -->
