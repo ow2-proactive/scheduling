@@ -1633,7 +1633,7 @@ public class ProActive {
                 //if not hierarchical search, we assume that the descriptor might has been
                 //register with the default jobID
                 pad = part.getDescriptor(xmlDescriptorUrl +
-                        ProActive.getJobId(), hierarchicalSearch);
+                        ProActive.getJobtoto(), hierarchicalSearch);
             } else {
                 pad = part.getDescriptor(xmlDescriptorUrl, hierarchicalSearch);
             }
@@ -2240,9 +2240,9 @@ public class ProActive {
     }
 
     /**
-     * @return the jobId associated with the object calling this method
+     * @return the jobtoto associated with the object calling this method
      */
-    public static String getJobId() {
+    public static String getJobtoto() {
         return ProActive.getBodyOnThis().getJobID();
     }
 
@@ -2343,7 +2343,7 @@ public class ProActive {
         Active activity, MetaObjectFactory factory) throws MOPException {
         return createStubObject(className, genericParameters,
             constructorParameters,
-            new Object[] { node, activity, factory, ProActive.getJobId() });
+            new Object[] { node, activity, factory, ProActive.getJobtoto() });
     }
 
     private static Object createStubObject(String className,
@@ -2363,7 +2363,7 @@ public class ProActive {
         String nameOfTargetType, Class[] genericParameters, Node node,
         Active activity, MetaObjectFactory factory) throws MOPException {
         return createStubObject(target,
-            new Object[] { node, activity, factory, ProActive.getJobId() },
+            new Object[] { node, activity, factory, ProActive.getJobtoto() },
             nameOfTargetType, genericParameters);
     }
 
@@ -2590,6 +2590,6 @@ public class ProActive {
      * @return String
      */
     public static String getProActiveVersion() {
-        return "$$%%ProActiveVersion%%$$";
+        return "$Id$";
     }
 }
