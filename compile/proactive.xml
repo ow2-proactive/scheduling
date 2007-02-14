@@ -886,34 +886,62 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/mpi/**/*.java" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
-		<!-- Delete existing header file to avoid conflict -->
-		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control" executable="rm" os="Linux">
-			<arg line=" -f org_objectweb_proactive_mpi_control_ProActiveMPIComm.h org_objectweb_proactive_mpi_control_ProActiveMPIComm_MessageRecvHandler.h" />
-		</exec>
-		<!-- Generate header file (based on classpath) -->
-		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control" executable="javah" os="Linux">
-			<arg line=" -jni org.objectweb.proactive.mpi.control.ProActiveMPIComm" />
-		</exec>
-		<!-- Generate library -->
-		<exec dir="${classes.dir}" executable="mpicc" os="Linux">
-			<arg line=" -I/usr/local/jdk1.4.0/include -I/usr/local/jdk1.4.0/include/linux ${src.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c -o libProActiveMPIComm.so -shared" />
-		</exec>
-		<!-- Move generated library file to classes repository -->
-		<exec dir="${classes.dir}" executable="mv" os="Linux">
-			<arg line=" libProActiveMPIComm.so org/objectweb/proactive/mpi/control" />
-		</exec>
-		<!-- Delete object file generated in classes repository -->
-		<exec dir="${classes.dir}" executable="rm" os="Linux">
-			<arg line=" -f ProActiveMPIComm.o" />
-		</exec>
-		<!-- Delete existing header file to avoid conflict -->
-		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control" executable="rm" os="Linux">
-			<arg line=" -f org_objectweb_proactive_mpi_control_ProActiveMPIComm.h org_objectweb_proactive_mpi_control_ProActiveMPIComm_MessageRecvHandler.h" />
-		</exec>
-		<!-- execute configure to generate Makefiles -->
-		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control/config" executable="sh" os="Linux">
-			<arg line="configure.sh " />
-		</exec>
+		
+		<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
+		<if>
+			<bool>
+				<and>
+					<os family="Unix"/>
+					<available file="mpicc" filepath="/bin:/usr/bin:/usr/local/bin"/>
+				</and>
+			</bool>
+			
+			
+			<!-- Delete existing header file to avoid conflict -->
+			<delete>
+				<fileset dir="${src.dir}/org/objectweb/proactive/mpi/control">
+					<include name="org_objectweb_proactive_mpi_control_ProActiveMPIComm.h"/>
+					<include name="org_objectweb_proactive_mpi_control_ProActiveMPIComm_MessageRecvHandler.h"/>
+				</fileset>
+			</delete>
+	
+			<!-- Generate header file (based on classpath) -->
+			<javah 
+				classpath="${classes.dir}" 
+				force="yes" 
+				class="org.objectweb.proactive.mpi.control.ProActiveMPIComm" 
+				destdir="${src.dir}/org/objectweb/proactive/mpi/control/" />
+
+			<!-- Generate library -->
+			<exec dir="${classes.dir}" executable="mpicc" os="Linux">
+				<arg line=" -I${java.home}/../include -I${java.home}/../include/linux ${src.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c -o ${classes.dir}/${proactive.dir}/mpi/control/libProActiveMPIComm.so -shared" />
+			</exec>
+						
+			<!-- Delete object file generated in classes repository -->
+			<delete>
+				<fileset dir="${classes.dir}">
+				    <include name="ProActiveMPIComm.o"/>
+				</fileset>
+			</delete>
+
+			<!-- Delete existing header file to avoid conflict -->
+			<delete>
+				<fileset dir="${src.dir}/org/objectweb/proactive/mpi/control">
+					<include name="org_objectweb_proactive_mpi_control_ProActiveMPIComm.h"/>
+					<include name="org_objectweb_proactive_mpi_control_ProActiveMPIComm_MessageRecvHandler.h"/>
+				</fileset>
+			</delete>
+
+			<!-- execute configure to generate Makefiles -->
+			<exec dir="${src.dir}/org/objectweb/proactive/mpi/control/config" executable="sh" os="Linux">
+				<arg line="configure.sh " />
+			</exec>
+
+			<else>			
+				<echo>Wrapping with control is only available for Unix and mpicc must be installed</echo>
+			</else>
+		</if>
+		
 	</target>
 
 	<!-- ================================================================ -->

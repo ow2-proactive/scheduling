@@ -34,15 +34,15 @@
 #define MSG_ALLSEND       	8
 #define MSG_FINALIZE		10
 #define MSG_SEND_PROACTIVE	12
-
-
+ 
+#ifdef _SEM_SEMUN_UNDEFINED
 union semun{
 	int val;	
 	struct semid_ds *buf;		
 	unsigned short int *array;
 	struct seminfo *__buf;	
 };
-
+#endif
 
 /* send buffer used in m_s.c Send_Request_Loop() */
 typedef struct _msg {	// to be put into common header file "javampi.h"

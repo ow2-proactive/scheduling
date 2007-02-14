@@ -33,6 +33,7 @@
 #include <mpi.h>
 #include <jni.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h> 
 #include <sys/ipc.h> 
 #include <sys/msg.h> 
