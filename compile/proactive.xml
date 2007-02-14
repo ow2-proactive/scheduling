@@ -434,7 +434,7 @@
 	<!-- ================================================================ -->
 	<!--                    Create OSGI ProActiveBundle.jar                    -->
 	<!--  =============================================================== -->
-	<target name="proActiveBundle" depends="proActiveJar">
+	<target name="proActiveBundle" depends="compile">
 		<mkdir dir="${bundle.dir}" />
 		<jar manifest="${manifest.dir}/Manifest.mf" jarfile="${bundle.dir}/proactiveBundle.jar">
 			<fileset dir="${classes.dir}">
@@ -458,7 +458,7 @@
 	<!-- ================================================================ -->
 	<!--                  Create OSGI helloWorlBundle.jar                      -->
 	<!--  =============================================================== -->
-	<target name="helloWorldBundle" depends="proActiveJar">
+	<target name="osgiHelloWorldBundle" depends="examples">
 		<mkdir dir="${bundle.dir}" />
 		<jar manifest="${manifest.example.dir}/Manifest.mf" jarfile="${bundle.dir}/helloWorldBundle.jar">
 			<fileset dir="${classes.dir}">
