@@ -872,17 +872,7 @@
 	<!--                         Compile mpi                              -->
 	<!-- ================================================================ -->
 
-	<target name="mpi" depends="core" description="Compile mpi classes for simple wrapping">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/mpi/*.java" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-		</javac>
-	</target>
-
-	<!-- ================================================================ -->
-	<!--                         Compile ProActiveMpi                     -->
-	<!-- ================================================================ -->
-
-	<target name="ProActiveMPI" depends="core" description="Compile mpi classes for wrapping with control">
+	<target name="mpi" depends="core" description="Compile mpi classes for wrapping with control">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/mpi/**/*.java" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
