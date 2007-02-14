@@ -8,7 +8,7 @@ function print_help {
 
 function listNodes {
 	jobId=$1
-	if [ $(oarstat -f -j $jobId | egrep -c "(job_state = R|reservation = Scheduled)") == "2" ] ;
+	if [ $(oarstat -f -j $jobId | egrep -c "(job_state = R|reservation = Scheduled)") -ge "1" ] ;
 	then
 		oarstat -f -j $jobId | grep exec_host | cut -d'=' -f2 | sed 's/+/ /g'
 	fi
@@ -42,3 +42,4 @@ else
 		listNodes $res
 	done
 fi
+
