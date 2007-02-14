@@ -19,6 +19,12 @@
 	<property name="docs.mainFile" value="PA_index.xml" />
 	<property name="dev.dir" value="${base}/dev" />
 
+	<!-- Create the time stamp -->
+	<tstamp>
+		<format property="TODAY" pattern="yyyy-MM-dd" />
+	</tstamp>
+
+	
 	<property name="name" value="ProActive" />
 	<property name="version" value="$$%%ProActiveVersion%%$$" />
 	<property name="version_" value="$$%%ProActiveUnderscoreVersion%%$$" />
@@ -80,10 +86,6 @@
 	<!--                       Initialisation                             -->
 	<!--  =============================================================== -->
 	<target name="init">
-		<!-- Create the time stamp -->
-		<tstamp>
-			<format property="TODAY" pattern="yyyy-MM-dd" />
-		</tstamp>
 		<!-- Create the build directory structure used by compile -->
 		<mkdir dir="${classes.dir}" />
 		<echo message="--- Debugging is ${debug} ---" />
@@ -480,7 +482,7 @@
 		<mkdir dir="${PAdist.dir}" />
 	</target>
 	
-	<target name="dist-cp-files" depends="dist-mk-dir, configurationCopy" 
+	<target name="dist-cp-files" depends="dist-mk-dir" 
 		description="Copy files for the release">
 		<!--        copy docs / scripts / src / compile / lib      -->
 		<copy todir="${PAdist.dir}" includeEmptyDirs="no">
@@ -508,7 +510,7 @@
 	</target>
 	
 	<target name="dist-examples_ic2d-jar" 
-		depends="dist-mk-dir, compile, proActiveJar, dist-cp-files">
+		depends="dist-mk-dir, compile">
 		<!-- Build the examples Jar -->
 		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" 
 			basedir="${classes.dir}" 
@@ -519,7 +521,7 @@
 	</target>
 		
 	<target name="dist-bin"
-		depends="dist-examples_ic2d-jar"
+		depends="dist-examples_ic2d-jar, proActiveJar, dist-cp-files"
 		description="Create zip with only jars">
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
 		<zip zipfile="${dist.dir}/ProActive-bin_${version_}.zip">
@@ -535,14 +537,14 @@
 		</zip>
 	</target>
 	
-	<target name="dist-doc" depends="dist-mk-dir, docs, dist-cp-files"
+	<target name="dist-doc" depends="docs, dist-cp-files"
 		description="Create zip with only doc">
 		<zip zipfile="${dist.dir}/ProActive-doc_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs" />
 		</zip>
 	</target>
 	
-	<target name="dist-src" depends="dist-mk-dir, dist-cp-files"
+	<target name="dist-src" depends="dist-cp-files"
 		description="Create zip with only sources and libs">
 		<zip zipfile="${dist.dir}/ProActive-src_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" >
@@ -554,7 +556,7 @@
 		</zip>
 	</target>
 	
-	<target name="dist-bundle" depends="dist-mk-dir, compile, proActiveJar, dist-examples_ic2d-jar, docs, dist-cp-files"
+	<target name="dist-bundle" depends="dist-cp-files, proActiveJar, dist-examples_ic2d-jar"
 		description="Create a zip with everythings">
 		<zip zipfile="${dist.dir}/ProActive-bundle_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
@@ -1008,7 +1010,7 @@
 	<!-- ==================================================================== -->
 	<!--      Converts docbook xml into ??? - uses the trax processor         -->
 	<!-- ==================================================================== -->
-	<target name="docbookTransform" depends="init">
+	<target name="docbookTransform"	>
 		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
 		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp}/${docbookInputFile}" out="${docs.tmp}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
 			<param name="profile.os" expression="${docbook.profile}" />
@@ -1183,7 +1185,7 @@
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
 	<!-- ==================================================================== -->
-	<target name="manual" description="Build all the different manual version: html, pdf... " depends="java2html,manualSingleHtml,manualHtml,manualPdf">
+	<target name="manual" description="Build all the different manual version: html, pdf... " depends="manualSingleHtml,manualHtml,manualPdf">
 		<!-- The generation of the files is done by the depends clause -->
 		<!-- Once the doc files have been generated, do some cleaning up -->
 		<delete dir="${docs.tmp}" />
