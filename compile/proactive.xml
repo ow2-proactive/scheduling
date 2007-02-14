@@ -309,7 +309,8 @@
 			<classpath refid="project.classpath" />
 		</javac>
 	</target>
-	<target name="p2p_daemon" depends="p2p">
+	
+	<target name="p2p_daemon">
 		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS">
 			<arg line="-Wall -g -o proactivep2p -x c proactivep2p.cpp proactivep2p.h" />
 		</exec>
