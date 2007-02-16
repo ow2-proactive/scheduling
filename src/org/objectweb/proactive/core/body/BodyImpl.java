@@ -32,6 +32,14 @@ package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
@@ -100,7 +108,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  *
  */
 public abstract class BodyImpl extends AbstractBody
-    implements java.io.Serializable {
+    implements java.io.Serializable, BodyImplMBean {
     //  
     // -- STATIC MEMBERS -----------------------------------------------
     //
@@ -187,6 +195,32 @@ public abstract class BodyImpl extends AbstractBody
         } else {
             this.ftmanager = null;
         }
+        
+        // JMX registration 
+        try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer(); 
+            ObjectName name = new ObjectName("org.objectweb.proactive:type=oa,class="+this.getName()+",name=" + this.
+getName() + "-" + this.getID().toString().replace(':','-') );
+                        mbs.registerMBean(this, name);
+                } catch (MalformedObjectNameException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (NullPointerException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (InstanceAlreadyExistsException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (MBeanRegistrationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (NotCompliantMBeanException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } 
+
+                // End JMX registration      
+
     }
 
     //

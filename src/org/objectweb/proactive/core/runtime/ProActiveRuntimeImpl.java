@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PublicKey;
@@ -40,6 +41,13 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -102,7 +110,7 @@ import org.objectweb.proactive.ext.security.securityentity.EntityVirtualNode;
  *
  */
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
-    implements ProActiveRuntime, LocalProActiveRuntime {
+    implements ProActiveRuntime, LocalProActiveRuntime, ProActiveRuntimeImplMBean {
     //
     // -- STATIC MEMBERS -----------------------------------------------------------
     //
@@ -202,6 +210,32 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             e.printStackTrace();
         }
 
+        //      JMX registration
+        try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName name = new ObjectName("org.objectweb.proactive.runtime:type=" + this.getURL() );
+                        mbs.registerMBean(this, name);
+                } catch (MalformedObjectNameException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (NullPointerException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (InstanceAlreadyExistsException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (MBeanRegistrationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                } catch (NotCompliantMBeanException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+
+                // End JMX registration
+
+
+        
         // logging info
         MDC.remove("runtime");
         MDC.put("runtime", getURL());
