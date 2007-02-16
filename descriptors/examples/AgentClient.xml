@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="AgentClient" property="unique"/>
+			<virtualNode name="AgentClient" property="unique" />
 		</virtualNodesDefinition>
 		<virtualNodesAcquisition>
-			<virtualNode name="Agent"/>
+			<virtualNode name="Agent" />
 		</virtualNodesAcquisition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="AgentClient">
 				<jvmSet>
-					<currentJVM protocol="rmi"/>
+					<currentJVM protocol="rmi" />
 				</jvmSet>
 			</map>
 		</mapping>
-		<lookup virtualNode="Agent" host="localhost" protocol="rmi"/>
+		<lookup virtualNode="Agent" host="localhost" protocol="rmi" />
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
 			</processDefinition>
 		</processes>
 	</infrastructure>

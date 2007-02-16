@@ -1,70 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:noNamespaceSchemaLocation=
-"http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="plugtest"/>
+			<virtualNode name="plugtest" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="plugtest">
 				<jvmSet>
-					<vmName value="Jvm1"/>				
+					<vmName value="Jvm1" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="globusProcess"/>
+					<processReference refid="globusProcess" />
 				</creation>
 			</jvm>
-			
+
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						
-						<absolutePath value="${PROACTIVE_HOME}/ProActive/lib/nqueen.jar"/>
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+
+						<absolutePath
+							value="${PROACTIVE_HOME}/ProActive/lib/nqueen.jar" />
 					</classpath>
 					<javaPath>
-						<absolutePath value="/nfs/software/java/j2sdk1.4.2_07/bin/java"/>
+						<absolutePath
+							value="/nfs/software/java/j2sdk1.4.2_07/bin/java" />
 					</javaPath>
 					<policyFile>
-						<absolutePath value="/nfs/home/rquilici/ProActive/scripts/proactive.java.policy"/>
+						<absolutePath
+							value="/nfs/home/rquilici/ProActive/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="/nfs/home/rquilici/ProActive/scripts/proactive-log4j"/>
+						<absolutePath
+							value="/nfs/home/rquilici/ProActive/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter value="-Dproactive.communication.protocol=http"/>
-						<parameter value="-Dproactive.http.port=22500"/>
+						<parameter
+							value="-Dproactive.communication.protocol=http" />
+						<parameter value="-Dproactive.http.port=22500" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="globusProcess">
-				<globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="globus_frontend">
-					<processReference refid="localJVM1"/>
-					 <globusOption>
+				<globusProcess
+					class="org.objectweb.proactive.core.process.globus.GlobusProcess"
+					hostname="globus_frontend">
+					<processReference refid="localJVM1" />
+					<globusOption>
 						<count>8</count>
 						<maxTime>120</maxTime>
-						<errorFile>/nfs/home/rquilici/error.txt</errorFile>
-					 </globusOption>
+						<errorFile>
+							/nfs/home/rquilici/error.txt
+						</errorFile>
+					</globusOption>
 				</globusProcess>
 			</processDefinition>
 		</processes>

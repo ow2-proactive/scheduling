@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="3.2">
-	
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="3.2"
+	xmlns:pas="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd">
+	<xs:import
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
+		schemaLocation="SecuritySchema.xsd" id="security_schema" />
 	<!-- 
 		The following element ProActiveDescriptor defines the root of the schema
 	-->
@@ -307,11 +312,21 @@
 	</xs:simpleType>
 	<!--ProActiveDescriptor element has three or four childs: mainDefinition element, that may appears any number of times, componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
 	<xs:complexType name="ProActiveDescriptorType">
-		<xs:sequence>
+   	<xs:sequence>
 			<xs:element name="variables" type="VariablesType"
 				minOccurs="0" />
-			<xs:element name="security" type="SecurityType"
-				minOccurs="0" />
+			<xs:element name="security" minOccurs="0" maxOccurs="1">
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="file">
+							<xs:complexType>
+								<xs:attribute name="uri" type="xs:anyURI" />
+							</xs:complexType>
+						</xs:element>
+						<xs:element ref="pas:Policy" />
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="mainDefinition" type="MainDefinitionType"
 				minOccurs="0" />
 			<xs:element name="componentDefinition"
@@ -335,6 +350,7 @@
 			<xs:element name="technicalServices"
 				type="TechnicalServiceType" minOccurs="0" />
 		</xs:sequence>
+ 	<xs:attribute name="schemaVersion" type="xs:decimal" use="required" fixed="3.3"/>	
 	</xs:complexType>
 
 	<xs:complexType name="VariablesType">
@@ -1514,9 +1530,6 @@
 			<xs:element name="errorFile" type="TextOrVariableType"
 				minOccurs="0" />
 		</xs:all>
-	</xs:complexType>
-	<xs:complexType name="SecurityType">
-		<xs:attribute name="file" type="xs:string" />
 	</xs:complexType>
 	<!--unicoreProcess element has 4 childs: processReference element which represents a process defined elsewhere, unicoreDirPath
 		which represents the unicore client configuration directory, keyFilePath which represnets de unicore cliente certificate file and

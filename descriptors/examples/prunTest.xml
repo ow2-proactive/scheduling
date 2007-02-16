@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="prunNode"/>
+			<virtualNode name="prunNode" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="prunNode">
 				<jvmSet>
-					<vmName value="Jvm1"/>
+					<vmName value="Jvm1" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="prunCluster"/>
+					<processReference refid="prunCluster" />
 				</creation>
 			</jvm>
 		</jvms>
@@ -27,44 +31,64 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="linuxJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
-						
-						<absolutePath value="${PROACTIVE_HOME}/lib/jini-core.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/jini-ext.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/reggie.jar"/>
-						
-						<absolutePath value="${PROACTIVE_HOME}/classes"/>
-						<absolutePath value="/home1/fabrice/workIbis/Ibis/classes"/>
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/jsch.jar" />
+
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/jini-core.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/jini-ext.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/reggie.jar" />
+
+						<absolutePath value="${PROACTIVE_HOME}/classes" />
+						<absolutePath
+							value="/home1/fabrice/workIbis/Ibis/classes" />
 					</classpath>
 					<javaPath>
-						<absolutePath value="/usr/local/sun-java/jdk1.4/bin/java"/>
+						<absolutePath
+							value="/usr/local/sun-java/jdk1.4/bin/java" />
 					</javaPath>
 					<policyFile>
-						<absolutePath value="/${PROACTIVE_HOME}scripts/unix/proactive.java.policy"/>
+						<absolutePath
+							value="/${PROACTIVE_HOME}scripts/unix/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j"/>
+						<absolutePath
+							value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter value="-DXXXXXXXXX=YYYYYYYY "/>
-						<parameter value="-Djava.library.path=${PROACTIVE_HOME}/lib "/>
-						<parameter value="-Dproactive.configuration=${PROACTIVE_HOME}/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
+						<parameter value="-DXXXXXXXXX=YYYYYYYY " />
+						<parameter
+							value="-Djava.library.path=${PROACTIVE_HOME}/lib " />
+						<parameter
+							value="-Dproactive.configuration=${PROACTIVE_HOME}/modelisation/scripts/mixed/proactiveConfiguration.xml" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="prunCluster">
-				<prunProcess class="org.objectweb.proactive.core.process.prun.PrunSubProcess">
-					<processReference refid="linuxJVM1"/>
+				<prunProcess
+					class="org.objectweb.proactive.core.process.prun.PrunSubProcess">
+					<processReference refid="linuxJVM1" />
 					<prunOption>
 						<hostsNumber>4</hostsNumber>
 						<processorPerNode>1</processorPerNode>

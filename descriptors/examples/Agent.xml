@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="Agent" property="unique"/>
+			<virtualNode name="Agent" property="unique" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
-		<register virtualNode="Agent" protocol="rmi"/>
+		<register virtualNode="Agent" protocol="rmi" />
 		<mapping>
 			<map virtualNode="Agent">
 				<jvmSet>
-					<currentJVM protocol="rmi"/>
+					<currentJVM protocol="rmi" />
 				</jvmSet>
 			</map>
 		</mapping>
@@ -18,7 +22,8 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
 			</processDefinition>
 		</processes>
 	</infrastructure>

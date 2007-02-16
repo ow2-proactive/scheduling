@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="JacobiMPI" />
@@ -25,9 +28,11 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.useIPaddress=true" />
+						<parameter
+							value="-Dproactive.useIPaddress=true" />
 						<parameter value="-Dproactive.rmi.port=6099" />
 					</jvmParameters>
 				</jvmProcess>
@@ -35,20 +40,24 @@
 
 			<!-- MPI PROCESSES -->
 			<processDefinition id="mpiJacobiProcess">
-				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="jacobi" >
+				<mpiProcess
+					class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess"
+					mpiFileName="jacobi">
 					<commandPath value="/usr/bin/mpirun" />
 					<mpiOptions>
 						<processNumber>4</processNumber>
 						<localRelativePath>
-							<relativePath origin="user.dir" value="../../src/org/objectweb/proactive/examples/mpi" />
+							<relativePath origin="user.dir"
+								value="../../src/org/objectweb/proactive/examples/mpi" />
 						</localRelativePath>
 					</mpiOptions>
 				</mpiProcess>
 			</processDefinition>
-				
+
 			<!-- DEPENDENT PROCESSES -->
 			<processDefinition id="dpsLocalProcess">
-				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess">
+				<dependentProcessSequence
+					class="org.objectweb.proactive.core.process.DependentListProcess">
 					<processReference refid="localJVM" />
 					<processReference refid="mpiJacobiProcess" />
 				</dependentProcessSequence>

@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="testNode"/>
+			<virtualNode name="testNode" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="testNode">
 				<jvmSet>
-					<vmName value="Jvm1"/>
-					<vmName value="Jvm2"/>
-					<vmName value="Jvm3"/>
+					<vmName value="Jvm1" />
+					<vmName value="Jvm2" />
+					<vmName value="Jvm3" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="jvmProcess"/>
+					<processReference refid="jvmProcess" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<creation>
-					<processReference refid="jvmProcess"/>
+					<processReference refid="jvmProcess" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
 				<creation>
-					<processReference refid="jvmProcess"/>
+					<processReference refid="jvmProcess" />
 				</creation>
 			</jvm>
 		</jvms>
@@ -36,41 +39,51 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="jvmProcess">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<bootclasspath>
-						<absolutePath  value="/home1/fabrice/IOFAb/Ibis/"/>
-						<absolutePath  value="/home1/fabrice/IOFAb/classlibs/jdk"/>
+						<absolutePath
+							value="/home1/fabrice/IOFAb/Ibis/" />
+						<absolutePath
+							value="/home1/fabrice/IOFAb/classlibs/jdk" />
 					</bootclasspath>
 					<classpath>
-						<absolutePath  value="/home1/fabrice/IOFAb/ProActive/"/>
-						<absolutePath  value="/home1/fabrice/IOFAb/classlibs/lib"/>
+						<absolutePath
+							value="/home1/fabrice/IOFAb/ProActive/" />
+						<absolutePath
+							value="/home1/fabrice/IOFAb/classlibs/lib" />
 					</classpath>
 					<!--<classpath>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/classes"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workIbis/Ibis/classes"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/bcel.jar"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/asm.jar"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/jini-core.jar"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/jini-ext.jar"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/reggie.jar"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/log4j.jar"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar"/>
-                    </classpath>-->
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/classes"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workIbis/Ibis/classes"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/bcel.jar"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/asm.jar"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/jini-core.jar"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/jini-ext.jar"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/reggie.jar"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/log4j.jar"/>
+						<absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar"/>
+						</classpath>-->
 					<policyFile>
-						<absolutePath  value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive.java.policy"/>
+						<absolutePath
+							value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath  value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive-log4j"/>
+						<absolutePath
+							value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib"/>
-						<parameter value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib://usr/local/sun-java/jdk1.4/jre/lib/i386"/>
-						<parameter value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
+						<parameter
+							value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib" />
+						<parameter
+							value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib://usr/local/sun-java/jdk1.4/jre/lib/i386" />
+						<parameter
+							value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml" />
 					</jvmParameters>
 					<!--<jvmParameters>
-                        <parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib"/>
-                        <parameter value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
-                    </jvmParameters>-->
+						<parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib"/>
+						<parameter value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
+						</jvmParameters>-->
 				</jvmProcess>
 			</processDefinition>
 		</processes>

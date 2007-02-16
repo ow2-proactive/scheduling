@@ -1,40 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
-   <componentDefinition>
-      <virtualNodesDefinition>               <!-- Declare the different virtual nodes-->
-         <virtualNode name="Hello"/>      
-      </virtualNodesDefinition>
-   </componentDefinition>
-   <deployment>
-      <register virtualNode="Hello" protocol="rmi"/> 
-      <mapping>                              <!-- Map the different virtual nodes to jvm ?-->
-         <map virtualNode="Hello">           
-            <jvmSet>
-               <vmName value="distant_Jvm"/>
-            </jvmSet>
-         </map>
-      </mapping>
-      
-      <jvms>                                 <!-- Define the different jvms-->
-         <jvm name="distant_Jvm">
-         <creation>
-            <processReference refid="rsh_amda"/>
-         </creation>
-         </jvm>
-      </jvms>
-   </deployment>
-   <infrastructure>
-      <processes>                            <!-- Define how the jvms should be created -->
-         
-         <processDefinition id="rsh_amda">     <!-- Creation of a node on a distant machine called "amda"  -->
-            <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess"  hostname="amda">
-               <processReference refid="jvmProcess"/>
-            </rshProcess>
-         </processDefinition>
-         
-         <processDefinition id="jvmProcess">  <!-- general definition of a java process -->
-            <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"></jvmProcess>
-         </processDefinition>
-      </processes>
-   </infrastructure>
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition><!-- Declare the different virtual nodes-->
+			<virtualNode name="Hello" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<register virtualNode="Hello" protocol="rmi" />
+		<mapping><!-- Map the different virtual nodes to jvm ?-->
+			<map virtualNode="Hello">
+				<jvmSet>
+					<vmName value="distant_Jvm" />
+				</jvmSet>
+			</map>
+		</mapping>
+
+		<jvms><!-- Define the different jvms-->
+			<jvm name="distant_Jvm">
+				<creation>
+					<processReference refid="rsh_amda" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes><!-- Define how the jvms should be created -->
+
+			<processDefinition id="rsh_amda"><!-- Creation of a node on a distant machine called "amda"  -->
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="amda">
+					<processReference refid="jvmProcess" />
+				</rshProcess>
+			</processDefinition>
+
+			<processDefinition id="jvmProcess"><!-- general definition of a java process -->
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				</jvmProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
 </ProActiveDescriptor>

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -12,7 +16,7 @@
 		<mapping>
 			<map virtualNode="plugtest">
 				<jvmSet>
-						<vmName value="JvmSophia" />							
+					<vmName value="JvmSophia" />
 				</jvmSet>
 			</map>
 		</mapping>
@@ -28,61 +32,85 @@
 		<processes>
 			<!-- ### JVM: Worker-->
 			<processDefinition id="JVM_Worker">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
-						
-						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
+
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 					</classpath>
 					<javaPath>
-						<absolutePath value="/home/sophia/plugtest/jdk/bin/java" />
+						<absolutePath
+							value="/home/sophia/plugtest/jdk/bin/java" />
 					</javaPath>
 					<policyFile>
-						<absolutePath value="/home/sophia/plugtest/ProActive/scripts/proactive.java.policy" />
+						<absolutePath
+							value="/home/sophia/plugtest/ProActive/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="/home/sophia/plugtest/ProActive/scripts/proactive-log4j" />
+						<absolutePath
+							value="/home/sophia/plugtest/ProActive/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter value="-Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader" />
-						<parameter value="-Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi" />
-						<parameter value="-Dlog4j.defaultInitOverride=true" />
-						<parameter value="-Dproactive.rmi.port=2030"/>
+						<parameter
+							value="-Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader" />
+						<parameter
+							value="-Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi" />
+						<parameter
+							value="-Dlog4j.defaultInitOverride=true" />
+						<parameter value="-Dproactive.rmi.port=2030" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
-			
+
 			<processDefinition id="JVM_Forwarder">
-					<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-						<extendedJvm refid="JVM_Worker"/>
-						<jvmParameters>
-							<parameter value="-Dproactive.communication.protocol=rmissh" />
-						</jvmParameters>
-					</jvmProcess>
-				</processDefinition>
-				
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<extendedJvm refid="JVM_Worker" />
+					<jvmParameters>
+						<parameter
+							value="-Dproactive.communication.protocol=rmissh" />
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+
 			<processDefinition id="oarProcess">
-				<oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess" bookedNodesAccess="ssh">
+				<oarProcess
+					class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+					bookedNodesAccess="ssh">
 					<processReference refid="JVM_Worker" />
 					<commandPath value="/usr/bin/oarsub" />
 					<oarOption>
 						<resources>nodes=all,weight=2</resources>
 						<scriptPath>
-							<absolutePath value="/home/sophia/plugtest/ProActive/scripts/unix/cluster/oarStartRuntime.sh" />
+							<absolutePath
+								value="/home/sophia/plugtest/ProActive/scripts/unix/cluster/oarStartRuntime.sh" />
 						</scriptPath>
 					</oarOption>
 				</oarProcess>
 			</processDefinition>
-			
+
 			<processDefinition id="sshHierarchical">
-				<hierarchicalProcess class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess" hostname="frontend_name" username="plugtest" internal_ip="138.96.20.1">
+				<hierarchicalProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
+					hostname="frontend_name" username="plugtest"
+					internal_ip="138.96.20.1">
 					<processReference refid="JVM_Forwarder" />
 					<hierarchicalReference refid="oarProcess" />
 				</hierarchicalProcess>

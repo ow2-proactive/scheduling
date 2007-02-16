@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="matrixNode" property="multiple"/>
+			<virtualNode name="matrixNode" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="matrixNode">
 				<jvmSet>
-					<vmName value="Jvm1"/>
+					<vmName value="Jvm1" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="rsh_list"/>
+					<processReference refid="rsh_list" />
 				</creation>
 			</jvm>
 		</jvms>
@@ -24,10 +27,14 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
 			</processDefinition>
 			<processDefinition id="rsh_list">
-				<processList class="org.objectweb.proactive.core.process.rsh.RSHProcessList" fixedName="node-" list="[0-100;2]^[10,20,0]" domain="grid5000.fr" padding="2">
+				<processList
+					class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
+					fixedName="node-" list="[0-100;2]^[10,20,0]" domain="grid5000.fr"
+					padding="2">
 					<processReference refid="localJVM"></processReference>
 				</processList>
 			</processDefinition>

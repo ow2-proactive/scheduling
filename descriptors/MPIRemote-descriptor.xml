@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="ProActive"/>
-		<descriptorVariable name="REMOTE_HOME" value="/home/smariani"/>
-		<descriptorVariable name="MPIRUN_PATH" value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun"/>
-		<descriptorVariable name="QSUB_PATH" value="/opt/torque/bin/qsub"/>
-		<descriptorVariable name="USER_HOME" value="/user/smariani/home"/>
+		<descriptorVariable name="PROACTIVE_HOME" value="ProActive" />
+		<descriptorVariable name="REMOTE_HOME" value="/home/smariani" />
+		<descriptorVariable name="MPIRUN_PATH"
+			value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun" />
+		<descriptorVariable name="QSUB_PATH"
+			value="/opt/torque/bin/qsub" />
+		<descriptorVariable name="USER_HOME"
+			value="/user/smariani/home" />
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -38,29 +44,43 @@
 		<processes>
 
 			<processDefinition id="localJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/jsch.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/jsch.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes" />
 					</classpath>
 					<javaPath>
-						<absolutePath value="${REMOTE_HOME}/jdk1.5.0_05/bin/java" />
+						<absolutePath
+							value="${REMOTE_HOME}/jdk1.5.0_05/bin/java" />
 					</javaPath>
 					<policyFile>
-						<absolutePath value="${REMOTE_HOME}/proactive.java.policy" />
+						<absolutePath
+							value="${REMOTE_HOME}/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/compile/proactive-log4j" />
+						<absolutePath
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/compile/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter value="-Dproactive.useIPaddress=true" />
+						<parameter
+							value="-Dproactive.useIPaddress=true" />
 						<parameter value="-Dproactive.rmi.port=6099" />
 					</jvmParameters>
 				</jvmProcess>
@@ -68,9 +88,11 @@
 
 			<!-- remote jvm Process -->
 			<processDefinition id="jvmProcess">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.useIPaddress=true" />
+						<parameter
+							value="-Dproactive.useIPaddress=true" />
 						<parameter value="-Dproactive.rmi.port=6099" />
 					</jvmParameters>
 				</jvmProcess>
@@ -78,7 +100,8 @@
 
 			<!-- pbs Process -->
 			<processDefinition id="pbsProcess">
-				<pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess">
+				<pbsProcess
+					class="org.objectweb.proactive.core.process.pbs.PBSSubProcess">
 					<processReference refid="localJVM1" />
 					<commandPath value="${QSUB_PATH}" />
 					<pbsOption>
@@ -86,7 +109,8 @@
 						<processorPerNode>1</processorPerNode>
 						<bookingDuration>00:02:00</bookingDuration>
 						<scriptPath>
-							<absolutePath value="${REMOTE_HOME}/pbsStartRuntime.sh" />
+							<absolutePath
+								value="${REMOTE_HOME}/pbsStartRuntime.sh" />
 						</scriptPath>
 					</pbsOption>
 				</pbsProcess>
@@ -94,12 +118,15 @@
 
 			<!-- mpi Process -->
 			<processDefinition id="mpiCPI">
-				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="cpi">
+				<mpiProcess
+					class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess"
+					mpiFileName="cpi">
 					<commandPath value="${MPIRUN_PATH}" />
 					<mpiOptions>
 						<processNumber>3</processNumber>
 						<localRelativePath>
-							<relativePath origin="user.home" value="${PROACTIVE_HOME}/scripts/unix" />
+							<relativePath origin="user.home"
+								value="${PROACTIVE_HOME}/scripts/unix" />
 						</localRelativePath>
 						<remoteAbsolutePath>
 							<absolutePath value="${REMOTE_HOME}/MyApp" />
@@ -110,7 +137,8 @@
 
 			<!-- dependent process -->
 			<processDefinition id="dpsCPI">
-				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess">
+				<dependentProcessSequence
+					class="org.objectweb.proactive.core.process.DependentListProcess">
 					<processReference refid="pbsProcess" />
 					<processReference refid="mpiCPI" />
 				</dependentProcessSequence>
@@ -118,9 +146,11 @@
 
 			<!-- ssh process -->
 			<processDefinition id="sshProcess">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="nef.inria.fr" username="smariani">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="nef.inria.fr" username="smariani">
 					<processReference refid="dpsCPI" />
-				
+
 				</sshProcess>
 			</processDefinition>
 		</processes>

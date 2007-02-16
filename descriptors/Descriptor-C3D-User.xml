@@ -1,52 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
-     	<!-- <security file="../../descriptors/security/c3dAddUserPolicy.xml"></security> -->
-     	<mainDefinition id="main" class="org.objectweb.proactive.examples.c3d.C3DUser">
-			<mapToVirtualNode value="main-user"/>
-		</mainDefinition>
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
+
+	<!-- <security file="../../descriptors/security/c3dAddUserPolicy.xml"></security> -->
+	<mainDefinition id="main"
+		class="org.objectweb.proactive.examples.c3d.C3DUser">
+		<mapToVirtualNode value="main-user" />
+	</mainDefinition>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="main-user"/>
-			<virtualNode name="User" property="unique"/>
+			<virtualNode name="main-user" />
+			<virtualNode name="User" property="unique" />
 		</virtualNodesDefinition>
 		<virtualNodesAcquisition>
-			<virtualNode name="Dispatcher"/>
+			<virtualNode name="Dispatcher" />
 		</virtualNodesAcquisition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="main-user">
-					<jvmSet>
-						<vmName value="JvmUser"/>
-					</jvmSet>
+				<jvmSet>
+					<vmName value="JvmUser" />
+				</jvmSet>
 			</map>
 			<map virtualNode="User">
 				<jvmSet>
-					<currentJVM protocol="rmi"/>
+					<currentJVM protocol="rmi" />
 				</jvmSet>
 			</map>
 		</mapping>
-		<lookup virtualNode="Dispatcher" host="*" protocol="rmi" port="*"/>
+		<lookup virtualNode="Dispatcher" host="*" protocol="rmi"
+			port="*" />
 		<jvms>
 			<jvm name="JvmUser">
 				<creation>
-					<processReference refid="JVMUserPreocess"/>
+					<processReference refid="JVMUserPreocess" />
 				</creation>
 			</jvm>
 		</jvms>
-		
+
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="JVMUserPreocess">
-					<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					</jvmProcess>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				</jvmProcess>
 			</processDefinition>
-		
+
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dsun.rmi.server.exceptionTrace=true" />  
+						<parameter
+							value="-Dsun.rmi.server.exceptionTrace=true" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

@@ -1,87 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:noNamespaceSchemaLocation=
-"http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 	</variables>
-	
-    <componentDefinition>
-        <virtualNodesDefinition>
-            <virtualNode name="plugtest" property="multiple"/>
-        </virtualNodesDefinition>
-    </componentDefinition>
-    <deployment>
-        <mapping>
-            <map virtualNode="plugtest">
-                <jvmSet>
-		    		<vmName value="JvmTestSite"/>
-                </jvmSet>
-            </map>
-        </mapping>
-        <jvms>
-            <jvm name="JvmTestSite">
-                <creation>
-                    <processReference refid="unicoreProcessTestSite"/>
-                </creation>
-            </jvm>
-        </jvms>
-    </deployment>
+
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="plugtest" property="multiple" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="plugtest">
+				<jvmSet>
+					<vmName value="JvmTestSite" />
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="JvmTestSite">
+				<creation>
+					<processReference refid="unicoreProcessTestSite" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
 	<fileTransferDefinitions>
 		<fileTransfer id="ProActiveLite">
-			<dir src="ProActive"/>
+			<dir src="ProActive" />
 		</fileTransfer>
 	</fileTransferDefinitions>
-    <infrastructure>
-	<processes>
-		<processDefinition id="jvmTestSite">
-                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-                    <classpath>
-			<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-			<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
-			<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-			<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-			<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
-			<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-			<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-			
-			<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
-                        <absolutePath value="ProActive/lib/nqueen.jar"/>
-                    </classpath>
-                    <javaPath>
-                        <absolutePath value="/opt/j2sdk1.4/bin/java"/>
-                    </javaPath>
-                    <policyFile>
-                        <absolutePath value="ProActive/scripts/proactive.java.policy"/>
-                    </policyFile>
-                    <log4jpropertiesFile>
-                        <absolutePath value="ProActive/scripts/proactive-log4j"/>
-                    </log4jpropertiesFile>
-                </jvmProcess>
-		</processDefinition>
-		<processDefinition id="unicoreProcessTestSite">
-			<unicoreProcess class="org.objectweb.proactive.core.process.unicore.UnicoreProcess" 
-				jobname="ProActivePlugtestJob" submitjob="true" savejob="false" keypassword="x">
-				<processReference refid="jvmTestSite"/>
-				<unicoreDirPath>
-					  <relativePath origin="user.home" value=".unicore"/>
-                      <!--absolutePath value="/home/mleyton/.unicore"/--> 
-                </unicoreDirPath>
-				<keyFilePath>
-					<relativePath origin="user.home" value=".unicore/keystore"/>
-					<!--absolutePath value="/home/mleyton/.unicore/keystore"/-->  
-				</keyFilePath>
-				<unicoreOption>
-					<usite name="Gate Europe" type="CLASSIC" url="http://testgrid.unicorepro.com:4000"/>
-					<vsite name="SUPRENUM" nodes="1" processors="1" memory="256" runtime="3600" priority="normal"/>
-				</unicoreOption>
-				<fileTransferDeploy refid="ProActiveLite">
-					<copyProtocol>processDefault</copyProtocol>
-					<sourceInfo prefix="/0/plugtest/ProActiveLite"/>
-					<destinationInfo/>
-				</fileTransferDeploy>
-			</unicoreProcess>
-		</processDefinition>
-	  </processes>
-    </infrastructure>
+	<infrastructure>
+		<processes>
+			<processDefinition id="jvmTestSite">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/jsch.jar" />
+						<absolutePath value="ProActive/lib/nqueen.jar" />
+					</classpath>
+					<javaPath>
+						<absolutePath value="/opt/j2sdk1.4/bin/java" />
+					</javaPath>
+					<policyFile>
+						<absolutePath
+							value="ProActive/scripts/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath
+							value="ProActive/scripts/proactive-log4j" />
+					</log4jpropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="unicoreProcessTestSite">
+				<unicoreProcess
+					class="org.objectweb.proactive.core.process.unicore.UnicoreProcess"
+					jobname="ProActivePlugtestJob" submitjob="true" savejob="false"
+					keypassword="x">
+					<processReference refid="jvmTestSite" />
+					<unicoreDirPath>
+						<relativePath origin="user.home"
+							value=".unicore" />
+						<!--absolutePath value="/home/mleyton/.unicore"/-->
+					</unicoreDirPath>
+					<keyFilePath>
+						<relativePath origin="user.home"
+							value=".unicore/keystore" />
+						<!--absolutePath value="/home/mleyton/.unicore/keystore"/-->
+					</keyFilePath>
+					<unicoreOption>
+						<usite name="Gate Europe" type="CLASSIC"
+							url="http://testgrid.unicorepro.com:4000" />
+						<vsite name="SUPRENUM" nodes="1" processors="1"
+							memory="256" runtime="3600" priority="normal" />
+					</unicoreOption>
+					<fileTransferDeploy refid="ProActiveLite">
+						<copyProtocol>processDefault</copyProtocol>
+						<sourceInfo prefix="/0/plugtest/ProActiveLite" />
+						<destinationInfo />
+					</fileTransferDeploy>
+				</unicoreProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
 </ProActiveDescriptor>

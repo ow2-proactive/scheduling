@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="plugtest" timeout="300000"/>
+			<virtualNode name="plugtest" timeout="300000" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="plugtest">
 				<jvmSet>
-					<vmName value="Jvm1"/>
+					<vmName value="Jvm1" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="sshSCC"/>
+					<processReference refid="sshSCC" />
 				</creation>
 			</jvm>
 		</jvms>
@@ -27,59 +31,83 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 					</classpath>
-					
+
 					<javaPath>
 						<!--<absolutePath value="/home/user/grid/jre1.5.0_02/bin/java"/>-->
-						<absolutePath value="IBMJava2-142/bin/java"/>
+						<absolutePath value="IBMJava2-142/bin/java" />
 					</javaPath>
 					<policyFile>
-						<absolutePath value="/home/user/grid/ProActive/scripts/proactive.java.policy"/>
+						<absolutePath
+							value="/home/user/grid/ProActive/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="/home/user/grid/ProActive/scripts/proactive-log4j"/>
+						<absolutePath
+							value="/home/user/grid/ProActive/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
-						<parameter value="-Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader"/>
-						<parameter value="-Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi"/>
-						<parameter value="-Dlog4j.defaultInitOverride=true"/>
-						<parameter value="-Dproactive.rmi.port=2051"/>	
+						<parameter
+							value="-Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader" />
+						<parameter
+							value="-Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi" />
+						<parameter
+							value="-Dlog4j.defaultInitOverride=true" />
+						<parameter value="-Dproactive.rmi.port=2051" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="localJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<extendedJvm refid="localJVM"/>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<extendedJvm refid="localJVM" />
 					<jvmParameters>
-						<parameter value="-Dproactive.communication.protocol=rmissh"/>
-						<parameter value="-Djava.rmi.server.hostname=10.12.15.19"/>
+						<parameter
+							value="-Dproactive.communication.protocol=rmissh" />
+						<parameter
+							value="-Djava.rmi.server.hostname=10.12.15.19" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="bsubSCC">
-				<bsubProcess class="org.objectweb.proactive.core.process.lsf.CNLSFProcess" interactive="true">
-					<processReference refid="localJVM"/>
-					<commandPath value="/opt/lsf/6.0/linux2.4-glibc2.2-amd64/bin/bsub"/>
+				<bsubProcess
+					class="org.objectweb.proactive.core.process.lsf.CNLSFProcess"
+					interactive="true">
+					<processReference refid="localJVM" />
+					<commandPath
+						value="/opt/lsf/6.0/linux2.4-glibc2.2-amd64/bin/bsub" />
 					<bsubOption>
 						<processor>50</processor>
 						<scriptPath>
-							<absolutePath value="/home/user/grid/startCNRuntime"/>
+							<absolutePath
+								value="/home/user/grid/startCNRuntime" />
 						</scriptPath>
 					</bsubOption>
 				</bsubProcess>
 			</processDefinition>
 			<processDefinition id="sshSCC">
-				<hierarchicalProcess class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess" hostname="frontend_name" internal_ip="10.12.15.19" username="grid">
+				<hierarchicalProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
+					hostname="frontend_name" internal_ip="10.12.15.19"
+					username="grid">
 					<processReference refid="localJVM1"></processReference>
 					<hierarchicalReference refid="bsubSCC"></hierarchicalReference>
 				</hierarchicalProcess>

@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="p2pvn" property="multiple"  />
+			<virtualNode name="p2pvn" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="p2pvn">
 				<jvmSet>
-					<vmName value="Jvm1"/>
-					<vmName value="Jvm2"/>
+					<vmName value="Jvm1" />
+					<vmName value="Jvm2" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<acquisition>
-					<serviceReference refid="p2plookup"/>
+					<serviceReference refid="p2plookup" />
 				</acquisition>
 			</jvm>
 			<jvm name="Jvm2">
@@ -28,15 +31,17 @@
 		</jvms>
 	</deployment>
 	<infrastructure>
-	<processes>
+		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-  </jvmProcess>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				</jvmProcess>
 			</processDefinition>
-			</processes>
+		</processes>
 		<services>
 			<serviceDefinition id="p2plookup">
-				<P2PService nodesAsked="2" acq="rmi" port="2410" NOA="10" TTU="60000" TTL="10">
+				<P2PService nodesAsked="2" acq="rmi" port="2410"
+					NOA="10" TTU="60000" TTL="10">
 					<peerSet>
 						<peer>localhost</peer>
 					</peerSet>

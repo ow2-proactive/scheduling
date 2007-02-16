@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:noNamespaceSchemaLocation=
-"http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="plugtest" property="multiple"/>
+			<virtualNode name="plugtest" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="plugtest">
 				<jvmSet>
-					<vmName value="newJvm"/>
+					<vmName value="newJvm" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="newJvm">
 				<creation>
-					<processReference refid="sshProcess"/>
+					<processReference refid="sshProcess" />
 				</creation>
 			</jvm>
 		</jvms>
@@ -29,44 +32,62 @@ xsi:noNamespaceSchemaLocation=
 	<infrastructure>
 		<processes>
 			<processDefinition id="linuxJVM1">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<classpath>					
-						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 					</classpath>
 					<javaPath>
-						<absolutePath value="/user/rquilici/home/j2sdk1.4.2_05/bin/java"/>
+						<absolutePath
+							value="/user/rquilici/home/j2sdk1.4.2_05/bin/java" />
 					</javaPath>
 					<policyFile>
-						<absolutePath  value="${PROACTIVE_HOME}/scripts/unix/proactive.java.policy"/>
+						<absolutePath
+							value="${PROACTIVE_HOME}/scripts/unix/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath  value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j"/>
+						<absolutePath
+							value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j" />
 					</log4jpropertiesFile>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="oarCluster">
-				<oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess" bookedNodesAccess="ssh">
-					<processReference refid="linuxJVM1"/>
-					<commandPath value="/usr/bin/oarsub"/>
+				<oarProcess
+					class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+					bookedNodesAccess="ssh">
+					<processReference refid="linuxJVM1" />
+					<commandPath value="/usr/bin/oarsub" />
 					<oarOption>
 						<resources>nodes=2,weight=2</resources>
-						 <scriptPath>
-                                  <absolutePath  value="/home/sophia/rquilici/ProActive/scripts/unix/cluster/oarStartRuntime.sh"/>
-                          </scriptPath>
+						<scriptPath>
+							<absolutePath
+								value="/home/sophia/rquilici/ProActive/scripts/unix/cluster/oarStartRuntime.sh" />
+						</scriptPath>
 					</oarOption>
 				</oarProcess>
 			</processDefinition>
 			<processDefinition id="sshProcess">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="oar.sophia.grid5000.fr">
-					<processReference refid="oarCluster"/>
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="oar.sophia.grid5000.fr">
+					<processReference refid="oarCluster" />
 				</sshProcess>
 			</processDefinition>
 		</processes>

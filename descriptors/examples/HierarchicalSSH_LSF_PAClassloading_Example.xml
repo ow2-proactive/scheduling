@@ -1,92 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 	</variables>
-        <componentDefinition>
-                <virtualNodesDefinition>
-                        <virtualNode name="plugtest" property="multiple" timeout="660000"/>
-                </virtualNodesDefinition>
-        </componentDefinition>
-        <deployment>
-                <mapping>
-                        <map virtualNode="plugtest">
-                                <jvmSet>
-                                        <vmName value="Jvm1"/>
-                                </jvmSet>
-                        </map>
-                </mapping>
-                <jvms>
-                        <jvm name="Jvm1">
-                                <creation>
-                                        <processReference refid="sshHierarchical"/>
-                                </creation>
-                        </jvm>
-                </jvms>
-        </deployment>
-        <infrastructure>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="plugtest" property="multiple"
+				timeout="660000" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="plugtest">
+				<jvmSet>
+					<vmName value="Jvm1" />
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="sshHierarchical" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
 		<processes>
 			<processDefinition id="internalJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-				<classpath>
-					<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-					<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
-					<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-					<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-					<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
-					<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-					<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-					<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
-				</classpath>
-				<javaPath>
-					<absolutePath  value="/home/rquilici/j2sdk1.4.2_09/bin/java"/>
-				</javaPath>
-				<policyFile>
-					<absolutePath  value="/home/rquilici/ProActive/scripts/proactive.java.policy"/>
-				</policyFile>
-				<log4jpropertiesFile>
-					<absolutePath  value="/home/rquilici/ProActive/scripts/proactive-log4j"/>
-				</log4jpropertiesFile>
-				<jvmParameters>
-					<parameter value="-Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader"/>
-					<parameter value="-Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi"/>
-					<parameter value="-Dlog4j.defaultInitOverride=true"/>
-				</jvmParameters>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
+					</classpath>
+					<javaPath>
+						<absolutePath
+							value="/home/rquilici/j2sdk1.4.2_09/bin/java" />
+					</javaPath>
+					<policyFile>
+						<absolutePath
+							value="/home/rquilici/ProActive/scripts/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath
+							value="/home/rquilici/ProActive/scripts/proactive-log4j" />
+					</log4jpropertiesFile>
+					<jvmParameters>
+						<parameter
+							value="-Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader" />
+						<parameter
+							value="-Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi" />
+						<parameter
+							value="-Dlog4j.defaultInitOverride=true" />
+					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 
-				<processDefinition id="frontendJVM">
-					<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-						<extendedJvm refid="internalJVM"/>
-						<jvmParameters>
-							<parameter value="-Dproactive.communication.protocol=rmissh"/>
-							<parameter value="-Djava.rmi.serverhostname=frontend_name"/>
-						</jvmParameters>
-					</jvmProcess>
-				</processDefinition>
+			<processDefinition id="frontendJVM">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<extendedJvm refid="internalJVM" />
+					<jvmParameters>
+						<parameter
+							value="-Dproactive.communication.protocol=rmissh" />
+						<parameter
+							value="-Djava.rmi.serverhostname=frontend_name" />
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
 
-            <processDefinition id="LSFprocess">
-                <bsubProcess class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess" queue="priority">
-                    <processReference refid="internalJVM"/>
-					<commandPath value="/opt/lsf/6.0/linux2.6-glibc2.3-ia64/bin/bsub -o output"/>
-                    <bsubOption>
-                        <processor>4</processor> <!--max 32 -->
-                        <resourceRequirement value="span[ptile=2]"/>
-                        <scriptPath>
-                            <absolutePath value="/home/rquilici/startRuntime.sh"/>
-                        </scriptPath>
-                    </bsubOption>
-                </bsubProcess>
-            </processDefinition>
-			
+			<processDefinition id="LSFprocess">
+				<bsubProcess
+					class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess"
+					queue="priority">
+					<processReference refid="internalJVM" />
+					<commandPath
+						value="/opt/lsf/6.0/linux2.6-glibc2.3-ia64/bin/bsub -o output" />
+					<bsubOption>
+						<processor>4</processor><!--max 32 -->
+						<resourceRequirement value="span[ptile=2]" />
+						<scriptPath>
+							<absolutePath
+								value="/home/rquilici/startRuntime.sh" />
+						</scriptPath>
+					</bsubOption>
+				</bsubProcess>
+			</processDefinition>
+
 			<processDefinition id="sshHierarchical">
-					<hierarchicalProcess class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess" 
-								hostname="frontend_name" username="rquilici" internal_ip="10.0.0.99">
-						<processReference refid="frontendJVM"/>
-						<hierarchicalReference refid = "LSFprocess"/>
-					</hierarchicalProcess>
-				</processDefinition>
-   
-             </processes>
-        </infrastructure>
+				<hierarchicalProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
+					hostname="frontend_name" username="rquilici"
+					internal_ip="10.0.0.99">
+					<processReference refid="frontendJVM" />
+					<hierarchicalReference refid="LSFprocess" />
+				</hierarchicalProcess>
+			</processDefinition>
+
+		</processes>
+	</infrastructure>
 </ProActiveDescriptor>

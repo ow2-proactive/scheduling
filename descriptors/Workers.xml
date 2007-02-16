@@ -1,72 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="Workers" property="multiple"/>
+			<virtualNode name="Workers" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="Workers">
 				<jvmSet>
-					<currentJVM/>
-	           <!-- Uncomment following lines to run the example on four machines with rsh. -->
-	           <!-- Don't forget to change the machine names in the hostname attribute of the rsh processes -->
-			<!--		<vmName value="Jvm1"/>
-					<vmName value="Jvm2"/>
-				 	<vmName value="Jvm3"/>
-					<vmName value="Jvm4"/>   -->
+					<currentJVM />
+					<!-- Uncomment following lines to run the example on four machines with rsh. -->
+					<!-- Don't forget to change the machine names in the hostname attribute of the rsh processes -->
+					<!--		<vmName value="Jvm1"/>
+						<vmName value="Jvm2"/>
+						<vmName value="Jvm3"/>
+						<vmName value="Jvm4"/>   -->
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="rsh_predadab"/>
+					<processReference refid="rsh_predadab" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<creation>
-					<processReference refid="rsh_noadcoco"/>
+					<processReference refid="rsh_noadcoco" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
 				<creation>
-					<processReference refid="rsh_crusoe"/>
+					<processReference refid="rsh_crusoe" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
 				<creation>
-					<processReference refid="rsh_amstel"/>
+					<processReference refid="rsh_amstel" />
 				</creation>
 			</jvm>
-			</jvms>
+		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
 			</processDefinition>
 			<processDefinition id="rsh_predadab">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
-                     <processReference refid="localJVM"/>
-                 </rshProcess>
-             </processDefinition>
-             <processDefinition id="rsh_noadcoco">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="noadcoco">
-                     <processReference refid="localJVM"/>
-                 </rshProcess>
-             </processDefinition>
-             <processDefinition id="rsh_crusoe">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="crusoe">
-                     <processReference refid="localJVM"/>
-                 </rshProcess>
-             </processDefinition>
-             <processDefinition id="rsh_amstel">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amstel">
-                     <processReference refid="localJVM"/>
-                 </rshProcess>
-             </processDefinition>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="predadab">
+					<processReference refid="localJVM" />
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_noadcoco">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="noadcoco">
+					<processReference refid="localJVM" />
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_crusoe">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="crusoe">
+					<processReference refid="localJVM" />
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_amstel">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="amstel">
+					<processReference refid="localJVM" />
+				</rshProcess>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>
