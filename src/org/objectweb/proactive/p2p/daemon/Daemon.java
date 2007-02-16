@@ -620,7 +620,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
             File file = new File(configFile);
             Reader reader = new FileReader(file);
             stream = new StreamReader(new InputSource(reader), this,
-                    getXMLSchema(), this);
+                    new String[] {getXMLSchema().toString()}, this);
         } catch (IOException ioe) {
             return false;
         }

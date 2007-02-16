@@ -70,7 +70,7 @@ public class StreamReader implements XMLReader {
     }
 
     public StreamReader(org.xml.sax.InputSource inputSource,
-        XMLHandler xmlHandler, java.net.URL schema,
+        XMLHandler xmlHandler, String[] schemas,
         org.xml.sax.ErrorHandler errorHandler) throws java.io.IOException {
         this.inputSource = inputSource;
 
@@ -82,14 +82,13 @@ public class StreamReader implements XMLReader {
         //parser = org.xml.sax.helpers.XMLReaderFactory.createXMLReader();
         parser.setContentHandler(adaptor);
 
-        if ((schema != null) || (errorHandler != null)) {
+        if ((schemas != null) || (errorHandler != null)) {
             try {
                 parser.setErrorHandler((errorHandler == null)
                     ? new SAXParserErrorHandler() : errorHandler);
 
-                if (schema != null) {
-                    parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource",
-                        schema.toString());
+                if (schemas != null) {
+                    parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource",schemas);
 
                     ///    File f = new FileInputStream( ProActive.class.getResourceAsStream("/DescriptorSchema.xsd"));
                 }

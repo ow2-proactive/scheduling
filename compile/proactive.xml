@@ -125,7 +125,11 @@
 			</fileset>
 		</copy>
 		<!-- copy descriptor schema -->
-		<copy todir="${classes.dir}/org/objectweb/proactive/core/descriptor/xml/" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>		
+		<copy todir="${classes.dir}/org/objectweb/proactive/core/descriptor/xml/" overwrite="yes">
+			<fileset dir="${base}/descriptors">
+				<include name="*.xsd"/>
+			</fileset>
+        </copy>
 		<copy todir="${base}/descriptors/examples" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
 	</target>
 

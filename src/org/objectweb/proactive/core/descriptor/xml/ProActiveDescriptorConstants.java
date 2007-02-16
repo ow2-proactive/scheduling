@@ -158,6 +158,7 @@ public interface ProActiveDescriptorConstants {
     public static final String JVMPARAMETERS_TAG = "jvmParameters";
     public static final String JVMPARAMETER_TAG = "parameter";
     public static final String SECURITY_TAG = "security";
+    public static final String SECURITY_FILE_TAG = "file";
     public static final String RMI_LOOKUP_TAG = "RMIRegistryLookup";
     public static final String P2P_SERVICE_TAG = "P2PService";
     public static final String PROACTIVE_SCHEDULER_TAG = "ProActiveScheduler";

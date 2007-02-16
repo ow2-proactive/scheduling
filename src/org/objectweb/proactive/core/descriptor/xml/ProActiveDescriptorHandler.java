@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Enumeration;
 
@@ -45,6 +46,7 @@ import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.core.xml.io.SAXParserErrorHandlerTerminating;
 import org.objectweb.proactive.scheduler.Scheduler;
+import org.xml.sax.SAXException;
 
 /**
  * This class receives deployment events
@@ -165,20 +167,16 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 	 * @param xmlDescriptorUrl
 	 *            the URL of XML Descriptor
 	 */
-	public static ProActiveDescriptorHandler createProActiveDescriptor(
-			String xmlDescriptorUrl, VariableContract variableContract)
-			throws java.io.IOException, org.xml.sax.SAXException {
-		// static method added to replace main method
-		InitialHandler h = new InitialHandler(xmlDescriptorUrl,
-				variableContract);
-		String uri = xmlDescriptorUrl;
-
+	
+	
+	public static URL selectSchema(String schema) throws java.io.IOException{
+		
 		// we get the schema from the class location
 		ClassLoader classLoader = ProActiveDescriptorHandler.class
 				.getClassLoader();
-		Enumeration<URL> schemaURLs = classLoader
-				.getResources("org/objectweb/proactive/core/descriptor/xml/DescriptorSchema.xsd");
-
+		
+		Enumeration<URL> schemaURLs = classLoader.getResources("org/objectweb/proactive/core/descriptor/xml/" + schema);
+		
 		// among the various descriptor schema that we may find, we will always
 		// favor the one that is in the jar file
 		URL schemaURLcandidate = null;
@@ -201,7 +199,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 			// we locate the proactive code
 			Enumeration<URL> classURLs = ProActiveDescriptorHandler.class
 					.getClassLoader().getResources(
-							"org/objectweb/proactive/core/descriptor/xml/");
+							"org/objectweb/proactive/core/descriptor/xml/"+schema);
 
 			// we make sure that we found a file structure (and not a jar)
 			URL classURLcandidate = null;
@@ -228,38 +226,76 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 							+ java.io.File.separator + ".."
 							+ java.io.File.separator + java.io.File.separator
 							+ "descriptors" + java.io.File.separator
-							+ "DescriptorSchema.xsd");
+							+ schema);
 
 					java.io.File test = new java.io.File(uriSchema);
 
 					// we make sure that we have found the right file
 					if (test.isFile()
-							&& test.getName().equals("DescriptorSchema.xsd")) {
+							&& test.getName().equals(schema)) {
 						schemaURLcandidate = uriSchema.toURL();
 					} else {
 						logger
-								.error("The Proactive.jar file doesn't contain the Descriptor Schema.");
+								.error("The Proactive.jar file doesn't contain the "+ schema + " Schema.");
 						schemaURLcandidate = null;
 					}
 				} else {
 					logger
-							.error("The descriptor schema could not be located in your environment.");
+							.error("The schema "+schema + " could not be located in your environment.");
 					schemaURLcandidate = null;
 				}
 			} catch (Exception e) {
 				logger
-						.error("The descriptor schema could not be located in your environment.");
+						.error("The schema "+ schema + " could not be located in your environment.");
 				schemaURLcandidate = null;
 			}
 		}
+		
+		return schemaURLcandidate;
+	}
+	
+	
+	
+	public static ProActiveDescriptorHandler createProActiveDescriptor(
+			String xmlDescriptorUrl, VariableContract variableContract)
+			throws java.io.IOException, org.xml.sax.SAXException {
+		// static method added to replace main method
+		InitialHandler h = new InitialHandler(xmlDescriptorUrl,
+				variableContract);
+		String uri = xmlDescriptorUrl;
 
-		logger.debug("Using XML schema: " + schemaURLcandidate);
+	
+		
+		String[] schemas = new String[] { "DescriptorSchema.xsd",
+				"SecuritySchema.xsd" } ;
+		
+	
+		String[] selectedSchemas = new String[schemas.length];
+	
+		for (int i= 0; i < schemas.length; i++) {
+	
+			
+			URL schemaURLcandidate = selectSchema(schemas[i]);
+			
+			if ((schemaURLcandidate != null) &&
+				((selectedSchemas[i] = schemaURLcandidate.toString()) != null)) {
+			logger.debug("Using XML schema: " + schemaURLcandidate.toString());
+			} else {
+				logger.error("No schema instance (file) found for " + schemas[i]);
+			}
 
+		}
+		
 		org.objectweb.proactive.core.xml.io.StreamReader sr = null;
-
+		org.xml.sax.InputSource inputSource = new org.xml.sax.InputSource(uri);
+		
+		inputSource.setSystemId(uri.toString());
+		
 		if ("enable".equals(ProActiveConfiguration.getSchemaValidationState())) {
+			
+			
 			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
-					new org.xml.sax.InputSource(uri), h, schemaURLcandidate,
+					new org.xml.sax.InputSource(uri), h, selectedSchemas,
 					new SAXParserErrorHandlerTerminating());
 		} else {
 			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
@@ -449,10 +485,36 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 	/**
 	 * This class receives Security events
 	 */
-	private class SecurityHandler extends BasicUnmarshaller {
+	private class SecurityHandler extends AbstractUnmarshallerDecorator {
 		private ProActiveDescriptor proActiveDescriptor;
 
 		public SecurityHandler(ProActiveDescriptor proActiveDescriptor) {
+			super();
+			this.proActiveDescriptor = proActiveDescriptor;
+			this.addHandler(SECURITY_FILE_TAG,
+					new SecurityFileHandler(proActiveDescriptor));
+		}
+
+		@Override
+		protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws SAXException {
+		}
+
+		public Object getResultObject() throws SAXException {
+			return proActiveDescriptor;
+		}
+
+		public void startContextElement(String name, Attributes attributes) throws SAXException {			
+		}
+
+	}
+
+	/**
+	 * This class receives Security events
+	 */
+	private class SecurityFileHandler extends BasicUnmarshaller {
+		private ProActiveDescriptor proActiveDescriptor;
+
+		public SecurityFileHandler(ProActiveDescriptor proActiveDescriptor) {
 			super();
 			this.proActiveDescriptor = proActiveDescriptor;
 		}
@@ -460,16 +522,25 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 		public void startContextElement(String name, Attributes attributes)
 				throws org.xml.sax.SAXException {
 			// create and register a VirtualNode
-			String file = attributes.getValue("file");
+			String path = attributes.getValue("uri");
 
-			if (!checkNonEmpty(file)) {
+			if (!checkNonEmpty(path)) {
 				throw new org.xml.sax.SAXException("Empty security file");
 			}
 
-			logger.debug("creating ProActiveSecurityManager : " + file);
-			proActiveDescriptor.createProActiveSecurityManager(file);
+			File f = new File(path);
+			if (! f.isAbsolute()) {
+				File descriptorPath = new File(this.proActiveDescriptor.getUrl());
+				String descriptorDir = descriptorPath.getParent();
+				if ( descriptorDir != null) {
+					path = descriptorDir + File.separator + path;
+				}
+			}
+			
+			logger.debug("creating ProActiveSecurityManager : " + path);
+			proActiveDescriptor.createProActiveSecurityManager(path);
 		}
 	}
-
+	
 	// end inner class SecurityHandler
 }
