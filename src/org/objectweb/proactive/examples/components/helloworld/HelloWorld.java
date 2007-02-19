@@ -93,7 +93,7 @@ public class HelloWorld {
             String arg2 = "r";
             String arg3 = HelloWorld.class.getResource(
                     "/org/objectweb/proactive/examples/components/helloworld/deployment.xml")
-                                          .getPath(); // the deployment descriptor for proactive
+                                          .toString(); // the deployment descriptor for proactive
 
             if (distributed) {
                 if (useWrapper) {

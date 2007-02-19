@@ -1623,7 +1623,7 @@ public class ProActive {
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
-        if (!xmlDescriptorUrl.startsWith("file:")) {
+        if (xmlDescriptorUrl.indexOf(':') == -1) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
