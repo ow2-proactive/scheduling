@@ -30,9 +30,13 @@
  */
 package org.objectweb.proactive.core.component.adl.implementations;
 
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 import org.objectweb.deployment.scheduling.component.api.FactoryProviderTask;
 import org.objectweb.deployment.scheduling.component.lib.AbstractInstanceProviderTask;
-
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Node;
@@ -44,16 +48,14 @@ import org.objectweb.fractal.adl.implementations.Implementation;
 import org.objectweb.fractal.adl.implementations.ImplementationCompiler;
 import org.objectweb.fractal.adl.implementations.ImplementationContainer;
 import org.objectweb.fractal.adl.nodes.VirtualNodeContainer;
-
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.type.Composite;
-
-import java.util.List;
-import java.util.Map;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -61,6 +63,7 @@ import java.util.Map;
  */
 public class ProActiveImplementationCompiler extends ImplementationCompiler {
     private static int counter = 0;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     public void compile(final List path, final ComponentContainer container,
         final TaskMap tasks, final Map context) throws ADLException {
@@ -150,27 +153,19 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                 contentDesc = new ContentDescription(Composite.class.getName());
             } else {
                 controllerDesc = new ControllerDescription(name,
-                        Constants.COMPOSITE,
-                        getClass().getResource(controller).getPath());
+                        Constants.COMPOSITE, getControllerPath(controller, name));
             }
         } else {
             // a primitive component
-            //if (implementation instanceof String) {
-            // that seems to be the case with the fractaladl
-            // contentDesc = new ContentDescription((String) implementation);
             contentDesc = new ContentDescription(implementation);
 
             if ("primitive".equals(controller) || (controller == null)) {
                 controllerDesc = new ControllerDescription(name,
                         Constants.PRIMITIVE);
             } else {
-                // System.out.println("CONTROLLER = " + controller);
                 controllerDesc = new ControllerDescription(name,
-                        Constants.PRIMITIVE,
-                        getClass().getResource(controller).getPath());
+                        Constants.PRIMITIVE, getControllerPath(controller, name));
             }
-
-            //}
         }
 
         createTask = new CreateTask((ProActiveImplementationBuilder) builder,
@@ -182,6 +177,17 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         createTask.setFactoryProviderTask(typeTask);
 
         tasks.addTask("create", container, createTask);
+    }
+
+    private static String getControllerPath(String controller, String name) {
+        URL controllerURL = ProActiveImplementationCompiler.class.getResource(controller);
+        if (controllerURL != null) {
+            return controllerURL.getPath();
+        } else {
+            logger.warn("Can't retrieve controller description \"" +
+                controller + "\" for component " + name);
+            return null;
+        }
     }
 
     // TODO change visibility of this inner class in ImplementationCompiler 
