@@ -129,15 +129,6 @@ public interface Loggers {
     public static final String SCILAB_WORKER = SCILAB + ".worker";
     public static final String SCILAB_TASK = SCILAB + ".task";
 
-    // Scheduler loggers
-    public static final String SCHEDULER = "proactive.scheduler";
-    public static final String SCHEDULER_COMMAND_LISTENER = SCHEDULER + ".commandlistener";
-    public static final String TASK_SCHEDULER = "proactive.taskscheduler";
-    public static final String JOB_TEMPLATE = SCHEDULER + ".jobTemplate";
-    public static final String RESSOURCE_MANAGER = SCHEDULER + ".ressourceManager";
-    public static final String RESSOURCE_LISTENER = SCHEDULER + ".ressourceListener";
-    public static final String JOB_MANAGER = SCHEDULER + ".jobManager";
-
     // Skeleton loggers
     static final public String SKELETONS = CORE+".skeletons";
     static final public String SKELETONS_STRUCTURE = SKELETONS+".structure";

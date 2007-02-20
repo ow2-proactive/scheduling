@@ -53,7 +53,6 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 class DeploymentHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
     private ProActiveDescriptor proActiveDescriptor;
-    private boolean activate = true;
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -80,33 +79,6 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         }
     }
 
-    /**
-     * This is the same constructor as the first but with the main difference that
-     * this one is used by the scheduler and has another argument which is the activate
-     * that tells the parser wether we are activating and creating the nodes or nt.
-     * @param proActiveDescriptor
-     * @param activate is set to false if we don't need to activate the VNs
-     */
-    public DeploymentHandler(ProActiveDescriptor proActiveDescriptor,
-        boolean activate) {
-        super(false);
-        this.activate = activate;
-        this.proActiveDescriptor = proActiveDescriptor;
-        this.addHandler(REGISTER_TAG, new RegisterHandler());
-        this.addHandler(LOOKUP_TAG, new LookupHandler());
-
-        {
-            PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
-            ch.addHandler(MAP_TAG, new MapHandler());
-            this.addHandler(MAPPING_TAG, ch);
-        }
-
-        {
-            PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
-            ch.addHandler(JVM_TAG, new JVMHandler());
-            this.addHandler(JVMS_TAG, ch);
-        }
-    }
 
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
@@ -267,22 +239,13 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {
                 if (name.equals(CURRENTJVM_TAG)) {
-                    // we create the node if and only if we are activating the mapping.
-                    // this is used by the scheduler to ensure that when parsing for 
-                    // description we don't create a node in the currentJVM
-                    if (activate) {
-                        String protocol = (String) activeHandler.getResultObject();
+                	String protocol = (String) activeHandler.getResultObject();
+                	if (!checkNonEmpty(protocol)) {
+                		protocol = System.getProperty("proactive.communication.protocol");
+                	}
 
-                        if (!checkNonEmpty(protocol)) {
-                            protocol = System.getProperty(
-                                    "proactive.communication.protocol");
-                        }
-
-                        vn.createNodeOnCurrentJvm(protocol);
-                    } else {
-                        throw new org.xml.sax.SAXException(
-                            "The use of the currentJVM tag is banned");
-                    }
+                	vn.createNodeOnCurrentJvm(protocol);
+                    
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }

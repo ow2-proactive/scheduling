@@ -107,7 +107,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="addons, ic2d, p2p, scheduler, timit, examples, trywithcatch, stub_wrapper, mpi" description="build the class files" />
+	<target name="compile" depends="addons, ic2d, p2p, timit, examples, trywithcatch, stub_wrapper, mpi" description="build the class files" />
 
 	<target name="addons" depends="bnb, calcium, jmx, loadbalancing, osgi, scilab, webservices"/>
 	
@@ -257,17 +257,6 @@
 			<classpath refid="project.classpath" />
 			<arg line="-d ${classes.dir} ${calcium-files}" />
 		</java>
-	</target>
-
-	<!-- ================================================================ -->
-	<!--                          Compile Scheduler                       -->
-	<!--  =============================================================== -->
-
-	<target name="scheduler" depends="core">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-			<include name="${proactive.dir}/scheduler/**/*.java" />
-		</javac>
 	</target>
 
 

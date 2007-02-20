@@ -770,8 +770,6 @@
 			<xs:element name="RMIRegistryLookup"
 				type="RMIRegistryLookupType" />
 			<xs:element name="P2PService" type="P2PServiceType" />
-			<xs:element name="ProActiveScheduler"
-				type="ProActiveSchedulerType" />
 			<xs:element name="faultTolerance" type="faultToleranceType" />
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required" />
@@ -817,25 +815,6 @@
 	<!-- RMIRegistryLookup has one attribute: the url to looup-->
 	<xs:complexType name="RMIRegistryLookupType">
 		<xs:attribute name="url" type="xs:string" use="required" />
-	</xs:complexType>
-	<!-- ProActiveScheduler has no childs. It has only 3 attributes:
-		numberOfNodes: an estimate of the number of nodes needed 
-		to start the application. This number may be altered at runtime,
-		if the job needs to have more ressources.
-		schedulerUrl: the url of the scheduler. By default we connect to the
-		following url: rmi://localhost:1234
-		jvmParameters: JVM parameters, mainly system variables, that need to
-		be submitted.
-	-->
-	<xs:complexType name="ProActiveSchedulerType">
-		<xs:attribute name="numberOfNodes" type="PosintOrVariableType"
-			use="required" />
-		<xs:attribute name="minNumberOfNodes"
-			type="PosintOrVariableType" use="optional" />
-		<xs:attribute name="schedulerUrl" type="xs:string"
-			use="optional" />
-		<xs:attribute name="jvmParameters" type="xs:string"
-			use="optional" />
 	</xs:complexType>
 	<!-- P2PService has one child peerSet that represents a set of peer's url.
 		It has also 6 attributes: 

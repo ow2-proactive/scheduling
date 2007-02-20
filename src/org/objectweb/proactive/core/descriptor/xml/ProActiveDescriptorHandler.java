@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.core.xml.io.SAXParserErrorHandlerTerminating;
-import org.objectweb.proactive.scheduler.Scheduler;
 import org.xml.sax.SAXException;
 
 /**
@@ -58,10 +57,6 @@ import org.xml.sax.SAXException;
 public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 		implements ProActiveDescriptorConstants {
 	protected ProActiveDescriptor proActiveDescriptor;
-
-	private Scheduler scheduler;
-
-	private String jobID;
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -100,40 +95,6 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 		}
 
 		this.addHandler(VARIABLES_TAG, new VariablesHandler(variableContract));
-	}
-
-	public ProActiveDescriptorHandler(Scheduler scheduler, String jobId,
-			String xmlDescriptorUrl) {
-		super(false);
-		this.proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
-		this.scheduler = scheduler;
-		this.jobID = jobId;
-		addHandler(MAIN_DEFINITION_TAG, new MainDefinitionHandler(scheduler,
-				jobId, this.proActiveDescriptor));
-		addHandler(INFRASTRUCTURE_TAG, new InfrastructureHandler(scheduler,
-				jobId, this.proActiveDescriptor));
-		addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor,
-				false));
-		addHandler(FILE_TRANSFER_DEFINITIONS_TAG,
-				new FileTransferDefinitionsHandler(proActiveDescriptor));
-		addHandler(TECHNICAL_SERVICES_TAG, new TechnicalServicesHandler(
-				proActiveDescriptor));
-		addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
-
-		{
-			PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
-			PassiveCompositeUnmarshaller vNodesDefHandler = new PassiveCompositeUnmarshaller();
-			PassiveCompositeUnmarshaller vNodesAcqHandler = new PassiveCompositeUnmarshaller();
-			vNodesDefHandler.addHandler(VIRTUAL_NODE_TAG,
-					new VirtualNodeHandler(proActiveDescriptor));
-			vNodesAcqHandler.addHandler(VIRTUAL_NODE_TAG,
-					new VirtualNodeLookupHandler());
-			compDefHandler.addHandler(VIRTUAL_NODES_DEFINITION_TAG,
-					vNodesDefHandler);
-			compDefHandler.addHandler(VIRTUAL_NODES_ACQUISITION_TAG,
-					vNodesAcqHandler);
-			this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
-		}
 	}
 
 	//

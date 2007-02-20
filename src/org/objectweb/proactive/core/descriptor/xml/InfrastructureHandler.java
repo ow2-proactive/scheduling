@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.descriptor.xml;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
-import org.objectweb.proactive.scheduler.Scheduler;
 
 
 /**
@@ -59,18 +58,6 @@ class InfrastructureHandler extends PassiveCompositeUnmarshaller
         ch.addHandler(SERVICE_DEFINITION_TAG,
             new ServiceDefinitionHandler(proActiveDescriptor));
         this.addHandler(SERVICES_TAG, ch);
-    }
-
-    public InfrastructureHandler(Scheduler scheduler, String jobId,
-        ProActiveDescriptor proActiveDescriptor) {
-        super(false);
-        CollectionUnmarshaller ch = new CollectionUnmarshaller();
-        ch.addHandler(SERVICE_DEFINITION_TAG,
-            new ServiceDefinitionHandler(scheduler, jobId, proActiveDescriptor));
-        this.addHandler(SERVICES_TAG, ch);
-        ch.addHandler(PROCESS_DEFINITION_TAG,
-            new ProcessDefinitionHandler(proActiveDescriptor));
-        this.addHandler(PROCESSES_TAG, ch);
     }
 
     //

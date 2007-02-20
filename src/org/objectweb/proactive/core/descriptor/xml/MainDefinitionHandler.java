@@ -37,10 +37,6 @@ import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-import org.objectweb.proactive.scheduler.GenericJob;
-import org.objectweb.proactive.scheduler.Scheduler;
-import org.objectweb.proactive.scheduler.SchedulerConstants;
-
 
 /**
  * This class receives main_definition events
@@ -50,10 +46,8 @@ import org.objectweb.proactive.scheduler.SchedulerConstants;
  * @since   ProActive
  */
 class MainDefinitionHandler extends PassiveCompositeUnmarshaller
-    implements ProActiveDescriptorConstants, SchedulerConstants {
+    implements ProActiveDescriptorConstants {
     private ProActiveDescriptor proActiveDescriptor;
-    private Scheduler scheduler;
-    private String jobId;
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -72,20 +66,6 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
             new MapToVirtualNodeHandler(proActiveDescriptor));
     }
 
-    public MainDefinitionHandler(Scheduler scheduler, String jobId,
-        ProActiveDescriptor proActiveDescriptor) {
-        this.proActiveDescriptor = proActiveDescriptor;
-        UnmarshallerHandler pathHandler = new PathHandler();
-        CollectionUnmarshaller classPath_Handler = new CollectionUnmarshaller(String.class);
-        classPath_Handler.addHandler(ABS_PATH_TAG, pathHandler);
-        this.scheduler = scheduler;
-        this.jobId = jobId;
-        this.addHandler(ARG_TAG, new ArgHandler(proActiveDescriptor));
-        this.addHandler(MAP_TO_VIRTUAL_NODE_TAG,
-            new MapToVirtualNodeHandler(proActiveDescriptor));
-        this.addHandler(CLASSPATH_TAG, classPath_Handler);
-    }
-
     public void startContextElement(String name, Attributes attributes)
         throws org.xml.sax.SAXException {
         String id = attributes.getValue("id");
@@ -94,11 +74,6 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
         if (!checkNonEmpty(className)) {
             throw new org.xml.sax.SAXException(
                 "class Tag without any mainDefinition defined");
-        }
-
-        if (scheduler != null) {
-            GenericJob tmpJob = scheduler.getTmpJob(this.jobId);
-            tmpJob.setClassName(className);
         }
 
         proActiveDescriptor.createMainDefinition(id);
@@ -115,18 +90,6 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
 
         if (name.equals(MAP_TO_VIRTUAL_NODE_TAG)) {
             //System.out.println("end of a mapToVirtualNode tag") ;
-        }
-
-        if (name.equals(CLASSPATH_TAG)) {
-            //System.out.println("end of a classpath tag") ;
-            if (scheduler != null) {
-                String[] result = (String[]) activeHandler.getResultObject();
-                GenericJob job = scheduler.getTmpJob(this.jobId);
-                job.setClassPath(result);
-                //        		for (int i=0; i<result.length; ++i) {
-                //        			System.out.println("------------" + result[i]);
-                //        		}
-            }
         }
     }
 
@@ -157,11 +120,6 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
             if (!checkNonEmpty(arg)) {
                 throw new org.xml.sax.SAXException(
                     "value Tag without any arg defined");
-            }
-
-            if (scheduler != null) {
-                GenericJob job = scheduler.getTmpJob(jobId);
-                job.addMainParameter(arg);
             }
 
             proActiveDescriptor.mainDefinitionAddParameter(arg);

@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-import org.objectweb.proactive.scheduler.SchedulerConstants;
 
 
 /**
@@ -89,25 +88,6 @@ public class ServiceThread extends Thread {
             nodeCount = nodeCount + ((part != null) ? part.length : 0);
             if (part != null) {
                 notifyVirtualNode(part);
-            }
-
-            if (service.getServiceName()
-                           .equals(SchedulerConstants.SCHEDULER_NODE_NAME)) {
-                SchedulerLookupService schedulerLookupService = ((SchedulerLookupService) service);
-                Node[] reservedNodes = schedulerLookupService.getNodes();
-
-                for (int i = 0; i < reservedNodes.length; i++) {
-                    Node node = reservedNodes[i];
-                    nodeCount++;
-                    ((VirtualNodeImpl) vn).nodeCreated(new NodeCreationEvent(
-                            vn, NodeCreationEvent.NODE_CREATED, node, nodeCount));
-                    //                    System.out.println("--------------------" + node.getNodeInformation().getURL());
-                    if (loggerDeployment.isInfoEnabled()) {
-                        loggerDeployment.info(
-                            "Service thread just created event for node: " +
-                            node.getNodeInformation().getURL());
-                    }
-                }
             }
 
             if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
