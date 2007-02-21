@@ -32,23 +32,20 @@ package org.objectweb.proactive.core.mop;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 
+import sun.rmi.server.MarshalInputStream;
 
-public class PAObjectInputStream extends ObjectInputStream {
+
+public class PAObjectInputStream extends MarshalInputStream {
     public PAObjectInputStream(InputStream in) throws IOException {
         super(in);
-    }
-
-    public PAObjectInputStream() throws IOException, SecurityException {
-        super();
     }
 
     protected Class<?> resolveClass(ObjectStreamClass desc)
         throws IOException, ClassNotFoundException {
         try {
-            super.resolveClass(desc);
+            return super.resolveClass(desc);
         } catch (ClassNotFoundException e) {
             //it didn't work using standard resolving
             //let's see if the mop has seen this class before		
@@ -56,6 +53,5 @@ public class PAObjectInputStream extends ObjectInputStream {
             //		System.out.println("Calling resolClass  FAILED trying MOP ");
             return MOP.loadClass(desc.getName());
         }
-        return super.resolveClass(desc);
     }
 }
