@@ -232,13 +232,16 @@ public class FuturePool extends Object implements java.io.Serializable {
             // of the result to the other futures to respect ProActive model
             // We use here the migration tag to perform a simple serialization (ie 
             // without continuation side-effects)
-            setMigrationTag();
-            for (int i = 1; i < futuresToUpdate.size(); i++) {
-                Future otherFuture = (Future) (futuresToUpdate.get(i));
-                otherFuture.receiveReply((FutureResult) Utils.makeDeepCopy(
-                        result));
+            int numOfFuturesToUpdate = futuresToUpdate.size();
+            if (numOfFuturesToUpdate>1){
+                setMigrationTag();
+                for (int i = 1; i < numOfFuturesToUpdate; i++) {
+                    Future otherFuture = (Future) (futuresToUpdate.get(i));
+                    otherFuture.receiveReply((FutureResult) Utils.makeDeepCopy(
+                            result));
+                }
+                unsetMigrationTag();
             }
-            unsetMigrationTag();
             stateChange();
 
             // 2) create and put ACservices
