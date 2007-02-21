@@ -30,8 +30,6 @@
  */ 
 package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
