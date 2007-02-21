@@ -528,7 +528,6 @@ private static void printMessageAndWait() {
   &lt;/componentDefinition&gt;
   &lt;deployment&gt;
    &lt;mapping&gt;
-    &lt;/map&gt;
     &lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
      &lt;jvmSet&gt;
       &lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
