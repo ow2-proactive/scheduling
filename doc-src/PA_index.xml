@@ -23,7 +23,6 @@
 <!ENTITY SSHTunneling SYSTEM "SSHTunneling.xml">
 <!ENTITY faultTolerance SYSTEM "faultTolerance.xml">
 <!ENTITY technicalService SYSTEM "technicalService.xml">
-<!ENTITY Scheduler_Doc SYSTEM "Scheduler.xml">
 <!ENTITY intro SYSTEM "components/intro.xml">
 <!ENTITY implementation SYSTEM "components/implementation.xml">
 <!ENTITY conformance SYSTEM "components/conformance.xml">
@@ -109,7 +108,6 @@
     &SSHTunneling;
     &faultTolerance;
     &technicalService;
-    &Scheduler_Doc;
    </part>
    
    <part id="ProActiveComponents">
