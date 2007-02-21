@@ -421,7 +421,7 @@ public class Service {
      * blocks until a request is available or until the body terminate
      */
     public void waitForRequest() {
-        requestQueue.waitForRequest();
+        requestQueue.waitForRequest(0);
     }
 
     /**

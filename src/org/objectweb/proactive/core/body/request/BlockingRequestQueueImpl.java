@@ -36,7 +36,9 @@ import java.util.LinkedList;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.event.RequestQueueEvent;
+import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.spmd.MethodBarrier;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrierWithMethodName;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
@@ -54,6 +56,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
     private boolean specialExecution = false;
     private String specialMethod = "";
     private LinkedList<MethodBarrier> methodBarriers = new LinkedList<MethodBarrier>();
+    private boolean waitingForRequest = false;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -171,16 +174,22 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         return blockingRemove(timeout, false);
     }
 
-    public synchronized void waitForRequest() {
-        while (isEmpty() && shouldWait) {
-            if (hasListeners()) {
-                notifyAllListeners(new RequestQueueEvent(ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-            }
+    public synchronized boolean isWaitingForRequest() {
+        return waitingForRequest;
+    }
+
+    public synchronized void waitForRequest(long timeout) {
+        if (hasListeners()) {
+            notifyAllListeners(new RequestQueueEvent(ownerID,
+                    RequestQueueEvent.WAIT_FOR_REQUEST));
+        }
+        try {
+        	this.waitingForRequest = timeout == 0;
+            this.wait(timeout);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            this.waitingForRequest = false;
         }
     }
 
@@ -212,14 +221,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             : ((requestFilter == null) ? removeYoungest()
                                        : removeYoungest(requestFilter));
         while ((r == null) && shouldWait) {
-            if (hasListeners()) {
-                notifyAllListeners(new RequestQueueEvent(ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                this.wait(timeout);
-            } catch (InterruptedException e) {
-            }
+            waitForRequest(timeout);
             r = oldest
                 ? ((requestFilter == null) ? removeOldest()
                                            : removeOldest(requestFilter))
@@ -285,14 +287,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         while (((this.isEmpty() && this.shouldWait) || this.suspended ||
                 (this.indexOfRequestToServe() == -1)) &&
                 !this.specialExecution) {
-            if (hasListeners()) {
-                notifyAllListeners(new RequestQueueEvent(ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                wait(timeout);
-            } catch (InterruptedException e) {
-            }
+            waitForRequest(timeout);
             if ((System.currentTimeMillis() - timeStartWaiting) > timeout) {
                 return removeOldest();
             }
@@ -323,14 +318,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         while (((this.isEmpty() && this.shouldWait) || this.suspended ||
                 (this.indexOfRequestToServe() == -1)) &&
                 !this.specialExecution) {
-            if (this.hasListeners()) {
-                this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-            }
+            waitForRequest(0);
         }
         if (this.specialExecution) {
             this.specialExecution = false;

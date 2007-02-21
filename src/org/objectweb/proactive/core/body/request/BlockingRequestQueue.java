@@ -143,11 +143,17 @@ public interface BlockingRequestQueue extends RequestQueue {
     public Request blockingRemoveYoungest(long timeout);
 
     /**
+     * Check if the thread is currently waiting for a request
+     * @return true iff the thread is waiting for a request
+     */
+    public boolean isWaitingForRequest();
+    
+    /**
      * Blocks the calling thread until there is a request available. The request
      * is not removed from the queue.
      * Returns immediately if there is already one.
      */
-    public void waitForRequest();
+    public void waitForRequest(long timeout);
 
     /**
      * Blocks the service of requests.
