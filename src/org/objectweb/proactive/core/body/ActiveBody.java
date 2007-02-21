@@ -51,6 +51,8 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.component.body.ComponentActivity;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -153,12 +155,26 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
 
         // run the activity of the body
         try {
-            runActive.runActivity(this);
+        	/* We may race with a termination request in immediate service */
+        	RunActive thisRunActive = this.runActive;
+        	if (thisRunActive != null) {
+        		thisRunActive.runActivity(this);
+        	}
             // the body terminate its activity
             if (isActive()) {
                 // serve remaining requests if non dead
-                while (!(localBodyStrategy.getRequestQueue().isEmpty())) {
-                    serve(localBodyStrategy.getRequestQueue().removeOldest());
+            	for (;;) {
+            		BlockingRequestQueue queue;
+            		try {
+            			/* We may race with a termination request in immediate service */
+            			queue = this.localBodyStrategy.getRequestQueue();
+            			if (queue.isEmpty()) {
+            				break;
+            			}
+            		} catch (ProActiveRuntimeException pre) {
+            			break;
+            		}
+            		serve(queue.removeOldest());
                 }
             }
         } catch (Exception e) {
