@@ -69,6 +69,7 @@ import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
+import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -195,6 +196,7 @@ public abstract class BodyImpl extends AbstractBody
         } else {
             this.ftmanager = null;
         }
+        this.gc = new GarbageCollector(this);
         
         // JMX registration 
         try {
@@ -220,7 +222,6 @@ getName() + "-" + this.getID().toString().replace(':','-') );
                 } 
 
                 // End JMX registration      
-
     }
 
     //
@@ -314,6 +315,10 @@ getName() + "-" + this.getID().toString().replace(':','-') );
 
     public void updateNodeURL(String newNodeURL) {
         this.nodeURL = newNodeURL;
+    }
+
+    public boolean isInImmediateService() throws IOException {
+    	return this.requestReceiver.isInImmediateService();
     }
 
     //
@@ -448,9 +453,11 @@ getName() + "-" + this.getID().toString().replace(':','-') );
                     if (!isActive()) {
                         return; //test if active in case of terminate() method otherwise eventProducer would be null
                     }
-                    messageEventProducer.notifyListeners(request,
-                        MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                        getRequestQueue().size());
+                    if (messageEventProducer != null) {
+                    	messageEventProducer.notifyListeners(request,
+                    			MessageEvent.VOID_REQUEST_SERVED, bodyID,
+                    			getRequestQueue().size());
+                    }
                     return;
                 }
                 UniqueID destinationBodyId = request.getSourceBodyID();
@@ -474,7 +481,7 @@ getName() + "-" + this.getID().toString().replace(':','-') );
                 // Create a non functional exception encapsulating the network exception
                 BodyNonFunctionalException nfe = new SendReplyCommunicationException(
                         "Exception occured in while sending reply to request = " +
-                        request.getMethodName(), e);
+                        request.getMethodName(), e, BodyImpl.this, request.getSourceBodyID());
 
                 NFEManager.fireNFE(nfe, BodyImpl.this);
             }

@@ -41,6 +41,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.SecurityEntity;
@@ -152,6 +154,10 @@ public interface RemoteBody extends Serializable, SecurityEntity {
      * @exception java.io.IOException if an exception occured during the remote communication
      */
     public Object receiveFTMessage(FTMessage fte) throws IOException;
+
+    public GCResponse receiveGCMessage(GCMessage msg) throws IOException;
+
+    public void setRegistered(boolean registered) throws IOException;
 
     /**
      * Change the body referenced by this adapter

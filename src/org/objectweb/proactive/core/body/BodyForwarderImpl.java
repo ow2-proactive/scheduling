@@ -45,6 +45,8 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.Communication;
@@ -252,6 +254,24 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
+    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg) throws IOException {
+        BodyAdapter rbody = (BodyAdapter) bodies.get(id);
+        if (rbody != null) {
+            return rbody.receiveGCMessage(msg);
+        } else {
+            throw new IOException("No BodyAdapter associated to id=" + id);
+        }
+    }
+
+    public void setRegistered(UniqueID id, boolean registered) throws IOException {
+    	BodyAdapter rbody = (BodyAdapter) bodies.get(id);
+        if (rbody != null) {
+            rbody.setRegistered(registered);
+        } else {
+            throw new IOException("No BodyAdapter associated to id=" + id);
+        }
+    }
+    
     /** @see UniversalBody#receiveReply(Reply) */
     public int receiveReply(UniqueID id, Reply r) throws IOException {
         // a FuturProxy can be present inside r and must know if it is running

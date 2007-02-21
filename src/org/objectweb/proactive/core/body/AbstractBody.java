@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
@@ -52,6 +52,8 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
@@ -106,7 +108,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // -- STATIC MEMBERS -----------------------------------------------
     //
     private static final String TERMINATED_BODY_EXCEPTION_MESSAGE = "The body has been Terminated";
-    
     private static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     //
@@ -140,9 +141,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     /** whether the body has been killed. A killed body has no more activity although
        stopping the activity thread is not immediate */
     private transient boolean isDead;
-    
+
     // GC
-    private transient GarbageCollector gc;
+    // Initialized in the subclasses after the local body strategy
+    protected transient GarbageCollector gc;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -196,23 +198,30 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             isSecurityOn = psm.getCertificate() != null;
             internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
-        this.gc = new GarbageCollector(this);
     }
-    
+
     public void updateReference(UniversalBodyProxy ref) {
-    	this.gc.addProxy(ref);
+        this.gc.addProxy(this, ref);
+    }
+
+    public void updateReferences(Collection<UniversalBodyProxy> newReferences) {
+        for (UniversalBodyProxy ubp : newReferences) {
+            this.gc.addProxy(this, ubp);
+        }
+    }
+
+    public Collection<UniqueID> getReferences() {
+        return this.gc.getReferencesID();
+    }
+
+    public GarbageCollector getGarbageCollector() {
+        return this.gc;
+    }
+
+    public void setRegistered(boolean registered) {
+    	this.gc.setRegistered(registered);
     }
     
-    public void updateReferences(Collection<UniversalBodyProxy> newReferences) {
-   		for (UniversalBodyProxy ubp : newReferences) {
-   			this.gc.addProxy(ubp);
-    	}
-    }
-
-    public Collection<UniversalBodyProxy> getReferences() {
-    	return this.gc.getReferences();
-    }
-
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -272,8 +281,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
             this.registerIncomingFutures();
             ftres = this.internalReceiveRequest(request);
-            if (GarbageCollector.isBuildingTopology()) {
-            	updateReferences(UniversalBodyProxy.getIncomingReferences());
+            if (GarbageCollector.dgcIsEnabled()) {
+                updateReferences(UniversalBodyProxy.getIncomingReferences());
             }
         } finally {
             this.exitFromThreadStore();
@@ -315,8 +324,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
             this.registerIncomingFutures();
             ftres = internalReceiveReply(reply);
-            if (GarbageCollector.isBuildingTopology()) {
-            	updateReferences(UniversalBodyProxy.getIncomingReferences());
+            if (GarbageCollector.dgcIsEnabled()) {
+                updateReferences(UniversalBodyProxy.getIncomingReferences());
             }
         } finally {
             exitFromThreadStore();
@@ -635,9 +644,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             psm.setBody(this);
             internalBodySecurity = new InternalBodySecurity(null);
         } catch (Exception e) {
-        	
-            logger.error(
-                "Error when contructing a DefaultProActiveManager");
+            logger.error("Error when contructing a DefaultProActiveManager");
             e.printStackTrace();
         }
     }
@@ -714,8 +721,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      *
      * @see org.objectweb.proactive.Body#getShortcutTargetBody(org.objectweb.proactive.core.component.representative.ItfID)
      */
-    public UniversalBody getShortcutTargetBody(
-        ItfID functionalItfID) {
+    public UniversalBody getShortcutTargetBody(ItfID functionalItfID) {
         if (shortcuts == null) {
             return null;
         } else {
@@ -986,6 +992,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.ftmanager = ftm;
     }
 
+    public GCResponse receiveGCMessage(GCMessage msg) {
+        return this.gc.receiveGCMessage(msg);
+    }
+    
+    public abstract boolean isInImmediateService() throws IOException;
+
     //
     // -- SERIALIZATION METHODS -----------------------------------------------
     //
@@ -998,7 +1010,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         throws java.io.IOException, ClassNotFoundException {
         this.gc = new GarbageCollector(this);
         in.defaultReadObject();
-
         // FAULT TOLERANCE
         if (this.ftmanager != null) {
             if (this.ftmanager.isACheckpoint()) {

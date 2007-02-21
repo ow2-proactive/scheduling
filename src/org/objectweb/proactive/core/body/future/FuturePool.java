@@ -30,6 +30,7 @@
  */ 
 package org.objectweb.proactive.core.body.future;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,9 +48,11 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
+import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
+import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 public class FuturePool extends Object implements java.io.Serializable {
@@ -569,11 +572,18 @@ public class FuturePool extends Object implements java.io.Serializable {
                                                                   .getLocalHalfBody(FuturePool.this.ownerBody));
                     }
                     FTManager ftm = ownerBody.getFTManager();
-                    if (ftm != null) {
-                        ftm.sendReply(reply, dest);
-                    } else {
-                        //System.out.println("ACService.doAutomaticContinuation() : sending reply");
-                        reply.send(dest);
+                    try {
+	                    if (ftm != null) {
+	                        ftm.sendReply(reply, dest);
+	                    } else {
+	                        //System.out.println("ACService.doAutomaticContinuation() : sending reply");
+	                        reply.send(dest);
+	                    }
+                    } catch (IOException ioe) {
+                    	BodyNonFunctionalException nfe = new SendReplyCommunicationException(
+                                "Exception occured in while sending reply in AC", ioe, ownerBody, dest.getID());
+
+                        NFEManager.fireNFE(nfe, ownerBody);
                     }
                     removeDestination();
                 }

@@ -25,6 +25,7 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.deployment.filetransfer = DEBUG,CONSOLE
 #log4j.logger.proactive.filetransfer = DEBUG, CONSOLE
 #log4j.logger.proactive.nfe = FATAL
+#log4j.logger.proactive.gc = DEBUG, CONSOLE
 #log4j.logger.proactive.ft = DEBUG, CONSOLE
 #log4j.logger.proactive.ft.cic = DEBUG, CONSOLE
 #log4j.logger.proactive.ft.pml = DEBUG, CONSOLE

@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.gc.GCTag;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -72,6 +73,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     protected transient UniversalBody universalBody;
     protected transient boolean isLocal;
 
+    private transient GCTag tag;
+    
     private static ThreadLocal<Collection<UniversalBodyProxy>> incomingReferences = new ThreadLocal<Collection<UniversalBodyProxy>>() {
     	protected synchronized Collection<UniversalBodyProxy> initialValue() {
             return new Vector<UniversalBodyProxy>();
@@ -158,7 +161,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
             }
         }
 
-        if (GarbageCollector.isBuildingTopology()) {
+        if (GarbageCollector.dgcIsEnabled()) {
         	((AbstractBody)ProActive.getBodyOnThis()).updateReference(this);
         }
     }
@@ -361,8 +364,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy
             logger.debug("universalBody is " + universalBody);
         }
         
-        if (GarbageCollector.isBuildingTopology()) {
+        if (GarbageCollector.dgcIsEnabled()) {
         	incomingReferences.get().add(this);
         }
+    }
+    
+    public void setGCTag(GCTag tag) {
+    	assert this.tag == null;
+    	this.tag = tag;
     }
 }

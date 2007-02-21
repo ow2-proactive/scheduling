@@ -51,6 +51,8 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ext.security.Communication;
@@ -515,6 +517,37 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException {
         return null;
+    }
+
+    public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
+        if (isLocal) {
+            return body.receiveGCMessage(msg);
+        } else {
+            ArrayList paramList = new ArrayList();
+            paramList.add(msg);
+
+            BodyRequest br = new BodyRequest("receiveGCMessage", paramList, bodyID, url);
+            br.send();
+            try {
+            	return (GCResponse) br.getReturnedObject();
+            } catch (Exception e) {
+            	e.printStackTrace();
+            	return null;
+            }
+        }
+
+    }
+    
+    public void setRegistered(boolean registered) throws IOException {
+        if (isLocal) {
+            body.setRegistered(registered);
+        } else {
+            ArrayList paramList = new ArrayList();
+            paramList.add(new Boolean(registered));
+
+            BodyRequest br = new BodyRequest("setRegistered", paramList, bodyID, url);
+            br.send();
+        }
     }
 
     /**

@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.Communication;
@@ -394,6 +396,14 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     public Object receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedRemoteBody.receiveFTMessage(bodyID, ev);
     }
+
+    public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
+    	return proxiedRemoteBody.receiveGCMessage(bodyID, msg);
+    }
+
+    public void setRegistered(boolean registered) throws IOException {
+		proxiedRemoteBody.setRegistered(bodyID, registered);
+	}
 
     //--------------------------------
     //  NFEProducer implementation

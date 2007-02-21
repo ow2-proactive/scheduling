@@ -48,6 +48,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
@@ -220,6 +222,14 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
         return this.body.receiveFTMessage(id, fte);
     }
 
+    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg) throws IOException {
+    	return body.receiveGCMessage(id, msg);
+    }
+    
+    public void setRegistered(UniqueID id, boolean registered) throws IOException {
+    	body.setRegistered(id, registered);
+    }
+    
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws IOException {
         body.changeProxiedBody(id, newBody);

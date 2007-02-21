@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.Communication;
@@ -174,6 +176,10 @@ public interface RemoteBodyForwarder {
     public Object receiveFTMessage(UniqueID id, FTMessage fte)
         throws IOException;
 
+    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg) throws IOException;
+
+    public void setRegistered(UniqueID id, boolean registered) throws IOException;
+    
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws java.io.IOException;
 

@@ -48,6 +48,8 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.Communication;
@@ -407,6 +409,14 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
     public Object receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedRemoteBody.receiveFTMessage(ev);
     }
+    
+    public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
+    	return proxiedRemoteBody.receiveGCMessage(msg);
+    }
+    
+    public void setRegistered(boolean registered) throws IOException {
+    	proxiedRemoteBody.setRegistered(registered);
+    }
 
     //--------------------------------
     //  NFEProducer implementation
@@ -457,7 +467,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
         return this;
     }
     
-
+    
     public String[] list(String url) throws IOException {
         throw new IOException ("Lookup is not implemented yet for this Adapter");
     }

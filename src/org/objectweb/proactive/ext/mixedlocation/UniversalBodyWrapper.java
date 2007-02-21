@@ -45,6 +45,8 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
@@ -328,6 +330,14 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.receiveFTMessage(ev);
     }
 
+    public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
+    	return this.wrappedBody.receiveGCMessage(msg);
+    }
+    
+    public void setRegistered(boolean registered) throws IOException {
+    	this.wrappedBody.setRegistered(registered);
+    }
+    
     public void createShortcut(Shortcut shortcut) throws IOException {
         // TODO implement
         throw new ProActiveRuntimeException(

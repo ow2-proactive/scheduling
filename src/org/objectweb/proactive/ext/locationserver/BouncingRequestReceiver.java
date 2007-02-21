@@ -64,4 +64,8 @@ public class BouncingRequestReceiver implements RequestReceiver {
     public void setImmediateService(String methodName, Class[] parametersTypes)
         throws IOException {
     }
+
+	public boolean isInImmediateService() throws IOException {
+		return false;
+	}
 }

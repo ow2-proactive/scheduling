@@ -634,7 +634,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             nodeName);
         registerBody(nodeName, localBody);
 
-        if (GarbageCollector.isBuildingTopology()) {
+        if (GarbageCollector.dgcIsEnabled()) {
         	((AbstractBody) localBody).updateReferences(UniversalBodyProxy.getIncomingReferences());
         }
         

@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -53,12 +54,14 @@ public class RequestReceiverImpl implements RequestReceiver,
     // refactored : keys are method names, and values are arrays of parameters types
     // map of immediate services (method names +lists of method parameters)
     private java.util.Map<String, Object> immediateServices;
+    private AtomicInteger inImmediateService;
 
     public RequestReceiverImpl() {
         immediateServices = new Hashtable<String, Object>(2);
         immediateServices.put("toString", ANY_PARAMETERS);
         immediateServices.put("hashCode", ANY_PARAMETERS);
         immediateServices.put("_terminateAOImmediately", ANY_PARAMETERS);
+        this.inImmediateService = new AtomicInteger(0);
     }
 
     public int receiveRequest(Request request, Body bodyReceiver)
@@ -69,7 +72,12 @@ public class RequestReceiverImpl implements RequestReceiver,
                     logger.debug("immediately serving " +
                         request.getMethodName());
                 }
-                bodyReceiver.serve(request);
+                this.inImmediateService.incrementAndGet();
+                try {
+                	bodyReceiver.serve(request);
+                } finally {
+                	this.inImmediateService.decrementAndGet();
+                }
                 if (logger.isDebugEnabled()) {
                     logger.debug("end of service for " +
                         request.getMethodName());
@@ -163,4 +171,8 @@ public class RequestReceiverImpl implements RequestReceiver,
             immediateServices.put(methodName, list);
         }
     }
+
+	public boolean isInImmediateService() throws IOException {
+		return this.inImmediateService.intValue() > 0;
+	}
 }

@@ -51,6 +51,8 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
@@ -385,6 +387,13 @@ public class EncryptedBody implements Body, Serializable {
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException {
         return null;
+    }
+
+    public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
+    	return null;
+    }
+    
+    public void setRegistered(boolean registered) {
     }
 
     public UniversalBody getShortcutTargetBody(

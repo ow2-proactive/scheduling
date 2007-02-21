@@ -41,6 +41,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.SecurityEntity;
@@ -177,4 +179,9 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
      * @exception java.io.IOException if a pb occurs during this method call
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException;
+
+    public GCResponse receiveGCMessage(GCMessage toSend) throws IOException;
+
+	public void setRegistered(boolean registered) throws IOException;
+
 }

@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive.core.body.ibis;
 
+import ibis.rmi.RemoteException;
+
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -43,14 +45,14 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.gc.GCMessage;
+import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import ibis.rmi.RemoteException;
 
 
 public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
@@ -261,6 +263,14 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
         return this.body.receiveFTMessage(fte);
     }
 
+    public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
+    	return body.receiveGCMessage(msg);
+    }
+    
+    public void setRegistered(boolean registered) throws IOException {
+    	body.setRegistered(registered);
+    }
+    
     /*
        private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
        long startTime=System.currentTimeMillis();

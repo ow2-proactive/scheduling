@@ -1320,6 +1320,7 @@ public class ProActive {
         throws java.io.IOException {
         BodyAdapter body = getRemoteBody(obj);
         body.register(url);
+        body.setRegistered(true);
         if (logger.isInfoEnabled()) {
             logger.info("Success at binding url " + url);
         }
@@ -1334,17 +1335,21 @@ public class ProActive {
         String protocol = UrlBuilder.getProtocol(url);
 
         // First step towards Body factory, will be introduced after the release
+        BodyAdapter ba;
         if (protocol.equals("rmi:")) {
-            new RmiBodyAdapter().unregister(url);
+            ba = new RmiBodyAdapter();
         } else if (protocol.equals("rmissh:")) {
-            new SshRmiBodyAdapter().unregister(url);
+        	ba = new SshRmiBodyAdapter();
         } else if (protocol.equals("http:")) {
-            new HttpBodyAdapter().unregister(url);
+        	ba = new HttpBodyAdapter();
         } else if (protocol.equals("ibis:")) {
-            new IbisBodyAdapter().unregister(url);
+        	ba = new IbisBodyAdapter();
         } else {
             throw new IOException("Protocol " + protocol + " not defined");
         }
+        UniversalBody ub = ba.lookup(url);
+        ba.unregister(url);
+        ub.setRegistered(false);
         if (logger.isDebugEnabled()) {
             logger.debug("Success at unbinding url " + url);
         }
@@ -2110,6 +2115,7 @@ public class ProActive {
      * <CODE>getFutureValue</CODE> is called again on this result, and so on.
      */
     public static Object getFutureValue(Object future) {
+    	while (true) {
         // If the object is not reified, it cannot be a future
         if ((MOP.isReifiedObject(future)) == false) {
             return future;
@@ -2120,11 +2126,10 @@ public class ProActive {
             if (!(theProxy instanceof Future)) {
                 return future;
             } else {
-                Object o = ((Future) theProxy).getResult();
-
-                return getFutureValue(o);
+                future = ((Future) theProxy).getResult();
             }
         }
+    	}
     }
 
     /**
@@ -2581,7 +2586,7 @@ public class ProActive {
      * it will be killed.
      *
      */
-    public void enableExitOnEmpty() {
+    public static void enableExitOnEmpty() {
         LocalBodyStore.getInstance().enableExitOnEmpty();
     }
 
