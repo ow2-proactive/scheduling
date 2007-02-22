@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
@@ -248,9 +249,7 @@ public class ComponentRequestImpl extends RequestImpl
      */
     public boolean isControllerRequest() {
         // according to the Fractal spec v2.0 , section 4.1
-        return ((methodCall.getComponentMetadata().getComponentInterfaceName() != null) &&
-        (methodCall.getComponentMetadata().getComponentInterfaceName().endsWith("-controller") ||
-        methodCall.getComponentMetadata().getComponentInterfaceName().equals("component")));
+        return Utils.isControllerInterfaceName(methodCall.getComponentMetadata().getComponentInterfaceName());
     }
 
     /*

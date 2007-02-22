@@ -109,5 +109,11 @@ public class Utils {
         result = result.substring(result.indexOf(m.getName()));
         return result;
     }
+    
+    public static boolean isControllerInterfaceName(String itfName) {
+    	// according to Fractal spec v2.0 , section 4.1
+        return ((itfName != null) && 
+        		(itfName.endsWith("-controller") || itfName.equals("component")));
+    }
 
 }

@@ -91,6 +91,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
     private Map<String, Interface> functionalItfs = new HashMap<String, Interface>();
     private Map<String, ProActiveController> controlItfs = new HashMap<String, ProActiveController>();
+    private Interface[] interfaceReferences = new Interface[0];
     private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
     private Body body;
     private RequestHandler firstControllerRequestHandler;
@@ -130,14 +131,8 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
         // 3. external functional interfaces
         addFunctionalInterfaces(componentParameters, component_is_primitive);
 
-        //        Set<String> s = controlItfs.keySet();
-        //        for (Iterator iter = s.iterator(); iter.hasNext();) {
-        //			String key = (String) iter.next();
-        //			((AbstractProActiveController)controlItfs.get(key)).init();
-        //		}
-
         // put all in a table
-        //        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
+        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " +
                 componentParameters.getControllerDescription().getName());
@@ -150,9 +145,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      */
     private void addFunctionalInterfaces(
         ComponentParameters componentParameters, boolean component_is_primitive) {
-        // ProActiveInterfaceType[] interface_types =
-        // (ProActiveInterfaceType[])componentParameters.getComponentType()
-        // .getFcInterfaceTypes();
         InterfaceType[] tmp = componentParameters.getComponentType()
                                                  .getFcInterfaceTypes();
         ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
@@ -411,7 +403,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        return functionalItfs.values().toArray();
+        return interfaceReferences;
     }
 
     /*

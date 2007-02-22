@@ -9,14 +9,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.collectiveitfs.GatherBindingChecker;
 import org.objectweb.proactive.core.component.collectiveitfs.GatherRequestsQueues;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
@@ -49,15 +52,17 @@ public class GathercastControllerImpl
             Iterator<Object> it = interfaces.iterator();
 
             while (it.hasNext()) {
-                addManagedInterface((ProActiveInterface) it.next());
+            	Interface itf = (Interface)it.next();
+            	// gather mechanism currently only offered for functional interfaces
+            	if (!Utils.isControllerInterfaceName(itf.getFcItfName())) {
+            		addManagedInterface((ProActiveInterface) itf);
+            	}
             }
         }
     }
 
     private boolean addManagedInterface(ProActiveInterface itf) {
         if (gatherItfs.containsKey(itf.getFcItfName())) {
-            //            controllerLogger.error("the interface named " + itf.getFcItfName() +
-            //                " is already managed by the collective interfaces controller");
             return false;
         }
 
@@ -66,8 +71,6 @@ public class GathercastControllerImpl
         if (itfType.isFcGathercastItf()) {
             gatherItfs.put(itf.getFcItfName(), itf);
         } else {
-            //            controllerLogger.error("the interface named " + itf.getFcItfName() +
-            //                " cannot be managed by this collective interfaces controller");
             return false;
         }
 
