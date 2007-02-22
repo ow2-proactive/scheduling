@@ -31,8 +31,10 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Vector;
 
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -160,7 +162,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 			// we locate the proactive code
 			Enumeration<URL> classURLs = ProActiveDescriptorHandler.class
 					.getClassLoader().getResources(
-							"org/objectweb/proactive/core/descriptor/xml/"+schema);
+							"org/objectweb/proactive/core/descriptor/xml/");
 
 			// we make sure that we found a file structure (and not a jar)
 			URL classURLcandidate = null;
@@ -179,15 +181,12 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 					java.net.URI uriSchema;
 					uriSchema = classURLcandidate.toURI();
 					// we navigate to the descriptor schema
-					uriSchema = uriSchema.resolve(".." + java.io.File.separator
-							+ ".." + java.io.File.separator + ".."
-							+ java.io.File.separator + ".."
-							+ java.io.File.separator + ".."
-							+ java.io.File.separator + ".."
-							+ java.io.File.separator + ".."
-							+ java.io.File.separator + java.io.File.separator
-							+ "descriptors" + java.io.File.separator
-							+ schema);
+
+					URI outsideSchema = new URI("../../../../../../../descriptors/"+schema);
+							
+					uriSchema = uriSchema.resolve(outsideSchema);
+					
+					logger.debug("Schema found:" + uriSchema);
 
 					java.io.File test = new java.io.File(uriSchema);
 
@@ -206,6 +205,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 					schemaURLcandidate = null;
 				}
 			} catch (Exception e) {
+				logger.debug(e.getMessage());
 				logger
 						.error("The schema "+ schema + " could not be located in your environment.");
 				schemaURLcandidate = null;
@@ -231,15 +231,15 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 				"SecuritySchema.xsd" } ;
 		
 	
-		String[] selectedSchemas = new String[schemas.length];
+		Vector<String> selectedSchemas = new Vector<String>();
 	
 		for (int i= 0; i < schemas.length; i++) {
 	
 			
 			URL schemaURLcandidate = selectSchema(schemas[i]);
 			
-			if ((schemaURLcandidate != null) &&
-				((selectedSchemas[i] = schemaURLcandidate.toString()) != null)) {
+			if (schemaURLcandidate != null) {
+				selectedSchemas.add(schemaURLcandidate.toString());
 			logger.debug("Using XML schema: " + schemaURLcandidate.toString());
 			} else {
 				logger.error("No schema instance (file) found for " + schemas[i]);
@@ -254,9 +254,10 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 		
 		if ("enable".equals(ProActiveConfiguration.getSchemaValidationState())) {
 			
-			
+			String[] selectedSchemasArray = selectedSchemas.toArray(new String[0]);
+			if (selectedSchemasArray.length == 0) selectedSchemasArray = null;
 			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
-					new org.xml.sax.InputSource(uri), h, selectedSchemas,
+					new org.xml.sax.InputSource(uri), h, selectedSchemasArray,
 					new SAXParserErrorHandlerTerminating());
 		} else {
 			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
