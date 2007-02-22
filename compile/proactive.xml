@@ -3,25 +3,42 @@
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
 
 	<property environment="env" />
-	<property name="base" value=".." />
-	<property name="lib" value="${base}/lib" />
-	<property name="src.dir" value="${base}/src" />
-	<property name="daemon.dir" value="${base}/p2p" />
+	
+	<property name="base.dir" value="${basedir}/.." />
+	<property name="lib.dir" value="${base.dir}/lib" />
+	<property name="src.dir" value="${base.dir}/src" />
+	<property name="dev.dir" value="${base.dir}/dev" />
+	<property name="daemon.dir" value="${base.dir}/p2p" />
+	<property name="classes.dir" value="${base.dir}/classes" />
+	<property name="test.classes.dir" value="${base.dir}/test-classes" />
+	<property name="classlibs.dir" value="${base.dir}/classlibs" />
+	<property name="dist.dir" value="${base.dir}/dist" />
+	<property name="PAdist.dir" value="${dist.dir}/ProActive" />
+	<property name="doc.src" value="${base.dir}/doc-src" />
+	<property name="docs.dir" value="${base.dir}/docs" />
+	<property name="docs.tmp.dir" value="${docs.dir}/tmp" />
+	<property name="docs.mainFile" value="PA_index.xml" />
+
 	<property name="proactive.dir" value="org/objectweb/proactive" />
 	<property name="proactive.core.dir" value="${proactive.dir}/core" />
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext" />
-	<property name="classes.dir" value="${base}/classes" />
-	<property name="test.classes.dir" value="${base}/test-classes" />
-	<property name="classlibs.dir" value="${base}/classlibs" />
-	<property name="dist.dir" value="${base}/dist" />
-	<property name="PAdist.dir" value="${dist.dir}/ProActive" />
-	<property name="doc.src" value="${base}/doc-src" />
-	<property name="docs.dir" value="${base}/docs" />
-	<property name="docs.tmp" value="${docs.dir}/tmp" />
-	<property name="docs.mainFile" value="PA_index.xml" />
-	<property name="dev.dir" value="${base}/dev" />
+
+	<!-- Javac properties -->
+	<property name="debug" value="on" />
+	<property name="source" value="1.5" />
+	
+	<!-- Osgi properties -->
+	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/" />
+	<property name="manifest.example.dir" value="${src.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
+	<property name="config.dir" value="${classes.dir}/${proactive.core.dir}/config/" />
+	<property name="bundle.dir" value="${base.dir}/dist/bundle" />
 
 	
+	<!--
+		Create a timestamp for this build 
+		If ${version} is defined its value is used as string version for this build
+		Otherwise the timestamp is used
+	-->
 	<tstamp>
 		<format property="TODAY" pattern="yyyy-MM-dd" />
 	</tstamp>
@@ -32,21 +49,14 @@
 			<property name="version_" value="${TODAY}"/>
 		</else>
 	</if>
-	
-	<property name="name" value="ProActive" />
-	<property name="debug" value="on" />
-	<property name="source" value="1.5" />
-	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/" />
-	<property name="manifest.example.dir" value="${src.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
-	<property name="config.dir" value="${classes.dir}/${proactive.core.dir}/config/" />
-	<property name="bundle.dir" value="${base}/dist/bundle" />
+
 	
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
 	
 	<path id="project.libs">
-		<fileset dir="${lib}">
+		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
 			<include name="jini/*.jar" />
 			<include name="globus/*.jar" />
@@ -60,15 +70,12 @@
 			<include name="scilab/*.jar" />
 			<include name="timit/*.jar" />
 		</fileset>
-		<fileset dir="${lib}/ws">
-			<include name="*.jar" />
-			<include name="components/*.jar" />
-		</fileset>
-		<pathelement location="${base}/dev/lib/junit-4.1.jar"/>
+		<!-- XXX ${dev.dir} is not included in the source release ! -->
+		<pathelement location="${dev.dir}/lib/junit-4.1.jar"/> 
 	</path>
 		
 	<path id="project.classpath">
-		<pathelement location="${base}/classes" />
+		<pathelement location="${base.dir}/classes" />
 		<path refid="project.libs"/>
 	</path>
 	
@@ -80,11 +87,11 @@
 	
 	<path id="examples.classpath">
 		<path refid="project.classpath" />
-		<pathelement location="${lib}/examples/clibwrapper_jiio.jar" />
-		<pathelement location="${lib}/examples/jai_codec.jar" />
-		<pathelement location="${lib}/examples/jai_core.jar" />
-		<pathelement location="${lib}/examples/mlibwrapper_jai.jar" />
-		<pathelement location="${lib}/examples/jai_imageio.jar" />
+		<pathelement location="${lib.dir}/examples/clibwrapper_jiio.jar" />
+		<pathelement location="${lib.dir}/examples/jai_codec.jar" />
+		<pathelement location="${lib.dir}/examples/jai_core.jar" />
+		<pathelement location="${lib.dir}/examples/mlibwrapper_jai.jar" />
+		<pathelement location="${lib.dir}/examples/jai_imageio.jar" />
 	</path>
 
 
@@ -126,17 +133,18 @@
 		</copy>
 		<!-- copy descriptor schema -->
 		<copy todir="${classes.dir}/org/objectweb/proactive/core/descriptor/xml/" overwrite="yes">
-			<fileset dir="${base}/descriptors">
+			<fileset dir="${base.dir}/descriptors">
 				<include name="*.xsd"/>
 			</fileset>
         </copy>
-		<copy todir="${base}/descriptors/examples" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
+		<copy todir="${base.dir}/descriptors/examples" overwrite="yes" file="${base.dir}/descriptors/DescriptorSchema.xsd"/>
 	</target>
 
 
 
 
 	<target name="core" depends="init, configurationCopy" description="Compile the ProActive core classes">
+		<!-- If it is a release, update ProActive.getVersion() -->
 		<if name="version">
 			<replaceregexp 
 				file="${src.dir}/${proactive.dir}/ProActive.java"		
@@ -194,7 +202,7 @@
 		</javac>
 		<!-- BnB API stubs generation -->
 		<echo message="Branch and Bound API stubs generating..." />
-		<property name="stub_bnb.classdir" value="${basedir}/../classes" />
+		<property name="stub_bnb.classdir" value="${base.dir}/classes" />
 		<path id="bnbClassDir">
 			<pathelement path="${stub_bnb.classdir}" />
 		</path>
@@ -235,7 +243,7 @@
 		</javac>
 		<!-- Calcium stubs generation -->
 		<echo message="Calcium stubs generating..." />
-		<property name="stub_calcium.classdir" value="${basedir}/../classes" />
+		<property name="stub_calcium.classdir" value="${base.dir}/classes" />
 		<path id="calciumClassDir">
 			<pathelement path="${stub_calcium.classdir}" />
 		</path>
@@ -337,7 +345,7 @@
 	<!--  =============================================================== -->
 
 	<target name="examples" depends="core, addons" description="Compile all the examples">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" excludes="${proactive.dir}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" excludes="${proactive.dir}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
 			<classpath refid="examples.classpath" />
 		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/examples" includeEmptyDirs="no">
@@ -450,7 +458,7 @@
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**" />
 			</fileset>
-			<fileset dir="${lib}/">
+			<fileset dir="${lib.dir}/">
 				<include name="asm.jar" />
 				<include name="log4j.jar" />
 				<include name="xercesImpl.jar" />
@@ -493,7 +501,7 @@
 		description="Copy files for the release">
 		<!--        copy docs / scripts / src / compile / lib      -->
 		<copy todir="${PAdist.dir}" includeEmptyDirs="no">
-			<fileset dir="${base}">
+			<fileset dir="${base.dir}">
 				<include name="README.html" />
 				<include name="docs/**" />
 				<include name="doc-src/**" />
@@ -587,13 +595,13 @@
 		<java classname="util.UpdateCopyrightAndVersion" fork="true">
 			<classpath refid="project.classpath" />
 			<!--  base dir -->
-			<arg value="${base}" />
+			<arg value="${base.dir}" />
 			<!--  exclude dirs -->
 			<arg value="${docs.dir}" />
 			<arg value="${dist.dir}" />
 			<arg value="${classes.dir}" />
 			<arg value="${test-classes.dir}" />
-			<arg value="${lib}" />
+			<arg value="${lib.dir}" />
 			<arg value="${dev.dir}" />
 		</java>
 	</target>
@@ -607,10 +615,10 @@
 		<!-- declare the Jalopy task -->
 		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
 			<classpath>
-				<fileset dir="${base}/dev/lib">
+				<fileset dir="${base.dir}/dev/lib">
 					<include name="*.jar" />
 				</fileset>
-				<fileset dir="${lib}">
+				<fileset dir="${lib.dir}">
 					<include name="log4j.jar" />
 				</fileset>
 			</classpath>
@@ -638,7 +646,7 @@
 	** Do not support Java 1.5 **
 	<target name="java2html">
 		<echo message="Converting java to html..." />
-		<java jar="${base}/dev/lib/j2h.jar" fork="true">
+		<java jar="${base.dir}/dev/lib/j2h.jar" fork="true">
 			<arg line="-d ${docs.dir}/ProActive_src_html" />
 			<arg line="-js ${src.dir}/${proactive.dir}" />
 			<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api" />
@@ -650,7 +658,7 @@
 	<!-- TODO tempory fix for java 1.5, do not generate index.html -->
 	<!-- http://www.java2html.de /dev/lib/j2h.jar -->
 	<target name="java2html">
-		<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base}/dev/lib/j2h.jar" />
+		<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base.dir}/dev/lib/j2h.jar" />
 		<j2h srcdir="${src.dir}/${proactive.dir}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="true" outputFormat="html" />
 	</target>
 
@@ -713,7 +721,7 @@
 	</target>
 	
 	<target name="stub" depends="stubGenerator, compile">
-		<property name="stub.classdir" value="${basedir}${file.separator}..${file.separator}classes" />
+		<property name="stub.classdir" value="${classes.dir}" />
 		<echo message="${stub.classdir}" />
 		<path id="classDir">
 			<pathelement path="${stub.classdir}" />
@@ -747,7 +755,7 @@
 	<!-- ================================================================ -->
 	<target name="stub_wrapper" depends="stubGenerator">
 		<echo message="Java primitive type wrapper stubs generating..." />
-		<property name="stub_wrapper.classdir" value="${basedir}/../classes" />
+		<property name="stub_wrapper.classdir" value="${classes.dir}" />
 		<path id="wrapperClassDir">
 			<pathelement path="${stub_wrapper.classdir}" />
 		</path>
@@ -801,7 +809,7 @@
 			<fileset dir="${classes.dir}" includes="**/*.class" />
 		</copy>
 		<unjar dest="${classlibs.dir}">
-			<fileset dir="${lib}">
+			<fileset dir="${lib.dir}">
 				<include name="*.jar" />
 			</fileset>
 		</unjar>
@@ -842,11 +850,11 @@
         <attribute name="nodeDescriptor" />
 		<element name="jvmargs" optional="yes" />
         <sequential>
-        	<delete dir="${base}/compile/log" />
+        	<delete dir="${base.dir}/compile/log" />
             <java classname="nonregressiontest.MainManager" fork="true">
             	<classpath refid="test.classpath"/>
-    			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-    			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
+    			<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
+    			<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
             	<jvmarg value="-Xdebug" />
             	<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
             	<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=@{nodeDescriptor}" />
@@ -946,21 +954,21 @@
 	<!--   Tests coverage : need clover license in user.home directory    -->
 	<!-- ================================================================ -->
 	<!-- Commented for the release
-    <property name="coverage.dir" value="${base}/compile/coverage"/>
+    <property name="coverage.dir" value="${base.dir}/compile/coverage"/>
     
     <path id="coverage.classpath">
     <path refid="test.classpath"/>
-    <pathelement location="${base}/dev/lib/clover.jar"/>
-    <pathelement location="${base}/dev/lib/cenquatasks.jar"/>
+    <pathelement location="${base.dir}/dev/lib/clover.jar"/>
+    <pathelement location="${base.dir}/dev/lib/cenquatasks.jar"/>
     </path>
     
-    <taskdef resource="com/cenqua/ant/antlib.xml" classpath="${base}/dev/lib/cenquatasks.jar"/>
-    <extendclasspath path="${base}/dev/lib/clover.jar"/>
-    <taskdef resource="clovertasks" classpath="${base}/dev/lib/clover.jar"/>
+    <taskdef resource="com/cenqua/ant/antlib.xml" classpath="${base.dir}/dev/lib/cenquatasks.jar"/>
+    <extendclasspath path="${base.dir}/dev/lib/clover.jar"/>
+    <taskdef resource="clovertasks" classpath="${base.dir}/dev/lib/clover.jar"/>
     
     <target name="coverage-init">
     <delete file="coverage*.*"/>
-    <copy file="${user.home}/clover.license" todir="${base}/dev/lib"/>
+    <copy file="${user.home}/clover.license" todir="${base.dir}/dev/lib"/>
     <clover-setup initString="coverage.db">
     <files>
     <exclude name="org/objectweb/proactive/ic2d/**/*.java"/>
@@ -973,14 +981,14 @@
     </target>
     
     <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
-    <delete file="${base}/compile/tests.log"/> -->
+    <delete file="${base.dir}/compile/tests.log"/> -->
 	<!-- classloader test needs clover tasks as specified in deployment-coverage.xml file -->
 	<!-- 
     <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
     <java classname="nonregressiontest.MainManager" fork="true">
     <classpath refid="coverage.classpath"/>
-    <jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
-    <jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
+    <jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy"/>
+    <jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j"/>
     <jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
     </java>
     <clover-report>
@@ -1000,7 +1008,7 @@
 		<classpath>
 			<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
 			<pathelement location="/usr/local/docbook-xsl-1.69.1" />
-			<pathelement location="${base}/dev/lib/docbook/docbook-xsl-1.69.1.zip" />
+			<pathelement location="${base.dir}/dev/lib/docbook/docbook-xsl-1.69.1.zip" />
 		</classpath>
 
 		<dtd publicId="-//OASIS//DTD DocBook XML V4.2//EN" location="dtd-4.2/docbookx.dtd" />
@@ -1018,32 +1026,32 @@
 	<!-- ==================================================================== -->
 	<target name="docbookTransform"	>
 		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
-		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp}/${docbookInputFile}" out="${docs.tmp}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
+		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/${docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
 			<param name="profile.os" expression="${docbook.profile}" />
 			<!--docbook.profile can be html, pdf or empty-->
 			<xmlcatalog refid="docbookcatalog" />
 			<classpath>
-				<fileset dir="${lib}">
+				<fileset dir="${lib.dir}">
 					<include name="**/*.jar" />
 				</fileset>
-				<fileset dir="${base}/dev/lib">
+				<fileset dir="${base.dir}/dev/lib">
 					<include name="**/*.jar" />
 				</fileset>
 			</classpath>
 		</xslt>
 
 		<!-- Do the real conversion, docbook to pdf or html -->
-		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
+		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
 			<xmlcatalog refid="docbookcatalog" />
 			<param name="TODAY" expression="${TODAY}" />
 			<!-- the date for the first page -->
 			<param name="VERSION" expression="${version}" />
 			<!-- the version number, for the first page -->
 			<classpath>
-				<fileset dir="${lib}">
+				<fileset dir="${lib.dir}">
 					<include name="**/*.jar" />
 				</fileset>
-				<fileset dir="${base}/dev/lib">
+				<fileset dir="${base.dir}/dev/lib">
 					<include name="**/*.jar" />
 				</fileset>
 			</classpath>
@@ -1067,11 +1075,11 @@
 		<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
 		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
 			<classpath>
-				<pathelement location="${base}/dev/lib/docbook/fop.jar" />
-				<pathelement location="${base}/dev/lib/docbook/jimi.zip" />
-				<pathelement location="${base}/dev/lib/docbook/avalon.jar" />
-				<pathelement location="${base}/dev/lib/docbook/batik.jar" />
-				<pathelement location="${lib}/ws/commons-logging.jar" />
+				<pathelement location="${base.dir}/dev/lib/docbook/fop.jar" />
+				<pathelement location="${base.dir}/dev/lib/docbook/jimi.zip" />
+				<pathelement location="${base.dir}/dev/lib/docbook/avalon.jar" />
+				<pathelement location="${base.dir}/dev/lib/docbook/batik.jar" />
+				<pathelement location="${lib.dir}/ws/commons-logging.jar" />
 			</classpath>
 		</taskdef>
 
@@ -1094,24 +1102,24 @@
 
 		<java classname="util.DocBookize" fork="true">
 			<classpath refid="project.classpath" />
-			<arg value="${docs.tmp}/${docbookInputFile}" />
+			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 			<!-- The xml file to parse -->
 			<arg value="ProActive_src_html/${proactive.dir}/" />
 			<!-- The path to find java files in html -->
 			<arg value="${src.dir}/${proactive.dir}/" />
 			<!-- the path for java file inclusion -->
-			<arg value="${base}/descriptors/" />
+			<arg value="${base.dir}/descriptors/" />
 			<!-- the path for xml file inclusion -->
 		</java>
 
 		<java classname="util.Validate" fork="true">
 			<classpath refid="project.classpath" />
 			<classpath>
-				<fileset dir="${base}/dev/lib/docbook/">
+				<fileset dir="${base.dir}/dev/lib/docbook/">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
-			<arg value="${docs.tmp}/${docbookInputFile}" />
+			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 		</java>
 
 	</target>
@@ -1123,7 +1131,7 @@
 	<target name="docbookPreProcess">
 
 		<!-- as this file gets edited, make sure it's a fresh copy-->
-		<delete file="${docs.tmp}/${docs.mainFile}" />
+		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
 
 		<!-- Copy the files needed for the html files (pics and maybe others) -->
 		<copy toDir="${docs.dir}/html/">
@@ -1135,7 +1143,7 @@
 		</copy>
 
 		<!-- Copying xml files so they can be edited (beautify programlistings) -->
-		<copy toDir="${docs.tmp}" includeemptydirs="no">
+		<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
 			<fileset dir="${doc.src}">
 				<include name="**/*" />
 				<exclude name="**/.svn" />
@@ -1194,10 +1202,10 @@
 	<target name="manual" description="Build all the different manual version: html, pdf... " depends="manualSingleHtml,manualHtml,manualPdf">
 		<!-- The generation of the files is done by the depends clause -->
 		<!-- Once the doc files have been generated, do some cleaning up -->
-		<delete dir="${docs.tmp}" />
+		<delete dir="${docs.tmp.dir}" />
 		<copy todir="${docs.dir}/examples">
 			<!-- XML descriptor examples also available -->
-			<fileset dir="${base}/descriptors/examples" />
+			<fileset dir="${base.dir}/descriptors/examples" />
 		</copy>
 	</target>
 	
@@ -1206,18 +1214,18 @@
 	        <attribute name="outputfile" />
 	    	<attribute name="classesdir" />
 	        <sequential>
-				<jdepend format="xml" outputfile="${base}/@{outputfile}.xml">	
+				<jdepend format="xml" outputfile="${base.dir}/@{outputfile}.xml">	
 	        		<classespath>
 	        			<pathelement location="@{classesdir}" />
 	        		</classespath>
 	        	</jdepend>
-				<xslt includes="@{outputfile}.xml" basedir="${base}" destdir="${base}" style="jdepend.xsl" />
+				<xslt includes="@{outputfile}.xml" basedir="${base.dir}" destdir="${base.dir}" style="jdepend.xsl" />
 	        	<delete>
-	        		<fileset dir="${base}">
+	        		<fileset dir="${base.dir}">
 	        		    <include name="@{outputfile}.xml"/>
 	        		</fileset>
 	        	</delete>
-	        	<echo> --> JDepend report available: ${base}/@{outputfile}.html</echo>
+	        	<echo> --> JDepend report available: ${base.dir}/@{outputfile}.html</echo>
 	        </sequential>
 	    </macrodef>
 		
@@ -1233,7 +1241,7 @@
 		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="g++" os="Linux">
 			<arg line=" -shared -o libMicroTimer.so  MicroTimer.cc" />
 		</exec>
-		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${lib}" />
+		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${lib.dir}" />
 	</target>
 	
 </project>
