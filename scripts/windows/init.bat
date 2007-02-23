@@ -112,7 +112,7 @@ IF EXIST "%PROACTIVE%\lib\timit\jfreechart-1.0.2.jar" set CLASSPATH=%CLASSPATH%;
 
 
 
-set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -classpath "%CLASSPATH%" -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy" -Dlog4j.configuration=file:"%PROACTIVE%\scripts\proactive-log4j"
+set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy" -Dlog4j.configuration=file:"%PROACTIVE%\scripts\proactive-log4j"
 
 rem Adding java tools to the path
 SET OK=1

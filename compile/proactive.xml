@@ -549,6 +549,10 @@
 				<exclude name="README.html" />
 				<exclude name="ic2d-plugins-src/**" />
 			</zipfileset>
+			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
+				<include name="compile/**/*.jar" />
+				<include name="compile/*.jar" />
+			</zipfileset>
 		</zip>
 	</target>
 	
