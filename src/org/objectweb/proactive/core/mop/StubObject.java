@@ -27,22 +27,30 @@
  *  Contributor(s): 
  * 
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.mop;
 
-
 /**
- *
+ * References on an active object are indirect link to the active object. There
+ * is some interposition objects between the caller and the targetted active
+ * object like a StubObject and a Proxy object. It is possible to know if an
+ * object is a reference onto an active object by checking if the object
+ * implements StubObject. A reference can be either on a local (on the same
+ * runtime) or on a distant (on a remote runtime) active object. if an object is
+ * a reference onto an active object, it implements StubObject but also the
+ * class of the active object allowing to perform method call as if the method
+ * call was made on the active object
  */
+
 public interface StubObject {
 
-    /**
-     *
-     */
-    public void setProxy(Proxy p);
+	/**
+	 * set the proxy to the active object
+	 */
+	public void setProxy(Proxy p);
 
-    /**
-     *
-     */
-    public Proxy getProxy();
+	/**
+	 * return the proxy to the active object
+	 */
+	public Proxy getProxy();
 }
