@@ -35,7 +35,7 @@ function modopt_parse {
 	do
 			case $Option in
 			a)
-				if [ "$SEEN_OPT_S" == "Yes" ] || [ "$SEEN_OPT_O" == "Yes" ] ; then
+				if [ "$SEEN_OPT_S" = "Yes" ] || [ "$SEEN_OPT_O" = "Yes" ] ; then
 					echo "Option -a, -o and -s are incompatible. Try -h to get more help" 1>&2
 					exit 1
 				fi
@@ -44,12 +44,12 @@ function modopt_parse {
 				OPTIONS_CLUSTERS=("${CLUSTERS[@]}")
 		;;
 		s)
-			if [ "$SEEN_OPT_A" == "Yes" ] || [ "$SEEN_OPT_O" == "Yes" ] ; then
+			if [ "$SEEN_OPT_A" = "Yes" ] || [ "$SEEN_OPT_O" = "Yes" ] ; then
 				echo "Option -a, -o and -s are incompatible. Try -h to get more help" 1>&2
 				exit 1
 			fi
 
-			if [ "$OPTARG" == "help" ] ; then
+			if [ "$OPTARG" = "help" ] ; then
 				echo "Available clusters are:" 1>&2
 				for i in `seq 0 $((${#CLUSTERS[@]}-1))` ; 
 				do
@@ -59,7 +59,7 @@ function modopt_parse {
 				exit 1
 			fi
 
-			if [ "$SEEN_OPT_S" == "No" ] ;
+			if [ "$SEEN_OPT_S" = "No" ] ;
 			then
 				OPTIONS_CLUSTERS=("$(resolv_cluster_alias $OPTARG)")
 			else 
@@ -69,7 +69,7 @@ function modopt_parse {
 			
 		;;
 		o)
-			if [ "$SEEN_OPT_S" == "Yes" ] || [ "$SEEN_OPT_A" == "Yes" ] ; then
+			if [ "$SEEN_OPT_S" = "Yes" ] || [ "$SEEN_OPT_A" = "Yes" ] ; then
 				echo "Option -a, -o and -s are incompatible. Try -h to get more help" 1>&2
 				exit 1
 			fi
@@ -88,7 +88,7 @@ function modopt_parse {
 
 	OPTIND=0
 
-	if [ "$VERBOSE" == "Yes" ] ;
+	if [ "$VERBOSE" = "Yes" ] ;
 	then
 		echo "SEEN_OPT_A=$SEEN_OPT_A" 1>&2
 		echo "SEEN_OPT_O=$SEEN_OPT_O" 1>&2

@@ -30,7 +30,7 @@ function clean_oarjobs_and_reservations {
 
 # Delete OAR logfile (~/OAR.*) on the given site
 function clean_oarlogfiles {
- if [ -z $2 ] || [ $2 == $LOCAL_CLUSTER ] ;
+ if [ -z $2 ] || [ $2 = $LOCAL_CLUSTER ] ;
  then
   # remove logfile in pwd
   echo rm ~/OAR.*.$1.std*
@@ -39,6 +39,11 @@ function clean_oarlogfiles {
   echo $SSH_CMD $(get_frontale_hostname $2) \
   rm ~/OAR.*.$1.std*
   fi
+}
+
+function get_nodescount {
+	$SSH_CMD $(get_oar_hostname $1) \
+		'oarnodes -s | grep -i alive | wc -l'
 }
 
 # Get free nodes for the cluster $1
