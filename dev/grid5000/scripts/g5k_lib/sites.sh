@@ -27,6 +27,7 @@ CLUSTERS=(
 	tartopom.rennes
 	azur.sophia
 	helios.sophia
+	sol.sophia
 	toulouse
 )
 
@@ -187,6 +188,9 @@ function get_cluster_from_hostname {
 		elif [ "$(expr $FQDN : '\(helios[0-9]\{1,3\}.sophia.grid5000.fr\)')" = "$FQDN" ] ;
 		then
 			echo "helios"	
+		elif [ "$(expr $FQDN : '\(sol[0-9]\{0,3\}.sophia.grid5000.fr\)')" = "$FQDN" ] ;
+		then
+			echo "sol"	
 		else
 			echo ERR_PREFIX "sophia_get_cluster, Strange FQDN=$FQDN for sophia site. Aborting" 1>&2
 			exit 1
@@ -241,6 +245,7 @@ function cluster2site {
     tartopom.rennes) echo rennes ;;
     azur.sophia)     echo sophia ;;
     helios.sophia)   echo sophia ;;
+    sol.sophia)      echo sophia ;;
     capricorne.lyon) echo lyon   ;;
     sagittaire.lyon) echo lyon   ;;
     # Note: each of idpot & icluster2 has its own NFS
@@ -254,6 +259,7 @@ function resolv_cluster_alias {
   case $1 in
 	helios)    echo helios.sophia     ;;
 	azur)      echo azur.sophia       ;;
+	sol)       echo sol.sophia        ;;
 	parasol)   echo parasol.rennes    ;;
 	paravent)  echo paravent.rennes   ;;
 	tartopom)  echo tartopom.rennes   ;;
@@ -290,6 +296,7 @@ function allow_direct_ssh {
 	CLUSTER=$1
   	if [ "$CLUSTER" = "azur.sophia" ]   ; then return 0 ;fi
   	if [ "$CLUSTER" = "helios.sophia" ] ; then return 0 ;fi
+  	if [ "$CLUSTER" = "sol.sophia" ] ; then return 0 ;fi
 
 	return 1
 }
@@ -308,6 +315,7 @@ function get_kadeploy_part {
 	paravent.rennes)   echo "sda3" ;;
 	azur.sophia)       echo "hda3" ;;
 	helios.sophia)     echo "sda3" ;;
+	sol.sophia)        echo "sda3" ;;
 	toulouse)          echo "sda3" ;;
 	*) echo "[E] $cluster is not KADEPLOYABLE" 1>&2
 	   return 1
