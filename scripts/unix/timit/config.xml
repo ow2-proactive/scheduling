@@ -19,8 +19,8 @@
              For this example you should have a directory named results at your project path.                 
                 -->
                 
-	<serie descriptorBase="${PROJECT_PATH}/descriptors/TimIt.xml"
-		result="${PROJECT_PATH}/results/example1.4-8.xml"
+	<serie descriptorBase="descriptors/TimIt.xml"
+		result="results/serie1/example1.4-8.xml"
 		class="${CLASS_PREFIX}.example1.Launcher">
 		<charts>
 			<chart type="MatrixChart"
@@ -29,45 +29,45 @@
 				subtitle="Communications pattern"
 				xaxislabel="Receiver rank" yaxislabel="Sender rank"
 				scalemode="logarithmic" legendFormatMode="pow2"
-				filename="${PROJECT_PATH}/results/example1.Pattern" />
+				filename="results/serie1/charts/example1.Pattern" />
 			<chart type="Line2dChart"
 				tag="events" filter="nbComms" attribute="avg"
 				title="Example1" subtitle="Total number of communications"
 				xaxislabel="Benchmarks" yaxislabel="Nb communications"
-				filename="${PROJECT_PATH}/results/example1.nbComms" />
+				filename="results/serie1/charts/example1.nbComms" />
 		</charts>
 		<benchmarks>
 			<benchmark name="Example1 ${NP}"
 				run="${RUN}" warmup="${WARMUP}" timeout="100"
-				descriptorGenerated="${PROJECT_PATH}/descriptors/generated.xml"
+				descriptorGenerated="descriptors/generated.xml"
 				removeExtremums="true"
 				note="My first test"
-				parameters="${PROJECT_PATH}/descriptors/generated.xml ${NP}"
-				output="${PROJECT_PATH}/results/example1-${NP}.xml">
+				parameters="descriptors/generated.xml ${NP}"
+				output="results/serie1/Example1/example1-${NP}.xml">
 				<descriptorVariable name="NODES" value="${NP}" />
 			</benchmark>
 		</benchmarks>
 	</serie>
 
 	<!-- Running example2 suite and generate a hierarchical bar chart -->	
-	<serie descriptorBase="${PROJECT_PATH}/descriptors/TimIt.xml"
-		result="${PROJECT_PATH}/results/example2.4-8.xml"
+	<serie descriptorBase="descriptors/TimIt.xml"
+		result="results/serie2/example2.4-8.xml"
 		class="${CLASS_PREFIX}.example2.Launcher">
 		<charts>
 			<chart type="HierarchicalBarChart"
 				filter="total,init,foo" title="Example2 on 4 and 8 nodes"
 				subtitle="Timing values" width="800" height="600"
 				xaxislabel="Benchmarks" yaxislabel="Time in seconds"
-				filename="${PROJECT_PATH}/results/example2.Timing" />
+				filename="results/serie2/charts/example2.Timing" />
 		</charts>
 		<benchmarks>
 			<benchmark name="Example2 ${NP}"
 				run="${RUN}" warmup="${WARMUP}" timeout="100"
-				descriptorGenerated="${PROJECT_PATH}/descriptors/generated.xml"
+				descriptorGenerated="descriptors/generated.xml"
 				removeExtremums="true"
 				note="My first test"
-				parameters="${PROJECT_PATH}/descriptors/generated.xml ${NP}"
-				output="${PROJECT_PATH}/results/example2-${NP}.xml">
+				parameters="descriptors/generated.xml ${NP}"
+				output="results/serie2/Example2/example2-${NP}.xml">
 				<descriptorVariable name="NODES" value="${NP}" />
 				<descriptorVariable name="TIMIT_ACTIVATE"
 					value="total,init,work,end,foo"/>

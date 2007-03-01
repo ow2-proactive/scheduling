@@ -4,9 +4,10 @@ echo
 echo --- TimIt --------------------------------------------------
 
 workingDir=`dirname $0`
-. $workingDir/env.sh
-CONFIG=$workingDir/../../src/org/objectweb/proactive/examples/timit
-$JAVACMD org.objectweb.proactive.benchmarks.timit.TimIt -c $CONFIG/config.xml
+PROACTIVE=$workingDir/../../../.
+. $PROACTIVE/scripts/unix/env.sh
+
+$JAVACMD org.objectweb.proactive.benchmarks.timit.TimIt -c config.xml
 
 echo
 echo ------------------------------------------------------------

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
+
+	<variables>
+		<descriptorVariable name="TIMIT_HOME"
+			value="../../../../classes/org/objectweb/proactive/benchmarks/timit" />
+		<descriptorVariable name="PROACTIVE_HOME" value="../" />
+		<descriptorVariable name="RMI_PORT" value="5000" />
+		<descriptorVariable name="COM_PROTO" value="rmi" />
+		<descriptorVariable name="VMARGS" value="-Xmx16M -Xms16M" />
+		<descriptorVariable name="TIMIT_ACTIVATE" value="none" />
+		<descriptorVariable name="NODES" value="1" />
+	</variables>
+
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="Workers" property="multiple" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="Workers">
+				<jvmSet>
+					<vmName value="Jvm1" />
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1" askedNodes="${NODES}">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<jvmParameters>
+						<parameter
+							value="-Dproactive.rmi.port=${RMI_PORT}" />
+						<parameter
+							value="-Dproactive.communication.protocol=${COM_PROTO}" />
+						<parameter
+							value="-Dproactive.timit.activation=${TIMIT_ACTIVATE}" />
+						<parameter value="${VMARGS}" />
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
