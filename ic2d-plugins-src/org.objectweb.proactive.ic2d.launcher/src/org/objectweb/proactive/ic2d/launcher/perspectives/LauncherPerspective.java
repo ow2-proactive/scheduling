@@ -100,7 +100,6 @@ public class LauncherPerspective implements IPerspectiveFactory ,IPerspectiveLis
 
 	public void perspectiveSavedAs(IWorkbenchPage page, IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
 		// TODO Auto-generated method stub
-		//System.out.println("LauncherPerspective.perspectiveSavedAs()");
 	}
 
 	public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {

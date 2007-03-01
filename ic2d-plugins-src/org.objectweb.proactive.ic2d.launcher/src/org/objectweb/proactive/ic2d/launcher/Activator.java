@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.launcher;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -62,7 +61,9 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
-		RuntimeFactory.getDefaultRuntime().getURL();
+		/*RuntimeFactory.getDefaultRuntime();
+        ProActiveRuntimeImpl.getProActiveRuntime();*/
+        
 	}
 
 	/*

@@ -277,8 +277,11 @@ public class NodeObject extends AbstractDataObject{
 		if(os==null){
 			if(host==null)
 				System.out.println("NodeObject.foundForTheFirstTime() host is null");
-			else if(spy==null)
-				System.out.println("NodeObject.foundForTheFirstTime() spy is null");
+			else if(spy==null){
+				System.out.println("[ERROR]Spy cant' be created");
+				Console.getInstance(Activator.CONSOLE_NAME).err("Spy cant' be created");
+				return;
+			}
 			else if(this.spy.getSystemProperty(HostObject.OS_PROPERTY)==null)
 				System.out.println("NodeObject.foundForTheFirstTime() system property is null");
 			else 

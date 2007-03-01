@@ -31,9 +31,11 @@
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -97,10 +99,21 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 					public void run () {
 						if (communications.isEmpty())
 							source.removeConnections(panel);
+
+						EditPartViewer view = getViewer();
+						if(view==null)
+							return;
+						Map registry = view.getEditPartRegistry();
+						if(registry==null)
+							return;
 						for (java.util.Iterator<AOObject> it = communications.iterator(); it.hasNext(); )
 						{
-							AOFigure target = (AOFigure)((AbstractGraphicalEditPart)getViewer().getEditPartRegistry().get(it.next())).getFigure();
-							source.addConnection(target, panel, getArrowColor());
+							AbstractGraphicalEditPart editPart = (AbstractGraphicalEditPart) registry.get(it.next());
+							if(editPart!=null){
+								AOFigure target = (AOFigure) editPart.getFigure();
+								if(target!=null)
+									source.addConnection(target, panel, getArrowColor());		
+							}
 						}
 					}});
 			}

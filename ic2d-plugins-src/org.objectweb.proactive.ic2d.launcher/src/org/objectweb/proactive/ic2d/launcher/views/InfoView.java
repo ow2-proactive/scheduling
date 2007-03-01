@@ -292,8 +292,6 @@ public class InfoView extends ViewPart  implements Observer{
 				ISelection selection = viewer.getSelection();
 				Object obj = ((IStructuredSelection)selection).getFirstElement();
 
-				System.out.println(".run() obj="+obj.toString());
-
 				IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
 				IWorkbenchPage page = /*workbenchWindow.getActivePage();*/getSite().getPage();
 				IWorkbench workbench = workbenchWindow.getWorkbench();
