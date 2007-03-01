@@ -8,7 +8,7 @@ import java.util.List;
 public class TryCatch extends Anything {
     private Terminal tryTerminal;
     private Block tryBlock;
-    private List catchBlocks;
+    private List<Catch> catchBlocks;
     private Block finallyBlock;
     public static boolean addPackageName = false;
     public static final String PACKAGE = "org.objectweb.proactive";
@@ -16,7 +16,7 @@ public class TryCatch extends Anything {
     private static final String END_TRY_WITH_CATCH = "ProActive.endTryWithCatch();";
     private static final String REMOVE_TRY_WITH_CATCH = "ProActive.removeTryWithCatch();";
 
-    public TryCatch(Terminal tt, Block tb, List cb, Block fb) {
+    public TryCatch(Terminal tt, Block tb, List<Catch> cb, Block fb) {
         tryTerminal = tt;
         tryBlock = tb;
         catchBlocks = cb;
@@ -38,10 +38,8 @@ public class TryCatch extends Anything {
     protected void prettyPrint(int indent) {
         super.prettyPrint(indent);
         System.out.print("tryWithCatch (");
-        Iterator iter = catchBlocks.iterator();
-        while (iter.hasNext()) {
-            Catch c = (Catch) iter.next();
-            System.out.print(c.getClassName() + ", ");
+        for (Catch c : catchBlocks) {
+            System.out.print(c.getClassName() + ", ");	
         }
         System.out.println(")");
 
@@ -51,9 +49,7 @@ public class TryCatch extends Anything {
 
         super.prettyPrint(indent);
         System.out.print("catch blocks:");
-        iter = catchBlocks.iterator();
-        while (iter.hasNext()) {
-            Catch c = (Catch) iter.next();
+        for (Catch c : catchBlocks) {
             System.out.print(c.getBlock() + ", ");
         }
 
@@ -73,7 +69,7 @@ public class TryCatch extends Anything {
             call += ("" + firstCatch.getClassName());
         } else {
             call += ("new Class[] {" + firstCatch.getClassName());
-            Iterator iter = catchBlocks.iterator();
+            Iterator<Catch> iter = catchBlocks.iterator();
             iter.next(); // The first one is already done
             while (iter.hasNext()) {
                 Catch ca = (Catch) iter.next();
@@ -97,7 +93,7 @@ public class TryCatch extends Anything {
         c.addAtOffset(tryBlock.getEnd().getLeft(),
             Catcher.INDENT + getPackageName() + END_TRY_WITH_CATCH + indent);
 
-        Iterator iter = catchBlocks.iterator();
+        Iterator<Catch> iter = catchBlocks.iterator();
         Catch ca = null;
         while (iter.hasNext()) {
             ca = (Catch) iter.next();

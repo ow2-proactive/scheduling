@@ -1,16 +1,15 @@
 package trywithcatch;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class Block extends Anything {
     private Terminal start;
     private Terminal end;
-    private List things;
+    private List<Anything> things;
 
-    public Block(Terminal start, Terminal end, List things) {
+    public Block(Terminal start, Terminal end, List<Anything> things) {
         this.start = start;
         this.end = end;
         this.things = things;
@@ -21,10 +20,8 @@ public class Block extends Anything {
     }
 
     public boolean isEmpty() {
-        Iterator iter = things.iterator();
-        while (iter.hasNext()) {
-            Anything a = (Anything) iter.next();
-            if (!a.isEmpty()) {
+        for (Anything a : things) {
+        	if (!a.isEmpty()) {
                 return false;
             }
         }
@@ -34,22 +31,18 @@ public class Block extends Anything {
 
     protected void prettyPrint(int indent) {
         start.prettyPrint(indent);
-        Iterator iter = things.iterator();
         indent++;
-        while (iter.hasNext()) {
-            Anything a = (Anything) iter.next();
-            a.prettyPrint(indent);
+        for (Anything a : things) {
+        	a.prettyPrint(indent);
         }
         indent--;
         end.prettyPrint(indent);
     }
 
     public void work(Catcher c) throws IOException {
-        Iterator iter = things.iterator();
-        while (iter.hasNext()) {
-            Anything a = (Anything) iter.next();
-            a.work(c);
-        }
+    	for (Anything a : things) {
+    		 a.work(c);
+    	}
     }
 
     public Terminal getStart() {

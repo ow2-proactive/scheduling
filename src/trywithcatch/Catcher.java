@@ -5,20 +5,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.List;
 
 
 public class Catcher {
     private String filename;
-    private List parseData;
+    private List<Anything> parseData;
     private InputStream input;
     private OutputStream output;
     private int offsetDelta = 0;
     private int inputOffset = 0;
     public static final String INDENT = "    ";
 
-    public Catcher(String f, OutputStream out, List p) {
+    public Catcher(String f, OutputStream out, List<Anything> p) {
         filename = f;
         parseData = p;
         output = out;
@@ -34,12 +33,9 @@ public class Catcher {
         }
 
         try {
-            Iterator iter = parseData.iterator();
-            while (iter.hasNext()) {
-                Anything a = (Anything) iter.next();
-                a.work(this);
-            }
-
+        	for (Anything a : parseData) {
+        		 a.work(this);
+        	}
             completeFile();
         } catch (IOException ioe) {
             ioe.printStackTrace();
