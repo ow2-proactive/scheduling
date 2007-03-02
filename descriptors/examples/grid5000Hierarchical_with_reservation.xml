@@ -30,7 +30,7 @@
 		<descriptorVariable name="HOME"
 			value="/home/sophia/${USERNAME}" />
 		<descriptorVariable name="PROACTIVE_HOME"
-			value="${HOME}/ProActive" />
+			value="${HOME}/ProActive" /> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA" value="${HOME}/Java/java" />
 		<descriptorVariable name="RMI_PORT" value="5000" />
 		<descriptorVariable name="COM_PROTO" value="rmissh" />
@@ -82,8 +82,6 @@
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 
 					</classpath>
 					<javaPath>
@@ -121,7 +119,7 @@
 				<hierarchicalProcess
 					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
 					hostname="193.51.209.11" internal_ip="138.96.20.214"
-					username="$USERNAME">
+					username="${USERNAME}">
 					<processReference refid="JVM_G5K" />
 					<hierarchicalReference refid="sshNodes" />
 				</hierarchicalProcess>

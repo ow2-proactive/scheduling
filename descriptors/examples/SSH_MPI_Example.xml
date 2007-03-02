@@ -51,8 +51,6 @@
 						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
@@ -77,7 +75,7 @@
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="${REMOTE_HOME}/${PROACTIVE_HOME}/compile/proactive-log4j" />
+							value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter
@@ -111,7 +109,7 @@
 						<bookingDuration>00:02:00</bookingDuration>
 						<scriptPath>
 							<absolutePath
-								value="${REMOTE_HOME}/pbsStartRuntime.sh" />
+								value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/unix/cluster/pbsStartRuntime.sh" />
 						</scriptPath>
 					</pbsOption>
 				</pbsProcess>

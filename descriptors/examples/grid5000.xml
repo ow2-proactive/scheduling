@@ -8,9 +8,9 @@
 
 		<javaPropertyVariable name="USER_HOME" value="user.home" />
 		<descriptorVariable name="PROACTIVE_HOME"
-			value="${USER_HOME}/ProActive" />
+			value="${USER_HOME}/ProActive" /> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA"
-			value="${USER_HOME}/OASIS/jdk/java" />
+			value="${USER_HOME}/OASIS/jdk/java" /> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="RMI_PORT" value="5000" />
 		<descriptorVariable name="COM_PROTO" value="rmi" />
 
@@ -221,8 +221,6 @@
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
 
 					</classpath>
 					<javaPath>

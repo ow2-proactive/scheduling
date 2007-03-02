@@ -5,6 +5,8 @@
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/usr/java" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
     <componentDefinition>
         <virtualNodesDefinition>
@@ -39,17 +41,15 @@
                 <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
                     <classpath>
 			    <absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-			    <absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
 			    <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
 			    <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-			    <absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
+			    <absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
 			    <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 			    <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-			    <absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
 			    <absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
                     </classpath>
                     <javaPath>
-                        <absolutePath value="/usr/java/bin/java"/>
+                        <absolutePath value="${JAVA_HOME}/bin/java"/>
                     </javaPath>
                     <policyFile>
 			    <absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/>

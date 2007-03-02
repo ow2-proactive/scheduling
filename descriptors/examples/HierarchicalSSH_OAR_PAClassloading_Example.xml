@@ -6,6 +6,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home/sophia/plugtest/jdk" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -38,34 +40,30 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/home/sophia/plugtest/jdk/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/home/sophia/plugtest/ProActive/scripts/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="/home/sophia/plugtest/ProActive/scripts/proactive-log4j" />
+							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter
@@ -100,7 +98,7 @@
 						<resources>nodes=all,weight=2</resources>
 						<scriptPath>
 							<absolutePath
-								value="/home/sophia/plugtest/ProActive/scripts/unix/cluster/oarStartRuntime.sh" />
+								value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" /><!--CHANGE ME!!!! -->
 						</scriptPath>
 					</oarOption>
 				</oarProcess>
@@ -110,7 +108,7 @@
 				<hierarchicalProcess
 					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
 					hostname="frontend_name" username="plugtest"
-					internal_ip="138.96.20.1">
+					internal_ip="138.96.20.1"> <!--CHANGE ME!!!! -->
 					<processReference refid="JVM_Forwarder" />
 					<hierarchicalReference refid="oarProcess" />
 				</hierarchicalProcess>

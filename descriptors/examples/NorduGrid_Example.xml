@@ -6,6 +6,8 @@
 
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home/rquilici/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -32,16 +34,15 @@
 	</deployment>
 	<fileTransferDefinitions>
    <fileTransfer id="ng_transfer">
-    <file src="http://grid.uio.no/runtime/j2re1.4.2_08.tar.gz" dest="j2re1.4.2_08.tar.gz" />
+     <file src="http://grid.uio.no/runtime/j2re1.4.2_08.tar.gz" dest="j2re1.4.2_08.tar.gz" />
      <file src="lib/ProActive.jar" dest="ProActive.jar" />
-     <file src="lib/asm.jar" dest="asm.jar" />
-     <file src="lib/javassist.jar" dest="asm.jar" />
+     <file src="lib/javassist.jar" dest="javassist.jar" />
      <file src="lib/components/fractal.jar" dest="fractal.jar" />
      <file src="lib/bouncycastle.jar" dest="bouncycastle.jar" />
      <file src="lib/log4j.jar" dest="log4j.jar" />
      <file src="lib/xercesImpl.jar" dest="xercesImpl.jar" />
-      <file src="scripts/proactive-log4j" dest="proactive-log4j" />
-       <file src="scripts/proactive.java.policy" dest="proactive.java.policy" />
+     <file src="scripts/proactive-log4j" dest="proactive-log4j" />
+     <file src="scripts/proactive.java.policy" dest="proactive.java.policy" />
   </fileTransfer>
 </fileTransferDefinitions>
 	<infrastructure>
@@ -50,7 +51,6 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath value="ProActive.jar"/>
-						<absolutePath value="asm.jar"/>
 						<absolutePath value="javassist.jar"/>
 						<absolutePath value="fractal.jar"/>
 						<absolutePath value="bouncycastle.jar"/>
@@ -77,7 +77,7 @@
 					</fileTransferDeploy>
 					 <ngOption>
 					 	<executable>
-							<absolutePath value="/0/plugtest/ProActive/scripts/unix/cluster/ngStartRuntime.sh"/>
+							<absolutePath value="${PROACTIVE_HOME}/scripts/unix/cluster/ngStartRuntime.sh"/>
 						</executable>
 						<count>28</count>
 						<outputFile>hello.txt</outputFile>

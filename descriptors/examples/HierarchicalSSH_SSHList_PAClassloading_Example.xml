@@ -6,6 +6,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home/rquilici/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -37,33 +39,29 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/home/rquilici/j2sdk1.4.2_09/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/home/rquilici/ProActive/scripts/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="/home/rquilici/ProActive/scripts/proactive-log4j" />
+							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter
@@ -83,7 +81,7 @@
 						<parameter
 							value="-Dproactive.communication.protocol=rmissh" />
 						<parameter
-							value="-Djava.rmi.server.hostname=10.0.10.2" />
+							value="-Djava.rmi.server.hostname=10.0.10.2" /> <!--CHANGE ME!!!! -->
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -98,7 +96,7 @@
 				<hierarchicalProcess
 					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
 					hostname="frontend_name" internal_ip="10.0.10.2"
-					username="rquilici">
+					username="rquilici"> <!--CHANGE ME!!!! -->
 					<processReference refid="localJVM1"></processReference>
 					<hierarchicalReference refid="ssh_list"></hierarchicalReference>
 				</hierarchicalProcess>

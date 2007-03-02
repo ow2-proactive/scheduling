@@ -3,6 +3,18 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="USER_HOME"
+			value="/home1/fabrice/IOFAb" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="${USER_HOME}/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="IBIS_HOME"
+			value="${USER_HOME}/Ibis" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="PRESERIALIZED_HOME"
+			value="${USER_HOME}/classlibs" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/usr/local/sun-java/jdk1.4" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="prunNode" />
@@ -31,35 +43,35 @@
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<bootclasspath>
 						<absolutePath
-							value="/home1/fabrice/IOFAb/Ibis/" />
+							value="${IBIS_HOME}/" />
 						<absolutePath
-							value="/home1/fabrice/IOFAb/classlibs/jdk" />
+							value="${PRESERIALIZED_HOME}/jdk" /> <!--  preserialized jars from JDK -->
 					</bootclasspath>
 					<classpath>
 						<absolutePath
-							value="/home1/fabrice/IOFAb/ProActive/" />
+							value="${PROACTIVE_HOME}/" />
 						<absolutePath
-							value="/home1/fabrice/IOFAb/classlibs/lib" />
+							value="${PRESERIALIZED_HOME}/lib" /> <!--  preserialized jars from ProActive -->
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/usr/local/sun-java/jdk1.4/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/unix/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive-log4j" />
+							value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter
-							value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib" />
+							value="-Djava.library.path=${PROACTIVE_HOME}/lib" />
 						<parameter
-							value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib://usr/local/sun-java/jdk1.4/jre/lib/i386" />
+							value="-Dsun.boot.library.path=${PROACTIVE_HOME}/lib:/${JAVA_HOME}/jre/lib/i386" />
 						<parameter
-							value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml" />
+							value="-Dproactive.configuration=${PROACTIVE_HOME}/modelisation/scripts/mixed/proactiveConfiguration.xml" />
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

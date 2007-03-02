@@ -34,7 +34,7 @@
 			<processDefinition id="ssh_list">
 				<processListbyHost
 					class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
-					hostlist="crusoe waha amstel">
+					hostlist="crusoe waha amstel"> <!--CHANGE ME!!!! -->
 					<processReference refid="localJVM"></processReference>
 				</processListbyHost>
 			</processDefinition>

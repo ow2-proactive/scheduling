@@ -6,6 +6,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home/rquilici/j2sdk1.4.2_09" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -38,31 +40,27 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/home/rquilici/j2sdk1.4.2_09/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/home/rquilici/ProActive/scripts/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="/home/rquilici/ProActive/scripts/proactive-log4j" />
+							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter
@@ -94,13 +92,13 @@
 					queue="priority">
 					<processReference refid="internalJVM" />
 					<commandPath
-						value="/opt/lsf/6.0/linux2.6-glibc2.3-ia64/bin/bsub -o output" />
+						value="/opt/lsf/6.0/linux2.6-glibc2.3-ia64/bin/bsub -o output" /><!--CHANGE ME!!!! -->
 					<bsubOption>
 						<processor>4</processor><!--max 32 -->
 						<resourceRequirement value="span[ptile=2]" />
 						<scriptPath>
 							<absolutePath
-								value="/home/rquilici/startRuntime.sh" />
+								value="/home/rquilici/startRuntime.sh" /><!--CHANGE ME!!!! -->
 						</scriptPath>
 					</bsubOption>
 				</bsubProcess>
@@ -110,7 +108,7 @@
 				<hierarchicalProcess
 					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
 					hostname="frontend_name" username="rquilici"
-					internal_ip="10.0.0.99">
+					internal_ip="10.0.0.99"> <!--CHANGE ME!!!! -->
 					<processReference refid="frontendJVM" />
 					<hierarchicalReference refid="LSFprocess" />
 				</hierarchicalProcess>

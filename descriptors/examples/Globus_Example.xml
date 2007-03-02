@@ -7,6 +7,11 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+		value="/nfs/software/java/j2sdk1.4.2_07" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+		<descriptorVariable name="GLOBUS_USER_HOME"
+			value="/nfs/home/rquilici" 
+		/>  <!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -39,32 +44,27 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-
-						<absolutePath
-							value="${PROACTIVE_HOME}/ProActive/lib/nqueen.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/nfs/software/java/j2sdk1.4.2_07/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/nfs/home/rquilici/ProActive/scripts/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="/nfs/home/rquilici/ProActive/scripts/proactive-log4j" />
+							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter
@@ -82,7 +82,7 @@
 						<count>8</count>
 						<maxTime>120</maxTime>
 						<errorFile>
-							/nfs/home/rquilici/error.txt
+							${GLOBUS_USER_HOME}/error.txt
 						</errorFile>
 					</globusOption>
 				</globusProcess>

@@ -3,13 +3,15 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
-	<variables>
+	<variables> <!-- Change these values to correct paths --> 
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="ProActive_RELEASE" />
 		<descriptorVariable name="REMOTE_HOME"
 			value="/user/amangin/home" />
 		<descriptorVariable name="SCILAB_HOME"
 			value="scilab/build4/scilab" />
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home/rquilici/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -64,8 +66,6 @@
 						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
@@ -84,7 +84,7 @@
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/user/gchazara/home/NOSAVE/java/jvm/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath

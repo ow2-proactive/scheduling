@@ -3,6 +3,11 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="/net/home/rquilici/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home1/rquilici/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Dispatcher" property="unique_singleAO" />
@@ -38,7 +43,7 @@
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<policyFile>
 						<absolutePath
-							value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/unix/proactive.java.policy" />
 					</policyFile>
 				</jvmProcess>
 			</processDefinition>
@@ -47,15 +52,27 @@
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath
-							value="/net/home/rquilici/ProActive/classes" />
+							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/usr/local/jdk1.4.0/bin/java" />
+							value="${JAVA_HOME}/bin/java" /> <!--CHANGE ME!!!! -->
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/unix/proactive.java.policy" />
 					</policyFile>
 				</jvmProcess>
 			</processDefinition>
@@ -67,7 +84,7 @@
 						<processor>4</processor>
 						<scriptPath>
 							<absolutePath
-								value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh" />
+								value="${PROACTIVE_HOME}/scripts/unix/cluster/startRuntime.sh" />
 						</scriptPath>
 					</bsubOption>
 				</bsubProcess>

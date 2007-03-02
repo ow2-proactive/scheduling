@@ -3,7 +3,12 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
-
+	<variables>
+		<descriptorVariable name="JAVA_HOME" 
+			value="/usr/java/j2sdk1.4.2_08" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+		<descriptorVariable name="REMOTE_HOME" 
+			value="/home/mozonne" /><!-- CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="plugtest" property="multiple"
@@ -45,7 +50,7 @@
 				<gLiteProcess
 					class="org.objectweb.proactive.core.process.glite.GLiteProcess"
 					virtualOrganisation="gilda"
-					executable="/usr/java/j2sdk1.4.2_08/bin/java" JDLFileName="job.jdl"
+					executable="${JAVA_HOME}/bin/java" JDLFileName="job.jdl"
 					Type="Job" stdError="error.log" stdOutput="stdout.log"
 					retryCount="3">
 					<processReference refid="localJVM" />
@@ -64,7 +69,7 @@
 								value="/public/JDL" />
 						</JDLFilePath>
 						<JDLRemoteFilePath>
-							<absolutePath value="/home/mozonne/JDL" />
+							<absolutePath value="${REMOTE_HOME}/JDL" />
 						</JDLRemoteFilePath>
 						<outputSandbox>
 							error.log stdout.log
@@ -80,8 +85,8 @@
 					<fileTransferDeploy refid="transfer">
 						<copyProtocol>processDefault</copyProtocol>
 						<sourceInfo
-							prefix="/afs/cern.ch/user/m/mozonne/public/JDL" />
-						<destinationInfo prefix="/home/mozonne/JDL/" />
+							prefix="/afs/cern.ch/user/m/mozonne/public/JDL" /> 
+						<destinationInfo prefix="${REMOTE_HOME}/JDL/" />
 					</fileTransferDeploy>
 				</sshProcess>
 			</processDefinition>

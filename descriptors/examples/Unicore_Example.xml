@@ -7,6 +7,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/opt/j2sdk1.4" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 
 	<componentDefinition>
@@ -44,13 +46,11 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
@@ -58,18 +58,17 @@
 
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/jsch.jar" />
-						<absolutePath value="ProActive/lib/nqueen.jar" />
 					</classpath>
 					<javaPath>
-						<absolutePath value="/opt/j2sdk1.4/bin/java" />
+						<absolutePath value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="ProActive/scripts/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="ProActive/scripts/proactive-log4j" />
+							value="${PROACTIVE_HOME}/proactive-log4j" />
 					</log4jpropertiesFile>
 				</jvmProcess>
 			</processDefinition>
@@ -81,7 +80,7 @@
 					<processReference refid="jvmTestSite" />
 					<unicoreDirPath>
 						<relativePath origin="user.home"
-							value=".unicore" />
+							value=".unicore" /> <!--CHANGE ME!!!! -->
 						<!--absolutePath value="/home/mleyton/.unicore"/-->
 					</unicoreDirPath>
 					<keyFilePath>
@@ -97,7 +96,7 @@
 					</unicoreOption>
 					<fileTransferDeploy refid="ProActiveLite">
 						<copyProtocol>processDefault</copyProtocol>
-						<sourceInfo prefix="/0/plugtest/ProActiveLite" />
+						<sourceInfo prefix="/0/plugtest/ProActiveLite" /> <!--CHANGE ME!!!! -->
 						<destinationInfo />
 					</fileTransferDeploy>
 				</unicoreProcess>

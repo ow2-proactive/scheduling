@@ -6,6 +6,8 @@
 
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home1/rquilici/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -34,17 +36,15 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
 					</classpath>
 					<javaPath>
-						<absolutePath value="/home/rquilici/j2sdk1.4.2_09/bin/java"/>
+						<absolutePath value="${JAVA_HOME}/bin/java"/>
 					</javaPath>
 					<policyFile>
 						<absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/>
@@ -58,7 +58,7 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="ssh_list">
-				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"  fixedName="125.110.118." list="[96-200]^[96,102,103,104,105,110,11,112]" domain="" username="rquilici">
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"  fixedName="125.110.118." list="[96-200]^[96,102,103,104,105,110,11,112]" domain="" username="rquilici"> <!--CHANGE ME!!!! -->
 					<processReference refid="localJVM"></processReference>
 				</processList>
 			</processDefinition>

@@ -6,6 +6,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="IBMJava2-142" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -37,32 +39,28 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 					</classpath>
 
 					<javaPath>
 						<!--<absolutePath value="/home/user/grid/jre1.5.0_02/bin/java"/>-->
-						<absolutePath value="IBMJava2-142/bin/java" />
+						<absolutePath value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/home/user/grid/ProActive/scripts/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="/home/user/grid/ProActive/scripts/proactive-log4j" />
+							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter
@@ -83,7 +81,7 @@
 						<parameter
 							value="-Dproactive.communication.protocol=rmissh" />
 						<parameter
-							value="-Djava.rmi.server.hostname=10.12.15.19" />
+							value="-Djava.rmi.server.hostname=10.12.15.19" /> <!--CHANGE ME!!!! -->
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -93,12 +91,12 @@
 					interactive="true">
 					<processReference refid="localJVM" />
 					<commandPath
-						value="/opt/lsf/6.0/linux2.4-glibc2.2-amd64/bin/bsub" />
+						value="/opt/lsf/6.0/linux2.4-glibc2.2-amd64/bin/bsub" /> <!--CHANGE ME!!!! -->
 					<bsubOption>
 						<processor>50</processor>
 						<scriptPath>
 							<absolutePath
-								value="/home/user/grid/startCNRuntime" />
+								value="/home/user/grid/startCNRuntime" /> <!--CHANGE ME!!!! -->
 						</scriptPath>
 					</bsubOption>
 				</bsubProcess>
@@ -107,7 +105,7 @@
 				<hierarchicalProcess
 					class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"
 					hostname="frontend_name" internal_ip="10.12.15.19"
-					username="grid">
+					username="grid"> <!--CHANGE ME!!!! -->
 					<processReference refid="localJVM1"></processReference>
 					<hierarchicalReference refid="bsubSCC"></hierarchicalReference>
 				</hierarchicalProcess>

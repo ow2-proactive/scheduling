@@ -7,6 +7,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home/plugtest/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -38,25 +40,21 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/home/plugtest/j2sdk1.4.2_05/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
@@ -84,7 +82,7 @@
 						<scriptPath>
 							<!--absolutePath value="/home/plugtest/ProActive/scripts/unix/cluster/pbsStartRuntime.sh"/-->
 							<absolutePath
-								value="/home/plugtest/pbsStartRuntime.sh" />
+								value="${PROACTIVE_HOME}/scripts/unix/cluster/pbsStartRuntime.sh" />
 						</scriptPath>
 					</pbsOption>
 				</pbsProcess>

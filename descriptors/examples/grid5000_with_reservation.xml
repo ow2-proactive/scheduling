@@ -80,8 +80,6 @@
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 
 					</classpath>
 					<javaPath>

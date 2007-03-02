@@ -53,8 +53,6 @@
 						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />

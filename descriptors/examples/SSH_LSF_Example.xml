@@ -7,6 +7,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/net/home/plugtest/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -38,25 +40,21 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/net/home/plugtest/j2sdk1.4.2_05/bin/java" />
+							value="${JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
@@ -81,7 +79,7 @@
 						<resourceRequirement value="span[ptile=2]" />
 						<scriptPath>
 							<absolutePath
-								value="/net/home/plugtest/ProActive/scripts/unix/cluster/startRuntime.sh" />
+								value="${PROACTIVE_HOME}/scripts/unix/cluster/startRuntime.sh" />
 						</scriptPath>
 					</bsubOption>
 				</bsubProcess>

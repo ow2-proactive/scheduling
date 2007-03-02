@@ -6,6 +6,8 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/home1/rquilici/j2sdk1.4.2_05" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -66,13 +68,11 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
@@ -86,17 +86,14 @@
 							value="${PROACTIVE_HOME}/lib/jini-ext.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/reggie.jar" />
-
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/usr/local/jdk1.4.0/bin/java" />
+							value="${JAVA_HOME}/bin/java" /> <!--CHANGE ME!!!! -->
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy" />
+							value="${PROACTIVE_HOME}/scripts/unix/proactive.java.policy" />
 					</policyFile>
 				</jvmProcess>
 			</processDefinition>

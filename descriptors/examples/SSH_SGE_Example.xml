@@ -38,26 +38,22 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath
 							value="${PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/componets/fractal.jar" />
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/nqueen.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/jsch.jar" />
 
 					</classpath>
 					<javaPath>
 						<absolutePath
-							value="/home/plugtest/j2sdk1.4.2_05/bin/java" />
+							value="/home/plugtest/j2sdk1.4.2_05/bin/java" /> <!--CHANGE ME!!!! -->
 					</javaPath>
 					<policyFile>
 						<absolutePath
@@ -85,7 +81,7 @@
 						<bookingDuration>3600</bookingDuration>
 						<scriptPath>
 							<absolutePath
-								value="/home/rquilici/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh" />
+								value="${PROACTIVE_HOME}/scripts/unix/cluster/gridEngineStartRuntime.sh" />
 						</scriptPath>
 						<parallelEnvironment>mpi</parallelEnvironment>
 					</gridEngineOption>
@@ -94,7 +90,7 @@
 			<processDefinition id="sshCluster">
 				<sshProcess
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
-					hostname="frontend" username="plugtest">
+					hostname="frontend" username="plugtest"> <!--CHANGE ME!!!! -->
 					<processReference refid="sgeprocess" />
 				</sshProcess>
 			</processDefinition>
