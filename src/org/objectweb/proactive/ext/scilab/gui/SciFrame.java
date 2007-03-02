@@ -55,6 +55,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import javasci.SciData;
+
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -884,12 +886,12 @@ public class SciFrame extends javax.swing.JFrame {
 		if (evt.getClickCount() == 2) {
 			String idTask = (String) this.tableTaskWaitModel.getValueAt(this.tableTaskWait.getSelectedRow(), 0);
 			
-			ArrayList listTask = service.getListTaskWait();
+			ArrayList<SciTaskInfo> listTask = service.getListTaskWait();
 			
 			SciTaskInfo sciTaskInfo = null;
 			int i; 
 			for(i=0; i<listTask.size(); i++){
-				sciTaskInfo = (SciTaskInfo) listTask.get(i);
+				sciTaskInfo = listTask.get(i);
 				if(idTask.equals(sciTaskInfo.getIdTask())){
 					break;
 				}
@@ -915,7 +917,7 @@ public class SciFrame extends javax.swing.JFrame {
 		if (evt.getClickCount() == 2) {
 			String idTask = (String)this.tableTaskRunModel.getValueAt(this.tableTaskRun.getSelectedRow(), 0);
 			
-			SciTaskInfo sciTaskInfo = (SciTaskInfo) service.getMapTaskRun().get(idTask);
+			SciTaskInfo sciTaskInfo = service.getMapTaskRun().get(idTask);
 			this.dialogResult.setPathScript(sciTaskInfo.getPathScript());
 			this.dialogResult.setJobInit(sciTaskInfo.getSciTask().getJobInit());
 			this.dialogResult.setDataOut("");
@@ -937,7 +939,7 @@ public class SciFrame extends javax.swing.JFrame {
 			this.dialogResult.setJobInit(sciTaskInfo.getSciTask().getJobInit());
 			
 			String strResult="";
-			ArrayList listResult = sciTaskInfo.getSciResult().getList();
+			ArrayList<SciData> listResult = sciTaskInfo.getSciResult().getList();
 			for(int i=0; i< listResult.size(); i++){
 				strResult += listResult.get(i).toString() + "\n";
 			}
@@ -1027,7 +1029,7 @@ public class SciFrame extends javax.swing.JFrame {
 		}
 	
 		String strResult="";
-		ArrayList listResult = sciTaskInfo.getSciResult().getList();
+		ArrayList<SciData> listResult = sciTaskInfo.getSciResult().getList();
 		for(i=0; i< listResult.size(); i++){
 			strResult += listResult.get(i).toString() + "\n";
 		}
@@ -1124,7 +1126,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void refreshTreeEngine(){
-		HashMap mapEngine = this.service.getMapEngine();
+		HashMap<String, SciEngineInfo> mapEngine = this.service.getMapEngine();
 		SciEngineInfo sciEngineInfo;
 		TreeEngineNode nodeEngine;
 		
@@ -1132,7 +1134,7 @@ public class SciFrame extends javax.swing.JFrame {
 		int count = this.rootEngine.getChildCount();
 		while(i<count){
 			nodeEngine = (TreeEngineNode) this.rootEngine.getChildAt(i);
-			sciEngineInfo = (SciEngineInfo) mapEngine.remove(nodeEngine.toString());
+			sciEngineInfo = mapEngine.remove(nodeEngine.toString());
 			if(sciEngineInfo == null){
 				nodeEngine.removeFromParent();
 				count--;
@@ -1143,8 +1145,8 @@ public class SciFrame extends javax.swing.JFrame {
 			}
 		}
 		
-		TreeSet listSort = new TreeSet(mapEngine.keySet());
-		Iterator it = listSort.iterator();
+		TreeSet<String> listSort = new TreeSet<String>(mapEngine.keySet());
+		Iterator<String> it = listSort.iterator();
 		
 		while(it.hasNext()){
 			sciEngineInfo = (SciEngineInfo) mapEngine.get(it.next());

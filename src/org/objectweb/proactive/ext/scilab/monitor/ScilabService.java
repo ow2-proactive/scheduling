@@ -112,14 +112,14 @@ public class ScilabService implements Serializable{
 	
 	public synchronized int deployEngine(String nameVirtualNode, String pathDescriptor, String arrayIdEngine[]){
 		logger.debug("->ScilabService In:deployEngine:" + nameVirtualNode);
-		HashMap mapNewEngine = SciDeployEngine.deploy(nameVirtualNode, pathDescriptor, arrayIdEngine); 
+		HashMap<String, SciEngine> mapNewEngine = SciDeployEngine.deploy(nameVirtualNode, pathDescriptor, arrayIdEngine); 
 		SciEngine sciEngine;
 		String idEngine;
 		BooleanWrapper isActivate;
 		
 		for(int i=0; i<arrayIdEngine.length; i++){
 			idEngine = arrayIdEngine[i];
-			sciEngine = (SciEngine)mapNewEngine.get(idEngine);
+			sciEngine = mapNewEngine.get(idEngine);
 			
 			if(sciEngine == null)
 				continue;
@@ -501,6 +501,7 @@ public class ScilabService implements Serializable{
 	 * 
 	 * @return a Map of terminated task
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized HashMap<String, SciTaskInfo> getMapTaskEnd() {
 		return (HashMap<String, SciTaskInfo>) mapTaskEnd.clone();
 	}
@@ -509,6 +510,7 @@ public class ScilabService implements Serializable{
 	/**
 	 * @return a Map of running task
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized HashMap<String, SciTaskInfo> getMapTaskRun() {
 		return  (HashMap<String, SciTaskInfo>) mapTaskRun.clone();
 	}
@@ -516,6 +518,7 @@ public class ScilabService implements Serializable{
 	/**
 	 * @return a Map of Deployed Engine
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized HashMap<String, SciEngineInfo> getMapEngine() {
 		return (HashMap<String, SciEngineInfo>) mapEngine.clone();
 	}
@@ -523,6 +526,7 @@ public class ScilabService implements Serializable{
 	/**
 	 * @return a List of pending tasks
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized ArrayList<SciTaskInfo> getListTaskWait() {
 		return (ArrayList<SciTaskInfo>) listTaskWait.clone();
 	}
