@@ -230,11 +230,11 @@ public class Line2dChart implements Chart {
         c.setRangeGridlinesVisible(true);
 
         try {
-            ChartUtilities.saveChartAsPNG(new java.io.File(fileName + ".png"),
+            ChartUtilities.saveChartAsPNG(XMLHelper.createFileWithDirs(fileName + ".png"),
                     chart, width, height);
 
             Utilities.saveChartAsSVG(chart, new Rectangle(width, height),
-                    new java.io.File(fileName + ".svg"));
+                    XMLHelper.createFileWithDirs(fileName + ".svg"));
         } catch (java.io.IOException e) {
             System.err.println("Error writing image to file");
             e.printStackTrace();

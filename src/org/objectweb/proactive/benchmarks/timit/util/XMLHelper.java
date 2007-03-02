@@ -45,6 +45,7 @@ import java.util.regex.Pattern;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -84,19 +85,33 @@ public class XMLHelper {
     public static void writeFile(Document document, String filename) {
         try {
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+            
+            FileOutputStream fos = new FileOutputStream(
+                    XMLHelper.createFileWithDirs(filename)
+                    );
+            out.output(document, fos);
+
+        } catch (Exception e) {
+            System.err.println("Unable to write the XML file: " + filename);
+            e.printStackTrace();
+        }
+    }
+    
+    public static File createFileWithDirs(String filename){
+        try {          
             File file = new File(filename);
 
             String path = file.getParent();
             if (path != null) {
                 new File(path).mkdirs();
             }
-            FileOutputStream fos = new FileOutputStream(file);
-            out.output(document, fos);
+            return file;
 
         } catch (Exception e) {
-            System.err.println("Unable to write file: " + filename);
-            e.printStackTrace();
-        }
+            System.err.println("Unable to create file: " + filename);
+            e.printStackTrace();  
+            return null;
+        }        
     }
 
     /**
@@ -147,7 +162,9 @@ public class XMLHelper {
 
         // Read and modify ProActive descriptor base
         Document doc = XMLHelper.readFile(inFilename);
-        Element eVariables = doc.getRootElement().getChild("variables");
+        // Get the root namespace in order to provide it when performing a getChild
+        Namespace descriptorNamespace = doc.getRootElement().getNamespace();        
+        Element eVariables = doc.getRootElement().getChild("variables",descriptorNamespace);        
         Iterator it = eVariables.getChildren().iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();

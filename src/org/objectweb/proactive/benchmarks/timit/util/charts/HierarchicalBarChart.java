@@ -196,11 +196,15 @@ public class HierarchicalBarChart implements Chart {
         domainAxis.setLowerMargin(0.05);
 
         try {
-            ChartUtilities.saveChartAsPNG(new java.io.File(filename + ".png"),
-                    chart, width, height);
+            if ( filename == null || "".equals(filename) ){
+                throw new RuntimeException("The output filename for the HierarchicalBarChart cannot be null or empty !");
+            }
+            
+            ChartUtilities.saveChartAsPNG(XMLHelper.createFileWithDirs(filename+".png"),
+                    chart, width, height);                        
 
             Utilities.saveChartAsSVG(chart, new Rectangle(width, height),
-                    new java.io.File(filename + ".svg"));
+                    XMLHelper.createFileWithDirs(filename + ".svg"));
 
         } catch (java.io.IOException e) {
             System.err.println("Error writing chart image to file");

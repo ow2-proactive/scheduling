@@ -69,6 +69,7 @@ import org.jfree.ui.RectangleEdge;
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.config.ConfigChart;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
+import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 
 /**
  * This class contains all methods to build a matrix chart from a
@@ -304,10 +305,9 @@ public class MatrixChart implements Chart {
         }
         g.dispose();
 
-        try {
-            javax.imageio.ImageIO.write(total, "png", new java.io.File(filename
-                    + ".png"));
-        } catch (IOException ex) {
+        try {                        
+            javax.imageio.ImageIO.write(total, "png", XMLHelper.createFileWithDirs(filename));
+        } catch (IOException ex) {            
             ex.printStackTrace();
         }
     }
@@ -319,11 +319,6 @@ public class MatrixChart implements Chart {
 
         NormalizedMatrixSeries matrix = new NormalizedMatrixSeries("s",
                 this.array.length, this.array.length);
-        // for (int i = 0; i<array.length; i++){
-        // for(int j = 0; j<array[i].length; j++){
-        // matrix.update(i,j,array[i][j]);
-        // }
-        // }
         return matrix;
     }
 
