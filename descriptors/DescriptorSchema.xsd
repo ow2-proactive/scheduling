@@ -3,7 +3,7 @@
 	attributeFormDefault="unqualified"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="3.2"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="3.3"
 	xmlns:pas="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd">
 	<xs:import
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
@@ -15,7 +15,7 @@
 		type="ProActiveDescriptorType">
 		<xs:annotation>
 			<xs:documentation>
-				Deployment Descriptor Schema - Version 3.2
+				Deployment Descriptor Schema - Version 3.3
 			</xs:documentation>
 		</xs:annotation>
 		<xs:unique name="mainId">
