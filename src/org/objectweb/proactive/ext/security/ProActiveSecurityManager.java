@@ -100,7 +100,7 @@ import sun.rmi.server.MarshalOutputStream;
  * a given SecurityEntity.
  */
 public class ProActiveSecurityManager implements Serializable, SecurityEntity {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_PSM);
 
     /* contains all active sessions for the current active object */
     protected Hashtable<Long,Session> sessions;
@@ -121,7 +121,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     // static private Object synchro = new Object();
 
     /* pointer to the wrapping SecurityEntity if exists */
-    protected SecurityEntity parent;
+    protected transient SecurityEntity parent;
     protected byte[] encodedKeyStore;
 
     // indicates the type of the secured object (object, node, runtime)
@@ -145,8 +145,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             this.policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
             keyStore = policyServer.getKeyStore();
         }
-        logger.debug("psm" + file +
-            " +-+--+-+-++-+-+-++-++-+--+-+-+-+-+-+-+-+-+-+-+-++--+-+-+-+-+-+-+-+ ");
+        logger.debug("creating Security Manager using file " + file);
     }
 
     /**

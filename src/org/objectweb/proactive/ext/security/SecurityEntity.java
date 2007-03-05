@@ -47,7 +47,7 @@ import org.objectweb.proactive.ext.security.securityentity.Entity;
  * implement. An entity can be an active object, a runtime, a domain.
  */
 public interface SecurityEntity {
-
+	
     /**
      * entity certificate
      * @return returns entity certificate
