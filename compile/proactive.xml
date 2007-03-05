@@ -202,24 +202,9 @@
 		</javac>
 		<!-- BnB API stubs generation -->
 		<echo message="Branch and Bound API stubs generating..." />
-		<property name="stub_bnb.classdir" value="${base.dir}/classes" />
-		<path id="bnbClassDir">
-			<pathelement path="${stub_bnb.classdir}" />
-		</path>
-		<pathconvert pathsep=" " property="bnbClassesDir" refid="bnbClassDir" />
-		<path id="bnbClasses">
-			<fileset dir="${classes.dir}/org/objectweb/proactive/branchnbound">
-				<include name="**/*.class" />
-				<exclude name="**/*$*" />
-			</fileset>
-		</path>
-		<pathconvert pathsep=" " property="bnb-files" refid="bnbClasses">
-			<map from="${bnbClassesDir}" to="" />
-		</pathconvert>
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
 			<classpath refid="project.classpath" />
-			<arg line="-d ${classes.dir}
-        ${bnb-files}" />
+			<arg line="-srcDir ${classes.dir} -pkg org.objectweb.proactive.branchnbound" />
 		</java>
 	</target>
 
@@ -243,27 +228,9 @@
 		</javac>
 		<!-- Calcium stubs generation -->
 		<echo message="Calcium stubs generating..." />
-		<property name="stub_calcium.classdir" value="${base.dir}/classes" />
-		<path id="calciumClassDir">
-			<pathelement path="${stub_calcium.classdir}" />
-		</path>
-		<pathconvert pathsep=" " property="calciumClassesDir" refid="calciumClassDir" />
-		<path id="calciumClasses">
-			<fileset dir="${classes.dir}/org/objectweb/proactive/calcium/proactive">
-				<include name="**/*.class" />
-				<exclude name="**/*$*" />
-			</fileset>
-			<fileset dir="${classes.dir}/org/objectweb/proactive/calcium/">
-				<include name="**/*Task.class"/>
-				<exclude name="**/*$*" />
-			</fileset>
-		</path>
-		<pathconvert pathsep=" " property="calcium-files" refid="calciumClasses">
-			<map from="${calciumClassesDir}" to="" />
-		</pathconvert>
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
 			<classpath refid="project.classpath" />
-			<arg line="-d ${classes.dir} ${calcium-files}" />
+			<arg line="-srcDir ${classes.dir} -pkg org.objectweb.proactive.calcium -class Task" />
 		</java>
 	</target>
 
@@ -722,34 +689,16 @@
 			<classpath refid="project.classpath" />
 			<include name="${proactive.dir}/ext/util/StubGenerator.java" />
 		</javac>
+		<javac srcdir="${src.dir}" destdir="${ant.library.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="util/AntTaskGenerateStub.java" />
+		</javac>
 	</target>
 	
 	<target name="stub" depends="stubGenerator, compile">
-		<property name="stub.classdir" value="${classes.dir}" />
-		<echo message="${stub.classdir}" />
-		<path id="classDir">
-			<pathelement path="${stub.classdir}" />
-		</path>
-		<!--     The path to the class dir   -->
-		<pathconvert pathsep=" " property="classesDir" refid="classDir" />
-		<!--  Select files to rewrite  -->
-		<path id="classFiles">
-			<fileset dir="${stub.classdir}">
-				<include name="**/*.class" />
-				<exclude name="**/*$*" />
-			</fileset>
-		</path>
-		<!--  Remove the trailing path from all files -->
-		<pathconvert pathsep=" " property="test-files" refid="classFiles">
-			<map from="${classesDir}" to="" />
-		</pathconvert>
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true" dir="${stub.classdir}">
-			<classpath>
-				<pathelement path="${stub.classdir}" />
-				<path refid="project.classpath" />
-				<pathelement path="${env.CLASSPATH}" />
-			</classpath>
-			<arg line="-d ${stub.classdir} ${test-files}" />
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
+			<arg line="-srcDir ${classes.dir} -pkg org.objectweb.proactive.core" />
 		</java>
 	</target>
 
@@ -759,24 +708,9 @@
 	<!-- ================================================================ -->
 	<target name="stub_wrapper" depends="stubGenerator">
 		<echo message="Java primitive type wrapper stubs generating..." />
-		<property name="stub_wrapper.classdir" value="${classes.dir}" />
-		<path id="wrapperClassDir">
-			<pathelement path="${stub_wrapper.classdir}" />
-		</path>
-		<pathconvert pathsep=" " property="wrapperClassesDir" refid="wrapperClassDir" />
-		<path id="wrapperClasses">
-			<fileset dir="${classes.dir}/org/objectweb/proactive/core/util/wrapper">
-				<include name="**/*.class" />
-				<exclude name="**/*$*" />
-			</fileset>
-		</path>
-		<pathconvert pathsep=" " property="wrapper-files" refid="wrapperClasses">
-			<map from="${wrapperClassesDir}" to="" />
-		</pathconvert>
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
 			<classpath refid="project.classpath" />
-			<arg line="-d ${classes.dir}
-        ${wrapper-files}" />
+			<arg line="-srcDir ${classes.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
 		</java>
 	</target>
 
