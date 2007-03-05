@@ -119,7 +119,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected LocalBodyStrategy localBodyStrategy;
 
     // SECURITY
-    protected ProActiveSecurityManager psm;
+    protected ProActiveSecurityManager securityManager;
     protected boolean isSecurityOn = false;
     protected transient InternalBodySecurity internalBodySecurity;
     protected Hashtable openedSessions;
@@ -174,12 +174,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                                   .newProActiveSPMDGroupManager();
 
         ProActiveSecurity.loadProvider();
+
         // SECURITY
         if (reifiedObject instanceof Secure) {
             isInterfaceSecureImplemented = true;
         }
 
-        if ((psm = factory.getProActiveSecurityManager()) == null) {
+        if ((securityManager = factory.getProActiveSecurityManager()) == null) {
             isSecurityOn = false;
             ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
                            .debug("Active Object security Off");
@@ -187,15 +188,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             isSecurityOn = true;
             ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
                            .debug("Active Object security On application is " +
-                psm.getPolicyServer().getApplicationName());
+                securityManager.getPolicyServer().getApplicationName());
             ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
                            .debug("current thread is " +
                 Thread.currentThread().getName());
         }
 
         if (this.isSecurityOn) {
-            psm.setBody(this);
-            isSecurityOn = psm.getCertificate() != null;
+            securityManager.setBody(this);
+            isSecurityOn = securityManager.getCertificate() != null;
             internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
     }
@@ -219,9 +220,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public void setRegistered(boolean registered) {
-    	this.gc.setRegistered(registered);
+        this.gc.setRegistered(registered);
     }
-    
+
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -272,7 +273,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     this.renegociateSessionIfNeeded(request.getSessionId());
                     if ((this.internalBodySecurity.isLocalBody()) &&
                             request.isCiphered()) {
-                        request.decrypt(psm);
+                        request.decrypt(securityManager);
                     }
                 } catch (SecurityNotAvailableException e) {
                     // do nothing
@@ -316,7 +317,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 try {
                     if ((internalBodySecurity.isLocalBody()) &&
                             reply.isCiphered()) {
-                        reply.decrypt(psm);
+                        reply.decrypt(securityManager);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -406,7 +407,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             enterInThreadStore();
             if (isSecurityOn) {
                 if (internalBodySecurity.isLocalBody()) {
-                    psm.terminateSession(sessionID);
+                    securityManager.terminateSession(sessionID);
                 } else {
                     internalBodySecurity.terminateSession(sessionID);
                 }
@@ -426,7 +427,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     //  if (psm == null) {
                     //  startDefaultProActiveSecurityManager();
                     //}
-                    return psm.getCertificate();
+                    return securityManager.getCertificate();
                 } else {
                     return internalBodySecurity.getCertificate();
                 }
@@ -438,11 +439,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager() {
-    	if (isSecurityOn && internalBodySecurity.isLocalBody()) {
-    		return psm;
-    	}
+        if (isSecurityOn && internalBodySecurity.isLocalBody()) {
+            return securityManager;
+        }
 
-    	return null;
+        return null;
     }
 
     public ProActiveSPMDGroupManager getProActiveSPMDGroupManager() {
@@ -462,7 +463,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     //if (psm == null) {
                     //startDefaultProActiveSecurityManager();
                     //}
-                    sessionID = psm.startNewSession(policy);
+                    sessionID = securityManager.startNewSession(policy);
 
                     return sessionID;
                 } else {
@@ -489,7 +490,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     //if (psm == null) {
                     //         startDefaultProActiveSecurityManager();
                     //        }
-                    pk = psm.getPublicKey();
+                    pk = securityManager.getPublicKey();
 
                     return pk;
                 } else {
@@ -513,7 +514,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 byte[] plop;
 
                 if (internalBodySecurity.isLocalBody()) {
-                    plop = psm.randomValue(sessionID, clientRandomValue);
+                    plop = securityManager.randomValue(sessionID, clientRandomValue);
 
                     return plop;
                 } else {
@@ -541,7 +542,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 byte[][] pke;
 
                 if (internalBodySecurity.isLocalBody()) {
-                    pke = psm.publicKeyExchange(sessionID, myPublicKey,
+                    pke = securityManager.publicKeyExchange(sessionID, myPublicKey,
                             myCertificate, signature);
 
                     return pke;
@@ -575,7 +576,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
             if (internalBodySecurity.isLocalBody()) {
                 //	System.out.println("secretKeyExchange demande un security manager a " + ProActive.getBodyOnThis());
-                ske = psm.secretKeyExchange(sessionID, encodedAESKey,
+                ske = securityManager.secretKeyExchange(sessionID, encodedAESKey,
                         encodedIVParameters, encodedClientMacKey,
                         encodedLockData, parametersSignature);
 
@@ -602,7 +603,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
 
             if (internalBodySecurity.isLocalBody()) {
-                return psm.getPolicy(securityContext);
+                return securityManager.getPolicy(securityContext);
             } else {
                 return internalBodySecurity.getPolicy(securityContext);
             }
@@ -619,12 +620,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             //if (psm == null) {
             //	  startDefaultProActiveSecurityManager();
             // }
-            if (!isSecurityOn || (psm == null)) {
+            if (!isSecurityOn || (securityManager == null)) {
                 throw new SecurityNotAvailableException();
             }
 
             if (internalBodySecurity.isLocalBody()) {
-                return psm.getCertificate().getEncoded();
+                return securityManager.getCertificate().getEncoded();
             } else {
                 return internalBodySecurity.getCertificatEncoded();
             }
@@ -639,9 +640,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected void startDefaultProActiveSecurityManager() {
         try {
             //     logger.info("starting a new psm ");
-            this.psm = new DefaultProActiveSecurityManager("vide ");
+            this.securityManager = new DefaultProActiveSecurityManager("vide ");
             isSecurityOn = true;
-            psm.setBody(this);
+            securityManager.setBody(this);
             internalBodySecurity = new InternalBodySecurity(null);
         } catch (Exception e) {
             logger.error("Error when contructing a DefaultProActiveManager");
@@ -657,7 +658,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 throw new SecurityNotAvailableException();
             }
             if (internalBodySecurity.isLocalBody()) {
-                return psm.getEntities();
+                return securityManager.getEntities();
             } else {
                 return internalBodySecurity.getEntities();
             }
@@ -735,11 +736,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     public void setPolicyServer(PolicyServer server) {
         if (server != null) {
-            if ((psm != null) && (psm.getPolicyServer() == null)) {
-                psm = new ProActiveSecurityManager(server);
+            if ((securityManager != null) && (securityManager.getPolicyServer() == null)) {
+                securityManager = new ProActiveSecurityManager(server);
                 isSecurityOn = true;
                 logger.debug("Security is on " + isSecurityOn);
-                psm.setBody(this);
+                securityManager.setBody(this);
             }
         }
     }
@@ -800,11 +801,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                             this + ", method " + methodCall.getName() +
                             " cert " + cert.getSubjectDN() + " " +
                             cert.getPublicKey());
-                        sessionID = psm.getSessionIDTo(cert);
+                        sessionID = securityManager.getSessionIDTo(cert);
                         if (sessionID == 0) {
-                            psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
+                            securityManager.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
                                 destinationBody);
-                            sessionID = this.psm.getSessionIDTo(cert);
+                            sessionID = this.securityManager.getSessionIDTo(cert);
                         }
                     }
                 } catch (SecurityNotAvailableException e) {
@@ -820,10 +821,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO)
                                .debug("renegotiate session " + sessionID);
                 updateLocation(destinationBody.getID(), e.getUniversalBody());
-                psm.terminateSession(sessionID);
+                securityManager.terminateSession(sessionID);
                 sendRequest(methodCall, future, e.getUniversalBody());
             } else {
-                psm.terminateSession(sessionID);
+                securityManager.terminateSession(sessionID);
                 sendRequest(methodCall, future, destinationBody);
             }
         } catch (CommunicationForbiddenException e) {
@@ -995,7 +996,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     public GCResponse receiveGCMessage(GCMessage msg) {
         return this.gc.receiveGCMessage(msg);
     }
-    
+
     public abstract boolean isInImmediateService() throws IOException;
 
     //

@@ -100,7 +100,7 @@ import sun.rmi.server.MarshalOutputStream;
  * a given SecurityEntity.
  */
 public class ProActiveSecurityManager implements Serializable, SecurityEntity {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_PSM);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER);
 
     /* contains all active sessions for the current active object */
     protected Hashtable<Long,Session> sessions;
@@ -330,7 +330,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             if (distantBodyCertificate != null) {
                 session.setDistantOAPublicKey(distantBodyCertificate.getPublicKey());
             } else {
-                ProActiveLogger.getLogger(Loggers.SECURITY_PSM).debug("WARNING remote object scertificate is null");
+                ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("WARNING remote object scertificate is null");
                 session.setDistantOAPublicKey(distantSecurityEntity.getPublicKey());
             }
 

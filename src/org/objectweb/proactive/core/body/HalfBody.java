@@ -78,10 +78,14 @@ public class HalfBody extends AbstractBody {
         super(new Object(), "LOCAL", factory, getRuntimeJobID());
 
         //SECURITY 
-        if (psm != null) {
-            psm = psm.generateSiblingCertificate("HalfBody");
-            psm.setBody(this);
-            isSecurityOn = psm.getCertificate() != null;
+        if (securityManager == null ) {
+        	securityManager = factory.getProActiveSecurityManager();
+        }
+        
+        if (securityManager != null) {
+            securityManager = securityManager.generateSiblingCertificate("HalfBody");
+            securityManager.setBody(this);
+            isSecurityOn = securityManager.getCertificate() != null;
             internalBodySecurity = new InternalBodySecurity(null); // SECURITY
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("  ------> HalfBody Security is " +
                 isSecurityOn);
@@ -150,7 +154,7 @@ public class HalfBody extends AbstractBody {
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         try {
             if (reply.isCiphered()) {
-                reply.decrypt(psm);
+                reply.decrypt(securityManager);
             }
         } catch (Exception e) {
             e.printStackTrace();

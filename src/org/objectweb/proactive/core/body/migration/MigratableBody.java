@@ -203,7 +203,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
                     SecurityContext result = null;
 
                     if (isSecurityOn) {
-                        result = psm.getPolicy(sc);
+                        result = securityManager.getPolicy(sc);
 
                         if (!result.isMigration()) {
                             ProActiveLogger.getLogger(Loggers.SECURITY)
@@ -243,7 +243,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
             // security
             // save opened sessions
             if (this.isSecurityOn) {
-                openedSessions = psm.getOpenedConnexion();
+                openedSessions = securityManager.getOpenedConnexion();
             }
 
             // try to migrate
@@ -305,7 +305,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
         hasJustMigrated = true;
         if (this.isSecurityOn) {
             internalBodySecurity = new InternalBodySecurity(null);
-            psm.setBody(this);
+            securityManager.setBody(this);
         }
     }
 

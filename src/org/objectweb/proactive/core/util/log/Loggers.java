@@ -108,7 +108,6 @@ public interface Loggers {
     public static final String SECURITY_POLICYSERVER = SECURITY +
         ".policyserver";
     public static final String SECURITY_CRYPTO = SECURITY + ".crypto";
-    public static final String SECURITY_PSM = SECURITY + ".psm";
     public static final String SECURITY_DESCRIPTOR = SECURITY + ".descriptor";
 
     // Fault-tolerance loggers
