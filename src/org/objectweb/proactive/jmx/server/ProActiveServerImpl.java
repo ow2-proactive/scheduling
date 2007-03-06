@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -27,13 +27,6 @@
  *  Contributor(s):
  *
  * ################################################################
- */
-
-/*
- * Created on May 3, 2005
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 package org.objectweb.proactive.jmx.server;
 

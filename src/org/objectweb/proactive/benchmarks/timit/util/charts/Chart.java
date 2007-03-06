@@ -2,11 +2,9 @@
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurre
- import org.objectweb.proactive.benchmarks.timit.TimIt;
- nt computing with Security and Mobility
+ *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
