@@ -537,7 +537,7 @@ public class GarbageCollector {
     /**
      * Called for each message
      */
-    GCSimpleResponse receiveSimpleGCMessage(GCSimpleMessage mesg) {
+    synchronized GCSimpleResponse receiveSimpleGCMessage(GCSimpleMessage mesg) {
         UniqueID senderID = mesg.getSender();
         Referencer kr = this.referencers.get(senderID);
         GCSimpleResponse resp = null;
