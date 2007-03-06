@@ -2,9 +2,10 @@ package org.objectweb.proactive.core.gc;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Random;
-import java.util.Vector;
 
+import org.apache.log4j.Level;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -28,16 +29,17 @@ public class GarbageCollectorThread implements Runnable {
         }
 
         for (;;) {
+            long sleepDuration = GarbageCollector.TTB;
             try {
-                Thread.sleep(GarbageCollector.TTB);
+                Thread.sleep(sleepDuration);
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
-
+            long start = System.currentTimeMillis();
             Iterator<UniversalBody> bodies = LocalBodyStore.getInstance()
                                                            .getLocalBodies()
                                                            .bodiesIterator();
-            Collection<GCSimpleMessage> toSend = new Vector<GCSimpleMessage>();
+            Collection<GCSimpleMessage> toSend = new LinkedList<GCSimpleMessage>();
             while (bodies.hasNext()) {
                 AbstractBody body = (AbstractBody) bodies.next();
                 Collection<GCSimpleMessage> messages = body.getGarbageCollector()
@@ -52,6 +54,15 @@ public class GarbageCollectorThread implements Runnable {
                 toSend.addAll(messages);
             }
             MessageSender.sendMessages(toSend);
+            sleepDuration = GarbageCollector.TTB -
+                (System.currentTimeMillis() - start);
+            if (sleepDuration <= 0) {
+                AsyncLogger.queueLog(Level.WARN,
+                    "Broadcasting took longer than TTB (" +
+                    GarbageCollector.TTB + "): " +
+                    (GarbageCollector.TTB - sleepDuration));
+                sleepDuration = 1;
+            }
         }
     }
 
