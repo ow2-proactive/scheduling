@@ -72,9 +72,9 @@ public class FindPrimes implements Serializable{
 				.getPath();
 		
 		ResourceManager manager= 
+			new ProActiveThreadedManager(descriptor, "local");
 			//new MonoThreadedManager();
 			//new MultiThreadedManager(5);
-			new ProActiveThreadedManager(descriptor, "local");
 		    //new ProActiveManager(descriptor, "local");
 		
 		Calcium calcium = new Calcium(manager);

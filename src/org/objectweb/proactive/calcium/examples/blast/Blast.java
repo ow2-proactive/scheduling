@@ -92,9 +92,9 @@ public class Blast {
 
         //descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
         ResourceManager manager = 
-        	//new MonoThreadedManager();
             new MultiThreadedManager(8);
-            //new ProActiveThreadedManager(descriptor, "local");
+       		//new MonoThreadedManager();
+        	//new ProActiveThreadedManager(descriptor, "local");
             //new ProActiveManager(descriptor, "local");
 
         Calcium calcium = new Calcium(manager);

@@ -109,12 +109,12 @@ public class SshTunnel {
              * We are under JSchSingle lock. lastTriedPort will not change until we release it.
              *
              * Try to find a free port by looping until we find a free port.
+             * 
+             * Start search at the last allocated port and exit if we looped over all ports
              */ 
             int lport;
             for (
-            		// Start search at the last allocated port
             		lport = lastTriedPort==65535 ? 1024 : lastTriedPort+1;
-            		// No free port found
             		lport != lastTriedPort;
             		lport = lport==65535 ? 1024 : lport+1) {
             				

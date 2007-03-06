@@ -63,7 +63,6 @@ public class BenchmarkStatistics implements Serializable {
 
     public BenchmarkStatistics(HierarchicalTimerStatistics time,
             EventStatistics events,
-            // long memory, int nbProc,
             String information) {
         this.time = time;
         this.events = events;
