@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package util;
 
 import java.io.File;
@@ -7,38 +37,36 @@ import java.net.URISyntaxException;
 
 
 public class UpdateCopyrightAndVersion {
-    private static String copyright = "/* " + "\n" +
-        " * ################################################################" +
-        "\n" + " * " + "\n" +
-        " * ProActive: The Java(TM) library for Parallel, Distributed, " +
-        "\n" + " *            Concurrent computing with Security and Mobility" +
-        "\n" + " * " + "\n" +
-        " * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis" +
-        "\n" + " * Contact: proactive@objectweb.org" + "\n" + " * " + "\n" +
-        " * This library is free software; you can redistribute it and/or" +
-        "\n" + " * modify it under the terms of the GNU Lesser General Public" +
-        "\n" +
-        " * License as published by the Free Software Foundation; either" +
-        "\n" + " * version 2.1 of the License, or any later version." + "\n" +
-        " *  " + "\n" +
-        " * This library is distributed in the hope that it will be useful," +
-        "\n" +
-        " * but WITHOUT ANY WARRANTY; without even the implied warranty of" +
-        "\n" +
-        " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU" +
-        "\n" + " * Lesser General Public License for more details." + "\n" +
-        " * " + "\n" +
-        " * You should have received a copy of the GNU Lesser General Public" +
-        "\n" +
-        " * License along with this library; if not, write to the Free Software" +
-        "\n" +
-        " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307" +
-        "\n" + " * USA" + "\n" + " *  " + "\n" +
-        " *  Initial developer(s):               The ProActive Team" + "\n" +
-        " *                        http://www.inria.fr/oasis/ProActive/contacts.html" +
-        "\n" + " *  Contributor(s): " + "\n" + " * " + "\n" +
-        " * ################################################################" +
-        "\n" + " */ " + "\n";
+    private static String copyright = "/*\n" +
+        " * ################################################################\n" +
+        " *\n" +
+        " * ProActive: The Java(TM) library for Parallel, Distributed,\n" +
+        " *            Concurrent computing with Security and Mobility\n" +
+        " *\n" +
+        " * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis\n" +
+        " * Contact: proactive@objectweb.org" + "\n" + 
+        " *\n" +
+        " * This library is free software; you can redistribute it and/or\n" +
+        " * modify it under the terms of the GNU Lesser General Public\n" +
+        " * License as published by the Free Software Foundation; either\n" +
+        " * version 2.1 of the License, or any later version.\n" +
+        " *\n" +
+        " * This library is distributed in the hope that it will be useful,\n" +
+        " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+        " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n" +
+        " * Lesser General Public License for more details.\n" +
+        " *\n" +
+        " * You should have received a copy of the GNU Lesser General Public\n" +
+        " * License along with this library; if not, write to the Free Software\n" +
+        " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" +
+        " * USA\n" + 
+	" *\n" +
+        " *  Initial developer(s):               The ProActive Team\n" +
+        " *                        http://www.inria.fr/oasis/ProActive/contacts.html\n" +
+        " *  Contributor(s):\n" + 
+        " *\n" +
+        " * ################################################################\n" +
+        " */\n";
     private static String PatternBegin = "$$%%";
     private static String PatternEnd = "%%$$";
     private static String VersionPattern = "ProActiveVersion";
@@ -76,6 +104,7 @@ public class UpdateCopyrightAndVersion {
         java.io.File sourceDir = new java.io.File(arg[0]);
         rootDir = sourceDir.toURI();
 
+       	excludeDirs = new File[0];
         if (arg.length > 1) {
         	excludeDirs = new File[arg.length - 1];
 
