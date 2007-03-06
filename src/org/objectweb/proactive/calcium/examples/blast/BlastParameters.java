@@ -39,7 +39,6 @@ public class BlastParameters {
 	
 	//blastall params
 	private String program;         //-p blastn|blastp|blastx
-	//private File  outPutFile;	 	//-o filename
 	
 	//FormatDB
 	private boolean isNucleotide;   //-p F Input is a nucleotide, not a protein.
