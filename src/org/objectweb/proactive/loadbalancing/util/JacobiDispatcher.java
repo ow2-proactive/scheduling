@@ -146,18 +146,18 @@ public class JacobiDispatcher {
 
 	
 
-/*	public static void main(String[] args) throws IOException, ProActiveException, AlreadyBoundException {
-		
-		// cmd : java Start globalSize nbWorker maxIter
-		
-		if (args.length != 3){
-			System.err.println("java Start globalSize nbWorker maxIter");
-			System.exit(1);
-		}
-		Node n = NodeFactory.getNode("rmi://anaconda:2805/StartTest");
-		P2PTest myTest= (P2PTest) ProActive.newActive(P2PTest.class.getName(),args,n);;
-	}
-*/
+//	public static void main(String[] args) throws IOException, ProActiveException, AlreadyBoundException {
+//		
+//		// cmd : java Start globalSize nbWorker maxIter
+//		
+//		if (args.length != 3){
+//			System.err.println("java Start globalSize nbWorker maxIter");
+//			System.exit(1);
+//		}
+//		Node n = NodeFactory.getNode("rmi://anaconda:2805/StartTest");
+//		P2PTest myTest= (P2PTest) ProActive.newActive(P2PTest.class.getName(),args,n);;
+//	}
+
 	public JacobiDispatcher() {}
 	
 public JacobiDispatcher(String s1, String s2, String s3, P2PService serviceP2P) throws ProActiveException {

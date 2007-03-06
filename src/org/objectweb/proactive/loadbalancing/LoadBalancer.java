@@ -187,11 +187,11 @@ public class LoadBalancer implements ProActiveInternalObject {
      * This method returns if this machine is in an underloaded state
      * @param none
      * @return none
-     *
-    public boolean AreYouUnderloaded() {
-        return underloaded;
-    }
-    */
+     */
+//    public boolean AreYouUnderloaded() {
+//        return underloaded;
+//    }
+    
     public String getName(){
     	return balancerName;
     }

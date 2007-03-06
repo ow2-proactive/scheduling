@@ -67,11 +67,12 @@ public class SimpleObjectMigration implements Serializable {
     }
 
     /**
-     * Creates a new <code>SimpleObjectMigration</code> instance.
-     *
-     * @param name a <code>String</code> value who represents the name
-       of the instance
-     */
+	 * Creates a new <code>SimpleObjectMigration</code> instance.
+	 * 
+	 * @param name
+	 *            a <code>String</code> value who represents the name of the
+	 *            instance
+	 */
     public SimpleObjectMigration(String name) {
         logger.info("SimpleObjectMigration> Constructor with a parameter : " +
             name);
@@ -115,17 +116,21 @@ public class SimpleObjectMigration implements Serializable {
     }
 
     /**
-     * Describe <code>main</code> method here.
-     * It migrate a simple object from node1 to node2
-     *
-     *<ul>
-     * <li>param1 : The source node url
-       (like <code>jini://host1/JiniNode1</code>)<li>
-     * <li>param2 : The destination node url
-       (like <code>rmi://host2/RmiNode2</code>)<li>
-     *</ul>
-     * @param args the 2 parameters in an array
-     */
+	 * Describe <code>main</code> method here. It migrate a simple object from
+	 * node1 to node2
+	 * 
+	 * <ul>
+	 * <li>param1 : The source node url (like
+	 * <code>jini://host1/JiniNode1</code>)
+	 * <li>
+	 * <li>param2 : The destination node url (like
+	 * <code>rmi://host2/RmiNode2</code>)
+	 * <li>
+	 * </ul>
+	 * 
+	 * @param args
+	 *            the 2 parameters in an array
+	 */
     public static void main(String[] args) {
         // The source node
         String urlSourceNode = "";
