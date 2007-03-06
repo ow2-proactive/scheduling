@@ -2,6 +2,10 @@ package org.objectweb.proactive.core.gc;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
 import org.objectweb.proactive.core.UniqueID;
@@ -9,7 +13,26 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 
 
+/**
+ * Just to give a name to our threads
+ */
+class GCThreadPool implements ThreadFactory {
+    static int id;
+
+    public Thread newThread(Runnable r) {
+        return new Thread(r, "ProActive GC Broadcasting Thread " + (id++));
+    }
+}
+
+
 public class Referenced implements Comparable {
+
+    /**
+     * The threaded broadcaster
+     */
+    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(2,
+            Integer.MAX_VALUE, GarbageCollector.TTA * 2, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(), new GCThreadPool());
 
     /**
      * The body we use to communicate with the proxy
@@ -22,20 +45,19 @@ public class Referenced implements Comparable {
     private WeakReference<GCTag> weakTag;
 
     /**
-     * The last GC response we got, can be null for example if we are
-     * currently sending a GC message
+     * The last GC response we got, can be null if not applicable
      */
     private GCSimpleResponse lastResponse;
+
+    /**
+     * Is there currently a thread sending a message to this referencer?
+     */
+    private boolean isSendingMessage;
 
     /**
      * Detect missed deadlines
      */
     private long lastResponseTimestamp;
-
-    /**
-     * The thread doing the communication
-     */
-    private Thread commThread;
 
     /**
      * Can be useful to know who we belong to
@@ -48,6 +70,7 @@ public class Referenced implements Comparable {
         proxy.setGCTag(tag);
         this.weakTag = new WeakReference<GCTag>(tag);
         this.gc = gc;
+        this.isSendingMessage = false;
         this.lastResponse = null;
         this.lastResponseTimestamp = System.currentTimeMillis();
     }
@@ -85,26 +108,20 @@ public class Referenced implements Comparable {
 
     void sendMessage(final GCMessage msg) {
         synchronized (this.gc) {
-            if ((this.commThread != null) && this.commThread.isAlive()) {
+            if (this.isSendingMessage) {
                 this.gc.log(Level.WARN,
                     "Sending thread for " + this + " still running");
                 return;
             }
-            this.lastResponse = null;
-            this.commThread = new Thread() {
-                        public void run() {
-                            Referenced.this.doSendTheMessage(msg);
+            this.isSendingMessage = true;
+            executor.execute(new Runnable() {
+                    public void run() {
+                        Referenced.this.doSendTheMessage(msg);
+                        synchronized (Referenced.this.gc) {
+                            Referenced.this.isSendingMessage = false;
                         }
-                    };
-            this.commThread.start();
-        }
-        try {
-            /*
-             * Alleviate some of the load
-             */
-            this.commThread.join(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+                    }
+                });
         }
     }
 
