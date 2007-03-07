@@ -86,8 +86,8 @@ public class NQueens implements Serializable{
 	public void start(int boardSize, int solvableSize, int times, String descriptor, String virtualNode) throws InterruptedException, PanicException{
 		
 		ResourceManager manager= 
-			//new MonoThreadedManager();
 			new MultiThreadedManager(10);
+			//new MonoThreadedManager();
 		 	//new ProActiveThreadedManager(descriptor, virtualNode);
 			//new ProActiveManager(descriptor, virtualNode);
 
