@@ -595,7 +595,7 @@
 			</classpath>
 		</taskdef>
 
-		<jalopy classpathref="project.classpath" style="proactiveJalopy.xml">
+		<jalopy classpathref="project.classpath" convention="proactiveJalopy.xml">
 			<fileset dir="${src.dir}/org/objectweb/proactive">
 				<include name="**/*.java" />
 			</fileset>

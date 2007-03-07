@@ -2,7 +2,7 @@
 <jalopy>
     <general>
         <compliance>
-            <version>14</version>
+            <version>15</version>
         </compliance>
         <style>
             <description>ProActive Java Coding Convention</description>
