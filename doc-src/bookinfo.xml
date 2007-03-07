@@ -30,7 +30,11 @@
     </mediaobject>
    
     <revhistory>  
-        <revision>
+    <revision>
+        <revnumber>3.2.1</revnumber>
+        <date>2007-03-07</date>
+    </revision>
+    <revision>
         <revnumber>3.2</revnumber>
         <date>2007-01-16</date>
     </revision>
