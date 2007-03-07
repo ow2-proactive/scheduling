@@ -84,9 +84,9 @@
       suitable pattern corresponds to Divide and Conquer.</para>
 
       <screen><emphasis role="bold">// Dac(&lt;Divide&gt;,&lt;Condition&gt;,&lt;Skeleton&gt;,&lt;Conquer&gt;)
-Skeleton</emphasis>&lt;Challenge&gt; root = new <emphasis role="bold">DaC</emphasis>&lt;Challenge&gt;( new ChallengeDivide(1),
+Skeleton</emphasis>&lt;Challenge,Primes&gt; root = new <emphasis role="bold">DaC</emphasis>&lt;Challenge,Primes&gt;( new ChallengeDivide(1),
                            new ChallengeDivideCondition(2), 
-                           new <emphasis role="bold">Seq</emphasis>&lt;Challenge&gt;(new SolveChallenge(3)),
+                           new <emphasis role="bold">Seq</emphasis>&lt;Challenge,Primes&gt;(new SolveChallenge(3)),
                            new ConquerChallenge(4));
         </screen>
     </sect2>
@@ -98,7 +98,7 @@ Skeleton</emphasis>&lt;Challenge&gt; root = new <emphasis role="bold">DaC</empha
       role="bold">Challenge</emphasis> and we will represent it using the
       following class.</para>
 
-      <screen>class Challenge implements Serializable{
+      <screen>class <emphasis role="bold">Challenge</emphasis> implements Serializable{
 
 public int max, min, solvableSize;
 
@@ -118,15 +118,25 @@ public int max, min, solvableSize;
     }
 }</screen>
 
-      <para>Note that the skeleton structure is parametrized using the
-      Challenge class.</para>
+      <para>The primes that are found will be stored in a <emphasis
+      role="bold">Primes</emphasis> class.</para>
+
+      <screen>public class <emphasis role="bold">Primes</emphasis> implements Serializable {
+
+    public Vector&lt;Integer&gt; primes;
+
+    public Primes(){
+        primes=new Vector&lt;Integer&gt;();
+    }
+}</screen>
 
       <sect3>
         <title>Divide</title>
 
-        <para></para>
+        <para>The divition of a Challenge into smaller internavls is handled
+        by a <emphasis role="bold">ChallengeDivide</emphasis> class:</para>
 
-        <screen>public class ChallengeDivide <emphasis role="bold">implements Divide</emphasis>&lt;Challenge&gt;{
+        <screen>public class ChallengeDivide <emphasis role="bold">implements Divide</emphasis>&lt;Challenge, Challenge&gt;{
     
     public <emphasis role="bold">Vector&lt;Challenge&gt; divide(Challenge param)</emphasis> {
         
@@ -146,7 +156,9 @@ public int max, min, solvableSize;
       <sect3>
         <title>Condition</title>
 
-        <para></para>
+        <para>The class <emphasis
+        role="bold">ChallengeDivideCondition</emphasis> is used to determine
+        if a Challenge must be subdivided or not.</para>
 
         <screen>public class ChallengeDivideCondition <emphasis role="bold">implements Condition&lt;Challenge&gt;</emphasis>{
     
@@ -160,18 +172,21 @@ public int max, min, solvableSize;
       <sect3>
         <title>Skeleton</title>
 
-        <para></para>
+        <para>The SolveChallenge class performes the actual findinf of primes.
+        This class wil recieve a Challenge and return </para>
 
-        <screen>public class <emphasis role="bold">SolveChallenge implements Execute&lt;Challenge&gt;</emphasis>{
+        <screen>public class <emphasis role="bold">SolveChallenge implements Execute&lt;Challenge,Primes&gt;</emphasis>{
 
-    public <emphasis role="bold">Challenge execute(Challenge param) </emphasis>{
+    public <emphasis role="bold">Primes execute(Challenge param) </emphasis>{
+        Primes primes = new Primes();
+
         for(int i=param.min;i&lt;=param.max;i++){
             if(isPrime(i)){
-                param.primes.add(new Integer(i));
+                primes.add(new Integer(i));
             }
         }
         
-        return param;
+        return primes;
     }
     //...
 }</screen>
@@ -180,11 +195,12 @@ public int max, min, solvableSize;
       <sect3>
         <title>Conquer</title>
 
-        <para></para>
+        <para>The ConquerChallenge class consolidates the result of the sub
+        challenges into a single result.</para>
 
-        <screen>public class ConquerChallenge <emphasis role="bold">implements Conquer&lt;Challenge&gt;</emphasis>{
+        <screen>public class ConquerChallenge <emphasis role="bold">implements Conquer&lt;Primes,Primes&gt;</emphasis>{
     
-    public <emphasis role="bold">Challenge conquer(Challenge parent, Vector&lt;Challenge&gt; p)</emphasis> {
+    public <emphasis role="bold">Primes conquer(Vector&lt;Primes&gt; p)</emphasis> {
             
         for(Challenge param:p){
             parent.max=Math.max(parent.max, param.max);
@@ -202,13 +218,13 @@ public int max, min, solvableSize;
     <sect2>
       <title>Create a new Calcium Instance</title>
 
-      <para></para>
+      <para>The instantiation of the framework is performed in the following
+      way</para>
 
       <screen>Skeleton&lt;Challenge&gt; root = ...; //Step 1
 <emphasis role="bold">ResourceManager</emphasis> manager= new <emphasis
           role="bold">ProActiveManager</emphasis>(descriptor, "local");
-<emphasis role="bold">Calcium</emphasis>&lt;Challenge&gt; calcium = new <emphasis
-          role="bold">Calcium</emphasis>&lt;Challenge&gt;(manager);</screen>
+<emphasis role="bold">Calcium</emphasis> calcium = new <emphasis role="bold">Calcium</emphasis>(manager);</screen>
     </sect2>
 
     <sect2>
@@ -217,12 +233,13 @@ public int max, min, solvableSize;
 
       <para></para>
 
-      <screen><emphasis role="bold">Stream</emphasis>&lt;Board&gt; stream = calcium.<emphasis
+      <screen><emphasis role="bold">Stream</emphasis>&lt;Challenge, Primes&gt; stream = calcium.<emphasis
           role="bold">newStream</emphasis>(root);
 
-stream.input(new Challenge(1,6400,300));
-stream.input(new Challenge(1,100,20));
-stream.input(new Challenge(1,640,64));
+Vector&lt;Future&lt;Primes&gt;&gt; futures = new Vector&lt;Future&lt;Primes&gt;&gt;();
+futures.add(stream.input(new Challenge(1,6400,300)));
+futures.add(stream.input(new Challenge(1,100,20)));
+futures.add(stream.input(new Challenge(1,640,64)));
 
 calcium.<emphasis role="bold">boot</emphasis>(); //begin the evaluation</screen>
     </sect2>
@@ -230,11 +247,10 @@ calcium.<emphasis role="bold">boot</emphasis>(); //begin the evaluation</screen>
     <sect2>
       <title>Collect the results</title>
 
-      <para></para>
-
-      <screen>for(Challenge res = stream.<emphasis role="bold">getResult()</emphasis>; res != null; res = stream.<emphasis
-          role="bold">getResult()</emphasis>)
-    System.out.println(res); //print results
+      <screen>for(Future&lt;Primes&gt; future:futures){
+    Primes res=future.get();
+    System.out.print(res);
+}
 
 calcium.<emphasis role="bold">shutdown</emphasis>(); //release the resources</screen>
     </sect2>
@@ -244,7 +260,7 @@ calcium.<emphasis role="bold">shutdown</emphasis>(); //release the resources</sc
 
       <para></para>
 
-      <screen><emphasis role="bold">Stats</emphasis> stats=stream.<emphasis
+      <screen><emphasis role="bold">Stats</emphasis> stats=future.get(0).<emphasis
           role="bold">getStats</emphasis>(res);
 System.out.println(stats);</screen>
     </sect2>
@@ -255,7 +271,7 @@ System.out.println(stats);</screen>
 
     <para>Skeletons can be composed in the following way:</para>
 
-    <screen>S := farm(S)|pipe(S1,S2)|if(cond,S1,S2)|while(cond,S)|for(i,S)|D&amp;C(cond,div,S,conq)|map(div, S, conq)|Seq(f)</screen>
+    <screen>S := farm(S)|pipe(S1,S2)|if(cond,S1,S2)|while(cond,S)|for(i,S)|D&amp;C(cond,div,S,conq)|map(div, S, conq)|fork(div, S1...SN, conq)|Seq(f)</screen>
 
     <para>Each skeleton represents a different parallelism described as
     follows:</para>
@@ -300,8 +316,13 @@ System.out.println(stats);</screen>
 
       <listitem>
         <para><emphasis role="bold">Map</emphasis> corresponds to a pattern
-        were the same function is applied to several parts of a
-        problem.</para>
+        were the same function is applied to several parts of a problem:
+        single instruction multiple data.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Fork</emphasis> models multiple data
+        multiple instruction.</para>
       </listitem>
     </itemizedlist>
   </sect1>
@@ -398,21 +419,5 @@ monitor.stop();</screen>
         </listitem>
       </itemizedlist>
     </sect2>
-  </sect1>
-
-  <sect1>
-    <title>Future Work</title>
-
-    <para></para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Handle fault tolerance</para>
-      </listitem>
-
-      <listitem>
-        <para>Allow scalability on the number of resources used</para>
-      </listitem>
-    </itemizedlist>
   </sect1>
 </chapter>
