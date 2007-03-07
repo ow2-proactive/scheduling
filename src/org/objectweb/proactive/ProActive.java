@@ -49,6 +49,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
@@ -207,8 +208,9 @@ public class ProActive {
 
     static {
         ProActiveConfiguration.load();
-        
+
         @SuppressWarnings("unused") // Execute RuntimeFactory's static blocks  
+
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
     }
 
@@ -696,13 +698,11 @@ public class ProActive {
         Object[] constructorParameters, Node node, Active activity,
         MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
-        //using default proactive node
-        if (node == null) {
-            node = NodeFactory.getDefaultNode();
-        }
-
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
+            if (factory.getProActiveSecurityManager() == null) {
+                factory.setProActiveSecurityManager(((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager());
+            }
         }
 
         if (Profiling.SECURITY) {
@@ -730,6 +730,11 @@ public class ProActive {
         }
         if (Profiling.SECURITY) {
             timer.stop();
+        }
+
+        //using default proactive node
+        if (node == null) {
+            node = NodeFactory.getDefaultNode();
         }
 
         try {
@@ -954,13 +959,11 @@ public class ProActive {
         Class[] genericParameters, Node node, Active activity,
         MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
-        if (node == null) {
-            //using default proactive node
-            node = NodeFactory.getDefaultNode();
-        }
-
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
+            if (factory.getProActiveSecurityManager() == null) {
+                factory.setProActiveSecurityManager(((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager());
+            }
         }
 
         ProActiveSecurityManager factorySM = factory.getProActiveSecurityManager();
@@ -979,6 +982,11 @@ public class ProActive {
 
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");
+        }
+
+        if (node == null) {
+            //using default proactive node
+            node = NodeFactory.getDefaultNode();
         }
 
         try {
@@ -1217,11 +1225,6 @@ public class ProActive {
         String nameOfTargetType, Node node, Active activity,
         MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
-        if (node == null) {
-            //using default proactive node
-            node = NodeFactory.getDefaultNode();
-        }
-
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
         }
@@ -1242,6 +1245,11 @@ public class ProActive {
 
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");
+        }
+
+        if (node == null) {
+            //using default proactive node
+            node = NodeFactory.getDefaultNode();
         }
 
         try {
@@ -1339,11 +1347,11 @@ public class ProActive {
         if (protocol.equals("rmi:")) {
             ba = new RmiBodyAdapter();
         } else if (protocol.equals("rmissh:")) {
-        	ba = new SshRmiBodyAdapter();
+            ba = new SshRmiBodyAdapter();
         } else if (protocol.equals("http:")) {
-        	ba = new HttpBodyAdapter();
+            ba = new HttpBodyAdapter();
         } else if (protocol.equals("ibis:")) {
-        	ba = new IbisBodyAdapter();
+            ba = new IbisBodyAdapter();
         } else {
             throw new IOException("Protocol " + protocol + " not defined");
         }
@@ -1665,12 +1673,16 @@ public class ProActive {
         } catch (org.xml.sax.SAXException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
-                "A problem occured when getting the proActiveDescriptor at location \""+xmlDescriptorUrl+"\".");
-            throw new ProActiveException("A problem occured when getting the proActiveDescriptor at location \""+xmlDescriptorUrl+"\"."+e);
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\".");
+            throw new ProActiveException(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\"." + e);
         } catch (java.io.IOException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
-                "A problem occured when getting the proActiveDescriptor at location \""+xmlDescriptorUrl+"\".");
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\".");
             throw new ProActiveException(e);
         }
     }
@@ -2115,21 +2127,21 @@ public class ProActive {
      * <CODE>getFutureValue</CODE> is called again on this result, and so on.
      */
     public static Object getFutureValue(Object future) {
-    	while (true) {
-        // If the object is not reified, it cannot be a future
-        if ((MOP.isReifiedObject(future)) == false) {
-            return future;
-        } else {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
-
-            // If it is reified but its proxy is not of type future, we cannot wait
-            if (!(theProxy instanceof Future)) {
+        while (true) {
+            // If the object is not reified, it cannot be a future
+            if ((MOP.isReifiedObject(future)) == false) {
                 return future;
             } else {
-                future = ((Future) theProxy).getResult();
+                org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
+
+                // If it is reified but its proxy is not of type future, we cannot wait
+                if (!(theProxy instanceof Future)) {
+                    return future;
+                } else {
+                    future = ((Future) theProxy).getResult();
+                }
             }
         }
-    	}
     }
 
     /**
