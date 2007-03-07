@@ -65,7 +65,8 @@ public class ProActiveClassLoaderHelper {
      * <li>2. runtime parents</li>
      * <li>3. tries to generate it (stub, component interface representative, or component interface metaobject)</li></ul>
      */
-    public synchronized byte[] getClassData(String className) throws ClassNotFoundException {
+    public synchronized byte[] getClassData(String className)
+        throws ClassNotFoundException {
         byte[] class_data = null;
 
         // 1. look in class cache
@@ -99,11 +100,11 @@ public class ProActiveClassLoaderHelper {
             String classname = Utils.convertStubClassNameToClassName(className);
 
             //ASM is now the default bytecode manipulator
-//            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-//                ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-//                class_data = bsb.create();
-//            } else 
-                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
+            //            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
+            //                ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+            //                class_data = bsb.create();
+            //            } else 
+            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
                 class_data = JavassistByteCodeStubBuilder.create(classname, null);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable

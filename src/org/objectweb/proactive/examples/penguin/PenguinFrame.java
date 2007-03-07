@@ -44,8 +44,8 @@ public class PenguinFrame extends javax.swing.JFrame {
                 }
             });
         getContentPane().setLayout(new java.awt.BorderLayout());
-        getContentPane().add(new javax.swing.JLabel(location),
-            java.awt.BorderLayout.NORTH);
+        getContentPane()
+            .add(new javax.swing.JLabel(location), java.awt.BorderLayout.NORTH);
         getContentPane().add(imagePanel, java.awt.BorderLayout.CENTER);
         pack();
         toFront();

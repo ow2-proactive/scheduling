@@ -42,12 +42,15 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
  * <p>This enumeration defines the various dispatch modes available for parameters. </p>
  * <p>It also provides an implementation of the "strategy" pattern: it implements the methods of
  * the <code>ParamDispatch</code> interface depending on the selected mode.
- *  
+ *
  * @author Matthieu Morel
  *
  */
-public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST, ONE_TO_ONE, 
-    ROUND_ROBIN, CUSTOM;
+public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
+    ONE_TO_ONE,
+    ROUND_ROBIN,
+    CUSTOM;
+
     /*
      *
      * @see org.objectweb.proactive.core.component.type.annotations.ParametersDispatch#dispatch(java.util.List, int, int)
@@ -105,8 +108,8 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
     /*
      * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#getDispatchSize(java.util.List, int)
      */
-    private int expectedDispatchSize(List<?> inputParameter, int nbOutputReceivers)
-        throws ParameterDispatchException {
+    private int expectedDispatchSize(List<?> inputParameter,
+        int nbOutputReceivers) throws ParameterDispatchException {
         int result = 0;
 
         switch (this) {
@@ -125,7 +128,8 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
             result = inputParameter.size();
             break;
         default:
-            result = BROADCAST.expectedDispatchSize(inputParameter, nbOutputReceivers);
+            result = BROADCAST.expectedDispatchSize(inputParameter,
+                    nbOutputReceivers);
         }
 
         return result;
@@ -146,8 +150,8 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
     /*
      * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#matchesClientSideParameterType(java.lang.reflect.Type)
      */
-    public boolean match(Type clientSideInputParameterType, Type serverSideInputParameterType)
-        throws ParameterDispatchException {
+    public boolean match(Type clientSideInputParameterType,
+        Type serverSideInputParameterType) throws ParameterDispatchException {
         boolean result = false;
         boolean clientSideParamTypeIsParameterizedType = (clientSideInputParameterType instanceof ParameterizedType);
         boolean serverSideParamTypeIsParameterizedType = (serverSideInputParameterType instanceof ParameterizedType);
@@ -161,46 +165,54 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
 
         if (clientSideParamTypeIsParameterizedType) {
             clientSideRawType = (Class) ((ParameterizedType) clientSideInputParameterType).getRawType();
-            if (!(((ParameterizedType)clientSideInputParameterType).getActualTypeArguments().length == 1)) {
-                throw new ParameterDispatchException("client side input parameter type " +
-                                                     clientSideInputParameterType + " can only be parameterized with one type");
+            if (!(((ParameterizedType) clientSideInputParameterType).getActualTypeArguments().length == 1)) {
+                throw new ParameterDispatchException(
+                    "client side input parameter type " +
+                    clientSideInputParameterType +
+                    " can only be parameterized with one type");
             }
             Type cType = ((ParameterizedType) clientSideInputParameterType).getActualTypeArguments()[0];
             if (cType instanceof ParameterizedType) {
-            	clientSideElementsType = (Class)((ParameterizedType)cType).getRawType();
+                clientSideElementsType = (Class) ((ParameterizedType) cType).getRawType();
             } else {
-            	clientSideElementsType = (Class)cType;
+                clientSideElementsType = (Class) cType;
             }
         } else {
             if (clientSideInputParameterType instanceof Class) {
                 clientSideClass = (Class) clientSideInputParameterType;
             } else {
-                throw new ParameterDispatchException("client side input parameter type " +
-                    clientSideInputParameterType + " can only be either a parameterized type or a class");
+                throw new ParameterDispatchException(
+                    "client side input parameter type " +
+                    clientSideInputParameterType +
+                    " can only be either a parameterized type or a class");
             }
         }
 
         if (serverSideParamTypeIsParameterizedType) {
             serverSideRawType = ((Class) ((ParameterizedType) serverSideInputParameterType).getRawType());
-            if (!(((ParameterizedType)serverSideInputParameterType).getActualTypeArguments().length == 1)) {
-                throw new ParameterDispatchException("server side input parameter type " +
-                                                     serverSideInputParameterType + " can only be parameterized with one type");
+            if (!(((ParameterizedType) serverSideInputParameterType).getActualTypeArguments().length == 1)) {
+                throw new ParameterDispatchException(
+                    "server side input parameter type " +
+                    serverSideInputParameterType +
+                    " can only be parameterized with one type");
             }
             Type sType = ((ParameterizedType) serverSideInputParameterType).getActualTypeArguments()[0];
             if (sType instanceof ParameterizedType) {
-            	serverSideElementsType = (Class)((ParameterizedType)sType).getRawType();
+                serverSideElementsType = (Class) ((ParameterizedType) sType).getRawType();
             } else {
-            	serverSideElementsType = (Class)sType;
+                serverSideElementsType = (Class) sType;
             }
-            
+
             serverSideElementsType = ((Class) ((ParameterizedType) serverSideInputParameterType).getOwnerType());
         } else {
             if (serverSideInputParameterType instanceof Class) {
                 serverSideClass = (Class) serverSideInputParameterType;
             } else {
-                throw new ParameterDispatchException("server side input parameter type " +
+                throw new ParameterDispatchException(
+                    "server side input parameter type " +
                     serverSideInputParameterType + " is incompatible with " +
-                    "client side input parameter type " + clientSideInputParameterType);
+                    "client side input parameter type " +
+                    clientSideInputParameterType);
             }
         }
 
@@ -208,7 +220,8 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
         case BROADCAST:
             if (clientSideParamTypeIsParameterizedType) {
                 if (serverSideParamTypeIsParameterizedType) {
-                    result = clientSideRawType.isAssignableFrom(serverSideRawType) && clientSideElementsType.isAssignableFrom(clientSideElementsType);
+                    result = clientSideRawType.isAssignableFrom(serverSideRawType) &&
+                        clientSideElementsType.isAssignableFrom(clientSideElementsType);
                 } else {
                     result = true; // maybe this constraint should be softened
                 }
@@ -228,10 +241,12 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
             }
             break;
         case ROUND_ROBIN:
-            result = ONE_TO_ONE.match(clientSideInputParameterType, serverSideInputParameterType);
+            result = ONE_TO_ONE.match(clientSideInputParameterType,
+                    serverSideInputParameterType);
             break;
         default:
-            result = BROADCAST.match(clientSideInputParameterType, serverSideInputParameterType);
+            result = BROADCAST.match(clientSideInputParameterType,
+                    serverSideInputParameterType);
         }
 
         return result;

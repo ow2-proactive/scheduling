@@ -49,14 +49,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class defines the activity of active objects that are components. It allows
- * the definition of a non functional activity (for managing a component in a stopped state), 
+ * the definition of a non functional activity (for managing a component in a stopped state),
  * and the encapsulation of a (possibly user-defined) functional activity that runs when the lifecycle of
  * the component is started.
- * 
+ *
  * @author Matthieu Morel
  *
  */
-public class ComponentActivity implements RunActive, InitActive, EndActive, Serializable {
+public class ComponentActivity implements RunActive, InitActive, EndActive,
+    Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
     private transient InitActive componentInitActive; // used only once
     private RunActive componentRunActive;
@@ -159,16 +160,16 @@ public class ComponentActivity implements RunActive, InitActive, EndActive, Seri
                     while (LifeCycleController.STOPPED.equals(
                                 Fractal.getLifeCycleController(
                                     componentBody.getProActiveComponentImpl())
-                                           .getFcState()) ) {
+                                           .getFcState())) {
                         componentService.blockingServeOldest(nfRequestFilter);
                         if (!body.isActive()) {
-                        	// in case of a migration 
-                        	break;
+                            // in case of a migration 
+                            break;
                         }
                     }
                     if (!body.isActive()) {
-                    	// in case of a migration 
-                    	break;
+                        // in case of a migration 
+                        break;
                     }
 
                     // 3.1. init object Activity

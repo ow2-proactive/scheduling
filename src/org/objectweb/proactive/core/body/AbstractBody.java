@@ -514,7 +514,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 byte[] plop;
 
                 if (internalBodySecurity.isLocalBody()) {
-                    plop = securityManager.randomValue(sessionID, clientRandomValue);
+                    plop = securityManager.randomValue(sessionID,
+                            clientRandomValue);
 
                     return plop;
                 } else {
@@ -542,8 +543,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 byte[][] pke;
 
                 if (internalBodySecurity.isLocalBody()) {
-                    pke = securityManager.publicKeyExchange(sessionID, myPublicKey,
-                            myCertificate, signature);
+                    pke = securityManager.publicKeyExchange(sessionID,
+                            myPublicKey, myCertificate, signature);
 
                     return pke;
                 } else {
@@ -576,9 +577,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
             if (internalBodySecurity.isLocalBody()) {
                 //	System.out.println("secretKeyExchange demande un security manager a " + ProActive.getBodyOnThis());
-                ske = securityManager.secretKeyExchange(sessionID, encodedAESKey,
-                        encodedIVParameters, encodedClientMacKey,
-                        encodedLockData, parametersSignature);
+                ske = securityManager.secretKeyExchange(sessionID,
+                        encodedAESKey, encodedIVParameters,
+                        encodedClientMacKey, encodedLockData,
+                        parametersSignature);
 
                 return ske;
             } else {
@@ -736,7 +738,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     public void setPolicyServer(PolicyServer server) {
         if (server != null) {
-            if ((securityManager != null) && (securityManager.getPolicyServer() == null)) {
+            if ((securityManager != null) &&
+                    (securityManager.getPolicyServer() == null)) {
                 securityManager = new ProActiveSecurityManager(server);
                 isSecurityOn = true;
                 logger.debug("Security is on " + isSecurityOn);

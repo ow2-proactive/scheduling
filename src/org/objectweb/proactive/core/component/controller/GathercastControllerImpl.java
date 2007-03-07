@@ -61,8 +61,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
 
 
-public class GathercastControllerImpl
-    extends AbstractProActiveController
+public class GathercastControllerImpl extends AbstractProActiveController
     implements GathercastController {
     private Map<String, List<ItfID>> bindingsOnServerItfs = new HashMap<String, List<ItfID>>();
     private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
@@ -82,11 +81,12 @@ public class GathercastControllerImpl
             Iterator<Object> it = interfaces.iterator();
 
             while (it.hasNext()) {
-            	Interface itf = (Interface)it.next();
-            	// gather mechanism currently only offered for functional interfaces
-            	if (!Utils.isControllerInterfaceName(itf.getFcItfName())) {
-            		addManagedInterface((ProActiveInterface) itf);
-            	}
+                Interface itf = (Interface) it.next();
+
+                // gather mechanism currently only offered for functional interfaces
+                if (!Utils.isControllerInterfaceName(itf.getFcItfName())) {
+                    addManagedInterface((ProActiveInterface) itf);
+                }
             }
         }
     }
@@ -215,13 +215,13 @@ public class GathercastControllerImpl
             gatherRequestsHandler.migrateFuturesHandlersTo(node);
         }
     }
-    
-	public void ensureCompatibility(ProActiveInterfaceType clientItfType, ProActiveInterface itf) throws IllegalBindingException {
-		// nothing to do in this version
-		
-	}
 
-	private void writeObject(java.io.ObjectOutputStream out)
+    public void ensureCompatibility(ProActiveInterfaceType clientItfType,
+        ProActiveInterface itf) throws IllegalBindingException {
+        // nothing to do in this version
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         out.defaultWriteObject();
     }

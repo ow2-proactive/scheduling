@@ -30,12 +30,13 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
+
 /**
  * This interface defines the Observable.
  * Part of the specialized Observer/Observable pattern.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public interface EventObservable extends java.io.Serializable {
 
@@ -44,7 +45,7 @@ public interface EventObservable extends java.io.Serializable {
      * it is not the same as some observer already in the set. The order in
      * which notifications will be delivered to multiple observers is not
      * specified. See the class comment.
-     * 
+     *
      * @param o
      *            an observer to be added.
      * @throws NullPointerException
@@ -55,7 +56,7 @@ public interface EventObservable extends java.io.Serializable {
     /**
      * Deletes an observer from the set of observers of this object. Passing
      * <CODE>null</CODE> to this method will have no effect.
-     * 
+     *
      * @param o
      *            the observer to be deleted.
      */
@@ -71,7 +72,7 @@ public interface EventObservable extends java.io.Serializable {
      * arguments: this observable object and <code>null</code>. In other
      * words, this method is equivalent to: <blockquote><tt>
      * notifyObservers(null)</tt></blockquote>
-     * 
+     *
      * @see java.util.Observable#clearChanged()
      * @see java.util.Observable#hasChanged()
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
@@ -86,7 +87,7 @@ public interface EventObservable extends java.io.Serializable {
      * <p>
      * Each observer has its <code>update</code> method called with two
      * arguments: this observable object and the <code>arg</code> argument.
-     * 
+     *
      * @param arg
      *            any object.
      * @see java.util.Observable#clearChanged()
@@ -112,7 +113,7 @@ public interface EventObservable extends java.io.Serializable {
      * <tt>hasChanged</tt> method will now return <tt>false</tt>. This
      * method is called automatically by the <code>notifyObservers</code>
      * methods.
-     * 
+     *
      * @see java.util.Observable#notifyObservers()
      * @see java.util.Observable#notifyObservers(java.lang.Object)
      */
@@ -120,7 +121,7 @@ public interface EventObservable extends java.io.Serializable {
 
     /**
      * Tests if this object has changed.
-     * 
+     *
      * @return <code>true</code> if and only if the <code>setChanged</code>
      *         method has been called more recently than the
      *         <code>clearChanged</code> method on this object;
@@ -132,7 +133,7 @@ public interface EventObservable extends java.io.Serializable {
 
     /**
      * Returns the number of observers of this <tt>Observable</tt> object.
-     * 
+     *
      * @return the number of observers of this object.
      */
     public int countObservers();
@@ -140,7 +141,7 @@ public interface EventObservable extends java.io.Serializable {
     /**
      * Returns a vector of StatData of the Observers of the current
      * <tt>Observable</tt> object.
-     * 
+     *
      * @return the vector of observed datas.
      */
     public EventDataBag getEventDataBag(int subjectRank);

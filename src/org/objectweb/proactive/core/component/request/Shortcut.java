@@ -118,8 +118,7 @@ public class Shortcut implements Serializable {
      */
     public ItfID getLinkedInterfaceID() {
         // it is the first encountered interface while creating the shortcut
-        return new ItfID(fcFunctionalInterfaceName,
-            steps.get(0).getID());
+        return new ItfID(fcFunctionalInterfaceName, steps.get(0).getID());
     }
 
     /**

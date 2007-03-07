@@ -40,26 +40,24 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEvent;
 import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEventObserver;
 
+
 /**
  * Worker contains a bloc of the global matrix
- * 
+ *
  * @author cdelbe
  */
 public class Worker extends Timed implements java.io.Serializable {
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3829306560222826269L;
-
     public static final boolean COMMUNICATION_PATTERN_OBSERVING_MODE = true;
 
     /** ORIENTATION */
     static final int UP = 1;
-
     static final int DOWN = 2;
-
     static final int LEFT = 3;
-
     static final int RIGHT = 4;
 
     /** The rank of this worker */
@@ -67,49 +65,33 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /** Synchronisation */
     private int iteration;
-
     private int maxIter;
-
     private int nbGetBoundRcvd;
-
     private int nbEndIterRcvd;
-
     private boolean hasStarted;
-
     private boolean alreadyRcvBound;
 
     /** The neigborhood */
     private Worker up;
-
     private Worker down;
-
     private Worker left;
-
     private Worker right;
-
     private int nbNeighbours;
 
     /** Neigborhood ranks */
     private int up_id;
-
     private int down_id;
-
     private int left_id;
-
     private int right_id;
 
     /** Current virtual boudaries */
     private double[] vbUp;
-
     private double[] vbDown;
-
     private double[] vbLeft;
-
     private double[] vbRight;
 
     /** The upper left x and y */
     private int upperLeftX;
-
     private int upperLeftY;
 
     /** The sub matrix size */
@@ -123,19 +105,15 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /** The sub matrix */
     private double[][] subMatrix;
-
     private double[][] subTemp;
 
     /** Local profiling */
     private long startTime;
-
     private long elapsedTime;
 
     /** Counters for the timing system. */
     public TimerCounter T_TOTAL = new TimerCounter("total");
-
     public TimerCounter T_WORK = new TimerCounter("work");
-
     public boolean isTotalStarted = false;
 
     /** The size of the group */
@@ -154,7 +132,7 @@ public class Worker extends Timed implements java.io.Serializable {
     }
 
     /**
-     * 
+     *
      * @param id
      */
     public Worker(Integer id) {
@@ -171,14 +149,14 @@ public class Worker extends Timed implements java.io.Serializable {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param boundaryValue
      * @param maxIter
      * @param nbWorker
      */
     public Worker(Integer id, Double boundaryValue, Integer maxIter,
-            Integer nbWorker) {
+        Integer nbWorker) {
         this.id = id.intValue();
         this.boundaryValue = boundaryValue.doubleValue();
         this.iteration = 0;
@@ -209,7 +187,7 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /**
      * Setter for the sub matrix.
-     * 
+     *
      * @param globalMatrixSize
      * @param subMatrixSize
      * @param upperLeftX
@@ -218,21 +196,21 @@ public class Worker extends Timed implements java.io.Serializable {
      * @return
      */
     public void setSubMatrix(int globalMatrixSize, int subMatrixSize,
-            int upperLeftX, int upperLeftY, double[][] subMatrix) {
+        int upperLeftX, int upperLeftY, double[][] subMatrix) {
         this.globalMatrixSize = globalMatrixSize;
         this.subMatrixSize = subMatrixSize;
         this.upperLeftX = upperLeftX;
         this.upperLeftY = upperLeftY;
         this.subMatrix = subMatrix.clone();
         this.subTemp = new double[subMatrixSize][subMatrixSize];
-        System.out.println("[JACOBI] worker " + this.id
-                + " : submatrix intialized on "
-                + ProActive.getBodyOnThis().getNodeURL());
+        System.out.println("[JACOBI] worker " + this.id +
+            " : submatrix intialized on " +
+            ProActive.getBodyOnThis().getNodeURL());
     }
 
     /**
      * Method called by the Launcher to set the neighborhood.
-     * 
+     *
      * @param up
      *            The upper neighbour Worker.
      * @param down
@@ -251,30 +229,29 @@ public class Worker extends Timed implements java.io.Serializable {
      *            The upper neighbour Worker.
      */
     public void setNeighbours(Worker up, Worker down, Worker left,
-            Worker right, int up_id, int down_id, int left_id, int right_id) {
+        Worker right, int up_id, int down_id, int left_id, int right_id) {
         System.out.println("");
         this.up = up;
         this.down = down;
         this.left = left;
         this.right = right;
         this.nbNeighbours = 0;
-        this.nbNeighbours += up == null ? 0 : 1;
-        this.nbNeighbours += down == null ? 0 : 1;
-        this.nbNeighbours += left == null ? 0 : 1;
-        this.nbNeighbours += right == null ? 0 : 1;
+        this.nbNeighbours += ((up == null) ? 0 : 1);
+        this.nbNeighbours += ((down == null) ? 0 : 1);
+        this.nbNeighbours += ((left == null) ? 0 : 1);
+        this.nbNeighbours += ((right == null) ? 0 : 1);
         this.up_id = up_id;
         this.down_id = down_id;
         this.left_id = left_id;
         this.right_id = right_id;
-        System.out.println("[JACOBI] worker " + this.id
-                + " : neighboroud initialized (" + this.nbNeighbours
-                + " neighbours)");
+        System.out.println("[JACOBI] worker " + this.id +
+            " : neighboroud initialized (" + this.nbNeighbours +
+            " neighbours)");
 
         super.activate(new TimerCounter[] { this.T_TOTAL, this.T_WORK },
-                new EventObserver[] { this.nbCommObserver,
-                        this.commSizeObserver }); // IF NOT ACTIVATED THERE IS
-                                                    // A NULLPOINTER IN THE
-                                                    // GETTOTALIME !!!!!
+            new EventObserver[] { this.nbCommObserver, this.commSizeObserver }); // IF NOT ACTIVATED THERE IS
+                                                                                 // A NULLPOINTER IN THE
+                                                                                 // GETTOTALIME !!!!!
     }
 
     // ////
@@ -285,7 +262,6 @@ public class Worker extends Timed implements java.io.Serializable {
      * One iteration of jacobi process
      */
     public void computeNewSubMatrix() {
-
         // TIMER
         if (!this.isTotalStarted) {
             this.T_TOTAL.start();
@@ -301,8 +277,8 @@ public class Worker extends Timed implements java.io.Serializable {
 
         // compute INSIDE the submatrix
         this.T_WORK.start();
-        for (int line = this.upperLeftY + 1; line < this.upperLeftY
-                + this.subMatrixSize - 1; line++) {
+        for (int line = this.upperLeftY + 1;
+                line < ((this.upperLeftY + this.subMatrixSize) - 1); line++) {
             this.computeInsideLine(line);
         }
         this.T_WORK.stop();
@@ -320,24 +296,22 @@ public class Worker extends Timed implements java.io.Serializable {
                 this.sendEndIter();
             }
         }
-
     }
 
     /**
      * Compute variation for one line Use to refine granularity of the
      * computation so as to serve get request
-     * 
+     *
      * @param line
      *            global matrix
      */
     public void computeInsideLine(int line) {
         int i;
-        for (i = this.upperLeftX + 1; i < this.upperLeftX + this.subMatrixSize
-                - 1; i++) {
-            this.subTemp[i - this.upperLeftX][line - this.upperLeftY] = (this
-                    .getLeftValue(i, line)
-                    + this.getRightValue(i, line) + this.getUpperValue(i, line) + this
-                    .getDownerValue(i, line)) * 0.25;
+        for (i = this.upperLeftX + 1;
+                i < ((this.upperLeftX + this.subMatrixSize) - 1); i++) {
+            this.subTemp[i - this.upperLeftX][line - this.upperLeftY] = (this.getLeftValue(i,
+                    line) + this.getRightValue(i, line) +
+                this.getUpperValue(i, line) + this.getDownerValue(i, line)) * 0.25;
         }
     }
 
@@ -346,31 +320,32 @@ public class Worker extends Timed implements java.io.Serializable {
      */
     public void computeBorderLine() {
         // compute first and last line
-        for (int i = this.upperLeftX; i < this.subMatrixSize + this.upperLeftX
-                - 1; i++) {
+        for (int i = this.upperLeftX;
+                i < ((this.subMatrixSize + this.upperLeftX) - 1); i++) {
             this.computeOnePoint(i, this.upperLeftY);
-            this.computeOnePoint(i, this.subMatrixSize + this.upperLeftY - 1);
+            this.computeOnePoint(i, (this.subMatrixSize + this.upperLeftY) - 1);
         }
+
         // compute fisrt and last column
-        for (int j = this.upperLeftY; j < this.upperLeftY + this.subMatrixSize; j++) {
+        for (int j = this.upperLeftY;
+                j < (this.upperLeftY + this.subMatrixSize); j++) {
             this.computeOnePoint(this.upperLeftX, j);
-            this.computeOnePoint(this.upperLeftX + this.subMatrixSize - 1, j);
+            this.computeOnePoint((this.upperLeftX + this.subMatrixSize) - 1, j);
         }
     }
 
     /**
      * perform the computation for the point (i,j) i and j in the global matrix
-     * 
+     *
      * @param i
      *            The line
      * @param j
      *            The column
      */
     private void computeOnePoint(int i, int j) {
-        this.subTemp[i - this.upperLeftX][j - this.upperLeftY] = (this
-                .getLeftValue(i, j)
-                + this.getRightValue(i, j) + this.getUpperValue(i, j) + this
-                .getDownerValue(i, j)) * 0.25;
+        this.subTemp[i - this.upperLeftX][j - this.upperLeftY] = (this.getLeftValue(i,
+                j) + this.getRightValue(i, j) + this.getUpperValue(i, j) +
+            this.getDownerValue(i, j)) * 0.25;
     }
 
     /**
@@ -385,7 +360,7 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /**
      * virtual accessor for neighbour values x an y in the global matrix
-     * 
+     *
      * @param i
      *            The line
      * @param j
@@ -404,20 +379,21 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /**
      * virtual accessor for neighbour values
-     * 
+     *
      * @param i
      *            The line
      * @param j
      *            The column
      */
     private double getDownerValue(int x, int y) {
-        if (y == this.globalMatrixSize - 1) {
+        if (y == (this.globalMatrixSize - 1)) {
             // must return boudarie value
             return this.boundaryValue;
-        } else if (y == this.upperLeftY + this.subMatrixSize - 1) {
+        } else if (y == ((this.upperLeftY + this.subMatrixSize) - 1)) {
             return this.vbDown[x - this.upperLeftX];
         } else {
-            return this.subMatrix[x - this.upperLeftX][y + 1 - this.upperLeftY];
+            return this.subMatrix[x - this.upperLeftX][(y + 1) -
+            this.upperLeftY];
         }
     }
 
@@ -433,13 +409,14 @@ public class Worker extends Timed implements java.io.Serializable {
     }
 
     private double getRightValue(int x, int y) {
-        if (x == this.globalMatrixSize - 1) {
+        if (x == (this.globalMatrixSize - 1)) {
             // must return boudarie value
             return this.boundaryValue;
-        } else if (x == this.upperLeftX + this.subMatrixSize - 1) {
+        } else if (x == ((this.upperLeftX + this.subMatrixSize) - 1)) {
             return this.vbRight[y - this.upperLeftY];
         } else {
-            return this.subMatrix[x + 1 - this.upperLeftX][y - this.upperLeftY];
+            return this.subMatrix[(x + 1) - this.upperLeftX][y -
+            this.upperLeftY];
         }
     }
 
@@ -449,7 +426,7 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /**
      * Sends the boundary values to the neighbours.
-     * 
+     *
      */
     public void sendBoundaries() {
         if (this.up != null) {
@@ -458,9 +435,7 @@ public class Worker extends Timed implements java.io.Serializable {
                 upline[i] = this.subMatrix[i][0];
             }
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
-                this
-                        .notifyOneRank(this.up_id,
-                             TimIt.getObjectSize(upline) + 4);
+                this.notifyOneRank(this.up_id, TimIt.getObjectSize(upline) + 4);
             }
             this.up.receiveBoundary(Worker.DOWN, upline, this.iteration);
         }
@@ -471,31 +446,31 @@ public class Worker extends Timed implements java.io.Serializable {
             }
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
                 this.notifyOneRank(this.down_id,
-                        TimIt.getObjectSize(downline) + 4);
+                    TimIt.getObjectSize(downline) + 4);
             }
             this.down.receiveBoundary(Worker.UP, downline, this.iteration);
         }
         if (this.left != null) {
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
-                this.notifyOneRank(this.left_id, 
-                        TimIt.getObjectSize(this.subMatrix[0]) + 4);
+                this.notifyOneRank(this.left_id,
+                    TimIt.getObjectSize(this.subMatrix[0]) + 4);
             }
             this.left.receiveBoundary(Worker.RIGHT, this.subMatrix[0],
-                    this.iteration);
+                this.iteration);
         }
         if (this.right != null) {
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
-                this.notifyOneRank(this.right_id, 
-                        TimIt.getObjectSize(this.subMatrixSize - 1) + 4);
+                this.notifyOneRank(this.right_id,
+                    TimIt.getObjectSize(this.subMatrixSize - 1) + 4);
             }
             this.right.receiveBoundary(Worker.LEFT,
-                    this.subMatrix[this.subMatrixSize - 1], this.iteration);
+                this.subMatrix[this.subMatrixSize - 1], this.iteration);
         }
     }
 
     /**
      * The end of the iteration.
-     * 
+     *
      * @param iter
      */
     public void endIter(int iter) {
@@ -505,14 +480,13 @@ public class Worker extends Timed implements java.io.Serializable {
                 // end of the computation
                 this.elapsedTime = System.currentTimeMillis() - this.startTime;
                 this.T_TOTAL.stop();
-                super
-                        .finalizeTimed(this.id, "Worker " + this.id
-                                + " has finished Wtime = "
-                                + this.T_WORK.getTotalTime());
-                System.out.println("[JACOBI] Worker " + this.id
-                        + " : computation ended after " + this.iteration);
-                System.out.println("[JACOBI] Time elapsed for Worker "
-                        + this.id + " : " + this.elapsedTime);
+                super.finalizeTimed(this.id,
+                    "Worker " + this.id + " has finished Wtime = " +
+                    this.T_WORK.getTotalTime());
+                System.out.println("[JACOBI] Worker " + this.id +
+                    " : computation ended after " + this.iteration);
+                System.out.println("[JACOBI] Time elapsed for Worker " +
+                    this.id + " : " + this.elapsedTime);
 
                 return;
             } else {
@@ -525,7 +499,7 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /**
      * Method exchanges values between workers.
-     * 
+     *
      * @param fromWho
      *            The rank of the sender
      * @param boundary
@@ -550,7 +524,6 @@ public class Worker extends Timed implements java.io.Serializable {
             break;
         }
         if (this.nbGetBoundRcvd == this.nbNeighbours) {
-
             if (!this.hasStarted) {
                 this.alreadyRcvBound = true;
             } else {
@@ -558,12 +531,10 @@ public class Worker extends Timed implements java.io.Serializable {
                 this.computeBorderLine();
                 this.updateMatrix();
                 this.iteration++;
-                if (this.iteration % 500 == 0) {
-                    System.out.println("Worker " + this.id + " : "
-                            + this.iteration + " (" + this.subMatrix[0][0]
-                            + ") in "
-                            + (System.currentTimeMillis() - this.startTime)
-                            + " ms");
+                if ((this.iteration % 500) == 0) {
+                    System.out.println("Worker " + this.id + " : " +
+                        this.iteration + " (" + this.subMatrix[0][0] + ") in " +
+                        (System.currentTimeMillis() - this.startTime) + " ms");
                 }
                 this.nbGetBoundRcvd = 0;
                 // send ack to neighbors
@@ -576,7 +547,6 @@ public class Worker extends Timed implements java.io.Serializable {
      * Sends ack to neighbors.
      */
     private void sendEndIter() {
-
         if (this.up != null) {
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
                 this.notifyOneRank(this.up_id, 4);
@@ -605,7 +575,7 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /**
      * Description of this worker.
-     * 
+     *
      * @return The description of this worker
      */
     public String toString() {
@@ -614,7 +584,7 @@ public class Worker extends Timed implements java.io.Serializable {
 
     /**
      * Called by Launcher to kill this active object
-     * 
+     *
      * @see org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher
      */
     public void terminate() {
@@ -632,11 +602,13 @@ public class Worker extends Timed implements java.io.Serializable {
     private void notifyOneRank(int destRank, int messageSize) {
         // Notification of 1 communication with the dest rank
         super.getEventObservable().setChanged();
-        super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver, destRank, 1));
+        super.getEventObservable()
+             .notifyObservers(new CommEvent(this.nbCommObserver, destRank, 1));
 
         // Notification
         super.getEventObservable().setChanged();
-        super.getEventObservable().notifyObservers(new CommEvent(this.commSizeObserver, destRank,
+        super.getEventObservable()
+             .notifyObservers(new CommEvent(this.commSizeObserver, destRank,
                 messageSize));
-    }   
+    }
 }

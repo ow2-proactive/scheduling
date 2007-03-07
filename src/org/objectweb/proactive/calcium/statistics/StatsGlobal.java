@@ -31,31 +31,39 @@
 package org.objectweb.proactive.calcium.statistics;
 
 public interface StatsGlobal {
-	
-	public int getReadyQueueLength();
-	public int getProccessingQueueLength();
-	public int getWaitingQueueLength();
-	public int getResultsQueueLength();
-	
-	public int getSolvedNumberOfTasks();
-	public int getSolvedNumberOfRootTasks();
-	
-	public long getAverageProcessingTime();
-	public long getAverageWaitingTime();
-	public long getAverageResultsTime();
-	public long getAverageReadyTime();
-	public long getAverageWallClockTime();
-	public long getAverageComputationTime();
-	
-	/*
-	public int getMaxWallclockTime();
-	public int getMaxProcessingTime();
-	public int getMaxWaitingTime();
-	public int getMaxResultsTime();
-	
-	public int getMinWallclockTime();
-	public int getMinProcessingTime();
-	public int getMinWaitingTime();
-	public int getMinResultsTime();
-	*/
+    public int getReadyQueueLength();
+
+    public int getProccessingQueueLength();
+
+    public int getWaitingQueueLength();
+
+    public int getResultsQueueLength();
+
+    public int getSolvedNumberOfTasks();
+
+    public int getSolvedNumberOfRootTasks();
+
+    public long getAverageProcessingTime();
+
+    public long getAverageWaitingTime();
+
+    public long getAverageResultsTime();
+
+    public long getAverageReadyTime();
+
+    public long getAverageWallClockTime();
+
+    public long getAverageComputationTime();
+
+    /*
+    public int getMaxWallclockTime();
+    public int getMaxProcessingTime();
+    public int getMaxWaitingTime();
+    public int getMaxResultsTime();
+
+    public int getMinWallclockTime();
+    public int getMinProcessingTime();
+    public int getMinWaitingTime();
+    public int getMinResultsTime();
+    */
 }

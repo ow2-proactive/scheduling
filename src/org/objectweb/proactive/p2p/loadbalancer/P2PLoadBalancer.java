@@ -54,277 +54,316 @@ import org.objectweb.proactive.loadbalancing.metrics.CPURanking.LinuxCPURanking;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
-public class P2PLoadBalancer extends LoadBalancer implements RunActive,ProActiveInternalObject{
-	static int MAX_KNOWN_PEERS = 10;
-	static long MAX_DISTANCE = 100;
-	protected String balancerName;
+
+public class P2PLoadBalancer extends LoadBalancer implements RunActive,
+    ProActiveInternalObject {
+    static int MAX_KNOWN_PEERS = 10;
+    static long MAX_DISTANCE = 100;
+    protected String balancerName;
     protected Random randomizer;
-	protected P2PService p2pService;
-    protected Vector acquaintances, forBalancing, forStealing;
+    protected P2PService p2pService;
+    protected Vector acquaintances;
+    protected Vector forBalancing;
+    protected Vector forStealing;
     protected P2PLoadBalancer myThis;
-    
     protected double ranking;
-    
-    
-    public P2PLoadBalancer() {}
 
-    protected void addToBalanceList(int n) {
-    	int i=0;
-    	Iterator it = acquaintances.iterator();
-    	while (i < n && it.hasNext()) {
-    		String itAddress = null;
-    		try {
-        		P2PService oService = (P2PService) it.next();
-        		itAddress = oService.getAddress().stringValue();
-        		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/"+this.balancerName;
-				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
-				
-				if (forBalancing.indexOf(oLB) < 0) {
-					long distance = ping(itAddress);
-					if (distance < MAX_DISTANCE) {
-						forBalancing.add(oLB);
-						i++;
-						}
-					}
-				} catch (ActiveObjectCreationException e) {
-	    			logger.error("[P2PLB] ActiveObjectCreationException");
-				} catch (IOException e) {
-	    			logger.error("[P2PLB] IOException");
-				} catch (NonFunctionalException e) {
-					logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from "+myNode.getNodeInformation().getHostName());
-				}
-    		}
-    	if (i >= n) return;
-    	
-    	// Still missing acquaintances
-
-    	it = acquaintances.iterator();
-    	while (i < n && it.hasNext()) {
-    		try {
-        		P2PService oService = (P2PService) it.next();
-        		String itAddress = oService.getAddress().stringValue();
-        		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/"+this.balancerName;
-				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
-				
-				if (!forBalancing.contains(oLB)) {
-					forBalancing.add(oLB);
-					i++;
-					}
-    		} catch (ActiveObjectCreationException e) {
-    			logger.error("[P2PLB] ActiveObjectCreationException");
-			} catch (IOException e) {
-    			logger.error("[P2PLB] IOException");
-			} catch (NonFunctionalException e) {
-				logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from "+myNode.getNodeInformation().getHostName());
-			}
-    		}
+    public P2PLoadBalancer() {
     }
 
-    
-    protected void addToStealList(int n) {
-    	int i=0;
-    	Iterator it = acquaintances.iterator();
-    	while (i < n && it.hasNext()) {
-    		String itAddress = null;
-    		try {
-        		P2PService oService = (P2PService) it.next();
-        		itAddress = oService.getAddress().stringValue();
-        		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/robinhood";
-				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
-				
-				if (!forStealing.contains(oLB)) {
-					long distance = ping(itAddress);
-					if (distance < MAX_DISTANCE ) {
-						forStealing.add(oLB);
-						i++;
-						}
-					}
-			} catch (ActiveObjectCreationException e) {
-    			logger.error("[P2PLB] ActiveObjectCreationException");
-			} catch (IOException e) {
-    			logger.error("[P2PLB] IOException");
-			} catch (NonFunctionalException e) {
-				logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from "+myNode.getNodeInformation().getHostName());
-			}
-    		}
-    	if (i >= n) return;
-    	
-    	// Still missing acquaintances
+    protected void addToBalanceList(int n) {
+        int i = 0;
+        Iterator it = acquaintances.iterator();
+        while ((i < n) && it.hasNext()) {
+            String itAddress = null;
+            try {
+                P2PService oService = (P2PService) it.next();
+                itAddress = oService.getAddress().stringValue();
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
+                    "/" + this.balancerName;
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                        itAddress);
 
-    	it = acquaintances.iterator();
-    	while (i < n && it.hasNext()) {
-    		String itAddress = null;
-    		try {
-        		P2PService oService = (P2PService) it.next();
-        		itAddress = oService.getAddress().stringValue();
-        		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/"+this.balancerName;
-				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
-				
-				if (!forStealing.contains(oLB)) {
-					forBalancing.add(oLB);
-						i++;
-					}
-			} catch (ActiveObjectCreationException e) {
-    			logger.error("[P2PLB] ActiveObjectCreationException");
-			} catch (IOException e) {
-    			logger.error("[P2PLB] IOException");
-			} catch (NonFunctionalException e) {
-				logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from "+myNode.getNodeInformation().getHostName());
-			}
-    		}
-    	
-    	
+                if (forBalancing.indexOf(oLB) < 0) {
+                    long distance = ping(itAddress);
+                    if (distance < MAX_DISTANCE) {
+                        forBalancing.add(oLB);
+                        i++;
+                    }
+                }
+            } catch (ActiveObjectCreationException e) {
+                logger.error("[P2PLB] ActiveObjectCreationException");
+            } catch (IOException e) {
+                logger.error("[P2PLB] IOException");
+            } catch (NonFunctionalException e) {
+                logger.error(
+                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                    myNode.getNodeInformation().getHostName());
+            }
+        }
+        if (i >= n) {
+            return;
+        }
+
+        // Still missing acquaintances
+        it = acquaintances.iterator();
+        while ((i < n) && it.hasNext()) {
+            try {
+                P2PService oService = (P2PService) it.next();
+                String itAddress = oService.getAddress().stringValue();
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
+                    "/" + this.balancerName;
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                        itAddress);
+
+                if (!forBalancing.contains(oLB)) {
+                    forBalancing.add(oLB);
+                    i++;
+                }
+            } catch (ActiveObjectCreationException e) {
+                logger.error("[P2PLB] ActiveObjectCreationException");
+            } catch (IOException e) {
+                logger.error("[P2PLB] IOException");
+            } catch (NonFunctionalException e) {
+                logger.error(
+                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                    myNode.getNodeInformation().getHostName());
+            }
+        }
+    }
+
+    protected void addToStealList(int n) {
+        int i = 0;
+        Iterator it = acquaintances.iterator();
+        while ((i < n) && it.hasNext()) {
+            String itAddress = null;
+            try {
+                P2PService oService = (P2PService) it.next();
+                itAddress = oService.getAddress().stringValue();
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
+                    "/robinhood";
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                        itAddress);
+
+                if (!forStealing.contains(oLB)) {
+                    long distance = ping(itAddress);
+                    if (distance < MAX_DISTANCE) {
+                        forStealing.add(oLB);
+                        i++;
+                    }
+                }
+            } catch (ActiveObjectCreationException e) {
+                logger.error("[P2PLB] ActiveObjectCreationException");
+            } catch (IOException e) {
+                logger.error("[P2PLB] IOException");
+            } catch (NonFunctionalException e) {
+                logger.error(
+                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                    myNode.getNodeInformation().getHostName());
+            }
+        }
+        if (i >= n) {
+            return;
+        }
+
+        // Still missing acquaintances
+        it = acquaintances.iterator();
+        while ((i < n) && it.hasNext()) {
+            String itAddress = null;
+            try {
+                P2PService oService = (P2PService) it.next();
+                itAddress = oService.getAddress().stringValue();
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
+                    "/" + this.balancerName;
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                        itAddress);
+
+                if (!forStealing.contains(oLB)) {
+                    forBalancing.add(oLB);
+                    i++;
+                }
+            } catch (ActiveObjectCreationException e) {
+                logger.error("[P2PLB] ActiveObjectCreationException");
+            } catch (IOException e) {
+                logger.error("[P2PLB] IOException");
+            } catch (NonFunctionalException e) {
+                logger.error(
+                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                    myNode.getNodeInformation().getHostName());
+            }
+        }
     }
 
     public double getRanking() {
-    	return this.ranking;
+        return this.ranking;
     }
-    
-    protected long ping(String nodeAddress) {
-    	// nodeAddress come in format "protocol://host:port/nodename"
-    long timeResp = Long.MAX_VALUE;
-	String itAddress = new String(nodeAddress.substring(0,nodeAddress.lastIndexOf("/")));
-	if (itAddress.lastIndexOf(':') >= itAddress.length()-6) itAddress = itAddress.substring(0,itAddress.lastIndexOf(':'));
-	if (itAddress.lastIndexOf('/') >= 0) itAddress = itAddress.substring(itAddress.lastIndexOf('/')+1);
 
-    BufferedReader in = null;
-    Runtime rtime = Runtime.getRuntime();
-    Process s;
-	try {
-		s = rtime.exec("/bin/ping -c 3 -l 2 -q " + itAddress);
-	    in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-	    String line;
-	    while ((line = in.readLine()) != null) {
-	         if (line.indexOf('=') > 0)  {
-	        	 line = line.substring(line.indexOf('=')+2,line.indexOf("ms")-1);
-	        	 // rtt min/avg/max/mdev = 0.246/0.339/0.413/0.069 ms, pipe 3
-	        	 String pingStats[] = line.split("/");
-	        	 timeResp = 1+Math.round(Double.parseDouble(pingStats[1])); 
-	          }
-	    	} 
-	    in.close();
-		} catch (IOException e) {
-			logger.error("[P2PLB] PING ERROR! ");
-		}
-    return timeResp;
+    protected long ping(String nodeAddress) {
+        // nodeAddress come in format "protocol://host:port/nodename"
+        long timeResp = Long.MAX_VALUE;
+        String itAddress = new String(nodeAddress.substring(0,
+                    nodeAddress.lastIndexOf("/")));
+        if (itAddress.lastIndexOf(':') >= (itAddress.length() - 6)) {
+            itAddress = itAddress.substring(0, itAddress.lastIndexOf(':'));
+        }
+        if (itAddress.lastIndexOf('/') >= 0) {
+            itAddress = itAddress.substring(itAddress.lastIndexOf('/') + 1);
+        }
+
+        BufferedReader in = null;
+        Runtime rtime = Runtime.getRuntime();
+        Process s;
+        try {
+            s = rtime.exec("/bin/ping -c 3 -l 2 -q " + itAddress);
+            in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (line.indexOf('=') > 0) {
+                    line = line.substring(line.indexOf('=') + 2,
+                            line.indexOf("ms") - 1);
+                    // rtt min/avg/max/mdev = 0.246/0.339/0.413/0.069 ms, pipe 3
+                    String[] pingStats = line.split("/");
+                    timeResp = 1 +
+                        Math.round(Double.parseDouble(pingStats[1]));
+                }
+            }
+            in.close();
+        } catch (IOException e) {
+            logger.error("[P2PLB] PING ERROR! ");
+        }
+        return timeResp;
     }
+
     /**
      * This method use the P2P infrastructure to search nodes which can
      * receive its active objects.  Method extended from LoadBalancer class.
      */
     public void startBalancing() {
-    	int size = forBalancing.size();
-    	if (size < 1) return;
+        int size = forBalancing.size();
+        if (size < 1) {
+            return;
+        }
 
-    	int badRemote = 0;
-    	
-    	int first = randomizer.nextInt(size);
-    	for (int i = 0; i < LoadBalancingConstants.SUBSET_SIZE  && size > 0; i++) {
-    		P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forBalancing.get((first+i)%size));
-    		try {
-				remoteP2Plb.getActiveObjectsFrom(myThis,ranking);
-			} catch (NonFunctionalException e) {
-				badRemote++;
-				forStealing.remove((first+i)%size);
-	    		size--;
-			}
-    	}
-    	if (badRemote > 0) addToStealList(badRemote);
+        int badRemote = 0;
+
+        int first = randomizer.nextInt(size);
+        for (int i = 0; (i < LoadBalancingConstants.SUBSET_SIZE) && (size > 0);
+                i++) {
+            P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forBalancing.get((first +
+                    i) % size));
+            try {
+                remoteP2Plb.getActiveObjectsFrom(myThis, ranking);
+            } catch (NonFunctionalException e) {
+                badRemote++;
+                forStealing.remove((first + i) % size);
+                size--;
+            }
+        }
+        if (badRemote > 0) {
+            addToStealList(badRemote);
+        }
     }
 
-    protected void getActiveObjectsFrom (P2PLoadBalancer remoteBalancer, double remoteRanking){
-		if (remoteRanking < ranking * LoadBalancingConstants.BALANCE_FACTOR) { // I'm better than him!
-			remoteBalancer.sendActiveObjectsTo(myNode);			
-		}
-	}
+    protected void getActiveObjectsFrom(P2PLoadBalancer remoteBalancer,
+        double remoteRanking) {
+        if (remoteRanking < (ranking * LoadBalancingConstants.BALANCE_FACTOR)) { // I'm better than him!
+            remoteBalancer.sendActiveObjectsTo(myNode);
+        }
+    }
 
-	/**
-     * This method use the P2P infrastructure to search nodes which I
-     * can steal work.  Method extended from LoadBalancer class.
-     */
+    /**
+    * This method use the P2P infrastructure to search nodes which I
+    * can steal work.  Method extended from LoadBalancer class.
+    */
     public void stealWork() {
-    	int size = forStealing.size();
-    	if (size < 1) return;
+        int size = forStealing.size();
+        if (size < 1) {
+            return;
+        }
 
-    	int badRemote = 0;
-    	int first = randomizer.nextInt(size);
-    	for (int i = 0; i < LoadBalancingConstants.NEIGHBORS_TO_STEAL && size > 0; i++) {
-    		P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forStealing.get((first+i)%size));
-   			try {
-				remoteP2Plb.sendActiveObjectsTo(myNode,ranking);
-			} catch (NonFunctionalException e) {
-				badRemote++;
-				forStealing.remove((first+i)%size);
-	        	size--;
-			}
-    	}
-    	if (badRemote > 0) addToStealList(badRemote);
+        int badRemote = 0;
+        int first = randomizer.nextInt(size);
+        for (int i = 0;
+                (i < LoadBalancingConstants.NEIGHBORS_TO_STEAL) && (size > 0);
+                i++) {
+            P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forStealing.get((first +
+                    i) % size));
+            try {
+                remoteP2Plb.sendActiveObjectsTo(myNode, ranking);
+            } catch (NonFunctionalException e) {
+                badRemote++;
+                forStealing.remove((first + i) % size);
+                size--;
+            }
+        }
+        if (badRemote > 0) {
+            addToStealList(badRemote);
+        }
     }
 
-public void sendActiveObjectsTo(Node remoteNode, double remoteRanking) {
+    public void sendActiveObjectsTo(Node remoteNode, double remoteRanking) {
+        if (this.ranking < (remoteRanking * LoadBalancingConstants.STEAL_FACTOR)) { // it's better than me!
+            sendActiveObjectsTo(remoteNode);
+        }
+    }
 
-    if (this.ranking < remoteRanking * LoadBalancingConstants.STEAL_FACTOR) { // it's better than me!
-    	sendActiveObjectsTo(remoteNode);
-    	}
-	}
+    public void runActivity(Body body) {
+        this.myThis = (P2PLoadBalancer) ProActive.getStubOnThis();
+        this.balancerName = "robinhood";
 
-public void runActivity(Body body) {
+        /* Updating the node reference */
+        try {
+            String itAddress = body.getNodeURL();
+            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
+                "/" + P2PConstants.SHARED_NODE_NAME + "_0";
+            this.myNode = NodeFactory.getNode(itAddress);
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
 
-	this.myThis = (P2PLoadBalancer) ProActive.getStubOnThis();
-    this.balancerName = "robinhood";
-    
-    /* Updating the node reference */
-    try {
-    	String itAddress = body.getNodeURL();
-    	itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/"+P2PConstants.SHARED_NODE_NAME+"_0";
-    	this.myNode = NodeFactory.getNode(itAddress);
-		} catch (NodeException e) {
-			e.printStackTrace();
-		}
+        // registering myself
+        try {
+            String itAddress = body.getNodeURL();
+            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
+                "/" + this.balancerName;
+            ProActive.register(myThis, itAddress);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-    // registering myself
-    try {
-		String itAddress = body.getNodeURL();
-		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/"+this.balancerName;
-		ProActive.register(myThis,itAddress);
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
+        Service service = new Service(body);
 
-	Service service = new Service(body);
-	
-	while (body.isActive()) {
-	    service.blockingServeOldest(); 
-	    }
-	}
+        while (body.isActive()) {
+            service.blockingServeOldest();
+        }
+    }
 
-	public void killMePlease() {
-		lm.killMePlease();
-		ProActive.terminateActiveObject(myThis,true);
-	}
+    public void killMePlease() {
+        lm.killMePlease();
+        ProActive.terminateActiveObject(myThis, true);
+    }
 
-	public void init() {
-    	this.forBalancing = new Vector(MAX_KNOWN_PEERS);
-    	this.forStealing = new Vector(MAX_KNOWN_PEERS);
+    public void init() {
+        this.forBalancing = new Vector(MAX_KNOWN_PEERS);
+        this.forStealing = new Vector(MAX_KNOWN_PEERS);
         this.randomizer = new Random();
+
         /* We update the ranking */
         LinuxCPURanking thisCPURanking = new LinuxCPURanking();
         ranking = thisCPURanking.getRanking();
 
-		try {
-			this.acquaintances = ((P2PService) P2PService.getLocalP2PService()).getAcquaintanceList();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	    /* We update the lists */
-	    this.addToBalanceList(MAX_KNOWN_PEERS);
-	    this.addToStealList(MAX_KNOWN_PEERS);
+        try {
+            this.acquaintances = ((P2PService) P2PService.getLocalP2PService()).getAcquaintanceList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	    // by now we use only P2P over Linux
-	    lm = new LoadMonitor(myThis,thisCPURanking);
-	    new Thread(lm).start();
+        /* We update the lists */
+        this.addToBalanceList(MAX_KNOWN_PEERS);
+        this.addToStealList(MAX_KNOWN_PEERS);
 
-	}
-
+        // by now we use only P2P over Linux
+        lm = new LoadMonitor(myThis, thisCPURanking);
+        new Thread(lm).start();
+    }
 }

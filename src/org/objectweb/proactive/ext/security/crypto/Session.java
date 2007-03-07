@@ -134,7 +134,8 @@ public class Session implements Serializable {
         rsa_eng = Cipher.getInstance("RSA/None/OAEPPadding", "BC"); // RSA Cipher.
         cl_mac = Mac.getInstance("HMACSHA1", "BC"); // Client side MAC
         se_mac = Mac.getInstance("HMACSHA1", "BC"); // Server side MAC
-        //      }
+                                                    //      }
+
         this.sessionID = sessionID;
         distantOACertificate = null; // The clients public key for encryption and decryption.
         distantOAPublicKey = null; // The clients authentication and signing certificate.
@@ -201,7 +202,8 @@ public class Session implements Serializable {
             }
 
             if (communication.isIntegrityEnabled()) {
-                ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug("writePDU as client cl_mac :" +
+                ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
+                               .debug("writePDU as client cl_mac :" +
                     displayByte(cl_hmac_key.getEncoded()));
                 mac = cl_mac.doFinal();
             }
@@ -268,7 +270,8 @@ public class Session implements Serializable {
                 try {
                     in = se_cipher.doFinal(in);
                 } catch (Exception ex) {
-                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug("PDU Cipher code decryption failed, session " +
+                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
+                                   .debug("PDU Cipher code decryption failed, session " +
                         sessionID);
                     throw new IOException("PDU failed to decrypt " +
                         ex.getMessage());
@@ -281,7 +284,8 @@ public class Session implements Serializable {
                 m = se_mac.doFinal();
 
                 if (!isEqual(m, mac)) {
-                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug("PDU Mac code failed , session " +
+                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
+                                   .debug("PDU Mac code failed , session " +
                         sessionID);
                     throw new IOException("PDU Mac code failed ");
                 }
@@ -293,7 +297,8 @@ public class Session implements Serializable {
                 try {
                     in = cl_cipher.doFinal(in);
                 } catch (Exception ex) {
-                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug("PDU Cipher code decryption failed, session " +
+                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
+                                   .debug("PDU Cipher code decryption failed, session " +
                         sessionID);
                     throw new IOException("PDU failed to decrypt " +
                         ex.getMessage());
@@ -305,7 +310,8 @@ public class Session implements Serializable {
                 byte[] m = null;
                 m = cl_mac.doFinal();
 
-                ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug("readPDU as server cl_mac :" +
+                ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
+                               .debug("readPDU as server cl_mac :" +
                     displayByte(cl_hmac_key.getEncoded()));
                 if (!isEqual(m, mac)) {
                     throw new IOException("PDU Mac code failed, session " +

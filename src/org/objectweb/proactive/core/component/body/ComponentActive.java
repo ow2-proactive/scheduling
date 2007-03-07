@@ -40,18 +40,18 @@ import org.objectweb.proactive.Active;
  * <p>
  * In this implementation of the Fractal model, every component is an active
  * object. The (non-functional) activity of the component can be customized by implementing
- * the interfaces {@link org.objectweb.proactive.core.component.body.ComponentInitActive}, {@link org.objectweb.proactive.core.component.body.ComponentRunActive}, 
+ * the interfaces {@link org.objectweb.proactive.core.component.body.ComponentInitActive}, {@link org.objectweb.proactive.core.component.body.ComponentRunActive},
  * {@link org.objectweb.proactive.core.component.body.ComponentEndActive}.</p>
  * <p> The non-functional activity of the component, if redefined, should use a request filter on component requests to distinguish
  * non-functional component requests from functional component requests. The default policy is FIFO.</p>
- * The functional activity can also be defined in a primitive component as usually through 
+ * The functional activity can also be defined in a primitive component as usually through
  * the {@link org.objectweb.proactive.InitActive}, {@link org.objectweb.proactive.RunActive}
  * and {@link org.objectweb.proactive.EndActive} interfaces.</p>
  * <p>The functional activity is initiated when the lifecycle of the component starts.</p>
  * <p>The functional activity is terminated when the lifecycle of the component ends, provided the implementation
  * of the {@link org.objectweb.proactive.RunActive#runActivity(Body)} method uses a loop <pre>while (isActive())/<pre>.</p>
  * <p>
- *   
+ *
  * @author Matthieu Morel
  */
 public interface ComponentActive extends Active {

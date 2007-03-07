@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  *
- *  
+ *
  *
  * A class for creating groups of interfaces
  * Indeed, the standard mechanism cannot be used here, as we are referencing components
@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveComponentGroup {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    
+
     /**
      * creates an empty group able to contain ProActiveInterfaceImpl objects of the given type..
      * The stub in front of the group proxy is of type ProActiveInterfaceImpl.
@@ -86,7 +86,8 @@ public class ProActiveComponentGroup {
         throws ClassNotFoundException, ClassNotReifiableException {
         try {
             Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(),
-            		null, null, ProxyForComponentInterfaceGroup.class.getName(), null);
+                    null, null,
+                    ProxyForComponentInterfaceGroup.class.getName(), null);
 
             ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result).getProxy();
             proxy.className = Interface.class.getName();
@@ -135,16 +136,14 @@ public class ProActiveComponentGroup {
                         ComponentType.class, String.class, String.class
                     });
             result = (ProActiveComponentRepresentative) constructor.newInstance(new Object[] {
-                        componentType,
-                        controllerDesc.getHierarchicalType(),
+                        componentType, controllerDesc.getHierarchicalType(),
                         controllerDesc.getControllersConfigFileLocation()
                     });
 
             // build the constructor call for the proxy object to create
             ConstructorCall reifiedCall = MOP.buildTargetObjectConstructorCall(ProActiveComponentRepresentativeImpl.class,
                     new Object[] {
-                        componentType,
-                        controllerDesc.getHierarchicalType(),
+                        componentType, controllerDesc.getHierarchicalType(),
                         controllerDesc.getControllersConfigFileLocation()
                     });
 

@@ -30,15 +30,15 @@
  */
 package org.objectweb.proactive.core.process.mpi;
 
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.process.DependentProcess;
-import org.objectweb.proactive.core.process.ExternalProcess;
-import org.objectweb.proactive.core.process.JVMNodeProcess;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.process.DependentProcess;
+import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.JVMNodeProcess;
 
 
 /**

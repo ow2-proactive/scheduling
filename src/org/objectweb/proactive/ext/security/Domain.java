@@ -36,6 +36,7 @@ import java.security.cert.*;
 
 public class Domain {
     private X509Certificate certificate;
+
     public Domain(String file, PolicyServer ps) {
     }
 

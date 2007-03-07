@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+
 /**
  * This class provide some methods to benchmark your applications. <br>
  * Example of use : (TODO)<br>
@@ -45,20 +46,18 @@ import java.util.Iterator;
  * timer.stop(T_total);<br>
  * Stats stats = reduce(timer, rank, leader, groupSize);
  * </code>
- * 
+ *
  * @see org.objectweb.proactive.benchmarks.timit.examples
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public class HierarchicalTimer implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -6579163067813117881L;
-
     public static final int MAX_ENABLED_COUNTERS = 20;
-
     private static final int MAX_DEPTH = 3;
 
     /*
@@ -77,7 +76,10 @@ public class HierarchicalTimer implements Serializable {
     protected int level;
 
     /* The parent counters array */
-    protected int[] parent, parentStarted;
+    protected int[] parent;
+
+    /* The parent counters array */
+    protected int[] parentStarted;
 
     /* The counter names */
     protected String[] counter_name;
@@ -94,7 +96,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Invoked by TimIt to activate only specified counters
-     * 
+     *
      * @param counters
      *            the counters you want to specify
      * @param tr
@@ -104,8 +106,8 @@ public class HierarchicalTimer implements Serializable {
         this.nbCounters = counters.length;
 
         if (this.nbCounters > HierarchicalTimer.MAX_ENABLED_COUNTERS) {
-            throw new RuntimeException("Too many Counters to create. Max is "
-                    + HierarchicalTimer.MAX_ENABLED_COUNTERS);
+            throw new RuntimeException("Too many Counters to create. Max is " +
+                HierarchicalTimer.MAX_ENABLED_COUNTERS);
         }
         this.total = new int[this.nbCounters][this.nbCounters][this.nbCounters];
         this.start = new long[HierarchicalTimer.MAX_DEPTH];
@@ -127,7 +129,9 @@ public class HierarchicalTimer implements Serializable {
      * Reset the timing values
      */
     public void resetTimer() {
-        int i, j, k;
+        int i;
+        int j;
+        int k;
         for (i = 0; i < this.nbCounters; i++) {
             for (j = 0; j < this.nbCounters; j++) {
                 for (k = 0; k < this.nbCounters; k++) {
@@ -141,7 +145,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Reset only one counter
-     * 
+     *
      * @param n
      *            the counter id
      */
@@ -155,7 +159,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Adds a HierarchicalTimer instance to the arrayList.
-     * 
+     *
      * @param t
      *            The HierarchicalTimer instance to add.
      */
@@ -168,7 +172,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Get the number of available counters
-     * 
+     *
      * @return the number of counters
      */
     public int getNbCounter() {
@@ -177,7 +181,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Get the name of counter from his id
-     * 
+     *
      * @param n
      *            the id of the counter
      * @return the name of the counter
@@ -188,19 +192,19 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Know if a counter is started or not
-     * 
+     *
      * @param n
      *            the id of the counter
      * @return true if started, false otherwise
      */
     public boolean isStarted(int n) {
-        return this.parent[0] == n || this.parent[1] == n
-                || this.parent[2] == n;
+        return (this.parent[0] == n) || (this.parent[1] == n) ||
+        (this.parent[2] == n);
     }
 
     /**
      * Starts a counter.
-     * 
+     *
      * @param n
      *            The integer that idetifies the timer to stop.
      */
@@ -233,7 +237,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Stops the adequate counter.
-     * 
+     *
      * @param n
      *            The integer that idetifies the timer to stop.
      */
@@ -243,26 +247,23 @@ public class HierarchicalTimer implements Serializable {
             if (this.total[this.parent[0]][this.parent[0]][this.parent[0]] < 0) {
                 this.total[this.parent[0]][this.parent[0]][this.parent[0]] = 1;
             }
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += HierarchicalTimer
-                    .getCtm()
-                    - this.start[this.level];
+            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += (HierarchicalTimer.getCtm() -
+            this.start[this.level]);
             break;
         case 1:
             if (this.total[this.parent[0]][this.parent[1]][this.parent[1]] < 0) {
                 this.total[this.parent[0]][this.parent[1]][this.parent[1]] = 1;
             }
-            this.total[this.parent[0]][this.parent[1]][this.parent[1]] += HierarchicalTimer
-                    .getCtm()
-                    - this.start[this.level];
+            this.total[this.parent[0]][this.parent[1]][this.parent[1]] += (HierarchicalTimer.getCtm() -
+            this.start[this.level]);
             break;
         case 2:
         case 3:
             if (this.total[this.parent[0]][this.parent[1]][this.parent[2]] < 0) {
                 this.total[this.parent[0]][this.parent[1]][this.parent[2]] = 1;
             }
-            this.total[this.parent[0]][this.parent[1]][this.parent[2]] += HierarchicalTimer
-                    .getCtm()
-                    - this.start[this.level];
+            this.total[this.parent[0]][this.parent[1]][this.parent[2]] += (HierarchicalTimer.getCtm() -
+            this.start[this.level]);
         }
         this.level--;
     }
@@ -271,9 +272,8 @@ public class HierarchicalTimer implements Serializable {
         if (this.total[this.parent[0]][this.parent[1]][this.parent[2]] < 0) {
             this.total[this.parent[0]][this.parent[1]][this.parent[2]] = 1;
         }
-        this.total[this.parentStarted[0]][this.parentStarted[1]][this.parentStarted[2]] += HierarchicalTimer
-                .getCtm()
-                - this.start[this.level];
+        this.total[this.parentStarted[0]][this.parentStarted[1]][this.parentStarted[2]] += (HierarchicalTimer.getCtm() -
+        this.start[this.level]);
         this.level--;
     }
 
@@ -285,7 +285,6 @@ public class HierarchicalTimer implements Serializable {
             break;
         case 1:
             this.total[this.parent[0]][this.parent[0]][this.parent[0]] -= this.total[this.parent[0]][this.parent[1]][this.parent[1]];
-
             this.total[this.parent[0]][this.parent[1]][this.parent[1]] = time;
 
             this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
@@ -331,7 +330,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Returns the time in milliseconds elapsed since last start of this counter
-     * 
+     *
      * @param n
      *            the counter Id
      * @return the elapsed time since start
@@ -342,7 +341,7 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * Returns the total time in milliseconds of this counter for this hierarchy
-     * 
+     *
      * @param n
      *            the counter Id
      * @return the total elapsed time for this hierarchy.
@@ -350,15 +349,15 @@ public class HierarchicalTimer implements Serializable {
     public int getHierarchicalTime(int n) {
         switch (this.level) {
         case 0:
-            return this.total[this.parent[0]][this.parent[0]][this.parent[0]]
-                    + this.getElapsedTime(n);
+            return this.total[this.parent[0]][this.parent[0]][this.parent[0]] +
+            this.getElapsedTime(n);
         case 1:
-            return this.total[this.parent[0]][this.parent[1]][this.parent[1]]
-                    + this.getElapsedTime(n);
+            return this.total[this.parent[0]][this.parent[1]][this.parent[1]] +
+            this.getElapsedTime(n);
         case 2:
         case 3:
-            return this.total[this.parent[0]][this.parent[1]][this.parent[2]]
-                    + this.getElapsedTime(n);
+            return this.total[this.parent[0]][this.parent[1]][this.parent[2]] +
+            this.getElapsedTime(n);
         default:
             return 0;
         }
@@ -367,7 +366,7 @@ public class HierarchicalTimer implements Serializable {
     /**
      * Returns the total time in milliseconds of this counter for all
      * hierarchies
-     * 
+     *
      * @param n
      *            the counter Id
      * @return the total time elapsed for this counter in all hierarchies
@@ -383,20 +382,21 @@ public class HierarchicalTimer implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return The description of the current hierarchical timer.
      */
     public String toString() {
         String result = "";
-        int i, j, k;
+        int i;
+        int j;
+        int k;
         for (i = 0; i < this.total.length; i++) {
             for (j = 0; j < this.total.length; j++) {
                 for (k = 0; k < this.total.length; k++) {
                     if (this.total[i][j][k] != -1) {
-                        result += this.counter_name[i] + " -> "
-                                + this.counter_name[j] + " -> "
-                                + this.counter_name[k] + "\t = "
-                                + this.total[i][j][k] + " ms\n";
+                        result += (this.counter_name[i] + " -> " +
+                        this.counter_name[j] + " -> " + this.counter_name[k] +
+                        "\t = " + this.total[i][j][k] + " ms\n");
                     }
                 }
             }
@@ -406,11 +406,10 @@ public class HierarchicalTimer implements Serializable {
 
     /**
      * This function must be called after all timers were collected.
-     * 
+     *
      * @return HierarchicalTimerStatistics An instance of stats class.
      */
     public HierarchicalTimerStatistics getStats() {
-
         double[][][] deviation = new double[this.nbCounters][this.nbCounters][this.nbCounters];
         double[][][] average = new double[this.nbCounters][this.nbCounters][this.nbCounters];
         double[][][] min = new double[this.nbCounters][this.nbCounters][this.nbCounters];
@@ -419,7 +418,9 @@ public class HierarchicalTimer implements Serializable {
 
         Iterator<HierarchicalTimer> it = this.timersList.iterator();
 
-        int i, j, k;
+        int i;
+        int j;
+        int k;
 
         // Initialization of deviation, average, min and max values
         // The value 0 is not used as init val of average and deviation
@@ -455,7 +456,6 @@ public class HierarchicalTimer implements Serializable {
                 for (j = 0; j < this.nbCounters; j++) {
                     for (k = 0; k < this.nbCounters; k++) {
                         if (t[i][j][k] != -1) {
-
                             tempValue = t[i][j][k] / 1000.0;
 
                             if (min[i][j][k] > tempValue) {
@@ -469,8 +469,9 @@ public class HierarchicalTimer implements Serializable {
                             if (deviation[i][j][k] == -1d) {
                                 deviation[i][j][k] = tempValue * tempValue;
                             } else {
-                                deviation[i][j][k] += tempValue * tempValue;
+                                deviation[i][j][k] += (tempValue * tempValue);
                             }
+
                             // Same for average
                             if (average[i][j][k] == -1d) {
                                 average[i][j][k] = tempValue;
@@ -486,23 +487,24 @@ public class HierarchicalTimer implements Serializable {
         for (i = 0; i < this.nbCounters; i++) {
             for (j = 0; j < this.nbCounters; j++) {
                 for (k = 0; k < this.nbCounters; k++) {
-                    if (average[i][j][k] != -1d && deviation[i][j][k] != -1d) {
+                    if ((average[i][j][k] != -1d) &&
+                            (deviation[i][j][k] != -1d)) {
                         average[i][j][k] /= groupSize;
                         tempValue = average[i][j][k] * average[i][j][k];
-                        deviation[i][j][k] = Math.sqrt(deviation[i][j][k]
-                                / groupSize - tempValue);
+                        deviation[i][j][k] = Math.sqrt((deviation[i][j][k] / groupSize) -
+                                tempValue);
                     }
                 }
             }
         }
         return new HierarchicalTimerStatistics(this.counter_name, deviation,
-                average, min, max, this.parent, this.nbCounters);
+            average, min, max, this.parent, this.nbCounters);
     }
 
     /**
      * Prints a 3dim array of doubles, suppose that array was initialized with
      * -1d values.
-     * 
+     *
      * @param array
      *            The 3 dim array of values to print.
      * @param counterName
@@ -511,16 +513,18 @@ public class HierarchicalTimer implements Serializable {
      *            The number of counters.
      */
     public static void printArray(double[][][] array, String[] counterName,
-            int n) {
+        int n) {
         String result = "";
-        int i, j, k;
+        int i;
+        int j;
+        int k;
         for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                 for (k = 0; k < n; k++) {
                     if (array[i][j][k] != -1d) {
-                        result += counterName[i] + " -> " + counterName[j]
-                                + " -> " + counterName[k] + "\t = "
-                                + array[i][j][k] + " s\n";
+                        result += (counterName[i] + " -> " + counterName[j] +
+                        " -> " + counterName[k] + "\t = " + array[i][j][k] +
+                        " s\n");
                     }
                 }
             }

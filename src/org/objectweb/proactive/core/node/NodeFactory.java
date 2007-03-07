@@ -121,7 +121,7 @@ public class NodeFactory {
 
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
                     UrlBuilder.checkProtocol(System.getProperty(
-                            "proactive.communication.protocol")), jobID );
+                            "proactive.communication.protocol")), jobID);
         }
 
         return defaultNode;

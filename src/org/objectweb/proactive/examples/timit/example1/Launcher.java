@@ -43,23 +43,23 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
+
 /**
  * A simple distributed application that use TimIt.<br>
  * The application have two classes : Launcher, Worker<br>
  * Launcher will deploy some Workers to do a job.
- * 
+ *
  * Notice that TimIt will automatically invoke the start and kill methods<br>
- * 
+ *
  * See the source code of these classes to know how use TimIt.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public class Launcher implements Startable {
 
     /** The typed group of workers */
     private Worker workers;
-
     private ProActiveDescriptor pad;
 
     /** TimIt needs an noarg constructor (can be implicit) */
@@ -74,7 +74,7 @@ public class Launcher implements Startable {
     /**
      * Part of Startable implementation. TimIt will invoke this method with
      * arguments provided by the xml deployement descriptor.
-     * 
+     *
      * @params The array of parameters.
      * @see org.objectweb.proactive.benchmarks.timit.util.Startable
      */
@@ -88,17 +88,17 @@ public class Launcher implements Startable {
             VirtualNode vnode = this.pad.getVirtualNode("Workers");
 
             Node[] nodes = vnode.getNodes();
-            System.out.println(nodes.length + " nodes found, " + np
-                    + " wanted. ");
+            System.out.println(nodes.length + " nodes found, " + np +
+                " wanted. ");
 
-            Object[] param = new Object[] {};
+            Object[] param = new Object[] {  };
             Object[][] params = new Object[np][];
             for (int i = 0; i < np; i++) {
                 params[i] = param;
             }
 
-            this.workers = (Worker) ProSPMD.newSPMDGroup(
-                    Worker.class.getName(), params, nodes);
+            this.workers = (Worker) ProSPMD.newSPMDGroup(Worker.class.getName(),
+                    params, nodes);
 
             // You must create a TimItManager instance and give it
             // a typed group of Timed workers.
@@ -134,7 +134,7 @@ public class Launcher implements Startable {
     /**
      * Part of the Startable implementation. TimIt will invoke this method
      * between each run.
-     * 
+     *
      * @see org.objectweb.proactive.benchmarks.timit.util.Startable
      */
     public void kill() {

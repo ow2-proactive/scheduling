@@ -34,89 +34,93 @@ import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
-public class Timer implements Serializable{
 
-	long t, accumulated;
+public class Timer implements Serializable {
+    long t;
+    long accumulated;
     int numberActivatedTimes;
     boolean cpuTime;
-    
-    public Timer(boolean useCPUTime){
-    	cpuTime=useCPUTime;
-    	reset();
+
+    public Timer(boolean useCPUTime) {
+        cpuTime = useCPUTime;
+        reset();
     }
-    
+
     public Timer() {
-    	this(false);
+        this(false);
     }
 
     /**
      * Starts the current timer. This method
      * resets the timer state.
      */
-	public void start() {
-		reset();
-	}
-	
-	/**
-	 * Stops the current timer.
-	 * @return Accumulated elapsed time.
-	 */
-	public long stop(){
-		if(t>0)
-		accumulated+=getCurrentTime() - t;
-		t=-1;
-		return accumulated;
-	}
-
-	/**
-	 * After the timer has been stoped, this method can
-	 * resume the counter. The new time will be agregated to
-	 * the previous time.
-	 */
-	public void resume(){
-    	t=getCurrentTime();
-    	numberActivatedTimes++;
+    public void start() {
+        reset();
     }
 
-	/**
-	 * Resets the timer state.
-	 */
+    /**
+     * Stops the current timer.
+     * @return Accumulated elapsed time.
+     */
+    public long stop() {
+        if (t > 0) {
+            accumulated += (getCurrentTime() - t);
+        }
+        t = -1;
+        return accumulated;
+    }
+
+    /**
+     * After the timer has been stoped, this method can
+     * resume the counter. The new time will be agregated to
+     * the previous time.
+     */
+    public void resume() {
+        t = getCurrentTime();
+        numberActivatedTimes++;
+    }
+
+    /**
+     * Resets the timer state.
+     */
     private void reset() {
         t = getCurrentTime();
-        accumulated=0;
-        numberActivatedTimes=1;
+        accumulated = 0;
+        numberActivatedTimes = 1;
     }
-    
+
     /**
      * @return The currently accumulated time of this timer.
      */
-    public long getTime(){
-    	if(t>0) return accumulated + getCurrentTime() - t;
-    	
-    	return accumulated;
+    public long getTime() {
+        if (t > 0) {
+            return (accumulated + getCurrentTime()) - t;
+        }
+
+        return accumulated;
     }
 
     /**
      * @return Number of times this timer wast activated: the number
-     * of times resume was called plus 1 (the inital start). 
+     * of times resume was called plus 1 (the inital start).
      */
-	public int getNumberOfActivatedTimes() {
-		return numberActivatedTimes;
-	}
-	
-	private long getCurrentTime(){
-		
-		if(!cpuTime) return System.currentTimeMillis();
-		
-		ThreadMXBean tmb=ManagementFactory.getThreadMXBean();
-		if(tmb.isThreadCpuTimeSupported()){
-			
-			if(!tmb.isThreadCpuTimeEnabled()){
-				tmb.setThreadCpuTimeEnabled(true);
-			}
-			return tmb.getCurrentThreadCpuTime()/1000000;
-		}
+    public int getNumberOfActivatedTimes() {
+        return numberActivatedTimes;
+    }
 
-		return System.currentTimeMillis();
-	}
+    private long getCurrentTime() {
+        if (!cpuTime) {
+            return System.currentTimeMillis();
+        }
+
+        ThreadMXBean tmb = ManagementFactory.getThreadMXBean();
+        if (tmb.isThreadCpuTimeSupported()) {
+            if (!tmb.isThreadCpuTimeEnabled()) {
+                tmb.setThreadCpuTimeEnabled(true);
+            }
+            return tmb.getCurrentThreadCpuTime() / 1000000;
+        }
+
+        return System.currentTimeMillis();
+    }
 }

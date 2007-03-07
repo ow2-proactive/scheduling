@@ -169,7 +169,7 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
     }
 
     public long startNewSession(UniqueID id, Communication policy)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         return body.startNewSession(id, policy);
     }
@@ -180,14 +180,14 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
     }
 
     public byte[] randomValue(UniqueID id, long sessionID, byte[] cl_rand)
-        throws RenegotiateSessionException, IOException, 
+        throws RenegotiateSessionException, IOException,
             SecurityNotAvailableException {
         return body.randomValue(id, sessionID, cl_rand);
     }
 
     public byte[][] publicKeyExchange(UniqueID id, long sessionID,
         byte[] my_pub, byte[] my_cert, byte[] sig_code)
-        throws IOException, RenegotiateSessionException, 
+        throws IOException, RenegotiateSessionException,
             SecurityNotAvailableException, KeyExchangeException {
         return body.publicKeyExchange(id, sessionID, my_pub, my_cert, sig_code);
     }
@@ -222,14 +222,16 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
         return this.body.receiveFTMessage(id, fte);
     }
 
-    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg) throws IOException {
-    	return body.receiveGCMessage(id, msg);
+    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg)
+        throws IOException {
+        return body.receiveGCMessage(id, msg);
     }
-    
-    public void setRegistered(UniqueID id, boolean registered) throws IOException {
-    	body.setRegistered(id, registered);
+
+    public void setRegistered(UniqueID id, boolean registered)
+        throws IOException {
+        body.setRegistered(id, registered);
     }
-    
+
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws IOException {
         body.changeProxiedBody(id, newBody);
@@ -294,7 +296,7 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
         byte[] encodedAESKey, byte[] encodedIVParameters,
         byte[] encodedClientMacKey, byte[] encodedLockData,
         byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return body.secretKeyExchange(id, sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,

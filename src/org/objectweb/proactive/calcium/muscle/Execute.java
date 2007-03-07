@@ -32,16 +32,16 @@ package org.objectweb.proactive.calcium.muscle;
 
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
+
 /**
  * Classes implementing this interface can be executed.
  * The object of providing this method is indicating
  * what is the sequential code that must be run.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <T>
  */
-public interface Execute<P,R> extends Muscle<P,R>{
-
-	public R execute(P param) throws RuntimeException, EnvironmentException;
+public interface Execute<P, R> extends Muscle<P, R> {
+    public R execute(P param) throws RuntimeException, EnvironmentException;
 }

@@ -60,8 +60,8 @@ public class RecoveryJob implements ActiveQueueJob {
 
     public void doTheJob() {
         try {
-            receiver.getProActiveRuntime().receiveCheckpoint(receiver.getNodeInformation()
-                                                                     .getURL(),
+            receiver.getProActiveRuntime()
+                    .receiveCheckpoint(receiver.getNodeInformation().getURL(),
                 toSend, incarnation);
             RecoveryProcessImpl.logger.info("[RECOVERY] " +
                 this.toSend.getBodyID() + " recovered.");

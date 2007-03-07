@@ -398,12 +398,12 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     }
 
     public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
-    	return proxiedRemoteBody.receiveGCMessage(bodyID, msg);
+        return proxiedRemoteBody.receiveGCMessage(bodyID, msg);
     }
 
     public void setRegistered(boolean registered) throws IOException {
-		proxiedRemoteBody.setRegistered(bodyID, registered);
-	}
+        proxiedRemoteBody.setRegistered(bodyID, registered);
+    }
 
     //--------------------------------
     //  NFEProducer implementation
@@ -453,9 +453,9 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     }
 
     /**
-     * List all the existing objects registered in a registry. 
+     * List all the existing objects registered in a registry.
      */
     public String[] list(String url) throws IOException {
-        throw new IOException ("Lookup is not implemented for this Adapter");
+        throw new IOException("Lookup is not implemented for this Adapter");
     }
 }

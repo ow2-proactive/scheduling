@@ -158,9 +158,7 @@ public class Utils {
         String functionalInterfaceName, String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ? ... but readable)
         return (GENERATED_DEFAULT_PREFIX + escapeString(javaInterfaceName) +
-        GEN_MIDDLE_SEPARATOR +
-        escapeString(functionalInterfaceName)
-        );
+        GEN_MIDDLE_SEPARATOR + escapeString(functionalInterfaceName));
     }
 
     public static String getMetaObjectComponentRepresentativeClassName(

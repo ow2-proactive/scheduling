@@ -147,7 +147,7 @@ public interface BlockingRequestQueue extends RequestQueue {
      * @return true iff the thread is waiting for a request
      */
     public boolean isWaitingForRequest();
-    
+
     /**
      * Blocks the calling thread until there is a request available. The request
      * is not removed from the queue.

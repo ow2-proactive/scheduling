@@ -65,7 +65,7 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
     public DefaultProActiveSecurityManager(String vide)
         throws Exception {
         super(vide);
-        sessions = new Hashtable<Long,Session>();
+        sessions = new Hashtable<Long, Session>();
         logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();

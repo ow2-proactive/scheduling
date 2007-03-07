@@ -230,7 +230,7 @@ public class ProActiveConfiguration {
     public static String getFTProtocol() {
         return System.getProperty("proactive.ft.protocol");
     }
-    
+
     public static boolean osgiServletEnabled() {
         return "enabled".equals(System.getProperty("proactive.http.servlet"));
     }

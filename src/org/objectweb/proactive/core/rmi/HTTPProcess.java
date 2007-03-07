@@ -77,7 +77,6 @@ public class HTTPProcess {
      *
      */
     public Object getBytes() {
-
         //        test ();
         Object result = null;
         byte[] replyMessage = null;
@@ -88,20 +87,20 @@ public class HTTPProcess {
 
         try {
             in.readFully(source);
-//                          System.out.println("SOURCE :");
-//                           for (int i=0; i< source.length ; i++) {
-//                               System.out.print((char)source[i]);
-//                           }
-            
+            //                          System.out.println("SOURCE :");
+            //                           for (int i=0; i< source.length ; i++) {
+            //                               System.out.print((char)source[i]);
+            //                           }
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            
-            Thread.currentThread().setContextClassLoader(this.getClass()
-                    .getClassLoader());
+
+            Thread.currentThread()
+                  .setContextClassLoader(this.getClass().getClassLoader());
             HttpMessage message = (HttpMessage) HttpMarshaller.unmarshallObject(source);
 
-            if (message != null)
-            	result = message.processMessage();
-            	Thread.currentThread().setContextClassLoader(cl);
+            if (message != null) {
+                result = message.processMessage();
+            }
+            Thread.currentThread().setContextClassLoader(cl);
             return result;
         } catch (IOException e) {
             e.printStackTrace();

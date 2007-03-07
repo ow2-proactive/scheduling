@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.mop;
 
+
 /**
  * References on an active object are indirect link to the active object. There
  * is some interposition objects between the caller and the targetted active
@@ -41,16 +42,15 @@ package org.objectweb.proactive.core.mop;
  * class of the active object allowing to perform method call as if the method
  * call was made on the active object
  */
-
 public interface StubObject {
 
-	/**
-	 * set the proxy to the active object
-	 */
-	public void setProxy(Proxy p);
+    /**
+     * set the proxy to the active object
+     */
+    public void setProxy(Proxy p);
 
-	/**
-	 * return the proxy to the active object
-	 */
-	public Proxy getProxy();
+    /**
+     * return the proxy to the active object
+     */
+    public Proxy getProxy();
 }

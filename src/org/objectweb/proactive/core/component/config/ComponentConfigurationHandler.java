@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
 
 /**
  * A handler for parsing the xml component configuration.
- * 
+ *
  * @author Matthieu Morel
  */
 public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
@@ -105,8 +105,8 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
             return (ComponentConfigurationHandler) initial_handler.getResultObject();
         } catch (SAXException se) {
             logger.fatal(
-                "a problem occured while parsing the components descriptor \""+url+"\": " +
-                se.getMessage());
+                "a problem occured while parsing the components descriptor \"" +
+                url + "\": " + se.getMessage());
             se.printStackTrace();
             throw se;
         }

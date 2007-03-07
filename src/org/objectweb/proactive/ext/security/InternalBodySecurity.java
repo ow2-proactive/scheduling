@@ -65,7 +65,7 @@ public class InternalBodySecurity implements SecurityEntity {
     }
 
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return distantBody.startNewSession(policy);
     }
@@ -76,14 +76,14 @@ public class InternalBodySecurity implements SecurityEntity {
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return distantBody.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         return distantBody.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
@@ -92,7 +92,7 @@ public class InternalBodySecurity implements SecurityEntity {
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return distantBody.secretKeyExchange(sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,

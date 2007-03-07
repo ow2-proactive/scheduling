@@ -64,9 +64,9 @@ import net.jini.lookup.entry.Name;
  *   to anothe remote objects library.
  *          @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
-    implements java.io.Serializable, net.jini.discovery.DiscoveryListener,
-        net.jini.lease.LeaseListener, RmiProActiveRuntime {
+public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.Serializable,
+    net.jini.discovery.DiscoveryListener, net.jini.lease.LeaseListener,
+    RmiProActiveRuntime {
     //    protected transient ProActiveRuntimeImpl proActiveRuntime;
     //    protected String proActiveRuntimeURL;
     //ServiceRegistar table used afterwards to register node service
@@ -97,7 +97,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         this.proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
         this.proActiveRuntimeURL = buildRuntimeURL();
         this.jiniRuntimeMap = new java.util.Hashtable<String, Vector<ServiceRegistration>>();
-        jiniRuntimeMap.put(proActiveRuntimeURL, new java.util.Vector<ServiceRegistration>());
+        jiniRuntimeMap.put(proActiveRuntimeURL,
+            new java.util.Vector<ServiceRegistration>());
         this.jiniNodeMap = new java.util.Hashtable<String, Vector<ServiceRegistration>>();
         this.jiniVirtualNodeMap = new java.util.Hashtable<String, Vector<ServiceRegistration>>();
         this.registrarsTable = new java.util.Vector<ServiceRegistrar>();
@@ -161,7 +162,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     }
 
     public void killAllNodes() throws RemoteException, ProActiveException {
-        for (java.util.Enumeration<String> e = jiniNodeMap.keys(); e.hasMoreElements();) {
+        for (java.util.Enumeration<String> e = jiniNodeMap.keys();
+                e.hasMoreElements();) {
             String nodeURL = e.nextElement();
             killNode(nodeURL);
         }
@@ -326,7 +328,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     //This method is very useful when the JiniRuntime receives event about a new Lookup service
     //that was discovered.In such case, the runtime registers all nodes and virtualnodes previously registered
     //as Jini service with the registrar given as parameter and the corresponding hashtable
-    private void registerServiceAfterDiscovery(Hashtable<String, Vector<ServiceRegistration>> jiniObjectTable,
+    private void registerServiceAfterDiscovery(
+        Hashtable<String, Vector<ServiceRegistration>> jiniObjectTable,
         ServiceRegistrar registrar) {
         ServiceRegistration reg = null;
         ServiceID serviceID = null;
@@ -415,7 +418,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         return serviceRegistrationTable;
     }
 
-    private void unregisterService(String objectUrl, Hashtable<String, Vector<ServiceRegistration>> jiniObjectTable)
+    private void unregisterService(String objectUrl,
+        Hashtable<String, Vector<ServiceRegistration>> jiniObjectTable)
         throws java.rmi.RemoteException {
         if (!jiniObjectTable.isEmpty()) {
             synchronized (jiniObjectTable) {

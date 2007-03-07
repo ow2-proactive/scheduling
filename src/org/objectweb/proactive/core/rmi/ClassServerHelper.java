@@ -84,11 +84,10 @@ public class ClassServerHelper {
 
     public synchronized String initializeClassServer()
         throws java.io.IOException {
+        if (ProActiveConfiguration.osgiServletEnabled()) {
+            return this.getCodebase();
+        }
 
-    	if (ProActiveConfiguration.osgiServletEnabled()) {
-    		return this.getCodebase();
-    	}
-    	
         if (!shouldCreateClassServer) {
             return null; // don't bother
         }
@@ -120,7 +119,7 @@ public class ClassServerHelper {
             codebase = "http://" + currentClassServer.getHostname() + ":" +
                 ClassServer.getServerSocketPort() + "/";
         }
-        
+
         return codebase;
     }
 }

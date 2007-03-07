@@ -88,7 +88,8 @@ public class StreamReader implements XMLReader {
                     ? new SAXParserErrorHandler() : errorHandler);
 
                 if (schemas != null) {
-                    parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource",schemas);
+                    parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource",
+                        schemas);
 
                     ///    File f = new FileInputStream( ProActive.class.getResourceAsStream("/DescriptorSchema.xsd"));
                 }
@@ -110,8 +111,8 @@ public class StreamReader implements XMLReader {
 
     // -- implements XMLReader ------------------------------------------------------
     public void read() throws SAXException, IOException {
-            //parser.setFeature("http://xml.org/sax/features/validation",true);
-            //parser.setFeature("http://apache.org/xml/features/validation/schema",true);
-            parser.parse(inputSource);
+        //parser.setFeature("http://xml.org/sax/features/validation",true);
+        //parser.setFeature("http://apache.org/xml/features/validation/schema",true);
+        parser.parse(inputSource);
     }
 }

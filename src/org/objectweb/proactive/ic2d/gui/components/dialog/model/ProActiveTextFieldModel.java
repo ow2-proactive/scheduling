@@ -77,7 +77,8 @@ public class ProActiveTextFieldModel extends TextFieldModel {
             case COMPOSING_VIRTUAL_NODES:
                 ((ProActiveComponent) model).setCurrentlyEditedComposingVirtualNodesNames(s);
                 break;
-            default:}
+            default:
+            }
         } finally {
             isTyping = false;
         }
@@ -102,7 +103,8 @@ public class ProActiveTextFieldModel extends TextFieldModel {
             case COMPOSING_VIRTUAL_NODES:
                 s = ((ProActiveComponent) model).getCurrentlyEditedComposingVirtualNodesNames();
                 break;
-            default:}
+            default:
+            }
         }
         componentTextChanged(s);
     }

@@ -30,32 +30,31 @@
  */
 package org.objectweb.proactive.calcium;
 
+
 /**
- * Example of a Managager that uses the calling thread (recursive) 
+ * Example of a Managager that uses the calling thread (recursive)
  * to execute the skeleton program.
- * 
+ *
  * @author mleyton
  *
  * @param <T>
  */
-public class MonoThreadedManager extends ResourceManager{
-			
-	public MonoThreadedManager(){
-	}
+public class MonoThreadedManager extends ResourceManager {
+    public MonoThreadedManager() {
+    }
 
-	public  Skernel boot(Skernel skernel){
-		Interpreter interp=new Interpreter();
+    public Skernel boot(Skernel skernel) {
+        Interpreter interp = new Interpreter();
 
-		while(skernel.hasReadyTask()){
-			Task<?> task=skernel.getReadyTask(0); //get a new task ready for execution
-			task=interp.interpret(task); 		 //interpreter this new task
-			skernel.putProcessedTask(task);				 //return the interpreter result to the kernel
-		}
-		
-		return skernel;
-	}
-	
-	public void shutdown(){
-		
-	}
+        while (skernel.hasReadyTask()) {
+            Task<?> task = skernel.getReadyTask(0); //get a new task ready for execution
+            task = interp.interpret(task); //interpreter this new task
+            skernel.putProcessedTask(task); //return the interpreter result to the kernel
+        }
+
+        return skernel;
+    }
+
+    public void shutdown() {
+    }
 }

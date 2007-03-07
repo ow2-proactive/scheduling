@@ -237,8 +237,9 @@ public interface VirtualNode extends java.io.Serializable, Job {
      *
      * @return An array of FileWrapper (Futures) with the retrieved files.
      */
-    public FileVector fileTransferRetrieve() throws ProActiveException, IOException;
-    
+    public FileVector fileTransferRetrieve()
+        throws ProActiveException, IOException;
+
     /**
      *
      * @return mpi process attached with the virtual node - null otherwise.
@@ -250,7 +251,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return true if it exists an MPI process with this VN - false otherwise.
      */
     public boolean hasMPIProcess();
-    
+
     /**
      * Set Filetransfer API parameters to use when Deploying and Retrieving files.
      * @param fileBlockSize The file will be splitted into blocks and transfered. This paramter

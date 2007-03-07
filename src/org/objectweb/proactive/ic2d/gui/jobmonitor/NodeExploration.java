@@ -242,9 +242,9 @@ public class NodeExploration implements JobMonitorConstants {
                 }
             }
         } catch (Exception e) {
-            	skippedObjects.addElement(jvmObject);
-                log(e);
-            
+            skippedObjects.addElement(jvmObject);
+            log(e);
+
             return;
         }
 
@@ -255,8 +255,7 @@ public class NodeExploration implements JobMonitorConstants {
             List<ProActiveRuntime> known = getKnownRuntimes(pr);
             Iterator<ProActiveRuntime> iter = known.iterator();
             while (iter.hasNext())
-                handleProActiveRuntime(iter.next(), depth +
-                    1);
+                handleProActiveRuntime(iter.next(), depth + 1);
         }
     }
 
@@ -320,11 +319,11 @@ public class NodeExploration implements JobMonitorConstants {
             asso.addChild(jvmObject, nodeObject);
             asso.addChild(jobObject, nodeObject);
         } catch (Exception e) {
-        	if(! skippedObjects.contains(jvmObject)){
-        		log(e);
-        		skippedObjects.addElement(jvmObject);
-        	}
-            
+            if (!skippedObjects.contains(jvmObject)) {
+                log(e);
+                skippedObjects.addElement(jvmObject);
+            }
+
             return;
         }
     }
@@ -334,7 +333,7 @@ public class NodeExploration implements JobMonitorConstants {
         for (int i = 0, size = activeObjects.size(); i < size; ++i) {
             ArrayList aoWrapper = (ArrayList) activeObjects.get(i);
             UniversalBody rba = (UniversalBody) aoWrapper.get(0);
-            
+
             String className = (String) aoWrapper.get(1);
             if (className.equalsIgnoreCase(
                         "org.objectweb.proactive.ic2d.spy.Spy")) {

@@ -30,8 +30,15 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
@@ -55,16 +62,6 @@ import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.examples.c3d.prim.View;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.Serializable;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import java.util.Date;
-import java.util.Vector;
 
 
 /**
@@ -296,7 +293,6 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                                                                      // intervalToRecompute is the next not-yet-returned interval
                                                                      //assert !received[stillComputing] : "Oups, recomputing one already received! " + stillComputing;
                                                                      // assign to newly freed engine an interval not yet received
-
             Interval redrawInterval = intervalsToDraw[intervalToRecompute];
             images.add(engine[engineFree].render(engineFree, redrawInterval));
             log("Interval " + redrawInterval.number +
@@ -409,7 +405,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         try {
             ProActive.register(ProActive.getStubOnThis(),
-                "//" + InetAddress.getLocalHost().getHostName() + "/" + "Dispatcher");
+                "//" + InetAddress.getLocalHost().getHostName() + "/" +
+                "Dispatcher");
         } catch (IOException ioe) {
             logger.error("Coudn't register the Dispatcher! " +
                 ioe.getMessage());
@@ -505,6 +502,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             /* Creates the intervals, starts the calculation */
             render();
         } else {
+
             /* Initializes the image of the new-coming consumer */
             Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0,
                     IMAGE_HEIGHT);
@@ -529,7 +527,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         }
 
         // return user_id
-        return this.lastUserID++ ;
+        return this.lastUserID++;
     }
 
     public void registerMigratedUser(int userNumber) {
@@ -571,18 +569,14 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         switch (nbUsers) {
         case 0:
             this.lastUserID = 0;
-
             break;
-
         case 1:
             this.election.terminate();
             this.election = null; // when only one user in simulation, election should not be used, 
 
             break;
-
         default:
             this.election.setNbUsers(nbUsers);
-
             break;
         }
     }
@@ -889,12 +883,11 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                                                  .getNode();
 
         try {
-            ProActive.newActive(C3DDispatcher.class.getName(),
-                param, dispatcherNode);
+            ProActive.newActive(C3DDispatcher.class.getName(), param,
+                dispatcherNode);
         } catch (Exception e) {
             logger.error("Problemn with C3DDispatcher Active Object creation:");
             e.printStackTrace();
         }
-
     }
 }

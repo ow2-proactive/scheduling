@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import org.apache.log4j.Logger;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
@@ -44,12 +48,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.*;
 import org.objectweb.proactive.mpi.*;
-
-import java.io.*;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
 
 
 public class ProActiveMPIManager implements Serializable {

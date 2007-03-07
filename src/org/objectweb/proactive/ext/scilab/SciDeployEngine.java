@@ -44,131 +44,137 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
- * SciDeployEngine contains all methods to deploy Scilab Engines from 
+ * SciDeployEngine contains all methods to deploy Scilab Engines from
  * a deployment descriptor
  * @author amangin
  *
  */
 public class SciDeployEngine {
-	private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_DEPLOY);
-	private static HashMap<String, Node> mapNode = new HashMap<String, Node>(); // List of deployed VNs 
-	
-	/**
-	 * @param pathDescriptor
-	 * @return list of virtual node contained in the deployment descriptor
-	 */
-	public static String[] getListVirtualNode(String pathDescriptor){
-		logger.debug("->SciDeployEngine In:getListVirtualNode:" + pathDescriptor);
-		
-		ProActiveDescriptor desc;
-		VirtualNode arrayVn[];
-		String arrayNameVn[] = null;
-		try {
-			desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
-			arrayVn = desc.getVirtualNodes();
-			arrayNameVn = new String[arrayVn.length];
-			
-			for(int i=0; i<arrayVn.length; i++){
-				arrayNameVn[i] = arrayVn[i].getName();
-			}
-	
-		} catch (ProActiveException e) {
-			e.printStackTrace();
-		}
-		
-		return arrayNameVn;	
-	}
-	
-	public static synchronized int getNbMappedNodes(String nameVirtualNode, String pathDescriptor){
-		ProActiveDescriptor desc;
-		VirtualNode vn;
-		try {
-			desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
-			vn = desc.getVirtualNode(nameVirtualNode);
-			return vn.getNbMappedNodes();
-		}catch (ProActiveException e) {
-			e.printStackTrace();
-		}
-		return -1;
-	}
-	
-	/**
-	 * @param nameVirtualNode 
-	 * @param pathDescriptor
-	 * @param arrayIdEngine
-	 * @return HashMap of deployed Scilab Engines
-	 */
-	public synchronized static HashMap<String, SciEngine> deploy(String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine){
-		logger.debug("->SciDeployEngine In:deploy:" + pathDescriptor);
-		ProActiveDescriptor desc;
-		VirtualNode vn;
-		Node nodes[];
-		SciEngine sciEngine;
-		HashMap<String, SciEngine> mapEngine = new HashMap<String, SciEngine>();
-		
-		try {
-			desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
-			vn = desc.getVirtualNode(nameVirtualNode);
-			vn.activate();
-			nodes = vn.getNodes();
-			
-			int length = (nodes.length >arrayIdEngine.length)? arrayIdEngine.length:nodes.length;
-			
-			for(int i=0; i<length; i++){
-				sciEngine = deploy(arrayIdEngine[i], nodes[i]);
-				mapEngine.put(arrayIdEngine[i], sciEngine);
-			}
-		} catch (ProActiveException e) {
-			e.printStackTrace();
-		}
-		return mapEngine;
-	}
-	
-	/**
-	 * 
-	 * @param idEngine
-	 * @param currentNode
-	 * @return a Scilab Engine deployed on the current node
-	 * @throws ActiveObjectCreationException
-	 * @throws NodeException
-	 */
-	private synchronized static SciEngine deploy(String idEngine, Node currentNode) throws ActiveObjectCreationException, NodeException {
-		Object param[] = new Object[]{idEngine};
-		SciEngine sciEngine  = (SciEngine) ProActive.newActive(SciEngine.class.getName(), param, currentNode);
-		mapNode.put(idEngine, currentNode);
-		try{
-			ProActive.setImmediateService(sciEngine, "killWorker");
-			ProActive.setImmediateService(sciEngine, "exit");
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return sciEngine;
-	}
-	
-	
-	/**
-	 * 
-	 * @param idEngine
-	 * @return a local Scilab Engine
-	 * @throws ActiveObjectCreationException
-	 * @throws NodeException
-	 */
-	
-	public static SciEngine deploy(String idEngine) throws ActiveObjectCreationException, NodeException {
-		logger.debug("->SciDeployEngine In:deploy");
-		Object param[] = new Object[]{idEngine};
-		SciEngine sciEngine  =  (SciEngine) ProActive.newActive(SciEngine.class.getName(), param);
-		try{
-			ProActive.setImmediateService(sciEngine, "killWorker");
-			ProActive.setImmediateService(sciEngine, "exit");
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		return sciEngine;
-	}
-	
-	public static Node getEngineNode(String idEngine){
-		return mapNode.get(idEngine);
-	}
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_DEPLOY);
+    private static HashMap<String, Node> mapNode = new HashMap<String, Node>(); // List of deployed VNs 
+
+    /**
+     * @param pathDescriptor
+     * @return list of virtual node contained in the deployment descriptor
+     */
+    public static String[] getListVirtualNode(String pathDescriptor) {
+        logger.debug("->SciDeployEngine In:getListVirtualNode:" +
+            pathDescriptor);
+
+        ProActiveDescriptor desc;
+        VirtualNode[] arrayVn;
+        String[] arrayNameVn = null;
+        try {
+            desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
+            arrayVn = desc.getVirtualNodes();
+            arrayNameVn = new String[arrayVn.length];
+
+            for (int i = 0; i < arrayVn.length; i++) {
+                arrayNameVn[i] = arrayVn[i].getName();
+            }
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+
+        return arrayNameVn;
+    }
+
+    public static synchronized int getNbMappedNodes(String nameVirtualNode,
+        String pathDescriptor) {
+        ProActiveDescriptor desc;
+        VirtualNode vn;
+        try {
+            desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
+            vn = desc.getVirtualNode(nameVirtualNode);
+            return vn.getNbMappedNodes();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    /**
+     * @param nameVirtualNode
+     * @param pathDescriptor
+     * @param arrayIdEngine
+     * @return HashMap of deployed Scilab Engines
+     */
+    public synchronized static HashMap<String, SciEngine> deploy(
+        String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine) {
+        logger.debug("->SciDeployEngine In:deploy:" + pathDescriptor);
+        ProActiveDescriptor desc;
+        VirtualNode vn;
+        Node[] nodes;
+        SciEngine sciEngine;
+        HashMap<String, SciEngine> mapEngine = new HashMap<String, SciEngine>();
+
+        try {
+            desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
+            vn = desc.getVirtualNode(nameVirtualNode);
+            vn.activate();
+            nodes = vn.getNodes();
+
+            int length = (nodes.length > arrayIdEngine.length)
+                ? arrayIdEngine.length : nodes.length;
+
+            for (int i = 0; i < length; i++) {
+                sciEngine = deploy(arrayIdEngine[i], nodes[i]);
+                mapEngine.put(arrayIdEngine[i], sciEngine);
+            }
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+        return mapEngine;
+    }
+
+    /**
+     *
+     * @param idEngine
+     * @param currentNode
+     * @return a Scilab Engine deployed on the current node
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    private synchronized static SciEngine deploy(String idEngine,
+        Node currentNode) throws ActiveObjectCreationException, NodeException {
+        Object[] param = new Object[] { idEngine };
+        SciEngine sciEngine = (SciEngine) ProActive.newActive(SciEngine.class.getName(),
+                param, currentNode);
+        mapNode.put(idEngine, currentNode);
+        try {
+            ProActive.setImmediateService(sciEngine, "killWorker");
+            ProActive.setImmediateService(sciEngine, "exit");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sciEngine;
+    }
+
+    /**
+     *
+     * @param idEngine
+     * @return a local Scilab Engine
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static SciEngine deploy(String idEngine)
+        throws ActiveObjectCreationException, NodeException {
+        logger.debug("->SciDeployEngine In:deploy");
+        Object[] param = new Object[] { idEngine };
+        SciEngine sciEngine = (SciEngine) ProActive.newActive(SciEngine.class.getName(),
+                param);
+        try {
+            ProActive.setImmediateService(sciEngine, "killWorker");
+            ProActive.setImmediateService(sciEngine, "exit");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sciEngine;
+    }
+
+    public static Node getEngineNode(String idEngine) {
+        return mapNode.get(idEngine);
+    }
 }

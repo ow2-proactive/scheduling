@@ -36,20 +36,18 @@ import java.util.Vector;
 /**
  * This class provides Farm parallelism (also known as Master/Slave).
  * A task will execute the child skeleton.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */
-public class Farm<P,R> implements Skeleton<P,R>{
+public class Farm<P, R> implements Skeleton<P, R> {
+    Skeleton<P, R> child;
 
-	Skeleton<P,R> child;
-	
-	public Farm(Skeleton<P,R> child){
-		this.child =child;
-	}
+    public Farm(Skeleton<P, R> child) {
+        this.child = child;
+    }
 
-	public Vector<Instruction<?,?>> getInstructionStack() {
-		
-		return child.getInstructionStack();
-	}
+    public Vector<Instruction<?, ?>> getInstructionStack() {
+        return child.getInstructionStack();
+    }
 }

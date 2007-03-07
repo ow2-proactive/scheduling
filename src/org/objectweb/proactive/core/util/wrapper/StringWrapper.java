@@ -78,14 +78,14 @@ public class StringWrapper implements Serializable {
         return this.value;
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		return ((obj instanceof StringWrapper)
-				&& ((StringWrapper)obj).stringValue().equals(value));
-	}
+    @Override
+    public boolean equals(Object obj) {
+        return ((obj instanceof StringWrapper) &&
+        ((StringWrapper) obj).stringValue().equals(value));
+    }
 
-	@Override
-	public int hashCode() {
-		return value.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
 }

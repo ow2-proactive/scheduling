@@ -33,35 +33,33 @@ package org.objectweb.proactive.benchmarks.timit.util;
 import java.io.Serializable;
 
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
-import org.objectweb.proactive.benchmarks.timit.util.observing.RealEventObservable;
-import org.objectweb.proactive.benchmarks.timit.util.observing.FakeEventObservable;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObservable;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
+import org.objectweb.proactive.benchmarks.timit.util.observing.FakeEventObservable;
+import org.objectweb.proactive.benchmarks.timit.util.observing.RealEventObservable;
+
 
 /**
  * All timed objects (like workers) must extends this class. It provide some
  * useful methods to reduce timers between workers and generate statistics.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class Timed implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5295024562082646228L;
-
     private HierarchicalTimer timer;
-    
     private EventObservable delegatedObservable;
-
     private TimItReductor timitReductor;
 
     /**
      * Singleton pattern
      */
     public Timed() {
-        if ( true ) { // Here we can switch to a fake observable
+        if (true) { // Here we can switch to a fake observable
             this.delegatedObservable = new RealEventObservable();
         } else {
             this.delegatedObservable = new FakeEventObservable();
@@ -85,14 +83,13 @@ public class Timed implements Serializable {
 
     /**
      * Activate only some TimerCounters and EventObservers
-     * 
+     *
      * @param counters
      *            counters to activate
      * @param events
      *            event to activate
      */
     public void activate(TimerCounter[] counters, EventObserver[] events) {
-
         if (counters != null) {
             this.timer = new HierarchicalTimer();
             this.timer.activateCounters(counters, this.timitReductor);
@@ -115,15 +112,15 @@ public class Timed implements Serializable {
     /**
      * Active only some counters. Debug version used to detect misplaced
      * start/stop/reset. For real test, use activateCounters()
-     * 
+     *
      * @param counters
      *            the array of counters you want to use
      * @param events
      *            the array of events you want to use
      */
     public void activateDebug(TimerCounter[] counters, EventObserver[] events) {
-        System.out.println("\n\n\t !! BE CARREFUL : "
-                + "Counters are activated with debug mode (slower) !! \n\n");
+        System.out.println("\n\n\t !! BE CARREFUL : " +
+            "Counters are activated with debug mode (slower) !! \n\n");
 
         if (counters != null) {
             this.timer = new SecuredHierarchicalTimer();
@@ -135,8 +132,8 @@ public class Timed implements Serializable {
             }
         }
     }
-    
-    public EventObservable getEventObservable(){
+
+    public EventObservable getEventObservable() {
         return this.delegatedObservable;
     }
 
@@ -157,14 +154,16 @@ public class Timed implements Serializable {
 
     /**
      * This method performs the EventData and the Timer reduction.
-     * 
+     *
      * @param rank
      *            an identification number for this timed object
      * @param information
      *            this message will be transmitted into results files
      */
     public void finalizeTimed(int rank, String information) {
-        if( this.timitReductor == null ) return;
+        if (this.timitReductor == null) {
+            return;
+        }
         EventDataBag eventDataBag = this.delegatedObservable.getEventDataBag(rank);
         this.timitReductor.receiveAll(eventDataBag, this.timer, information);
     }

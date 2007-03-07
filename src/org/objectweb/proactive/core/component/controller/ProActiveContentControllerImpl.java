@@ -79,25 +79,25 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         super(owner);
         fcSubComponents = new ArrayList<Component>();
     }
-    
-        protected void setControllerItfType() {
-            try {
-                setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
-                        ProActiveContentController.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE));
-            } catch (InstantiationException e) {
-                throw new ProActiveRuntimeException("cannot create controller " +
-                    this.getClass().getName());
-            }
-	}
 
+    protected void setControllerItfType() {
+        try {
+            setItfType(ProActiveTypeFactoryImpl.instance()
+                                               .createFcItfType(Constants.CONTENT_CONTROLLER,
+                    ProActiveContentController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
+        } catch (InstantiationException e) {
+            throw new ProActiveRuntimeException("cannot create controller " +
+                this.getClass().getName());
+        }
+    }
 
-
-	/*
-     * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()
-     *
-     * in this implementation, the external interfaces are also internal interfaces
-     */
+    /*
+    * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()
+    *
+    * in this implementation, the external interfaces are also internal interfaces
+    */
     public Object[] getFcInternalInterfaces() {
         logger.error(
             "Internal interfaces are only accessible from the stub, i.e. from outside of this component");
@@ -145,33 +145,34 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
     public void addFcSubComponent(Component subComponent)
         throws IllegalLifeCycleException, IllegalContentException {
         checkLifeCycleIsStopped();
-            // no sharing in the current implementation of Fractal
-            // => only one parent for a given component
-            // FIXME control requests are enqueued
-            // pb is that the subComponent might not be stopped
-            try {
-                // could not do this invocation on a group (non reifiable return type)
-            	if (ProActiveGroup.isGroup(subComponent)) {
-            		try {
-						addFcSubComponent(ProActiveGroup.getGroup(subComponent));
-					} catch (ContentControllerExceptionListException e) {
-						e.printStackTrace();
-						throw new IllegalContentException("problem adding a list of component to a composite : " + e.getMessage());
-					}
-            		return;
-            	}
-                if (Fractal.getSuperController(subComponent)
-                               .getFcSuperComponents().length != 0) {
+        // no sharing in the current implementation of Fractal
+        // => only one parent for a given component
+        // FIXME control requests are enqueued
+        // pb is that the subComponent might not be stopped
+        try {
+            // could not do this invocation on a group (non reifiable return type)
+            if (ProActiveGroup.isGroup(subComponent)) {
+                try {
+                    addFcSubComponent(ProActiveGroup.getGroup(subComponent));
+                } catch (ContentControllerExceptionListException e) {
+                    e.printStackTrace();
                     throw new IllegalContentException(
-                        "This implementation of the Fractal model does not currently allow sharing : " +
-                        Fractal.getNameController(subComponent).getFcName() +
-                        " has no super controller");
+                        "problem adding a list of component to a composite : " +
+                        e.getMessage());
                 }
-            } catch (NoSuchInterfaceException e) {
-                logger.error(
-                    "could not check that the subcomponent is not shared, continuing ignoring this verification ... " +
-                    e);
+                return;
             }
+            if (Fractal.getSuperController(subComponent).getFcSuperComponents().length != 0) {
+                throw new IllegalContentException(
+                    "This implementation of the Fractal model does not currently allow sharing : " +
+                    Fractal.getNameController(subComponent).getFcName() +
+                    " has no super controller");
+            }
+        } catch (NoSuchInterfaceException e) {
+            logger.error(
+                "could not check that the subcomponent is not shared, continuing ignoring this verification ... " +
+                e);
+        }
 
         ProActiveComponent this_component = ((ProActiveComponent) getFcItfOwner());
         Component ref_on_this_component = this_component.getRepresentativeOnThis();
@@ -275,99 +276,96 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         }
         return allSubComponents;
     }
-    
+
     // TODO factorize code
-	public void addFcSubComponent(List<Component> subComponents) throws ContentControllerExceptionListException {
-		lifeCycleExceptions.clear();
-		contentExceptions.clear();
-		
-		ExecutorService threadPool = Executors.newCachedThreadPool();
-		ContentControllerExceptionListException e = new ContentControllerExceptionListException();
-		for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {
-			Component element = iter.next();
-			AddSubComponentTask task = new AddSubComponentTask(e, this, element);
-			threadPool.execute(task);
-		}
-		threadPool.shutdown();
-		if (!e.isEmpty()) {
-			throw e;
-		}
-	}
-	
-	public void removeFcSubComponent(List<Component> subComponents) throws ContentControllerExceptionListException {
-		lifeCycleExceptions.clear();
-		contentExceptions.clear();
-		
-		ExecutorService threadPool = Executors.newCachedThreadPool();
-		ContentControllerExceptionListException e = new ContentControllerExceptionListException();
-		for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {
-			Component element = iter.next();
-			RemoveSubComponentTask task = new RemoveSubComponentTask(e, this, element);
-			threadPool.execute(task);
-		}
-		threadPool.shutdown();
-		if (!e.isEmpty()) {
-			throw e;
-		}
-		
-	}
-	
-	
-	private static class AddSubComponentTask implements Runnable {
-		
-		ContentControllerExceptionListException exceptions;
-		ProActiveContentControllerImpl controller;
-		Component component;
-		
-		
-		public AddSubComponentTask(ContentControllerExceptionListException exceptions, ProActiveContentControllerImpl controller, Component component) {
-			this.exceptions = exceptions;
-			this.controller = controller;
-			this.component = component;
-		}
-		
-		public void run() {
-			try {
-				controller.addFcSubComponent(component);
-			} catch (IllegalContentException e) {
-				e.printStackTrace();
-				exceptions.addIllegalContentException(component, e);
-			} catch (IllegalLifeCycleException e) {
-				e.printStackTrace();
-				exceptions.addIllegalLifeCycleException(component, e);
-			}
-		}
-		
-		
-	}
-	
-	
-private static class RemoveSubComponentTask implements Runnable {
-		
-		ContentControllerExceptionListException exceptions;
-		ProActiveContentControllerImpl controller;
-		Component component;
-		
-		public RemoveSubComponentTask(ContentControllerExceptionListException exceptions, ProActiveContentControllerImpl controller, Component component) {
-			this.exceptions = exceptions;
-			this.controller = controller;
-			this.component = component;
-		}
-		
-		public void run() {
-			try {
-				controller.removeFcSubComponent(component);
-			} catch (IllegalContentException e) {
-				e.printStackTrace();
-				exceptions.addIllegalContentException(component, e);
-			} catch (IllegalLifeCycleException e) {
-				e.printStackTrace();
-				exceptions.addIllegalLifeCycleException(component, e);
-			}
-		}
-		
-		
-	}
-    
-    
+    public void addFcSubComponent(List<Component> subComponents)
+        throws ContentControllerExceptionListException {
+        lifeCycleExceptions.clear();
+        contentExceptions.clear();
+
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        ContentControllerExceptionListException e = new ContentControllerExceptionListException();
+        for (Iterator<Component> iter = subComponents.iterator();
+                iter.hasNext();) {
+            Component element = iter.next();
+            AddSubComponentTask task = new AddSubComponentTask(e, this, element);
+            threadPool.execute(task);
+        }
+        threadPool.shutdown();
+        if (!e.isEmpty()) {
+            throw e;
+        }
+    }
+
+    public void removeFcSubComponent(List<Component> subComponents)
+        throws ContentControllerExceptionListException {
+        lifeCycleExceptions.clear();
+        contentExceptions.clear();
+
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        ContentControllerExceptionListException e = new ContentControllerExceptionListException();
+        for (Iterator<Component> iter = subComponents.iterator();
+                iter.hasNext();) {
+            Component element = iter.next();
+            RemoveSubComponentTask task = new RemoveSubComponentTask(e, this,
+                    element);
+            threadPool.execute(task);
+        }
+        threadPool.shutdown();
+        if (!e.isEmpty()) {
+            throw e;
+        }
+    }
+
+    private static class AddSubComponentTask implements Runnable {
+        ContentControllerExceptionListException exceptions;
+        ProActiveContentControllerImpl controller;
+        Component component;
+
+        public AddSubComponentTask(
+            ContentControllerExceptionListException exceptions,
+            ProActiveContentControllerImpl controller, Component component) {
+            this.exceptions = exceptions;
+            this.controller = controller;
+            this.component = component;
+        }
+
+        public void run() {
+            try {
+                controller.addFcSubComponent(component);
+            } catch (IllegalContentException e) {
+                e.printStackTrace();
+                exceptions.addIllegalContentException(component, e);
+            } catch (IllegalLifeCycleException e) {
+                e.printStackTrace();
+                exceptions.addIllegalLifeCycleException(component, e);
+            }
+        }
+    }
+
+    private static class RemoveSubComponentTask implements Runnable {
+        ContentControllerExceptionListException exceptions;
+        ProActiveContentControllerImpl controller;
+        Component component;
+
+        public RemoveSubComponentTask(
+            ContentControllerExceptionListException exceptions,
+            ProActiveContentControllerImpl controller, Component component) {
+            this.exceptions = exceptions;
+            this.controller = controller;
+            this.component = component;
+        }
+
+        public void run() {
+            try {
+                controller.removeFcSubComponent(component);
+            } catch (IllegalContentException e) {
+                e.printStackTrace();
+                exceptions.addIllegalContentException(component, e);
+            } catch (IllegalLifeCycleException e) {
+                e.printStackTrace();
+                exceptions.addIllegalLifeCycleException(component, e);
+            }
+        }
+    }
 }

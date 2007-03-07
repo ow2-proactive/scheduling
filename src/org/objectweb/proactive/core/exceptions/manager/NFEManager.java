@@ -93,7 +93,6 @@ public class NFEManager {
         try {
             throw nfe;
         } catch (BodyNonFunctionalException bnfe) {
-
             /* Avoid killing an AO */
             logger.warn("NFE in a Body", nfe);
 

@@ -80,7 +80,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroup(String className, Object[][] params,
         String nodeName)
-        throws ClassNotFoundException, ClassNotReifiableException, 
+        throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
@@ -100,7 +100,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroup(String className, Object[][] params,
         String[] nodeListString)
-        throws ClassNotFoundException, ClassNotReifiableException, 
+        throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
@@ -121,7 +121,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroup(String className, Object[][] params,
         Node node)
-        throws ClassNotFoundException, ClassNotReifiableException, 
+        throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
@@ -142,7 +142,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroup(String className, Object[][] params,
         Node[] nodeList)
-        throws ClassNotFoundException, ClassNotReifiableException, 
+        throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         Object result = ProActiveGroup.newGroup(className);
         Group g = ProActiveGroup.getGroup(result);
@@ -171,7 +171,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroup(String className, Object[][] params,
         VirtualNode virtualNode)
-        throws ClassNotFoundException, ClassNotReifiableException, 
+        throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProSPMD.newSPMDGroup(className, params, virtualNode.getNodes());
     }
@@ -192,8 +192,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroupInParallel(String className,
         Object[][] params, String nodeName)
-        throws ClassNotFoundException, ClassNotReifiableException, 
-            NodeException {
+        throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
         return ProSPMD.newSPMDGroupInParallel(className, params, nodeList);
@@ -211,8 +210,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroupInParallel(String className,
         Object[][] params, String[] nodeListString)
-        throws ClassNotFoundException, ClassNotReifiableException, 
-            NodeException {
+        throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
@@ -249,8 +247,7 @@ public class ProSPMD {
      */
     public static Object newSPMDGroupInParallel(String className,
         Object[][] params, VirtualNode virtualNode)
-        throws ClassNotFoundException, ClassNotReifiableException, 
-            NodeException {
+        throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         return ProSPMD.newSPMDGroupInParallel(className, params,
             virtualNode.getNodes());
     }
@@ -312,7 +309,8 @@ public class ProSPMD {
      * @return the index of the object
      */
     public static int getMyRank() {
-        return ProActiveGroup.getGroup(ProSPMD.getSPMDGroup()).indexOf(ProActive.getStubOnThis());
+        return ProActiveGroup.getGroup(ProSPMD.getSPMDGroup())
+                             .indexOf(ProActive.getStubOnThis());
     }
 
     /**
@@ -335,8 +333,8 @@ public class ProSPMD {
             AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();
             body.getProActiveSPMDGroupManager().addToBarrierTags(barrierName);
             // set the number of awaited message barriers
-            body.getProActiveSPMDGroupManager().setAwaitedBarrierCalls(barrierName,
-                ProActiveGroup.size(group));
+            body.getProActiveSPMDGroupManager()
+                .setAwaitedBarrierCalls(barrierName, ProActiveGroup.size(group));
             // send the barrier messages
             ProxyForGroup proxy = (ProxyForGroup) ProActiveGroup.getGroup(group);
             proxy.reify(new MethodCallBarrier(barrierName));
@@ -353,8 +351,8 @@ public class ProSPMD {
      */
     public static void barrier(String[] methodNames) {
         try {
-            (ProActive.getStubOnThis()).getProxy().reify(new MethodCallBarrierWithMethodName(
-                    methodNames));
+            (ProActive.getStubOnThis()).getProxy()
+             .reify(new MethodCallBarrierWithMethodName(methodNames));
         } catch (InvocationTargetException e) {
             System.err.println(
                 "Unable to invoke a method call to control groups");

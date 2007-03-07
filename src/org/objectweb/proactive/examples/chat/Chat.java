@@ -145,7 +145,8 @@ public class Chat implements java.io.Serializable, RunActive {
             this.writeUsersInTheList();
             this.diffusionGroup.addIntoDiffusionGroup((Chat) ProActive.getStubOnThis(),
                 this.name); // 3
-            ProActiveGroup.getGroup(this.diffusionGroup).add((Chat) ProActive.getStubOnThis()); //4
+            ProActiveGroup.getGroup(this.diffusionGroup)
+                          .add((Chat) ProActive.getStubOnThis()); //4
             this.frame.list.append(this.name + "\n");
             this.writeMessage(new Message(" *** " + this.name +
                     " has joined the place"));
@@ -178,7 +179,8 @@ public class Chat implements java.io.Serializable, RunActive {
         this.writeMessage(new Message(" *** " + this.name + " has left"));
         this.diffusionGroup.removeUserFromTheList(this.name);
         this.diffusionGroup.removeFromDiffusionGroup((Chat) ProActive.getStubOnThis());
-        ProActiveGroup.getGroup(this.diffusionGroup).remove((Chat) ProActive.getStubOnThis());
+        ProActiveGroup.getGroup(this.diffusionGroup)
+                      .remove((Chat) ProActive.getStubOnThis());
     }
 
     /**
@@ -318,8 +320,8 @@ public class Chat implements java.io.Serializable, RunActive {
      * @param userName - the name to remove
      */
     public void removeUserFromTheList(String userName) {
-        this.frame.list.setText(this.frame.list.getText().replaceAll(userName +
-                "\n", ""));
+        this.frame.list.setText(this.frame.list.getText()
+                                               .replaceAll(userName + "\n", ""));
     }
 
     public static void main(String[] args) {

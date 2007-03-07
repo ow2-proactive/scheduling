@@ -106,7 +106,6 @@ public class FileProcess {
         if (b != null) {
             return b;
         }
-        
 
         //if (info.path != null) {
         //    System.out.println("ClassServer sent class " + info.path +

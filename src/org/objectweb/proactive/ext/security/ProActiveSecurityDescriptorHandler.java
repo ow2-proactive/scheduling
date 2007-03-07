@@ -121,8 +121,7 @@ public class ProActiveSecurityDescriptorHandler
         //            policyServer.setApplicationCertificate(applicationCertificatePath);
         //        } else 
         if (name.equals(RULES_TAG)) {
-            
-            policyRules =   (ArrayList) activeHandler.getResultObject();
+            policyRules = (ArrayList) activeHandler.getResultObject();
             policyServer.setPolicies(policyRules);
         } else if (name.equals(APPLICATION_NAME_TAG)) {
             applicationName = (String) activeHandler.getResultObject();
@@ -474,7 +473,7 @@ public class ProActiveSecurityDescriptorHandler
     public static PolicyServer createPolicyServer(String xmlDescriptorUrl)
         throws InvalidPolicyFile {
         //static method added to replace main method
-    	String uri = null;
+        String uri = null;
         try {
             InitialHandler h = new InitialHandler();
 
@@ -489,7 +488,8 @@ public class ProActiveSecurityDescriptorHandler
         } catch (Exception e) {
             e.printStackTrace();
             ProActiveLogger.getLogger(Loggers.SECURITY)
-                           .warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler at location \""+uri+"\".");
+                           .warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler at location \"" +
+                uri + "\".");
             throw new InvalidPolicyFile(e);
         }
     }
@@ -508,7 +508,8 @@ public class ProActiveSecurityDescriptorHandler
         }
     }
 
-    public static void main(String[] args) throws IOException, org.xml.sax.SAXException {
+    public static void main(String[] args)
+        throws IOException, org.xml.sax.SAXException {
         InitialHandler h = new InitialHandler();
 
         // ProActiveSecurityDescriptorHandler h = new ProActiveSecurityDescriptorHandler();
@@ -517,7 +518,4 @@ public class ProActiveSecurityDescriptorHandler
                     args[0]), h);
         sr.read();
     }
-    
-    
-
 }

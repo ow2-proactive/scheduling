@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
-
 import java.io.IOException;
-
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
 
 
 public class RequestInfo {
@@ -133,8 +132,8 @@ public class RequestInfo {
             int index = requestURI.indexOf(".class");
 
             if (index > 1) {
-                this.classFileName = requestURI.substring(1, index).replace('/',
-                        '.');
+                this.classFileName = requestURI.substring(1, index)
+                                               .replace('/', '.');
             } else {
                 throw new java.io.IOException(
                     "Malformed Request Line, expected a path to a .class file: " +

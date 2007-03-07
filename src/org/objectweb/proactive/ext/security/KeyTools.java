@@ -131,7 +131,8 @@ public class KeyTools {
      * @exception Exception if input parameters are not OK or certificate generation fails
      */
     static public KeyStore createP12(String alias, PrivateKey privKey,
-        X509Certificate cert, Collection<Certificate> cacerts) throws Exception {
+        X509Certificate cert, Collection<Certificate> cacerts)
+        throws Exception {
         Certificate[] chain;
         if (cacerts == null) {
             chain = null;

@@ -56,7 +56,8 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
     private ClassLoader proActiveClassLoader = null;
     RMIClassLoaderSpi rmiClassLoaderSpi = RMIClassLoader.getDefaultProviderInstance();
     private boolean useProActiveClassLoader = ClassLoader.getSystemClassLoader()
-                                                         .toString().startsWith("org.objectweb.proactive.core.classloader.ProActiveClassLoader");
+                                                         .toString()
+                                                         .startsWith("org.objectweb.proactive.core.classloader.ProActiveClassLoader");
 
     public ProActiveRMIClassLoaderSpi() {
         if (useProActiveClassLoader) {

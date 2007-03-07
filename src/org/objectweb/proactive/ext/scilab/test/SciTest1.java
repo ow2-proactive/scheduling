@@ -41,42 +41,39 @@ import org.objectweb.proactive.ext.scilab.SciEngine;
 import org.objectweb.proactive.ext.scilab.SciResult;
 import org.objectweb.proactive.ext.scilab.SciTask;
 
-public class SciTest1 {
 
-	public static void main(String[] args) throws Exception {
-		//initialized dispatcher engine
-				
-        SciData m1 = new SciDoubleMatrix("a",1, 1, new double[]{15});
-        SciData m2 = new SciDoubleMatrix("b",1, 1, new double[]{23});
-        SciData m3 = new SciDoubleMatrix("x",1, 1);
-		
-		SciTask task = new SciTask("id");
-		task.addDataIn(m1);
-		task.addDataIn(m2);
-		task.addDataIn(m3);
-		task.addDataOut(m3);
-		task.setJob("x = a+b;");
-		
-		
-		// local deployment
-		SciEngine engine = SciDeployEngine.deploy("ScilabEngine");
-		BooleanWrapper isActivate = engine.activate();
-		
-		if(isActivate.booleanValue()){
-			System.out.println("->Scilab engine is not activate");
-		}
-		
-		SciResult sciResult = engine.execute(task);
-		ArrayList listResult = sciResult.getList();
-		
-		SciData result;
-		for(int i=0; i<listResult.size(); i++){
-			result = (SciData)listResult.get(i);
-			System.out.println(result);
-		}
-	
-		
-		engine.exit();
-		System.exit(0);
-	}
+public class SciTest1 {
+    public static void main(String[] args) throws Exception {
+        //initialized dispatcher engine
+        SciData m1 = new SciDoubleMatrix("a", 1, 1, new double[] { 15 });
+        SciData m2 = new SciDoubleMatrix("b", 1, 1, new double[] { 23 });
+        SciData m3 = new SciDoubleMatrix("x", 1, 1);
+
+        SciTask task = new SciTask("id");
+        task.addDataIn(m1);
+        task.addDataIn(m2);
+        task.addDataIn(m3);
+        task.addDataOut(m3);
+        task.setJob("x = a+b;");
+
+        // local deployment
+        SciEngine engine = SciDeployEngine.deploy("ScilabEngine");
+        BooleanWrapper isActivate = engine.activate();
+
+        if (isActivate.booleanValue()) {
+            System.out.println("->Scilab engine is not activate");
+        }
+
+        SciResult sciResult = engine.execute(task);
+        ArrayList listResult = sciResult.getList();
+
+        SciData result;
+        for (int i = 0; i < listResult.size(); i++) {
+            result = (SciData) listResult.get(i);
+            System.out.println(result);
+        }
+
+        engine.exit();
+        System.exit(0);
+    }
 }

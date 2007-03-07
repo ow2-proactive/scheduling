@@ -50,8 +50,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.9
  *
  */
-public class CircularArrayList extends java.util.AbstractList
-    implements java.util.List, java.io.Serializable {
+public class CircularArrayList extends java.util.AbstractList implements java.util.List,
+    java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
     private static final int DEFAULT_SIZE = 5;
     protected Object[] array;
@@ -252,8 +252,9 @@ public class CircularArrayList extends java.util.AbstractList
             return array[pos];
         } finally {
             array[pos] = null; // Let gc do its work
-            // optimized for FIFO access, i.e. adding to back and
-            // removing from front
+                               // optimized for FIFO access, i.e. adding to back and
+                               // removing from front
+
             if (pos == head) {
                 head = (head + 1) % array.length;
             } else if (pos == tail) {

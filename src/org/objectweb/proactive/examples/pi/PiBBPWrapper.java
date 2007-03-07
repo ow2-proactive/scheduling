@@ -35,58 +35,55 @@ import java.util.List;
 
 import org.objectweb.fractal.api.control.BindingController;
 
+
 /**
  * This class contains code for managing the master component in the component version of the pi application.
  * @author ProActive team
  *
  */
-public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingController {
-    
+public class PiBBPWrapper extends PiBBP implements MasterComputation,
+    BindingController {
     HashMap nameToComputer = new HashMap(); // map between binding names and Components 
     PiCompMultiCast clientMultiCast;
+
     public PiBBPWrapper() {
     }
 
+    public String[] listFc() {
+        return new String[] { "multicastDispatcher" };
+    }
 
-  
-  public String[] listFc() {
-      return new String[] { "multicastDispatcher" };
-  }
-
-   
     public Object lookupFc(final String cItf) {
-    	if(cItf.compareTo("multicastDispatcher")==0)
-    		return clientMultiCast;
-    	return null;
+        if (cItf.compareTo("multicastDispatcher") == 0) {
+            return clientMultiCast;
+        }
+        return null;
     }
 
     public void bindFc(final String cItf, final Object sItf) {
-
         if (cItf.startsWith("multicastDispatcher")) {
-           clientMultiCast=(PiCompMultiCast)sItf;
+            clientMultiCast = (PiCompMultiCast) sItf;
         }
     }
- 
+
     public void unbindFc(final String cItf) {
-    	if (cItf.startsWith("multicastDispatcher")) {
-            clientMultiCast=null;
-         }
+        if (cItf.startsWith("multicastDispatcher")) {
+            clientMultiCast = null;
+        }
     }
-   
-	public boolean computePi(List<Interval> params) {
-			
-		long timeAtBeginningOfComputation = System.currentTimeMillis();
-		   
-		/*Call on the client multicast interface. 
-		 * Due to the dispatching policy of the client multicast interface, each item of the param list is sent to one "pi computer"*/   
-		List<Result> results=clientMultiCast.compute(params);
-		
-		System.out.println("Intervals sent to the computers...\n");
-		/*The different resluts are gathered to make the final result*/
+
+    public boolean computePi(List<Interval> params) {
+        long timeAtBeginningOfComputation = System.currentTimeMillis();
+
+        /*Call on the client multicast interface.
+         * Due to the dispatching policy of the client multicast interface, each item of the param list is sent to one "pi computer"*/
+        List<Result> results = clientMultiCast.compute(params);
+
+        System.out.println("Intervals sent to the computers...\n");
+
+        /*The different resluts are gathered to make the final result*/
         Result total = PiUtil.conquerPIList(results);
 
-        
-        
         long timeAtEndOfComputation = System.currentTimeMillis();
 
         //*************************************************************
@@ -99,19 +96,12 @@ public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingCon
             (timeAtEndOfComputation - timeAtBeginningOfComputation) + " ms");
         System.out.println("Cumulated time from all computers is : " +
             total.getComputationTime() + " ms");
-        System.out.println("Ratio for " + results.size() +
-            " processors is : " +
+        System.out.println("Ratio for " + results.size() + " processors is : " +
             (((double) total.getComputationTime() / ((double) (timeAtEndOfComputation -
             timeAtBeginningOfComputation))) * 100) + " %");
-        
+
         System.out.println(total.getNumericalResult().toString());
-		
-		
-		
-		
-		return true;
-		
-		
-		
-	}
+
+        return true;
+    }
 }

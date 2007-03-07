@@ -51,22 +51,25 @@ public class SingleValueUnmarshaller extends BasicUnmarshaller {
      * if the data is split into several chunks.
      */
     public void readValue(String value) throws SAXException {
-        
-    	/*
+
+        /*
         if (resultObject == null) {
             setResultObject(value);
         } else {
             setResultObject(resultObject + value);
         }
         */
-    	
-    	//Fix chunk reading problem
-        if (resultObject != null) value= resultObject+value;
-       
+
+        //Fix chunk reading problem
+        if (resultObject != null) {
+            value = resultObject + value;
+        }
+
         //Transform variables into values if necessary
-        if(org.objectweb.proactive.core.xml.VariableContract.xmlproperties !=null)
-        	value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value);
-        
+        if (org.objectweb.proactive.core.xml.VariableContract.xmlproperties != null) {
+            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value);
+        }
+
         setResultObject(value);
     }
 }

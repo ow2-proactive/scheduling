@@ -36,15 +36,15 @@ import java.util.Iterator;
 import org.jdom.Attribute;
 import org.jdom.Element;
 
+
 /**
  * Read all attribute of a given Element and put them in a hashmap, then it can
  * be used in an easier way.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public abstract class Tag {
-
     private HashMap<String, String> attributes; // <variable name,value>
 
     /**
@@ -56,7 +56,7 @@ public abstract class Tag {
 
     /**
      * Construct a Tag from all attributes of a given Element
-     * 
+     *
      * @param eBench
      *            the Element to read
      */
@@ -71,7 +71,7 @@ public abstract class Tag {
 
     /**
      * Extend current tag with new attributes values
-     * 
+     *
      * @param name
      * @param value
      */
@@ -95,7 +95,7 @@ public abstract class Tag {
         while (it.hasNext()) {
             String key = it.next();
             String value = this.attributes.get(key);
-            result += key + "=" + value + (it.hasNext() ? ", " : "");
+            result += (key + "=" + value + (it.hasNext() ? ", " : ""));
         }
         return result + "]\n";
     }

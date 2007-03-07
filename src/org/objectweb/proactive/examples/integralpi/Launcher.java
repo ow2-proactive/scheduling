@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 
+
 /**
  * This simple program approximates pi by computing<br>
  * pi = integral from 0 to 1 of 4/(1+x*x)dx<br>
@@ -57,78 +58,79 @@ import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
  *
  */
 public class Launcher {
-    
-    private static ProActiveDescriptor pad ;
-    
+    private static ProActiveDescriptor pad;
+
     /** The main method, not used by TimIt */
     public static void main(String[] args) {
-        
         try {
             // The number of workers
             int np = Integer.valueOf(args[1]).intValue();
-            
-            Object[] param = new Object[] {};
+
+            Object[] param = new Object[] {  };
             Object[][] params = new Object[np][];
             for (int i = 0; i < np; i++) {
                 params[i] = param;
             }
-            
-            Worker workers = (Worker) ProSPMD.newSPMDGroup(
-                    Worker.class.getName(), params, provideNodes(args[0]));
-            
+
+            Worker workers = (Worker) ProSPMD.newSPMDGroup(Worker.class.getName(),
+                    params, provideNodes(args[0]));
+
             String input = "";
             long numOfIterations = 1;
-            double result, error;            
+            double result;
+            double error;
             DoubleWrapper results;
-            
-            while( numOfIterations > 0 ){
-                
+
+            while (numOfIterations > 0) {
                 // Prompt the user
-                System.out.print( "\nEnter the number of iterations (0 to exit) : " );
-                
+                System.out.print(
+                    "\nEnter the number of iterations (0 to exit) : ");
+
                 try {
                     // Read a line of text from the user.
                     input = stdin.readLine();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-                
+
                 numOfIterations = Long.parseLong(input);
-                
-                if ( numOfIterations <= 0 ) break;
-                
+
+                if (numOfIterations <= 0) {
+                    break;
+                }
+
                 // Workers starts their job and return a group of Futures
-                results = workers.start( numOfIterations );
-                
-                result = ((DoubleWrapper)ProActiveGroup.getGroup(results).get(0)).doubleValue();
-                error =  result - Math.PI;
-                
-                System.out.println( "\nCalculated PI is " + result + " error is " + error );
+                results = workers.start(numOfIterations);
+
+                result = ((DoubleWrapper) ProActiveGroup.getGroup(results).get(0)).doubleValue();
+                error = result - Math.PI;
+
+                System.out.println("\nCalculated PI is " + result +
+                    " error is " + error);
             }
-            
+
             finish();
-            
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
-    
-    private static BufferedReader stdin =
-            new BufferedReader( new InputStreamReader( System.in ) );
-    
-    private static Node[] provideNodes( String descriptorUrl ){
+
+    private static BufferedReader stdin = new BufferedReader(new InputStreamReader(
+                System.in));
+
+    private static Node[] provideNodes(String descriptorUrl) {
         try {
             // Common stuff about ProActive deployement
-            pad = ProActive.getProactiveDescriptor( descriptorUrl );
-            
+            pad = ProActive.getProactiveDescriptor(descriptorUrl);
+
             pad.activateMappings();
             VirtualNode vnode = pad.getVirtualNodes()[0];
-            
+
             Node[] nodes = vnode.getNodes();
-            
+
             System.out.println(nodes.length + " nodes found");
-            
+
             return nodes;
         } catch (NodeException ex) {
             ex.printStackTrace();
@@ -137,8 +139,8 @@ public class Launcher {
         }
         return null;
     }
-    
-    private static void finish(){
+
+    private static void finish() {
         try {
             pad.killall(true);
             ProActive.exitSuccess();

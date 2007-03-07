@@ -73,8 +73,9 @@ public class ProActiveAdlWriter extends FractalAdlWriter {
             // remove * at the end of the virtual node
             vn.astSetAttribute("name",
                 c.getVirtualNode().endsWith("*")
-                ? c.getVirtualNode().substring(0,
-                    c.getVirtualNode().length() - 1) : c.getVirtualNode());
+                ? c.getVirtualNode()
+                   .substring(0, c.getVirtualNode().length() - 1)
+                : c.getVirtualNode());
             vn.astSetAttribute("cardinality",
                 c.getVirtualNode().endsWith("*") ? "multiple" : "single");
             comp.astAddNode(vn);
@@ -128,7 +129,8 @@ public class ProActiveAdlWriter extends FractalAdlWriter {
     }
 
     private LinkedVirtualNode findNode(Component c, String vnName) {
-        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance().getNode(c.getName(),
+        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance()
+                                                        .getNode(c.getName(),
                 vnName, true);
         if (lvn == null) {
             logger.error("Not found : " + c.getName() + " , " + vnName);

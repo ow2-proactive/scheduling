@@ -119,12 +119,13 @@ public class ProActiveImplementationBuilderImpl
             } else {
                 // 	TODO add self exported virtual node ?
                 // for the moment, just add a leaf to the linked vns
-                ExportedVirtualNodesList.instance().addLeafVirtualNode(name,
+                ExportedVirtualNodesList.instance()
+                                        .addLeafVirtualNode(name,
                     adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
             }
             if (context.get("deployment-descriptor") != null) {
-                deploymentVN =
-                    ((ProActiveDescriptor) context.get("deployment-descriptor")).getVirtualNode(adlVN.getName());
+                deploymentVN = ((ProActiveDescriptor) context.get(
+                        "deployment-descriptor")).getVirtualNode(adlVN.getName());
                 if (deploymentVN == null) {
                     if (adlVN.getName().equals("null")) {
                         logger.info(name +
@@ -150,17 +151,20 @@ public class ProActiveImplementationBuilderImpl
             }
         }
         Component result;
-        
+
         // FIXME : exhaustively specify the behaviour
-        if (deploymentVN!=null && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) && controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) && !contentDesc.uniqueInstance()) {
-            result = (Component)((Group)((ProActiveGenericFactory)Fractal.getGenericFactory(bootstrap)).newFcInstanceAsList((ComponentType) type,
+        if ((deploymentVN != null) &&
+                VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
+                controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
+                !contentDesc.uniqueInstance()) {
+            result = (Component) ((Group) ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newFcInstanceAsList((ComponentType) type,
                     controllerDesc, contentDesc, deploymentVN)).getGroupByType();
         } else {
-            result = ((ProActiveGenericFactory)Fractal.getGenericFactory(bootstrap)).newFcInstance((ComponentType) type,
+            result = ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newFcInstance((ComponentType) type,
                     controllerDesc, contentDesc, deploymentVN);
         }
-//        registry.addComponent(result); // the registry can handle groups
 
+        //        registry.addComponent(result); // the registry can handle groups
         return result;
     }
 }

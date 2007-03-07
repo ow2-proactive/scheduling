@@ -41,22 +41,20 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
+
 /**
  * @author cdelbe
  */
 public class Launcher implements Startable {
-
     static final public double boudaryValue = 0;
-
     static final public double initialValue = 1000000000;
 
     // for killing
     private ProActiveDescriptor pad;
-
     private Worker[] workers;
 
     /**
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -65,7 +63,7 @@ public class Launcher implements Startable {
     }
 
     /**
-     * 
+     *
      * @param args
      */
     public void start(String[] args) {
@@ -74,8 +72,8 @@ public class Launcher implements Startable {
 
         TimItManager tManager = null;
         if (args.length < 4) {
-            System.err
-                    .println("java Launcher deploymentDesc globalSize nbWorker maxIter [server url]");
+            System.err.println(
+                "java Launcher deploymentDesc globalSize nbWorker maxIter [server url]");
             System.exit(1);
         }
 
@@ -95,8 +93,8 @@ public class Launcher implements Startable {
         System.out.println("         * # of workers       = " + nbWorker);
         System.out.println("         * worker grid size   = " + workerGridSize);
         System.out.println("         * # of iterations    = " + maxIter);
-        System.out.println("         * boundary value     = "
-                + Launcher.boudaryValue);
+        System.out.println("         * boundary value     = " +
+            Launcher.boudaryValue);
 
         Node[] nodes = null;
 
@@ -110,11 +108,12 @@ public class Launcher implements Startable {
             nodes = vnode.getNodes();
             // create workers
             for (int i = 0; i < nbWorker; i++) {
-                this.workers[i] = (Worker) (ProActive.newActive(Worker.class
-                        .getName(), new Object[] { new Integer(i),
-                        new Double(Launcher.boudaryValue),
-                        new Integer(maxIter), new Integer(nbWorker) },
-                        (nodes.length == (nbWorker - 1) ? nodes[i] : nodes[0])));
+                this.workers[i] = (Worker) (ProActive.newActive(Worker.class.getName(),
+                        new Object[] {
+                            new Integer(i), new Double(Launcher.boudaryValue),
+                            new Integer(maxIter), new Integer(nbWorker)
+                        },
+                        ((nodes.length == (nbWorker - 1)) ? nodes[i] : nodes[0])));
             }
             System.out.println("[JACOBI] Workers are deployed");
 
@@ -125,7 +124,6 @@ public class Launcher implements Startable {
 
             BenchmarkStatistics bstats = tManager.getBenchmarkStatistics();
             System.out.println(bstats);
-
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
@@ -153,18 +151,24 @@ public class Launcher implements Startable {
 
     /**
      * Creates the virtual grid used as mapping.
-     * 
+     *
      * @param workerGridSize
      *            The size of the grid
      */
     public void createVirtualGrid(int workerGridSize) {
         System.out.println("[JACOBI] Creating workers virtual grid... ");
         int nbWorker = this.workers.length;
-        int up_id, down_id, left_id, right_id = -1;
+        int up_id;
+        int down_id;
+        int left_id;
+        int right_id = -1;
         for (int i = 0; i < nbWorker; i++) {
             System.out.println("[JACOBI] Initializing worker " + i + "...");
             Worker currentWorker = this.workers[i];
-            Worker up, down, left, right;
+            Worker up;
+            Worker down;
+            Worker left;
+            Worker right;
             if (i == 0) { // upper left
                 left = null;
                 left_id = -1;
@@ -192,7 +196,7 @@ public class Launcher implements Startable {
                 up_id = i - workerGridSize;
                 right = this.workers[i + 1];
                 right_id = i + 1;
-            } else if (i == nbWorker - 1) { // lower right
+            } else if (i == (nbWorker - 1)) { // lower right
                 down = null;
                 down_id = -1;
                 right = null;
@@ -210,8 +214,8 @@ public class Launcher implements Startable {
                 left_id = i - 1;
                 down = this.workers[i + workerGridSize];
                 down_id = i + workerGridSize;
-            } else if ((i > (workerGridSize * (workerGridSize - 1)))
-                    && (i < (workerGridSize * workerGridSize - 1))) { // down
+            } else if ((i > (workerGridSize * (workerGridSize - 1))) &&
+                    (i < ((workerGridSize * workerGridSize) - 1))) { // down
                 up = this.workers[i - workerGridSize];
                 up_id = i - workerGridSize;
                 right = this.workers[i + 1];
@@ -220,7 +224,7 @@ public class Launcher implements Startable {
                 left_id = i - 1;
                 down = null;
                 down_id = -1;
-            } else if (i % workerGridSize == 0) { // left
+            } else if ((i % workerGridSize) == 0) { // left
                 left = null;
                 left_id = -1;
                 right = this.workers[i + 1];
@@ -229,7 +233,7 @@ public class Launcher implements Startable {
                 up_id = i - workerGridSize;
                 down = this.workers[i + workerGridSize];
                 down_id = i + workerGridSize;
-            } else if (i % workerGridSize == (workerGridSize - 1)) {// right
+            } else if ((i % workerGridSize) == (workerGridSize - 1)) { // right
                 right = null;
                 right_id = -1;
                 left = this.workers[i - 1];
@@ -249,14 +253,14 @@ public class Launcher implements Startable {
                 right_id = i + 1;
             }
             currentWorker.setNeighbours(up, down, left, right, up_id, down_id,
-                    left_id, right_id);
+                left_id, right_id);
         }
         System.out.println("[JACOBI] Virtual grid is created.");
     }
 
     /**
      * Creates and splits the matrix.
-     * 
+     *
      * @param workerGridSize
      *            The size of the grid matrix.
      * @param subMatrixSize
@@ -265,7 +269,7 @@ public class Launcher implements Startable {
      *            The size of the global matrix.
      */
     public void createAndSplitMatrix(int workerGridSize, int subMatrixSize,
-            int globalMatrixSize) {
+        int globalMatrixSize) {
         System.out.println("[JACOBI] Creating and spliting global matrix");
         for (int currentW = 0; currentW < this.workers.length; currentW++) {
             // create submatrix
@@ -276,22 +280,22 @@ public class Launcher implements Startable {
                     currentSubMatrix[i][j] = Launcher.initialValue;
                 }
             }
+
             // compute upperLeft values
             int upperLeftX = (currentW % workerGridSize) * subMatrixSize;
             int upperLeftY = (currentW / workerGridSize) * subMatrixSize;
 
             // send submatrix to worker
             this.workers[currentW].setSubMatrix(globalMatrixSize,
-                    subMatrixSize, upperLeftX, upperLeftY, currentSubMatrix);
+                subMatrixSize, upperLeftX, upperLeftY, currentSubMatrix);
         }
         System.out.println("[JACOBI]Global Matrix created and splitted");
-
     }
 
     /**
      * Part of the Startable implementation. TimIt will invoke this method
      * between each run.
-     * 
+     *
      * @see org.objectweb.proactive.benchmarks.timit.util.Startable
      */
     public void kill() {
@@ -303,7 +307,7 @@ public class Launcher implements Startable {
     /**
      * Part of the Startable implementation. TimIt will invoke this method
      * between each benchmark.
-     * 
+     *
      * @see org.objectweb.proactive.benchmarks.timit.util.Startable
      */
     public void masterKill() {

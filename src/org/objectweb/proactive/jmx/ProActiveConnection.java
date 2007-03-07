@@ -148,7 +148,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
      * @see javax.management.MBeanServerConnection#queryMBeans(javax.management.ObjectName, javax.management.QueryExp)
      */
     @SuppressWarnings("unused")
-    public Set <ObjectInstance> queryMBeans(ObjectName name, QueryExp query)
+    public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query)
         throws IOException {
         return this.mbs.queryMBeans(name, query);
     }
@@ -262,9 +262,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
         NotificationListener listener, NotificationFilter filter,
         Object handback) throws InstanceNotFoundException, IOException {
         System.out.println("ProActiveConnection.addNotificationListener()");
-    	try {
+        try {
             ListenerAdapter tl = new ListenerAdapter(listener);
-            
+
             this.listenerMap.put(listener, tl);
             this.mbs.addNotificationListener(name, tl, filter, handback);
         } catch (Exception e) {
@@ -420,7 +420,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
      *   This method is the same as queryMBeans but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#queryMBeans(javax.management.ObjectName, javax.management.QueryExp)
      */
-    public GenericTypeWrapper queryMBeansAsynchronous(ObjectName name, QueryExp query) {
+    public GenericTypeWrapper queryMBeansAsynchronous(ObjectName name,
+        QueryExp query) {
         try {
             return new GenericTypeWrapper<Set>(this.queryMBeans(name, query));
         } catch (IOException e) {
@@ -432,11 +433,12 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
      * This method  is the same as queryNames but returns a reifiable type in order to perform ProActive asynchronous call
     * @see javax.management.MBeanServerConnection#queryNames(javax.management.ObjectName, javax.management.QueryExp)
     */
-    public GenericTypeWrapper queryNamesAsynchronous(ObjectName name, QueryExp query) {
+    public GenericTypeWrapper queryNamesAsynchronous(ObjectName name,
+        QueryExp query) {
         try {
             return new GenericTypeWrapper<Set>(this.queryNames(name, query));
         } catch (IOException e) {
-            return new GenericTypeWrapper<Exception> (e);
+            return new GenericTypeWrapper<Exception>(e);
         }
     }
 
@@ -448,7 +450,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
         try {
             return new GenericTypeWrapper<Integer>(this.getMBeanCount());
         } catch (IOException e) {
-            return new GenericTypeWrapper<Exception> (e);
+            return new GenericTypeWrapper<Exception>(e);
         }
     }
 
@@ -459,9 +461,10 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
     public GenericTypeWrapper getAttributeAsynchronous(ObjectName name,
         String attribute) {
         try {
-            return new GenericTypeWrapper <Object>(this.getAttribute(name, attribute));
+            return new GenericTypeWrapper<Object>(this.getAttribute(name,
+                    attribute));
         } catch (Exception e) {
-        	return new GenericTypeWrapper<Exception> (e);
+            return new GenericTypeWrapper<Exception>(e);
         }
     }
 
@@ -472,72 +475,74 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
     public GenericTypeWrapper getAttributesAsynchronous(ObjectName name,
         String[] attributes) {
         try {
-            return new GenericTypeWrapper<AttributeList>(this.getAttributes(name, attributes));
+            return new GenericTypeWrapper<AttributeList>(this.getAttributes(
+                    name, attributes));
         } catch (Exception e) {
-           return new GenericTypeWrapper<Exception> (e);
-        } 
+            return new GenericTypeWrapper<Exception>(e);
+        }
     }
 
     /**
      * This method  is the same as setAttributes  but returns a reifiable type in order to perform ProActive asynchronous call
-  	 * @see javax.management.MBeanServerConnection#setAttributes(javax.management.ObjectName, javax.management.AttributeList) 
-  	 */
+           * @see javax.management.MBeanServerConnection#setAttributes(javax.management.ObjectName, javax.management.AttributeList)
+           */
     public GenericTypeWrapper setAttributesAsynchronous(ObjectName name,
         AttributeList attributes) {
         try {
-            return new GenericTypeWrapper<AttributeList>(this.setAttributes(name, attributes));
+            return new GenericTypeWrapper<AttributeList>(this.setAttributes(
+                    name, attributes));
         } catch (Exception e) {
-          return new GenericTypeWrapper<Exception>(e);
-        } 
+            return new GenericTypeWrapper<Exception>(e);
+        }
     }
 
     /**
      * This method  is the same as invoke  but returns a reifiable type in order to perform ProActive asynchronous call
-     * @see javax.management.MBeanServerConnection#invoke(javax.management.ObjectName, java.lang.String, java.lang.Object[], java.lang.String[])  	 
-  	 */
+     * @see javax.management.MBeanServerConnection#invoke(javax.management.ObjectName, java.lang.String, java.lang.Object[], java.lang.String[])
+           */
     public GenericTypeWrapper invokeAsynchronous(ObjectName name,
         String operationName, Object[] params, String[] signature) {
         try {
-            return new GenericTypeWrapper <Object>(this.invoke(name, operationName, params,
-                    signature));
+            return new GenericTypeWrapper<Object>(this.invoke(name,
+                    operationName, params, signature));
         } catch (Exception e) {
-           return new  GenericTypeWrapper<Exception> (e);
-        } 
+            return new GenericTypeWrapper<Exception>(e);
+        }
     }
 
     /**
      * This method  is the same as getDefaultDomain  but returns a reifiable type in order to perform ProActive asynchronous call
-     * @see javax.management.MBeanServerConnection#getDefaultDomain()  	 
-  	 */
+     * @see javax.management.MBeanServerConnection#getDefaultDomain()
+           */
     public GenericTypeWrapper getDefaultDomainAsynchronous() {
         try {
             return new GenericTypeWrapper<String>(this.getDefaultDomain());
         } catch (IOException e) {
-            return new GenericTypeWrapper<Exception> (e);
+            return new GenericTypeWrapper<Exception>(e);
         }
     }
 
     /**
      * This method  is the same as getDomain  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getDomains()
-  	 */
+           */
     public GenericTypeWrapper getDomainsAsynchronous() {
         try {
-            return new GenericTypeWrapper <String [] >(this.getDomains());
+            return new GenericTypeWrapper<String[]>(this.getDomains());
         } catch (IOException e) {
-          return new GenericTypeWrapper<Exception > (e);
+            return new GenericTypeWrapper<Exception>(e);
         }
     }
 
     /**
      * This method  is the same as getMBeanInfo  but returns a reifiable type in order to perform ProActive asynchronous call
-  	 * @see javax.management.MBeanServerConnection#getMBeanInfo(javax.management.ObjectName)
-  	  *    */
-    public GenericTypeWrapper  getMBeanInfoAsynchronous(ObjectName name) {
+           * @see javax.management.MBeanServerConnection#getMBeanInfo(javax.management.ObjectName)
+            *    */
+    public GenericTypeWrapper getMBeanInfoAsynchronous(ObjectName name) {
         try {
             return new GenericTypeWrapper<MBeanInfo>(this.getMBeanInfo(name));
         } catch (Exception e) {
-      return new GenericTypeWrapper <Exception > (e);
-        } 
+            return new GenericTypeWrapper<Exception>(e);
+        }
     }
 }

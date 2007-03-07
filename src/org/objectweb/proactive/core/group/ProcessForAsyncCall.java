@@ -79,7 +79,8 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                         // a call on the Component interface
                         target = object;
                     } else {
-                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata().getComponentInterfaceName());
+                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata()
+                                                                                              .getComponentInterfaceName());
                     }
                     this.proxyGroup.addToListOfResult(memberListOfResultGroup,
                         this.mc.execute(target), this.index);
@@ -96,28 +97,24 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                         this.proxyGroup.addToListOfResult(memberListOfResultGroup,
                             this.mc.execute(object), this.index);
                     } else if (!objectIsLocal) {
-
                         /* add the return value into the result group */
                         this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
                             ((StubObject) object).getProxy().reify(this.mc),
                             this.index);
                     } else {
-
                         /* add the return value into the result group */
                         this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                            ((StubObject) object).getProxy().reify(new MethodCall(
-                                    this.mc)), this.index);
+                            ((StubObject) object).getProxy()
+                             .reify(new MethodCall(this.mc)), this.index);
                     }
                 }
             } catch (Throwable e) {
-
                 /* when an exception occurs, put it in the result group instead of the (unreturned) value */
                 this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
                     new ExceptionInGroup(this.memberList.get(this.index),
                         this.index, e.fillInStackTrace()), this.index);
             }
         } else {
-
             /* when there is a Throwable instead of an Object, a method call is impossible, add null to the result group */
             this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
                 null, this.index);

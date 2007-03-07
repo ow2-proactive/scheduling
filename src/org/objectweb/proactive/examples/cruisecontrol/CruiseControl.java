@@ -211,5 +211,4 @@ public class CruiseControl implements org.objectweb.proactive.RunActive {
         }
     }
 }
-
 // The END

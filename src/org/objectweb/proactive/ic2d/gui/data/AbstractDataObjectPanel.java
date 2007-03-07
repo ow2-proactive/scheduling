@@ -201,11 +201,11 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
 
     protected void displayDataObjectInfo() {
         javax.swing.JOptionPane.showMessageDialog(parentFrame, // Component
-            // parentComponent,
-        new DataObjectInfoPanel(), // Object message,
+                                                               // parentComponent,
+            new DataObjectInfoPanel(), // Object message,
             type + " info :" + name, // String title,
             javax.swing.JOptionPane.INFORMATION_MESSAGE // int
-        // messageType,
+                                                        // messageType,
         );
     }
 

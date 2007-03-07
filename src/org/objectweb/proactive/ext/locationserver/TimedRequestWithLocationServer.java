@@ -47,8 +47,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 
-public class TimedRequestWithLocationServer extends RequestImpl
-    implements java.io.Serializable {
+public class TimedRequestWithLocationServer extends RequestImpl implements java.io.Serializable {
     private static final int MAX_TRIES = 30;
 
     /**

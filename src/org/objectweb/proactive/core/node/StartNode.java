@@ -276,7 +276,7 @@ public class StartNode {
         } else if (MULTICAST_LOCATOR_NAME.equals(option)) {
             multicastLocator = true;
         } else {
-        	printUsage();
+            printUsage();
         }
     }
 

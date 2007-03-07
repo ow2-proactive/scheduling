@@ -45,8 +45,7 @@ package org.objectweb.proactive.core.event;
  * @since   ProActive 0.9
  *
  */
-public class ProActiveEvent extends java.util.EventObject
-    implements java.io.Serializable {
+public class ProActiveEvent extends java.util.EventObject implements java.io.Serializable {
     public static final int GENERIC_TYPE = -1;
 
     /** type of the message */

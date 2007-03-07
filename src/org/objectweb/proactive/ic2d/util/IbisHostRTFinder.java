@@ -59,14 +59,15 @@ public class IbisHostRTFinder implements HostRTFinder {
 
     private static final int DEFAULT_RMI_PORT = 1099;
     private IC2DMessageLogger logger;
-	private DefaultListModel skippedObjects;
+    private DefaultListModel skippedObjects;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public IbisHostRTFinder(IC2DMessageLogger logger, DefaultListModel skippedObjects) {
+    public IbisHostRTFinder(IC2DMessageLogger logger,
+        DefaultListModel skippedObjects) {
         this.logger = logger;
-        this.skippedObjects= skippedObjects;
+        this.skippedObjects = skippedObjects;
     }
 
     public IbisHostRTFinder() {
@@ -106,12 +107,12 @@ public class IbisHostRTFinder implements HostRTFinder {
                     part = new ProActiveRuntimeAdapterImpl(r);
                     runtimeArray.add(part);
                 } catch (Exception e) {
-//                	we build a jvmObject with depth of 0 since this jvm won't be monitored
-                	MonitoredJVM jvmObject = new MonitoredJVM(id, 0);
-                	if(! skippedObjects.contains(jvmObject)){
+                    //                	we build a jvmObject with depth of 0 since this jvm won't be monitored
+                    MonitoredJVM jvmObject = new MonitoredJVM(id, 0);
+                    if (!skippedObjects.contains(jvmObject)) {
                         log(e.getMessage(), e);
                         skippedObjects.addElement(jvmObject);
-                	}
+                    }
                 }
             }
         }

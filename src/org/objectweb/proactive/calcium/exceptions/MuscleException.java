@@ -30,20 +30,20 @@
  */
 package org.objectweb.proactive.calcium.exceptions;
 
+
 /**
  * A Parameter Exception indicates that the execution of the task related with this parameter
- * can not continue, and the execution of related tasks (parent, brothers, children) must 
+ * can not continue, and the execution of related tasks (parent, brothers, children) must
  * also be stoped.
- *  
+ *
  * @author The ProActive Team (mleyton)
  */
 public class MuscleException extends RuntimeException {
+    public MuscleException(String msg) {
+        super(msg);
+    }
 
-	public MuscleException(String msg){
-		super(msg);
-	}
-	
-	public MuscleException(Exception e){
-		super(e);
-	}
+    public MuscleException(Exception e) {
+        super(e);
+    }
 }

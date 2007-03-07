@@ -39,8 +39,8 @@ import org.objectweb.proactive.loadbalancing.metrics.Metric;
 
 public class LinuxCPURanking implements Metric {
     private double ranking = 1;
-	private double normaLoad;
-	private RandomAccessFile statfile;
+    private double normaLoad;
+    private RandomAccessFile statfile;
 
     /**
      * This method returns sets the machine ranking, in our implementation is the CPU clock
@@ -65,21 +65,23 @@ public class LinuxCPURanking implements Metric {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         this.normaLoad = 1.0;
         //load = 0;
         int nProcessors = 0;
         try {
-        	nProcessors = Runtime.getRuntime().availableProcessors();
-        	if (nProcessors > 1) this.normaLoad = 1/(1.0 * nProcessors);
+            nProcessors = Runtime.getRuntime().availableProcessors();
+            if (nProcessors > 1) {
+                this.normaLoad = 1 / (1.0 * nProcessors);
+            }
             statfile = new RandomAccessFile("/proc/loadavg", "r");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (NumberFormatException e) {
             e.printStackTrace();
-		}
+        }
     }
-    
+
     public void setRanking(double x) {
         ranking = x;
     }
@@ -87,10 +89,9 @@ public class LinuxCPURanking implements Metric {
     public void addToRanking(double x) {
         ranking += x;
     }
-    
 
     /* -- IMPLEMENTS METRIC -- */
-    
+
     /**
      * This method returns if the machine ranking
      */
@@ -98,31 +99,30 @@ public class LinuxCPURanking implements Metric {
         return ranking;
     }
 
-    
-	public void takeDecision(LoadBalancer lb) {
-		double load = getLoad();
-		if (load > LoadBalancingConstants.OVERLOADED_THREASHOLD) {
-          lb.startBalancing();
+    public void takeDecision(LoadBalancer lb) {
+        double load = getLoad();
+        if (load > LoadBalancingConstants.OVERLOADED_THREASHOLD) {
+            lb.startBalancing();
         } else if (load < LoadBalancingConstants.UNDERLOADED_THREASHOLD) {
-           lb.stealWork();
+            lb.stealWork();
         }
-		
-	}
+    }
 
-	public double getLoad() {
-		 String cpuLine = null;
-	        try {
-	            statfile.seek(0);
-	            cpuLine = statfile.readLine();
-	        } catch (IOException e) {
-	            return 1;
-	        }
+    public double getLoad() {
+        String cpuLine = null;
+        try {
+            statfile.seek(0);
+            cpuLine = statfile.readLine();
+        } catch (IOException e) {
+            return 1;
+        }
 
-	        double min1;
-	        
-	        java.util.StringTokenizer st = new java.util.StringTokenizer(cpuLine," ");
-	        min1 = Double.parseDouble(st.nextToken());
+        double min1;
 
-	       return min1*normaLoad;
-	}
+        java.util.StringTokenizer st = new java.util.StringTokenizer(cpuLine,
+                " ");
+        min1 = Double.parseDouble(st.nextToken());
+
+        return min1 * normaLoad;
+    }
 }

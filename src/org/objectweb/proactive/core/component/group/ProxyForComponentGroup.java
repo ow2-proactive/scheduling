@@ -40,9 +40,10 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
+
 /**
  * An extension of the standard group proxy for handling groups of components.
- * 
+ *
  * @author Matthieu Morel
  *
  */
@@ -93,39 +94,31 @@ public class ProxyForComponentGroup extends ProxyForGroup {
         }
     }
 
-    
     /**
      * @return Returns the componentType.
      */
     public ComponentType getComponentType() {
-    
         return componentType;
     }
 
-    
     /**
      * @param componentType The componentType to set.
      */
     public void setComponentType(ComponentType componentType) {
-    
         this.componentType = componentType;
     }
 
-    
     /**
      * @return Returns the controllerDesc.
      */
     public ControllerDescription getControllerDesc() {
-    
         return controllerDesc;
     }
 
-    
     /**
      * @param controllerDesc The controllerDesc to set.
      */
     public void setControllerDesc(ControllerDescription controllerDesc) {
-    
         this.controllerDesc = controllerDesc;
     }
 }

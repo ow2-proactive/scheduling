@@ -149,7 +149,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.terminate();
         } else {
-            (new BodyRequest("terminate", new ArrayList<Object>(), bodyID, this.url)).send();
+            (new BodyRequest("terminate", new ArrayList<Object>(), bodyID,
+                this.url)).send();
         }
     }
 
@@ -158,11 +159,11 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      * @see org.objectweb.proactive.core.body.UniversalBody#getNodeURL()
      */
     public String getNodeURL() throws HTTPRemoteException {
-    	if (isLocal) {
+        if (isLocal) {
             return body.getNodeURL();
         } else {
-            BodyRequest br = new BodyRequest("getNodeURL", new ArrayList<Object>(),
-                    bodyID, this.url);
+            BodyRequest br = new BodyRequest("getNodeURL",
+                    new ArrayList<Object>(), bodyID, this.url);
             br.send();
             try {
                 return (String) br.getReturnedObject();
@@ -201,7 +202,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.enableAC();
         } else {
-            (new BodyRequest("enableAC", new ArrayList<Object>(), bodyID, this.url)).send();
+            (new BodyRequest("enableAC", new ArrayList<Object>(), bodyID,
+                this.url)).send();
         }
     }
 
@@ -212,7 +214,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.disableAC();
         } else {
-            (new BodyRequest("disableAC", new ArrayList<Object>(), bodyID, this.url)).send();
+            (new BodyRequest("disableAC", new ArrayList<Object>(), bodyID,
+                this.url)).send();
         }
     }
 
@@ -294,7 +297,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         if (isLocal) {
             return body.startNewSession(policy);
@@ -324,8 +327,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.getPublicKey();
         } else {
-            BodyRequest req = new BodyRequest("getPublicKey", new ArrayList<Object>(),
-                    bodyID, this.url);
+            BodyRequest req = new BodyRequest("getPublicKey",
+                    new ArrayList<Object>(), bodyID, this.url);
             req.send();
 
             try {
@@ -342,7 +345,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      * @see org.objectweb.proactive.core.body.UniversalBody#randomValue(long, byte[])
      */
     public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         if (isLocal) {
             return body.randomValue(sessionID, cl_rand);
@@ -371,7 +374,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      */
     public byte[][] publicKeyExchange(long sessionID, byte[] my_pub,
         byte[] my_cert, byte[] sig_code)
-        throws SecurityNotAvailableException, IOException, KeyExchangeException, 
+        throws SecurityNotAvailableException, IOException, KeyExchangeException,
             RenegotiateSessionException {
         if (isLocal) {
             return body.publicKeyExchange(sessionID, my_pub, my_cert, sig_code);
@@ -406,7 +409,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      */
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         if (isLocal) {
             return body.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3, tmp4);
@@ -489,12 +492,11 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.getEntities();
         } else {
-            BodyRequest req = new BodyRequest("getEntities", new ArrayList<Object>(),
-                    bodyID, this.url);
+            BodyRequest req = new BodyRequest("getEntities",
+                    new ArrayList<Object>(), bodyID, this.url);
             req.send();
 
             try {
-                
                 return (ArrayList<Entity>) req.getReturnedObject();
             } catch (SecurityNotAvailableException ex) {
                 throw ex;
@@ -526,18 +528,18 @@ public class HttpRemoteBodyImpl implements RemoteBody {
             ArrayList paramList = new ArrayList();
             paramList.add(msg);
 
-            BodyRequest br = new BodyRequest("receiveGCMessage", paramList, bodyID, url);
+            BodyRequest br = new BodyRequest("receiveGCMessage", paramList,
+                    bodyID, url);
             br.send();
             try {
-            	return (GCResponse) br.getReturnedObject();
+                return (GCResponse) br.getReturnedObject();
             } catch (Exception e) {
-            	e.printStackTrace();
-            	return null;
+                e.printStackTrace();
+                return null;
             }
         }
-
     }
-    
+
     public void setRegistered(boolean registered) throws IOException {
         if (isLocal) {
             body.setRegistered(registered);
@@ -545,7 +547,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
             ArrayList paramList = new ArrayList();
             paramList.add(new Boolean(registered));
 
-            BodyRequest br = new BodyRequest("setRegistered", paramList, bodyID, url);
+            BodyRequest br = new BodyRequest("setRegistered", paramList,
+                    bodyID, url);
             br.send();
         }
     }

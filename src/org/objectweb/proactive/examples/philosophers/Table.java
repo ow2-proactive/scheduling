@@ -120,8 +120,7 @@ public class Table implements org.objectweb.proactive.RunActive {
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    private class GetForkRequestFilter
-        implements org.objectweb.proactive.core.body.request.RequestFilter {
+    private class GetForkRequestFilter implements org.objectweb.proactive.core.body.request.RequestFilter {
         public GetForkRequestFilter() {
         }
 

@@ -58,7 +58,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
     // Optim
     private final String cachedShortString;
     private final String cachedCanonString;
-    
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -70,7 +70,8 @@ public class UniqueID implements java.io.Serializable, Comparable {
         this.id = new java.rmi.server.UID();
         this.vmID = uniqueVMID;
         this.cachedCanonString = "" + id + " " + vmID;
-        this.cachedShortString = "" + Math.abs(cachedCanonString.hashCode() % 65536);
+        this.cachedShortString = "" +
+            Math.abs(cachedCanonString.hashCode() % 65536);
     }
 
     //
@@ -114,7 +115,8 @@ public class UniqueID implements java.io.Serializable, Comparable {
     public String toString() {
         if (logger.isDebugEnabled()) {
             return "<" +
-            vmID.toString().substring(vmID.toString().length() - 9,
+            vmID.toString()
+                .substring(vmID.toString().length() - 9,
                 vmID.toString().length() - 6) + ">";
         } else {
             return getCanonString();
@@ -122,16 +124,16 @@ public class UniqueID implements java.io.Serializable, Comparable {
     }
 
     public String shortString() {
-    	return this.cachedShortString;
+        return this.cachedShortString;
     }
-    
+
     public String getCanonString() {
-    	return this.cachedCanonString;
+        return this.cachedCanonString;
     }
-    
+
     public int compareTo(Object o) {
-    	UniqueID u = (UniqueID) o;
-    	return getCanonString().compareTo(u.getCanonString());
+        UniqueID u = (UniqueID) o;
+        return getCanonString().compareTo(u.getCanonString());
     }
 
     /**

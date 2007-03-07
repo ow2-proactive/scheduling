@@ -47,10 +47,9 @@ import org.objectweb.proactive.jmx.ProActiveJMXConstants;
  * @author ProActive Team
  *
  */
-public class ClientConnector implements Serializable{
-
-	private static final long serialVersionUID = 7966471528807607476L;
-	private ProActiveConnection connection;
+public class ClientConnector implements Serializable {
+    private static final long serialVersionUID = 7966471528807607476L;
+    private ProActiveConnection connection;
     private JMXConnector connector;
     private String url;
 

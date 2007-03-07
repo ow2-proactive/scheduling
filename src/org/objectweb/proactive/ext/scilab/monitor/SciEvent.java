@@ -31,8 +31,10 @@
 package org.objectweb.proactive.ext.scilab.monitor;
 
 import java.util.EventObject;
+
+
 /**
- * 
+ *
  * This class represents a Scilab event
  *
  */
@@ -40,5 +42,4 @@ public class SciEvent extends EventObject {
     public SciEvent(Object source) {
         super(source);
     }
-    
 }

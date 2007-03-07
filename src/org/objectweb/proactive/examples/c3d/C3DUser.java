@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
@@ -49,13 +53,6 @@ import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
-import java.io.IOException;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import java.util.Hashtable;
-
 
 /**
  * The user logic of the C3D application.
@@ -64,6 +61,7 @@ import java.util.Hashtable;
  */
 public class C3DUser implements InitActive, java.io.Serializable, User,
     UserLogic {
+
     /** useful for showing information, if no GUI is available, or for error messages*/
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
@@ -122,7 +120,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     // shouldn't be called from outside the class. 
     public void rebuild() {
-        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis(); 
+        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
         this.c3ddispatcher.registerMigratedUser(i_user);
         createGUI();
     }
@@ -155,11 +153,11 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
 
         int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
-        this.i_user = user_id ;
+        this.i_user = user_id;
 
         wait.destroy();
 
-        this.savedGuiValues = null; 
+        this.savedGuiValues = null;
         // Create user Frame  
         createGUI();
     }
@@ -316,7 +314,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     }
 
     public void setDispatcherMachine(String machine, String os) {
-        this.dispMachineAndOS = "    "+machine + "\n    " + os;
+        this.dispMachineAndOS = "    " + machine + "\n    " + os;
 
         String guiInfoText = this.gui.getUserInfo();
         int index = guiInfoText.lastIndexOf('\n');

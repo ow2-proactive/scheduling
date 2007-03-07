@@ -30,39 +30,29 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util;
 
+
 /**
  * This class represent parameters for one benchmark test. These parameters are
  * set in the configuration file.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk, Judicael Ribault
  */
 public class Parameter {
-
     public String className;
-
     public String[] args;
-
     public int run;
-
     public String outputFile;
-
     public String note;
-
     public String name;
-
     public XMLHelper xhp;
-
     public String proActiveDescriptor;
-
     public long timeout;
-
     public String[] jvmArgs;
-
     public int warmUpRuns;
 
     /**
      * Create an instance of Paramater for a benchmark test
-     * 
+     *
      * @param xhp
      *            a reference to the XMLHelper instance
      * @param name
@@ -85,10 +75,9 @@ public class Parameter {
      *            Arguments passed to create a jvm
      */
     public Parameter(XMLHelper xhp, String name, String className,
-            String[] args, int run, String outputFile, String note,
-            String proActiveDescriptor, long timeout, String[] jvmArgs,
-            int warmUpRuns) {
-
+        String[] args, int run, String outputFile, String note,
+        String proActiveDescriptor, long timeout, String[] jvmArgs,
+        int warmUpRuns) {
         this.xhp = xhp;
         this.name = name;
         this.className = className;
@@ -101,5 +90,4 @@ public class Parameter {
         this.jvmArgs = jvmArgs.clone();
         this.warmUpRuns = warmUpRuns;
     }
-
 }

@@ -39,8 +39,7 @@ import org.objectweb.proactive.core.UniqueID;
  * @see java.awt.dnd.DropTargetListener
  * @see java.awt.dnd.DropTarget
  */
-public abstract class UniqueIDDropTargetListener
-    implements java.awt.dnd.DropTargetListener {
+public abstract class UniqueIDDropTargetListener implements java.awt.dnd.DropTargetListener {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -115,7 +114,8 @@ public abstract class UniqueIDDropTargetListener
         // try to get the ActiveObject
         Object data = null;
         try {
-            data = event.getTransferable().getTransferData(TransferableUniqueID.UNIQUEID_FLAVOR);
+            data = event.getTransferable()
+                        .getTransferData(TransferableUniqueID.UNIQUEID_FLAVOR);
         } catch (java.io.IOException e) {
             rejectDrop(event);
             return;

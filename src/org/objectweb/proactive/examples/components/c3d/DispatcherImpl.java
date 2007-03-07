@@ -30,13 +30,16 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.component.Fractive;
@@ -50,12 +53,6 @@ import org.objectweb.proactive.examples.c3d.C3DDispatcher;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
 import org.objectweb.proactive.examples.c3d.RenderingEngine;
-
-import java.io.IOException;
-
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
 
 
 /**

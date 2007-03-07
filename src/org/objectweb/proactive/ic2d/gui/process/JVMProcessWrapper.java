@@ -130,8 +130,8 @@ public class JVMProcessWrapper {
         try {
             process.startProcess();
         } catch (java.io.IOException e) {
-            messagePanel.getMessageLogger().log("Problem when starting the process",
-                e);
+            messagePanel.getMessageLogger()
+                        .log("Problem when starting the process", e);
         }
     }
 

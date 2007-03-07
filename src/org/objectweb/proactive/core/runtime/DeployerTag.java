@@ -30,75 +30,79 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+
 /**
- * DeployerTag allows applications to utilize topographic informations 
+ * DeployerTag allows applications to utilize topographic informations
  * to speed up calculations.
- * 
+ *
  * Deployment descriptors describe how to acquire ressources. This, static, information
- * can be used to organize Nodes in groups. Two Nodes in the same group are likely close 
- * to each other. An application, by using smartly DeployerTag, can improve its  
+ * can be used to organize Nodes in groups. Two Nodes in the same group are likely close
+ * to each other. An application, by using smartly DeployerTag, can improve its
  * performances by bringing together communicating active objects.
- * 
+ *
  *  A DeployerTag object contains two informations. The first one is who created this node.
- *  The second one is two which group this node contains. It is ensured that tupples <vmid, group> 
+ *  The second one is two which group this node contains. It is ensured that tupples <vmid, group>
  *  are uniques.
  */
 public class DeployerTag implements java.io.Serializable {
-	
-	// An unique identifier describing the VM from which this node was deployed
-	private String vmid;
-	// The group to which this node is belonging. Groups are unique _per VM_ 
-	private int  myGroup;
-	
-	
-	public DeployerTag() {
-		vmid = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getVMID().toString();
-		myGroup = -1;
-	}
-	
-	public DeployerTag(String _str) {
-		String [] sa = _str.split("~");
-		assert(sa.length == 2);
-		
-		vmid = sa[0];
-		myGroup = Integer.parseInt(sa[1]);
-	}
-	
-	public boolean equals(Object _gi) {
-		if (this == _gi) 
-			return true;		
-		
-		if (! (_gi instanceof DeployerTag))
-			return false;
-		
-		DeployerTag gi = (DeployerTag)_gi;
-		if (gi.vmid == vmid && gi.myGroup == myGroup)
-			return true;
-		
-		return true;
-	}
-	
-	public int hashcode() {
-		return this.toString().hashCode();
-	}
-	
-	public String toString() {
-		return vmid + "~" + myGroup;
-	}
-	
-	/**
-	 * Returns the VMID of the runtime which deployed this node 
-	 * @return the VMID of the runtime which deployed this node
-	 */
-	public String getVMID() {
-		return vmid;
-	}
-	
-	/**
-	 * Returns the group of this node
-	 * @return the group of this node
-	 */
-	public int getGroup() {
-		return myGroup;
-	}
+    // An unique identifier describing the VM from which this node was deployed
+    private String vmid;
+
+    // The group to which this node is belonging. Groups are unique _per VM_ 
+    private int myGroup;
+
+    public DeployerTag() {
+        vmid = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation()
+                                   .getVMID().toString();
+        myGroup = -1;
+    }
+
+    public DeployerTag(String _str) {
+        String[] sa = _str.split("~");
+        assert (sa.length == 2);
+
+        vmid = sa[0];
+        myGroup = Integer.parseInt(sa[1]);
+    }
+
+    public boolean equals(Object _gi) {
+        if (this == _gi) {
+            return true;
+        }
+
+        if (!(_gi instanceof DeployerTag)) {
+            return false;
+        }
+
+        DeployerTag gi = (DeployerTag) _gi;
+        if ((gi.vmid == vmid) && (gi.myGroup == myGroup)) {
+            return true;
+        }
+
+        return true;
+    }
+
+    public int hashcode() {
+        return this.toString().hashCode();
+    }
+
+    public String toString() {
+        return vmid + "~" + myGroup;
+    }
+
+    /**
+     * Returns the VMID of the runtime which deployed this node
+     * @return the VMID of the runtime which deployed this node
+     */
+    public String getVMID() {
+        return vmid;
+    }
+
+    /**
+     * Returns the group of this node
+     * @return the group of this node
+     */
+    public int getGroup() {
+        return myGroup;
+    }
 }

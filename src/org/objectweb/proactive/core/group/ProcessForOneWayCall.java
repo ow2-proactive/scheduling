@@ -103,17 +103,17 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                         this.mc.execute(object);
                     } else if (objectIsLocal) {
                         if (!(mc instanceof MethodCallControlForGroup)) {
-							((StubObject) object).getProxy().reify(
-									new MethodCall(this.mc));
-						} else {
-							((StubObject) object).getProxy().reify(this.mc);
-						}
-					} else {
-						((StubObject) object).getProxy().reify(this.mc);
-					}
+                            ((StubObject) object).getProxy()
+                             .reify(new MethodCall(this.mc));
+                        } else {
+                            ((StubObject) object).getProxy().reify(this.mc);
+                        }
+                    } else {
+                        ((StubObject) object).getProxy().reify(this.mc);
+                    }
                 }
             } catch (Throwable e) {
-            	e.printStackTrace();
+                e.printStackTrace();
                 this.exceptionList.add(new ExceptionInGroup(object, this.index,
                         e.fillInStackTrace()));
             }

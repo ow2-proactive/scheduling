@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ibis;
 
-import ibis.rmi.RemoteException;
-
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -53,6 +51,8 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import ibis.rmi.RemoteException;
 
 
 public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
@@ -171,7 +171,7 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     }
 
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         return body.startNewSession(policy);
     }
@@ -182,21 +182,21 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     }
 
     public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws IOException, SecurityNotAvailableException, 
+        throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException {
         return body.randomValue(sessionID, cl_rand);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] my_pub,
         byte[] my_cert, byte[] sig_code)
-        throws IOException, SecurityNotAvailableException, 
+        throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException, KeyExchangeException {
         return body.publicKeyExchange(sessionID, my_pub, my_cert, sig_code);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws IOException, SecurityNotAvailableException, 
+        throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException {
         return body.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3, tmp4);
     }
@@ -264,13 +264,13 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     }
 
     public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
-    	return body.receiveGCMessage(msg);
+        return body.receiveGCMessage(msg);
     }
-    
+
     public void setRegistered(boolean registered) throws IOException {
-    	body.setRegistered(registered);
+        body.setRegistered(registered);
     }
-    
+
     /*
        private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
        long startTime=System.currentTimeMillis();

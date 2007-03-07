@@ -30,30 +30,30 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util;
 
+
 /**
  * A MigratableCounter is a TimerCounter which can be migrated using ProActive
  * migration.<br>
  * This counter use a network clock and is much slower than a classic
  * TimerCounter.<br>
  * Use with care.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk, Judicael Ribault
- * 
+ *
  */
 public class MigratableCounter extends TimerCounter {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2195039327751012564L;
-
     private TimItReductor netclock;
-
-    private long elapsed, latency;
+    private long elapsed;
+    private long latency;
 
     /**
      * Create an instance of MigratableCounter
-     * 
+     *
      * @param s
      *            the name of the counter you want to create
      */
@@ -71,7 +71,7 @@ public class MigratableCounter extends TimerCounter {
     /**
      * Invoked by TimItReductor to setup network clock (which is localized on
      * TimItReductor instance node
-     * 
+     *
      * @param tr
      *            the TimItReductor instance
      */
@@ -85,9 +85,10 @@ public class MigratableCounter extends TimerCounter {
     public void start() {
         this.latency = System.currentTimeMillis();
         this.elapsed = this.netclock.getCurrentTimeMillis(); // ask time to
-                                                                // network clock
+                                                             // network clock
+
         this.latency = System.currentTimeMillis() - this.latency;
-        this.elapsed -= this.latency / 2; // adjust and consider an symetrical
+        this.elapsed -= (this.latency / 2); // adjust and consider an symetrical
                                             // connection
     }
 
@@ -98,7 +99,7 @@ public class MigratableCounter extends TimerCounter {
         this.latency = System.currentTimeMillis();
         this.elapsed = this.netclock.getCurrentTimeMillis() - this.elapsed;
         this.latency = System.currentTimeMillis() - this.latency;
-        this.elapsed -= this.latency / 2; // adjust and consider an symetrical
+        this.elapsed -= (this.latency / 2); // adjust and consider an symetrical
                                             // connection
 
         super.setValue((int) this.elapsed);

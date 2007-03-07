@@ -92,11 +92,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-
     private Map fcInterfaceReferences;
     private Map nfInterfaceReferences;
     private Proxy proxy;
-
     private ComponentType componentType = null; // immutable
     private StubObject stubOnBaseObject = null;
     private String hierarchicalType = null;
@@ -124,18 +122,16 @@ public class ProActiveComponentRepresentativeImpl
         InterfaceType[] interface_types = componentType.getFcInterfaceTypes();
         try {
             for (int j = 0; j < interface_types.length; j++) {
-            	if (!interface_types[j].isFcCollectionItf()) {
-            		
-            		// itfs members of collection itfs are dynamically generated
-                Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
-                                                                                     .generateFunctionalInterface(interface_types[j].getFcItfName(),
-                        this, (ProActiveInterfaceType)interface_types[j]);
+                if (!interface_types[j].isFcCollectionItf()) {
+                    // itfs members of collection itfs are dynamically generated
+                    Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
+                                                                                         .generateFunctionalInterface(interface_types[j].getFcItfName(),
+                            this, (ProActiveInterfaceType) interface_types[j]);
 
-                // all calls are to be reified
-                fcInterfaceReferences.put(interface_reference.getFcItfName(),
-                    interface_reference);
-            	} 
-            	
+                    // all calls are to be reified
+                    fcInterfaceReferences.put(interface_reference.getFcItfName(),
+                        interface_reference);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -191,8 +187,9 @@ public class ProActiveComponentRepresentativeImpl
                         });
                 currentInterface = RepresentativeInterfaceClassGenerator.instance()
                                                                         .generateControllerInterface(currentController.getFcItfName(),
-                        this, (ProActiveInterfaceType) currentController.getFcItfType());
-                ((StubObject)currentInterface).setProxy(proxy);
+                        this,
+                        (ProActiveInterfaceType) currentController.getFcItfType());
+                ((StubObject) currentInterface).setProxy(proxy);
             } catch (Exception e) {
                 logger.error("could not create controller " +
                     controllersConfiguration.get(controllerItfName) + " : " +
@@ -230,9 +227,9 @@ public class ProActiveComponentRepresentativeImpl
         Class[] parameterTypes, Object[] effectiveParameters, short priority) {
         try {
             return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
-                    Class.forName(className).getDeclaredMethod(methodName,
-                        parameterTypes), effectiveParameters, null, (String) null, null,
-                    priority));
+                    Class.forName(className)
+                         .getDeclaredMethod(methodName, parameterTypes),
+                    effectiveParameters, null, (String) null, null, priority));
 
             // functional interface name is null
         } catch (NoSuchMethodException e) {
@@ -244,7 +241,6 @@ public class ProActiveComponentRepresentativeImpl
         }
     }
 
-  
     /*
      *implements  org.objectweb.fractal.api.Component#getFcInterface(String)}
      */
@@ -263,39 +259,35 @@ public class ProActiveComponentRepresentativeImpl
             }
             if (nfInterfaceReferences.containsKey(interfaceName)) {
                 return nfInterfaceReferences.get(interfaceName);
-            } else {            	
+            } else {
                 throw new NoSuchInterfaceException(interfaceName);
             }
         }
 
         if (fcInterfaceReferences.containsKey(interfaceName)) {
-        	return fcInterfaceReferences.get(interfaceName);
+            return fcInterfaceReferences.get(interfaceName);
         } else {
-        	// maybe the member of a collection itf?
-        	InterfaceType itfType = Utils.getItfType(interfaceName, this);
-        	if (itfType !=null && itfType.isFcCollectionItf()) {
-        		
-        		try {
-//        				// generate the corresponding interface locally
-        				Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
-        					.generateFunctionalInterface(interfaceName,
-        							this, (ProActiveInterfaceType)itfType);
+            // maybe the member of a collection itf?
+            InterfaceType itfType = Utils.getItfType(interfaceName, this);
+            if ((itfType != null) && itfType.isFcCollectionItf()) {
+                try {
+                    //        				// generate the corresponding interface locally
+                    Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
+                                                                                         .generateFunctionalInterface(interfaceName,
+                            this, (ProActiveInterfaceType) itfType);
 
-        				((StubObject)interface_reference).setProxy(proxy);
-        				// keep it in the list of functional interfaces
-        				fcInterfaceReferences.put(interfaceName,interface_reference);
-        				return interface_reference;
-        			 
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
-        	}
+                    ((StubObject) interface_reference).setProxy(proxy);
+                    // keep it in the list of functional interfaces
+                    fcInterfaceReferences.put(interfaceName, interface_reference);
+                    return interface_reference;
+                } catch (SecurityException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        	
-        
 
         throw new NoSuchInterfaceException(interfaceName);
     }
@@ -370,25 +362,24 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     public int hashCode() {
-    	// reified as a standard invocation (not a component one)
-    	Object result;
-		try {
-			result = proxy.reify((MethodCall) MethodCall.getMethodCall(
-			         Class.forName(Object.class.getName()).getDeclaredMethod("hashCode",
-			             new Class[] {}), new Object[] {}, (Map<TypeVariable, Class>)null));
-	        return ((Integer) result).intValue();
-		} catch (SecurityException e) {
-			throw new ProActiveRuntimeException(e.toString());
-		} catch (NoSuchMethodException e) {
-			throw new ProActiveRuntimeException(e.toString());
-		} catch (ClassNotFoundException e) {
-			throw new ProActiveRuntimeException(e.toString());
-		} catch (Throwable e) {
-			throw new ProActiveRuntimeException(e.toString());
-		}
-
+        // reified as a standard invocation (not a component one)
+        Object result;
+        try {
+            result = proxy.reify((MethodCall) MethodCall.getMethodCall(
+                        Class.forName(Object.class.getName())
+                             .getDeclaredMethod("hashCode", new Class[] {  }),
+                        new Object[] {  }, (Map<TypeVariable, Class>) null));
+            return ((Integer) result).intValue();
+        } catch (SecurityException e) {
+            throw new ProActiveRuntimeException(e.toString());
+        } catch (NoSuchMethodException e) {
+            throw new ProActiveRuntimeException(e.toString());
+        } catch (ClassNotFoundException e) {
+            throw new ProActiveRuntimeException(e.toString());
+        } catch (Throwable e) {
+            throw new ProActiveRuntimeException(e.toString());
+        }
     }
-    
 
     /**
      * Only valid for a single element. return null for a group.
@@ -435,11 +426,9 @@ public class ProActiveComponentRepresentativeImpl
         return Constants.PRIMITIVE.equals(hierarchicalType);
     }
 
-	public void _terminateAO(Proxy proxy) {
+    public void _terminateAO(Proxy proxy) {
+    }
 
-	}
-
-	public void _terminateAOImmediatly(Proxy proxy) {
-	}
-	
+    public void _terminateAOImmediatly(Proxy proxy) {
+    }
 }

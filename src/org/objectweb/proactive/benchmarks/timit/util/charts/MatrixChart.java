@@ -69,23 +69,22 @@ import org.objectweb.proactive.benchmarks.timit.config.ConfigChart;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 
+
 /**
  * This class contains all methods to build a matrix chart from a
  * two-dimensional integer array. Used for communication pattern analysis.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class MatrixChart implements Chart {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -9045078395503131290L;
-
-    public static final String logoFile = org.objectweb.proactive.benchmarks.timit.config.ConfigReader.PROJECT_PATH+"/src/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png";
-
+    public static final String logoFile = org.objectweb.proactive.benchmarks.timit.config.ConfigReader.PROJECT_PATH +
+        "/src/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png";
     private Chart.LegendFormat legendFormatMode;
-
     private Chart.Scale scaleMode;
 
     /** The array that will be displayed on the chart */
@@ -101,20 +100,18 @@ public class MatrixChart implements Chart {
     private JFreeChart mainChart;
 
     /** The legend containing chart */
-    private JFreeChart legendChart;    
+    private JFreeChart legendChart;
 
     public void generateChart(Element eTimit, BenchmarkStatistics bstats,
-            ConfigChart cChart) {                       
-        
+        ConfigChart cChart) {
         String name = cChart.get("eventName");
-        int[][] a = (int[][]) bstats.getEventsStatistics().getEventDataValue(
-                name);
-        this.array = (a == null ? MatrixChart.build2DArray(16) : a);
+        int[][] a = (int[][]) bstats.getEventsStatistics()
+                                    .getEventDataValue(name);
+        this.array = ((a == null) ? MatrixChart.build2DArray(16) : a);
         this.maxValue = MatrixChart.getMaxValue(this.array);
-        this.scaleMode =
-            ConfigChart.scaleValue(cChart.get("scaleMode"));
-        this.legendFormatMode =
-            ConfigChart.legendValue(cChart.get("legendFormatMode"));
+        this.scaleMode = ConfigChart.scaleValue(cChart.get("scaleMode"));
+        this.legendFormatMode = ConfigChart.legendValue(cChart.get(
+                    "legendFormatMode"));
 
         if (this.scaleMode == Chart.Scale.DEFAULT) {
             this.scaleMode = Chart.Scale.LOGARITHMIC;
@@ -128,7 +125,7 @@ public class MatrixChart implements Chart {
 
     /**
      * Creates a two-dim array and returns it.
-     * 
+     *
      * @param size
      *            The size of the array.
      * @return The created array
@@ -145,7 +142,9 @@ public class MatrixChart implements Chart {
     }
 
     private static int getMaxValue(int[][] a) {
-        int i, j, max = 0;
+        int i;
+        int j;
+        int max = 0;
 
         for (i = 0; i < a.length; i++) {
             for (j = 0; j < a.length; j++) {
@@ -158,10 +157,8 @@ public class MatrixChart implements Chart {
     }
 
     private void buildMainChart(String title, String subTitle,
-            String xAxisLabel, String yAxisLabel, String fileName) {
-
-        final MatrixSeriesCollection dataset = new MatrixSeriesCollection(this
-                .createMatrixDataSet());
+        String xAxisLabel, String yAxisLabel, String fileName) {
+        final MatrixSeriesCollection dataset = new MatrixSeriesCollection(this.createMatrixDataSet());
 
         final JFreeChart chart = ChartFactory.createBubbleChart(title,
                 xAxisLabel, yAxisLabel, dataset, PlotOrientation.VERTICAL,
@@ -199,7 +196,6 @@ public class MatrixChart implements Chart {
     }
 
     private void buildLegendChart(int nbValues) {
-
         this.legendValues = new int[nbValues + 1];
         this.legendValues[0] = 0;
         int offset = 255 / nbValues;
@@ -207,18 +203,17 @@ public class MatrixChart implements Chart {
 
         if (this.scaleMode == Chart.Scale.LOGARITHMIC) {
             double logStep = (Math.log(this.maxValue) / Math.log(2)) / nbValues;
-            for (int i = 1; i < nbValues + 1; i++) {
+            for (int i = 1; i < (nbValues + 1); i++) {
                 this.legendValues[i] = (int) Math.pow(2, logStep * i);
             }
         } else { // Linear scale mode
-            for (int i = 1; i < nbValues + 1; i++) {
+            for (int i = 1; i < (nbValues + 1); i++) {
                 this.legendValues[i] = (step * this.maxValue) / 255;
                 step += offset;
             }
         }
 
-        final MatrixSeriesCollection dataset = new MatrixSeriesCollection(this
-                .createLegendDataSet());
+        final MatrixSeriesCollection dataset = new MatrixSeriesCollection(this.createLegendDataSet());
 
         final JFreeChart chart = ChartFactory.createBubbleChart("", "", "",
                 dataset, PlotOrientation.VERTICAL, true, true, false);
@@ -245,7 +240,7 @@ public class MatrixChart implements Chart {
         // Custumize the range axis ( y )
         final NumberAxis rangeAxis = (NumberAxis) plot1.getRangeAxis();
         rangeAxis.setTickUnit(new CustomTickUnit(rangeAxis.getTickUnit()
-                .getSize()));
+                                                          .getSize()));
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         rangeAxis.setRange(-1, this.legendValues.length);
         rangeAxis.setTickLabelsVisible(true);
@@ -262,24 +257,22 @@ public class MatrixChart implements Chart {
 
     private void buildFinalChart(ConfigChart cChart) {
         this.buildFinalChart(cChart.get("title"), cChart.get("subTitle"),
-                cChart.get("filename"), cChart.get("xAxisLabel"), cChart
-                        .get("yAxisLabel"), Integer
-                        .valueOf(cChart.get("width")), Integer.valueOf(cChart
-                        .get("height")));
+            cChart.get("filename"), cChart.get("xAxisLabel"),
+            cChart.get("yAxisLabel"), Integer.valueOf(cChart.get("width")),
+            Integer.valueOf(cChart.get("height")));
     }
 
     private void buildFinalChart(String title, String subTitle,
-            String filename, String xAxisLabel, String yAxisLabel, int width,
-            int height) {
-
+        String filename, String xAxisLabel, String yAxisLabel, int width,
+        int height) {
         this.buildMainChart(title, subTitle, xAxisLabel, yAxisLabel, filename);
 
         this.buildLegendChart(5);
 
-        BufferedImage mainChartImage = this.mainChart.createBufferedImage(
-                width, height);
-        BufferedImage legendChartImage = this.legendChart.createBufferedImage(
-                width / 6, height / 3);
+        BufferedImage mainChartImage = this.mainChart.createBufferedImage(width,
+                height);
+        BufferedImage legendChartImage = this.legendChart.createBufferedImage(width / 6,
+                height / 3);
         BufferedImage info = null;
         try {
             info = ImageIO.read(new File(MatrixChart.logoFile));
@@ -294,18 +287,19 @@ public class MatrixChart implements Chart {
         g.drawImage(legendChartImage, width, height / 4, null);
         g.setPaint(Color.WHITE);
         g.fillRect(width, 0, width, height / 4);
-        g.fillRect(width, height / 4 + height / 3, width, height);
+        g.fillRect(width, (height / 4) + (height / 3), width, height);
         if (info != null) {
             // g.drawImage(info, (width+(width/6))-info.getWidth(),10, null); //
             // up-right
-            g.drawImage(info, (width + (width / 6)) - info.getWidth(), height
-                    - info.getHeight(), null); // down-right
+            g.drawImage(info, (width + (width / 6)) - info.getWidth(),
+                height - info.getHeight(), null); // down-right
         }
         g.dispose();
 
-        try {                        
-            javax.imageio.ImageIO.write(total, "png", XMLHelper.createFileWithDirs(filename));
-        } catch (IOException ex) {            
+        try {
+            javax.imageio.ImageIO.write(total, "png",
+                XMLHelper.createFileWithDirs(filename));
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -314,7 +308,6 @@ public class MatrixChart implements Chart {
      * Creates a NormalizedMatrixSeries from the array and returns it.
      */
     private NormalizedMatrixSeries createMatrixDataSet() {
-
         NormalizedMatrixSeries matrix = new NormalizedMatrixSeries("s",
                 this.array.length, this.array.length);
         return matrix;
@@ -337,7 +330,7 @@ public class MatrixChart implements Chart {
     private class CustomRenderer extends StandardXYItemRenderer {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -7987810288979911261L;
 
@@ -349,7 +342,7 @@ public class MatrixChart implements Chart {
 
         /**
          * Creates a new renderer.
-         * 
+         *
          * @param colors
          *            the colors.
          */
@@ -361,45 +354,44 @@ public class MatrixChart implements Chart {
         /**
          * Returns the paint for an item. Overrides the default behaviour
          * inherited from AbstractSeriesRenderer.
-         * 
+         *
          * @param row
          *            the series.
          * @param column
          *            the category.
-         * 
+         *
          * @return The item color.
          */
         public Paint getItemPaint(final int series, final int item) {
             int value = 0;
             if (this.legendMode) {
                 if (MatrixChart.this.scaleMode == Chart.Scale.LOGARITHMIC) {
-                    value = (255 / (MatrixChart.this.legendValues.length - 1))
-                            * item;
+                    value = (255 / (MatrixChart.this.legendValues.length - 1)) * item;
                 } else {
-                    value = (MatrixChart.this.legendValues[item] * 255)
-                            / (MatrixChart.this.maxValue == 0 ? 1
-                                    : MatrixChart.this.maxValue);
+                    value = (MatrixChart.this.legendValues[item] * 255) / ((MatrixChart.this.maxValue == 0)
+                        ? 1 : MatrixChart.this.maxValue);
                 }
             } else {
-                if (item != 0 && item % MatrixChart.this.array.length == 0) {
+                if ((item != 0) &&
+                        ((item % MatrixChart.this.array.length) == 0)) {
                     this.currentRow++;
                 }
-                value = (int) ((MatrixChart.this.array[this.currentRow][item
-                        % MatrixChart.this.array.length] / (MatrixChart.this.maxValue + 0.01)) * 255);
+                value = (int) ((MatrixChart.this.array[this.currentRow][item % MatrixChart.this.array.length] / (MatrixChart.this.maxValue +
+                    0.01)) * 255);
 
                 if (MatrixChart.this.scaleMode == Chart.Scale.LOGARITHMIC) {
-                    value = (int) (((Math.log((value == 255 ? 255 : value + 1)) / Math
-                            .log(2)) / (Math.log(255) / Math.log(2))) * 255);
+                    value = (int) (((Math.log(((value == 255) ? 255 : (value +
+                            1))) / Math.log(2)) / (Math.log(255) / Math.log(2))) * 255);
                 }
             }
 
             return new Color(0, 0,
-                    (int) (255 - Math.pow(value / 255.0, 6) * 80), value);
+                (int) (255 - (Math.pow(value / 255.0, 6) * 80)), value);
         }
 
         /**
          * Draws the visual representation of a single data item.
-         * 
+         *
          * @param g2
          *            the graphics device.
          * @param state
@@ -428,10 +420,9 @@ public class MatrixChart implements Chart {
          *            the pass index.
          */
         public void drawItem(Graphics2D g2, XYItemRendererState state,
-                Rectangle2D dataArea, PlotRenderingInfo info, XYPlot plot,
-                ValueAxis domainAxis, ValueAxis rangeAxis, XYDataset dataset,
-                int series, int item, CrosshairState crosshairState, int pass) {
-
+            Rectangle2D dataArea, PlotRenderingInfo info, XYPlot plot,
+            ValueAxis domainAxis, ValueAxis rangeAxis, XYDataset dataset,
+            int series, int item, CrosshairState crosshairState, int pass) {
             PlotOrientation orientation = plot.getOrientation();
 
             // get the data point...
@@ -454,16 +445,15 @@ public class MatrixChart implements Chart {
             double zero2 = rangeAxis.valueToJava2D(0.0, dataArea,
                     rangeAxisLocation);
             transDomain = domainAxis.valueToJava2D(z, dataArea,
-                    domainAxisLocation)
-                    - zero1;
-            transRange = zero2
-                    - rangeAxis.valueToJava2D(z, dataArea, rangeAxisLocation);
+                    domainAxisLocation) - zero1;
+            transRange = zero2 -
+                rangeAxis.valueToJava2D(z, dataArea, rangeAxisLocation);
 
             transDomain = Math.abs(transDomain);
             transRange = Math.abs(transRange);
 
-            RoundRectangle2D.Double rect = new RoundRectangle2D.Double(transX
-                    - transDomain / 2.0, transY - transRange / 2.0,
+            RoundRectangle2D.Double rect = new RoundRectangle2D.Double(transX -
+                    (transDomain / 2.0), transY - (transRange / 2.0),
                     transDomain, transRange, 10, 10);
 
             g2.setPaint(this.getItemPaint(series, item));
@@ -473,13 +463,14 @@ public class MatrixChart implements Chart {
             g2.draw(rect);
 
             this.updateCrosshairValues(crosshairState, x, y, transX, transY,
-                    orientation);
+                orientation);
         }
     }
 
     private static class CustomAxis extends NumberAxis {
+
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -1624475755178533032L;
 
@@ -490,7 +481,7 @@ public class MatrixChart implements Chart {
         /**
          * Calculates the positions of the tick labels for the axis, storing the
          * results in the tick label list (ready for drawing).
-         * 
+         *
          * @param g2
          *            the graphics device.
          * @param state
@@ -499,13 +490,12 @@ public class MatrixChart implements Chart {
          *            the area in which the plot should be drawn.
          * @param edge
          *            the location of the axis.
-         * 
+         *
          * @return A list of ticks.
-         * 
+         *
          */
         public List<NumberTick> refreshTicks(Graphics2D g2, AxisState state,
-                Rectangle2D dataArea, RectangleEdge edge) {
-
+            Rectangle2D dataArea, RectangleEdge edge) {
             List<NumberTick> result = new java.util.ArrayList<NumberTick>();
             if (RectangleEdge.isTopOrBottom(edge)) {
                 result = this.refreshTicksHorizontal(g2, dataArea, edge);
@@ -526,14 +516,13 @@ public class MatrixChart implements Chart {
             result.set(0, newFirst);
             result.set(size - 1, newLast);
             return result;
-
         }
     }
 
     private class CustomTickUnit extends NumberTickUnit {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -6476772736783076413L;
 
@@ -543,31 +532,29 @@ public class MatrixChart implements Chart {
 
         /**
          * Converts a value to a string.
-         * 
+         *
          * @param value
          *            the value.
-         * 
+         *
          * @return The formatted string.
          */
         public String valueToString(double value) {
-            if( MatrixChart.this.legendFormatMode
-                    == Chart.LegendFormat.POW10 ) {
-                return (value >= 0
-                        && value < MatrixChart.this.legendValues.length ? ""
-                                + MatrixChart.formatDataSize(
-                                        MatrixChart.this.legendValues[(int) value],
-                                        1000) : "");
-            } else if( MatrixChart.this.legendFormatMode
-                    == Chart.LegendFormat.POW2 ) {
-                return (value >= 0
-                        && value < MatrixChart.this.legendValues.length ? ""
-                                + MatrixChart.formatDataSize(
-                                        MatrixChart.this.legendValues[(int) value],
-                                        1024) : "");
+            if (MatrixChart.this.legendFormatMode == Chart.LegendFormat.POW10) {
+                return (((value >= 0) &&
+                (value < MatrixChart.this.legendValues.length))
+                ? ("" +
+                MatrixChart.formatDataSize(MatrixChart.this.legendValues[(int) value],
+                    1000)) : "");
+            } else if (MatrixChart.this.legendFormatMode == Chart.LegendFormat.POW2) {
+                return (((value >= 0) &&
+                (value < MatrixChart.this.legendValues.length))
+                ? ("" +
+                MatrixChart.formatDataSize(MatrixChart.this.legendValues[(int) value],
+                    1024)) : "");
             } else {
-                return (value >= 0
-                        && value < MatrixChart.this.legendValues.length ? ""
-                                + MatrixChart.this.legendValues[(int) value] : "");
+                return (((value >= 0) &&
+                (value < MatrixChart.this.legendValues.length))
+                ? ("" + MatrixChart.this.legendValues[(int) value]) : "");
             }
         }
     }

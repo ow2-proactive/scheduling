@@ -42,50 +42,47 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  * The Seq skeleton is a wrapper for the user inputed
  * sequential code. This class allows the code to be nested
  * inside other skeletons.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <P>
  */
-public class Seq<P,R> implements Skeleton<P,R>, Instruction<P,R> {
+public class Seq<P, R> implements Skeleton<P, R>, Instruction<P, R> {
+    Execute<P, R> secCode;
+    int muscleId;
 
-	Execute<P,R> secCode;
-	int muscleId;
-	
-	public Seq(Execute<P,R> secCode){
-		this.secCode=secCode;
-		muscleId=0;
-	}
-	
-	public Vector<Instruction<?,?>> getInstructionStack() {
-		
-		Vector<Instruction<?,?>> v=new Vector<Instruction<?,?>>();
-		v.add(this);
-		return v;
-	}
+    public Seq(Execute<P, R> secCode) {
+        this.secCode = secCode;
+        muscleId = 0;
+    }
 
-	public Task<R> compute(Task<P> t) throws RuntimeException, EnvironmentException {
-		
-		Timer timer = new Timer();
-		R resultObject= secCode.execute(t.getObject());
-		timer.stop();
-		
-		//Task<T> resultTask= t.reBirth(resultObject);
-		//resultTask.getStats().trackWorkout(secCode, timer);
-		//return resultTask;
-		
-		Task<R> newtask = t.reBirth(resultObject); 
-		
-		//t.setResult(resultObject);
-		t.getStats().getWorkout().track(secCode,timer);
-		return newtask;
-	}
+    public Vector<Instruction<?, ?>> getInstructionStack() {
+        Vector<Instruction<?, ?>> v = new Vector<Instruction<?, ?>>();
+        v.add(this);
+        return v;
+    }
 
-	public String toString(){
-		return "Seq("+this.secCode.getClass()+")";
-	}
+    public Task<R> compute(Task<P> t)
+        throws RuntimeException, EnvironmentException {
+        Timer timer = new Timer();
+        R resultObject = secCode.execute(t.getObject());
+        timer.stop();
 
-	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<P>) t);
-	}
+        //Task<T> resultTask= t.reBirth(resultObject);
+        //resultTask.getStats().trackWorkout(secCode, timer);
+        //return resultTask;
+        Task<R> newtask = t.reBirth(resultObject);
+
+        //t.setResult(resultObject);
+        t.getStats().getWorkout().track(secCode, timer);
+        return newtask;
+    }
+
+    public String toString() {
+        return "Seq(" + this.secCode.getClass() + ")";
+    }
+
+    public Task<?> computeUnknown(Task<?> t) throws Exception {
+        return compute((Task<P>) t);
+    }
 }

@@ -32,23 +32,22 @@ package org.objectweb.proactive.calcium.examples.nqueens;
 
 import org.objectweb.proactive.calcium.muscle.Condition;
 
+
 public class DivideCondition implements Condition<Board> {
 
-	/**
-	 * Divide while condition holds
-	 * @param board
-	 * @return true if board should be divided, false otherwise
-	 */
-	public boolean evalCondition(Board board){
-		
-		if(board.isRootBoard()){
-			return true;
-		}
-		else{
-			if(board.row+board.solvableSize<board.n){
-				return true;
-			}
-		}	
-		return false;
-	}
+    /**
+     * Divide while condition holds
+     * @param board
+     * @return true if board should be divided, false otherwise
+     */
+    public boolean evalCondition(Board board) {
+        if (board.isRootBoard()) {
+            return true;
+        } else {
+            if ((board.row + board.solvableSize) < board.n) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

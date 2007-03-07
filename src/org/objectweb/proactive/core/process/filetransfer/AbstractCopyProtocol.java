@@ -80,7 +80,8 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
         this.isDefaultProtocol = isDefaultProtocol;
     }
 
-    public void setFileTransferDefinitions(FileTransferDefinition[] fileTransfer) {
+    public void setFileTransferDefinitions(
+        FileTransferDefinition[] fileTransfer) {
         this.fileTransfer = fileTransfer;
     }
 

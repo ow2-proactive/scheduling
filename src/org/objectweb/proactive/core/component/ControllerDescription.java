@@ -134,7 +134,8 @@ public class ControllerDescription implements Serializable {
         } else {
             this.controllersConfigFileLocation = controllersConfigFileLocation;
         }
-        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(this.controllersConfigFileLocation).getControllers();
+        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(this.controllersConfigFileLocation)
+                                                      .getControllers();
     }
 
     /**
@@ -142,7 +143,9 @@ public class ControllerDescription implements Serializable {
      * @param controllerDesc the ControllerDescription to copy.
      */
     public ControllerDescription(ControllerDescription controllerDesc) {
-        this(controllerDesc.name, controllerDesc.hierarchicalType, controllerDesc.controllersConfigFileLocation, controllerDesc.synchronous);
+        this(controllerDesc.name, controllerDesc.hierarchicalType,
+            controllerDesc.controllersConfigFileLocation,
+            controllerDesc.synchronous);
     }
 
     /**
@@ -192,7 +195,7 @@ public class ControllerDescription implements Serializable {
     public String getControllersConfigFileLocation() {
         return controllersConfigFileLocation;
     }
-    
+
     public Map getControllersSignatures() {
         return controllersSignatures;
     }

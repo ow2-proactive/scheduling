@@ -30,14 +30,13 @@
  */
 package org.objectweb.proactive.examples.hello;
 
-import org.apache.log4j.Logger;
+import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
-
-import java.net.UnknownHostException;
 
 
 /** A stripped-down Active Object example.
@@ -54,9 +53,10 @@ public class TinyHello implements java.io.Serializable {
     /** The Active Object creates and returns information on its location
      * @return a StringWrapper which is a Serialized version, for asynchrony */
     public StringMutableWrapper sayHello() {
-        return new StringMutableWrapper(
-            this.message + "\n from " + getHostName() + "\n at " +
-            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date()));
+        return new StringMutableWrapper(this.message + "\n from " +
+            getHostName() + "\n at " +
+            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(
+                new java.util.Date()));
     }
 
     /** finds the name of the local machine */
@@ -70,19 +70,18 @@ public class TinyHello implements java.io.Serializable {
 
     /** The call that starts the Acive Objects, and displays results.
      * @param args must contain the name of an xml descriptor */
-    public static void main(String[] args)
-        throws Exception {
+    public static void main(String[] args) throws Exception {
         // Creates an active instance of class Tiny on the local node
-        TinyHello tiny = (TinyHello) ProActive.newActive(
-                TinyHello.class.getName(), // the class to deploy
+        TinyHello tiny = (TinyHello) ProActive.newActive(TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
             ); // which jvm should be used to hold the Active Object
 
         // get and display a value 
         StringMutableWrapper received = tiny.sayHello(); // possibly remote call
-        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity
-        // quitting
-        
+        logger.info("On " + getHostName() + ", a message was received: " +
+            received); // potential wait-by-necessity
+                       // quitting
+
         ProActive.exitSuccess();
     }
 }

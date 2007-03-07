@@ -169,7 +169,7 @@ public interface JVMProcess extends ExternalProcess {
      * @param jvmProcess the extended jvm
      */
     public void setExtendedJVM(JVMProcessImpl jvmProcess);
-    
+
     /**
      * Each time a makeDeepCopy is performed on a JVMProcess this method must be called.
      */

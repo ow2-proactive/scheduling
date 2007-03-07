@@ -38,19 +38,16 @@ import java.lang.annotation.Target;
 /**
  * Annotates a method: it specifies the dispatch mode applicable for <b>all</b>
  * parameters of the method
- * 
+ *
  * @author Matthieu Morel
- * 
+ *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface MethodDispatchMetadata {
-    
-	/**
-	 * specifies the dispatch mode
-	 * @return the dispatch mode
-	 */
+    /**
+     * specifies the dispatch mode
+     * @return the dispatch mode
+     */
     ParamDispatchMetadata mode();
-        
-
 }

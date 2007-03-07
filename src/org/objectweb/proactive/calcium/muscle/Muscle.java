@@ -30,6 +30,5 @@
  */
 package org.objectweb.proactive.calcium.muscle;
 
-public interface Muscle<P,R> extends java.io.Serializable{
-
+public interface Muscle<P, R> extends java.io.Serializable {
 }

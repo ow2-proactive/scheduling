@@ -180,8 +180,8 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException;
 
-    public GCResponse receiveGCMessage(GCMessage toSend) throws IOException;
+    public GCResponse receiveGCMessage(GCMessage toSend)
+        throws IOException;
 
-	public void setRegistered(boolean registered) throws IOException;
-
+    public void setRegistered(boolean registered) throws IOException;
 }

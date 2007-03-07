@@ -34,16 +34,17 @@ import java.util.Vector;
 
 import org.objectweb.proactive.benchmarks.timit.util.EventStatistics;
 
+
 /**
  * This class represents several StatDatas provided by observers of a subject.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public class EventDataBag implements java.io.Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -6689679318037025254L;
 
@@ -97,10 +98,9 @@ public class EventDataBag implements java.io.Serializable {
     public String toString() {
         String res = "";
         for (int i = 0; i < this.bag.size(); i++) {
-            res += this.bag.get(i).toString() + "\n";
+            res += (this.bag.get(i).toString() + "\n");
         }
 
         return res;
     }
-
 }

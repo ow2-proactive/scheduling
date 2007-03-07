@@ -110,7 +110,8 @@ import org.objectweb.proactive.ext.security.securityentity.EntityVirtualNode;
  *
  */
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
-    implements ProActiveRuntime, LocalProActiveRuntime, ProActiveRuntimeImplMBean {
+    implements ProActiveRuntime, LocalProActiveRuntime,
+        ProActiveRuntimeImplMBean {
     //
     // -- STATIC MEMBERS -----------------------------------------------------------
     //
@@ -131,7 +132,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveSecurityManager runtimeSecurityManager;
 
     // map of local nodes, key is node name
-    private java.util.Hashtable<String,LocalNode> nodeMap;
+    private java.util.Hashtable<String, LocalNode> nodeMap;
     private String defaultNodeVirtualNode = null;
 
     //
@@ -165,7 +166,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet<String>());
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNode>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptor>();
-            this.nodeMap = new java.util.Hashtable<String,LocalNode>();
+            this.nodeMap = new java.util.Hashtable<String, LocalNode>();
 
             try {
                 String file = System.getProperties()
@@ -213,29 +214,28 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //      JMX registration
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = new ObjectName("org.objectweb.proactive.runtime:type=" + this.getURL() );
-                        mbs.registerMBean(this, name);
-                } catch (MalformedObjectNameException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (NullPointerException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (InstanceAlreadyExistsException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (MBeanRegistrationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (NotCompliantMBeanException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                }
+            ObjectName name = new ObjectName(
+                    "org.objectweb.proactive.runtime:type=" + this.getURL());
+            mbs.registerMBean(this, name);
+        } catch (MalformedObjectNameException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstanceAlreadyExistsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MBeanRegistrationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NotCompliantMBeanException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-                // End JMX registration
+        // End JMX registration
 
-
-        
         // logging info
         MDC.remove("runtime");
         MDC.put("runtime", getURL());
@@ -384,7 +384,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         synchronized (nodeMap) {
             nodeNames = new String[nodeMap.size()];
 
-            for (java.util.Enumeration<String> e = nodeMap.keys(); e.hasMoreElements();) {
+            for (java.util.Enumeration<String> e = nodeMap.keys();
+                    e.hasMoreElements();) {
                 nodeNames[i] = e.nextElement();
                 i++;
             }
@@ -574,7 +575,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return localNode.getJobId();
     }
 
-    public ArrayList<BodyAdapter> getActiveObjects(String nodeName, String className) {
+    public ArrayList<BodyAdapter> getActiveObjects(String nodeName,
+        String className) {
         //the array to return
         ArrayList<BodyAdapter> localBodies = new ArrayList<BodyAdapter>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
@@ -626,7 +628,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody).getProActiveSecurityManager();
 
         if (objectSecurityManager != null) {
-            ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName).getSecurityManager();
+            ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName)
+                                                                       .getSecurityManager();
             objectSecurityManager.setParent(nodeSecurityManager);
         }
 
@@ -635,9 +638,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         registerBody(nodeName, localBody);
 
         if (GarbageCollector.dgcIsEnabled()) {
-        	((AbstractBody) localBody).updateReferences(UniversalBodyProxy.getIncomingReferences());
+            ((AbstractBody) localBody).updateReferences(UniversalBodyProxy.getIncomingReferences());
         }
-        
+
         if (isLocal) {
             // if the body and proxy are on the same vm, returns the local view
             //System.out.println("body and proxy on the same vm");
@@ -656,10 +659,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String, Body)
      */
     public UniversalBody receiveBody(String nodeName, Body body) {
-    	ProActiveSecurityManager psm = ((AbstractBody) body).getProActiveSecurityManager();
-    	if (psm != null) {
-    		psm.setParent(this.nodeMap.get(nodeName).getSecurityManager());
-    	}
+        ProActiveSecurityManager psm = ((AbstractBody) body).getProActiveSecurityManager();
+        if (psm != null) {
+            psm.setParent(this.nodeMap.get(nodeName).getSecurityManager());
+        }
 
         registerBody(nodeName, body);
 

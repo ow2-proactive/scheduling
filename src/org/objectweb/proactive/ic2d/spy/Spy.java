@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.spy;
 
 import java.io.IOException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
@@ -86,29 +87,26 @@ public class Spy implements org.objectweb.proactive.RunActive,
         this.updateFrequence = updateFrequence;
     }
 
-    
-
-    
     public void migrateTo(UniqueID bodyId, String nodeDestination)
-    throws MigrationException {
-    Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
-    if (body == null) {
-        throw new MigrationException("Cannot find object id=" + bodyId);
+        throws MigrationException {
+        Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
+        if (body == null) {
+            throw new MigrationException("Cannot find object id=" + bodyId);
+        }
+        if (!(body instanceof Migratable)) {
+            throw new MigrationException("Object cannot Migrate");
+        }
+        Node node = null;
+        try {
+            node = org.objectweb.proactive.core.node.NodeFactory.getNode(nodeDestination);
+        } catch (org.objectweb.proactive.core.node.NodeException e) {
+            throw new MigrationException("Cannot find node " + nodeDestination,
+                e);
+        }
+        ProActive.migrateTo(body, node, true,
+            Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
-    if (!(body instanceof Migratable)) {
-        throw new MigrationException("Object cannot Migrate");
-    }
-    Node node = null;
-    try {
-        node = org.objectweb.proactive.core.node.NodeFactory.getNode(nodeDestination);
-    } catch (org.objectweb.proactive.core.node.NodeException e) {
-        throw new MigrationException("Cannot find node " + nodeDestination,
-            e);
-    }
-    ProActive.migrateTo(body, node, true, Request.NFREQUEST_IMMEDIATE_PRIORITY);
-}
 
-    
     public String getSystemProperty(String key) {
         return System.getProperty(key);
     }
@@ -167,11 +165,11 @@ public class Spy implements org.objectweb.proactive.RunActive,
             e.printStackTrace();
         }
     }
-    
-    
+
     public MigratableBody getBody(UniqueID bodyId) {
-    	MigratableBody body = (MigratableBody)LocalBodyStore.getInstance().getLocalBody(bodyId);
-    	return body;
+        MigratableBody body = (MigratableBody) LocalBodyStore.getInstance()
+                                                             .getLocalBody(bodyId);
+        return body;
     }
 
     //

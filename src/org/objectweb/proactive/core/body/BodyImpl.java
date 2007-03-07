@@ -83,6 +83,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  *
  *
  */
+
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * <p>
@@ -108,8 +109,8 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * @see UniqueID
  *
  */
-public abstract class BodyImpl extends AbstractBody
-    implements java.io.Serializable, BodyImplMBean {
+public abstract class BodyImpl extends AbstractBody implements java.io.Serializable,
+    BodyImplMBean {
     //  
     // -- STATIC MEMBERS -----------------------------------------------
     //
@@ -197,31 +198,33 @@ public abstract class BodyImpl extends AbstractBody
             this.ftmanager = null;
         }
         this.gc = new GarbageCollector(this);
-        
+
         // JMX registration 
         try {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer(); 
-            ObjectName name = new ObjectName("org.objectweb.proactive:type=oa,class="+this.getName()+",name=" + this.
-getName() + "-" + this.getID().toString().replace(':','-') );
-                        mbs.registerMBean(this, name);
-                } catch (MalformedObjectNameException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (NullPointerException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (InstanceAlreadyExistsException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (MBeanRegistrationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } catch (NotCompliantMBeanException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                } 
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName name = new ObjectName(
+                    "org.objectweb.proactive:type=oa,class=" + this.getName() +
+                    ",name=" + this.getName() + "-" +
+                    this.getID().toString().replace(':', '-'));
+            mbs.registerMBean(this, name);
+        } catch (MalformedObjectNameException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstanceAlreadyExistsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MBeanRegistrationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NotCompliantMBeanException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-                // End JMX registration      
+        // End JMX registration      
     }
 
     //
@@ -318,7 +321,7 @@ getName() + "-" + this.getID().toString().replace(':','-') );
     }
 
     public boolean isInImmediateService() throws IOException {
-    	return this.requestReceiver.isInImmediateService();
+        return this.requestReceiver.isInImmediateService();
     }
 
     //
@@ -389,13 +392,13 @@ getName() + "-" + this.getID().toString().replace(':','-') );
                         timer.setTimer("serve." + request.getMethodName());
                         timer.start();
                     }
-                    
+
                     //If the request is not a "terminate Active Object" request, 
                     //it is served normally.
-                    if(!isTerminateAORequest(request)) {
-                    	reply = request.serve(BodyImpl.this);
+                    if (!isTerminateAORequest(request)) {
+                        reply = request.serve(BodyImpl.this);
                     }
-                    
+
                     if (Profiling.SERVICE) {
                         //timer.setTimer("serve."+this.getMethodName());
                         timer.stop();
@@ -454,9 +457,9 @@ getName() + "-" + this.getID().toString().replace(':','-') );
                         return; //test if active in case of terminate() method otherwise eventProducer would be null
                     }
                     if (messageEventProducer != null) {
-                    	messageEventProducer.notifyListeners(request,
-                    			MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                    			getRequestQueue().size());
+                        messageEventProducer.notifyListeners(request,
+                            MessageEvent.VOID_REQUEST_SERVED, bodyID,
+                            getRequestQueue().size());
                     }
                     return;
                 }
@@ -481,7 +484,8 @@ getName() + "-" + this.getID().toString().replace(':','-') );
                 // Create a non functional exception encapsulating the network exception
                 BodyNonFunctionalException nfe = new SendReplyCommunicationException(
                         "Exception occured in while sending reply to request = " +
-                        request.getMethodName(), e, BodyImpl.this, request.getSourceBodyID());
+                        request.getMethodName(), e, BodyImpl.this,
+                        request.getSourceBodyID());
 
                 NFEManager.fireNFE(nfe, BodyImpl.this);
             }
@@ -495,7 +499,7 @@ getName() + "-" + this.getID().toString().replace(':','-') );
                     BodyImpl.this, future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
-            if (methodCall.getComponentMetadata()!=null) {
+            if (methodCall.getComponentMetadata() != null) {
                 request = new ComponentRequestImpl((RequestImpl) request);
             }
             if (future != null) {
@@ -525,19 +529,19 @@ getName() + "-" + this.getID().toString().replace(':','-') );
         // -- PROTECTED METHODS -----------------------------------------------
         //
 
-        
         /**
          * Test if the MethodName of the request is "terminateAO" or "terminateAOImmediately".
          * If true, AbstractBody.terminate() is called
-         * @param request The request to serve 
+         * @param request The request to serve
          * @return true if the name of the method is "terminateAO" or "terminateAOImmediately".
          */
         private boolean isTerminateAORequest(Request request) {
-        	boolean terminateRequest = (request.getMethodName()).startsWith("_terminateAO");
-        	if (terminateRequest) {
-        		terminate();
-        	}
-        	return terminateRequest;
+            boolean terminateRequest = (request.getMethodName()).startsWith(
+                    "_terminateAO");
+            if (terminateRequest) {
+                terminate();
+            }
+            return terminateRequest;
         }
     }
 
@@ -592,8 +596,6 @@ getName() + "-" + this.getID().toString().replace(':','-') );
         public long getNextSequenceID() {
             return 0;
         }
-
-        
     }
 
     // end inner class LocalInactiveBody

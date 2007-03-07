@@ -34,39 +34,38 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
 
-public class For<P> implements Instruction<P,P>, Skeleton<P,P> {
 
-	Skeleton<P,P> child;
-	int times;
-	
-	public For(int times, Skeleton<P,P> child){
-		this.child=child;
-		this.times=times;
-	}
-	
-	public Vector<Instruction<?,?>> getInstructionStack() {
-		Vector<Instruction<?,?>> v = new Vector<Instruction<?,?>>();
-		v.add(this);
-		return v;
-	}
-	
-	public Task<P> compute(Task<P> task) throws Exception {
-		
-		if(times > 0){
-			//Get Child stack
-			Vector<Instruction<?,?>> childStack=child.getInstructionStack();
-			
-			//Add the For with one less time to execute
-			childStack.add(0,new For<P>(times-1,child)); 
-			
-			Vector<Instruction<?,?>> taskStack = task.getStack();
-			taskStack.addAll(childStack);
-			task.setStack(taskStack);
-		}
-		return task;
-	}
+public class For<P> implements Instruction<P, P>, Skeleton<P, P> {
+    Skeleton<P, P> child;
+    int times;
 
-	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<P>) t);
-	}
+    public For(int times, Skeleton<P, P> child) {
+        this.child = child;
+        this.times = times;
+    }
+
+    public Vector<Instruction<?, ?>> getInstructionStack() {
+        Vector<Instruction<?, ?>> v = new Vector<Instruction<?, ?>>();
+        v.add(this);
+        return v;
+    }
+
+    public Task<P> compute(Task<P> task) throws Exception {
+        if (times > 0) {
+            //Get Child stack
+            Vector<Instruction<?, ?>> childStack = child.getInstructionStack();
+
+            //Add the For with one less time to execute
+            childStack.add(0, new For<P>(times - 1, child));
+
+            Vector<Instruction<?, ?>> taskStack = task.getStack();
+            taskStack.addAll(childStack);
+            task.setStack(taskStack);
+        }
+        return task;
+    }
+
+    public Task<?> computeUnknown(Task<?> t) throws Exception {
+        return compute((Task<P>) t);
+    }
 }

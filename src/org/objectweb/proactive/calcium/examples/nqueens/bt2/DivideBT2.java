@@ -36,70 +36,70 @@ import org.objectweb.proactive.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.muscle.Divide;
 
-public class DivideBT2 implements Divide<Board, Board>{
-	
-	public Vector<Board> divide(Board board) throws RuntimeException, EnvironmentException {
 
-		if(board.isRootBoard()){
-			return initDivideBT2(board);
-		}
-		
-		return divideBT2((BoardBT2)board);
-	}
-	
-	private Vector<Board> initDivideBT2(Board board) {
-		
-		Vector<Board> v = new Vector<Board>();
-		
-		int sidemask = (1 << (board.n - 1)) | 1;
-		int lastmask = sidemask;
-		int topbit = 1 << (board.n - 1);
-		int mask = (1 << board.n) - 1;
-		int endbit = topbit >> 1;
+public class DivideBT2 implements Divide<Board, Board> {
+    public Vector<Board> divide(Board board)
+        throws RuntimeException, EnvironmentException {
+        if (board.isRootBoard()) {
+            return initDivideBT2(board);
+        }
 
-		for (int i = 1, j = board.n - 2; i < j; i++, j--) {
-			//bound1 = i; //bound2 = j;
-			int bit = 1 << i;
-			
-			v.add(
-				new BoardBT2(board.n, board.solvableSize, 1, bit << 1, bit, bit >> 1, i, j, sidemask, lastmask,
-					topbit,	mask, endbit, null));
+        return divideBT2((BoardBT2) board);
+    }
 
-			lastmask |= lastmask >> 1 | lastmask << 1;
-			endbit >>= 1;
-		}
-		
-		return v;
-	}
+    private Vector<Board> initDivideBT2(Board board) {
+        Vector<Board> v = new Vector<Board>();
 
-	public Vector<Board> divideBT2(BoardBT2 board) {
+        int sidemask = (1 << (board.n - 1)) | 1;
+        int lastmask = sidemask;
+        int topbit = 1 << (board.n - 1);
+        int mask = (1 << board.n) - 1;
+        int endbit = topbit >> 1;
 
-		Vector<Board> v = new Vector<Board>();
+        for (int i = 1, j = board.n - 2; i < j; i++, j--) {
+            //bound1 = i; //bound2 = j;
+            int bit = 1 << i;
 
-		int mask = (1 << board.n) - 1;
-		int bitmap = mask & ~(board.left | board.down | board.right);
-		int bit;
+            v.add(new BoardBT2(board.n, board.solvableSize, 1, bit << 1, bit,
+                    bit >> 1, i, j, sidemask, lastmask, topbit, mask, endbit,
+                    null));
 
-		if (board.row < board.bound1) {
-			bitmap |= board.sidemask;
-			bitmap ^= board.sidemask;
-		} else if (board.row == board.bound2) {
-			if ((board.down & board.sidemask) == 0) {
-				// "return;" original alogirithm is converted into
-				v.add(new Board(board.n, board.solvableSize)); //dummy child task
-				return v; // no more search is required in this branch
-			}
-			if ((board.down & board.sidemask) != board.sidemask)
-				bitmap &= board.sidemask;
-		}
-		while (bitmap != 0) {
-			bitmap ^= board.board[board.row] = bit = -bitmap & bitmap;
-			v.add(new BoardBT2(board.n, board.solvableSize, board.row + 1, (board.left | bit) << 1,
-					board.down | bit, (board.right | bit) >> 1, board.bound1,
-					board.bound2, board.sidemask, board.lastmask, board.topbit, board.mask,
-					board.endbit, board.board));
-		} // while-generando
+            lastmask |= ((lastmask >> 1) | (lastmask << 1));
+            endbit >>= 1;
+        }
 
-		return v;
-	}
+        return v;
+    }
+
+    public Vector<Board> divideBT2(BoardBT2 board) {
+        Vector<Board> v = new Vector<Board>();
+
+        int mask = (1 << board.n) - 1;
+        int bitmap = mask & ~(board.left | board.down | board.right);
+        int bit;
+
+        if (board.row < board.bound1) {
+            bitmap |= board.sidemask;
+            bitmap ^= board.sidemask;
+        } else if (board.row == board.bound2) {
+            if ((board.down & board.sidemask) == 0) {
+                // "return;" original alogirithm is converted into
+                v.add(new Board(board.n, board.solvableSize)); //dummy child task
+                return v; // no more search is required in this branch
+            }
+            if ((board.down & board.sidemask) != board.sidemask) {
+                bitmap &= board.sidemask;
+            }
+        }
+        while (bitmap != 0) {
+            bitmap ^= (board.board[board.row] = bit = -bitmap & bitmap);
+            v.add(new BoardBT2(board.n, board.solvableSize, board.row + 1,
+                    (board.left | bit) << 1, board.down | bit,
+                    (board.right | bit) >> 1, board.bound1, board.bound2,
+                    board.sidemask, board.lastmask, board.topbit, board.mask,
+                    board.endbit, board.board));
+        } // while-generando
+
+        return v;
+    }
 }

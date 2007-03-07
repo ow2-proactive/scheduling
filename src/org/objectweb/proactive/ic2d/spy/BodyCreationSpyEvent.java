@@ -33,8 +33,7 @@ package org.objectweb.proactive.ic2d.spy;
 import org.objectweb.proactive.core.UniqueID;
 
 
-public class BodyCreationSpyEvent extends BodySpyEvent
-    implements java.io.Serializable {
+public class BodyCreationSpyEvent extends BodySpyEvent implements java.io.Serializable {
 
     /** The name of the class */
     protected String className;

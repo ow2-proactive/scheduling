@@ -95,12 +95,12 @@ public class MetaObjectInterfaceClassGenerator
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, ProActiveInterfaceType interfaceType, boolean isInternal,
-        boolean isFunctionalInterface)
+        Component owner, ProActiveInterfaceType interfaceType,
+        boolean isInternal, boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
-            if (ProActiveLogger.getLogger(
-                        Loggers.COMPONENTS_GEN_ITFS).isDebugEnabled()) {
+            if (ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS)
+                                   .isDebugEnabled()) {
                 ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS)
                                .debug("generating metaobject interface reference");
             }
@@ -154,21 +154,20 @@ public class MetaObjectInterfaceClassGenerator
                         implField);
                 generatedCtClass.addMethod(implSetter);
 
-				// field for overriden methods
+                // field for overriden methods
                 CtField methodsField = new CtField(pool.get(
                             "java.lang.reflect.Method[]"), "overridenMethods",
                         generatedCtClass);
                 methodsField.setModifiers(Modifier.STATIC);
                 generatedCtClass.addField(methodsField);
-                
+
                 // field for generics parameters
                 CtField genericTypesMappingField = new CtField(pool.get(
-                "java.util.Map"), "genericTypesMapping",
-                generatedCtClass);
+                            "java.util.Map"), "genericTypesMapping",
+                        generatedCtClass);
 
                 genericTypesMappingField.setModifiers(Modifier.STATIC);
                 generatedCtClass.addField(genericTypesMappingField);
-
 
                 // list all methods to implement
                 Map methodsToImplement = new HashMap();
@@ -223,17 +222,19 @@ public class MetaObjectInterfaceClassGenerator
                 v.copyInto(validMethods);
 
                 reifiedMethods = validMethods;
-                
+
                 JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass,
-                    reifiedMethods, classesIndexer, interfaceType.getFcItfSignature(), null);
+                    reifiedMethods, classesIndexer,
+                    interfaceType.getFcItfSignature(), null);
 
                 createMethods(generatedCtClass, reifiedMethods, interfaceType);
 
-//                                generatedCtClass.writeFile("generated/");
-//                                System.out.println("[JAVASSIST] generated class : " +
-//                                    generatedClassFullName);
+                //                                generatedCtClass.writeFile("generated/");
+                //                                System.out.println("[JAVASSIST] generated class : " +
+                //                                    generatedClassFullName);
                 byte[] bytecode = generatedCtClass.toBytecode();
-                ClassDataCache.instance().addClassData(generatedClassFullName,
+                ClassDataCache.instance()
+                              .addClassData(generatedClassFullName,
                     generatedCtClass.toBytecode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassFullName +
@@ -245,7 +246,8 @@ public class MetaObjectInterfaceClassGenerator
                 }
 
                 // convert the bytes into a Class
-                generated_class = Utils.defineClass(generatedClassFullName, bytecode);
+                generated_class = Utils.defineClass(generatedClassFullName,
+                        bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
@@ -256,9 +258,10 @@ public class MetaObjectInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
-        	throw new InterfaceGenerationFailedException(
-                    "Cannot generate meta object representative on interface [" + interfaceName + "] with signature [" +  interfaceType.getFcItfSignature() + "] with javassist",
-                    e);
+            throw new InterfaceGenerationFailedException(
+                "Cannot generate meta object representative on interface [" +
+                interfaceName + "] with signature [" +
+                interfaceType.getFcItfSignature() + "] with javassist", e);
         }
     }
 

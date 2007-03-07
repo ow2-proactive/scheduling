@@ -81,8 +81,9 @@ public class ImageCanvas extends Canvas {
         gr = this.offScreenBuffer.getGraphics();
 
         paint(gr); // Passes our off-screen buffer to our paint method, which,
-        // unsuspecting, paints on it just as it would on the Graphics
-        // passed by the browser or applet viewer.
+                   // unsuspecting, paints on it just as it would on the Graphics
+                   // passed by the browser or applet viewer.
+
         g.drawImage(this.offScreenBuffer, 0, 0, this);
         // And now we transfer the info in the buffer onto the
         // graphics context we got from the browser in one smooth motion.
@@ -113,14 +114,14 @@ public class ImageCanvas extends Canvas {
      */
     public void setPixels(Image2D image) {
         Interval interval = image.getInterval();
-        if (interval.totalImageHeight != my_HEIGHT || interval.totalImageWidth != my_WIDTH ) {
+        if ((interval.totalImageHeight != my_HEIGHT) ||
+                (interval.totalImageWidth != my_WIDTH)) {
             // just in case image format has unsuspectedly been changed
-            this.my_WIDTH  = interval.totalImageWidth; 
+            this.my_WIDTH = interval.totalImageWidth;
             this.my_HEIGHT = interval.totalImageHeight;
             this.display = new BufferedImage(my_WIDTH, my_HEIGHT,
                     BufferedImage.TYPE_INT_RGB);
-            setPreferredSize(new Dimension(this.my_WIDTH,this.my_HEIGHT));
-
+            setPreferredSize(new Dimension(this.my_WIDTH, this.my_HEIGHT));
         }
         this.display.setRGB(0, interval.yfrom, interval.totalImageWidth,
             interval.yto - interval.yfrom, image.getPixels(), 0,

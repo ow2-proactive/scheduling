@@ -75,11 +75,8 @@ public abstract class RuntimeFactory {
 
     /** the table where associations Protocol - Factory are kept */
     private static java.util.HashMap<String, String> protocolFactoryMapping = new java.util.HashMap<String, String>();
-    private static java.util.HashMap<String, RuntimeFactory> instanceFactoryMapping = new java.util.HashMap<String, RuntimeFactory>();
-
-    //private static ProActiveRuntime defaultRuntime = null;
-    //private static RuntimeFactory defaultRuntimeFactory;
- 
+    private static java.util.HashMap<String, RuntimeFactory> instanceFactoryMapping =
+        new java.util.HashMap<String, RuntimeFactory>();
 
     static {
         ProActiveConfiguration.load();
@@ -126,7 +123,8 @@ public abstract class RuntimeFactory {
      * @return true if the given proActiveRuntime belongs to this JVM false else
      */
     public static boolean isRuntimeLocal(ProActiveRuntime proActiveRuntime) {
-        return proActiveRuntime.getVMInformation().getVMID().equals(UniqueID.getCurrentVMID());
+        return proActiveRuntime.getVMInformation().getVMID()
+                               .equals(UniqueID.getCurrentVMID());
     }
 
     /**

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.process;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

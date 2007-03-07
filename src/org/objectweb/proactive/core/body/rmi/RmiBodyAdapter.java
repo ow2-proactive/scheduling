@@ -150,42 +150,41 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
             try {
                 construct((RmiRemoteBody) o);
             } catch (ProActiveException e1) {
-                throw new java.io.IOException(
-                		"The remote object at " + url + " is not accessible ");
+                throw new java.io.IOException("The remote object at " + url +
+                    " is not accessible ");
             }
             return this;
-        } 
-        
-            throw new java.io.IOException(
-                "The given url does exist but doesn't point to a remote body  url=" +
-                url + " class found is " + o.getClass().getName());
+        }
+
+        throw new java.io.IOException(
+            "The given url does exist but doesn't point to a remote body  url=" +
+            url + " class found is " + o.getClass().getName());
     }
 
-
     /**
-     * List all active object previously registered in a RMI registry. 
-     * @param url the url of the host to scan, typically //machine_name 
-     * @return a list of Strings, representing the registered names, and {} if no registry 
-     * @exception java.io.IOException if scanning reported some problem (registry not found, or malformed Url) 
+     * List all active object previously registered in a RMI registry.
+     * @param url the url of the host to scan, typically //machine_name
+     * @return a list of Strings, representing the registered names, and {} if no registry
+     * @exception java.io.IOException if scanning reported some problem (registry not found, or malformed Url)
      */
-    public String [] list(String url) throws java.io.IOException {
-        String [] names = null;
+    public String[] list(String url) throws java.io.IOException {
+        String[] names = null;
 
         // Try if URL is the address of a RmiRemoteBody
-            try {
-                names = java.rmi.Naming.list(url);
-            } catch (MalformedURLException e) {
-                // connection failed, try to find a rmiregistry at proactive.rmi.port port
-                // ie change the port specified in url. 
-                // Is this needed ? 
-                String url2 = UrlBuilder.getProtocol(url) + "//" +
-                    UrlBuilder.getHostNameFromUrl(url) + ":" +
-                    System.getProperty("proactive.rmi.port") + "/" ;
+        try {
+            names = java.rmi.Naming.list(url);
+        } catch (MalformedURLException e) {
+            // connection failed, try to find a rmiregistry at proactive.rmi.port port
+            // ie change the port specified in url. 
+            // Is this needed ? 
+            String url2 = UrlBuilder.getProtocol(url) + "//" +
+                UrlBuilder.getHostNameFromUrl(url) + ":" +
+                System.getProperty("proactive.rmi.port") + "/";
 
-                names = java.rmi.Naming.list(url2);
-            } catch (ConnectException e) {
-                return new String [] {};
-            }
-            return names;
+            names = java.rmi.Naming.list(url2);
+        } catch (ConnectException e) {
+            return new String[] {  };
+        }
+        return names;
     }
 }

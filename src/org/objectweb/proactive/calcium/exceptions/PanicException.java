@@ -34,14 +34,12 @@ package org.objectweb.proactive.calcium.exceptions;
 /**
  * A panic exception indicates that all the execution must
  * be halted as a result of this error.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */
 public class PanicException extends Exception {
-
-	public PanicException(String msg) {
-		super(msg);
-	}
-
+    public PanicException(String msg) {
+        super(msg);
+    }
 }

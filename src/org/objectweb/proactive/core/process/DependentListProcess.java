@@ -41,8 +41,7 @@ import java.io.IOException;
  * @since ProActive 3.0
  *
  */
-public class DependentListProcess
-    extends AbstractSequentialListProcessDecorator {
+public class DependentListProcess extends AbstractSequentialListProcessDecorator {
     public DependentListProcess() {
         super();
     }

@@ -46,8 +46,7 @@ public class ItfID implements Serializable {
     private UniqueID componentBodyID;
     boolean isClientItf = false;
 
-    public ItfID(String itfName,
-        UniqueID componentBodyID) {
+    public ItfID(String itfName, UniqueID componentBodyID) {
         this.itfName = itfName;
         this.componentBodyID = componentBodyID;
     }

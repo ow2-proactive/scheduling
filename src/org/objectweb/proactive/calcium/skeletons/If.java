@@ -36,57 +36,55 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.muscle.Condition;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
+
 /**
- * This class provides If conditioning. 
+ * This class provides If conditioning.
  * Depending on the result of the Condition, either
  * one child skeletal structure will be executed, or the other.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <P>
  */
-public class If<P,R> implements Skeleton<P,R>, Instruction<P,P> {
+public class If<P, R> implements Skeleton<P, R>, Instruction<P, P> {
+    Condition<P> cond;
+    Skeleton<P, ?> ifChild;
+    Skeleton<P, ?> elseChild;
 
-	Condition<P> cond;
-	Skeleton<P,?> ifChild, elseChild;
-	public If(Condition<P> cond, Skeleton<P,R> ifChild, Skeleton<P,R> elseChild){
-	
-		this.cond=cond;
-		this.ifChild=ifChild;
-		this.elseChild=elseChild;
-	}
-	
-	public Vector<Instruction<?,?>> getInstructionStack() {
+    public If(Condition<P> cond, Skeleton<P, R> ifChild,
+        Skeleton<P, R> elseChild) {
+        this.cond = cond;
+        this.ifChild = ifChild;
+        this.elseChild = elseChild;
+    }
 
-		Vector<Instruction<?,?>> v = new Vector<Instruction<?,?>>();
-		v.add(this);
-		return v;
-	}
+    public Vector<Instruction<?, ?>> getInstructionStack() {
+        Vector<Instruction<?, ?>> v = new Vector<Instruction<?, ?>>();
+        v.add(this);
+        return v;
+    }
 
-	
-	public Task<P> compute(Task<P> t) throws Exception{
-		
-		Vector<Instruction<?,?>> childStack;
-		Timer timer = new Timer();
-		boolean evalCondition= cond.evalCondition(t.getObject());
-		timer.stop();
-		
-		if(evalCondition){
-			childStack= ifChild.getInstructionStack();
-		}
-		else{
-			childStack= elseChild.getInstructionStack();
-		}
-		
-		Vector<Instruction<?,?>> taskStack = t.getStack();
-		taskStack.addAll(childStack);
-		t.setStack(taskStack);
-		t.getStats().getWorkout().track(cond, timer);
-		
-		return t;
-	}
-	
-	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<P>) t);
-	}
+    public Task<P> compute(Task<P> t) throws Exception {
+        Vector<Instruction<?, ?>> childStack;
+        Timer timer = new Timer();
+        boolean evalCondition = cond.evalCondition(t.getObject());
+        timer.stop();
+
+        if (evalCondition) {
+            childStack = ifChild.getInstructionStack();
+        } else {
+            childStack = elseChild.getInstructionStack();
+        }
+
+        Vector<Instruction<?, ?>> taskStack = t.getStack();
+        taskStack.addAll(childStack);
+        t.setStack(taskStack);
+        t.getStats().getWorkout().track(cond, timer);
+
+        return t;
+    }
+
+    public Task<?> computeUnknown(Task<?> t) throws Exception {
+        return compute((Task<P>) t);
+    }
 }

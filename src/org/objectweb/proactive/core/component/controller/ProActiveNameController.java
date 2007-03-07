@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
 /**
  * Implementation of the {@link org.objectweb.fractal.api.control.NameController}
- * 
+ *
  * @author Matthieu Morel
  *
  */
@@ -59,7 +59,8 @@ public class ProActiveNameController extends AbstractProActiveController
 
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.NAME_CONTROLLER,
+            setItfType(ProActiveTypeFactoryImpl.instance()
+                                               .createFcItfType(Constants.NAME_CONTROLLER,
                     NameController.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -68,9 +69,9 @@ public class ProActiveNameController extends AbstractProActiveController
         }
     }
 
-	/*
-     * @see org.objectweb.fractal.api.control.NameController#getFcName()
-     */
+    /*
+    * @see org.objectweb.fractal.api.control.NameController#getFcName()
+    */
     public String getFcName() {
         return name;
     }

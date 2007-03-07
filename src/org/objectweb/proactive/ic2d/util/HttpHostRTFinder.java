@@ -55,8 +55,8 @@ public class HttpHostRTFinder implements HostRTFinder {
     /**
      * @see org.objectweb.proactive.ic2d.util.HostRTFinder#findPARuntimes(java.lang.String, int)
      */
-    public ArrayList<ProActiveRuntimeAdapterImpl> findPARuntimes(String host, int port)
-        throws IOException {
+    public ArrayList<ProActiveRuntimeAdapterImpl> findPARuntimes(String host,
+        int port) throws IOException {
         logger.log("Exploring " + host + " with HTTP on port " + port);
         ArrayList<ProActiveRuntimeAdapterImpl> runtimeArray = new ArrayList<ProActiveRuntimeAdapterImpl>();
         ProActiveRuntimeAdapterImpl adapter;

@@ -41,16 +41,18 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
+
 /**
  * A factory for instantiating components on remote nodes.
- * 
+ *
  * @author Matthieu Morel
  *
  */
 public interface ProActiveGenericFactory extends GenericFactory {
+
     /**
      * Creates a component.
-     * 
+     *
      * @param type
      *            an arbitrary component type.
      * @param controllerDesc
@@ -65,11 +67,11 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if the component cannot be created.
      */
     Component newFcInstance(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc) throws InstantiationException;
+        ContentDescription contentDesc) throws InstantiationException;
 
     /**
      * Creates a component on a given node.
-     * 
+     *
      * @param type
      *            an arbitrary component type.
      * @param controllerDesc
@@ -86,13 +88,13 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if the component cannot be created.
      */
     Component newFcInstance(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, Node node)
-            throws InstantiationException;
+        ContentDescription contentDesc, Node node)
+        throws InstantiationException;
 
     /**
      * Creates a component on a given virtual node. It creates one component
      * only, even if the virtual node is multiple.<br>
-     * 
+     *
      * @param type
      *            an arbitrary component type.
      * @param controllerDesc
@@ -112,17 +114,15 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if the component cannot be created.
      */
     Component newFcInstance(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode)
-            throws InstantiationException;
-    
-    
+        ContentDescription contentDesc, VirtualNode virtualNode)
+        throws InstantiationException;
 
     /**
      * Creates a list of components on a given virtual node.<br>
-     * If the component is primitive, the list is expected to contain 
+     * If the component is primitive, the list is expected to contain
      * <code>contentDesc.length<code> components.<br>
      * If the component is composite, the list is expected to contain 1 element.
-     * 
+     *
      * @param type
      *            an arbitrary component type.
      * @param controllerDesc
@@ -131,25 +131,25 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *            <tt>null</tt> then a "default" controller part will be used.
      * @param contentDesc
      *            a description of the content part of the component to be
-     *            created. Each component has a specific content. 
+     *            created. Each component has a specific content.
      *            This description is implementation specific.
      * @param virtualNode
      *            the virtual node where to create the components.
      * @return an list of {@link Component} interfaces of the created
-     *         components. 
+     *         components.
      * @throws InstantiationException
      *             if the component cannot be created.
      */
-    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription[] contentDesc, VirtualNode virtualNode)
-            throws InstantiationException;
+    List<Component> newFcInstanceAsList(Type type,
+        ControllerDescription controllerDesc, ContentDescription[] contentDesc,
+        VirtualNode virtualNode) throws InstantiationException;
 
     /**
      * Creates a list of components on a given virtual node.<br>
-     * If the component is primitive, the list is expected to contain 
+     * If the component is primitive, the list is expected to contain
      * <code>nodes.length<code> components.<br>
      * If the component is composite, the list is expected to contain 1 element.
-     * 
+     *
      * @param type
      *            an arbitrary component type.
      * @param controllerDesc
@@ -158,26 +158,26 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *            <tt>null</tt> then a "default" controller part will be used.
      * @param contentDesc
      *            a description of the content part of the component to be
-     *            created. Each component has a specific content. 
+     *            created. Each component has a specific content.
      *            This description is implementation specific.
      * @param nodes
      *            the nodes where to create the components.
      * @return an list of {@link Component} interfaces of the created
-     *         components. 
+     *         components.
      * @throws InstantiationException
-     *             if one or several of the components cannot be created. The cause of this 
+     *             if one or several of the components cannot be created. The cause of this
      *             exception may contain the list of instantiation exceptions.
      */
-    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, Node[] nodes)
-            throws InstantiationException;
-    
+    List<Component> newFcInstanceAsList(Type type,
+        ControllerDescription controllerDesc, ContentDescription contentDesc,
+        Node[] nodes) throws InstantiationException;
+
     /**
      * Creates a list of components on a given virtual node.<br>
-     * If the component is primitive, the list is expected to contain 
+     * If the component is primitive, the list is expected to contain
      * <code>virtualNodes.getNodes().length<code> components.<br>
      * If the component is composite, the list is expected to contain 1 element.
-     * 
+     *
      * @param type
      *            an arbitrary component type.
      * @param controllerDesc
@@ -192,17 +192,17 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @return an list of {@link Component} interfaces of the created
      *         components.
      * @throws InstantiationException
-     *             if one or several of the components cannot be created. The cause of this 
+     *             if one or several of the components cannot be created. The cause of this
      *             exception may contain the list of instantiation exceptions.
      */
-    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode virtualNode)
-            throws InstantiationException;
+    List<Component> newFcInstanceAsList(Type type,
+        ControllerDescription controllerDesc, ContentDescription contentDesc,
+        VirtualNode virtualNode) throws InstantiationException;
 
     /**
      * Creates a component on a given virtual node. It creates one component
      * only, even if the virtual node is multiple.<br>
-     * 
+     *
      * @param type
      *            an arbitrary component type.
      * @param controllerDesc
@@ -217,11 +217,10 @@ public interface ProActiveGenericFactory extends GenericFactory {
     * @return an list of {@link Component} interfaces of the created
      *         components.
      * @throws InstantiationException
-     *             if one or several of the components cannot be created. The cause of this 
+     *             if one or several of the components cannot be created. The cause of this
      *             exception may contain the list of instantiation exceptions.
      */
-    List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-            ContentDescription[] contentDesc, Node[] nodes)
-            throws InstantiationException;
-
+    List<Component> newFcInstanceAsList(Type type,
+        ControllerDescription controllerDesc, ContentDescription[] contentDesc,
+        Node[] nodes) throws InstantiationException;
 }

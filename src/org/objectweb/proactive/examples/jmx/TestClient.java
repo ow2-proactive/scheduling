@@ -69,7 +69,7 @@ public class TestClient implements NotificationListener, Serializable {
     private transient JMXConnector connector;
     private String url;
     private ConnectionListener listener;
-    
+
     public static void main(String[] args) {
         new TestClient();
     }
@@ -83,7 +83,6 @@ public class TestClient implements NotificationListener, Serializable {
         this.url = read();
         connect();
         getMBeanInformations();
-
     }
 
     private String read() {
@@ -105,13 +104,13 @@ public class TestClient implements NotificationListener, Serializable {
         /* adds a connector listener */
         this.connector.addConnectionNotificationListener(this, null, null);
         try {
-			this.listener = (ConnectionListener)ProActive.newActive(ConnectionListener.class.getName(), new Object[] { this.connection});
-		} catch (ActiveObjectCreationException e) {
-			e.printStackTrace();
-		} catch (NodeException e) {
-			e.printStackTrace();
-		}
-
+            this.listener = (ConnectionListener) ProActive.newActive(ConnectionListener.class.getName(),
+                    new Object[] { this.connection });
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
     }
 
     private void domains() {
@@ -137,19 +136,16 @@ public class TestClient implements NotificationListener, Serializable {
         }
     }
 
-
-
     private void mbeans(String domain) {
         try {
-            
-        	ObjectName on = new ObjectName(domain + ":*");
+            ObjectName on = new ObjectName(domain + ":*");
             Set<ObjectInstance> queryMBeans = connection.queryMBeans(on, null);
             ObjectInstance[] beans = new ObjectInstance[queryMBeans.size()];
             queryMBeans.toArray(beans);
             //			Iterator<ObjectInstance> iterator = queryMBeans.iterator();
             for (int i = 0; i < beans.length; i++) {
                 ObjectName beanName = beans[i].getObjectName();
-                
+
                 System.out.println(" [ " + i + " ] " + beanName);
             }
             System.out.println("[ D ]  Domains list");
@@ -178,36 +174,37 @@ public class TestClient implements NotificationListener, Serializable {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } 
+        }
     }
 
     private void beanProperties(ObjectName on) {
         System.out.println();
         System.out.println("-------------------- " + on +
             " ---------------------------- ");
-        
-        
+
         MBeanInfo beanInfo = (MBeanInfo) connection.getMBeanInfoAsynchronous(on)
                                                    .getObject();
-        System.out.println("\tConstructors : " );
+        System.out.println("\tConstructors : ");
         System.out.println();
-        MBeanConstructorInfo [] constructorInfos = beanInfo.getConstructors();
-        for (int i=0;i<constructorInfos.length; i++) {
-        	System.out.print(constructorInfos[i].getName() + " ( ");
-        	MBeanParameterInfo [] params = constructorInfos[i].getSignature();
-        	if (params.length == 0) {
-        		System.out.println( " );");
-        	} else {
-        		
-        	for (int j=0; j<params.length ; j++) {
-        		if ( j == params.length -1) 
-        			System.out.println(params[j].getType() + "  " + params[j].getName() + "  ); ");
-        		else
-        			System.out.println(params[j].getType() + "  " + params[j].getName() + "  , ");
-        	}
+        MBeanConstructorInfo[] constructorInfos = beanInfo.getConstructors();
+        for (int i = 0; i < constructorInfos.length; i++) {
+            System.out.print(constructorInfos[i].getName() + " ( ");
+            MBeanParameterInfo[] params = constructorInfos[i].getSignature();
+            if (params.length == 0) {
+                System.out.println(" );");
+            } else {
+                for (int j = 0; j < params.length; j++) {
+                    if (j == (params.length - 1)) {
+                        System.out.println(params[j].getType() + "  " +
+                            params[j].getName() + "  ); ");
+                    } else {
+                        System.out.println(params[j].getType() + "  " +
+                            params[j].getName() + "  , ");
+                    }
+                }
+            }
         }
-        }
-        
+
         String description = beanInfo.getDescription();
         System.out.println("\tDescription :\t" + description);
         System.out.println();
@@ -216,56 +213,57 @@ public class TestClient implements NotificationListener, Serializable {
         for (int i = 0; i < attribs.length; i++) {
             Object obj = connection.getAttributeAsynchronous(on,
                     attribs[i].getName()).getObject();
-            System.out.println("\t\t" + attribs[i].getDescription() + " =\t " + obj);
+            System.out.println("\t\t" + attribs[i].getDescription() + " =\t " +
+                obj);
         }
 
         System.out.println();
-        
+
         MBeanOperationInfo[] infos = beanInfo.getOperations();
         if (infos.length != 0) {
-        System.out.println("\tOperations :");
-        
-        for (int i = 0; i < infos.length; i++) {
-            System.out.println("Description = " + infos[i].getDescription());
-            System.out.print("\t" + infos[i].getReturnType() + "  ");
-            System.out.print(infos[i].getName() + "  ( ");
+            System.out.println("\tOperations :");
 
-            MBeanParameterInfo[] params = infos[i].getSignature();
-            if (params.length == 0) {
-                System.out.println(" );");
-            } else {
-                for (int j = 0; j < params.length; j++) {
-                    if (j == (params.length - 1)) {
-                        System.out.print(params[j].getType() + "  " +
-                            params[j].getName() + " ) ");
-                    } else {
-                        System.out.print(params[j].getType() + "  " +
-                            params[j].getName() + " , ");
+            for (int i = 0; i < infos.length; i++) {
+                System.out.println("Description = " +
+                    infos[i].getDescription());
+                System.out.print("\t" + infos[i].getReturnType() + "  ");
+                System.out.print(infos[i].getName() + "  ( ");
+
+                MBeanParameterInfo[] params = infos[i].getSignature();
+                if (params.length == 0) {
+                    System.out.println(" );");
+                } else {
+                    for (int j = 0; j < params.length; j++) {
+                        if (j == (params.length - 1)) {
+                            System.out.print(params[j].getType() + "  " +
+                                params[j].getName() + " ) ");
+                        } else {
+                            System.out.print(params[j].getType() + "  " +
+                                params[j].getName() + " , ");
+                        }
                     }
+                    System.out.println();
                 }
-                System.out.println();
             }
         }
-        }
         System.out.println();
-        
-        
-        MBeanNotificationInfo [] notifs = beanInfo.getNotifications();
+
+        MBeanNotificationInfo[] notifs = beanInfo.getNotifications();
         if (notifs.length != 0) {
-        	System.out.println("\tNotifications :");
-        	try {
-				this.connection.addNotificationListener(on, listener, null, null);
-			} catch (InstanceNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-        for (int i = 0; i< notifs.length ; i++) {
-        	System.out.println("\t\t" + notifs[i].getDescription() + " : \t\t" + notifs[i].getName() );
-        }
+            System.out.println("\tNotifications :");
+            try {
+                this.connection.addNotificationListener(on, listener, null, null);
+            } catch (InstanceNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < notifs.length; i++) {
+                System.out.println("\t\t" + notifs[i].getDescription() +
+                    " : \t\t" + notifs[i].getName());
+            }
         }
     }
-
 
     private void getMBeanInformations() {
         domains();

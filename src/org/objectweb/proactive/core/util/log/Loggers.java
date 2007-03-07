@@ -64,12 +64,16 @@ public interface Loggers {
         ".controllers";
     static final public String COMPONENTS_REQUESTS = COMPONENTS + ".requests";
     static final public String COMPONENTS_ACTIVITY = COMPONENTS + ".activity";
-    static final public String COMPONENTS_GEN_ITFS = COMPONENTS +".gen.interface";
-    static final public String COMPONENTS_GEN_ANNOTATION = COMPONENTS +".gen.annotation";
+    static final public String COMPONENTS_GEN_ITFS = COMPONENTS +
+        ".gen.interface";
+    static final public String COMPONENTS_GEN_ANNOTATION = COMPONENTS +
+        ".gen.annotation";
     static final public String COMPONENTS_ADL = COMPONENTS + ".adl";
     static final public String COMPONENTS_GUI = COMPONENTS + ".gui";
-    static final public String COMPONENTS_MULTICAST = COMPONENTS + ".multicast";
-    static final public String COMPONENTS_GATHERCAST = COMPONENTS + ".gathercast";
+    static final public String COMPONENTS_MULTICAST = COMPONENTS +
+        ".multicast";
+    static final public String COMPONENTS_GATHERCAST = COMPONENTS +
+        ".gathercast";
     static final public String DEPLOYMENT = "proactive.deployment";
     static final public String DEPLOYMENT_PROCESS = DEPLOYMENT + ".process";
     static final public String DEPLOYMENT_LOG = DEPLOYMENT + ".log";
@@ -130,9 +134,10 @@ public interface Loggers {
     public static final String SCILAB_TASK = SCILAB + ".task";
 
     // Skeleton loggers
-    static final public String SKELETONS = CORE+".skeletons";
-    static final public String SKELETONS_STRUCTURE = SKELETONS+".structure";
-    static final public String SKELETONS_MANAGER = SKELETONS+".manager";
-    static final public String SKELETONS_KERNEL = SKELETONS+".kernel";
-    static final public String SKELETONS_APPLICATION = SKELETONS+".application";
+    static final public String SKELETONS = CORE + ".skeletons";
+    static final public String SKELETONS_STRUCTURE = SKELETONS + ".structure";
+    static final public String SKELETONS_MANAGER = SKELETONS + ".manager";
+    static final public String SKELETONS_KERNEL = SKELETONS + ".kernel";
+    static final public String SKELETONS_APPLICATION = SKELETONS +
+        ".application";
 }

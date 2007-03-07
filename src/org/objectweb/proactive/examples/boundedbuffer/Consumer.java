@@ -60,7 +60,7 @@ public class Consumer extends ConsumerProducer {
                 listener.consumerStartRunning();
             }
             buffer.get(); // Get the datas --> returns a future object.
-            // The call is synchronous as String is final
+                          // The call is synchronous as String is final
         }
     }
 }

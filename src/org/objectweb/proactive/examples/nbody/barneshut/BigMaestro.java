@@ -30,36 +30,34 @@
  */
 package org.objectweb.proactive.examples.nbody.barneshut;
 
-
 import java.io.Serializable;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Synchronization of the others Maestro
  */
 public class BigMaestro implements Serializable {
-    
+
     /** Counts the number of Maestro that have respond */
     private int nbFinished = 0;
-    
+
     /** Number of iteration at a time */
     private int iter = 0;
-    
+
     /** Number of iteration maximum */
     private int maxIter;
-                         
+
     /** List of all the Planets */
     private List lPlanets;
-    
+
     /** KillSupport */
     private org.objectweb.proactive.examples.nbody.common.Start killsupport;
 
     /** References on all the Active Maestro */
     private Maestro[] maestroArray;
-    
-    
+
     /**
      * Required by ProActive
      */
@@ -72,18 +70,16 @@ public class BigMaestro implements Serializable {
      * @param max the total number of iterations that should be simulated
      * @param killsupport KillSupport
      */
-
-        public BigMaestro(Maestro[] maestroArray, Integer max,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-            this.killsupport = killsupport;
-            this.maxIter = max.intValue();
-            this.maestroArray = maestroArray;
-            // All the Maestro have a list of 8 Planets
-            this.lPlanets = new ArrayList(maestroArray.length * 8);
-            for(int i=0; i<maestroArray.length * 8; i++)
-                lPlanets.add(null);
-        }
-
+    public BigMaestro(Maestro[] maestroArray, Integer max,
+        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+        this.killsupport = killsupport;
+        this.maxIter = max.intValue();
+        this.maestroArray = maestroArray;
+        // All the Maestro have a list of 8 Planets
+        this.lPlanets = new ArrayList(maestroArray.length * 8);
+        for (int i = 0; i < (maestroArray.length * 8); i++)
+            lPlanets.add(null);
+    }
 
     /**
      * Called by a Maestro when all of this Domain have finished computation.
@@ -93,11 +89,11 @@ public class BigMaestro implements Serializable {
      */
     public void notifyFinished(int id, List lPla) {
         this.nbFinished++; // one another have finished
-        
+
         // update of the new planets's positions
-        for(int i=0; i<lPla.size(); i++)
-            lPlanets.set(id * 8 + i, lPla.get(i));
-        
+        for (int i = 0; i < lPla.size(); i++)
+            lPlanets.set((id * 8) + i, lPla.get(i));
+
         // next iteration
         if (this.nbFinished == maestroArray.length) {
             this.nbFinished = 0;
@@ -107,12 +103,8 @@ public class BigMaestro implements Serializable {
             }
 
             // Restart all the Maestro
-            for(int i=0; i<maestroArray.length; i++)
+            for (int i = 0; i < maestroArray.length; i++)
                 maestroArray[i].finished();
-
         }
     }
-
-
-
 }

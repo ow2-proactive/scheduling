@@ -46,8 +46,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
  * @since   ProActive 0.9
  *
  */
-public class AppletEntrance
-    extends org.objectweb.proactive.examples.StandardFrame {
+public class AppletEntrance extends org.objectweb.proactive.examples.StandardFrame {
     public AppletEntrance(String name, int width, int height) {
         super(name, width, height);
     }

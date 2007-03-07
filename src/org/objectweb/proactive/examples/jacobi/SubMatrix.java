@@ -130,7 +130,6 @@ public class SubMatrix implements Serializable {
         this.name = name;
         this.resultFile = resultFile;
         this.jacobi = jacobi;
-        
     }
 
     /**
@@ -515,9 +514,9 @@ public class SubMatrix implements Serializable {
      * Launch the main loop
      */
     public void loop() {
-    	logger.debug("[JACOBI] [" + this.name +
-                "] Iteration : " + iterationsToStop);
-    	
+        logger.debug("[JACOBI] [" + this.name + "] Iteration : " +
+            iterationsToStop);
+
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
@@ -550,7 +549,7 @@ public class SubMatrix implements Serializable {
     public void stop() {
         this.iterationsToStop = 0;
         logger.debug("[JACOBI] [" + this.name +
-                "] Stop Message Received, waiting for others.");
+            "] Stop Message Received, waiting for others.");
         ProSPMD.barrier("stop");
         if ((north != null) && (east != null) && (west != null) &&
                 (south != null)) {
@@ -559,23 +558,25 @@ public class SubMatrix implements Serializable {
                 pw = new PrintWriter(new FileOutputStream(resultFile), true);
 
                 DecimalFormat decimalFormat = new DecimalFormat("0.00");
-                
-                
+
                 for (int i = 0; i < height; i++) {
                     String line = "[";
                     for (int j = 0; j < (width - 1); j++) {
-                        line += (decimalFormat.format(current[(i * width) + j]) + " ");
+                        line += (decimalFormat.format(current[(i * width) + j]) +
+                        " ");
                     }
-                    line += decimalFormat.format(current[((i * width) + width) - 1]);
+                    line += decimalFormat.format(current[((i * width) + width) -
+                        1]);
                     line += "] ";
                     pw.println(line);
                 }
-                logger.info("CALCULATION COMPLETE, plese find results in: "+resultFile.getAbsolutePath());
+                logger.info("CALCULATION COMPLETE, plese find results in: " +
+                    resultFile.getAbsolutePath());
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             } finally {
-            	pw.close();
+                pw.close();
             }
             // Send the terminate signal to the main program
             this.jacobi.terminateAll();

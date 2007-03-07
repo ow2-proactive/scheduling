@@ -33,18 +33,21 @@ package org.objectweb.proactive.examples.pi;
 import org.objectweb.proactive.examples.pi.Interval;
 import org.objectweb.proactive.examples.pi.Result;
 
+
 /**
  * This interface has to be implemented by all workers who will perform pi computation
  * @author ProActive team
  *
  */
 public interface PiComp {
+
     /**
      * Computes a part of the final pi value
      * @param msg The interval on which the computation has to be done
      * @return the result for the computation of his interval
      */
     public Result compute(Interval msg);
+
     /**
      * Sets the scale for BigDecimal numbers involved in the computation
      * @param scale The scale to set

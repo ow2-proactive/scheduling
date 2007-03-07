@@ -66,7 +66,6 @@ import org.objectweb.proactive.examples.c3d.geom.Vec;
  */
 public class UserGUI implements ActionListener {
     protected UserLogic c3dUser;
-    
     protected JButton sendMessageButton;
     protected JButton addSphereButton;
     protected JButton resetSceneButton;
@@ -97,18 +96,19 @@ public class UserGUI implements ActionListener {
         mainFrame = new JFrame(title);
         mainFrame.setContentPane(createMainPanel());
         mainFrame.setJMenuBar(createMenuBar());
-        
+
         mainFrame.pack();
         mainFrame.setVisible(true);
-        
+
         this.c3dUser = c3dUser;
         mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                c3dUser.terminate();
-                trash();
-            }
-        });
+                public void windowClosing(WindowEvent e) {
+                    c3dUser.terminate();
+                    trash();
+                }
+            });
     }
+
     /** Generates the menu bar which contains list, clear, quit and about items*/
     private JMenuBar createMenuBar() {
         //      menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
@@ -314,60 +314,57 @@ public class UserGUI implements ActionListener {
 
     /** Returns the important values which where shown on screen, like the log, the messages...*/
     public String[] getValues() {
-        String users="";
-        int max =  this.sendToComboBox.getItemCount() ;
-        for (int i = 1 ; i < max ; i++)  // Just don't save the BROADCAST value
-            users += this.sendToComboBox.getItemAt(i) + "\n";
+        String users = "";
+        int max = this.sendToComboBox.getItemCount();
+        for (int i = 1; i < max; i++) // Just don't save the BROADCAST value
+
+            users += (this.sendToComboBox.getItemAt(i) + "\n");
         return new String[] {
-            this.logArea.getText(), 
-            this.messageLogArea.getText(),
-            this.userInfoText,
-            users
+            this.logArea.getText(), this.messageLogArea.getText(),
+            this.userInfoText, users
         };
         // no need to store the users, as the dispatcher informs of them again!
     }
 
     /** Sets the given values to the different elements of the GUI */
     public void setValues(String[] values) {
-        if (values != null ) {
+        if (values != null) {
             this.logArea.setText(values[0]);
             this.messageLogArea.setText(values[1]);
-            
+
             // restore also the users combo box!
             String users = values[3];
-            while (true)  { 
+            while (true) {
                 int index = users.indexOf('\n');
                 if (index != -1) {
-                    this.sendToComboBox.addItem(users.substring(0,index));
-                }
-                else 
+                    this.sendToComboBox.addItem(users.substring(0, index));
+                } else {
                     break;
-                users = users.substring(index+1);
-            }  
+                }
+                users = users.substring(index + 1);
+            }
         }
     }
 
     public void showUserInfo() {
         if (userInfoFrame == null) {
             userInfoFrame = new JFrame("Information");
-            userInfoFrame.getContentPane().add(createUserInfoArea(
-                    this.userInfoText));
+            userInfoFrame.getContentPane()
+                         .add(createUserInfoArea(this.userInfoText));
             userInfoFrame.pack();
         }
         userInfoFrame.setLocation(mainFrame.getLocation());
         userInfoFrame.setVisible(true);
         //userInfoFrame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE); not needed, is default
     }
-    
- 
+
     public void setUserInfo(String newInfo) {
-        this.userInfoText = newInfo; 
-    }
-    
-    public String getUserInfo() {
-        return this.userInfoText ; 
+        this.userInfoText = newInfo;
     }
 
+    public String getUserInfo() {
+        return this.userInfoText;
+    }
 
     /** Event handler, which transforms events into method calls */
     public void actionPerformed(ActionEvent e) {
@@ -416,5 +413,4 @@ public class UserGUI implements ActionListener {
             log("EVENT not handled : " + source);
         }
     }
-
 }

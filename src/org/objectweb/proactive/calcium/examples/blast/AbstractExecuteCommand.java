@@ -46,61 +46,67 @@ import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 public abstract class AbstractExecuteCommand {
-	
-	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
-	
-	Process execCommand(URL program, String args[], File workingDir, String add2path) throws IOException{
-		
-		if(program == null || program.getPath().length() <=0){
-			throw new IllegalArgumentException("Program path is not specified");
-		}
-		
-		List<String> command = new ArrayList<String>();
-		command.add(program.getPath());
-		
-		for(String s:args){command.add(s);}
-		ProcessBuilder pb = new ProcessBuilder(command);
-		pb.redirectErrorStream(true);
-		
-		pb.directory(workingDir);
-		
-		if(add2path !=null && add2path.length()>0){
-			Map<String,String> env = pb.environment();
-			env.put("PATH", env.get("PATH")+System.getProperty("path.separator")+add2path);
-		}
-		
-		Process p = pb.start();
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-		return p;
-	}
-	
-	private static void printStream(InputStream in) throws IOException{
-		
-		String line;
-		BufferedReader input = new BufferedReader(new InputStreamReader(in));
-		while ((line = input.readLine()) != null) {
-			System.out.println(line);
-		}
-	}
-	
-	protected abstract URL getProgramURL() throws EnvironmentException, MuscleException;
-	
-	protected void execProcess(String arguments, File workingDirectory) throws EnvironmentException {
-		
-		URL programURL =getProgramURL(); 		
+    Process execCommand(URL program, String[] args, File workingDir,
+        String add2path) throws IOException {
+        if ((program == null) || (program.getPath().length() <= 0)) {
+            throw new IllegalArgumentException("Program path is not specified");
+        }
 
-		try {
-			Process process = execCommand(programURL, arguments.split(" "), workingDirectory, "");
-			if(	process.waitFor() != 0){
-				String msg= "Command did not finish successfully: "+programURL+" "+arguments;
-				logger.error(msg);
-				throw new MuscleException(msg);
-			}
+        List<String> command = new ArrayList<String>();
+        command.add(program.getPath());
 
-			//TODO perhaps do some verification here?
-		} catch (Exception e) {
-			throw new MuscleException(e);
-		}
-	}
+        for (String s : args) {
+            command.add(s);
+        }
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectErrorStream(true);
+
+        pb.directory(workingDir);
+
+        if ((add2path != null) && (add2path.length() > 0)) {
+            Map<String, String> env = pb.environment();
+            env.put("PATH",
+                env.get("PATH") + System.getProperty("path.separator") +
+                add2path);
+        }
+
+        Process p = pb.start();
+
+        return p;
+    }
+
+    private static void printStream(InputStream in) throws IOException {
+        String line;
+        BufferedReader input = new BufferedReader(new InputStreamReader(in));
+        while ((line = input.readLine()) != null) {
+            System.out.println(line);
+        }
+    }
+
+    protected abstract URL getProgramURL()
+        throws EnvironmentException, MuscleException;
+
+    protected void execProcess(String arguments, File workingDirectory)
+        throws EnvironmentException {
+        URL programURL = getProgramURL();
+
+        try {
+            Process process = execCommand(programURL, arguments.split(" "),
+                    workingDirectory, "");
+            if (process.waitFor() != 0) {
+                String msg = "Command did not finish successfully: " +
+                    programURL + " " + arguments;
+                logger.error(msg);
+                throw new MuscleException(msg);
+            }
+
+            //TODO perhaps do some verification here?
+        } catch (Exception e) {
+            throw new MuscleException(e);
+        }
+    }
 }

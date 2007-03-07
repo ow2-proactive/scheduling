@@ -45,6 +45,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurity;
  */
 public class StartDomain {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_DOMAIN);
+
     protected StartDomain() {
     }
 

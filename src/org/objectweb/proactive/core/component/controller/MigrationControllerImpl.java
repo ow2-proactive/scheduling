@@ -68,7 +68,7 @@ public class MigrationControllerImpl extends AbstractProActiveController
 
     public void migrateTo(Node node) throws MigrationException {
         // need to migrate gathercast futures handlers active objects first
-    	((ProActiveComponentImpl)owner).migrateControllersDependentActiveObjectsTo(node);
+        ((ProActiveComponentImpl) owner).migrateControllersDependentActiveObjectsTo(node);
         ProActive.migrateTo(node);
     }
 

@@ -48,8 +48,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Serializable {
+public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType,
+    Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+
     /**
      * The generatedClassName of the interface described by this type.
      */
@@ -79,13 +81,13 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         this.signature = itfType.getFcItfSignature();
         this.isClient = itfType.isFcClientItf();
         this.isOptional = itfType.isFcOptionalItf();
-        if(itfType.isFcCollectionItf()) {
+        if (itfType.isFcCollectionItf()) {
             cardinality = ProActiveTypeFactory.COLLECTION_CARDINALITY;
         } else {
             cardinality = ProActiveTypeFactory.SINGLETON_CARDINALITY;
         }
     }
-    
+
     /**
      * Constructor for ProActiveInterfaceTypeImpl.
      */
@@ -98,27 +100,29 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         this.cardinality = cardinality;
         checkMethodsSignatures(signature, cardinality);
     }
-    
-    
+
     private boolean checkMethodsSignatures(String signature, String cardinality) {
         try {
-        if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
-            Class c = Class.forName(signature);
-            Method[] methods = c.getMethods();
-            for (Method m : methods) {
-                if (!(m.getGenericReturnType() instanceof ParameterizedType) && !(Void.TYPE ==m.getReturnType())) {
-                    throw new ProActiveRuntimeException("methods of a multicast interface must return parameterized types or void, " +
-                            "which is not the case for method " + m.toString() + " in interface " + signature);
+            if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
+                Class c = Class.forName(signature);
+                Method[] methods = c.getMethods();
+                for (Method m : methods) {
+                    if (!(m.getGenericReturnType() instanceof ParameterizedType) &&
+                            !(Void.TYPE == m.getReturnType())) {
+                        throw new ProActiveRuntimeException(
+                            "methods of a multicast interface must return parameterized types or void, " +
+                            "which is not the case for method " + m.toString() +
+                            " in interface " + signature);
+                    }
                 }
             }
-        }
         } catch (ClassNotFoundException e) {
-            throw new ProActiveRuntimeException("cannot find interface defined in component interface signature : " + e.getMessage());
+            throw new ProActiveRuntimeException(
+                "cannot find interface defined in component interface signature : " +
+                e.getMessage());
         }
         return true;
     }
-
-
 
     // -------------------------------------------------------------------------
     // Implementation of the InterfaceType interface
@@ -163,10 +167,10 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     public String getFcCardinality() {
         return cardinality;
     }
-    
+
     public boolean isFcCollective() {
-        return (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality)
-                 || (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)));
+        return (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality) ||
+        (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)));
     }
 
     public boolean isFcGathercastItf() {
@@ -180,13 +184,11 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     public boolean isFcSingletonItf() {
         return ProActiveTypeFactory.SINGLETON_CARDINALITY.equals(cardinality);
     }
-    
+
     /*
      * @see org.objectweb.fractal.api.type.InterfaceType#isFcCollectionItf()
      */
     public boolean isFcCollectionItf() {
         return ProActiveTypeFactory.COLLECTION_CARDINALITY.equals(cardinality);
     }
-
-
 }

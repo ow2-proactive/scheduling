@@ -71,15 +71,15 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     private String notActivatedMessage = "This VirtualNode lookup is not yet activated. Activate it first";
     protected String runtimeHostForLookup = "LOOKUP_HOST";
     protected String runtimePortForLookup = "LOOKUP_PORT";
-    private int fileBlockSize, overlapping;
-    
+    private int fileBlockSize;
+    private int overlapping;
+
     public VirtualNodeLookup(String name) {
         this.name = name;
         ProActiveRuntimeImpl proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
-        fileBlockSize=org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
-        overlapping=org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
-        
+        fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
+        overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
     }
 
     /**
@@ -135,8 +135,8 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 return;
             }
             try {
-            	this.urlForLookup = UrlBuilder.buildUrl(this.lookupHost, this.name,
-                      this.lookupProtocol, this.portForLookup);
+                this.urlForLookup = UrlBuilder.buildUrl(this.lookupHost,
+                        this.name, this.lookupProtocol, this.portForLookup);
                 //		this.remoteProActiveRuntime = RuntimeFactory.getRuntime(urlForLookup,lookupProtocol);
                 //		this.virtualNode = remoteProActiveRuntime.getVirtualNode(this.name);
                 this.virtualNode = ProActive.lookupVirtualNode(urlForLookup);
@@ -146,8 +146,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 throw new ProActiveRuntimeException(e);
             }
         } else {
-            vnLogger.debug("VirtualNode " + this.name +
-                " already activated");
+            vnLogger.debug("VirtualNode " + this.name + " already activated");
         }
     }
 
@@ -405,29 +404,26 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             " ERROR: No MPI process attached with the virtual node !");
     }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
-	 */
-	public FileVector fileTransferRetrieve() throws ProActiveException {
-		
-			throw new ProActiveException("No File Transfer Retrieve support from VirtualNodeLookup");
-		
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
+     */
+    public FileVector fileTransferRetrieve() throws ProActiveException {
+        throw new ProActiveException(
+            "No File Transfer Retrieve support from VirtualNodeLookup");
+    }
 
-	public ExternalProcess getMPIProcess() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public ExternalProcess getMPIProcess() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public boolean hasMPIProcess() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	public void setFileTransferParams(int fileBlockSize, int overlapping) {
+    public boolean hasMPIProcess() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-		this.fileBlockSize=fileBlockSize;
-		this.overlapping=overlapping;
-	}
-	
+    public void setFileTransferParams(int fileBlockSize, int overlapping) {
+        this.fileBlockSize = fileBlockSize;
+        this.overlapping = overlapping;
+    }
 }

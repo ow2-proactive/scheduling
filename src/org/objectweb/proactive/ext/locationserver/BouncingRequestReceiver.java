@@ -65,7 +65,7 @@ public class BouncingRequestReceiver implements RequestReceiver {
         throws IOException {
     }
 
-	public boolean isInImmediateService() throws IOException {
-		return false;
-	}
+    public boolean isInImmediateService() throws IOException {
+        return false;
+    }
 }

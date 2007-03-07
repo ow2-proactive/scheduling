@@ -33,21 +33,20 @@ package org.objectweb.proactive.calcium.examples.nqueens;
 import org.objectweb.proactive.calcium.muscle.Execute;
 
 
-abstract public class SolveBoard implements Execute<Board,Result> {
-	
-    protected int n1,n2;
-    
-    public SolveBoard(){
+abstract public class SolveBoard implements Execute<Board, Result> {
+    protected int n1;
+    protected int n2;
 
+    public SolveBoard() {
     }
-    
+
     protected int position(int bit) {
-    	int i;
+        int i;
         for (i = 0; (bit >>= 1) != 0; i++)
             ;
         return i;
     }
-    
+
     //Worker main method
     /*
     public Board execute(Board board) {
@@ -56,16 +55,17 @@ abstract public class SolveBoard implements Execute<Board,Result> {
         n2 = n1 - 1;
 
         if (board.isBT1()) {
-        	BoardBT1 boardBT1=(BoardBT1)board;
+                BoardBT1 boardBT1=(BoardBT1)board;
             backtrack1(boardBT1, boardBT1.row, boardBT1.left, boardBT1.down, boardBT1.right);
         } else {
-        	BoardBT2 boardBT2=(BoardBT2)board;
+                BoardBT2 boardBT2=(BoardBT2)board;
             backtrack2((BoardBT2)board, boardBT2.row, boardBT2.left, boardBT2.down, boardBT2.right);
         }
     }
     */
-    protected Result mixBoard(Result res, int n1, int n2){
+    protected Result mixBoard(Result res, int n1, int n2) {
         int i;
+
         // mix the solutions to find the final ones
         if ((res.n % 2) == 0) {
             // n is even
@@ -86,10 +86,9 @@ abstract public class SolveBoard implements Execute<Board,Result> {
         }
         return res;
     }
-    
+
     // prints the board
     protected void display(Board board) {
-
         int y;
         int bit;
         System.out.println("N= " + board.n);

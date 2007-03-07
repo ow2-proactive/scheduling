@@ -40,61 +40,62 @@ import javasci.SciData;
 import javasci.SciDoubleMatrix;
 import javasci.Scilab;
 
+
 public class SciTestSeqMult {
+    public static void main(String[] args) throws Exception {
+        if (args.length != 2) {
+            System.out.println("Invalid number of parameter : " + args.length);
+            return;
+        }
 
-	public static void main(String[] args) throws Exception {
+        BufferedReader reader = new BufferedReader(new FileReader(args[0]));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(
+                    new FileWriter(args[1])));
 
-		if (args.length != 2) {
-			System.out.println("Invalid number of parameter : " + args.length);
-			return;
-		}
+        double[] m1;
+        double[] m2;
 
-		BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-		PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(
-				args[1])));
+        String line;
+        int nbRow;
+        int nbCol;
 
-		double[] m1;
-		double[] m2;
+        double startTime;
+        double endTime;
 
-		String line;
-		int nbRow;
-		int nbCol;
-		
-		double startTime;
-		double endTime;
-		
-		while ((line = reader.readLine()) != null) {
-			if(line.trim().startsWith("#"))
-				continue;
-			
-			if (line.trim().equals(""))
-				break;
+        while ((line = reader.readLine()) != null) {
+            if (line.trim().startsWith("#")) {
+                continue;
+            }
 
-			nbRow = Integer.parseInt(line);
-			nbCol = Integer.parseInt(line);
+            if (line.trim().equals("")) {
+                break;
+            }
 
-			m1 = new double[nbRow * nbCol];
-			m2 = new double[nbRow * nbCol];
-			for (int i = 0; i < nbRow * nbCol; i++) {
-				m1[i] = Math.random() * 10.0;
-				m2[i] = Math.random() * 10.0;
-			}
-			
-			startTime = System.currentTimeMillis();
-			Scilab.sendData(new SciDoubleMatrix("A", nbRow, nbCol, m1));
-			Scilab.sendData(new SciDoubleMatrix("B", nbRow, nbCol, m2));
-			Scilab.sendData(new SciData("C"));
-			Scilab.exec("C=A*B;");
+            nbRow = Integer.parseInt(line);
+            nbCol = Integer.parseInt(line);
 
-			SciData sciResult = Scilab.receiveDataByName("C");
-			endTime = System.currentTimeMillis();
-			
-			System.out.println(endTime - startTime);
-			//System.out.println(sciResult);
-	    	writer.println(nbRow  + " " + (endTime - startTime));
-		}
-		
-		reader.close();
-		writer.close();
-	}
+            m1 = new double[nbRow * nbCol];
+            m2 = new double[nbRow * nbCol];
+            for (int i = 0; i < (nbRow * nbCol); i++) {
+                m1[i] = Math.random() * 10.0;
+                m2[i] = Math.random() * 10.0;
+            }
+
+            startTime = System.currentTimeMillis();
+            Scilab.sendData(new SciDoubleMatrix("A", nbRow, nbCol, m1));
+            Scilab.sendData(new SciDoubleMatrix("B", nbRow, nbCol, m2));
+            Scilab.sendData(new SciData("C"));
+            Scilab.exec("C=A*B;");
+
+            SciData sciResult = Scilab.receiveDataByName("C");
+            endTime = System.currentTimeMillis();
+
+            System.out.println(endTime - startTime);
+            //System.out.println(sciResult);
+            writer.println(nbRow + " " + (endTime - startTime));
+        }
+
+        reader.close();
+        writer.close();
+    }
 }

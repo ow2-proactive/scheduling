@@ -47,45 +47,47 @@ public class BodyRequest extends MessageImpl implements Request,
     java.io.Serializable {
     protected MethodCall methodCall;
     protected boolean isPriority;
-	protected boolean isNFRequest;
-	protected int nfRequestPriority;
+    protected boolean isNFRequest;
+    protected int nfRequestPriority;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-	public BodyRequest(Body targetBody, String methodName,
-			Class[] paramClasses, Object[] params, boolean isPriority)
-	throws NoSuchMethodException {
-		super(null, 0, true, methodName);
-		if (paramClasses == null) {
-			paramClasses = new Class[params.length];
-			for (int i = 0; i < params.length; i++) {
-				paramClasses[i] = params[i].getClass();
-			}
-		}
-		methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName,
-				paramClasses), params, (Map<TypeVariable, Class>)null);
-		this.isPriority = isPriority;
-	}
-
-	//Non functional BodyRequests constructor
     public BodyRequest(Body targetBody, String methodName,
-    		Class[] paramClasses, Object[] params, boolean isNFRequest, int nfRequestPriority)
-    throws NoSuchMethodException {
-    	super(null, 0, true, methodName);
-    	if (paramClasses == null) {
-    		paramClasses = new Class[params.length];
-    		for (int i = 0; i < params.length; i++) {
-    			paramClasses[i] = params[i].getClass();
-    		}
-    	}
-    	methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName,
-    			paramClasses), params, (Map<TypeVariable, Class>)null);
-    	
-    	this.isNFRequest = isNFRequest;
-    	this.nfRequestPriority = nfRequestPriority;
+        Class[] paramClasses, Object[] params, boolean isPriority)
+        throws NoSuchMethodException {
+        super(null, 0, true, methodName);
+        if (paramClasses == null) {
+            paramClasses = new Class[params.length];
+            for (int i = 0; i < params.length; i++) {
+                paramClasses[i] = params[i].getClass();
+            }
+        }
+        methodCall = MethodCall.getMethodCall(targetBody.getClass()
+                                                        .getMethod(methodName,
+                    paramClasses), params, (Map<TypeVariable, Class>) null);
+        this.isPriority = isPriority;
     }
-    
+
+    //Non functional BodyRequests constructor
+    public BodyRequest(Body targetBody, String methodName,
+        Class[] paramClasses, Object[] params, boolean isNFRequest,
+        int nfRequestPriority) throws NoSuchMethodException {
+        super(null, 0, true, methodName);
+        if (paramClasses == null) {
+            paramClasses = new Class[params.length];
+            for (int i = 0; i < params.length; i++) {
+                paramClasses[i] = params[i].getClass();
+            }
+        }
+        methodCall = MethodCall.getMethodCall(targetBody.getClass()
+                                                        .getMethod(methodName,
+                    paramClasses), params, (Map<TypeVariable, Class>) null);
+
+        this.isNFRequest = isNFRequest;
+        this.nfRequestPriority = nfRequestPriority;
+    }
+
     // SECURITY
     public boolean isCiphered() {
         return false;
@@ -176,25 +178,23 @@ public class BodyRequest extends MessageImpl implements Request,
             e.printStackTrace();
         }
     }
-    
-    
+
     //
     // -- METHODS DEALING WITH NON FUNCTIONAL REQUESTS
     //
-    
-	public boolean isFunctionalRequest() {
-		return this.isNFRequest;
-	}
+    public boolean isFunctionalRequest() {
+        return this.isNFRequest;
+    }
 
-	public void setFunctionalRequest(boolean isFunctionalRequest) {
-	   this.isNFRequest = isFunctionalRequest; 
-	}
+    public void setFunctionalRequest(boolean isFunctionalRequest) {
+        this.isNFRequest = isFunctionalRequest;
+    }
 
-	public void setNFRequestPriority(int nfReqPriority) {
-		this.nfRequestPriority = nfReqPriority;
-	}
+    public void setNFRequestPriority(int nfReqPriority) {
+        this.nfRequestPriority = nfReqPriority;
+    }
 
-	public int getNFRequestPriority() {
-		return this.nfRequestPriority;
-	}
+    public int getNFRequestPriority() {
+        return this.nfRequestPriority;
+    }
 }

@@ -94,8 +94,7 @@ public interface LocalBodyStrategy {
      * @param request the request to serve
      */
     public void serve(Request request);
-    
-    
+
     /**
      * Returns a unique identifier that can be used to tag a future, a request
      * @return a unique identifier that can be used to tag a future, a request.

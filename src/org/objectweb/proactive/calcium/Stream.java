@@ -38,60 +38,56 @@ import org.objectweb.proactive.calcium.futures.Future;
 import org.objectweb.proactive.calcium.futures.FutureImpl;
 import org.objectweb.proactive.calcium.skeletons.Instruction;
 import org.objectweb.proactive.calcium.skeletons.Skeleton;
-
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class Stream<T,R>{
-	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
-	
-	private int streamId;
-	private Facade facade;
-	private Skeleton<T,R> skeleton;
-	private int streamPriority;
-	
-	protected Stream(Facade facade,  Skeleton<T,R> skeleton){
-		
-		this.streamId=(int)(Math.random()*Integer.MAX_VALUE);
-		this.skeleton=skeleton;
-		this.facade=facade;
-		this.streamPriority=Task.DEFAULT_PRIORITY;
-	}
+public class Stream<T, R> {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
+    private int streamId;
+    private Facade facade;
+    private Skeleton<T, R> skeleton;
+    private int streamPriority;
 
-	/**
-	 * Inputs a new T to be computed.
-	 * @param param The T to be computed.
-	 * @throws PanicException 
-	 * @throws InterruptedException 
-	 */
-	public Future<R> input(T param) throws InterruptedException, PanicException{
-		
-		//Put the parameters in a Task container
-		Task<T> task = new Task<T>(param);
+    protected Stream(Facade facade, Skeleton<T, R> skeleton) {
+        this.streamId = (int) (Math.random() * Integer.MAX_VALUE);
+        this.skeleton = skeleton;
+        this.facade = facade;
+        this.streamPriority = Task.DEFAULT_PRIORITY;
+    }
 
-		Vector<Instruction<?,?>> instructionStack = (Vector<Instruction<?,?>>) skeleton.getInstructionStack();
-		task.setStack(instructionStack);
-		task.setPriority(streamPriority);
-		
-		FutureImpl<R> future = new FutureImpl<R>(task.getId());
-		facade.putTask(task, future);
+    /**
+     * Inputs a new T to be computed.
+     * @param param The T to be computed.
+     * @throws PanicException
+     * @throws InterruptedException
+     */
+    public Future<R> input(T param) throws InterruptedException, PanicException {
+        //Put the parameters in a Task container
+        Task<T> task = new Task<T>(param);
 
-		return (Future<R>)future;
-	}
+        Vector<Instruction<?, ?>> instructionStack = (Vector<Instruction<?, ?>>) skeleton.getInstructionStack();
+        task.setStack(instructionStack);
+        task.setPriority(streamPriority);
 
-	/**
-	 * Inputs a vector of T to be computed.
-	 * @param paramV A vector containing the T.
-	 * @throws PanicException 
-	 * @throws InterruptedException 
-	 */
-	public Vector<Future<R>> input(Vector<T> paramV) throws InterruptedException, PanicException{
-		
-		Vector<Future<R>> vector= new Vector<Future<R>>(paramV.size());
-		for(T param:paramV)
-			vector.add(input(param));
-		
-		return vector;
-	}
+        FutureImpl<R> future = new FutureImpl<R>(task.getId());
+        facade.putTask(task, future);
+
+        return (Future<R>) future;
+    }
+
+    /**
+     * Inputs a vector of T to be computed.
+     * @param paramV A vector containing the T.
+     * @throws PanicException
+     * @throws InterruptedException
+     */
+    public Vector<Future<R>> input(Vector<T> paramV)
+        throws InterruptedException, PanicException {
+        Vector<Future<R>> vector = new Vector<Future<R>>(paramV.size());
+        for (T param : paramV)
+            vector.add(input(param));
+
+        return vector;
+    }
 }

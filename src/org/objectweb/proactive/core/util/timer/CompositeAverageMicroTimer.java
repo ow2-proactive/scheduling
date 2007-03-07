@@ -123,13 +123,16 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         tmp.append("Number of measures: ").append(this.getNumberOfValues());
         tmp.append("\nTotal time measured: ").append(this.getCumulatedTime());
         tmp.append("\nAverage time: ").append(this.getAverage()).append("\n");
+
         //  Now we deal with the internal timers
         Iterator<Timer> it = timerMap.values().iterator();
         while (it.hasNext()) {
             Timer t = it.next();
             tmp.append("    ").append(t.getName()).append("\n");
-            tmp.append("        ").append("Number of measures: ").append(t.getNumberOfValues());
-            tmp.append("\n        ").append("Total time measured: ").append(t.getCumulatedTime());
+            tmp.append("        ").append("Number of measures: ")
+               .append(t.getNumberOfValues());
+            tmp.append("\n        ").append("Total time measured: ")
+               .append(t.getCumulatedTime());
             tmp.append("\n        ").append("Average time: ")
                .append(t.getAverage()).append("\n");
         }

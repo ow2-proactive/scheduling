@@ -301,7 +301,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 futureMaxDelay = Long.parseLong(System.getProperty(
                             "proactive.future.maxdelay"));
             } catch (IllegalArgumentException iea) {
-
                 /* The property is not set, that's not a problem */
                 futureMaxDelay = 0;
             }
@@ -489,13 +488,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
                 // it's a halfbody...
                 if (sender == null) {
-                    sender = LocalBodyStore.getInstance().getLocalHalfBody(senderID);
+                    sender = LocalBodyStore.getInstance()
+                                           .getLocalHalfBody(senderID);
                 }
                 if (sender != null) {
                     UniversalBody dest = FuturePool.getBodyDestination();
                     if (dest != null) {
-                        sender.getFuturePool().addAutomaticContinuation(ID,
-                            creatorID, dest);
+                        sender.getFuturePool()
+                              .addAutomaticContinuation(ID, creatorID, dest);
                     }
                 }
 

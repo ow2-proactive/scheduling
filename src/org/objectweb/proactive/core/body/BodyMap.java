@@ -167,7 +167,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     //
     public Object clone() {
         BodyMap newLocationTable = new BodyMap();
-        newLocationTable.idToBodyMap = (Hashtable<UniqueID, UniversalBody>)idToBodyMap.clone();
+        newLocationTable.idToBodyMap = (Hashtable<UniqueID, UniversalBody>) idToBodyMap.clone();
 
         return newLocationTable;
     }

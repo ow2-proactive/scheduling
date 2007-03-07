@@ -105,8 +105,8 @@ public class Start implements Serializable {
             } else if (args[1].equals("-3d")) {
                 ddd = true;
                 break;
-            }else if (args[1].equals("-3dft")) {
-            	displayft = true;
+            } else if (args[1].equals("-3dft")) {
+                displayft = true;
                 ddd = true;
                 break;
             }
@@ -147,7 +147,8 @@ public class Start implements Serializable {
         if (ddd) {
             try {
                 Class.forName("com.sun.j3d.utils.behaviors.mouse.MouseRotate");
-                Class.forName("org.objectweb.proactive.examples.nbody.common.NBody3DFrame");
+                Class.forName(
+                    "org.objectweb.proactive.examples.nbody.common.NBody3DFrame");
             } catch (Exception e) {
                 ddd = false;
                 logger.warn("Java 3D not installed, switching to 2D");

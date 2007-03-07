@@ -38,10 +38,11 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 
+
 /**
  * A primitive non-optimized pool for futures handlers. Indeed, in the current implementation,
  * one futures handler is created for each invocation that returns a result...
- * 
+ *
  * @author Matthieu Morel
  *
  */
@@ -102,7 +103,7 @@ public class GatherFuturesHandlerPool {
                     if (validate(handler)) {
                         unlocked.remove(handler);
                         locked.put(handler, new Long(now));
-//                        System.out.println("REUSED " + ++reused);
+                        //                        System.out.println("REUSED " + ++reused);
                         return (handler);
                     } else {
                         // object failed validation
@@ -124,5 +125,4 @@ public class GatherFuturesHandlerPool {
         handler.passivate();
         unlocked.put(handler, new Long(System.currentTimeMillis()));
     }
-
 }

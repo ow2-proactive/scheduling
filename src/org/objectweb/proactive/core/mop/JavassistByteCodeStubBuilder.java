@@ -70,31 +70,35 @@ public class JavassistByteCodeStubBuilder {
      * @return the bytecode for the corresponding stub class
      * @throws NoClassDefFoundError if the specified classname does not correspond to a class in the classpath
      */
-    public static byte[] create(String className, Class[] genericParameters) throws NoClassDefFoundError {
+    public static byte[] create(String className, Class[] genericParameters)
+        throws NoClassDefFoundError {
         CtClass generatedCtClass = null;
         if (genericParameters == null) {
-        	genericParameters = new Class[0];
+            genericParameters = new Class[0];
         }
         CtMethod[] reifiedMethodsWithoutGenerics;
         try {
             ClassPool pool = ClassPool.getDefault();
             generatedCtClass = pool.makeClass(Utils.convertClassNameToStubClassName(
                         className, genericParameters));
-            
+
             CtClass superCtClass = null;
             try {
-            	superCtClass = pool.get(className);
+                superCtClass = pool.get(className);
             } catch (NotFoundException e) {
-            	// may happen in environments with multiple classloaders: className is not available
-            	// in the initial classpath of javassist's class pool
-            	// ==> try to append classpath of the class corresponding to className
-            	pool.appendClassPath(new ClassClassPath(Class.forName(className)));
-            	superCtClass = pool.get(className);
+                // may happen in environments with multiple classloaders: className is not available
+                // in the initial classpath of javassist's class pool
+                // ==> try to append classpath of the class corresponding to className
+                pool.appendClassPath(new ClassClassPath(Class.forName(className)));
+                superCtClass = pool.get(className);
             }
-            
-            CtField outsideOfConstructorField = new CtField(pool.get(CtClass.booleanType.getName()), "outsideOfConstructor", generatedCtClass);
-            
-            generatedCtClass.addField(outsideOfConstructorField, (superCtClass.isInterface()? " false" : "true"));
+
+            CtField outsideOfConstructorField = new CtField(pool.get(
+                        CtClass.booleanType.getName()), "outsideOfConstructor",
+                    generatedCtClass);
+
+            generatedCtClass.addField(outsideOfConstructorField,
+                (superCtClass.isInterface() ? " false" : "true"));
             if (superCtClass.isInterface()) {
                 generatedCtClass.addInterface(superCtClass);
                 generatedCtClass.setSuperclass(pool.get(Object.class.getName()));
@@ -106,18 +110,16 @@ public class JavassistByteCodeStubBuilder {
 
             createStubObjectMethods(generatedCtClass);
 
-            
             CtField methodsField = new CtField(pool.get(
                         "java.lang.reflect.Method[]"), "overridenMethods",
                     generatedCtClass);
-            
+
             methodsField.setModifiers(Modifier.STATIC);
             generatedCtClass.addField(methodsField);
 
-            
             CtField genericTypesMappingField = new CtField(pool.get(
-            "java.util.Map"), "genericTypesMapping",
-            generatedCtClass);
+                        "java.util.Map"), "genericTypesMapping",
+                    generatedCtClass);
 
             genericTypesMappingField.setModifiers(Modifier.STATIC);
             generatedCtClass.addField(genericTypesMappingField);
@@ -134,7 +136,7 @@ public class JavassistByteCodeStubBuilder {
             Object exists;
 
             List<String> classesIndexer = new Vector<String>();
-            
+
             classesIndexer.add(superCtClass.getName());
 
             // If the target type is an interface, the only thing we have to do is to
@@ -160,7 +162,7 @@ public class JavassistByteCodeStubBuilder {
 
                     // The declared reifiedMethods for the current class
                     CtMethod[] declaredCtMethods = currentCtClass.getDeclaredMethods();
-                    
+
                     // For each method declared in this class
                     for (int i = 0; i < declaredCtMethods.length; i++) {
                         CtMethod currentMethod = declaredCtMethods[i];
@@ -200,10 +202,9 @@ public class JavassistByteCodeStubBuilder {
             // now get the methods from implemented interfaces
             List<CtClass> superInterfaces = new Vector<CtClass>();
             addSuperInterfaces(superCtClass, superInterfaces);
-            
+
             CtClass[] implementedInterfacesTable = (superInterfaces.toArray(new CtClass[superInterfaces.size()]));
-            for (int i=0; i< implementedInterfacesTable.length; i++) {
-                
+            for (int i = 0; i < implementedInterfacesTable.length; i++) {
             }
             for (int itfsIndex = 0;
                     itfsIndex < implementedInterfacesTable.length;
@@ -215,7 +216,6 @@ public class JavassistByteCodeStubBuilder {
 
                 //              The declared methods for the current interface
                 CtMethod[] declaredMethods = implementedInterfacesTable[itfsIndex].getDeclaredMethods();
-                
 
                 // For each method declared in this class
                 for (int i = 0; i < declaredMethods.length; i++) {
@@ -235,7 +235,8 @@ public class JavassistByteCodeStubBuilder {
                 }
             }
 
-            reifiedMethodsWithoutGenerics = (CtMethod[]) (temp.values().toArray(new CtMethod[temp.size()]));
+            reifiedMethodsWithoutGenerics = (CtMethod[]) (temp.values()
+                                                              .toArray(new CtMethod[temp.size()]));
 
             // Determines which reifiedMethods are valid for reification
             // It is the responsibility of method checkMethod 
@@ -253,25 +254,26 @@ public class JavassistByteCodeStubBuilder {
 
             // Installs the list of valid reifiedMethods as an instance variable of this object
             reifiedMethodsWithoutGenerics = validMethods;
-            
-            
+
             Class realSuperClass = Class.forName(className);
             TypeVariable<GenericDeclaration>[] tv = realSuperClass.getTypeParameters();
             Map<TypeVariable, Class> genericTypesMapping = new HashMap<TypeVariable, Class>();
-            if (genericParameters.length!=0) {
-            	// only deal with cases where parameters have been specified
-            	for (int i = 0; i < tv.length; i++) {
-            		genericTypesMapping.put(tv[i], genericParameters[i]);
-            	}
+            if (genericParameters.length != 0) {
+                // only deal with cases where parameters have been specified
+                for (int i = 0; i < tv.length; i++) {
+                    genericTypesMapping.put(tv[i], genericParameters[i]);
+                }
             }
 
             // create static block with method initializations
-            createStaticInitializer(generatedCtClass, reifiedMethodsWithoutGenerics,
-                classesIndexer, className, genericParameters);
+            createStaticInitializer(generatedCtClass,
+                reifiedMethodsWithoutGenerics, classesIndexer, className,
+                genericParameters);
 
-            createReifiedMethods(generatedCtClass, reifiedMethodsWithoutGenerics, superCtClass.isInterface());
-//                        generatedClass.writeFile();
-//                        System.out.println("[JAVASSIST] generated class : " + generatedClass.getName());
+            createReifiedMethods(generatedCtClass,
+                reifiedMethodsWithoutGenerics, superCtClass.isInterface());
+            //                        generatedClass.writeFile();
+            //                        System.out.println("[JAVASSIST] generated class : " + generatedClass.getName());
 
             // detach to fix  "frozen class" errors encountered in some large scale deployments 
             byte[] bytecode = generatedCtClass.toBytecode();
@@ -283,8 +285,6 @@ public class JavassistByteCodeStubBuilder {
                 className + " with javassist : " + e.getMessage());
         }
     }
-    
-    
 
     /**
      * @param generatedClass
@@ -292,118 +292,121 @@ public class JavassistByteCodeStubBuilder {
      * @throws NotFoundException
      * @throws CannotCompileException
      */
-     private static void createReifiedMethods(CtClass generatedClass,
-    	        CtMethod[] reifiedMethods, boolean stubOnInterface)
-    	        throws NotFoundException, CannotCompileException {
-    	        for (int i = 0; i < reifiedMethods.length; i++) {
-    	            CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
-    	            String body = ("{\nObject[] parameters = new Object[" +
-    	                paramTypes.length + "];\n");
-    	            for (int j = 0; j < paramTypes.length; j++) {
-    	                if (paramTypes[j].isPrimitive()) {
-    	                    body += ("  parameters[" + j + "]=" +
-    	                    wrapPrimitiveParameter(paramTypes[j], "$" + (j + 1)) +
-    	                    ";\n");
-    	                } else {
-    	                    body += ("  parameters[" + j + "]=$" + (j + 1) + ";\n");
-    	                }
-    	            }
-    	            CtClass returnType = reifiedMethods[i].getReturnType();
-    	            String postWrap = null;
-    	            String preWrap = null;
+    private static void createReifiedMethods(CtClass generatedClass,
+        CtMethod[] reifiedMethods, boolean stubOnInterface)
+        throws NotFoundException, CannotCompileException {
+        for (int i = 0; i < reifiedMethods.length; i++) {
+            CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
+            String body = ("{\nObject[] parameters = new Object[" +
+                paramTypes.length + "];\n");
+            for (int j = 0; j < paramTypes.length; j++) {
+                if (paramTypes[j].isPrimitive()) {
+                    body += ("  parameters[" + j + "]=" +
+                    wrapPrimitiveParameter(paramTypes[j], "$" + (j + 1)) +
+                    ";\n");
+                } else {
+                    body += ("  parameters[" + j + "]=$" + (j + 1) + ";\n");
+                }
+            }
+            CtClass returnType = reifiedMethods[i].getReturnType();
+            String postWrap = null;
+            String preWrap = null;
 
-    	            if (returnType != CtClass.voidType) {
-    	                if (!returnType.isPrimitive()) {
-    	                    preWrap = "(" + returnType.getName() + ")";
-    	                } else {
-    	                    //boolean, byte, char, short, int, long, float, double
-    	                    if (returnType.equals(CtClass.booleanType)) {
-    	                        preWrap = "((Boolean)";
-    	                        postWrap = ").booleanValue()";
-    	                    }
-    	                    if (returnType.equals(CtClass.byteType)) {
-    	                        preWrap = "((Byte)";
-    	                        postWrap = ").byteValue()";
-    	                    }
-    	                    if (returnType.equals(CtClass.charType)) {
-    	                        preWrap = "((Character)";
-    	                        postWrap = ").charValue()";
-    	                    }
-    	                    if (returnType.equals(CtClass.shortType)) {
-    	                        preWrap = "((Short)";
-    	                        postWrap = ").shortValue()";
-    	                    }
-    	                    if (returnType.equals(CtClass.intType)) {
-    	                        preWrap = "((Integer)";
-    	                        postWrap = ").intValue()";
-    	                    }
-    	                    if (returnType.equals(CtClass.longType)) {
-    	                        preWrap = "((Long)";
-    	                        postWrap = ").longValue()";
-    	                    }
-    	                    if (returnType.equals(CtClass.floatType)) {
-    	                        preWrap = "((Float)";
-    	                        postWrap = ").floatValue()";
-    	                    }
-    	                    if (returnType.equals(CtClass.doubleType)) {
-    	                        preWrap = "((Double)";
-    	                        postWrap = ").doubleValue()";
-    	                    }
-    	                }
-    	                body += "return ";
-    	                if (preWrap != null) {
-    	                    body += preWrap;
-    	                }
-    	            }
-    	            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
-    	                    "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-    	                    ", parameters, genericTypesMapping))");
-    	            
-    	            
-//    	            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
-//    	            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-//    	            ", parameters))");
-    	            if (postWrap != null) {
-    	                body += postWrap;
-    	            }
-    	            body += ";";
-    	            
-    	            // the following is for inserting conditional statement for method code executing
-    	            // within or outside the construction of the object
-    	            if (!stubOnInterface) {
-    	                String preReificationCode = "if (outsideOfConstructor) ";
-    	                // outside of constructor : object is already constructed
-    	                
-    	                String postReificationCode = "\n} else {\n";
-    	                // if inside constructor (i.e. in a method called by a
-    	                // constructor from a super class)
-    	                if (!reifiedMethods[i].getReturnType().equals(CtClass.voidType)) {
-    	                    postReificationCode += "return ";
-    	                }
-    	                postReificationCode += "super." + reifiedMethods[i].getName() + "(";
-    	                for (int j = 0; j < paramTypes.length; j++) {
-    	                    postReificationCode += "$" + (j + 1)
-    	                            + (((j + 1) < paramTypes.length) ? "," : "");
-    	                }
+            if (returnType != CtClass.voidType) {
+                if (!returnType.isPrimitive()) {
+                    preWrap = "(" + returnType.getName() + ")";
+                } else {
+                    //boolean, byte, char, short, int, long, float, double
+                    if (returnType.equals(CtClass.booleanType)) {
+                        preWrap = "((Boolean)";
+                        postWrap = ").booleanValue()";
+                    }
+                    if (returnType.equals(CtClass.byteType)) {
+                        preWrap = "((Byte)";
+                        postWrap = ").byteValue()";
+                    }
+                    if (returnType.equals(CtClass.charType)) {
+                        preWrap = "((Character)";
+                        postWrap = ").charValue()";
+                    }
+                    if (returnType.equals(CtClass.shortType)) {
+                        preWrap = "((Short)";
+                        postWrap = ").shortValue()";
+                    }
+                    if (returnType.equals(CtClass.intType)) {
+                        preWrap = "((Integer)";
+                        postWrap = ").intValue()";
+                    }
+                    if (returnType.equals(CtClass.longType)) {
+                        preWrap = "((Long)";
+                        postWrap = ").longValue()";
+                    }
+                    if (returnType.equals(CtClass.floatType)) {
+                        preWrap = "((Float)";
+                        postWrap = ").floatValue()";
+                    }
+                    if (returnType.equals(CtClass.doubleType)) {
+                        preWrap = "((Double)";
+                        postWrap = ").doubleValue()";
+                    }
+                }
+                body += "return ";
+                if (preWrap != null) {
+                    body += preWrap;
+                }
+            }
+            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
+            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
+            ", parameters, genericTypesMapping))");
 
-    	                postReificationCode += ");";
-    	                body = preReificationCode + body + postReificationCode;
-    	            }
-    	            body += "\n}";
-//    	            System.out.println("method : " + reifiedMethods[i].getName()
-//    	                    + " : \n" + body);
-    	            CtMethod methodToGenerate = null;
-    	            try {
-    	                methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
-    	                        reifiedMethods[i].getName(),
-    	                        reifiedMethods[i].getParameterTypes(),
-    	                        reifiedMethods[i].getExceptionTypes(), body, generatedClass);
-    	            } catch (RuntimeException e) {
-    	                e.printStackTrace();
-    	            }
-    	            generatedClass.addMethod(methodToGenerate);
-    	        }
-    	    }
+            //    	            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
+            //    	            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
+            //    	            ", parameters))");
+            if (postWrap != null) {
+                body += postWrap;
+            }
+            body += ";";
+
+            // the following is for inserting conditional statement for method code executing
+            // within or outside the construction of the object
+            if (!stubOnInterface) {
+                String preReificationCode = "if (outsideOfConstructor) ";
+
+                // outside of constructor : object is already constructed
+                String postReificationCode = "\n} else {\n";
+
+                // if inside constructor (i.e. in a method called by a
+                // constructor from a super class)
+                if (!reifiedMethods[i].getReturnType().equals(CtClass.voidType)) {
+                    postReificationCode += "return ";
+                }
+                postReificationCode += ("super." + reifiedMethods[i].getName() +
+                "(");
+                for (int j = 0; j < paramTypes.length; j++) {
+                    postReificationCode += ("$" + (j + 1) +
+                    (((j + 1) < paramTypes.length) ? "," : ""));
+                }
+
+                postReificationCode += ");";
+                body = preReificationCode + body + postReificationCode;
+            }
+            body += "\n}";
+            //    	            System.out.println("method : " + reifiedMethods[i].getName()
+            //    	                    + " : \n" + body);
+            CtMethod methodToGenerate = null;
+            try {
+                methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
+                        reifiedMethods[i].getName(),
+                        reifiedMethods[i].getParameterTypes(),
+                        reifiedMethods[i].getExceptionTypes(), body,
+                        generatedClass);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+            generatedClass.addMethod(methodToGenerate);
+        }
+    }
+
     /**
      * @param generatedClass
      * @param reifiedMethods
@@ -412,27 +415,31 @@ public class JavassistByteCodeStubBuilder {
      * @throws NotFoundException
      */
     public static void createStaticInitializer(CtClass generatedClass,
-        CtMethod[] reifiedMethods, List<String> classesIndexer, String superClassName, Class[] genericParameters)
+        CtMethod[] reifiedMethods, List<String> classesIndexer,
+        String superClassName, Class[] genericParameters)
         throws CannotCompileException, NotFoundException {
-    	if (genericParameters == null) {
-    		genericParameters = new Class[0];
-    	}
+        if (genericParameters == null) {
+            genericParameters = new Class[0];
+        }
         CtConstructor classInitializer = generatedClass.makeClassInitializer();
 
         String classInitializerBody = "{\n";
-        classInitializerBody+="Class[] genericParameters = new Class[" + genericParameters.length+"];\n";
-        for (int i=0; i<genericParameters.length; i++) {
-        	classInitializerBody+="genericParameters["+i+"] = Class.forName(\""+genericParameters[i].getName()+"\");\n";
+        classInitializerBody += ("Class[] genericParameters = new Class[" +
+        genericParameters.length + "];\n");
+        for (int i = 0; i < genericParameters.length; i++) {
+            classInitializerBody += ("genericParameters[" + i +
+            "] = Class.forName(\"" + genericParameters[i].getName() + "\");\n");
         }
-        classInitializerBody+="Class realSuperClass = Class.forName(\"" + superClassName+"\");\n";
-        classInitializerBody+="java.lang.reflect.TypeVariable[] tv = realSuperClass.getTypeParameters();\n";
-        classInitializerBody+="genericTypesMapping = new java.util.HashMap();\n";
-        
+        classInitializerBody += ("Class realSuperClass = Class.forName(\"" +
+        superClassName + "\");\n");
+        classInitializerBody += "java.lang.reflect.TypeVariable[] tv = realSuperClass.getTypeParameters();\n";
+        classInitializerBody += "genericTypesMapping = new java.util.HashMap();\n";
+
         // generic types mapping only occurs when parameters are specified
-        if (genericParameters.length!=0) {
-        	classInitializerBody+="for (int i = 0; i < tv.length; i++) {\n";
-        	classInitializerBody+="     genericTypesMapping.put(tv[i], genericParameters[i]);\n";
-        	classInitializerBody+="}\n";
+        if (genericParameters.length != 0) {
+            classInitializerBody += "for (int i = 0; i < tv.length; i++) {\n";
+            classInitializerBody += "     genericTypesMapping.put(tv[i], genericParameters[i]);\n";
+            classInitializerBody += "}\n";
         }
 
         classInitializerBody += ("overridenMethods = new java.lang.reflect.Method[" +
@@ -473,7 +480,7 @@ public class JavassistByteCodeStubBuilder {
         }
 
         classInitializerBody += "\n}";
-//        System.out.println(classInitializerBody);
+        //        System.out.println(classInitializerBody);
         classInitializer.setBody(classInitializerBody);
     }
 
@@ -484,7 +491,8 @@ public class JavassistByteCodeStubBuilder {
      */
     public static void createStubObjectMethods(CtClass generatedClass)
         throws CannotCompileException, NotFoundException {
-        CtField proxyField = new CtField(ClassPool.getDefault().get(Proxy.class.getName()),
+        CtField proxyField = new CtField(ClassPool.getDefault()
+                                                  .get(Proxy.class.getName()),
                 "myProxy", generatedClass);
         generatedClass.addField(proxyField);
         proxyGetter = CtNewMethod.getter("getProxy", proxyField);
@@ -575,17 +583,19 @@ public class JavassistByteCodeStubBuilder {
                 (met.getParameterTypes().length == 0)) {
             return false;
         }
-        
-        if ((met.getSignature().equals(proxyGetter.getSignature()) || met.getSignature().equals(proxySetter.getSignature()))) {
+
+        if ((met.getSignature().equals(proxyGetter.getSignature()) ||
+                met.getSignature().equals(proxySetter.getSignature()))) {
             return false;
         }
 
         return true;
     }
-    
-    private static void addSuperInterfaces(CtClass cl, List<CtClass> superItfs) throws NotFoundException {
+
+    private static void addSuperInterfaces(CtClass cl, List<CtClass> superItfs)
+        throws NotFoundException {
         if (!cl.isInterface() && !Modifier.isAbstract(cl.getModifiers())) {
-        	// inspect interfaces AND abstract classes
+            // inspect interfaces AND abstract classes
             return;
         }
         CtClass[] super_interfaces = cl.getInterfaces();
@@ -594,5 +604,4 @@ public class JavassistByteCodeStubBuilder {
             addSuperInterfaces(super_interfaces[i], superItfs);
         }
     }
-    
 }

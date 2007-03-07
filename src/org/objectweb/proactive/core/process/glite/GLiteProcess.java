@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.process.glite;
 
+import java.util.LinkedList;
+
 import javax.naming.directory.InvalidAttributeValueException;
 
 import org.glite.wms.jdlj.*; // /lib/glite/glite-wms-jdlj.jar
@@ -42,8 +44,6 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileDependant;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
-
-import java.util.LinkedList;
 
 
 /**
@@ -58,7 +58,7 @@ import java.util.LinkedList;
  * @since ProActive 3.1
  */
 public class GLiteProcess extends AbstractExternalProcessDecorator
-        implements FileDependant {
+    implements FileDependant {
 
     /**
      * Firsts parameters
@@ -74,7 +74,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
             "user.home") + FILE_SEPARATOR + "out.log";
     protected static final String DEFAULT_CONFIG_FILE = System.getProperty(
             "user.home") + FILE_SEPARATOR + "public" + FILE_SEPARATOR + "JDL" +
-            FILE_SEPARATOR + "vo.conf";
+        FILE_SEPARATOR + "vo.conf";
     protected int jobID;
     protected String hostList;
     protected String processor = DEFAULT_PROCESSOR_NUMBER;
@@ -89,6 +89,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     protected boolean jdlRemote = false;
     protected String netServer;
     protected String logBook;
+
     /*jdl related fields*/
     protected GLiteJobAd jad;
     protected int jobNodeNumber = 2;
@@ -137,7 +138,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         jad = new GLiteJobAd();
     }
 
-
     public static void main(String[] args) {
         ProActiveDescriptor pad;
         try {
@@ -162,82 +162,105 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
          *  gLiteStartRuntime.sh must be in InputSandBox within xml descriptor
          */
         if (this.getJobType().equals("MPICH")) {
-            args = this.getJobExecutable() + initial_args.substring(initial_args.indexOf("/bin/java") + "/bin/java".length());
+            args = this.getJobExecutable() +
+                initial_args.substring(initial_args.indexOf("/bin/java") +
+                    "/bin/java".length());
             /*arguments will be parsed again at script level within gLite environment*/
             this.setJobExecutable("gLiteStartRuntime.sh");
         } else {
-            args = initial_args.substring(initial_args.indexOf("/bin/java") + "/bin/java".length());
+            args = initial_args.substring(initial_args.indexOf("/bin/java") +
+                    "/bin/java".length());
         }
-    
+
         args = checkSyntax(args);
 
         try {
+
             /*multiple job*/
-            if (this.getJobType().equals("job") && this.getJobJobType().equals("mpich") ) {
-                this.jad.addAttribute(Jdl.TYPE,  "job");
-                this.jad.addAttribute(Jdl.JOBTYPE,  Jdl.JOBTYPE_MPICH);
+            if (this.getJobType().equals("job") &&
+                    this.getJobJobType().equals("mpich")) {
+                this.jad.addAttribute(Jdl.TYPE, "job");
+                this.jad.addAttribute(Jdl.JOBTYPE, Jdl.JOBTYPE_MPICH);
                 this.jad.addAttribute(Jdl.NODENUMB, this.getJobNodeNumber());
 
-            /*single job, number of nodes doesn t matter (so far)*/
+                /*single job, number of nodes doesn t matter (so far)*/
             } else if (this.getJobType() != null) {
                 this.jad.addAttribute(Jdl.TYPE, "job");
             }
 
-            if (this.getJobExecutable() != null)
+            if (this.getJobExecutable() != null) {
                 this.jad.addAttribute(Jdl.EXECUTABLE, this.getJobExecutable());
+            }
 
-            if (this.getJobStdOutput() != null)
+            if (this.getJobStdOutput() != null) {
                 this.jad.addAttribute(Jdl.STDOUTPUT, this.getJobStdOutput());
+            }
 
-            if (this.getJobStdInput() != null)
+            if (this.getJobStdInput() != null) {
                 this.jad.addAttribute(Jdl.STDINPUT, this.getJobStdInput());
+            }
 
-            if (this.getJobStdError() != null)
+            if (this.getJobStdError() != null) {
                 this.jad.addAttribute(Jdl.STDERROR, this.getJobStdError());
+            }
 
-            if (this.getJobOutput_se() != null)
+            if (this.getJobOutput_se() != null) {
                 this.jad.addAttribute(Jdl.OUTPUT_SE, this.getJobOutput_se());
+            }
 
-            if (this.getJobVO() != null)
+            if (this.getJobVO() != null) {
                 this.jad.addAttribute(Jdl.VIRTUAL_ORGANISATION, this.getJobVO());
+            }
 
-            if (this.getJobRetryCount() != null)
-                this.jad.addAttribute(Jdl.RETRYCOUNT, Integer.parseInt(getJobRetryCount()));
+            if (this.getJobRetryCount() != null) {
+                this.jad.addAttribute(Jdl.RETRYCOUNT,
+                    Integer.parseInt(getJobRetryCount()));
+            }
 
-            if (this.getJobMyProxyServer() != null)
+            if (this.getJobMyProxyServer() != null) {
                 this.jad.addAttribute(Jdl.MYPROXY, this.getJobMyProxyServer());
+            }
 
-            if (this.getJobEnvironment() != null)
+            if (this.getJobEnvironment() != null) {
                 this.jad.addAttribute(Jdl.ENVIRONMENT, this.getJobEnvironment());
+            }
 
-            if (this.getJobRequirements() != null)
-                this.jad.setAttributeExpr(Jdl.REQUIREMENTS, this.getJobRequirements());
+            if (this.getJobRequirements() != null) {
+                this.jad.setAttributeExpr(Jdl.REQUIREMENTS,
+                    this.getJobRequirements());
+            }
 
-            if (this.getJobRank() != null)
+            if (this.getJobRank() != null) {
                 this.jad.setAttributeExpr(Jdl.RANK, this.getJobRank());
+            }
 
-            if (this.getJobDataAccessProtocol() != null)
-                this.jad.addAttribute(Jdl.DATA_ACCESS, this.getJobDataAccessProtocol());
+            if (this.getJobDataAccessProtocol() != null) {
+                this.jad.addAttribute(Jdl.DATA_ACCESS,
+                    this.getJobDataAccessProtocol());
+            }
 
-            if (this.getJobStorageIndex() != null)
-                this.jad.addAttribute(Jdl.OD_STORAGE_ELEMENT, this.getJobStorageIndex());
+            if (this.getJobStorageIndex() != null) {
+                this.jad.addAttribute(Jdl.OD_STORAGE_ELEMENT,
+                    this.getJobStorageIndex());
+            }
 
-            if (this.getJobFuzzyRank() != null)
+            if (this.getJobFuzzyRank() != null) {
                 this.jad.addAttribute(Jdl.FUZZY_RANK, this.getJobFuzzyRank());
+            }
 
-            if (this.jobInputSB != null && this.jobInputSB.size() > 0) {
+            if ((this.jobInputSB != null) && (this.jobInputSB.size() > 0)) {
                 for (int i = 0; i < this.jobInputSB.size(); i++) {
                     String entry = (String) jobInputSB.get(i);
                     this.jad.addAttribute(Jdl.INPUTSB, entry);
                 }
             }
-            if (this.jobOutputSB != null && this.jobOutputSB.size() > 0) {
+            if ((this.jobOutputSB != null) && (this.jobOutputSB.size() > 0)) {
                 for (int i = 0; i < this.jobOutputSB.size(); i++) {
                     String entry = (String) jobOutputSB.get(i);
                     this.jad.addAttribute(Jdl.OUTPUTSB, entry);
                 }
             }
-            
+
             if (jad.hasAttribute(Jdl.ARGUMENTS)) {
                 jad.delAttribute(Jdl.ARGUMENTS);
             }
@@ -277,11 +300,11 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
 
         if (!confFileOption) {
             return DEFAULT_COMMAND_PATH + " " + path + FILE_SEPARATOR +
-                    fileName;
+            fileName;
         }
 
         return DEFAULT_COMMAND_PATH + " --config-vo " + configFile + " " +
-                path + FILE_SEPARATOR + fileName;
+        path + FILE_SEPARATOR + fileName;
     }
 
     /**
@@ -400,7 +423,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, int attrValue)
-            throws Exception {
+        throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -411,7 +434,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, double attrValue)
-            throws Exception {
+        throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -422,7 +445,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, String attrValue)
-            throws Exception {
+        throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -433,7 +456,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, boolean attrValue)
-            throws Exception {
+        throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -529,7 +552,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     /**
      * @param jobType type (so far,just "Job" is supported)
      */
-
     public void setJobType(String jobType) {
         this.jobType = jobType;
     }
@@ -544,7 +566,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
 
     /**
      *
-     * @param jobJobType jobtype (so far, just "normal" and "mpich" are supported)  
+     * @param jobJobType jobtype (so far, just "normal" and "mpich" are supported)
      */
     public void setJobJobType(String jobJobType) {
         this.jobJobType = jobJobType;
@@ -553,7 +575,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     /**
      * @return Executable command (usually absolute java command)
      */
-
     public String getJobExecutable() {
         return jobExecutable;
     }
@@ -652,7 +673,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     /**
      * @return hostname of a MyProxy server where the user has registered her/his long-term proxy certificate.
      */
-
     public String getJobMyProxyServer() {
         return jobMyProxyServer;
     }
@@ -677,7 +697,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     public void setJobDataAccessProtocol(String jobDataAccessProtocol) {
         this.jobDataAccessProtocol = jobDataAccessProtocol;
     }
-
 
     /**
      * @return attribute kept for backward compatibility and will be soon deprecated. Use DataRequirements attribute 3.14 instead.
@@ -706,7 +725,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     public void setJobEnvironment(String jobEnvironment) {
         this.jobEnvironment = jobEnvironment;
     }
-
 
     /**
      * @return list of string representing environment settings that have to be performed on the execution machine and are needed by the job to run properly.
@@ -756,7 +774,9 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @return true if sucsessfully added, false if not (does not asses file properties)
      */
     public boolean addInputSBEntry(String entry) {
-        if (jobInputSB == null) jobInputSB = new LinkedList();
+        if (jobInputSB == null) {
+            jobInputSB = new LinkedList();
+        }
         return jobInputSB.add(entry);
     }
 
@@ -765,10 +785,11 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @return job fails in the case file does not outputed during job
      */
     public boolean addOutputSBEntry(String entry) {
-        if (jobOutputSB == null) jobOutputSB = new LinkedList();
+        if (jobOutputSB == null) {
+            jobOutputSB = new LinkedList();
+        }
         return jobOutputSB.add(entry);
     }
-
 
     /**
      * @return arguments to the jobExecutable

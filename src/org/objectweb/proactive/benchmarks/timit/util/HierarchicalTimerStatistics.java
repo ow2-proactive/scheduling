@@ -34,34 +34,26 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 
+
 /**
  * Represents some pure time statistics of one run
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class HierarchicalTimerStatistics implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2887387260859694305L;
-
     private String[] timerName;
-
     private double[][][] deviation;
-
     private double[][][] average;
-
     private double[][][] min;
-
     private double[][][] max;
-
     private int[] hierarchy;
-
     private int nb;
-
     private int padding;
-
     private boolean empty;
 
     /**
@@ -70,14 +62,14 @@ public class HierarchicalTimerStatistics implements Serializable {
      */
     public HierarchicalTimerStatistics() {
         this(new String[1], new double[1][1][1], new double[1][1][1],
-                new double[1][1][1], new double[1][1][1], new int[1], 0);
+            new double[1][1][1], new double[1][1][1], new int[1], 0);
         this.empty = true;
     }
 
     /**
      * Invoked by HierarchicalTimer to create statistics when all timed objects
      * were finalized
-     * 
+     *
      * @param timerName
      * @param deviation
      * @param average
@@ -87,8 +79,8 @@ public class HierarchicalTimerStatistics implements Serializable {
      * @param nb
      */
     public HierarchicalTimerStatistics(String[] timerName,
-            double[][][] deviation, double[][][] average, double[][][] min,
-            double[][][] max, int[] hierarchy, int nb) {
+        double[][][] deviation, double[][][] average, double[][][] min,
+        double[][][] max, int[] hierarchy, int nb) {
         this.timerName = timerName.clone();
         this.deviation = deviation.clone();
         this.average = average.clone();
@@ -155,12 +147,14 @@ public class HierarchicalTimerStatistics implements Serializable {
      * Construct a well formatted String which show timers value with hierarchy
      */
     public String toString() {
-        if ( this.empty || this.timerName.length == 0 ) {
+        if (this.empty || (this.timerName.length == 0)) {
             return "";
         }
 
         String result = "";
-        int i, j, k;
+        int i;
+        int j;
+        int k;
 
         // Suppose that the root timer is the first of the timerName array
         String rootName = this.timerName[0];
@@ -172,37 +166,31 @@ public class HierarchicalTimerStatistics implements Serializable {
         for (i = 0; i < this.nb; i++) {
             for (j = 0; j < this.nb; j++) {
                 for (k = 0; k < this.nb; k++) {
-
                     if (this.min[i][j][k] != -1) {
-
                         // If the current timer name is the rootName print data
                         if (this.timerName[k] != null) {
                             if (this.timerName[k].equals(rootName)) {
                                 tName = rootName + " :";
-                                tName = this.paddingString(tName, 30,
-                                        ' ', false);
-                                result += tName
-                                        + "min "
-                                        + this.format(this.min[i][j][k]);
+                                tName = this.paddingString(tName, 30, ' ', false);
+                                result += (tName + "min " +
+                                this.format(this.min[i][j][k]));
                             } else {
                                 if (this.timerName[j] != null) {
-                                    if (this.timerName[k]
-                                            .equals(this.timerName[j])) {
-                                        tName = "-----> " + this.timerName[j]
-                                                + " :";
+                                    if (this.timerName[k].equals(
+                                                this.timerName[j])) {
+                                        tName = "-----> " + this.timerName[j] +
+                                            " :";
                                         tName = this.paddingString(tName, 30,
                                                 ' ', false);
-                                        result += tName
-                                                + "min "
-                                                + this.format(this.min[i][j][k]);
+                                        result += (tName + "min " +
+                                        this.format(this.min[i][j][k]));
                                     } else {
-                                        tName = "        -----> "
-                                                + this.timerName[k] + " :";
+                                        tName = "        -----> " +
+                                            this.timerName[k] + " :";
                                         tName = this.paddingString(tName, 30,
                                                 ' ', false);
-                                        result += tName
-                                                + "min "
-                                                + this.format(this.min[i][j][k]);
+                                        result += (tName + "min " +
+                                        this.format(this.min[i][j][k]));
                                     }
                                 }
                             }
@@ -210,14 +198,14 @@ public class HierarchicalTimerStatistics implements Serializable {
                     }
 
                     if (this.average[i][j][k] != -1) {
-                        result += "avg " + this.format(this.average[i][j][k]);
+                        result += ("avg " + this.format(this.average[i][j][k]));
                     }
                     if (this.max[i][j][k] != -1) {
-                        result += "max " + this.format(this.max[i][j][k]);
+                        result += ("max " + this.format(this.max[i][j][k]));
                     }
                     if (this.deviation[i][j][k] != -1) {
-                        result += "dev " + this.format(this.deviation[i][j][k])
-                                + "\n" + first;
+                        result += ("dev " +
+                        this.format(this.deviation[i][j][k]) + "\n" + first);
                     }
                     first = "";
                 }
@@ -229,15 +217,14 @@ public class HierarchicalTimerStatistics implements Serializable {
 
     /**
      * Get a formatted String from a double value (time)
-     * 
+     *
      * @param t
      *            time value
      * @return formatted String (padded)
      */
     private final String format(double t) {
-        return this.paddingString(TimIt.df.format(t),
-                this.padding, ' ', true)
-                + "s    ";
+        return this.paddingString(TimIt.df.format(t), this.padding, ' ', true) +
+        "s    ";
     }
 
     /**
@@ -247,10 +234,10 @@ public class HierarchicalTimerStatistics implements Serializable {
     private String paddingString(String s, int n, char c, boolean paddingLeft) {
         StringBuffer str = new StringBuffer(s);
         int strLength = str.length();
-        if (n > 0 && n > strLength) {
+        if ((n > 0) && (n > strLength)) {
             for (int i = 0; i <= n; i++) {
                 if (paddingLeft) {
-                    if (i < n - strLength) {
+                    if (i < (n - strLength)) {
                         str.insert(0, c);
                     }
                 } else {

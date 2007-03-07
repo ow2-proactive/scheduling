@@ -90,5 +90,4 @@ public class LongWrapper implements Serializable {
     public int hashCode() {
         return new Long(this.value).hashCode();
     }
-
 }

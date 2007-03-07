@@ -35,62 +35,64 @@ import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.statistics.Stats;
 
+
 public class FutureImpl<R> implements Future<R> {
+    Task<R> task;
+    int taskId;
 
-	Task<R> task;
-	int taskId;
-		
-	public FutureImpl(int taskId){
-		this.task=null;
-		this.taskId=taskId;
-	}
-	
-	public int hashCode(){
-		return taskId;
-	}
-	
-	public int getTaskId(){
-		
-		return this.taskId;
-	}
-	
-	public boolean isDone(){
-		return task!=null;
-	}
-	
-	/**
-	 * This method returns the result of the computation for
-	 * every inputed parameter. If no parameter is yet available
-	 * this method will block. 
-	 * 
-	 * @return The result of the computation on a parameter, or null if there are no more
-	 * parameters being computed.
-	 * @throws PanicException Is thrown if a unrecoverable error takes place inside the framework.
-	 * @throws MuscleException Is thrown if a functional exception happens during the execution
-	 * of the skeleton's muscle.
-	 */
-	public synchronized R get() throws InterruptedException, MuscleException{
-		while(!isDone()){
-			wait();
-		}
-		
-		//TODO fix this exception cast!!!
-		if(task.hasException())throw  (MuscleException)task.getException();
-		
-		return task.getObject();
-	}
+    public FutureImpl(int taskId) {
+        this.task = null;
+        this.taskId = taskId;
+    }
 
-	public Stats getStats(){
-		
-		if(!isDone()) return null;
-		
-		return task.getStats();
-	}
-	
-	@SuppressWarnings("unchecked")
-	public synchronized void setFinishedTask(Task<?> task){
-		this.task=(Task<R>)task;
-		
-		notifyAll();
-	}
+    public int hashCode() {
+        return taskId;
+    }
+
+    public int getTaskId() {
+        return this.taskId;
+    }
+
+    public boolean isDone() {
+        return task != null;
+    }
+
+    /**
+     * This method returns the result of the computation for
+     * every inputed parameter. If no parameter is yet available
+     * this method will block.
+     *
+     * @return The result of the computation on a parameter, or null if there are no more
+     * parameters being computed.
+     * @throws PanicException Is thrown if a unrecoverable error takes place inside the framework.
+     * @throws MuscleException Is thrown if a functional exception happens during the execution
+     * of the skeleton's muscle.
+     */
+    public synchronized R get() throws InterruptedException, MuscleException {
+        while (!isDone()) {
+            wait();
+        }
+
+        //TODO fix this exception cast!!!
+        if (task.hasException()) {
+            throw (MuscleException) task.getException();
+        }
+
+        return task.getObject();
+    }
+
+    public Stats getStats() {
+        if (!isDone()) {
+            return null;
+        }
+
+        return task.getStats();
+    }
+
+    @SuppressWarnings("unchecked")
+    public synchronized void setFinishedTask(Task<?> task) {
+        this.task = (Task<R>) task;
+
+        notifyAll();
+    }
 }

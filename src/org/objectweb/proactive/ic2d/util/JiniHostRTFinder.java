@@ -43,14 +43,15 @@ import javax.swing.DefaultListModel;
  */
 public class JiniHostRTFinder implements HostRTFinder {
     private IC2DMessageLogger logger;
-	private DefaultListModel skippedObjects;
+    private DefaultListModel skippedObjects;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public JiniHostRTFinder(IC2DMessageLogger logger, DefaultListModel skippedObjects) {
+    public JiniHostRTFinder(IC2DMessageLogger logger,
+        DefaultListModel skippedObjects) {
         this.logger = logger;
-        this.skippedObjects= skippedObjects;
+        this.skippedObjects = skippedObjects;
     }
 
     //
@@ -63,7 +64,7 @@ public class JiniHostRTFinder implements HostRTFinder {
     public ArrayList findPARuntimes(String host, int port)
         throws IOException {
         //we guess here that the port is fixed in Jini implementation
-        JiniRTListener RTlist = new JiniRTListener(host, logger, skippedObjects );
+        JiniRTListener RTlist = new JiniRTListener(host, logger, skippedObjects);
         try {
             //          stay around long enough to receice replies
             Thread.sleep(10000L);

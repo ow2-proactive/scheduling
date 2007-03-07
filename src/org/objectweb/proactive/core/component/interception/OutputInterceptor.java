@@ -66,16 +66,16 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @author Matthieu Morel
  */
 public interface OutputInterceptor {
-	   
-	/**
-     * This method is executed when an output invocation is intercepted, before executing the output invocation.
-     * @param methodCall the method to be executed (MethodCall objects include method parameters and other ProActive-specific infos)
-     */
+
+    /**
+    * This method is executed when an output invocation is intercepted, before executing the output invocation.
+    * @param methodCall the method to be executed (MethodCall objects include method parameters and other ProActive-specific infos)
+    */
     public void beforeOutputMethodInvocation(MethodCall methodCall);
 
     /**
      * This method is executed when an output invocation has been intercepted, after the execution of the output invocation.
      * @param methodCall the method that has been executed (MethodCall objects include method parameters and other ProActive-specific infos)
      */
-      public void afterOutputMethodInvocation(MethodCall methodCall);
+    public void afterOutputMethodInvocation(MethodCall methodCall);
 }

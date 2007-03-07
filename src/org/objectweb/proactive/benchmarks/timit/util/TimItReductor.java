@@ -40,35 +40,29 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
 
+
 /**
  * This class is an active object used by TimItManager to retrieve timers from
  * all workers. It localized on Startable instance node
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public class TimItReductor implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -3249170377806470213L;
 
     /** timeout (in seconds) when gatehering statistics from Timeds */
     public static final int TIMEOUT = 5000;
-
     private transient Service service;
-
     private int nbReceived;
-
     private HierarchicalTimer timer;
-
     private String information;
-
     private int groupSize;
-
     private EventDataBag eventDataBag;
-
     private BenchmarkStatistics bstats;
 
     /**
@@ -76,7 +70,6 @@ public class TimItReductor implements Serializable {
      * thus StatDatas)
      */
     private ArrayList<EventDataBag> bagList = new ArrayList<EventDataBag>();
-
     private static boolean error = false;
 
     /**
@@ -88,7 +81,7 @@ public class TimItReductor implements Serializable {
 
     /**
      * Used by MigratableCounter as a network clock
-     * 
+     *
      * @return
      */
     public long getCurrentTimeMillis() {
@@ -97,11 +90,10 @@ public class TimItReductor implements Serializable {
 
     /**
      * Invoked by Timed instances when finalizing
-     * 
+     *
      * @param receivedTimer
      */
     public void receiveTimer(HierarchicalTimer receivedTimer) {
-
         if (this.nbReceived == 0) {
             this.timer = receivedTimer;
         }
@@ -109,11 +101,10 @@ public class TimItReductor implements Serializable {
     }
 
     private void handleInformation(String receivedInformation) {
-        if (this.information == null || this.information.length() == 0) {
+        if ((this.information == null) || (this.information.length() == 0)) {
             this.information = receivedInformation;
-
         } else {
-            this.information += "\n" + receivedInformation;
+            this.information += ("\n" + receivedInformation);
         }
     }
 
@@ -136,13 +127,12 @@ public class TimItReductor implements Serializable {
 
     /**
      * Invoked by TimItManager when Startable call finalizeStats()
-     * 
+     *
      * @param groupSize
      *            the size of the Timed group
      * @return a BenchmarkStatistics
      */
     public BenchmarkStatistics getStatistics() {
-
         // Check if already computed
         if (this.bstats != null) {
             return this.bstats;
@@ -157,7 +147,7 @@ public class TimItReductor implements Serializable {
         HierarchicalTimerStatistics hts;
         EventStatistics events;
 
-        while (this.nbReceived < this.groupSize && !TimItReductor.error) {
+        while ((this.nbReceived < this.groupSize) && !TimItReductor.error) {
             this.service.blockingServeOldest(TimItReductor.TIMEOUT);
         }
 
@@ -205,7 +195,7 @@ public class TimItReductor implements Serializable {
      * eventDataVector is preserved between workers.
      */
     public void receiveAll(EventDataBag eventDataBag,
-            HierarchicalTimer receivedTimer, String receivedInformation) {
+        HierarchicalTimer receivedTimer, String receivedInformation) {
         if (eventDataBag != null) {
             this.bagList.add(eventDataBag);
         }
@@ -223,7 +213,7 @@ public class TimItReductor implements Serializable {
 
     /**
      * Collapse all EventData results from all Timeds
-     * 
+     *
      * @return an EventDataBag containing collapsed results
      */
     private EventDataBag collapseEventData() {
@@ -231,17 +221,18 @@ public class TimItReductor implements Serializable {
             return null;
         }
 
-        if (this.nbReceived < this.groupSize && !TimItReductor.error) {
+        if ((this.nbReceived < this.groupSize) && !TimItReductor.error) {
             this.service.blockingServeOldest(TimItReductor.TIMEOUT);
         }
-        int i, j;
+        int i;
+        int j;
 
         // This first bag will contain all collapsed StatDatas
         EventDataBag firstBag = this.bagList.get(0);
 
         if (firstBag == null) {
-            System.out.println("The first bag is null inside method "
-                    + "TimItReductor.collapseStatData !");
+            System.out.println("The first bag is null inside method " +
+                "TimItReductor.collapseStatData !");
             return null;
         }
 
@@ -257,6 +248,7 @@ public class TimItReductor implements Serializable {
         }
 
         EventDataBag anotherBag;
+
         // Iterate through elements of the firstBag
         for (i = 0; i < firstBag.size(); i++) {
             // Get the data to collapse with
@@ -264,15 +256,15 @@ public class TimItReductor implements Serializable {
             // Iterate through other bags
             for (j = 1; j < this.bagList.size(); j++) {
                 anotherBag = this.bagList.get(j);
-                data.collapseWith(anotherBag.getEventData(i), anotherBag
-                        .getSubjectRank());
+                data.collapseWith(anotherBag.getEventData(i),
+                    anotherBag.getSubjectRank());
             }
         }
         return firstBag;
     }
 
     /**
-     * 
+     *
      * @return the EventDataBag of collapsed results
      */
     public EventDataBag getEventDataBag() {

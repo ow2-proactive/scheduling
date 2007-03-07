@@ -36,11 +36,12 @@ import org.objectweb.proactive.Body;
 /**
  * This interface defines the initialization of the activity of an active object which is a Fractal component.
  * It replaces the {@link org.objectweb.proactive.InitActive} when using Fractal components.
- * 
+ *
  * @author Matthieu Morel
  *
  */
 public interface ComponentInitActive extends ComponentActive {
+
     /**
      * See @see org.objectweb.proactive.InitActive#initActivity(Body)
      */

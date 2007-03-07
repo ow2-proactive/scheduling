@@ -58,7 +58,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private SshTunnel _tunnel;
     private HttpURLConnection _httpConnection;
-    private java.util.Hashtable<String,List<String>> _properties;
+    private java.util.Hashtable<String, List<String>> _properties;
     static private TryCache _tryCache = null;
 
     static private TryCache getTryCache() {
@@ -75,7 +75,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
 
     public HttpSshUrlConnection(java.net.URL u) throws IOException {
         super(u);
-        _properties = new Hashtable<String,List<String>>();
+        _properties = new Hashtable<String, List<String>>();
     }
 
     private void checkNotConnected() throws IllegalStateException {
@@ -90,7 +90,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
-    public Map <String,List<String>> getRequestProperties() {
+    public Map<String, List<String>> getRequestProperties() {
         checkNotConnected();
         return _properties;
     }
@@ -122,7 +122,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         List<String> list = _properties.get(key);
         if (list == null) {
             list = new ArrayList<String>();
-        } 
+        }
         list.add(value);
         _properties.put(key, list);
     }
@@ -200,7 +200,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
-    public Map<String,List<String>> getHeaderFields() {
+    public Map<String, List<String>> getHeaderFields() {
         try {
             ensureTunnel();
             return _httpConnection.getHeaderFields();
@@ -282,9 +282,9 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
                     java.net.URL httpURL = new java.net.URL("http://" + host +
                             ":" +
                             port // uncomment the following line and comment the one above to make sure
-                            // you test that connections fallback to tunneling if the main
-                        // connection fails.
-                        //+ 1 
+                                 // you test that connections fallback to tunneling if the main
+                                 // connection fails.
+                                 //+ 1 
                              +path);
                     logger.debug("try http not tunneled");
                     _httpConnection = (HttpURLConnection) httpURL.openConnection();

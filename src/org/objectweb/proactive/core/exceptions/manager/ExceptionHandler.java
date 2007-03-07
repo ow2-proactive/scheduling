@@ -88,7 +88,7 @@ public class ExceptionHandler {
     public static void addRequest(MethodCall methodCall, FutureProxy future) {
         MethodCallExceptionContext context = methodCall.getExceptionContext();
         if (context.isExceptionAsynchronously() ||
-        		context.isRuntimeExceptionHandled()) {
+                context.isRuntimeExceptionHandled()) {
             ExceptionMaskStack stack = ExceptionMaskStack.get();
             synchronized (stack) {
                 Method m = methodCall.getReifiedMethod();
@@ -110,7 +110,8 @@ public class ExceptionHandler {
         synchronized (stack) {
             boolean runtime = stack.isRuntimeExceptionHandled();
             boolean async = stack.areExceptionTypesCaught(m.getExceptionTypes());
-            MethodCallExceptionContext res = new MethodCallExceptionContext(runtime, async);
+            MethodCallExceptionContext res = new MethodCallExceptionContext(runtime,
+                    async);
 
             //            System.out.println(m + " => " + res);
             return res;

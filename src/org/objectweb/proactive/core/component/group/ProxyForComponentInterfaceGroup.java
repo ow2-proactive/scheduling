@@ -127,7 +127,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                         interfaceType.getFcItfName());
                 }
                 mc = MethodCall.getComponentMethodCall(adaptedMethod,
-                        mc.getEffectiveArguments(), mc.getGenericTypesMapping(),
+                        mc.getEffectiveArguments(),
+                        mc.getGenericTypesMapping(),
                         mc.getComponentMetadata().getComponentInterfaceName(),
                         mc.getComponentMetadata().getSenderItfID(),
                         mc.getComponentMetadata().getPriority());
@@ -193,7 +194,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                     Class returnTypeForGroup = (Class) ((ParameterizedType) mc.getReifiedMethod()
                                                                               .getGenericReturnType()).getActualTypeArguments()[0];
                     result = MOP.newInstance(returnTypeForGroup.getName(),
-                    		null, null, ProxyForGroup.class.getName(), paramProxy);
+                            null, null, ProxyForGroup.class.getName(),
+                            paramProxy);
                     ((ProxyForGroup) ((StubObject) result).getProxy()).setClassName(returnTypeForGroup.getName());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -203,9 +205,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                 Map<MethodCall, Integer> generatedMethodCalls;
 
                 try {
-                    generatedMethodCalls = MulticastHelper
-                                                   .generateMethodCallsForMulticastDelegatee(owner, mc,
-                            delegatee);
+                    generatedMethodCalls = MulticastHelper.generateMethodCallsForMulticastDelegatee(owner,
+                            mc, delegatee);
                 } catch (ParameterDispatchException e) {
                     throw new InvocationTargetException(e,
                         "cannot dispatch invocation parameters for method " +
@@ -255,9 +256,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
             Map<MethodCall, Integer> generatedMethodCalls;
 
             try {
-                generatedMethodCalls = MulticastHelper
-                                               .generateMethodCallsForMulticastDelegatee(owner, mc,
-                        delegatee);
+                generatedMethodCalls = MulticastHelper.generateMethodCallsForMulticastDelegatee(owner,
+                        mc, delegatee);
             } catch (ParameterDispatchException e) {
                 throw new InvocationTargetException(e,
                     "cannot dispatch invocation parameters for method " +
@@ -319,7 +319,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
      * @param owner The owner to set.
      */
     public void setOwner(Component owner) {
-        this.owner = (ProActiveComponent)owner;
+        this.owner = (ProActiveComponent) owner;
     }
 
     /**

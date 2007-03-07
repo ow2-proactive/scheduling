@@ -32,48 +32,48 @@ package org.objectweb.proactive.calcium.statistics;
 
 import java.io.Serializable;
 
-public class Exercise implements Serializable{
 
-	private long computationTime;
-	private int numberExecutedTimes;
+public class Exercise implements Serializable {
+    private long computationTime;
+    private int numberExecutedTimes;
 
-	Exercise(){
-		computationTime=0;
-	}
-	
-	Exercise(Timer timer) {
-		this.computationTime = timer.getTime();
-		this.computationTime = 1;
-	}
+    Exercise() {
+        computationTime = 0;
+    }
 
-	/**
-	 * @return Returns the computationTime.
-	 */
-	public long getComputationTime() {
-		return computationTime;
-	}
+    Exercise(Timer timer) {
+        this.computationTime = timer.getTime();
+        this.computationTime = 1;
+    }
 
-	/**
-	 * @return Returns the numberExecutedTimes.
-	 */
-	public long getNumberExecutedTimes() {
-		return numberExecutedTimes;
-	}
+    /**
+     * @return Returns the computationTime.
+     */
+    public long getComputationTime() {
+        return computationTime;
+    }
 
-	/**
-	 * @param computationTime The computationTime to increment in.
-	 */
-	void incrementComputationTime(Timer time) {
-		this.computationTime += time.getTime();
-		numberExecutedTimes += time.getNumberOfActivatedTimes();
-	}
-	
-	void incrementComputationTime(Exercise exercise) {
-		this.computationTime += exercise.computationTime;
-		this.numberExecutedTimes += exercise.numberExecutedTimes;
-	}
-	
-	public String toString(){
-		return computationTime+"/"+numberExecutedTimes;
-	}
+    /**
+     * @return Returns the numberExecutedTimes.
+     */
+    public long getNumberExecutedTimes() {
+        return numberExecutedTimes;
+    }
+
+    /**
+     * @param computationTime The computationTime to increment in.
+     */
+    void incrementComputationTime(Timer time) {
+        this.computationTime += time.getTime();
+        numberExecutedTimes += time.getNumberOfActivatedTimes();
+    }
+
+    void incrementComputationTime(Exercise exercise) {
+        this.computationTime += exercise.computationTime;
+        this.numberExecutedTimes += exercise.numberExecutedTimes;
+    }
+
+    public String toString() {
+        return computationTime + "/" + numberExecutedTimes;
+    }
 }

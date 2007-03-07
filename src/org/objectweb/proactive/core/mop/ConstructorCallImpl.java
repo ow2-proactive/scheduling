@@ -117,7 +117,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
      * @throws ConstructorCallExecutionFailedException
      */
     public Object execute()
-        throws InvocationTargetException, 
+        throws InvocationTargetException,
             ConstructorCallExecutionFailedException {
         // System.out.println("ConstructorCall: The constructor is " + reifiedConstructor); 
         try {

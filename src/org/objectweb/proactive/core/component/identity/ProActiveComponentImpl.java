@@ -88,7 +88,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     implements ProActiveComponent, Interface, Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private transient ProActiveComponent representativeOnMyself = null;
-
     private Map<String, Interface> functionalItfs = new HashMap<String, Interface>();
     private Map<String, ProActiveController> controlItfs = new HashMap<String, ProActiveController>();
     private Interface[] interfaceReferences = new Interface[0];
@@ -167,7 +166,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                     // components
                     if (!(interface_types[i].isFcClientItf() &&
                             component_is_primitive)) {
-
                         itf_ref = MetaObjectInterfaceClassGenerator.instance()
                                                                    .generateFunctionalInterface(interface_types[i].getFcItfName(),
                                 this, interface_types[i]);
@@ -282,7 +280,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
                     continue;
                 }
- 
             }
 
             if (ContentController.class.isAssignableFrom(controllerClass)) {

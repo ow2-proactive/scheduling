@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.mpi;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 
 public interface MPISpmd {

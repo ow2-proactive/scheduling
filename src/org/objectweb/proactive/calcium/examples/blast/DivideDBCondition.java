@@ -34,11 +34,10 @@ import java.io.File;
 
 import org.objectweb.proactive.calcium.muscle.Condition;
 
-public class DivideDBCondition implements Condition<BlastParameters>{
 
-	public boolean evalCondition(BlastParameters param) {
-
-		File file = param.getDatabaseFile();
-		return file.length() > param.getMaxDBSize();
-	}
+public class DivideDBCondition implements Condition<BlastParameters> {
+    public boolean evalCondition(BlastParameters param) {
+        File file = param.getDatabaseFile();
+        return file.length() > param.getMaxDBSize();
+    }
 }

@@ -85,7 +85,6 @@ public class Service {
     //
     protected Body body;
     protected BlockingRequestQueue requestQueue;
-
     protected LifeCycleController lifeCycleController = null;
 
     //protected RequestFilterOnMethodName requestFilterOnMethodName = null;
@@ -104,7 +103,8 @@ public class Service {
             try {
                 lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
             } catch (NoSuchInterfaceException e) {
-                throw new ProActiveRuntimeException("could not find the life cycle controller for this component");
+                throw new ProActiveRuntimeException(
+                    "could not find the life cycle controller for this component");
             }
         }
     }

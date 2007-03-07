@@ -33,15 +33,15 @@ package org.objectweb.proactive.core.component.body;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 
+
 /**
  * A request filter for prioritized component requests.
  * (experimental)
- * 
+ *
  * @author Matthieu Morel
  *
  */
-public class PrioritizedComponentRequestFilter
-    extends NFRequestFilterImpl {
+public class PrioritizedComponentRequestFilter extends NFRequestFilterImpl {
     public boolean acceptRequest(Request request) {
         // standard requests cannot be component controller requests
         return false;

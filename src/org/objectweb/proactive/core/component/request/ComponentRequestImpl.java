@@ -107,7 +107,7 @@ public class ComponentRequestImpl extends RequestImpl
         throws ServeException {
         Object result = null;
         Throwable exception = null;
-        
+
         if (logger.isDebugEnabled()) {
             try {
                 logger.debug("invocation on method [" + methodCall.getName() +
@@ -115,7 +115,8 @@ public class ComponentRequestImpl extends RequestImpl
                     methodCall.getComponentMetadata().getComponentInterfaceName() +
                     "] on component : [" +
                     ((ComponentParametersController) ((ComponentBodyImpl) targetBody)
-                     .getProActiveComponentImpl().getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
+                     .getProActiveComponentImpl()
+                     .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
                      .getName() + "]");
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
@@ -124,29 +125,31 @@ public class ComponentRequestImpl extends RequestImpl
 
         try {
             if (isControllerRequest()) {
-            	
                 result = ((ProActiveComponentImpl) ((ComponentBodyImpl) targetBody)
                           .getProActiveComponentImpl()).getControllerRequestHandler()
                           .handleRequest(this);
-
             } else {
-                
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                     interceptBeforeInvocation(targetBody);
 
                     String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
                                                        .getComponentParameters()
                                                        .getHierarchicalType();
-                    
-                    // gather: interception managed with non-transformed incoming requests
-                    ProActiveInterface itf =  (ProActiveInterface)((ComponentBody)targetBody).getProActiveComponentImpl().getFcInterface(methodCall.getComponentMetadata().getComponentInterfaceName());
-                    ProActiveInterfaceType itfType = (ProActiveInterfaceType)itf.getFcItfType();
-                    if (itfType.isFcGathercastItf() && (!getMethodCall().getComponentMetadata().getSenderItfID().equals(new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
-                        // delegate to gather controller, except for self requests
-                        result = Fractive.getGathercastController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl()).handleRequestOnGatherItf(this);
-                        
-                    }
 
+                    // gather: interception managed with non-transformed incoming requests
+                    ProActiveInterface itf = (ProActiveInterface) ((ComponentBody) targetBody).getProActiveComponentImpl()
+                                                                   .getFcInterface(methodCall.getComponentMetadata()
+                                                                                             .getComponentInterfaceName());
+                    ProActiveInterfaceType itfType = (ProActiveInterfaceType) itf.getFcItfType();
+                    if (itfType.isFcGathercastItf() &&
+                            (!getMethodCall().getComponentMetadata()
+                                      .getSenderItfID()
+                                      .equals(new ItfID(
+                                    itfType.getFcItfName(), targetBody.getID())))) {
+                        // delegate to gather controller, except for self requests
+                        result = Fractive.getGathercastController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                                         .handleRequestOnGatherItf(this);
+                    }
                     // if the component is a composite , forward to functional interface 
                     else if (hierarchical_type.equals(Constants.COMPOSITE)) {
                         //						// forward to functional interface whose name is given as a parameter in the method call
@@ -155,9 +158,9 @@ public class ComponentRequestImpl extends RequestImpl
                                 // TODO_M allow stopping shortcut here
                             }
                             // executing on connected server interface
-                            result = methodCall.execute((ProActiveInterface) (((ComponentBodyImpl) targetBody)
-                                  .getProActiveComponentImpl())
-                                  .getFcInterface(methodCall.getComponentMetadata().getComponentInterfaceName()));
+                            result = methodCall.execute((ProActiveInterface) (((ComponentBodyImpl) targetBody).getProActiveComponentImpl()).getFcInterface(
+                                        methodCall.getComponentMetadata()
+                                                  .getComponentInterfaceName()));
                         } catch (IllegalArgumentException e) {
                             throw new ServeException("could not reify method call : ",
                                 e);
@@ -200,7 +203,6 @@ public class ComponentRequestImpl extends RequestImpl
                     exception);
             }
         }
-        
 
         return new FutureResult(result, exception, null);
     }
@@ -249,7 +251,8 @@ public class ComponentRequestImpl extends RequestImpl
      */
     public boolean isControllerRequest() {
         // according to the Fractal spec v2.0 , section 4.1
-        return Utils.isControllerInterfaceName(methodCall.getComponentMetadata().getComponentInterfaceName());
+        return Utils.isControllerInterfaceName(methodCall.getComponentMetadata()
+                                                         .getComponentInterfaceName());
     }
 
     /*
@@ -286,7 +289,8 @@ public class ComponentRequestImpl extends RequestImpl
 
     public void shortcutNotification(UniversalBody sender,
         UniversalBody intermediate) {
-        methodCall.getComponentMetadata().shortcutNotification(sender, intermediate);
+        methodCall.getComponentMetadata()
+                  .shortcutNotification(sender, intermediate);
     }
 
     public Shortcut getShortcut() {

@@ -47,8 +47,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class RequestWithLocationServer extends RequestImpl
-    implements java.io.Serializable {
+public class RequestWithLocationServer extends RequestImpl implements java.io.Serializable {
     private static final int MAX_TRIES = 30;
     static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 

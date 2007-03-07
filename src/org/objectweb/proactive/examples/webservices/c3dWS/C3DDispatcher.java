@@ -1198,7 +1198,6 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
          * Does some initialization when the first consumer registers
          */
         if (h_users.size() == 1) {
-
             /* Sets the scene to the consumers wish */
             scene = newscene;
 

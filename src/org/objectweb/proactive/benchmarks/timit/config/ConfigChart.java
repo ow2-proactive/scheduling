@@ -33,8 +33,8 @@ package org.objectweb.proactive.benchmarks.timit.config;
 import org.jdom.Element;
 import org.objectweb.proactive.benchmarks.timit.util.charts.Chart;
 
-public class ConfigChart extends Tag {
 
+public class ConfigChart extends Tag {
     public ConfigChart(Element eChart) {
         super(eChart);
     }
@@ -55,10 +55,10 @@ public class ConfigChart extends Tag {
             return "600";
         }
         if (name.equalsIgnoreCase("scalemode")) {
-            return ""+Chart.Scale.DEFAULT;
+            return "" + Chart.Scale.DEFAULT;
         }
         if (name.equalsIgnoreCase("legendformatmode")) {
-            return ""+Chart.LegendFormat.DEFAULT;
+            return "" + Chart.LegendFormat.DEFAULT;
         }
         if (name.equalsIgnoreCase("alpha")) {
             return "255";
@@ -70,28 +70,28 @@ public class ConfigChart extends Tag {
             return "";
         }
 
-        throw new RuntimeException("Variable chart.'" + name
-                + "' missing in configuration file");
+        throw new RuntimeException("Variable chart.'" + name +
+            "' missing in configuration file");
     }
-    
-    public static Chart.Scale scaleValue( String scaleMode ) {
-        if ( scaleMode.equalsIgnoreCase("LINEAR")) {
+
+    public static Chart.Scale scaleValue(String scaleMode) {
+        if (scaleMode.equalsIgnoreCase("LINEAR")) {
             return Chart.Scale.LINEAR;
         }
-        if ( scaleMode.equalsIgnoreCase("LOGARITHMIC")) {
+        if (scaleMode.equalsIgnoreCase("LOGARITHMIC")) {
             return Chart.Scale.LOGARITHMIC;
         }
         return Chart.Scale.DEFAULT;
     }
-    
-    public static Chart.LegendFormat legendValue( String legendMode ) {
-        if ( legendMode.equalsIgnoreCase("NONE")) {
+
+    public static Chart.LegendFormat legendValue(String legendMode) {
+        if (legendMode.equalsIgnoreCase("NONE")) {
             return Chart.LegendFormat.NONE;
         }
-        if ( legendMode.equalsIgnoreCase("POW10")) {
+        if (legendMode.equalsIgnoreCase("POW10")) {
             return Chart.LegendFormat.POW10;
         }
-        if ( legendMode.equalsIgnoreCase("POW2")) {
+        if (legendMode.equalsIgnoreCase("POW2")) {
             return Chart.LegendFormat.POW2;
         }
         return Chart.LegendFormat.DEFAULT;

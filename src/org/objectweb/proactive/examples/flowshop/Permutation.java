@@ -31,14 +31,13 @@
 package org.objectweb.proactive.examples.flowshop;
 
 import java.io.Serializable;
-
 import java.util.Arrays;
 
 
 /**
  * Contains some tool to manipulate permutation (integer table).
  *
- * @author cdalmass 
+ * @author cdalmass
  *
  */
 public class Permutation implements Serializable {
@@ -95,29 +94,28 @@ public class Permutation implements Serializable {
         }
         return perm;
     }
-    
-    public static int[] iemePerm (int n, int size) {
-    	if (n > 20) { //21! is upper than Long.MAX_VALUE
-    		return iemePermBig(n,size);
-    	}
-    	int[] set = new int[size];
-    	for (int i = 0; i < set.length; i++) {
-			set[i] = i;
-		}
-    	
-    	//
-    	for (int i = 0; i < set.length; i++) {
-			
-		}
-    	return null;
+
+    public static int[] iemePerm(int n, int size) {
+        if (n > 20) { //21! is upper than Long.MAX_VALUE
+            return iemePermBig(n, size);
+        }
+        int[] set = new int[size];
+        for (int i = 0; i < set.length; i++) {
+            set[i] = i;
+        }
+
+        //
+        for (int i = 0; i < set.length; i++) {
+        }
+        return null;
     }
 
-    private static int[] iemePermBig(int n,int size) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private static int[] iemePermBig(int n, int size) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	//test
+    //test
     public static void main(String[] args) {
         int[] perm1 = new int[] { 3, 2, 1, 0 };
         int[] perm2 = new int[] { 0, 3, 2, 1 };
@@ -178,8 +176,7 @@ public class Permutation implements Serializable {
 
     public static int compareTo(int[] perm1, int[] perm2) {
         if (perm1.length != perm2.length) {
-            throw new IllegalArgumentException(
-                "Permutation's size not equal");
+            throw new IllegalArgumentException("Permutation's size not equal");
         }
         for (int i = 0; i < perm1.length; i++) {
             if (perm1[i] < perm2[i]) {

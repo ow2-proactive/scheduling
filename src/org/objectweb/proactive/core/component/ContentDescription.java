@@ -65,7 +65,7 @@ public class ContentDescription implements Serializable {
         this.activity = activity;
         this.factory = factory;
     }
-    
+
     /**
      * constructor
      * @param className the name of the base class of the component
@@ -75,7 +75,6 @@ public class ContentDescription implements Serializable {
     public ContentDescription(String className, Object[] constructorParameters) {
         this(className, constructorParameters, null, null);
     }
-
 
     /**
      * constructor
@@ -101,7 +100,7 @@ public class ContentDescription implements Serializable {
     public String getClassName() {
         return className;
     }
-    
+
     /**
      * setter for the classname
      * @param className the name of the class
@@ -126,10 +125,9 @@ public class ContentDescription implements Serializable {
         return factory;
     }
 
-
     /**
-     * Indicates that there should only be one instance of this component 
-     * when instantiating the component on a given multiple virtual node 
+     * Indicates that there should only be one instance of this component
+     * when instantiating the component on a given multiple virtual node
      *
      */
     public void forceSingleInstance() {
@@ -137,8 +135,8 @@ public class ContentDescription implements Serializable {
     }
 
     /**
-     * Returns whether there should only be one instance of this component 
-     * when instantiating the component on a given multiple virtual node 
+     * Returns whether there should only be one instance of this component
+     * when instantiating the component on a given multiple virtual node
      * @return boolean
      */
     public boolean uniqueInstance() {
@@ -146,7 +144,7 @@ public class ContentDescription implements Serializable {
     }
 
     /**
-     * setter 
+     * setter
      * @param factory MetaObjectFactory
      */
     public void setFactory(MetaObjectFactory factory) {

@@ -226,18 +226,18 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
         return this.serviceP2P;
     }
 
-	/** 
-	 * Set the regexp for the node family. 
-	 * @param nodeFamilyRegexp the regexp in Java Regexp String format.
-	 */
-	public void setNodeFamilyRegexp(String nodeFamilyRegexp) {
-		this.nodeFamilyRegexp = nodeFamilyRegexp;
-	}
-	
-	/**
-	 * @return thr node family regexp specified inside the XML descriptor.
-	 */
-	public String getNodeFamilyRegexp() {
-		return this.nodeFamilyRegexp;
-	}
+    /**
+     * Set the regexp for the node family.
+     * @param nodeFamilyRegexp the regexp in Java Regexp String format.
+     */
+    public void setNodeFamilyRegexp(String nodeFamilyRegexp) {
+        this.nodeFamilyRegexp = nodeFamilyRegexp;
+    }
+
+    /**
+     * @return thr node family regexp specified inside the XML descriptor.
+     */
+    public String getNodeFamilyRegexp() {
+        return this.nodeFamilyRegexp;
+    }
 }

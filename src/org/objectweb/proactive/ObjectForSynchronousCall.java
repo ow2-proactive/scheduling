@@ -47,8 +47,7 @@ package org.objectweb.proactive;
  * @since   ProActive 0.9
  *
  */
-public final class ObjectForSynchronousCall extends Object
-    implements java.io.Serializable {
+public final class ObjectForSynchronousCall extends Object implements java.io.Serializable {
 
     /**
      * No arg constructor for Serializable

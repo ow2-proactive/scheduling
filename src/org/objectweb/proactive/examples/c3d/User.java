@@ -60,13 +60,11 @@ public interface User {
      * @param interval        The interval
      */
     public void setPixels(Image2D image);
-    
-    
+
     /**
      * Reflect a change on the dispatcher host.
      * @param os the Name of the OS supporting the dispatcher
      * @param machine the name of the physical machine hosting the dispatcher
      */
     public void setDispatcherMachine(String machine, String os);
-
 }

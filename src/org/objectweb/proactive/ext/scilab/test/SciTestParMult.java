@@ -82,34 +82,34 @@ public class SciTestParMult {
 
             nbRow = Integer.parseInt(line);
             nbCol = Integer.parseInt(line);
-            System.out.println(nbEngine + "  size=" + nbRow );
+            System.out.println(nbEngine + "  size=" + nbRow);
             m1 = new double[nbRow * nbCol];
             m2 = new double[nbRow * nbCol];
             for (int k = 0; k < (nbRow * nbCol); k++) {
-                m1[k] = Math.random() * 10.0; 
+                m1[k] = Math.random() * 10.0;
                 m2[k] = Math.random() * 10.0;
             }
 
             startTime = System.currentTimeMillis();
-            result = GridMatrix.mult(service, "mult" + i, m1, nbRow, nbCol, m2, nbRow, nbCol);
+            result = GridMatrix.mult(service, "mult" + i, m1, nbRow, nbCol, m2,
+                    nbRow, nbCol);
             m3 = result.get();
 
             endTime = System.currentTimeMillis();
             System.out.println(endTime - startTime);
 
-           /* System.out.println(" ");
-            for (int k = 0; k < nbRow; k++) {
-                for (int j = 0; j < nbCol; j++) {
-                    System.out.print(m3[(k * nbCol) + j] + " ");
-                }
-                System.out.println(" ");
-            }*/
-            
+            /* System.out.println(" ");
+             for (int k = 0; k < nbRow; k++) {
+                 for (int j = 0; j < nbCol; j++) {
+                     System.out.print(m3[(k * nbCol) + j] + " ");
+                 }
+                 System.out.println(" ");
+             }*/
             writer.println(nbEngine + " " + nbRow + (endTime - startTime));
         }
-        
+
         reader.close();
-		writer.close();
+        writer.close();
         service.exit();
         System.exit(0);
     }

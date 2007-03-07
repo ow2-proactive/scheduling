@@ -61,7 +61,8 @@ public class ProActiveDialogController extends BasicDialogController
         ProActiveComponent component = (ProActiveComponent) configuration.getRootComponent();
         int index = ((ProActiveDialogModel) model).getExportedVirtualNodesCompositionTableSelectionModel()
                      .getMinSelectionIndex();
-        String name = (String) component.getExportedVirtualNodesNames().get(index);
+        String name = (String) component.getExportedVirtualNodesNames()
+                                        .get(index);
         component.removeExportedVirtualNode(name);
     }
 

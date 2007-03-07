@@ -38,7 +38,7 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
     private ReaderDisplay display;
     private javax.swing.JComboBox policy;
     public boolean isActive = true; //By default when the application is launched, R/W activities start.
-    
+
     public AppletReader(String name, int width, int height) {
         super(name, width, height);
     }
@@ -70,7 +70,7 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
         // Controls
         javax.swing.JPanel pControls = new javax.swing.JPanel(new java.awt.BorderLayout());
         javax.swing.JPanel pPolicy = new javax.swing.JPanel(new java.awt.BorderLayout());
-               
+
         pPolicy.add(new javax.swing.JLabel("Synchronization Policy"),
             java.awt.BorderLayout.WEST);
         policy = new javax.swing.JComboBox(new String[] {
@@ -82,7 +82,7 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
                 }
             });
         pPolicy.add(policy, java.awt.BorderLayout.CENTER);
-    
+
         pControls.add(pPolicy, java.awt.BorderLayout.CENTER);
         panel.add(pControls, java.awt.BorderLayout.SOUTH);
         return panel;

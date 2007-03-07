@@ -39,19 +39,18 @@ import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.examples.nqueens.NQueens;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.futures.Future;
 import org.objectweb.proactive.calcium.skeletons.DaC;
 import org.objectweb.proactive.calcium.skeletons.Pipe;
 import org.objectweb.proactive.calcium.skeletons.Seq;
 import org.objectweb.proactive.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
-import org.objectweb.proactive.calcium.futures.Future;
 
 
 public class Blast {
-    Skeleton<BlastParameters,BlastParameters> root;
+    Skeleton<BlastParameters, BlastParameters> root;
 
     public Blast() {
-
         /*
          * Blast a database
          * 2.1 Format the database
@@ -59,58 +58,53 @@ public class Blast {
          * 2.3 Blast the database
          * 2.4 Cleanup
          */
-       Pipe<BlastParameters,BlastParameters> blastPipe = new Pipe<BlastParameters,BlastParameters>(
-    		   					  new Seq<BlastParameters,BlastParameters>(new ExecuteFormatDB()),
-        						  new Seq<BlastParameters,BlastParameters>(new ExecuteFormatQuery()),
-                				  new Seq<BlastParameters,BlastParameters>(new ExecuteBlast()),
-                				  new Seq<BlastParameters,BlastParameters>(new CleanBlast())
-                				  );
+        Pipe<BlastParameters, BlastParameters> blastPipe = new Pipe<BlastParameters, BlastParameters>(new Seq<BlastParameters, BlastParameters>(
+                    new ExecuteFormatDB()),
+                new Seq<BlastParameters, BlastParameters>(new ExecuteFormatQuery()),
+                new Seq<BlastParameters, BlastParameters>(new ExecuteBlast()),
+                new Seq<BlastParameters, BlastParameters>(new CleanBlast()));
 
-    	
         /* 1   Divide the database
          * 2   Blast the database with the query
          * 3   Conquer the query results  */
-        root = new DaC<BlastParameters,BlastParameters>(new DivideDB(), 
-        								new DivideDBCondition(),
-        								blastPipe, 
-        								new ConquerResults());
-        			
+        root = new DaC<BlastParameters, BlastParameters>(new DivideDB(),
+                new DivideDBCondition(), blastPipe, new ConquerResults());
     }
 
     public static void main(String[] args) throws Exception {
-    	BlastParameters param = new BlastParameters(
-    			new File("/tmp/blast.query"), 
-    			new File("/tmp/blast.db"), true, 100*1024);
-    	param.setRootParameter(true);
+        BlastParameters param = new BlastParameters(new File("/tmp/blast.query"),
+                new File("/tmp/blast.db"), true, 100 * 1024);
+        param.setRootParameter(true);
         Blast blast = new Blast();
         blast.start(param);
     }
 
-    private void start(BlastParameters parameters) throws InterruptedException, PanicException {
+    private void start(BlastParameters parameters)
+        throws InterruptedException, PanicException {
         String descriptor = NQueens.class.getResource("LocalDescriptor.xml")
                                          .getPath();
 
         //descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
-        ResourceManager manager = 
-            new MultiThreadedManager(8);
-       		//new MonoThreadedManager();
-        	//new ProActiveThreadedManager(descriptor, "local");
-            //new ProActiveManager(descriptor, "local");
+        ResourceManager manager = new MultiThreadedManager(8);
 
+        //new MonoThreadedManager();
+        //new ProActiveThreadedManager(descriptor, "local");
+        //new ProActiveManager(descriptor, "local");
         Calcium calcium = new Calcium(manager);
-        Stream<BlastParameters,BlastParameters> stream = calcium.newStream(root);
-        Future<BlastParameters> future=stream.input(parameters);
+        Stream<BlastParameters, BlastParameters> stream = calcium.newStream(root);
+        Future<BlastParameters> future = stream.input(parameters);
         calcium.boot();
 
-		try {
-			BlastParameters res= future.get();
-			File outPutFile=res.getOutPutFile();
-			System.out.println("Result in:"+outPutFile.getAbsolutePath()+ +outPutFile.length() + " [bytes]");
-			System.out.println(future.getStats());
-		} catch (MuscleException e) {
-			e.printStackTrace();
-		}
-        
+        try {
+            BlastParameters res = future.get();
+            File outPutFile = res.getOutPutFile();
+            System.out.println("Result in:" + outPutFile.getAbsolutePath() +
+                +outPutFile.length() + " [bytes]");
+            System.out.println(future.getStats());
+        } catch (MuscleException e) {
+            e.printStackTrace();
+        }
+
         StatsGlobal stats = calcium.getStatsGlobal();
         System.out.println(stats);
         calcium.shutdown();

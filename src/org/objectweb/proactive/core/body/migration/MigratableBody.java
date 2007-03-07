@@ -82,15 +82,14 @@ public class MigratableBody extends BodyImpl implements Migratable,
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-       
+
     //
     // -- implements Migratable -----------------------------------------------
     //
-    
-    public boolean hasJustMigrated(){
-    	return this.hasJustMigrated;
+    public boolean hasJustMigrated() {
+        return this.hasJustMigrated;
     }
-    
+
     public UniversalBody migrateTo(Node node) throws MigrationException {
         return internalMigrateTo(node, false);
     }
@@ -110,11 +109,11 @@ public class MigratableBody extends BodyImpl implements Migratable,
             migrationManager.removeMigrationEventListener(listener);
         }
     }
-    
-	public MigrationManager getMigrationManager() {
-		return migrationManager;
-	}
-    
+
+    public MigrationManager getMigrationManager() {
+        return migrationManager;
+    }
+
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -140,27 +139,27 @@ public class MigratableBody extends BodyImpl implements Migratable,
             hasJustMigrated = false;
         }
     }
-    
-    protected void setRequestReceiver(RequestReceiver requestReceiver){
-    	this.requestReceiver = requestReceiver;
+
+    protected void setRequestReceiver(RequestReceiver requestReceiver) {
+        this.requestReceiver = requestReceiver;
     }
-    
-    protected void setReplyReceiver(ReplyReceiver replyReceiver){
-    	this.replyReceiver = replyReceiver;
+
+    protected void setReplyReceiver(ReplyReceiver replyReceiver) {
+        this.replyReceiver = replyReceiver;
     }
-    
-    protected void setHasMigrated(){
-    	this.hasJustMigrated = true;
+
+    protected void setHasMigrated() {
+        this.hasJustMigrated = true;
     }
-    
-    protected RequestReceiver getRequestReceiver(){
-    	return this.requestReceiver;
+
+    protected RequestReceiver getRequestReceiver() {
+        return this.requestReceiver;
     }
-    
-    protected ReplyReceiver getReplyReceiver(){
-    	return this.replyReceiver;
+
+    protected ReplyReceiver getReplyReceiver() {
+        return this.replyReceiver;
     }
-    
+
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
@@ -251,15 +250,13 @@ public class MigratableBody extends BodyImpl implements Migratable,
             if (isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(migratedBody);
             }
-            
+
             // ****************************************************************
             // Javier dixit: This is the moment to update the location on the FT Manager
             // ****************************************************************
-            
             if (this.ftmanager != null) {
-            	this.ftmanager.updateLocationAtServer(savedID, migratedBody);
+                this.ftmanager.updateLocationAtServer(savedID, migratedBody);
             }
-            
         } catch (MigrationException e) {
             openedSessions = null;
             nodeURL = saveNodeURL;
@@ -270,12 +267,11 @@ public class MigratableBody extends BodyImpl implements Migratable,
             }
             acceptCommunication();
             throw e;
-        } 
+        }
 
         if (!byCopy) {
-        	this.migrationManager.changeBodyAfterMigration(this,migratedBody);
-        	activityStopped();
-            
+            this.migrationManager.changeBodyAfterMigration(this, migratedBody);
+            activityStopped();
         } else {
             bodyID = savedID;
             nodeURL = saveNodeURL;

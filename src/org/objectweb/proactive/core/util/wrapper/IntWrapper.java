@@ -77,7 +77,7 @@ public class IntWrapper implements Serializable {
     public String toString() {
         return this.value + "";
     }
-    
+
     @Override
     public boolean equals(Object arg0) {
         if (arg0 instanceof IntWrapper) {
@@ -90,5 +90,4 @@ public class IntWrapper implements Serializable {
     public int hashCode() {
         return new Integer(this.value).hashCode();
     }
-
 }

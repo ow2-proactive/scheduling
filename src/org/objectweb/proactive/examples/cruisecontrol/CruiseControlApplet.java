@@ -42,8 +42,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
  * recieve the user interaction on the 2 panes and send the corresponding messages to the Interface Dispatcher
  *
  */
-public class CruiseControlApplet
-    extends org.objectweb.proactive.examples.StandardFrame {
+public class CruiseControlApplet extends org.objectweb.proactive.examples.StandardFrame {
     // components
 
     /**

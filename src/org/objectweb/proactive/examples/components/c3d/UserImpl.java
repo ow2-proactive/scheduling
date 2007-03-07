@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-import org.objectweb.fractal.api.control.BindingController;
+import java.io.IOException;
 
+import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -39,11 +40,10 @@ import org.objectweb.proactive.examples.c3d.C3DUser;
 import org.objectweb.proactive.examples.c3d.User;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 
-import java.io.IOException;
-
 
 /** The component container for a User. */
 public class UserImpl extends C3DUser implements BindingController, User {
+
     /** Mandatory ProActive empty no-arg constructor */
     public UserImpl() {
     }

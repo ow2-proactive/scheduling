@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 public class SecurityMigrationException extends MigrationException {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 300940928165011339L;
 

@@ -40,9 +40,9 @@ import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
  * @author The ProActive Team (mleyton)
  *
  * @param <T>
- * 
+ *
  */
-public interface Condition<P> extends Muscle<P, Boolean>{
-
-	public boolean evalCondition(P param) throws RuntimeException, EnvironmentException;
+public interface Condition<P> extends Muscle<P, Boolean> {
+    public boolean evalCondition(P param)
+        throws RuntimeException, EnvironmentException;
 }

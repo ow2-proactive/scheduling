@@ -126,7 +126,8 @@ public class MonitoredObjectsList extends JDialog {
 
     private JTabbedPane init() {
         setTitle("Monitored objects");
-        getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(),
+        getContentPane()
+            .setLayout(new javax.swing.BoxLayout(getContentPane(),
                 javax.swing.BoxLayout.Y_AXIS));
 
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -210,7 +211,6 @@ public class MonitoredObjectsList extends JDialog {
                 }
             }
         } else {
-
             /* Job Monitor */
             copyList(jobPanel.getMonitoredHosts(), monitoredListModel);
             copyList(jobPanel.getSkippedObjects(), skippedListModel);

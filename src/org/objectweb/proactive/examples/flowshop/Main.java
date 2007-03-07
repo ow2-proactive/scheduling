@@ -185,7 +185,8 @@ public class Main {
 
     public static void exit(ArrayList<ProActiveDescriptor> pads, int returnCode) {
         try {
-            for (Iterator<ProActiveDescriptor> iter = pads.iterator(); iter.hasNext();) {
+            for (Iterator<ProActiveDescriptor> iter = pads.iterator();
+                    iter.hasNext();) {
                 ProActiveDescriptor pad = iter.next();
                 pad.killall(false);
             }
@@ -264,8 +265,7 @@ public class Main {
                         vns.toArray(new VirtualNode[vns.size()]),
                         BasicQueueImpl.class.getName());
             } else {
-                manager = ProActiveBranchNBound.newBnB(task,
-                        vns.get(0),
+                manager = ProActiveBranchNBound.newBnB(task, vns.get(0),
                         BasicQueueImpl.class.getName());
             }
         } catch (ActiveObjectCreationException e) {

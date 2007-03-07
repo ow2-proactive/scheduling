@@ -30,11 +30,12 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
+
 /**
  * This class encapsulates an Object ie the EventData.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public interface EventData extends java.io.Serializable {
 

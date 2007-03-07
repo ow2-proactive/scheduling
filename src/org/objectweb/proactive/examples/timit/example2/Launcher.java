@@ -47,22 +47,22 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
+
 /**
  * A simple distributed application that use TimIt.<br>
  * The application have three classes : Launcher, Worker and Root<br>
  * Launcher will deploy some Workers to do a job. Theses Workers will use a Root
  * instance to do it.
- * 
+ *
  * See the source code of these classes to know how use TimIt
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
+
 // You have to implements Startable implements
 public class Launcher implements Startable {
-
     private Worker workers; // Our typed group of workers
-
     private ProActiveDescriptor pad; // A reference to the descriptor
 
     // TimIt needs an noarg constructor (can be implicit)
@@ -85,21 +85,20 @@ public class Launcher implements Startable {
             VirtualNode vnode = this.pad.getVirtualNode("Workers");
 
             Node[] nodes = vnode.getNodes();
-            System.out.println(nodes.length + " nodes found, " + np
-                    + " wanted. ");
+            System.out.println(nodes.length + " nodes found, " + np +
+                " wanted. ");
 
-            Object[] param = new Object[] {};
+            Object[] param = new Object[] {  };
             Object[][] params = new Object[np][];
             for (int i = 0; i < np; i++) {
                 params[i] = param;
             }
 
-            this.workers = (Worker) ProSPMD.newSPMDGroup(
-                    Worker.class.getName(), params, nodes);
+            this.workers = (Worker) ProSPMD.newSPMDGroup(Worker.class.getName(),
+                    params, nodes);
 
             // You must create a TimItManager instance and give to it
             // typed group of Timed workers
-
             TimItManager tManager = TimItManager.getInstance();
             tManager.setTimedObjects(this.workers);
             // Just start your workers...
@@ -127,8 +126,8 @@ public class Launcher implements Startable {
     public void kill() {
         Group<Worker> gWorkers = ProActiveGroup.getGroup(workers);
         Iterator<Worker> it = gWorkers.iterator();
-        
-        while( it.hasNext() ) {
+
+        while (it.hasNext()) {
             ProActive.terminateActiveObject(it.next(), true);
         }
         ProActive.waitForPotentialException();

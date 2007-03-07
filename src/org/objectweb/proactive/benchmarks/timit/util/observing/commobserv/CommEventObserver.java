@@ -34,24 +34,27 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObservable;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 
+
 /**
  * This class implements the StatDataObserver interface. Part of the specialized
  * Observer/Observable pattern.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class CommEventObserver implements EventObserver {
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8068073524780563668L;
+
     /** This will be the concrete StatData */
     private CommEventData commStatData;
     private String name;
 
     /**
      * Creates a new instance of CommEventObserver
-     * 
+     *
      * @param name
      *            The name of the event tag in the result xml file
      * @param groupSize
@@ -67,29 +70,30 @@ public class CommEventObserver implements EventObserver {
 
     /**
      * Updates the current observer ( the observable will call this method ).
-     * 
+     *
      * @param s
      *            The observable caller
      * @param arg
      *            Argument that contains the information
      */
     public void update(EventObservable s, Object arg) {
-        if (arg instanceof CommEvent && ((CommEvent) arg).getObserver() == this) {
+        if (arg instanceof CommEvent &&
+                (((CommEvent) arg).getObserver() == this)) {
             this.commStatData.mark(((CommEvent) arg).getDestRank(),
-                    ((CommEvent) arg).getValue());// increment the value each
-                                                    // time we speak to sombody
+                ((CommEvent) arg).getValue()); // increment the value each
+                                               // time we speak to sombody
         }
     }
 
     /**
      * Returns the event data associated with this observer.
-     * 
+     *
      * @return The CommEventData associated with this observer
      */
     public EventData getEventData() {
         return this.commStatData;
     }
-    
+
     /**
      * Return the name of this event observer
      */

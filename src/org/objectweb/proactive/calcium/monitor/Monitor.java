@@ -31,7 +31,7 @@
 package org.objectweb.proactive.calcium.monitor;
 
 public interface Monitor {
+    public void start();
 
-	public void start();
-	public void stop();
+    public void stop();
 }

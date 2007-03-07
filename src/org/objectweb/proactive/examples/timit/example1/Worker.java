@@ -43,28 +43,29 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.D
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 
+
 /**
  * A simple distributed application that use TimIt.<br>
  * The application have three classes : Launcher, Worker and Root<br>
  * Launcher will deploy some Workers to do a job. Theses Workers will use a Root
  * instance to do it.<br>
- * 
+ *
  * See the source code of these classes to know how use TimIt.<br>
- * 
+ *
  * In this example the Worker uses 3 observers :<br> - One for counting the
  * total number of communications<br> - One for building the message density
  * distribution pattern<br> - One for building the data density distribution<br>
- * 
+ *
  * @see org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultObserver
  * @see org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommObserver
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public class Worker extends Timed {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2784624024382450983L;
 
@@ -95,23 +96,22 @@ public class Worker extends Timed {
 
     /**
      * This method is called by the Launcher to start the job.
-     * 
+     *
      * @see org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher
      */
     public void start() {
         this.rank = ProSPMD.getMyRank();
         this.workers = (Worker) ProSPMD.getSPMDGroup();
         this.workersArray = (Worker[]) ProActiveGroup.getGroup(this.workers)
-                .toArray(new Worker[0]);
+                                                     .toArray(new Worker[0]);
         this.groupSize = ProSPMD.getMySPMDGroupSize();
 
         // The defaultObserver will perform two
         // operations. The first operation is performed between
         // workers and second between notifications ( notifications
         // are of course internal to a worker )
-        this.defaultObserver = new DefaultEventObserver(
-                "nbComms", DefaultEventData.SUM,
-                DefaultEventData.SUM);
+        this.defaultObserver = new DefaultEventObserver("nbComms",
+                DefaultEventData.SUM, DefaultEventData.SUM);
         // The nbCommObserver is used to build
         // the message density pattern, a chart will be built from
         // the gathered data.
@@ -129,8 +129,9 @@ public class Worker extends Timed {
         // Then, you have to specify all counters you want to activate. That
         // means all counters defined in this class, but also counter defined
         // in other class, thanks to the TimerStore instance.
-        super.activate(new EventObserver[] { this.defaultObserver,
-                this.nbCommObserver, this.commSizeObserver });
+        super.activate(new EventObserver[] {
+                this.defaultObserver, this.nbCommObserver, this.commSizeObserver
+            });
 
         try {
             // ************** INITIALIZATION
@@ -144,13 +145,16 @@ public class Worker extends Timed {
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 1) % this.groupSize;
                 // Notification of the nbCommObserver observer
-                super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver,
+                super.getEventObservable()
+                     .notifyObservers(new CommEvent(this.nbCommObserver,
                         destRank, 1));
                 // Notification of the commSizeObserver observer
-                super.getEventObservable().notifyObservers(new CommEvent(this.commSizeObserver,
+                super.getEventObservable()
+                     .notifyObservers(new CommEvent(this.commSizeObserver,
                         destRank, 2));
                 // Notification of the defaultObserver observer
-                super.getEventObservable().notifyObservers(new Event(this.defaultObserver, 1.0));
+                super.getEventObservable()
+                     .notifyObservers(new Event(this.defaultObserver, 1.0));
                 // Perform the distant call
                 this.workersArray[destRank].toto(i);
             }
@@ -159,19 +163,21 @@ public class Worker extends Timed {
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 2) % this.groupSize;
                 // Notification of the nbCommObserver observer
-                super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver,
+                super.getEventObservable()
+                     .notifyObservers(new CommEvent(this.nbCommObserver,
                         destRank, 1));
                 // Notification of the commSizeObserver observer
-                super.getEventObservable().notifyObservers(new CommEvent(this.commSizeObserver,
+                super.getEventObservable()
+                     .notifyObservers(new CommEvent(this.commSizeObserver,
                         destRank, 160));
                 // Notification of the defaultObserver observer
-                super.getEventObservable().notifyObservers(new Event(this.defaultObserver, 1));
+                super.getEventObservable()
+                     .notifyObservers(new Event(this.defaultObserver, 1));
                 // Perform the distant call
                 this.workersArray[destRank].toto(i);
             }
 
             Thread.sleep(314);
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -188,7 +194,7 @@ public class Worker extends Timed {
 
     /**
      * Will be called distantly.
-     * 
+     *
      * @param x
      *            An arbitrary integer
      */
@@ -198,7 +204,7 @@ public class Worker extends Timed {
 
     /**
      * Called by Launcher to kill this active object
-     * 
+     *
      * @see org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher
      */
     public void terminate() {

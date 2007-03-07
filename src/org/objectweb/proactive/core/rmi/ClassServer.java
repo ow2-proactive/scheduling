@@ -205,7 +205,7 @@ public class ClassServer implements Runnable {
                 return;
             }
         }
-    } 
+    }
 
     private void newListener() {
         (new Thread(this, "ClassServer-" + hostname + ":" + port)).start();

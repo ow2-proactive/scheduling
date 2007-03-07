@@ -29,14 +29,15 @@
  * ################################################################
  */
 package org.objectweb.proactive.ext.scilab.monitor;
+
 import java.util.EventListener;
 
+
 /**
- * 
+ *
  * This interface is a listener for Scilab events
  *
  */
 public interface SciEventListener extends EventListener {
-	public void actionPerformed(SciEvent evt);
+    public void actionPerformed(SciEvent evt);
 }
-

@@ -40,33 +40,32 @@ import org.objectweb.proactive.calcium.skeletons.DaC.ConquerInst;
 import org.objectweb.proactive.calcium.skeletons.DaC.DivideInst;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
+
 /**
  * Map is only a special case of Divide and Conquer, and therfore
  * represents data parallelism.
- * 
+ *
  * A taks is Divided once into subtaks (without evaluating a condition),
- * the subtasks are then executed using the child skeleton, and then the 
+ * the subtasks are then executed using the child skeleton, and then the
  * results are conquered using the Conquer object.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */
-public class Map<P,R> extends DaC<P,R> {
-	
-	public <X,Y> Map(Divide<P,X> div, Skeleton<X,Y> child, Conquer<Y,R> conq){
-		
-		super((Divide<P,P>)div, null,(Skeleton<P,R>)child, (Conquer<R,R>)conq);
-	}
-	
-	//Override parent method to avoid using the condition
-	public Task<P> compute(Task<P> t) throws EnvironmentException {
-		
-		t.pushInstruction(new ConquerInst(conq));
-		t.pushInstruction(new DivideInst(div,child));
-		return t;
-	}
+public class Map<P, R> extends DaC<P, R> {
+    public <X, Y>Map(Divide<P, X> div, Skeleton<X, Y> child, Conquer<Y, R> conq) {
+        super((Divide<P, P>) div, null, (Skeleton<P, R>) child,
+            (Conquer<R, R>) conq);
+    }
 
-	public String toString(){
-		return "Map";
-	}
+    //Override parent method to avoid using the condition
+    public Task<P> compute(Task<P> t) throws EnvironmentException {
+        t.pushInstruction(new ConquerInst(conq));
+        t.pushInstruction(new DivideInst(div, child));
+        return t;
+    }
+
+    public String toString() {
+        return "Map";
+    }
 }

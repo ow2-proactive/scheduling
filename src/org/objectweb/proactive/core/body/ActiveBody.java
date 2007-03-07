@@ -93,7 +93,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
      */
     public ActiveBody(ConstructorCall c, String nodeURL, Active activity,
         MetaObjectFactory factory, String jobID)
-        throws java.lang.reflect.InvocationTargetException, 
+        throws java.lang.reflect.InvocationTargetException,
             ConstructorCallExecutionFailedException {
         // Creates the reified object
         super(c.execute(), nodeURL, activity, factory, jobID);
@@ -155,26 +155,28 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
 
         // run the activity of the body
         try {
-        	/* We may race with a termination request in immediate service */
-        	RunActive thisRunActive = this.runActive;
-        	if (thisRunActive != null) {
-        		thisRunActive.runActivity(this);
-        	}
+
+            /* We may race with a termination request in immediate service */
+            RunActive thisRunActive = this.runActive;
+            if (thisRunActive != null) {
+                thisRunActive.runActivity(this);
+            }
+
             // the body terminate its activity
             if (isActive()) {
                 // serve remaining requests if non dead
-            	for (;;) {
-            		BlockingRequestQueue queue;
-            		try {
-            			/* We may race with a termination request in immediate service */
-            			queue = this.localBodyStrategy.getRequestQueue();
-            			if (queue.isEmpty()) {
-            				break;
-            			}
-            		} catch (ProActiveRuntimeException pre) {
-            			break;
-            		}
-            		serve(queue.removeOldest());
+                for (;;) {
+                    BlockingRequestQueue queue;
+                    try {
+                        /* We may race with a termination request in immediate service */
+                        queue = this.localBodyStrategy.getRequestQueue();
+                        if (queue.isEmpty()) {
+                            break;
+                        }
+                    } catch (ProActiveRuntimeException pre) {
+                        break;
+                    }
+                    serve(queue.removeOldest());
                 }
             }
         } catch (Exception e) {

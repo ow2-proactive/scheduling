@@ -36,6 +36,5 @@ package org.objectweb.proactive.core.group;
  *
  * @author Laurent Baduel
  */
-public class UnreachableGroupException extends RuntimeException
-    implements java.io.Serializable {
+public class UnreachableGroupException extends RuntimeException implements java.io.Serializable {
 }

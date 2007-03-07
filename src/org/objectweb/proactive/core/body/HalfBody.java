@@ -78,16 +78,18 @@ public class HalfBody extends AbstractBody {
         super(new Object(), "LOCAL", factory, getRuntimeJobID());
 
         //SECURITY 
-        if (securityManager == null ) {
-        	securityManager = factory.getProActiveSecurityManager();
+        if (securityManager == null) {
+            securityManager = factory.getProActiveSecurityManager();
         }
-        
+
         if (securityManager != null) {
-            securityManager = securityManager.generateSiblingCertificate("HalfBody");
+            securityManager = securityManager.generateSiblingCertificate(
+                    "HalfBody");
             securityManager.setBody(this);
             isSecurityOn = securityManager.getCertificate() != null;
             internalBodySecurity = new InternalBodySecurity(null); // SECURITY
-            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("  ------> HalfBody Security is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
+                           .debug("  ------> HalfBody Security is " +
                 isSecurityOn);
         }
 
@@ -101,7 +103,8 @@ public class HalfBody extends AbstractBody {
             try {
                 // create the fault-tolerance manager
                 int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getFTProtocol());
-                this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
+                this.ftmanager = factory.newFTManagerFactory()
+                                        .newHalfFTManager(protocolSelector);
                 this.ftmanager.init(this);
                 if (bodyLogger.isDebugEnabled()) {
                     bodyLogger.debug("Init FTManager on " + this.getNodeURL());
@@ -176,9 +179,9 @@ public class HalfBody extends AbstractBody {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
-	public boolean isInImmediateService() {
-		throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
-	}
+    public boolean isInImmediateService() {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
 
     /**
      *  @see org.objectweb.proactive.Job#getJobID()
@@ -252,7 +255,7 @@ public class HalfBody extends AbstractBody {
                     HalfBody.this, future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
-            if (methodCall.getComponentMetadata() != null ) {
+            if (methodCall.getComponentMetadata() != null) {
                 request = new ComponentRequestImpl((RequestImpl) request);
             }
             if (future != null) {

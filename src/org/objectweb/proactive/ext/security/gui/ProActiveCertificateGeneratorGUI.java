@@ -410,7 +410,8 @@ public class ProActiveCertificateGeneratorGUI extends JFrame
                     "No current certificate !\n you have to load or create one before generating an sub certificate",
                     "Certificate Warning", JOptionPane.WARNING_MESSAGE);
             } else {
-                getJTextFieldSubCertificate().setText(jTextFieldDistinguishedName.getText());
+                getJTextFieldSubCertificate()
+                    .setText(jTextFieldDistinguishedName.getText());
                 getJFrameSubCertificate().setVisible(true);
             }
         } else if (ev.getSource() == jButtonSubCertificateOk) {
@@ -424,8 +425,8 @@ public class ProActiveCertificateGeneratorGUI extends JFrame
                         Long.parseLong(getJTextFieldValidity().getText()) * 3600 * 24,
                         null, subKeyPair.getPrivate(), subKeyPair.getPublic(),
                         true,
-                        ((X509Certificate) currentKeyStore.getCertificate(
-                            SecurityConstants.KEYSTORE_ENTITY_PATH)).getSubjectDN()
+                        ((X509Certificate) currentKeyStore
+                         .getCertificate(SecurityConstants.KEYSTORE_ENTITY_PATH)).getSubjectDN()
                          .toString(), currentKeyPair.getPrivate(),
                         ((X509Certificate) currentKeyStore.getCertificate(
                             SecurityConstants.KEYSTORE_ENTITY_PATH)).getPublicKey());
@@ -496,7 +497,8 @@ public class ProActiveCertificateGeneratorGUI extends JFrame
                             Long.parseLong(getJTextFieldValidity().getText()) * 360,
                             null, subKeyPair.getPrivate(),
                             subKeyPair.getPublic(), true,
-                            ((X509Certificate) currentKeyStore.getCertificate(
+                            ((X509Certificate) currentKeyStore
+                             .getCertificate(
                                 SecurityConstants.KEYSTORE_ENTITY_PATH)).getSubjectDN()
                              .toString(), currentKeyPair.getPrivate(),
                             ((X509Certificate) currentKeyStore.getCertificate(

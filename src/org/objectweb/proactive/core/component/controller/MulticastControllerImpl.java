@@ -70,16 +70,14 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class MulticastControllerImpl
-    extends AbstractProActiveController implements MulticastController,
-        Serializable {
+public class MulticastControllerImpl extends AbstractProActiveController
+    implements MulticastController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private static Logger multicastLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST);
     private Map<String, ProActiveInterface> multicastItfs = new HashMap<String, ProActiveInterface>();
     private Map clientSideProxies = new HashMap();
-    private Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods = new HashMap<String, Map<SerializableMethod, SerializableMethod>>();
-
-    
+    private Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods =
+        new HashMap<String, Map<SerializableMethod, SerializableMethod>>();
 
     public MulticastControllerImpl(Component owner) {
         super(owner);
@@ -165,7 +163,6 @@ public class MulticastControllerImpl
                 e.getMessage());
         }
     }
-
 
     /*
      * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#searchMatchingMethod(java.lang.reflect.Method, java.lang.reflect.Method[])
@@ -347,11 +344,11 @@ public class MulticastControllerImpl
 
         // need to find matching method in server interface
         try {
-//            if (matchingMethods.get(mc.getComponentMetadata()
-//                                          .getComponentInterfaceName()) == null) {
-//                System.out.println("########## \n" +
-//                    matchingMethods.toString());
-//            }
+            //            if (matchingMethods.get(mc.getComponentMetadata()
+            //                                          .getComponentInterfaceName()) == null) {
+            //                System.out.println("########## \n" +
+            //                    matchingMethods.toString());
+            //            }
             Method matchingMethodInServerInterface = matchingMethods.get(mc.getComponentMetadata()
                                                                            .getComponentInterfaceName())
                                                                     .get(new SerializableMethod(
@@ -371,7 +368,8 @@ public class MulticastControllerImpl
                                                                                        .get(generatedMethodCallIndex); // initialize
                 }
 
-                result.put(new MethodCall(matchingMethodInServerInterface, mc.getGenericTypesMapping(), 
+                result.put(new MethodCall(matchingMethodInServerInterface,
+                        mc.getGenericTypesMapping(),
                         individualEffectiveArguments, mc.getExceptionContext()),
                     generatedMethodCallIndex % delegatee.size());
                 // default is to do some round robin when nbGeneratedMethodCalls > nbReceivers

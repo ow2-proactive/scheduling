@@ -113,9 +113,10 @@ public class HalfBodies extends GarbageCollector {
         this.log(Level.DEBUG, "Sending GC Message to: " + refs);
         Vector<GCSimpleMessage> messages = new Vector<GCSimpleMessage>(refs.size());
         for (Referenced r : refs) {
-            messages.add(new GCSimpleMessage(r, this.body.getID(), false, dummyActivity));
+            messages.add(new GCSimpleMessage(r, this.body.getID(), false,
+                    dummyActivity));
         }
-        
+
         return messages;
     }
 

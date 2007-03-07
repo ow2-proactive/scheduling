@@ -116,7 +116,8 @@ public class Launcher {
                 try {
                     return f.newComponent(pargs[1], new HashMap());
                 } catch (ClassCastException e) {
-                    if (e.getMessage().indexOf("attribute_controller_representative") != (-1)) {
+                    if (e.getMessage()
+                             .indexOf("attribute_controller_representative") != (-1)) {
                         System.out.println(
                             "Error while parsing the ADL. This could be due to the setting of attributes without implementing AttributeController. ");
                         throw e;
@@ -142,7 +143,8 @@ public class Launcher {
             }
             result[0] = args[0];
             result[1] = args[1];
-            result[2] = (args.length == 3 || args.length == 4) ? args[2] : "run";
+            result[2] = ((args.length == 3) || (args.length == 4)) ? args[2]
+                                                                   : "run";
             result[3] = (args.length == 4) ? args[3] : null;
         } else {
             result[0] = "-java";

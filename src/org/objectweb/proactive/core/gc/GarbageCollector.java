@@ -424,9 +424,10 @@ public class GarbageCollector {
                         }
                     }
                     this.nrReachedConsensus++;
+
                     /* We reached a consensus on my activity */
                     if (this.nrReachedConsensus < GarbageCollector.NR_CONSENSUS) {
-                    	int backupNrReachedConsensus = this.nrReachedConsensus; // setLastActivity() will clear it
+                        int backupNrReachedConsensus = this.nrReachedConsensus; // setLastActivity() will clear it
                         this.incActivity();
                         this.nrReachedConsensus = backupNrReachedConsensus;
                         return null;

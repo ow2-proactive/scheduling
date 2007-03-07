@@ -107,7 +107,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
     }
 
     protected void checkBindability(String clientItfName, Interface serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (!(serverItf instanceof ProActiveInterface)) {
             throw new IllegalBindingException(
@@ -215,7 +215,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
     }
 
     protected void checkUnbindability(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         checkLifeCycleIsStopped();
         checkClientInterfaceName(clientItfName);
@@ -276,12 +276,11 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
      * {@link BindingController#bindFc(java.lang.String, java.lang.Object)}
      */
     public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
-    	
-    	// get value of (eventual) future before casting
-    	serverItf = ProActive.getFutureValue(serverItf);
-    	
+        // get value of (eventual) future before casting
+        serverItf = ProActive.getFutureValue(serverItf);
+
         ProActiveInterface sItf = (ProActiveInterface) serverItf;
         if (controllerLogger.isDebugEnabled()) {
             String serverComponentName;
@@ -421,7 +420,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
 
     private void primitiveBindFc(String clientItfName,
         ProActiveInterface serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         // delegate binding operation to the reified object
         BindingController user_binding_controller = (BindingController) ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject();
@@ -439,7 +438,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
      */
     private void compositeBindFc(String clientItfName,
         InterfaceType clientItfType, Interface serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         ProActiveInterface clientItf = null;
         clientItf = (ProActiveInterface) getFcItfOwner()
@@ -486,7 +485,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
      * unbindFc(parallelServerItfName) !)
      */
     public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         // remove from bindings and set impl object to null
         if (isPrimitive()) {

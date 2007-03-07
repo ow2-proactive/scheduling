@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
-public class BlockingRequestQueueImpl extends RequestQueueImpl
-    implements java.io.Serializable, BlockingRequestQueue {
+public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.io.Serializable,
+    BlockingRequestQueue {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -184,7 +184,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
                     RequestQueueEvent.WAIT_FOR_REQUEST));
         }
         try {
-        	this.waitingForRequest = timeout == 0;
+            this.waitingForRequest = timeout == 0;
             this.wait(timeout);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -206,8 +206,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             if (this.spmdManager == null) {
                 this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
             }
-            if(!spmdManager.isCurrentBarriersEmpty()) {
-            return this.barrierBlockingRemove(); // the oospmd way ...
+            if (!spmdManager.isCurrentBarriersEmpty()) {
+                return this.barrierBlockingRemove(); // the oospmd way ...
             }
         }
 

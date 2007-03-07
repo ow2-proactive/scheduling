@@ -89,7 +89,7 @@ public class Launcher {
      * @throws NoSuchMethodException
      */
     public void activate()
-        throws ProActiveException, NodeException, ClassNotFoundException, 
+        throws ProActiveException, NodeException, ClassNotFoundException,
             NoSuchMethodException {
         MainDefinition[] mainDefinitions = pad.getMainDefinitions();
 

@@ -336,7 +336,8 @@ public class ActiveObjectCommunicationRecorder {
                 strokeWidth = (communicationCount * ratio) + 1;
             }
             g2.setStroke(new java.awt.BasicStroke(strokeWidth));
-            boolean sameNode = sourcePanel.getActiveObject().isInsideSameNode(destPanel.getActiveObject());
+            boolean sameNode = sourcePanel.getActiveObject()
+                                          .isInsideSameNode(destPanel.getActiveObject());
 
             //            System.out.println(nb + "------------------------------" );
             //            System.out.println("source: " + sourcePanel.getActiveObject().toString());

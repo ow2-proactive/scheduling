@@ -169,8 +169,8 @@ public class DinnerLayout {
      * UserFrame
      * This is the <b>real</b> AWT Frame
      */
-    protected class UserFrame extends javax.swing.JPanel
-        implements java.awt.event.ActionListener, java.awt.event.MouseListener {
+    protected class UserFrame extends javax.swing.JPanel implements java.awt.event.ActionListener,
+        java.awt.event.MouseListener {
         protected javax.swing.JButton bQuit;
         protected javax.swing.JButton bAuto;
 

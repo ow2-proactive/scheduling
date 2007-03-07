@@ -87,9 +87,11 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
                     if (logger.isDebugEnabled()) {
                         logger.debug("directly executing request " +
                             r.getMethodCall().getName() +
-                            ((r.getMethodCall().getComponentMetadata().getComponentInterfaceName() != null)
+                            ((r.getMethodCall().getComponentMetadata()
+                               .getComponentInterfaceName() != null)
                             ? (" on interface " +
-                            r.getMethodCall().getComponentMetadata().getComponentInterfaceName()) : ""));
+                            r.getMethodCall().getComponentMetadata()
+                             .getComponentInterfaceName()) : ""));
                     }
                 }
                 bodyReceiver.serve(r);

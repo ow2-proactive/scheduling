@@ -54,206 +54,198 @@ import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenExc
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+
 public class ReplyImpl extends MessageImpl implements Reply,
-		java.io.Serializable {
+    java.io.Serializable {
 
-	/**
-	 * The hypothetic result
-	 */
-	protected FutureResult result;
+    /**
+     * The hypothetic result
+     */
+    protected FutureResult result;
 
-	// security features
+    // security features
 
-	/**
-	 * the encrypted result
-	 */
-	protected byte[][] encryptedResult;
+    /**
+     * the encrypted result
+     */
+    protected byte[][] encryptedResult;
+    protected boolean ciphered;
 
-	protected boolean ciphered;
+    // true if this reply is sent by automatic continuation
+    private boolean isAC;
 
-	// true if this reply is sent by automatic continuation
-	private boolean isAC;
+    /*
+     * the session ID used to find the key and decrypt the reply
+     */
+    protected long sessionID;
+    protected transient ProActiveSecurityManager psm = null;
 
-	/*
-	 * the session ID used to find the key and decrypt the reply
-	 */
-	protected long sessionID;
+    /**
+     * Indicates how many times we will try to send the Reply
+     */
+    private static final int MAX_TRIES = 15;
+    transient protected LocationServer server;
 
-	protected transient ProActiveSecurityManager psm = null;
+    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
+        FutureResult result, ProActiveSecurityManager psm) {
+        super(senderID, sequenceNumber, true, methodName);
+        this.result = result;
+        this.psm = psm;
+        this.isAC = false;
+    }
 
-	/**
-	 * Indicates how many times we will try to send the Reply
-	 */
-	private static final int MAX_TRIES = 15;
+    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
+        FutureResult result, ProActiveSecurityManager psm,
+        boolean isAutomaticContinuation) {
+        this(senderID, sequenceNumber, methodName, result, psm);
+        this.isAC = isAutomaticContinuation;
+    }
 
-	transient protected LocationServer server;
+    public FutureResult getResult() {
+        return result;
+    }
 
-	public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-			FutureResult result, ProActiveSecurityManager psm) {
-		super(senderID, sequenceNumber, true, methodName);
-		this.result = result;
-		this.psm = psm;
-		this.isAC = false;
-	}
+    public int send(UniversalBody destinationBody) throws IOException {
+        // if destination body is on the same VM that the sender, we must
+        // perform
+        // a deep copy of result in order to preserve ProActive model.
+        UniqueID destinationID = destinationBody.getID();
+        boolean isLocal = ((LocalBodyStore.getInstance()
+                                          .getLocalBody(destinationID) != null) ||
+            (LocalBodyStore.getInstance().getLocalHalfBody(destinationID) != null));
 
-	public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-			FutureResult result, ProActiveSecurityManager psm,
-			boolean isAutomaticContinuation) {
-		this(senderID, sequenceNumber, methodName, result, psm);
-		this.isAC = isAutomaticContinuation;
-	}
+        if (isLocal) {
+            result = (FutureResult) Utils.makeDeepCopy(result);
+        }
 
-	public FutureResult getResult() {
-		return result;
-	}
+        // security
+        if (!ciphered && (psm != null)) {
+            long sessionID = 0;
 
-	public int send(UniversalBody destinationBody) throws IOException {
-		// if destination body is on the same VM that the sender, we must
-		// perform
-		// a deep copy of result in order to preserve ProActive model.
-		UniqueID destinationID = destinationBody.getID();
-		boolean isLocal = ((LocalBodyStore.getInstance().getLocalBody(
-				destinationID) != null) || (LocalBodyStore.getInstance()
-				.getLocalHalfBody(destinationID) != null));
+            try {
+                sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
 
-		if (isLocal) {
-			result = (FutureResult) Utils.makeDeepCopy(result);
-		}
+                if (sessionID == 0) {
+                    psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO,
+                        destinationBody);
+                    sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
+                }
 
-		// security
-		if (!ciphered && (psm != null)) {
-			long sessionID = 0;
+                if (sessionID != 0) {
+                    encryptedResult = psm.encrypt(sessionID, result,
+                            Session.ACT_AS_SERVER);
+                    ciphered = true;
+                    this.sessionID = sessionID;
+                }
+            } catch (SecurityNotAvailableException e) {
+                // do nothing
+            } catch (CommunicationForbiddenException e) {
+                e.printStackTrace();
+            } catch (AuthenticationException e) {
+                e.printStackTrace();
+            } catch (RenegotiateSessionException e) {
+                psm.terminateSession(sessionID);
+                try {
+                    destinationBody.terminateSession(sessionID);
+                } catch (SecurityNotAvailableException e1) {
+                    e.printStackTrace();
+                }
+                this.send(destinationBody);
+            }
+        }
 
-			try {
-				sessionID = psm
-						.getSessionIDTo(destinationBody.getCertificate());
+        // end security
+        // fault-tolerance returned value
+        int ftres = FTManager.NON_FT;
+        try {
+            ftres = destinationBody.receiveReply(this);
+        } catch (Exception ex) {
+            this.backupSolution(destinationBody);
+        }
 
-				if (sessionID == 0) {
-					psm.initiateSession(
-							SecurityContext.COMMUNICATION_SEND_REPLY_TO,
-							destinationBody);
-					sessionID = psm.getSessionIDTo(destinationBody
-							.getCertificate());
-				}
+        return ftres;
+    }
 
-				if (sessionID != 0) {
-					encryptedResult = psm.encrypt(sessionID, result,
-							Session.ACT_AS_SERVER);
-					ciphered = true;
-					this.sessionID = sessionID;
-				}
-			} catch (SecurityNotAvailableException e) {
-				// do nothing
-			} catch (CommunicationForbiddenException e) {
-				e.printStackTrace();
-			} catch (AuthenticationException e) {
-				e.printStackTrace();
-			} catch (RenegotiateSessionException e) {
-				psm.terminateSession(sessionID);
-				try {
-					destinationBody.terminateSession(sessionID);
-				} catch (SecurityNotAvailableException e1) {
-					e.printStackTrace();
-				}
-				this.send(destinationBody);
-			}
-		}
+    // security issue
+    public boolean isCiphered() {
+        return ciphered;
+    }
 
-		// end security
-		// fault-tolerance returned value
-		int ftres = FTManager.NON_FT;
-		try {
-			ftres = destinationBody.receiveReply(this);
-		} catch (Exception ex) {
-			this.backupSolution(destinationBody);
-		}
+    public boolean decrypt(ProActiveSecurityManager psm)
+        throws RenegotiateSessionException {
+        if ((sessionID != 0) && ciphered) {
+            byte[] decryptedMethodCall = psm.decrypt(sessionID,
+                    encryptedResult, Session.ACT_AS_CLIENT);
+            try {
+                ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
+                ObjectInputStream in = new ObjectInputStream(bin);
+                result = (FutureResult) in.readObject();
+                in.close();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-		return ftres;
-	}
+        return false;
+    }
 
-	// security issue
-	public boolean isCiphered() {
-		return ciphered;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.objectweb.proactive.core.body.reply.Reply#getSessionId()
+     */
+    public long getSessionId() {
+        return sessionID;
+    }
 
-	public boolean decrypt(ProActiveSecurityManager psm)
-			throws RenegotiateSessionException {
-		if ((sessionID != 0) && ciphered) {
-			byte[] decryptedMethodCall = psm.decrypt(sessionID,
-					encryptedResult, Session.ACT_AS_CLIENT);
-			try {
-				ByteArrayInputStream bin = new ByteArrayInputStream(
-						decryptedMethodCall);
-				ObjectInputStream in = new ObjectInputStream(bin);
-				result = (FutureResult) in.readObject();
-				in.close();
-				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+    /**
+     * @see org.objectweb.proactive.core.body.reply.Reply#isAutomaticContinuation()
+     */
+    public boolean isAutomaticContinuation() {
+        return this.isAC;
+    }
 
-		return false;
-	}
+    /**
+     * Try to send the reply after obtaining a position
+     * from the location server
+     *
+     * @param destinationBody the destination for the reply
+     * @throws java.io.IOException
+     */
+    protected void backupSolution(UniversalBody destinationBody)
+        throws java.io.IOException {
+        int tries = 0;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.objectweb.proactive.core.body.reply.Reply#getSessionId()
-	 */
-	public long getSessionId() {
-		return sessionID;
-	}
+        // get the new location from the server
+        UniqueID bodyID = destinationBody.getID();
+        while (tries < MAX_TRIES) {
+            UniversalBody remoteBody = null;
+            UniversalBody mobile = queryServer(bodyID);
 
-	/**
-	 * @see org.objectweb.proactive.core.body.reply.Reply#isAutomaticContinuation()
-	 */
-	public boolean isAutomaticContinuation() {
-		return this.isAC;
-	}
+            // we want to bypass the stub/proxy
+            remoteBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
 
-	/**
-	 * Try to send the reply after obtaining a position
-	 * from the location server
-	 * 
-	 * @param destinationBody the destination for the reply
-	 * @throws java.io.IOException
-	 */
-	protected void backupSolution(UniversalBody destinationBody)
-			throws java.io.IOException {
-		int tries = 0;
-		// get the new location from the server
-		UniqueID bodyID = destinationBody.getID();
-		while (tries < MAX_TRIES) {
-			UniversalBody remoteBody = null;
-			UniversalBody mobile = queryServer(bodyID);
+            try {
+                remoteBody.receiveReply(this);
 
-			// we want to bypass the stub/proxy
-			remoteBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile)
-					.getProxy()).getResult();
+                return;
+            } catch (Exception e) {
+                tries++;
 
-			try {
-				remoteBody.receiveReply(this);
+                if (tries == MAX_TRIES) {
+                    throw new IOException(e.getMessage());
+                }
+            }
+        }
+    }
 
-				return;
-			} catch (Exception e) {
-
-				tries++;
-
-				if (tries == MAX_TRIES) {
-					throw new IOException(e.getMessage());
-				}
-			}
-
-		}
-	}
-
-	protected UniversalBody queryServer(UniqueID bodyID) {
-		if (server == null) {
-			server = LocationServerFactory.getLocationServer();
-		}
-		UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
-		ProActive.waitFor(mobile);
-		return mobile;
-	}
+    protected UniversalBody queryServer(UniqueID bodyID) {
+        if (server == null) {
+            server = LocationServerFactory.getLocationServer();
+        }
+        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+        ProActive.waitFor(mobile);
+        return mobile;
+    }
 }

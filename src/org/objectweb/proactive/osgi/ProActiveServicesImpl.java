@@ -30,6 +30,14 @@
  */
 package org.objectweb.proactive.osgi;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.AlreadyBoundException;
+
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -41,22 +49,10 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-
 import org.osgi.framework.BundleContext;
-
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
-
 import org.ungoverned.gravity.servicebinder.ServiceBinderContext;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.rmi.AlreadyBoundException;
-
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -126,8 +122,9 @@ public class ProActiveServicesImpl implements ProActiveService {
      * @param ref
      */
     public void unbind(HttpService ref) {
-    	System.out.println("Node is no more accessible by Http, temination of ProActiveService");
-    	terminate ();
+        System.out.println(
+            "Node is no more accessible by Http, temination of ProActiveService");
+        terminate();
     }
 
     /**
@@ -146,62 +143,56 @@ public class ProActiveServicesImpl implements ProActiveService {
      */
     private void createNode() {
         try {
-        	
-            this.node = NodeFactory.createNode(ClassServer.getUrl() +'/' + 
+            this.node = NodeFactory.createNode(ClassServer.getUrl() + '/' +
                     OSGI_NODE_NAME);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (AlreadyBoundException e) {
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
 
     /**
      *
-     * @return 
+     * @return
      */
     private boolean registerServlet() {
         try {
-        	
-        	
-        	HttpContext myContext = new HttpContext () {
+            HttpContext myContext = new HttpContext() {
+                    public boolean handleSecurity(HttpServletRequest arg0,
+                        HttpServletResponse arg1) throws IOException {
+                        // TODO Auto-generated method stub
+                        return false;
+                    }
 
-        		
-				public boolean handleSecurity(HttpServletRequest arg0, HttpServletResponse arg1) throws IOException {
-					// TODO Auto-generated method stub
-					return false;
-				}
+                    public URL getResource(String arg0) {
+                        try {
+                            return new URL(aliasServlet + "?" + arg0);
+                        } catch (MalformedURLException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
 
-				public URL getResource(String arg0) {
-					try {
-						return new URL(aliasServlet + "?" + arg0);
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					return null;
-				}
+                    public String getMimeType(String arg0) {
+                        // TODO Auto-generated method stub
+                        return null;
+                    }
+                };
 
-				public String getMimeType(String arg0) {
-					// TODO Auto-generated method stub
-					return null;
-				}
-        		
-        	};
-        	 
             this.http.registerServlet(aliasServlet, this.servlet, null, null);
-            this.http.registerResources("/",aliasServlet + "doc" ,myContext); 
-            
-            
+            this.http.registerResources("/", aliasServlet + "doc", myContext);
+
             return true;
         } catch (Throwable t) {
-            t.printStackTrace(); 
+            t.printStackTrace();
             return false;
         }
     }
 
     /**
-     * 
+     *
      */
     public void terminate() {
 
@@ -216,9 +207,8 @@ public class ProActiveServicesImpl implements ProActiveService {
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
-        
+
         /* unregister Servlet */
         this.http.unregister(aliasServlet);
-        
     }
 }

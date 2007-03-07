@@ -213,15 +213,15 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             ex.printStackTrace();
         }
     }
-    
+
     public void exit() {
-    	try {
-    		if (pad != null) {
-    			pad.killall(false);
-    		}
-    	} catch (ProActiveException e) {
-    		e.printStackTrace();
-    	}
+        try {
+            if (pad != null) {
+                pad.killall(false);
+            }
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
 
         System.exit(0);
     }

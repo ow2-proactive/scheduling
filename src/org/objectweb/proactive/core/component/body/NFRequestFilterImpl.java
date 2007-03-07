@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
 /**
  * This class is a filter for non functional component requests : it can separate
  * component controller requests from component functional requests.
- * 
+ *
  * @author Matthieu Morel
  *
  */
@@ -50,11 +50,11 @@ public class NFRequestFilterImpl implements RequestFilter, java.io.Serializable 
     /**
      * This methods verifies whether a request is a component controller request.
      * @param request the request to filter
-     * @return true if the request is a component controller request, false otherwise  
+     * @return true if the request is a component controller request, false otherwise
      */
     public boolean acceptRequest(Request request) {
         if (request instanceof ComponentRequest) {
-            return acceptRequest((ComponentRequest)request);
+            return acceptRequest((ComponentRequest) request);
         } else {
             // standard requests cannot be component controller requests
             return false;
@@ -69,5 +69,4 @@ public class NFRequestFilterImpl implements RequestFilter, java.io.Serializable 
     public boolean acceptRequest(ComponentRequest request) {
         return ((ComponentRequest) request).isControllerRequest();
     }
-
 }

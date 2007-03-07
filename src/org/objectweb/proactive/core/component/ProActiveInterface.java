@@ -85,6 +85,6 @@ public interface ProActiveInterface extends Interface, StubObject {
      * @see #getFcItfImpl getFcItfImpl
      */
     public abstract void setFcItfImpl(final Object impl);
-    
+
     public boolean isFcCollective();
 }

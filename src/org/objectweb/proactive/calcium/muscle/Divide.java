@@ -34,16 +34,17 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
+
 /**
  * This class is used to divide a parameter
  * into a vector of parameteres. It is used
  * in skeletons such as: divide&conquer, and map
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <T>
  */
-public interface Divide<P,R> extends Muscle<P,Vector<R>>{
-
-	public Vector<R> divide(P param) throws RuntimeException, EnvironmentException;
+public interface Divide<P, R> extends Muscle<P, Vector<R>> {
+    public Vector<R> divide(P param)
+        throws RuntimeException, EnvironmentException;
 }

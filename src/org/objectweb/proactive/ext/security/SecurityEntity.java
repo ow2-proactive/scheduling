@@ -47,7 +47,7 @@ import org.objectweb.proactive.ext.security.securityentity.Entity;
  * implement. An entity can be an active object, a runtime, a domain.
  */
 public interface SecurityEntity {
-	
+
     /**
      * entity certificate
      * @return returns entity certificate
@@ -65,7 +65,7 @@ public interface SecurityEntity {
      * @throws RenegotiateSessionException if the session immediatly expires
      */
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     /**
@@ -85,7 +85,7 @@ public interface SecurityEntity {
      * @throws RenegotiateSessionException if the session has expired
      */
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     /**
@@ -103,7 +103,7 @@ public interface SecurityEntity {
      */
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException;
 
     /**
@@ -127,7 +127,7 @@ public interface SecurityEntity {
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     /**

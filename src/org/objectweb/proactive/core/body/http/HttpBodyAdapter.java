@@ -72,8 +72,6 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
     public HttpBodyAdapter(UniversalBody body) throws ProActiveException {
         RemoteBody remoteBody = new HttpRemoteBodyImpl(body);
         construct(remoteBody);
-        
-        
     }
 
     //
@@ -86,7 +84,6 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @exception java.io.IOException if the remote body cannot be registered
      */
     public void register(String urn) throws java.io.IOException {
-
         URL u = null;
         String url = null;
         int port = ClassServer.getServerSocketPort();
@@ -101,7 +98,6 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
             urn = u.getPath();
         } catch (MalformedURLException e) {
             url = ClassServer.getUrl() + urn;
-            
         }
         urnBodys.put(urn, this);
         //        urn = urn.substring(urn.lastIndexOf('/') + 1);
@@ -125,59 +121,55 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @return a UniversalBody
      */
     public UniversalBody lookup(String urn) throws java.io.IOException {
-//        try {
+        //        try {
+        URL u = null;
+        int port = 0;
+        try {
+            u = new URL(urn);
+            port = u.getPort();
+        } catch (MalformedURLException e) {
+            if (!urn.startsWith("http://")) {
+                urn = "http://" + urn;
+                return lookup(urn);
+            }
+            throw e;
+        }
+        if (port == 0) {
+            throw new HTTPUnexpectedException(
+                "You have to specify a port where the runtime can be reached");
+        }
+        String url = u.toString();
+        urn = u.getPath();
+        HttpLookupMessage message = new HttpLookupMessage(urn, url, port);
+        message.send();
+        UniversalBody result = message.getReturnedObject();
+        if (result == null) {
+            throw new java.io.IOException("The url " + url +
+                " is not bound to any known object");
+        } else {
+            return result;
+        }
 
-        	URL u = null;
-        	int port = 0;
-        	try {         		
-        		u = new URL (urn);
-        		port = u.getPort();
-        		
-        	} catch (MalformedURLException e) {
-        		if (!urn.startsWith("http://")) {
-        			urn = "http://" + urn;
-        			return lookup(urn);
-        		}
-        		throw e;
-        	}
-        		if (port == 0) {
-        			throw new HTTPUnexpectedException("You have to specify a port where the runtime can be reached");
-        		}
-        		String url = u.toString();
-        		urn = u.getPath();
-                HttpLookupMessage message = new HttpLookupMessage(urn, url, port);        		
-                message.send();
-                UniversalBody result = message.getReturnedObject();
-                if (result == null) {
-                    throw new java.io.IOException("The url " + url +
-                        " is not bound to any known object");
-                } else {
-                    return result;
-                
-        	}
-        	
-//        	
-//        	String url;
-////            int port = ClassServer.getServerSocketPort();
-//            url = urn;
+        //        	
+        //        	String url;
+        ////            int port = ClassServer.getServerSocketPort();
+        //            url = urn;
 
-            
-
-//            urn = urn.substring(urn.lastIndexOf('/') + 1);
-//
-//
-//       
-//
-//            //            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
-//            //                    port, message, ProActiveXMLUtils.MESSAGE);
-//            //UniversalBody result = (UniversalBody) message.processMessage();
-//
-//
-//            //System.out.println("result = " + result );
-//          
-//        } catch (Exception e) {
-//            throw new HTTPUnexpectedException("Unexpected exception", e);
-//        }
+        //            urn = urn.substring(urn.lastIndexOf('/') + 1);
+        //
+        //
+        //       
+        //
+        //            //            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
+        //            //                    port, message, ProActiveXMLUtils.MESSAGE);
+        //            //UniversalBody result = (UniversalBody) message.processMessage();
+        //
+        //
+        //            //System.out.println("result = " + result );
+        //          
+        //        } catch (Exception e) {
+        //            throw new HTTPUnexpectedException("Unexpected exception", e);
+        //        }
     }
 
     /**
@@ -188,25 +180,26 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
     public static synchronized UniversalBody getBodyFromUrn(String urn) {
         return (UniversalBody) urnBodys.get(urn);
     }
-    
+
     /**
      * List all active object previously registered in the registry
-     * @param url the url of the host to scan, typically //machine_name 
-     * @return a list of Strings, representing the registered names, and {} if no registry 
-     * @exception java.io.IOException if scanning reported some problem (registry not found, or malformed Url) 
+     * @param url the url of the host to scan, typically //machine_name
+     * @return a list of Strings, representing the registered names, and {} if no registry
+     * @exception java.io.IOException if scanning reported some problem (registry not found, or malformed Url)
      */
-    /* (non-Javadoc) 
+
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.BodyAdapterImpl#list(java.lang.String)
      */
-    public String [] list(String url) throws java.io.IOException {
-        String [] names = null;
-        names = new String [this.urnBodys.size()];
+    public String[] list(String url) throws java.io.IOException {
+        String[] names = null;
+        names = new String[this.urnBodys.size()];
         Enumeration<String> e = urnBodys.keys();
-        int i=0;
+        int i = 0;
         while (e.hasMoreElements()) {
-          		names[i++] = e.nextElement();
-        	}
-        
+            names[i++] = e.nextElement();
+        }
+
         return names;
     }
 }

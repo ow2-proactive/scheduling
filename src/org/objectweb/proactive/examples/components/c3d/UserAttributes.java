@@ -35,6 +35,7 @@ package org.objectweb.proactive.examples.components.c3d;
  * Change some properties of the user of the rendering session.
  */
 public interface UserAttributes {
+
     /** Change the name of this user */
     void setUserName(String name);
 

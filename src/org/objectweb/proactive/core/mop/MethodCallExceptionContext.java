@@ -78,7 +78,8 @@ public class MethodCallExceptionContext implements Serializable {
         return runtimeExceptionHandled;
     }
 
-    public static MethodCallExceptionContext optimize(MethodCallExceptionContext context) {
+    public static MethodCallExceptionContext optimize(
+        MethodCallExceptionContext context) {
         if (DEFAULT.equals(context)) {
             context = null;
         }

@@ -52,23 +52,31 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         super(false);
         this.variableContract = variableContract;
 
-        this.addHandler(VARIABLES_DESCRIPTOR_TAG, new VariableHandler(VARIABLES_DESCRIPTOR_TAG));
-        this.addHandler(VARIABLES_PROGRAM_TAG, new VariableHandler(VARIABLES_PROGRAM_TAG));
-        this.addHandler(VARIABLES_JAVAPROPERTY_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_TAG));
-        this.addHandler(VARIABLES_PROGRAM_DEFAULT_TAG, new VariableHandler(VARIABLES_PROGRAM_DEFAULT_TAG));
-        this.addHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG, new VariableHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG));
-        this.addHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-        this.addHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
-        
-        this.addHandler(VARIABLES_INCLUDE_XML_FILE_TAG, new IncludeXMLFileHandler());
-        this.addHandler(VARIABLES_INCLUDE_PROPERTY_FILE_TAG, new IncludePropertiesFileHandler());
+        this.addHandler(VARIABLES_DESCRIPTOR_TAG,
+            new VariableHandler(VARIABLES_DESCRIPTOR_TAG));
+        this.addHandler(VARIABLES_PROGRAM_TAG,
+            new VariableHandler(VARIABLES_PROGRAM_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_TAG,
+            new VariableHandler(VARIABLES_JAVAPROPERTY_TAG));
+        this.addHandler(VARIABLES_PROGRAM_DEFAULT_TAG,
+            new VariableHandler(VARIABLES_PROGRAM_DEFAULT_TAG));
+        this.addHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG,
+            new VariableHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG,
+            new VariableHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG,
+            new VariableHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
+
+        this.addHandler(VARIABLES_INCLUDE_XML_FILE_TAG,
+            new IncludeXMLFileHandler());
+        this.addHandler(VARIABLES_INCLUDE_PROPERTY_FILE_TAG,
+            new IncludePropertiesFileHandler());
     }
-    
+
     protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
-    	
-    	//Once the variables have been defined, we load pending values from the javaproperties
-    	variableContract.setJavaPropertiesValues();
+        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+        //Once the variables have been defined, we load pending values from the javaproperties
+        variableContract.setJavaPropertiesValues();
     }
 
     /**
@@ -78,13 +86,15 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
      */
     public static void createVariablesHandler(String filename,
         VariableContract variableContract) {
-    	VariablesFileHandler vfh = new VariablesFileHandler(variableContract);
+        VariablesFileHandler vfh = new VariablesFileHandler(variableContract);
 
         org.objectweb.proactive.core.xml.io.StreamReader sr;
+
         //String file = VariablesHandler.class.getResource(filename).getPath();
         InputSource source = new org.xml.sax.InputSource(filename);
         try {
-            sr = new org.objectweb.proactive.core.xml.io.StreamReader(source, vfh);
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(source,
+                    vfh);
             sr.read();
             //return (cast) vh.getResultObject();
         } catch (Exception e) {
@@ -92,69 +102,68 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
             e.printStackTrace();
         }
     }
-    
-    public static class VariablesFileHandler extends PassiveCompositeUnmarshaller{
-    	
-    	VariablesFileHandler(VariableContract variableContract){
-    		super(false);
-            this.addHandler(VARIABLES_TAG, new VariablesHandler(variableContract));
-    	}
+
+    public static class VariablesFileHandler
+        extends PassiveCompositeUnmarshaller {
+        VariablesFileHandler(VariableContract variableContract) {
+            super(false);
+            this.addHandler(VARIABLES_TAG,
+                new VariablesHandler(variableContract));
+        }
     }
-    
+
     private class VariableHandler extends BasicUnmarshaller {
-    	
-    	VariableContractType varType;
-    	String varStringType;
-    	
-    	VariableHandler(String varStringType) {
-        	this.varType=VariableContractType.getType(varStringType);
-        	this.varStringType=varStringType;
-       
+        VariableContractType varType;
+        String varStringType;
+
+        VariableHandler(String varStringType) {
+            this.varType = VariableContractType.getType(varStringType);
+            this.varStringType = varStringType;
         }
 
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
-        	
-         	if(this.varType==null)
-                throw new org.xml.sax.SAXException("Ilegal Descriptor Variable Type: "+varStringType);
-         	
+            if (this.varType == null) {
+                throw new org.xml.sax.SAXException(
+                    "Ilegal Descriptor Variable Type: " + varStringType);
+            }
+
             // Variable Name
             String name = attributes.getValue("name");
             if (!checkNonEmpty(name)) {
-                throw new org.xml.sax.SAXException(
-                    "Variable has no name");
+                throw new org.xml.sax.SAXException("Variable has no name");
             }
 
             String value = attributes.getValue("value");
-            if(value==null) value="";
+            if (value == null) {
+                value = "";
+            }
             // Define and set variables into the contract
-            variableContract.setDescriptorVariable(name, value,varType);
+            variableContract.setDescriptorVariable(name, value, varType);
         }
     }
 
     private class IncludeXMLFileHandler extends BasicUnmarshaller {
-    	IncludeXMLFileHandler() {
+        IncludeXMLFileHandler() {
         }
 
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
-
             String file = attributes.getValue("location");
             if (checkNonEmpty(file)) {
                 // Specific processing for loading an xml file
-            	variableContract.loadXML(file);
+                variableContract.loadXML(file);
                 return;
             }
         }
     }
-    
+
     private class IncludePropertiesFileHandler extends BasicUnmarshaller {
-    	IncludePropertiesFileHandler() {
+        IncludePropertiesFileHandler() {
         }
 
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
-
             String file = attributes.getValue("location");
             if (checkNonEmpty(file)) {
                 // Specific processing for loading a file

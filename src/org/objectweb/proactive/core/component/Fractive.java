@@ -139,11 +139,11 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         final Component component) throws NoSuchInterfaceException {
         return (ComponentParametersController) component.getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);
     }
-    
+
     public static ProActiveBindingController getBindingController(
-            final ProActiveComponent component) throws NoSuchInterfaceException {
-            return (ProActiveBindingController) component.getFcInterface(Constants.BINDING_CONTROLLER);
-        }
+        final ProActiveComponent component) throws NoSuchInterfaceException {
+        return (ProActiveBindingController) component.getFcInterface(Constants.BINDING_CONTROLLER);
+    }
 
     /**
      * Returns the {@link org.objectweb.proactive.core.component.controller.MulticastController MulticastController}
@@ -158,7 +158,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         final Component component) throws NoSuchInterfaceException {
         return (MulticastController) component.getFcInterface(Constants.MULTICAST_CONTROLLER);
     }
-    
+
     /**
      * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveContentController ProActiveContentController}
      * interface of the given component.
@@ -172,7 +172,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         final Component component) throws NoSuchInterfaceException {
         return (ProActiveContentController) component.getFcInterface(Constants.CONTENT_CONTROLLER);
     }
-    
+
     /**
      * Returns the {@link org.objectweb.proactive.core.component.controller.GathercastController GatherController}
      * interface of the given component.
@@ -364,12 +364,12 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         try {
             // instantiate the component metaobject factory with parameters of
             // the component
-        	
+
             // type must be a component type
             if (!(type instanceof ComponentType)) {
                 throw new InstantiationException(
                     "Argument type must be an instance of ComponentType");
-            } 
+            }
             ComponentParameters componentParameters = new ComponentParameters((ComponentType) type,
                     controllerDesc);
             if (contentDesc.getFactory() == null) {
@@ -382,7 +382,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                         (Constants.COMPOSITE.equals(
                             controllerDesc.getHierarchicalType()))) {
                     factory_params.put(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY,
-                            Constants.SYNCHRONOUS);
+                        Constants.SYNCHRONOUS);
                 }
                 contentDesc.setFactory(new ProActiveMetaObjectFactory(
                         factory_params));
@@ -391,14 +391,13 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             }
 
             // TODO_M : add controllers in the component metaobject factory?
-            Object ao = null ;
+            Object ao = null;
 
-                
             // 3 possibilities : either the component is created on a node (or
             // null), it is created on a virtual node, or on multiple nodes
-            ao = ProActive.newActive(contentDesc.getClassName(),
-                    null, contentDesc.getConstructorParameters(),
-                    node, contentDesc.getActivity(), contentDesc.getFactory());
+            ao = ProActive.newActive(contentDesc.getClassName(), null,
+                    contentDesc.getConstructorParameters(), node,
+                    contentDesc.getActivity(), contentDesc.getFactory());
 
             // Find the proxy
             org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) ao).getProxy();
@@ -756,8 +755,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 ", because construction of component representative failed." +
                 t.toString());
             throw new NamingException(
-                "Could not perform lookup for component at URL: " +
-                url+
+                "Could not perform lookup for component at URL: " + url +
                 ", because construction of component representative failed.");
         }
     }

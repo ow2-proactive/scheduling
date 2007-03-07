@@ -34,19 +34,19 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.muscle.Divide;
 
-public class ChallengeDivide implements Divide<Challenge, Challenge>{
-	
-	public Vector<Challenge> divide(Challenge param) {
-		
-		Challenge ttUp = new Challenge(1+param.min+(param.max-param.min)/2,param.max,param.solvableSize);
 
-		Challenge ttDown = new Challenge(param.min,
-				param.min+(param.max-param.min)/2, param.solvableSize);
-		
-		Vector<Challenge> v = new Vector<Challenge>();
-		v.add(ttUp);
-		v.add(ttDown);
-		
-		return v;
-	}
+public class ChallengeDivide implements Divide<Challenge, Challenge> {
+    public Vector<Challenge> divide(Challenge param) {
+        Challenge ttUp = new Challenge(1 + param.min +
+                ((param.max - param.min) / 2), param.max, param.solvableSize);
+
+        Challenge ttDown = new Challenge(param.min,
+                param.min + ((param.max - param.min) / 2), param.solvableSize);
+
+        Vector<Challenge> v = new Vector<Challenge>();
+        v.add(ttUp);
+        v.add(ttDown);
+
+        return v;
+    }
 }

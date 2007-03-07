@@ -62,7 +62,6 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 2.0
  */
 public class PrunSubProcess extends AbstractExternalProcessDecorator {
-	
     //    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
     //            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
     //        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
@@ -125,7 +124,6 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     //        super.setInputMessageLogger(new CompositeMessageLogger(
     //                new ParserMessageLogger(), inputMessageLogger));
     //    }
- 
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());

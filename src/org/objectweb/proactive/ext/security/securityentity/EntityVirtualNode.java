@@ -51,6 +51,7 @@ public class EntityVirtualNode extends Entity implements Serializable {
      * @param application
      * @param certificate
      */
+
     /**
      * represent
      */

@@ -303,8 +303,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                             res.add(new String[] {
                                     (String) (keys.get(
                                         vKeys.remove(key).intValue())),
-                                    tab1.get(key).toString(),
-                                    "" + i
+                                    tab1.get(key).toString(), "" + i
                                 });
                             tab1.remove(key);
                         }

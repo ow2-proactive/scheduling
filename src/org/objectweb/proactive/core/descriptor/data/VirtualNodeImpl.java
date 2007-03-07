@@ -69,8 +69,8 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
-import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -254,7 +254,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.padURL = padURL;
 
         this.descriptorURL = descriptor.getProActiveDescriptorURL();
-
     }
 
     //
@@ -743,7 +742,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             return node;
         } else {
-            throw new NodeException("Cannot get a node from Virtual Node " + this.name+". Descriptor in use : \""+descriptorURL+"\"." );
+            throw new NodeException("Cannot get a node from Virtual Node " +
+                this.name + ". Descriptor in use : \"" + descriptorURL + "\".");
         }
     }
 
@@ -753,7 +753,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         if (node == null) {
             throw new NodeException(
-                "Cannot return the first node, no nodes hava been created for Virtual Node "+this.name+". Descriptor in use : \""+descriptorURL+"\".");
+                "Cannot return the first node, no nodes hava been created for Virtual Node " +
+                this.name + ". Descriptor in use : \"" + descriptorURL + "\".");
         }
 
         FileVector fw = fileTransferDeployedStatus.get(node.getNodeInformation()
@@ -787,7 +788,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             if (!MAX_P2P) {
                 throw new NodeException(
-                    "Cannot return nodes, no nodes have been created for Virtual Node "+this.name+". Descriptor in use : \""+descriptorURL+"\".");
+                    "Cannot return nodes, no nodes have been created for Virtual Node " +
+                    this.name + ". Descriptor in use : \"" + descriptorURL +
+                    "\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
@@ -821,7 +824,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             if (!MAX_P2P) {
                 throw new NodeException(
-                    "Cannot return nodes, no nodes have been created for Virtual Node "+this.name+". Descriptor in use : \""+descriptorURL+"\".");
+                    "Cannot return nodes, no nodes have been created for Virtual Node " +
+                    this.name + ". Descriptor in use : \"" + descriptorURL +
+                    "\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
@@ -859,7 +864,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         } else {
             throw new NodeException(
-                "Cannot return nodes, no nodes hava been created. Descriptor in use : \""+descriptorURL+"\".");
+                "Cannot return nodes, no nodes hava been created. Descriptor in use : \"" +
+                descriptorURL + "\".");
         }
     }
 
@@ -1004,12 +1010,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public String getJobID() {
         return this.jobID;
     }
-    
+
     //
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
     //
     private transient ExecutorService rrThreadpool = Executors.newCachedThreadPool();
-
 
     //
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
@@ -1035,7 +1040,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             runtimeRegisteredPerform(event);
         }
     }
-    
+
     private synchronized void forwarderRuntimeRegisteredPerform(
         RuntimeRegistrationEvent event) {
         VirtualMachine virtualMachine = null;
@@ -1294,7 +1299,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             } else {
                 throw new NodeException(
                     "After many retries, not even one node can be found for Virtual Node \"" +
-                    this.name + "\" in descriptor \"" + this.descriptorURL + "\".");
+                    this.name + "\" in descriptor \"" + this.descriptorURL +
+                    "\".");
             }
         }
 
@@ -1334,14 +1340,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             fw.waitForAll(); //wait-by-necessity
         }
 
-//        rrThreadpool.shutdown();
-//        while (!rrThreadpool.isTerminated()) {
-//        	try {
-//                Thread.sleep(100);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        //        rrThreadpool.shutdown();
+        //        while (!rrThreadpool.isTerminated()) {
+        //        	try {
+        //                Thread.sleep(100);
+        //            } catch (InterruptedException e) {
+        //                e.printStackTrace();
+        //            }
+        //        }
         return;
     }
 
@@ -1366,7 +1372,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     throw new NodeException("After many retries, only " +
                         nbCreatedNodes + " nodes are created on " +
                         tempNodeCount + " expected for Virtual Node \"" +
-                        this.name + "\" in descriptor \"" + descriptorURL + "\".");
+                        this.name + "\" in descriptor \"" + descriptorURL +
+                        "\".");
                 }
             } else {
                 throw new NodeException("After many retries, only " +
@@ -1578,10 +1585,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String url, String protocol, String vmName) {
         Node node = new NodeImpl(part, url, checkProtocol(protocol),
                 this.jobID, vmName);
-       synchronized (createdNodes) {
-    	   createdNodes.add(node);	
-	}
-       
+        synchronized (createdNodes) {
+            createdNodes.add(node);
+        }
+
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
         nodeCreated = true;
@@ -1692,7 +1699,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 return;
             }
         }
-        
+
         out.defaultWriteObject();
     }
 

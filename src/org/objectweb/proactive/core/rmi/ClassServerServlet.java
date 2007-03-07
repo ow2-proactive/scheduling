@@ -30,17 +30,16 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.objectweb.proactive.core.util.UrlBuilder;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.UnknownHostException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 public class ClassServerServlet extends HttpServlet {
@@ -70,8 +69,8 @@ public class ClassServerServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         //        try { 
-//        System.out.println(
-//            "*************************** DO GET ****************************** ");
+        //        System.out.println(
+        //            "*************************** DO GET ****************************** ");
         doPost(request, response);
         //            PrintWriter out = response.getWriter();
         //            out.println("Some informations about the ProActive runtime : \n");
@@ -109,7 +108,7 @@ public class ClassServerServlet extends HttpServlet {
             //                        "proactive.http.port"));
             String url = UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
                         java.net.InetAddress.getLocalHost()), "", "http:", port); /*+
-               "/" + SERVLET_NAME ;*/
+            "/" + SERVLET_NAME ;*/
 
             if (url.charAt(url.length() - 1) == '/') {
                 url = url.substring(0, url.length() - 1);

@@ -34,61 +34,57 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 /**
  * Example of a manager that uses threads to
  * execute the skeleton program.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <T>
  */
-public class MultiThreadedManager extends ResourceManager{
-	
-	ExecutorService threadPool;  //Thread pool
-	int numThreads; 			 //Maximum number of threads to be used
-	
-	public MultiThreadedManager(int numThreads){
-		
-		this.threadPool=Executors.newFixedThreadPool(numThreads);
-		this.numThreads=numThreads;
-	}
-	
-	@Override
-	public  Skernel boot(Skernel skernel) {
-		
-		for(int i=0;i<numThreads;i++){
-			threadPool.submit(new CallableInterpreter(skernel));
-		}
-		return skernel;
-	}
-	
-	@Override
-	public void shutdown(){
-		threadPool.shutdownNow();
-	}
-	
-	/**
-	 * Callable class for invoking the interpret method in a new thread (processor).
-	 * 
-	 */
-	protected class CallableInterpreter extends Interpreter implements Callable<Task<?>>{
-		
-		Skernel skernel;
-		
-		public CallableInterpreter(Skernel skernel){
-			this.skernel=skernel;
-		}
+public class MultiThreadedManager extends ResourceManager {
+    ExecutorService threadPool; //Thread pool
+    int numThreads; //Maximum number of threads to be used
 
-		public Task<?> call() throws Exception {
-			
-			Task<?> task = skernel.getReadyTask(DEFAULT_GET_READY_TASK_TIMEOUT);
-			
-			while(task!=null){
-				task = super.interpret(task);
-				skernel.putProcessedTask(task);
-				task = skernel.getReadyTask(DEFAULT_GET_READY_TASK_TIMEOUT);
-			}
-			return task;
-		}
-	}
+    public MultiThreadedManager(int numThreads) {
+        this.threadPool = Executors.newFixedThreadPool(numThreads);
+        this.numThreads = numThreads;
+    }
+
+    @Override
+    public Skernel boot(Skernel skernel) {
+        for (int i = 0; i < numThreads; i++) {
+            threadPool.submit(new CallableInterpreter(skernel));
+        }
+        return skernel;
+    }
+
+    @Override
+    public void shutdown() {
+        threadPool.shutdownNow();
+    }
+
+    /**
+     * Callable class for invoking the interpret method in a new thread (processor).
+     *
+     */
+    protected class CallableInterpreter extends Interpreter implements Callable<Task<?>> {
+        Skernel skernel;
+
+        public CallableInterpreter(Skernel skernel) {
+            this.skernel = skernel;
+        }
+
+        public Task<?> call() throws Exception {
+            Task<?> task = skernel.getReadyTask(DEFAULT_GET_READY_TASK_TIMEOUT);
+
+            while (task != null) {
+                task = super.interpret(task);
+                skernel.putProcessedTask(task);
+                task = skernel.getReadyTask(DEFAULT_GET_READY_TASK_TIMEOUT);
+            }
+            return task;
+        }
+    }
 }

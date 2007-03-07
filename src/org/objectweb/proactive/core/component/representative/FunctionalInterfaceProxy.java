@@ -40,8 +40,7 @@ import org.objectweb.proactive.core.mop.Proxy;
  * @author Matthieu Morel
  */
 public interface FunctionalInterfaceProxy extends Proxy {
-
-	public abstract Object reify(MethodCall c) throws Throwable;
+    public abstract Object reify(MethodCall c) throws Throwable;
 
     public void setBodyProxy(Proxy proxy);
 

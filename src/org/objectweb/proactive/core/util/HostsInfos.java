@@ -43,14 +43,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * TODO hostsTable should be HashTable<InetAddress, Hashtable<String, String>>
  * but the key "all" need to be handled separately since a null key is not allowed
- * inside a HashTable 
+ * inside a HashTable
  */
 
 //the Unique instance of HostInfos
 public class HostsInfos {
-	private static HostsInfos hostsInfos = new HostsInfos();
+    private static HostsInfos hostsInfos = new HostsInfos();
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
-
     private static Hashtable<String, Hashtable<String, String>> hostsTable;
 
     private HostsInfos() {
@@ -65,29 +64,30 @@ public class HostsInfos {
     }
 
     public static String hostnameToIP(String hostname) {
-    	if (hostname == null || hostname.equals("all"))
-    		return hostname;
-    	
-    	try {
-    		return InetAddress.getByName(hostname).getHostAddress();
-    	} catch (UnknownHostException e) {
-			return hostname;
-		}
+        if ((hostname == null) || hostname.equals("all")) {
+            return hostname;
+        }
+
+        try {
+            return InetAddress.getByName(hostname).getHostAddress();
+        } catch (UnknownHostException e) {
+            return hostname;
+        }
     }
-    
+
     public static Hashtable getHostInfos(String _hostname) {
-    	String hostname = hostnameToIP(_hostname);
+        String hostname = hostnameToIP(_hostname);
         return getHostInfos(hostname, true);
     }
 
     public static String getUserName(String _hostname) {
-    	String hostname = hostnameToIP(_hostname);
+        String hostname = hostnameToIP(_hostname);
         Hashtable host_infos = getHostInfos(hostname, true);
         return (String) host_infos.get("username");
     }
 
     public static String getSecondaryName(String _hostname) {
-    	String hostname = hostnameToIP(_hostname);
+        String hostname = hostnameToIP(_hostname);
         Hashtable host_infos = getHostInfos(hostname, true);
         String secondary = (String) host_infos.get("secondary");
         if (secondary != null) {
@@ -98,7 +98,7 @@ public class HostsInfos {
     }
 
     public static void setUserName(String _hostname, String username) {
-    	String hostname = hostnameToIP(_hostname);
+        String hostname = hostnameToIP(_hostname);
         Hashtable<String, String> host_infos = getHostInfos(hostname, false);
         if (host_infos.get("username") == null) {
             host_infos.put("username", username);
@@ -112,15 +112,16 @@ public class HostsInfos {
     }
 
     public static void setSecondaryName(String _hostname, String secondary_name) {
-    	String hostname = hostnameToIP(_hostname);
+        String hostname = hostnameToIP(_hostname);
         Hashtable<String, String> host_infos = getHostInfos(hostname, false);
         if (host_infos.get("secondary") == null) {
             host_infos.put("secondary", secondary_name);
         }
     }
 
-    protected static Hashtable<String, String> getHostInfos(String _hostname, boolean common) {
-    	String hostname = hostnameToIP(_hostname);
+    protected static Hashtable<String, String> getHostInfos(String _hostname,
+        boolean common) {
+        String hostname = hostnameToIP(_hostname);
         Hashtable<String, String> host_infos = findHostInfos(hostname);
         if (host_infos == null) {
             if (common) {
@@ -137,8 +138,8 @@ public class HostsInfos {
     /**
      *
      */
-    final static String REGEXP_KEYVAL="(([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]{1,3}\\.){3}[0-9]{1,3})";
-	
+    final static String REGEXP_KEYVAL = "(([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]{1,3}\\.){3}[0-9]{1,3})";
+
     private void loadProperties() {
         String userNames = System.getProperty("proactive.ssh.username");
 
@@ -146,18 +147,19 @@ public class HostsInfos {
             userNames = System.getProperty("user.name");
         }
         parseUserNames(userNames);
-        
+
         String secondaryNames = System.getProperty("proactive.secondaryNames");
         if (secondaryNames != null) {
-        	
-        	if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL + ")?")) {
-        		for (String keyval : secondaryNames.split(",")) {
-        			String [] tmp = keyval.split(":");
-        			setSecondaryName(tmp[0], tmp[1]);
-        		}	
-        	} else {
-        		logger.error("Invalid value for proactive.secondaryNames: " + secondaryNames);
-        	}
+            if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL +
+                        ")?")) {
+                for (String keyval : secondaryNames.split(",")) {
+                    String[] tmp = keyval.split(":");
+                    setSecondaryName(tmp[0], tmp[1]);
+                }
+            } else {
+                logger.error("Invalid value for proactive.secondaryNames: " +
+                    secondaryNames);
+            }
         }
     }
 
@@ -185,7 +187,7 @@ public class HostsInfos {
     }
 
     private static Hashtable<String, String> findHostInfos(String _hostname) {
-    	String hostname = hostnameToIP(_hostname);
+        String hostname = hostnameToIP(_hostname);
         Hashtable<String, String> host_infos = hostsTable.get(hostname);
         if (host_infos == null) {
             try {

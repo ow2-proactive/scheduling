@@ -67,7 +67,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
      * is in the {@link Constants} class.
      */
     public AbstractProActiveController(Component owner) {
-        this.owner = (ProActiveComponent)owner;
+        this.owner = (ProActiveComponent) owner;
         setControllerItfType();
     }
 
@@ -133,14 +133,15 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     }
 
     protected abstract void setControllerItfType();
-    
+
     /**
      * If a controller holds references to active objects which are dependent on it, it needs to
-     * trigger the migration of these active objects. This is done by overriding this method. 
+     * trigger the migration of these active objects. This is done by overriding this method.
      * @param node
      * @throws MigrationException
      */
-    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException {
-    	// nothing by default
+    public void migrateDependentActiveObjectsTo(Node node)
+        throws MigrationException {
+        // nothing by default
     }
 }

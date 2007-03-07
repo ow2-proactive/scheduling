@@ -35,21 +35,26 @@ import java.io.File;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.muscle.Execute;
 
-public class CleanBlast implements Execute<BlastParameters,BlastParameters> {
 
-	public BlastParameters execute(BlastParameters param) throws RuntimeException, EnvironmentException {
-		
-		String[] file={param.getDatabaseFile().getAbsolutePath(), param.getQueryFile().getAbsolutePath()};
-		String ext[] = {"nsq","nsi", "nsd", "nin", "nhr"};
-		
-		for(int j=0; j<file.length; j++){
-			for(int i=0; i<ext.length;i++){
-				File f = new File(file[j]+"."+ext[i]);
-				f.delete();
-			}
-		}
-		
-		if(!param.isRootParameter()) param.getDatabaseFile().delete();
-		return param;
-	}
+public class CleanBlast implements Execute<BlastParameters, BlastParameters> {
+    public BlastParameters execute(BlastParameters param)
+        throws RuntimeException, EnvironmentException {
+        String[] file = {
+                param.getDatabaseFile().getAbsolutePath(),
+                param.getQueryFile().getAbsolutePath()
+            };
+        String[] ext = { "nsq", "nsi", "nsd", "nin", "nhr" };
+
+        for (int j = 0; j < file.length; j++) {
+            for (int i = 0; i < ext.length; i++) {
+                File f = new File(file[j] + "." + ext[i]);
+                f.delete();
+            }
+        }
+
+        if (!param.isRootParameter()) {
+            param.getDatabaseFile().delete();
+        }
+        return param;
+    }
 }

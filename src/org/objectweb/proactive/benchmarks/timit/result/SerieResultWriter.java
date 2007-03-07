@@ -40,27 +40,25 @@ import org.jdom.filter.ElementFilter;
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 
+
 /**
  * This class generate final serie result file from generated benchmark
  * statistics result file. Generated file will be an XML file
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class SerieResultWriter {
-
     private Document document;
-
     private Element eTimit;
-
     private String filename;
 
     /**
      * Construct a new SerieResultWriter from his filename
-     * 
+     *
      * @param filename
      *            the name of the file to create
      */
-    public SerieResultWriter( String filename ) {
+    public SerieResultWriter(String filename) {
         this.eTimit = new Element("timit");
         this.document = new Document(this.eTimit);
         this.filename = filename;
@@ -76,7 +74,7 @@ public class SerieResultWriter {
     /**
      * Add a new result to write to the file. Output file is updated every time
      * you invoke this method.
-     * 
+     *
      * @param bResults
      *            the root Element of XML benchmark result file
      * @param name
@@ -87,25 +85,25 @@ public class SerieResultWriter {
      *            the total number of timeout errors which occured
      *            during the serie run
      */
-    public void addResult(
-            Element bResults, String name, int runs, int totalTimeoutErrors ) {
+    public void addResult(Element bResults, String name, int runs,
+        int totalTimeoutErrors) {
         Element benchResult = new Element("FinalStatistics");
         this.eTimit.addContent(benchResult);
         benchResult.setAttribute(new Attribute("name", name));
         benchResult.setAttribute(new Attribute("runs", "" + runs));
-        benchResult.setAttribute(new Attribute("timeoutErrors", ""
-                + totalTimeoutErrors));
-        benchResult.setAttribute(new Attribute("date", ""
-                + (new java.sql.Timestamp(System.currentTimeMillis()))));
+        benchResult.setAttribute(new Attribute("timeoutErrors",
+                "" + totalTimeoutErrors));
+        benchResult.setAttribute(new Attribute("date",
+                "" + (new java.sql.Timestamp(System.currentTimeMillis()))));
 
         // Timer statistics
-        this.fillTimersResults(benchResult, bResults
-                .getDescendants(new ElementFilter("timers")));
+        this.fillTimersResults(benchResult,
+            bResults.getDescendants(new ElementFilter("timers")));
 
         // Event statistics
-        this.fillEventsResults(benchResult, bResults
-                .getDescendants(new ElementFilter("events")));
-        
+        this.fillEventsResults(benchResult,
+            bResults.getDescendants(new ElementFilter("events")));
+
         // Informations
         this.fillInformations(benchResult);
 
@@ -113,9 +111,6 @@ public class SerieResultWriter {
         XMLHelper.writeFile(this.document, this.filename);
     }
 
-
-    
-    
     //
     // -- PRIVATE METHODS ----------------------------------------------------
     //
@@ -125,7 +120,6 @@ public class SerieResultWriter {
      * then fill in values in the sub tag eTimers
      */
     private void fillTimersResults(Element eTimers, Iterator itTimers) {
-
         Iterator initIterator;
         Element temp;
 
@@ -159,10 +153,10 @@ public class SerieResultWriter {
             while (targetIterator.hasNext() && finalIterator.hasNext()) {
                 Element e1 = (Element) targetIterator.next();
                 Element e2 = (Element) finalIterator.next();
-                if (!e1.getAttributeValue("name").equals(
-                        e2.getAttributeValue("name"))) {
+                if (!e1.getAttributeValue("name")
+                           .equals(e2.getAttributeValue("name"))) {
                     throw new IllegalStateException(
-                            "You are trying to finalize different timers !");
+                        "You are trying to finalize different timers !");
                 }
                 // Get current target element ie timer values
                 tab1[0] = Double.valueOf(e1.getAttributeValue("min"));
@@ -184,7 +178,7 @@ public class SerieResultWriter {
                     tab2[2] = tab1[2];
                 }
                 // Deviation
-                tab2[3] += tab1[1] * tab1[1];
+                tab2[3] += (tab1[1] * tab1[1]);
                 // Set back the final values
                 e2.setAttribute("min", "" + tab2[0]);
                 e2.setAttribute("avg", "" + TimIt.df.format(tab2[1]));
@@ -200,7 +194,19 @@ public class SerieResultWriter {
 
         //
         // Finalize standard deviation, avg values and children sum
-        double average, deviation, sqrt, childrenSum;
+        double average;
+
+        //
+        // Finalize standard deviation, avg values and children sum
+        double deviation;
+
+        //
+        // Finalize standard deviation, avg values and children sum
+        double sqrt;
+
+        //
+        // Finalize standard deviation, avg values and children sum
+        double childrenSum;
         Iterator children;
         Iterator finalIterator = eCloneTimers.getDescendants();
         while (finalIterator.hasNext()) {
@@ -212,7 +218,7 @@ public class SerieResultWriter {
             // Compute Avg^2
             average = average * average;
             // Compute Deviation
-            sqrt = deviation / run - average; // avoid truncatures problems
+            sqrt = (deviation / run) - average; // avoid truncatures problems
             deviation = Math.sqrt((sqrt > 0) ? sqrt : 0);
             // Set back the final deviation value
             e1.setAttribute("dev", "" + TimIt.df.format(deviation));
@@ -221,20 +227,19 @@ public class SerieResultWriter {
             childrenSum = 0.0;
             children = e1.getChildren().iterator();
             while (children.hasNext()) {
-                childrenSum += Double.valueOf(((Element) children.next())
-                        .getAttributeValue("avg"));
+                childrenSum += Double.valueOf(((Element) children.next()).getAttributeValue(
+                        "avg"));
             }
-            e1.setAttribute(new Attribute("sum", TimIt.df.format(childrenSum / run)));
+            e1.setAttribute(new Attribute("sum",
+                    TimIt.df.format(childrenSum / run)));
         }
     }
-
 
     /**
      * Compute min/avg/max/dev values from list benchmark statistics run,
      * then fill in values in the sub tag eTimers
      */
     private void fillEventsResults(Element eEvents, Iterator itEvents) {
-
         Iterator initIterator;
         Element temp;
         DecimalFormat df = TimIt.df;
@@ -263,30 +268,41 @@ public class SerieResultWriter {
                 temp.setAttribute(avg);
                 temp.setAttribute(max);
                 temp.setAttribute(dev);
-
             } catch (NumberFormatException e) {
                 // We can't perform a min/avg/max/dev computation on this value
-                temp.setAttribute( new Attribute(
-                        "value", "Too complex value, first run shown") );
+                temp.setAttribute(new Attribute("value",
+                        "Too complex value, first run shown"));
             }
         }
 
         // Merging results...
-        double fMin, fAvg, fMax, fDev, tValue;
+        double fMin;
+
+        // Merging results...
+        double fAvg;
+
+        // Merging results...
+        double fMax;
+
+        // Merging results...
+        double fDev;
+
+        // Merging results...
+        double tValue;
         int run = 0;
         do {
             run++;
-            Iterator targetIterator = eCurrentEvents
-                    .getDescendants(new ElementFilter("event"));
-            Iterator finalIterator = eCloneEvents
-                    .getDescendants(new ElementFilter("event"));
+            Iterator targetIterator = eCurrentEvents.getDescendants(new ElementFilter(
+                        "event"));
+            Iterator finalIterator = eCloneEvents.getDescendants(new ElementFilter(
+                        "event"));
             while (targetIterator.hasNext() && finalIterator.hasNext()) {
                 Element e1 = (Element) targetIterator.next();
                 Element e2 = (Element) finalIterator.next();
-                if (!e1.getAttributeValue("name").equals(
-                        e2.getAttributeValue("name"))) {
+                if (!e1.getAttributeValue("name")
+                           .equals(e2.getAttributeValue("name"))) {
                     throw new IllegalStateException(
-                            "You are trying to finalize different events !");
+                        "You are trying to finalize different events !");
                 }
                 try {
                     if (e2.getAttribute("value") == null) {
@@ -305,7 +321,7 @@ public class SerieResultWriter {
                         if (tValue > fMax) {
                             fMax = tValue;
                         }
-                        fDev += tValue * tValue;
+                        fDev += (tValue * tValue);
 
                         // Set back the final values
                         e2.setAttribute("min", "" + df.format(fMin));
@@ -326,7 +342,15 @@ public class SerieResultWriter {
 
         //
         // Finalize standard deviation and avg values
-        double average, deviation, sqrt;
+        double average;
+
+        //
+        // Finalize standard deviation and avg values
+        double deviation;
+
+        //
+        // Finalize standard deviation and avg values
+        double sqrt;
         Iterator finalIterator = eCloneEvents.getChildren().iterator();
         while (finalIterator.hasNext()) {
             Element e1 = (Element) finalIterator.next();
@@ -338,44 +362,44 @@ public class SerieResultWriter {
                 // Compute Avg^2
                 average = average * average;
                 // Compute Deviation
-                sqrt = deviation / run - average; // avoid truncatures
+                sqrt = (deviation / run) - average; // avoid truncatures
                                                     // problems
+
                 deviation = Math.sqrt((sqrt > 0) ? sqrt : 0);
                 // Set back the final deviation value
                 e1.setAttribute("dev", "" + TimIt.df.format(deviation));
             }
         }
     }
-    
+
     /**
      * Add some informations about the used VMs
      * @param benchResults
      */
-    private void fillInformations( Element benchResults ) {
+    private void fillInformations(Element benchResults) {
         Element eInfos = new Element("informations");
         benchResults.addContent(eInfos);
-        
-        
+
         //
         // Informations about deployer machine
         //
         Element eDeployer = new Element("deployer");
         eInfos.addContent(eDeployer);
         // JVM version
-        String jvmVersion = System.getProperty("java.vm.vendor")
-            + " " + System.getProperty("java.vm.name")
-            + " " + System.getProperty("java.vm.version")
-            + " - Version " + System.getProperty("java.version");
-        eDeployer.setAttribute(new Attribute("jvm",jvmVersion));
-        
+        String jvmVersion = System.getProperty("java.vm.vendor") + " " +
+            System.getProperty("java.vm.name") + " " +
+            System.getProperty("java.vm.version") + " - Version " +
+            System.getProperty("java.version");
+        eDeployer.setAttribute(new Attribute("jvm", jvmVersion));
+
         // OS Version
-        String osVersion = System.getProperty("os.arch")
-            + " " + System.getProperty("os.name")
-            + " " + System.getProperty("os.version");
+        String osVersion = System.getProperty("os.arch") + " " +
+            System.getProperty("os.name") + " " +
+            System.getProperty("os.version");
         eDeployer.setAttribute(new Attribute("os", osVersion));
-        
+
         // Processor count
         eDeployer.setAttribute(new Attribute("processors",
-                ""+Runtime.getRuntime().availableProcessors()));
+                "" + Runtime.getRuntime().availableProcessors()));
     }
 }

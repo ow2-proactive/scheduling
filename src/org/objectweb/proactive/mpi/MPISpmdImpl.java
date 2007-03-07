@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.mpi;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.AbstractExternalProcess;
@@ -40,11 +43,6 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
 
 
 public class MPISpmdImpl implements MPISpmd, java.io.Serializable {

@@ -222,7 +222,8 @@ public class ExportedVirtualNodesList {
                 if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return lvn;
                 }
-                if (lvn.getExportedVirtualNodeNameAfterComposition().equals(virtualNodeName)) {
+                if (lvn.getExportedVirtualNodeNameAfterComposition()
+                           .equals(virtualNodeName)) {
                     return lvn;
                 }
             }
@@ -368,7 +369,8 @@ public class ExportedVirtualNodesList {
             while (it.hasNext()) {
                 LinkedVirtualNode lvn = (LinkedVirtualNode) it.next();
                 if (lvn.getVirtualNodeName().equals(virtualNodeName) ||
-                        lvn.getExportedVirtualNodeNameAfterComposition().equals(virtualNodeName)) {
+                        lvn.getExportedVirtualNodeNameAfterComposition()
+                               .equals(virtualNodeName)) {
                     // as the current list should not be modified while iterated, keep a list
                     // of elements to remove
                     to_remove = lvn;
@@ -382,7 +384,8 @@ public class ExportedVirtualNodesList {
 
             // remove from composer
             if (to_remove.getComposer() != null) {
-                to_remove.getComposer().getComposingVirtualNodes().remove(to_remove);
+                to_remove.getComposer().getComposingVirtualNodes()
+                         .remove(to_remove);
             }
             exportedVNs.remove(to_remove);
             //            it = to_remove.iterator();
@@ -412,7 +415,8 @@ public class ExportedVirtualNodesList {
                 if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return lvn.getComposingVirtualNodes();
                 }
-                if (lvn.getExportedVirtualNodeNameAfterComposition().equals(virtualNodeName)) {
+                if (lvn.getExportedVirtualNodeNameAfterComposition()
+                           .equals(virtualNodeName)) {
                     return lvn.getComposingVirtualNodes();
                 }
             }

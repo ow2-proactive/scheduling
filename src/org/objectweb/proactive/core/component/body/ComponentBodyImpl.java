@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-/** 
+/**
  * This class has been inserted into the bodies hierarchy in order to instantiate the
  * component metaobject (ProActiveComponent).
  */
@@ -58,14 +58,13 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     private ProActiveComponent componentIdentity = null;
     private Map<String, Shortcut> shortcutsOnThis = null; // key = functionalItfName, value = shortcut
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-
     private boolean insideFunctionalActivity = false;
 
     public ComponentBodyImpl() {
         super();
     }
 
-    /** 
+    /**
      * Constructor for ComponentBodyImpl.
      *
      * It creates the component metaobject only if the MetaObjectFactory is parameterized
@@ -79,7 +78,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      */
     public ComponentBodyImpl(Object reifiedObject, String nodeURL,
         Active activity, MetaObjectFactory factory, String jobID)
-        throws java.lang.reflect.InvocationTargetException, 
+        throws java.lang.reflect.InvocationTargetException,
             ConstructorCallExecutionFailedException {
         super(reifiedObject, nodeURL, factory, jobID);
         //        filterOnNFRequests = new RequestFilterOnPrioritizedNFRequests();
@@ -112,11 +111,8 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * @return the ProActiveComponent meta-object
      */
     public ProActiveComponentImpl getProActiveComponentImpl() {
-        return (ProActiveComponentImpl)componentIdentity;
+        return (ProActiveComponentImpl) componentIdentity;
     }
-    
-    
-    
 
     /**
      * overrides the @link{Body#isActive()} method :
@@ -169,6 +165,4 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         }
         shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
     }
-
-
 }

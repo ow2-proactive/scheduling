@@ -117,8 +117,8 @@ public class IbisBodyAdapter extends BodyAdapterImpl {
             try {
                 construct((IbisRemoteBody) o);
             } catch (ProActiveException e1) {
-                throw new java.io.IOException(
-                    "The remote object at " + url + " is not accessible ");
+                throw new java.io.IOException("The remote object at " + url +
+                    " is not accessible ");
             }
 
             return this;

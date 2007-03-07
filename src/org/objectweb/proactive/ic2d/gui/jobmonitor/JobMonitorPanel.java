@@ -484,7 +484,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             JPanel left = new JPanel(new BorderLayout());
 
             tree = new JTree(model);
-            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+            tree.getSelectionModel()
+                .setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
             tree.setCellRenderer(new JobMonitorTreeCellRenderer());
             tree.setLargeModel(true);
             tree.setRowHeight(ROW_HEIGHT);

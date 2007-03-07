@@ -40,45 +40,51 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 
-public class ActiveObjectSkernel extends Skernel implements RunActive, Serializable {
 
-	public ActiveObjectSkernel(){
-	}
+public class ActiveObjectSkernel extends Skernel implements RunActive,
+    Serializable {
+    public ActiveObjectSkernel() {
+    }
 
-	public ActiveObjectSkernel(Skernel skernel){
-		super();
-		
-		while(skernel.getReadyQueueLength() >0){
-			this.addReadyTask(skernel.getReadyTask(0));
-		}
-	}
+    public ActiveObjectSkernel(Skernel skernel) {
+        super();
 
-	//Producer-Consumer
-	public void runActivity(Body body) {
-		Service service = new Service(body);
-		
-		while(true){
-			String allowedMethodNames="getStats|addReadyTask|putProcessedTask|getReadyQueueLength|hasResults|isFinished|isPaniqued|getStatsGlobal";
-			
-			if(getReadyQueueLength() > 0 ) allowedMethodNames +="getReadyTask|";
-			if(hasResults()) allowedMethodNames += "getResult|";
-			
-			service.blockingServeOldest( new RequestFilterOnAllowedMethods(allowedMethodNames));
-		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Task<?> getReadyTask(){
-		Task<?> task= super.getReadyTask(0);
-		if(task==null){    //ProActive doesn't handle null
-			task= new Task<Object>();
-			task.setDummy();
-			return task;   //return dummy task
-		}
-		return task;
-	}
-	
-	protected class RequestFilterOnAllowedMethods implements RequestFilter,
+        while (skernel.getReadyQueueLength() > 0) {
+            this.addReadyTask(skernel.getReadyTask(0));
+        }
+    }
+
+    //Producer-Consumer
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+
+        while (true) {
+            String allowedMethodNames = "getStats|addReadyTask|putProcessedTask|getReadyQueueLength|hasResults|isFinished|isPaniqued|getStatsGlobal";
+
+            if (getReadyQueueLength() > 0) {
+                allowedMethodNames += "getReadyTask|";
+            }
+            if (hasResults()) {
+                allowedMethodNames += "getResult|";
+            }
+
+            service.blockingServeOldest(new RequestFilterOnAllowedMethods(
+                    allowedMethodNames));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Task<?> getReadyTask() {
+        Task<?> task = super.getReadyTask(0);
+        if (task == null) { //ProActive doesn't handle null
+            task = new Task<Object>();
+            task.setDummy();
+            return task; //return dummy task
+        }
+        return task;
+    }
+
+    protected class RequestFilterOnAllowedMethods implements RequestFilter,
         java.io.Serializable {
         private String allowedMethodNames;
 
@@ -87,7 +93,7 @@ public class ActiveObjectSkernel extends Skernel implements RunActive, Serializa
         }
 
         public boolean acceptRequest(Request request) {
-            return allowedMethodNames.indexOf(request.getMethodName())>=0;
+            return allowedMethodNames.indexOf(request.getMethodName()) >= 0;
         }
     }
 }

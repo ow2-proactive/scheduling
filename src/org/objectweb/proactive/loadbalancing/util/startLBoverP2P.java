@@ -53,182 +53,175 @@ import org.objectweb.proactive.p2p.service.StartP2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
+
 /*
  * ################################################################
- * 
+ *
  * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
  * computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis Contact:
  * proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation; either version 2.1 of the License, or any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- * 
+ *
  * Initial developer(s): The ProActive Team
  * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
- * 
+ *
  * ################################################################
  */
-
 public class startLBoverP2P implements ProActiveInternalObject,
-		NodeCreationEventListener {
-	Vector arrivedNodes;
+    NodeCreationEventListener {
+    Vector arrivedNodes;
+    P2PNodeLookup p2pNodeLookup;
+    Vector loadBalancers;
+    protected int nodesBooked;
 
-	P2PNodeLookup p2pNodeLookup;
+    /**
+     * @param args
+     * @throws AlreadyBoundException
+     * @throws ProActiveException
+     * @throws Exception
+     */
+    public static void main(String[] args)
+        throws AlreadyBoundException, ProActiveException {
+        //Node n = NodeFactory.createNode("rmi://psychoquack:2805/StartTest");
+        startLBoverP2P start = (startLBoverP2P) ProActive.newActive(startLBoverP2P.class.getName(),
+                null /*,n*/);
 
-	Vector loadBalancers;
+        start.doit("IntegrationTest");
+        start.killMe();
+    }
 
-	protected int nodesBooked;
+    public startLBoverP2P() {
+    }
 
-	/**
-	 * @param args
-	 * @throws AlreadyBoundException
-	 * @throws ProActiveException
-	 * @throws Exception
-	 */
-	public static void main(String[] args) throws AlreadyBoundException,
-			ProActiveException {
+    public void doit(String JobId) throws ProActiveException {
+        nodesBooked = 0;
+        ProActiveConfiguration.load();
+        ProActiveDescriptor pad;
+        VirtualNode vn = null;
+        arrivedNodes = new Vector();
+        try {
+            pad = ProActive.getProactiveDescriptor(
+                    "/user/sboukhal/home/TestLB.xml");
+            vn = pad.getVirtualNode("IntegrationTest");
+            ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
+            System.out.println("Activation");
+            vn.activate();
+            System.out.println("/Activation");
+        } catch (ProActiveException e2) {
+            e2.printStackTrace();
+        }
 
-		//Node n = NodeFactory.createNode("rmi://psychoquack:2805/StartTest");
-		
-		startLBoverP2P start = (startLBoverP2P) ProActive.newActive(
-				startLBoverP2P.class.getName(), null/*,n*/);
+        while (nodesBooked < 9)
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
 
-		start.doit("IntegrationTest");
-		start.killMe();
-	}
+        System.out.println("[TEST] Starting P2P Infranstructure");
 
-	public startLBoverP2P() {
-	}
+        String peersFile = "/user/jbustos/home/peers.file";
+        StartP2PService sp2ps = new StartP2PService(peersFile);
+        try {
+            sp2ps.start();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
 
-	public void doit(String JobId) throws ProActiveException {
+        try {
+            Thread.sleep(1 * 1000);
+        } catch (InterruptedException e) {
+        }
 
-		nodesBooked = 0;
-		ProActiveConfiguration.load();
-		ProActiveDescriptor pad;
-		VirtualNode vn = null;
-		arrivedNodes = new Vector();
-		try {
-			pad = ProActive.getProactiveDescriptor("/user/sboukhal/home/TestLB.xml");
-			vn = pad.getVirtualNode("IntegrationTest");
-			((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
-			System.out.println("Activation");
-			vn.activate();
-			System.out.println("/Activation");
-		} catch (ProActiveException e2) {
-			e2.printStackTrace();
-		}
+        Iterator it = arrivedNodes.iterator();
 
-		while (nodesBooked < 9)
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-			}
+        while (it.hasNext()) {
+            Node remoteNode = (Node) it.next();
 
-		System.out.println("[TEST] Starting P2P Infranstructure");
+            sp2ps = (StartP2PService) ProActive.newActive(StartP2PService.class.getName(),
+                    new Object[] { peersFile }, remoteNode);
+            sp2ps.start();
+            ProActive.terminateActiveObject(sp2ps, false);
+        }
 
-		String peersFile = "/user/jbustos/home/peers.file";
-		StartP2PService sp2ps = new StartP2PService(peersFile);
-		try {
-			sp2ps.start();
-		} catch (ProActiveException e) {
-			e.printStackTrace();
-		}
+        arrivedNodes.add(ProActive.getNode());
 
-		try {
-			Thread.sleep(1 * 1000);
-		} catch (InterruptedException e) {
-		}
+        try {
+            Thread.sleep(2 * 1000);
+        } catch (InterruptedException e) {
+        }
+        System.out.println("[TEST] Starting P2P LoadBalancer");
 
-		Iterator it = arrivedNodes.iterator();
+        String itAddress;
+        loadBalancers = new Vector();
+        P2PLoadBalancer p2plb = null;
+        it = arrivedNodes.iterator();
 
-		while (it.hasNext()) {
-			Node remoteNode = (Node) it.next();
+        while (it.hasNext()) {
+            Node n = (Node) it.next();
+            itAddress = n.getNodeInformation().getURL();
+            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
+                "/" + P2PConstants.P2P_NODE_NAME;
 
-			sp2ps = (StartP2PService) ProActive.newActive(StartP2PService.class
-					.getName(), new Object[] { peersFile }, remoteNode);
-			sp2ps.start();
-			ProActive.terminateActiveObject(sp2ps, false);
+            p2plb = null;
+            try {
+                p2plb = (P2PLoadBalancer) ProActive.newActive(P2PLoadBalancer.class.getName(),
+                        null, itAddress);
+                loadBalancers.add(p2plb);
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace();
+            } catch (NodeException e) {
+                e.printStackTrace();
+            }
+        }
 
-		}
+        try {
+            Thread.sleep(1000 * 1);
+        } catch (InterruptedException e) {
+        }
 
-		arrivedNodes.add(ProActive.getNode());
+        it = loadBalancers.iterator();
+        while (it.hasNext()) {
+            ((P2PLoadBalancer) it.next()).init();
+        }
 
-		try {
-			Thread.sleep(2 * 1000);
-		} catch (InterruptedException e) {
-		}
-		System.out.println("[TEST] Starting P2P LoadBalancer");
+        try {
+            Thread.sleep(1000 * 1);
+        } catch (InterruptedException e) {
+        }
 
-		String itAddress;
-		loadBalancers = new Vector();
-		P2PLoadBalancer p2plb = null;
-		it = arrivedNodes.iterator();
+        try {
+            JacobiDispatcher jacobiTest = new JacobiDispatcher("400", "25",
+                    "3000", P2PService.getLocalP2PService());
+        } catch (ProActiveException e) {
+        } catch (Exception e) {
+        }
+    }
 
-		while (it.hasNext()) {
-			Node n = (Node) it.next();
-			itAddress = n.getNodeInformation().getURL();
-			itAddress = itAddress.substring(0, itAddress.lastIndexOf("/"))
-					+ "/" + P2PConstants.P2P_NODE_NAME;
+    public void nodeCreated(NodeCreationEvent event) {
+        arrivedNodes.add(event.getNode());
+        nodesBooked++;
+        System.out.println("nodeCreated : " +
+            event.getNode().getNodeInformation().getName());
+    }
 
-			p2plb = null;
-			try {
-				p2plb = (P2PLoadBalancer) ProActive.newActive(
-						P2PLoadBalancer.class.getName(), null, itAddress);
-				loadBalancers.add(p2plb);
-
-			} catch (ActiveObjectCreationException e) {
-				e.printStackTrace();
-			} catch (NodeException e) {
-				e.printStackTrace();
-			}
-		}
-
-		try {
-			Thread.sleep(1000 * 1);
-		} catch (InterruptedException e) {
-		}
-
-		it = loadBalancers.iterator();
-		while (it.hasNext()) {
-			((P2PLoadBalancer) it.next()).init();
-		}
-
-		try {
-			Thread.sleep(1000 * 1);
-		} catch (InterruptedException e) {
-		}
-
-		try {
-			JacobiDispatcher jacobiTest = new JacobiDispatcher("400", "25",
-					"3000", P2PService.getLocalP2PService());
-		} catch (ProActiveException e) {
-		} catch (Exception e) {
-		}
-
-	}
-
-	public void nodeCreated(NodeCreationEvent event) {
-		arrivedNodes.add(event.getNode());
-		nodesBooked++;
-		System.out.println("nodeCreated : "+event.getNode().getNodeInformation().getName());
-	}
-
-	public void killMe() {
-		try {
-			ProActive.getBodyOnThis().terminate();
-		} catch (IOException e) {
-		}
-	}
+    public void killMe() {
+        try {
+            ProActive.getBodyOnThis().terminate();
+        } catch (IOException e) {
+        }
+    }
 }

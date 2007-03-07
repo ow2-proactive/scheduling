@@ -31,31 +31,28 @@
 package org.objectweb.proactive.benchmarks.timit.util;
 
 import java.io.Serializable;
+
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
 
+
 /**
  * Represents some pure counter statistics of one run
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public class EventStatistics implements Serializable {
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3762604865283613499L;
-
     private String[] counterName;
-
     private Object[] value;
-
     private EventDataBag statDataBag;
-
     private int nb;
-
     private int padding;
-
     private boolean empty;
 
     public EventStatistics() {
@@ -64,7 +61,7 @@ public class EventStatistics implements Serializable {
     }
 
     public EventStatistics(String[] counterName, Object[] value, int nb,
-            EventDataBag statDataBag) {
+        EventDataBag statDataBag) {
         this.counterName = counterName.clone();
         this.value = value.clone();
         this.statDataBag = statDataBag;
@@ -125,16 +122,15 @@ public class EventStatistics implements Serializable {
         String result = "";
 
         for (int i = 0; i < this.nb; i++) {
-            result += this.counterName[i] + " : " + this.value[i] + "\n";
+            result += (this.counterName[i] + " : " + this.value[i] + "\n");
         }
 
         return result;
     }
 
     public final String format(double t) {
-        return this.paddingString(TimIt.df.format(t), this.padding,
-                ' ', true)
-                + "    ";
+        return this.paddingString(TimIt.df.format(t), this.padding, ' ', true) +
+        "    ";
     }
 
     /**
@@ -144,10 +140,10 @@ public class EventStatistics implements Serializable {
     private String paddingString(String s, int n, char c, boolean paddingLeft) {
         StringBuffer str = new StringBuffer(s);
         int strLength = str.length();
-        if (n > 0 && n > strLength) {
+        if ((n > 0) && (n > strLength)) {
             for (int i = 0; i <= n; i++) {
                 if (paddingLeft) {
-                    if (i < n - strLength) {
+                    if (i < (n - strLength)) {
                         str.insert(0, c);
                     }
                 } else {

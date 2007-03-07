@@ -149,8 +149,9 @@ public class Bindings implements Serializable {
      * only the name of the collective interface is returned.
      */
     public String[] getExternalClientBindings() {
-        return (String[]) normalBindings.keySet().toArray(new String[normalBindings.keySet()
-                                                                                   .size()]);
+        return (String[]) normalBindings.keySet()
+                                        .toArray(new String[normalBindings.keySet()
+                                                                          .size()]);
     }
 
     /**
@@ -174,7 +175,7 @@ public class Bindings implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param binding Binding the binding to add
      */
     private void addCollectiveBindingOnExternalClientItf(Binding binding) {

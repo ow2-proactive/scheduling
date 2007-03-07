@@ -41,17 +41,16 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 
+
 public class Serie extends Tag {
-
     private ConfigChart[] charts;
-
     private Benchmark[] benchmarks;
-    
+
     public Serie(Element eSerie) {
         super(eSerie);
 
         // Construct ConfigChart array (if needed)
-        if( eSerie.getChild("charts") != null ) {
+        if (eSerie.getChild("charts") != null) {
             List chartList = eSerie.getChild("charts").getChildren();
             this.charts = new ConfigChart[chartList.size()];
             for (int i = 0; i < this.charts.length; i++) {
@@ -62,7 +61,6 @@ public class Serie extends Tag {
         // Construct Benchmark array
         List benchList = eSerie.getChild("benchmarks").getChildren();
         this.benchmarks = Benchmark.toArray(benchList);
-
     }
 
     public String get(String name) {
@@ -77,8 +75,8 @@ public class Serie extends Tag {
             return "error.log";
         }
 
-        throw new RuntimeException("Variable benchmark.'" + name
-                + "' missing in configuration file");
+        throw new RuntimeException("Variable benchmark.'" + name +
+            "' missing in configuration file");
     }
 
     public Benchmark[] getBenchmarks() {
@@ -86,13 +84,15 @@ public class Serie extends Tag {
     }
 
     public ConfigChart[] getCharts() {
-        if( this.charts == null ) return null;
+        if (this.charts == null) {
+            return null;
+        }
         return this.charts.clone();
     }
 
     public String toString() {
-        return super.toString() + Arrays.toString(this.charts) + "  -  "
-                + Arrays.toString(this.benchmarks) + "\n";
+        return super.toString() + Arrays.toString(this.charts) + "  -  " +
+        Arrays.toString(this.benchmarks) + "\n";
     }
 
     public static Serie[] oldtoArray(List serieList) {
@@ -106,8 +106,8 @@ public class Serie extends Tag {
 
         return result;
     }
+
     public static Serie[] toArray(List serieList) {
-        
         ArrayList<String> seqList;
         int quantity = serieList.size();
         ArrayList<Serie> result = new ArrayList<Serie>();
@@ -132,7 +132,7 @@ public class Serie extends Tag {
                     }
                 }
             }
-            
+
             // 2 : expanding sequences (recursive call)
             if (seqList.size() > 0) {
                 expand(eSerie, seqList, 0, result);
@@ -145,27 +145,25 @@ public class Serie extends Tag {
     }
 
     private static void expand(Element eSerie, ArrayList<String> seqList,
-            int index, ArrayList<Serie> out) {
-
+        int index, ArrayList<Serie> out) {
         String seq = seqList.get(index);
         String[] values = seq.split(",");
 
         for (String value : values) {
             Element eSerieClone = (Element) eSerie.clone();
-            XMLHelper.replaceAll(
-                    eSerieClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
-                    value);
+            XMLHelper.replaceAll(eSerieClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
+                value);
             Iterator itDesc = eSerieClone.getDescendants();
-            while( itDesc.hasNext() ) {
+            while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();
-                if( eDesc instanceof Element ) {
-                XMLHelper.replaceAll(
-                        (Element) eDesc, "\\x23\\x7B" + seq + "\\x7D", // #{*},
+                if (eDesc instanceof Element) {
+                    XMLHelper.replaceAll((Element) eDesc,
+                        "\\x23\\x7B" + seq + "\\x7D", // #{*},
                         value);
                 }
             }
 
-            if (index + 1 < seqList.size()) {
+            if ((index + 1) < seqList.size()) {
                 expand(eSerieClone, seqList, index + 1, out);
             } else {
                 out.add(new Serie(eSerieClone));

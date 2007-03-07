@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
  * @author Matthieu Morel
  */
 public interface RequestHandler {
-    
+
     /**
      * If the current controller is suitable, the request is executed. If not executed,
      * it is passed to the next handler.
@@ -58,7 +58,7 @@ public interface RequestHandler {
         throws MethodCallExecutionFailedException, InvocationTargetException;
 
     /**
-     * 
+     *
      * @return the next handler in the chain, or null
      */
     public RequestHandler nextHandler();

@@ -58,13 +58,14 @@ import org.objectweb.proactive.jmx.listeners.ProActiveConnectionNotificationEmit
  * @author ProActive Team
  *
  */
-public class ProActiveConnector implements JMXConnector, Serializable, NotificationListener  {
+public class ProActiveConnector implements JMXConnector, Serializable,
+    NotificationListener {
     private static final long serialVersionUID = -4295401093312884914L;
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
     private ProActiveConnection connection;
     private ProActiveServerImpl paServer;
-    private JMXServiceURL jmxServiceURL; 
+    private JMXServiceURL jmxServiceURL;
     private transient ProActiveConnectionNotificationEmitter emitter;
     private Map env;
     private int state = CLOSED;
@@ -132,9 +133,9 @@ public class ProActiveConnector implements JMXConnector, Serializable, Notificat
             this.emitter.sendConnectionNotificationFailed();
             throw new IOException(e.getMessage());
         } catch (IOException e) {
-        	this.emitter.sendConnectionNotificationFailed();
-        	e.printStackTrace();
-        	throw new IOException(e.getMessage());
+            this.emitter.sendConnectionNotificationFailed();
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
         this.state = OPEN;
         emitter.sendConnectionNotificationOpened();
@@ -170,7 +171,7 @@ public class ProActiveConnector implements JMXConnector, Serializable, Notificat
     public void addConnectionNotificationListener(
         NotificationListener listener, NotificationFilter filter,
         Object handback) {
-    	this.listeners.addElement(listener);
+        this.listeners.addElement(listener);
         this.emitter.addNotificationListener(this, filter, handback);
     }
 
@@ -198,14 +199,12 @@ public class ProActiveConnector implements JMXConnector, Serializable, Notificat
         return "" + this.hashCode();
     }
 
-    private Vector <NotificationListener>listeners  = new Vector <NotificationListener>();
+    private Vector<NotificationListener> listeners = new Vector<NotificationListener>();
 
-	public void handleNotification(Notification notification, Object handback) {
-		Enumeration<NotificationListener> e= listeners.elements();
-		while(e.hasMoreElements()) {
-			e.nextElement().handleNotification(notification,handback);
-		}
-	}
-
-
+    public void handleNotification(Notification notification, Object handback) {
+        Enumeration<NotificationListener> e = listeners.elements();
+        while (e.hasMoreElements()) {
+            e.nextElement().handleNotification(notification, handback);
+        }
+    }
 }

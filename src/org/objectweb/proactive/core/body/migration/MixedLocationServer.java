@@ -48,339 +48,317 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
+
 public class MixedLocationServer implements org.objectweb.proactive.RunActive,
-		LocationServer {
-	static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
+    LocationServer {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 
-	/**
-	 * Delay minimum to send the same version to the same caller
-	 */
-	public static final int DELAY_SAME_REPLY = 1000;
+    /**
+     * Delay minimum to send the same version to the same caller
+     */
+    public static final int DELAY_SAME_REPLY = 1000;
+    private LocationMap table;
+    private Hashtable requestTable;
+    private String url;
 
-	private LocationMap table;
+    public MixedLocationServer() {
+    }
 
-	private Hashtable requestTable;
+    public MixedLocationServer(String url) {
+        this.url = normalizeURL(url);
+        this.table = new LocationMap();
+        this.requestTable = new Hashtable();
+    }
 
-	private String url;
+    /**
+     * Update the location for the mobile object s with id
+     */
+    public void updateLocation(UniqueID i, UniversalBody s) {
+        updateLocation(i, s, LocationMap.CONSTANT_VERSION);
+    }
 
-	public MixedLocationServer() {}
+    /**
+     * Update the location for the mobile object s with id and indicating the
+     * version v
+     */
+    public void updateLocation(UniqueID i, UniversalBody s, int version) {
+        table.updateBody(i, s, version);
+    }
 
-	public MixedLocationServer(String url) {
-		this.url = normalizeURL(url);
-		this.table = new LocationMap();
-		this.requestTable = new Hashtable();
-	}
+    /**
+     * Return a reference to the remote body if available. Return null otherwise
+     */
+    public UniversalBody searchObject(UniqueID id) {
+        //System.out.print("Searching for "+ id);
+        UniversalBody u = (UniversalBody) table.getBody(id);
+        return u;
+    }
 
-	/**
-	 * Update the location for the mobile object s with id
-	 */
-	public void updateLocation(UniqueID i, UniversalBody s) {
-		updateLocation(i, s, LocationMap.CONSTANT_VERSION);
-	}
+    /**
+     * First register with the specified url Then wait for request
+     *
+     * Serve "updateLocation" by priority put a searchObject in queue and wait
+     * DELAY_SAME_REPLY if the version of the requested ID has not changed since
+     * the last request
+     */
+    public void runActivity(org.objectweb.proactive.Body body) {
+        this.register();
+        Service service = new Service(body);
 
-	/**
-	 * Update the location for the mobile object s with id and indicating the
-	 * version v
-	 */
-	public void updateLocation(UniqueID i, UniversalBody s, int version) {
-		table.updateBody(i, s, version);
-	}
+        while (body.isActive()) {
+            while (service.hasRequestToServe("updateLocation")) {
+                service.serveOldest("updateLocation");
+            }
+            Request oldest = service.blockingRemoveOldest();
 
-	/**
-	 * Return a reference to the remote body if available. Return null otherwise
-	 */
-	public UniversalBody searchObject(UniqueID id) {
-		//System.out.print("Searching for "+ id);
-		UniversalBody u = (UniversalBody) table.getBody(id);
-		return u;
-	}
+            if (oldest != null) {
+                synchronized (this.requestTable) {
+                    if (oldest.getMethodName().equals("searchObject")) {
+                        // we have to verify if we have received a request of
+                        // the
+                        // same sender for the same ID
+                        UniqueID id = (UniqueID) oldest.getParameter(0);
+                        String requestID = oldest.getSender().getID().toString() +
+                            id.toString();
 
-	/**
-	 * First register with the specified url Then wait for request
-	 * 
-	 * Serve "updateLocation" by priority put a searchObject in queue and wait
-	 * DELAY_SAME_REPLY if the version of the requested ID has not changed since
-	 * the last request
-	 */
-	public void runActivity(org.objectweb.proactive.Body body) {
+                        LocationRequestInfo oldRequest = (LocationRequestInfo) requestTable.get(requestID);
 
-		this.register();
-		Service service = new Service(body);
+                        if (oldRequest != null) {
+                            int oldVersion = oldRequest.getVersion();
 
-		while (body.isActive()) {
-			while (service.hasRequestToServe("updateLocation")) {
-				service.serveOldest("updateLocation");
-			}
-			Request oldest = service.blockingRemoveOldest();
+                            // an old version exists
+                            // if we don't have the same version ==> serve this
+                            // request and save it
+                            int newVersion = table.getVersion(id);
+                            if (oldVersion != newVersion) {
+                                service.serve(oldest);
+                                requestTable.put(requestID,
+                                    new LocationRequestInfo(newVersion,
+                                        System.currentTimeMillis(), true));
+                            } else {
+                                // we still have the same version
+                                // if the previous call hasn't been served ==>
+                                // have a look to it's creation time
+                                // else put the request in the table and in the
+                                // queue
+                                if (oldRequest.hasBeenServed()) {
+                                    requestTable.put(requestID,
+                                        new LocationRequestInfo(newVersion,
+                                            System.currentTimeMillis(), false));
+                                    try {
+                                        body.receiveRequest(oldest);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (RenegotiateSessionException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    // if the delay is gone, serve the request
+                                    // else put it in the queue
+                                    if ((oldRequest.getCreationTime() +
+                                            DELAY_SAME_REPLY) < System.currentTimeMillis()) {
+                                        service.serve(oldest);
+                                        oldRequest.setServed(true);
+                                    } else {
+                                        try {
+                                            body.receiveRequest(oldest);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (RenegotiateSessionException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            // no old request so serve the request and save it
+                            service.serve(oldest);
 
-			if (oldest != null) {
-				synchronized (this.requestTable) {
-					if (oldest.getMethodName().equals("searchObject")) {
-						// we have to verify if we have received a request of
-						// the
-						// same sender for the same ID
-						UniqueID id = (UniqueID) oldest.getParameter(0);
-						String requestID = oldest.getSender().getID()
-								.toString()
-								+ id.toString();
+                            int version = table.getVersion(id);
+                            requestTable.put(requestID,
+                                new LocationRequestInfo(version,
+                                    System.currentTimeMillis(), true));
+                        }
+                    } else {
+                        service.serve(oldest);
+                    }
+                }
+            }
+        }
+    }
 
-						LocationRequestInfo oldRequest = (LocationRequestInfo) requestTable
-								.get(requestID);
+    protected String normalizeURL(String url) {
+        String tmp = url;
 
-						if (oldRequest != null) {
-							int oldVersion = oldRequest.getVersion();
-							// an old version exists
-							// if we don't have the same version ==> serve this
-							// request and save it
-							int newVersion = table.getVersion(id);
-							if (oldVersion != newVersion) {
-								service.serve(oldest);
-								requestTable.put(requestID,
-										new LocationRequestInfo(newVersion,
-												System.currentTimeMillis(),
-												true));
+        try {
+            tmp = UrlBuilder.checkUrl(url);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return tmp;
+    }
 
-							} else {
-								// we still have the same version
-								// if the previous call hasn't been served ==>
-								// have a look to it's creation time
-								// else put the request in the table and in the
-								// queue
-								if (oldRequest.hasBeenServed()) {
-									requestTable.put(requestID,
-											new LocationRequestInfo(newVersion,
-													System.currentTimeMillis(),
-													false));
-									try {
-										body.receiveRequest(oldest);
-									} catch (IOException e) {
-										e.printStackTrace();
-									} catch (RenegotiateSessionException e) {
-										e.printStackTrace();
-									}
-								} else {
-									// if the delay is gone, serve the request
-									// else put it in the queue
-									if (oldRequest.getCreationTime()
-											+ DELAY_SAME_REPLY < System
-											.currentTimeMillis()) {
-										service.serve(oldest);
-										oldRequest.setServed(true);
-									} else {
-										try {
-											body.receiveRequest(oldest);
-										} catch (IOException e) {
-											e.printStackTrace();
-										} catch (RenegotiateSessionException e) {
-											e.printStackTrace();
-										}
-									}
-								}
+    protected void register() {
+        try {
+            logger.info("Attempt at binding : " + url);
+            ProActive.register(ProActive.getStubOnThis(), url);
+            logger.info("Location Server bound in registry : " + url);
+        } catch (Exception e) {
+            logger.fatal("Cannot bind in registry - aborting " + url);
+            e.printStackTrace();
+            return;
+        }
+    }
 
-							}
-						} else {
-							// no old request so serve the request and save it
-							service.serve(oldest);
+    public static void main(String[] args) {
+        ProActiveConfiguration.load();
+        String name = ProActiveConfiguration.getLocationServerRmi();
 
-							int version = table.getVersion(id);
-							requestTable.put(requestID,
-									new LocationRequestInfo(version, System
-											.currentTimeMillis(), true));
-						}
+        Object[] arg = new Object[1];
+        arg[0] = name;
 
-					} else {
-						service.serve(oldest);
-					}
-				}
-			}
-		}
-	}
+        MixedLocationServer server = null;
 
-	protected String normalizeURL(String url) {
-		String tmp = url;
+        try {
+            if (args.length == 1) {
+                server = (MixedLocationServer) ProActive.newActive(MixedLocationServer.class.getName(),
+                        arg, NodeFactory.getNode(args[0]));
+            } else {
+                server = (MixedLocationServer) ProActive.newActive(MixedLocationServer.class.getName(),
+                        arg);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		try {
-			tmp = UrlBuilder.checkUrl(url);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		return tmp;
-	}
+    //
+    // -- INNER CLASSES -----------------------------------------------
+    //
+    protected class LocationMap {
+        public static final int CONSTANT_VERSION = 0;
+        public static final int NO_VERSION_FOUND = -1;
+        public static final int MIGRATING_OUT = 2000;
+        private Hashtable idToBodyMap;
 
-	protected void register() {
-		try {
-			logger.info("Attempt at binding : " + url);
-			ProActive.register(ProActive.getStubOnThis(), url);
-			logger.info("Location Server bound in registry : " + url);
-		} catch (Exception e) {
-			logger.fatal("Cannot bind in registry - aborting " + url);
-			e.printStackTrace();
-			return;
-		}
-	}
+        public LocationMap() {
+            idToBodyMap = new Hashtable();
+        }
 
-	public static void main(String[] args) {
-		ProActiveConfiguration.load();
-		String name = ProActiveConfiguration.getLocationServerRmi();
+        public void updateBody(UniqueID id, UniversalBody body, int version) {
+            synchronized (this.idToBodyMap) {
+                // remove old reference if exists and if is an older version
+                WrappedLocationBody wrappedBody = (WrappedLocationBody) idToBodyMap.get(id);
 
-		Object[] arg = new Object[1];
-		arg[0] = name;
+                if (wrappedBody == null) {
+                    // add new reference
+                    idToBodyMap.put(id, new WrappedLocationBody(body, version));
+                } else if (wrappedBody.getVersion() <= version) {
+                    idToBodyMap.remove(id);
 
-		MixedLocationServer server = null;
+                    // add new reference
+                    idToBodyMap.put(id, new WrappedLocationBody(body, version));
+                }
+            }
+        }
 
-		try {
+        public UniversalBody getBody(UniqueID id) {
+            Object o = null;
+            if (id != null) {
+                synchronized (this.idToBodyMap) {
+                    o = idToBodyMap.get(id);
+                    if (o != null) {
 
-			if (args.length == 1) {
-				server = (MixedLocationServer) ProActive.newActive(
-						MixedLocationServer.class.getName(), arg, NodeFactory
-								.getNode(args[0]));
-			} else {
-				server = (MixedLocationServer) ProActive.newActive(
-						MixedLocationServer.class.getName(), arg);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+                        /*
+                        WrappedLocationBody wrappedBody = (WrappedLocationBody) o;
 
-	//
-	// -- INNER CLASSES -----------------------------------------------
-	//
+                        if (wrappedBody.isMigrating()) {
+                                try {
+                                        wait(MIGRATING_OUT);
+                                } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                }
+                        }
+                        */
+                        return ((WrappedLocationBody) o).getBody();
+                    }
+                }
+            }
 
-	protected class LocationMap {
-		public static final int CONSTANT_VERSION = 0;
+            return (UniversalBody) o;
+        }
 
-		public static final int NO_VERSION_FOUND = -1;
+        public int getVersion(UniqueID id) {
+            if (id != null) {
+                synchronized (this.idToBodyMap) {
+                    Object o = idToBodyMap.get(id);
+                    if (o != null) {
+                        WrappedLocationBody wrappedBody = (WrappedLocationBody) o;
+                        return wrappedBody.getVersion();
+                    }
+                }
+            }
+            return NO_VERSION_FOUND;
+        }
+    }
 
-		public static final int MIGRATING_OUT = 2000;
+    protected class WrappedLocationBody {
+        private int version;
+        private UniversalBody wrappedBody;
+        private boolean isMigrating;
 
-		private Hashtable idToBodyMap;
+        public WrappedLocationBody(UniversalBody body, int version) {
+            this.wrappedBody = body;
+            this.version = version;
+            this.isMigrating = false;
+        }
 
-		public LocationMap() {
-			idToBodyMap = new Hashtable();
-		}
+        public WrappedLocationBody(UniversalBody body, int version,
+            boolean isMigrating) {
+            this.wrappedBody = body;
+            this.version = version;
+            this.isMigrating = isMigrating;
+        }
 
-		public void updateBody(UniqueID id, UniversalBody body, int version) {
-			synchronized (this.idToBodyMap) {
-				// remove old reference if exists and if is an older version
-				WrappedLocationBody wrappedBody = (WrappedLocationBody) idToBodyMap
-						.get(id);
+        public int getVersion() {
+            return this.version;
+        }
 
-				if (wrappedBody == null) {
-					// add new reference
-					idToBodyMap.put(id, new WrappedLocationBody(body, version));
-				} else if (wrappedBody.getVersion() <= version) {
-					idToBodyMap.remove(id);
+        public UniversalBody getBody() {
+            return this.wrappedBody;
+        }
 
-					// add new reference
-					idToBodyMap.put(id, new WrappedLocationBody(body, version));
-				}
-			}
-		}
+        public boolean isMigrating() {
+            return this.isMigrating;
+        }
+    }
 
-		public UniversalBody getBody(UniqueID id) {
-			Object o = null;
-			if (id != null) {
-				synchronized (this.idToBodyMap) {
-					o = idToBodyMap.get(id);
-					if (o != null) {
-						/*
-						WrappedLocationBody wrappedBody = (WrappedLocationBody) o;
-						
-						if (wrappedBody.isMigrating()) {
-							try {
-								wait(MIGRATING_OUT);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						}
-						*/
-						return ((WrappedLocationBody) o).getBody();
-					}
-				}
-			}
+    protected class LocationRequestInfo {
+        private int version;
+        private long creationTime;
+        private boolean served;
 
-			return (UniversalBody) o;
-		}
+        public LocationRequestInfo(int version, long creationTime,
+            boolean served) {
+            this.version = version;
+            this.creationTime = creationTime;
+            this.served = served;
+        }
 
-		public int getVersion(UniqueID id) {
-			if (id != null) {
-				synchronized (this.idToBodyMap) {
-					Object o = idToBodyMap.get(id);
-					if (o != null) {
-						WrappedLocationBody wrappedBody = (WrappedLocationBody) o;
-						return wrappedBody.getVersion();
-					}
-				}
-			}
-			return NO_VERSION_FOUND;
+        public boolean hasBeenServed() {
+            return this.served;
+        }
 
-		}
-	}
+        public int getVersion() {
+            return this.version;
+        }
 
-	protected class WrappedLocationBody {
-		private int version;
+        public long getCreationTime() {
+            return this.creationTime;
+        }
 
-		private UniversalBody wrappedBody;
-
-		private boolean isMigrating;
-
-		public WrappedLocationBody(UniversalBody body, int version) {
-			this.wrappedBody = body;
-			this.version = version;
-			this.isMigrating = false;
-		}
-
-		public WrappedLocationBody(UniversalBody body, int version,
-				boolean isMigrating) {
-			this.wrappedBody = body;
-			this.version = version;
-			this.isMigrating = isMigrating;
-		}
-
-		public int getVersion() {
-			return this.version;
-		}
-
-		public UniversalBody getBody() {
-			return this.wrappedBody;
-		}
-
-		public boolean isMigrating() {
-			return this.isMigrating;
-		}
-
-	}
-
-	protected class LocationRequestInfo {
-		private int version;
-
-		private long creationTime;
-
-		private boolean served;
-
-		public LocationRequestInfo(int version, long creationTime,
-				boolean served) {
-			this.version = version;
-			this.creationTime = creationTime;
-			this.served = served;
-		}
-
-		public boolean hasBeenServed() {
-			return this.served;
-		}
-
-		public int getVersion() {
-			return this.version;
-		}
-
-		public long getCreationTime() {
-			return this.creationTime;
-		}
-
-		public void setServed(boolean served) {
-			this.served = served;
-		}
-	}
-
+        public void setServed(boolean served) {
+            this.served = served;
+        }
+    }
 }

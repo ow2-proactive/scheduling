@@ -30,22 +30,14 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.examples.c3d.C3DDispatcher;
-import org.objectweb.proactive.examples.c3d.Dispatcher;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -53,6 +45,12 @@ import java.net.UnknownHostException;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.examples.c3d.C3DDispatcher;
+import org.objectweb.proactive.examples.c3d.Dispatcher;
 
 
 /** A dialog with two text fields, which handles incorrect entries.
@@ -73,7 +71,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         super();
 
         String localHostUrl = NameAndHostDialog.getLocalHostUrl();
-        
+
         setTitle("Welcome to the Collaborative 3D Environment.");
 
         this.userTextField = new JTextField(this.userName, 10);
@@ -168,15 +166,15 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         this.c3dDispatcher = null;
         // First try with the provided url, if the user entered the exact url for the dispatcher
         try {
-            this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(), url);
+            this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
+                    url);
             setVisible(false);
             return;
         } catch (Exception e) {
             //e.printStackTrace();
             // do nothing, it's just not a correct dispatcher url
-        }        
-        
-        
+        }
+
         // Second, check the url given does map to a machine, and get list of registered objects on it
         try {
             hostName = UrlBuilder.getHostNameFromUrl(url);
@@ -193,7 +191,6 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             String name = UrlBuilder.getNameFromUrl(registeredObjects[i]);
 
             if (name.indexOf("_VN") == -1) { // replace by (java 1.5 String.contains)
-
                 try {
                     this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
                             registeredObjects[i]);
@@ -234,9 +231,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
     public Dispatcher getValidatedDispatcher() {
         return this.c3dDispatcher;
     }
-    
-    
-    /** Gets the name of the machine this is running on. 
+
+    /** Gets the name of the machine this is running on.
      * @return a url which is suitable for looking up active objects. */
     public static String getLocalHostUrl() {
         String localhost = "";
@@ -259,5 +255,4 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         return localhost;
     }
-
 }

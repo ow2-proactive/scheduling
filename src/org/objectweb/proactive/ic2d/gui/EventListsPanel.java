@@ -204,7 +204,8 @@ public class EventListsPanel extends javax.swing.JPanel
     // 
     public void clearAll() {
         synchronized (objectTrackPanelMap) {
-            java.util.Iterator<ObjTrackPanel> i = objectTrackPanelMap.values().iterator();
+            java.util.Iterator<ObjTrackPanel> i = objectTrackPanelMap.values()
+                                                                     .iterator();
             while (i.hasNext()) {
                 // clean the ui
                 ObjTrackPanel otp = i.next();
@@ -279,7 +280,8 @@ public class EventListsPanel extends javax.swing.JPanel
     public void allEventsProcessed() {
         //Code for downScrolling should be there...
         synchronized (objectTrackPanelMap) {
-            java.util.Iterator<ObjTrackPanel> i = objectTrackPanelMap.values().iterator();
+            java.util.Iterator<ObjTrackPanel> i = objectTrackPanelMap.values()
+                                                                     .iterator();
             while (i.hasNext()) {
                 // clean the ui
                 ObjTrackPanel otp = i.next();
@@ -508,7 +510,8 @@ public class EventListsPanel extends javax.swing.JPanel
 
     /** returns all SpyMessageEvents that belong to the same body,
      * the same type (request or reply) and occured after target */
-    private java.util.LinkedList<Object> getMsgAfter(SpyMessageEvent target, UniqueID id) {
+    private java.util.LinkedList<Object> getMsgAfter(SpyMessageEvent target,
+        UniqueID id) {
         java.util.LinkedList<Object> result = new java.util.LinkedList<Object>();
         int index = events.indexOf(target);
         if (index == -1) {
@@ -549,8 +552,7 @@ public class EventListsPanel extends javax.swing.JPanel
     //
     // -- INNER CLASSES -----------------------------------------------
     //  
-    private class MyListSelectionListener
-        implements javax.swing.event.ListSelectionListener {
+    private class MyListSelectionListener implements javax.swing.event.ListSelectionListener {
 
         /**
          * When an item is selected,
@@ -906,8 +908,7 @@ public class EventListsPanel extends javax.swing.JPanel
         }
     } // end inner class EventListModel
 
-    public class BoundedCircularArrayList
-        extends org.objectweb.proactive.core.util.CircularArrayList {
+    public class BoundedCircularArrayList extends org.objectweb.proactive.core.util.CircularArrayList {
         private int fixedSize;
 
         public BoundedCircularArrayList(int size) {

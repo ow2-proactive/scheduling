@@ -46,9 +46,10 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * This class is the parent of classes for generating component interfaces. It provides utility methods that are used in subclasses.
- * 
+ *
  * @author Matthieu Morel
  *
  */
@@ -56,23 +57,25 @@ public abstract class AbstractInterfaceClassGenerator {
     protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS);
     protected static ClassPool pool = ClassPool.getDefault();
 
-
     protected Class loadClass(final String className)
         throws ClassNotFoundException {
         // try to fetch the class from the default class loader
-        return Thread.currentThread().getContextClassLoader().loadClass(className);
+        return Thread.currentThread().getContextClassLoader()
+                     .loadClass(className);
     }
 
     public ProActiveInterface generateControllerInterface(
         final String controllerInterfaceName, Component owner,
-        ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        ProActiveInterfaceType interfaceType)
+        throws InterfaceGenerationFailedException {
         return generateInterface(controllerInterfaceName, owner, interfaceType,
             false, false);
     }
 
     public ProActiveInterface generateFunctionalInterface(
         final String functionalInterfaceName, Component owner,
-        ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        ProActiveInterfaceType interfaceType)
+        throws InterfaceGenerationFailedException {
         return generateInterface(functionalInterfaceName, owner, interfaceType,
             false, true);
     }

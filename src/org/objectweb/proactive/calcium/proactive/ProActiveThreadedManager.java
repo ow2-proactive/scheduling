@@ -41,71 +41,73 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
+
 public class ProActiveThreadedManager extends AbstractProActiveManager {
+    ExecutorService threadPool;
 
-	ExecutorService threadPool;
+    public ProActiveThreadedManager(Node[] nodes) {
+        super(nodes);
+    }
 
-	public ProActiveThreadedManager(Node nodes[]){		
-		super(nodes);
-	}
-	
-	public ProActiveThreadedManager(VirtualNode vn){
-		super(vn);
-	}
-	
-	public ProActiveThreadedManager(String descriptorPath, String virtualNodeName){
-		super(descriptorPath,virtualNodeName);
-	}
+    public ProActiveThreadedManager(VirtualNode vn) {
+        super(vn);
+    }
 
-	@Override
-	public Skernel boot(Skernel skernel) {
-		logger.info("ProActive skeleton manager is using "+nodes.length+" nodes");
-		threadPool=Executors.newCachedThreadPool();
-		try {
-			for(int i=0;i<nodes.length;i++){
-				Interpreter interp=(Interpreter)ProActive.newActive(Interpreter.class.getName(),null,nodes[i]);
-				threadPool.submit(new ProActiveCallableInterpreter(skernel,interp));
-			}
-		} catch (Exception e) {
-			logger.error("Error, unable to create interpreter active objects");
-			e.printStackTrace();
-		}
-		return skernel;
-	}
-	
-	@Override
-	public void shutdown() {
-		super.shutdown();
-		if(threadPool != null){
-			threadPool.shutdownNow();
-		}
-	}
-	
-	protected class ProActiveCallableInterpreter implements Callable<Task<?>>{
-			
-		Interpreter interp;
-		Skernel skernel;
-		
-		public ProActiveCallableInterpreter(Skernel skernel, Interpreter interp){
-			this.skernel=skernel;
-			this.interp=interp;
-		}
+    public ProActiveThreadedManager(String descriptorPath,
+        String virtualNodeName) {
+        super(descriptorPath, virtualNodeName);
+    }
 
-		public Task<?> call() throws Exception {
-			
-			Task<?> task = skernel.getReadyTask(0);
-			
-			while(task!=null){
-				task = interp.interpret(task);
-				
-				ProActive.waitFor(task); //Wait for the future
+    @Override
+    public Skernel boot(Skernel skernel) {
+        logger.info("ProActive skeleton manager is using " + nodes.length +
+            " nodes");
+        threadPool = Executors.newCachedThreadPool();
+        try {
+            for (int i = 0; i < nodes.length; i++) {
+                Interpreter interp = (Interpreter) ProActive.newActive(Interpreter.class.getName(),
+                        null, nodes[i]);
+                threadPool.submit(new ProActiveCallableInterpreter(skernel,
+                        interp));
+            }
+        } catch (Exception e) {
+            logger.error("Error, unable to create interpreter active objects");
+            e.printStackTrace();
+        }
+        return skernel;
+    }
 
-				skernel.putProcessedTask(task);
+    @Override
+    public void shutdown() {
+        super.shutdown();
+        if (threadPool != null) {
+            threadPool.shutdownNow();
+        }
+    }
 
-				task = skernel.getReadyTask(0);
-			}
+    protected class ProActiveCallableInterpreter implements Callable<Task<?>> {
+        Interpreter interp;
+        Skernel skernel;
 
-			return task;
-		}
-	}
+        public ProActiveCallableInterpreter(Skernel skernel, Interpreter interp) {
+            this.skernel = skernel;
+            this.interp = interp;
+        }
+
+        public Task<?> call() throws Exception {
+            Task<?> task = skernel.getReadyTask(0);
+
+            while (task != null) {
+                task = interp.interpret(task);
+
+                ProActive.waitFor(task); //Wait for the future
+
+                skernel.putProcessedTask(task);
+
+                task = skernel.getReadyTask(0);
+            }
+
+            return task;
+        }
+    }
 }

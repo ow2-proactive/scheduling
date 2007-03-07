@@ -158,8 +158,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
     /**
      * Cell Renderer
      */
-    private class ProcessListCellRenderer
-        extends javax.swing.DefaultListCellRenderer {
+    private class ProcessListCellRenderer extends javax.swing.DefaultListCellRenderer {
         public ProcessListCellRenderer() {
         }
 

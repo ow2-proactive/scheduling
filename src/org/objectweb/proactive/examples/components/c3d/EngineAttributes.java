@@ -34,6 +34,7 @@ import org.objectweb.fractal.api.control.AttributeController;
 
 
 public interface EngineAttributes extends AttributeController {
+
     /** The name of the Engine, which is used to be displayed */
     String getName();
 

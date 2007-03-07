@@ -37,9 +37,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
+
 
 /**
  * This class stores the FileTransfer arquitecture specific
@@ -54,7 +55,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.
  * @since   ProActive 2.3
  */
 public class FileTransferWorkShop implements Serializable {
-	private static final String PROCESSDEFAULT_KEYWORD = "processDefault";
+    private static final String PROCESSDEFAULT_KEYWORD = "processDefault";
     private static final String IMPLICIT_KEYWORD = "implicit";
     private static final String[] ALLOWED_COPY_PROTOCOLS = {
             PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp", "nordugrid", "pftp"
@@ -339,22 +340,21 @@ public class FileTransferWorkShop implements Serializable {
      * this workshop.
      * @return an array with all the FileDescriptions linked with this FTW.
      */
-    public FileDescription[] getAllFileDescriptions(){
-    
-    	ArrayList<FileDescription> fd = new ArrayList<FileDescription>();
+    public FileDescription[] getAllFileDescriptions() {
+        ArrayList<FileDescription> fd = new ArrayList<FileDescription>();
 
         Iterator<String> it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
             FileTransferDefinition ft = fileTransfers.get(it.next());
-            
-            FileDescription fdesc[]=ft.getAllFiles();
-            for(int i=0; i < fdesc.length ; i++)
-            	fd.add(fdesc[i]);
+
+            FileDescription[] fdesc = ft.getAllFiles();
+            for (int i = 0; i < fdesc.length; i++)
+                fd.add(fdesc[i]);
         }
-        
+
         return fd.toArray(new FileDescription[0]);
     }
-    
+
     /**
      * For a given filename, it creates the Full Path using
      * the source information of this FTW.
@@ -370,7 +370,7 @@ public class FileTransferWorkShop implements Serializable {
         return buildFilePathString(dstInfoParams.getPrefix(),
             dstInfoParams.getFileSeparator(), fileDesc.getDestName());
     }
-    
+
     public static String buildFilePathString(StructureInformation infoParam,
         String filename) {
         return buildFilePathString(infoParam.getPrefix(),
@@ -379,11 +379,10 @@ public class FileTransferWorkShop implements Serializable {
 
     public static String buildFilePathString(String prefix, String fileSep,
         String filename) {
-
         /*
          *BORDER CONDITIONS
          */
- 	
+
         //Trim white spaces
         prefix = prefix.trim();
         fileSep = fileSep.trim();

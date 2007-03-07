@@ -33,41 +33,43 @@ package org.objectweb.proactive.calcium.examples.blast;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.muscle.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class ExecuteFormatDB extends AbstractExecuteCommand implements Execute<BlastParameters,BlastParameters> {
-	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
-	
-	public BlastParameters execute(BlastParameters param) throws EnvironmentException {
-		
-		if(logger.isDebugEnabled()){
-			logger.debug("Formating database file:"+param.getDatabaseFile().getAbsolutePath());
-		}
 
-		super.execProcess(param.getFormatDBString(), param.getWorkingDirectory());
+public class ExecuteFormatDB extends AbstractExecuteCommand implements Execute<BlastParameters, BlastParameters> {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-		return param;
-	}
+    public BlastParameters execute(BlastParameters param)
+        throws EnvironmentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Formating database file:" +
+                param.getDatabaseFile().getAbsolutePath());
+        }
 
-	@Override
-	public URL getProgramURL() throws EnvironmentException, MuscleException{
+        super.execProcess(param.getFormatDBString(), param.getWorkingDirectory());
 
-		String osName = System.getProperty("os.name");
-		
-		if(!osName.equals("Linux")){
-			throw new EnvironmentException("Linux machines are required");
-		}
-		
-		URL url=  Blast.class.getClass().getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/formatdb");
-		
-		if(url==null){
-			throw new MuscleException("Unable to find formatdb binary");
-		}
+        return param;
+    }
 
-		return url;
-	}
+    @Override
+    public URL getProgramURL() throws EnvironmentException, MuscleException {
+        String osName = System.getProperty("os.name");
+
+        if (!osName.equals("Linux")) {
+            throw new EnvironmentException("Linux machines are required");
+        }
+
+        URL url = Blast.class.getClass()
+                             .getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/formatdb");
+
+        if (url == null) {
+            throw new MuscleException("Unable to find formatdb binary");
+        }
+
+        return url;
+    }
 }

@@ -78,10 +78,10 @@ public class MOPClassLoader extends URLClassLoader {
         byte[] cb = null;
         cb = classDataCache.get(classname);
         if (cb == null) {
-        	if (logger.isDebugEnabled()) {
-        		logger.debug(
-                	"MOPClassLoader: class " + classname + " not found, trying to generate it");
-        	}
+            if (logger.isDebugEnabled()) {
+                logger.debug("MOPClassLoader: class " + classname +
+                    " not found, trying to generate it");
+            }
             try {
                 this.loadClass(classname);
             } catch (ClassNotFoundException e) {
@@ -155,19 +155,20 @@ public class MOPClassLoader extends URLClassLoader {
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         return this.loadClass(name, null, null, false);
     }
-    
-    
-    public Class loadClass(String name, Class[] genericParameters) throws ClassNotFoundException {
+
+    public Class loadClass(String name, Class[] genericParameters)
+        throws ClassNotFoundException {
         return this.loadClass(name, genericParameters, null, false);
     }
 
-    public Class loadClass(String name, Class[] genericParameters, ClassLoader cl)
-        throws ClassNotFoundException {
+    public Class loadClass(String name, Class[] genericParameters,
+        ClassLoader cl) throws ClassNotFoundException {
         return this.loadClass(name, genericParameters, cl, false);
     }
 
-    protected synchronized Class loadClass(String name, Class[] genericParameters, ClassLoader cl,
-        boolean resolve) throws ClassNotFoundException {
+    protected synchronized Class loadClass(String name,
+        Class[] genericParameters, ClassLoader cl, boolean resolve)
+        throws ClassNotFoundException {
         if (this.getParent() != null) {
             try {
                 return this.getParent().loadClass(name);
@@ -179,7 +180,8 @@ public class MOPClassLoader extends URLClassLoader {
             //defined the stub class using the context class loader
             //we check here
             try {
-                return Thread.currentThread().getContextClassLoader().loadClass(name);
+                return Thread.currentThread().getContextClassLoader()
+                             .loadClass(name);
             } catch (ClassNotFoundException e) {
                 //no luck, proceed
             }
@@ -199,13 +201,15 @@ public class MOPClassLoader extends URLClassLoader {
                 String classname = Utils.convertStubClassNameToClassName(name);
 
                 byte[] data = null;
-//                if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
-//                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-//                    data = bsb.create();
-//                    MOPClassLoader.classDataCache.put(name, data);
-//                } else 
-                    if (BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                    data = JavassistByteCodeStubBuilder.create(classname, genericParameters);
+
+                //                if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
+                //                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+                //                    data = bsb.create();
+                //                    MOPClassLoader.classDataCache.put(name, data);
+                //                } else 
+                if (BYTE_CODE_MANIPULATOR.equals("javassist")) {
+                    data = JavassistByteCodeStubBuilder.create(classname,
+                            genericParameters);
                     MOPClassLoader.classDataCache.put(name, data);
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
@@ -254,7 +258,8 @@ public class MOPClassLoader extends URLClassLoader {
                     throw new ClassNotFoundException(ex.getMessage());
                 }
             } else {
-                logger.debug("Cannot generate class " + name + " as a stub class");
+                logger.debug("Cannot generate class " + name +
+                    " as a stub class");
                 throw e;
             }
         }

@@ -40,7 +40,7 @@ package org.objectweb.proactive.ext.security.exceptions;
 public class SecurityNotAvailableException extends Exception {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7963144698084073622L;
 

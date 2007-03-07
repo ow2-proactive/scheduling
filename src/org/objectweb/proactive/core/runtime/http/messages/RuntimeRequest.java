@@ -72,14 +72,14 @@ public class RuntimeRequest extends ReflectRequest implements Serializable {
         return this.returnedObject;
     }
 
-    public RuntimeRequest(String newmethodName, ArrayList<Object> newparameters,
-        String url) {
+    public RuntimeRequest(String newmethodName,
+        ArrayList<Object> newparameters, String url) {
         this(newmethodName, url);
         this.parameters = newparameters;
     }
 
-    public RuntimeRequest(String newmethodName, ArrayList<Object> newparameters,
-        ArrayList newparamsTypes, String url) {
+    public RuntimeRequest(String newmethodName,
+        ArrayList<Object> newparameters, ArrayList newparamsTypes, String url) {
         this(newmethodName, newparameters, url);
     }
 

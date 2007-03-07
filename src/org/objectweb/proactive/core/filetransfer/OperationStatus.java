@@ -32,60 +32,59 @@ package org.objectweb.proactive.core.filetransfer;
 
 import java.io.Serializable;
 
+
 /**
  * This class is used to determine if an operation has finished, is pending
  * or encountered some problems.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */
 public class OperationStatus implements Serializable {
+    private Exception e = null;
+    private boolean p = false;
 
-	private Exception e=null;
-	private boolean p=false;
-	
-	/**
-	 * ProActive empty constructor.
-	 * Can also be used if the operation finished successfully
-	 */
-	public OperationStatus(){ //default is succesfull operation
-		
-	}
-	
-	/**
-	 * If the operation was never processed, then this constructor can be used
-	 * @param isPending True if the operation was never processed. False otherwise.
-	 */
-	public OperationStatus(boolean isPending){ //operation was never performed
-		p=isPending;
-	}
-	
-	/**
-	 * This constructor can be used if the operation experienced problems
-	 * while processing.
-	 * @param e The exception that was encountered
-	 */
-	public OperationStatus(Exception e){ //operation encountered problems
-		this.e=e;
-	}
-	
-	/**
-	 * Determines if the operation had problems
-	 * @return true if problems where encountered
-	 */
-	public boolean hasException(){
-		return e!=null;
-	}
-	
-	/**
-	 * Returns the exception that was encountered
-	 * @return The exception or null if no exception took place.
-	 */
-	public Exception getException(){
-		return e;
-	}
-	
-	public boolean isPending(){
-		return p;
-	}
+    /**
+     * ProActive empty constructor.
+     * Can also be used if the operation finished successfully
+     */
+    public OperationStatus() { //default is succesfull operation
+    }
+
+    /**
+     * If the operation was never processed, then this constructor can be used
+     * @param isPending True if the operation was never processed. False otherwise.
+     */
+    public OperationStatus(boolean isPending) { //operation was never performed
+        p = isPending;
+    }
+
+    /**
+     * This constructor can be used if the operation experienced problems
+     * while processing.
+     * @param e The exception that was encountered
+     */
+    public OperationStatus(Exception e) { //operation encountered problems
+        this.e = e;
+    }
+
+    /**
+     * Determines if the operation had problems
+     * @return true if problems where encountered
+     */
+    public boolean hasException() {
+        return e != null;
+    }
+
+    /**
+     * Returns the exception that was encountered
+     * @return The exception or null if no exception took place.
+     */
+    public Exception getException() {
+        return e;
+    }
+
+    public boolean isPending() {
+        return p;
+    }
 }

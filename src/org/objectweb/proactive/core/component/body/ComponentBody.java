@@ -33,9 +33,9 @@ package org.objectweb.proactive.core.component.body;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
 
-/** 
+/**
  * Defines the actions specific to a component body.
- * 
+ *
  * @author Matthieu Morel
  */
 public interface ComponentBody {

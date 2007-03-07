@@ -48,16 +48,17 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+
 /**
  * An helper class for reading and writing XML files
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class XMLHelper {
 
     /**
      * Get XML Document thanks to its filename
-     * 
+     *
      * @param filename
      *            the XML file name
      * @return the XML Document
@@ -65,7 +66,6 @@ public class XMLHelper {
     public static Document readFile(String filename) {
         try {
             return new SAXBuilder().build(new File(filename));
-
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -74,7 +74,7 @@ public class XMLHelper {
 
     /**
      * Save document into XML file
-     * 
+     *
      * @param document
      *            the Document to save
      * @param filename
@@ -83,20 +83,18 @@ public class XMLHelper {
     public static void writeFile(Document document, String filename) {
         try {
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-            
-            FileOutputStream fos = new FileOutputStream(
-                    XMLHelper.createFileWithDirs(filename)
-                    );
-            out.output(document, fos);
 
+            FileOutputStream fos = new FileOutputStream(XMLHelper.createFileWithDirs(
+                        filename));
+            out.output(document, fos);
         } catch (Exception e) {
             System.err.println("Unable to write the XML file: " + filename);
             e.printStackTrace();
         }
     }
-    
-    public static File createFileWithDirs(String filename){
-        try {          
+
+    public static File createFileWithDirs(String filename) {
+        try {
             File file = new File(filename);
 
             String path = file.getParent();
@@ -104,17 +102,16 @@ public class XMLHelper {
                 new File(path).mkdirs();
             }
             return file;
-
         } catch (Exception e) {
             System.err.println("Unable to create file: " + filename);
-            e.printStackTrace();  
+            e.printStackTrace();
             return null;
-        }        
+        }
     }
 
     /**
      * This method allow to append a message to an error file
-     * 
+     *
      * @param filename
      *            the error file to write
      * @param message
@@ -128,12 +125,11 @@ public class XMLHelper {
                 new File(path).mkdirs();
             }
             FileOutputStream fos = new FileOutputStream(file, true); // true->append
-            String time = ""
-                    + (new java.sql.Timestamp(System.currentTimeMillis()));
+            String time = "" +
+                (new java.sql.Timestamp(System.currentTimeMillis()));
             message = time + "  " + message + "\n";
             fos.write(message.getBytes());
             fos.close();
-
         } catch (Exception e) {
             System.err.println("Unable to write file: " + filename);
             e.printStackTrace();
@@ -144,7 +140,7 @@ public class XMLHelper {
      * Generate a ProActive descriptor file thanks to a pad base file. Variables
      * in this pad will be reassigned. Note: local variables mask global
      * variable
-     * 
+     *
      * @param inFilename
      *            the ProActive descriptor base file
      * @param gvars
@@ -155,14 +151,15 @@ public class XMLHelper {
      *            the generated pad file name
      */
     public static void generateDescriptor(String inFilename,
-            HashMap<String, String> gvars, HashMap<String, String> lvars,
-            String outFilename) {
-
+        HashMap<String, String> gvars, HashMap<String, String> lvars,
+        String outFilename) {
         // Read and modify ProActive descriptor base
         Document doc = XMLHelper.readFile(inFilename);
+
         // Get the root namespace in order to provide it when performing a getChild
-        Namespace descriptorNamespace = doc.getRootElement().getNamespace();        
-        Element eVariables = doc.getRootElement().getChild("variables",descriptorNamespace);        
+        Namespace descriptorNamespace = doc.getRootElement().getNamespace();
+        Element eVariables = doc.getRootElement()
+                                .getChild("variables", descriptorNamespace);
         Iterator it = eVariables.getChildren().iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
@@ -180,7 +177,7 @@ public class XMLHelper {
 
     /**
      * Replace all occurences of old by value in all attributes of elt
-     * 
+     *
      * @param elt
      *            the Element to parse
      * @param old
@@ -198,15 +195,14 @@ public class XMLHelper {
 
     /**
      * Replace all variable occurences in serie's list by their value in vars
-     * 
+     *
      * @param serieList
      *            the list of series to parse
      * @param vars
      *            the variables to set
      */
     public static void replaceVariables(List serieList,
-            HashMap<String, String> vars) {
-
+        HashMap<String, String> vars) {
         // Replace variables
         Pattern p = Pattern.compile("[^\\x24\\x7B\\x7D]*\\x24\\x7B" + // *${
                 "([^\\x7D]*)" + // A,B,C
@@ -231,7 +227,7 @@ public class XMLHelper {
     /**
      * Scan all attributes of a given Element and replace variable name by their
      * real value
-     * 
+     *
      * @param elt
      *            the Element to scan
      * @param p
@@ -240,7 +236,7 @@ public class XMLHelper {
      *            the variables values
      */
     private static void replaceVariablesAttributes(Element elt, Pattern p,
-            HashMap<String, String> vars) {
+        HashMap<String, String> vars) {
         Iterator itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
@@ -250,8 +246,9 @@ public class XMLHelper {
                 String var = m.group(1);
                 String resolve = vars.get(var);
                 values = values.replaceAll("\\x24\\x7B" + var + "\\x7D", // ${*}
-                        resolve.split(",").length == 1 ? resolve : "#{"
-                                + resolve + "}");
+                        (resolve.split(",").length == 1) ? resolve
+                                                         : ("#{" + resolve +
+                        "}"));
                 attr.setValue(values);
             }
         }
@@ -261,7 +258,7 @@ public class XMLHelper {
      * Filter elements from value of name attribute<br>
      * Remove all elements which are not in values. If a parent is not in
      * accepted values, its children will not be accepted.
-     * 
+     *
      * @param timit
      *            the Element to modify
      * @param values
@@ -271,13 +268,13 @@ public class XMLHelper {
         Arrays.sort(values);
         List<Element> children = eTag.getChildren();
         int i = 0;
-        
-        while( i<children.size() ) {
+
+        while (i < children.size()) {
             Element elt = children.get(i);
             Element parent = elt.getParentElement();
 
-            while( ! filter( elt, values ) ) {
-                if( ! elt.getName().equals(parent.getName()) ) {
+            while (!filter(elt, values)) {
+                if (!elt.getName().equals(parent.getName())) {
                     children = eTag.getChildren();
                     i--;
                     break;
@@ -287,8 +284,8 @@ public class XMLHelper {
             i++;
         }
     }
-    
-    private static boolean filter( Element eTag, String[] values ) {
+
+    private static boolean filter(Element eTag, String[] values) {
         if (values.length == 0) {
             return true;
         }
@@ -301,17 +298,17 @@ public class XMLHelper {
             for (int i = 0; i < children.size(); i++) {
                 Element child = (Element) children.get(i);
                 Element parent = child.getParentElement();
-                while( ! filter(child, values) ) {
+                while (!filter(child, values)) {
                     child = parent;
                 }
             }
-            return true; 
-        }        
+            return true;
+        }
     }
 
     /**
      * Print document on stdout. For debug purpose
-     * 
+     *
      * @param doc
      */
     public static void printOut(Document doc) {

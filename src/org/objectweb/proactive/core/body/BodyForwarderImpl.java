@@ -91,7 +91,6 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
      * @param rBody The body to be added
      */
     public synchronized void add(BodyAdapter rBody) {
-    	
         if (!bodies.containsKey(rBody.getID())) {
             // We do not want to overwrite an already existing entry. 
             // Not checking that this entry do not already exist can lead to
@@ -125,7 +124,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see UniversalBody#disableAC() */
     public void disableAC(UniqueID id) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.disableAC();
         } else {
@@ -135,7 +134,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see UniversalBody#enableAC() */
     public void enableAC(UniqueID id) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.enableAC();
         } else {
@@ -146,7 +145,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#getCertificate() */
     public X509Certificate getCertificate(UniqueID id)
         throws SecurityNotAvailableException, IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getCertificate();
         } else {
@@ -157,7 +156,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#getCertificate() */
     public byte[] getCertificateEncoded(UniqueID id)
         throws SecurityNotAvailableException, IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getCertificateEncoded();
         } else {
@@ -168,7 +167,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#getEntities() */
     public ArrayList getEntities(UniqueID id)
         throws SecurityNotAvailableException, IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getEntities();
         } else {
@@ -178,7 +177,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see UniversalBody#getID() */
     public UniqueID getID(UniqueID id) {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getID();
         } else {
@@ -190,7 +189,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see UniversalBody#getNodeURL() */
     public String getNodeURL(UniqueID id) {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getNodeURL();
         } else {
@@ -204,7 +203,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     public SecurityContext getPolicy(UniqueID id,
         SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getPolicy(securityContext);
         } else {
@@ -215,7 +214,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#getPublicKey() */
     public PublicKey getPublicKey(UniqueID id)
         throws SecurityNotAvailableException, IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getPublicKey();
         } else {
@@ -225,7 +224,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see UniversalBody#getRemoteAdapter() */
     public BodyAdapter getRemoteAdapter(UniqueID id) {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         return new BodyAdapterForwarder(partf.getBodyAdapterForwarder(), rbody);
     }
@@ -235,7 +234,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         byte[] my_pub, byte[] my_cert, byte[] sig_code)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.publicKeyExchange(sessionID, my_pub, my_cert, sig_code);
         } else {
@@ -246,7 +245,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see UniversalBody#receiveFTMessage(FTMessage) */
     public Object receiveFTMessage(UniqueID id, FTMessage ev)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.receiveFTMessage(ev);
         } else {
@@ -254,7 +253,8 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg) throws IOException {
+    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg)
+        throws IOException {
         BodyAdapter rbody = (BodyAdapter) bodies.get(id);
         if (rbody != null) {
             return rbody.receiveGCMessage(msg);
@@ -263,22 +263,23 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    public void setRegistered(UniqueID id, boolean registered) throws IOException {
-    	BodyAdapter rbody = (BodyAdapter) bodies.get(id);
+    public void setRegistered(UniqueID id, boolean registered)
+        throws IOException {
+        BodyAdapter rbody = (BodyAdapter) bodies.get(id);
         if (rbody != null) {
             rbody.setRegistered(registered);
         } else {
             throw new IOException("No BodyAdapter associated to id=" + id);
         }
     }
-    
+
     /** @see UniversalBody#receiveReply(Reply) */
     public int receiveReply(UniqueID id, Reply r) throws IOException {
         // a FuturProxy can be present inside r and must know if it is running
         // on a body forwarder or not. See FuturProxy.writeObject
         FuturePool.addMeAsBodyForwarder();
         try {
-            BodyAdapter rbody =  bodies.get(id);
+            BodyAdapter rbody = bodies.get(id);
             if (rbody != null) {
                 return rbody.receiveReply(r);
             } else {
@@ -297,7 +298,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         // on a body forwarder or not. See FuturProxy.writeObject
         FuturePool.addMeAsBodyForwarder();
         try {
-            BodyAdapter rbody =  bodies.get(id);
+            BodyAdapter rbody = bodies.get(id);
             if (rbody != null) {
                 return rbody.receiveRequest(request);
             } else {
@@ -311,7 +312,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see UniversalBody#removeImmediateService(String, Class[]) */
     public void removeImmediateService(UniqueID id, String methodName,
         Class[] parametersTypes) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.removeImmediateService(methodName, parametersTypes);
         } else {
@@ -324,7 +325,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         byte[] tmp1, byte[] tmp2, byte[] tmp3, byte[] tmp4)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
                 tmp4);
@@ -336,7 +337,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see UniversalBody#setImmediateService(String, Class[]) */
     public void setImmediateService(UniqueID id, String methodName,
         Class[] parametersTypes) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.setImmediateService(methodName, parametersTypes);
         } else {
@@ -347,7 +348,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see UniversalBody#setImmediateService(String) */
     public void setImmediateService(UniqueID id, String methodName)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.setImmediateService(methodName);
         } else {
@@ -359,7 +360,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     public long startNewSession(UniqueID id, Communication policy)
         throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.startNewSession(policy);
         } else {
@@ -369,7 +370,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see UniversalBody#terminate() */
     public void terminate(UniqueID id) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             // TODO probably remove this AO from our cache
             rbody.terminate();
@@ -381,7 +382,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#terminateSession(long) */
     public void terminateSession(UniqueID id, long sessionID)
         throws IOException, SecurityNotAvailableException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.terminateSession(sessionID);
         } else {
@@ -393,7 +394,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     public byte[] randomValue(UniqueID id, long sessionID, byte[] cl_rand)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.randomValue(sessionID, cl_rand);
         } else {
@@ -404,7 +405,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see UniversalBody#updateLocation(UniqueID, UniversalBody) */
     public void updateLocation(UniqueID id, UniqueID uid, UniversalBody body)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.updateLocation(uid, body);
         } else {
@@ -414,7 +415,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see org.objectweb.proactive.Job#getJobID() */
     public String getJobID(UniqueID id) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.getJobID();
         } else {
@@ -425,7 +426,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.core.exceptions.manager.NFEProducer#addNFEListener(NFEListener) */
     public void addNFEListener(UniqueID id, NFEListener listener)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.addNFEListener(listener);
         } else {
@@ -436,7 +437,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.core.exceptions.manager.NFEProducer#removeNFEListener(NFEListener) */
     public void removeNFEListener(UniqueID id, NFEListener listener)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.removeNFEListener(listener);
         } else {
@@ -447,7 +448,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see BodyAdapter#changeProxiedBody(Body) */
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.changeProxiedBody(newBody);
         } else {
@@ -458,7 +459,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.core.exceptions.manager.NFEProducer#fireNFE(NonFunctionalException) */
     public int fireNFE(UniqueID id, NonFunctionalException e)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.fireNFE(e);
         } else {
@@ -469,7 +470,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see BodyAdapter#lookup(String) */
     public UniversalBody lookup(UniqueID id, String url)
         throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             return rbody.lookup(url);
         } else {
@@ -479,7 +480,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see BodyAdapter#register(String) */
     public void register(UniqueID id, String url) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.register(url);
         } else {
@@ -489,7 +490,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see BodyAdapter#unregister(String) */
     public void unregister(UniqueID id, String url) throws IOException {
-        BodyAdapter rbody =  bodies.get(id);
+        BodyAdapter rbody = bodies.get(id);
         if (rbody != null) {
             rbody.unregister(url);
         } else {

@@ -34,8 +34,7 @@ package org.objectweb.proactive.examples.boundedbuffer;
 /**
  * Simple Active consumer
  */
-public abstract class ConsumerProducer
-    implements org.objectweb.proactive.RunActive {
+public abstract class ConsumerProducer implements org.objectweb.proactive.RunActive {
     protected String name;
     protected ConsumerProducerListener listener;
     protected BoundedBuffer buffer;

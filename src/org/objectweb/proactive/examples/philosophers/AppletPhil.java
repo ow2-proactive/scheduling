@@ -55,7 +55,6 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
 
     private void go() {
         try {
-
             /* le Layout est necessairement actif, puisqu'il est referenc? par tous les autres objets.
              */
             theLayout = (DinnerLayout) org.objectweb.proactive.ProActive.turnActive(theLayout);

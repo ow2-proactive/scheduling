@@ -251,7 +251,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) throws ProActiveException, HTTPRemoteException {
-    	if (isLocal) {
+        if (isLocal) {
             localruntime.register(proActiveRuntimeDist, proActiveRuntimeName,
                 creatorID, creationProtocol, vmName);
 

@@ -426,6 +426,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
            p.surf.ks = 0.3;
            scene.addObject(p);
          */
+
         /* Creates five lights for the scene */
         scene.addLight(new Light(100, 100, -50, 1.0));
         scene.addLight(new Light(-100, 100, -50, 1.0));
@@ -1118,7 +1119,6 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                     c3ddispatcher.spinUnclock(i_user);
                 }
             } else if ((source == mi_exit) || (source == b_exit)) {
-
                 /* Exit the appplication */
                 setVisible(false);
                 exit();
@@ -1256,8 +1256,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         /**
          * AWT 1.1 event handling for window events
          */
-        class MyWindowListener extends WindowAdapter
-            implements java.io.Serializable {
+        class MyWindowListener extends WindowAdapter implements java.io.Serializable {
             public void windowClosing(WindowEvent e) {
                 setVisible(false);
                 exit();

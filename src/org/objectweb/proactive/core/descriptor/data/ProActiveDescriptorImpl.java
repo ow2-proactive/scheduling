@@ -148,9 +148,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     public String getUrl() {
         return this.url;
     }
-    
+
     public String getProActiveDescriptorURL() {
-    	return descriptorURL;
+        return descriptorURL;
     }
 
     /**
@@ -219,7 +219,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
 
         for (String id : mainDefinitionMapping.keySet()) {
-        	activateMain(id);
+            activateMain(id);
         }
     }
 
@@ -243,7 +243,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         return mainDefinitionMapping;
     }
 
-    public void setMainDefinitionMapping(HashMap<String, MainDefinition> newMapping) {
+    public void setMainDefinitionMapping(
+        HashMap<String, MainDefinition> newMapping) {
         mainDefinitionMapping = newMapping;
     }
 
@@ -776,7 +777,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
 
         public void updateService(UniversalService s) {
-
             for (ServiceUpdater serviceUpdater : updaterList) {
                 serviceUpdater.updateService(s);
             }
@@ -797,9 +797,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
 
         public void updateProcess(ExternalProcess p) {
-           
-        	for (ProcessUpdater processUpdater : updaterList) {
-        		processUpdater.updateProcess(p);
+            for (ProcessUpdater processUpdater : updaterList) {
+                processUpdater.updateProcess(p);
             }
 
             updaterList.clear();
@@ -955,9 +954,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         ((TechnicalServiceWrapper) this.technicalServiceMapping.get(tsParsed.getId())).setTs(ts);
     }
 
-    public TechnicalService getTechnicalService(
-        String technicalServiceId) {
-        TechnicalService ts =  this.technicalServiceMapping.get(technicalServiceId);
+    public TechnicalService getTechnicalService(String technicalServiceId) {
+        TechnicalService ts = this.technicalServiceMapping.get(technicalServiceId);
 
         if (ts == null) {
             ts = new TechnicalServiceWrapper();

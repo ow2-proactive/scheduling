@@ -38,46 +38,43 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 
+
 /**
  * This class construct a serie of benchmarks thanks to a configuration file.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class ConfigReader {
-    
     public static String PROJECT_PATH;
-    
+
     static {
-        String classesPath = ConfigReader.class.getResource(".").getPath();                
-        ConfigReader.PROJECT_PATH = classesPath.substring(0, classesPath.indexOf("/classes"));        
+        String classesPath = ConfigReader.class.getResource(".").getPath();
+        ConfigReader.PROJECT_PATH = classesPath.substring(0,
+                classesPath.indexOf("/classes"));
     }
 
     private Document document;
-
     private Element eTimit;
-
     private HashMap<String, String> globalVariables; // <variable name,value>
-
-    private Serie[] series;        
+    private Serie[] series;
 
     public ConfigReader(String filename) {
-
         // Get the <timit> root tag from configuration file
         this.document = XMLHelper.readFile(filename);
         this.eTimit = this.document.getRootElement();
 
         // Get global variables
         this.globalVariables = new HashMap<String, String>();
-        
+
         // Add the default global variable PROJECT_PATH        
-        this.globalVariables.put("PROJECT_PATH",PROJECT_PATH);
-        
+        this.globalVariables.put("PROJECT_PATH", PROJECT_PATH);
+
         Iterator it = this.eTimit.getChild("globalVariables").getChildren()
-                .iterator();
+                                 .iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
-            this.globalVariables.put(var.getAttributeValue("name"), var
-                    .getAttributeValue("value"));
+            this.globalVariables.put(var.getAttributeValue("name"),
+                var.getAttributeValue("value"));
         }
 
         // Read and parse all <serie> tags

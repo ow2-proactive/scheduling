@@ -137,8 +137,8 @@ public class ThreadPlayer {
                     eventReplayProgressBar.setString((recordMark + 1) + "/" +
                         eventList.size());
                     eventReplayProgressBar.setValue(recordMark + 1);
-                    dispatchEvent(activeObjectList.get(
-                            recordMark), eventList.get(recordMark));
+                    dispatchEvent(activeObjectList.get(recordMark),
+                        eventList.get(recordMark));
                     recordMark++;
                 }
                 try {

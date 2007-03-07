@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.component.ComponentParameters;
  * @author Matthieu Morel
  */
 public interface ComponentParametersController extends AttributeController {
-
     public ComponentParameters getComponentParameters();
 
     public void setComponentParameters(ComponentParameters componentParameters);

@@ -33,22 +33,20 @@ package org.objectweb.proactive.calcium.proactive;
 import org.objectweb.proactive.calcium.Interpreter;
 import org.objectweb.proactive.calcium.Task;
 
-public class ActiveObjectInterpreter {
 
-	public ActiveObjectInterpreter(){
-	
-	}
-	
-	public void start(ActiveObjectSkernel aom){
-		
-		Interpreter interp = new Interpreter();
-		while(true){
-			Task<?> task = aom.getReadyTask(0);
-			if(task.isDummy()){
-				break;
-			}
-			task=interp.interpret(task);
-			aom.putProcessedTask(task);
-		}
-	}
+public class ActiveObjectInterpreter {
+    public ActiveObjectInterpreter() {
+    }
+
+    public void start(ActiveObjectSkernel aom) {
+        Interpreter interp = new Interpreter();
+        while (true) {
+            Task<?> task = aom.getReadyTask(0);
+            if (task.isDummy()) {
+                break;
+            }
+            task = interp.interpret(task);
+            aom.putProcessedTask(task);
+        }
+    }
 }

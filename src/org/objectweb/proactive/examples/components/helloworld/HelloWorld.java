@@ -182,14 +182,15 @@ public class HelloWorld {
                     // component assembly
                     Fractal.getContentController(CComp).addFcSubComponent(cComp);
                     Fractal.getContentController(SComp).addFcSubComponent(sComp);
-                    Fractal.getBindingController(CComp).bindFc("r",
-                        cComp.getFcInterface("r"));
-                    Fractal.getBindingController(cComp).bindFc("s",
+                    Fractal.getBindingController(CComp)
+                           .bindFc("r", cComp.getFcInterface("r"));
+                    Fractal.getBindingController(cComp)
+                           .bindFc("s",
                         Fractal.getContentController(CComp)
                                .getFcInternalInterface("s"));
                     //Fractal.getBindingController(cComp).bindFc("s", CComp.getFcInterface("s"));
-                    Fractal.getBindingController(SComp).bindFc("s",
-                        sComp.getFcInterface("s"));
+                    Fractal.getBindingController(SComp)
+                           .bindFc("s", sComp.getFcInterface("s"));
                     // replaces client and server components by "wrapper" components
                     // THIS CHANGES REFERENCES (STUBS)
                     cComp = CComp;
@@ -199,10 +200,10 @@ public class HelloWorld {
                 // component assembly
                 Fractal.getContentController(rComp).addFcSubComponent(cComp);
                 Fractal.getContentController(rComp).addFcSubComponent(sComp);
-                Fractal.getBindingController(rComp).bindFc("r",
-                    cComp.getFcInterface("r"));
-                Fractal.getBindingController(cComp).bindFc("s",
-                    sComp.getFcInterface("s"));
+                Fractal.getBindingController(rComp)
+                       .bindFc("r", cComp.getFcInterface("r"));
+                Fractal.getBindingController(cComp)
+                       .bindFc("s", sComp.getFcInterface("s"));
             }
 
             // start root component

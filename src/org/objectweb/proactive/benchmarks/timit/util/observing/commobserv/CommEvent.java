@@ -33,6 +33,7 @@ package org.objectweb.proactive.benchmarks.timit.util.observing.commobserv;
 import org.objectweb.proactive.benchmarks.timit.util.observing.Event;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 
+
 /**
  * A communication event represented by the triplet (observer, destination rank,
  * value).<br>
@@ -42,7 +43,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
  * <li>value</li>
  * to the
  * <li>destination rank</li>.
- * 
+ *
  * @see org.objectweb.proactive.benchmarks.timit.util.observing.Event
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
@@ -53,7 +54,7 @@ public class CommEvent extends Event {
 
     /**
      * Creates an instance of CommEvent.
-     * 
+     *
      * @param observer
      *            The observer that registers this event
      * @param destRank
@@ -68,7 +69,7 @@ public class CommEvent extends Event {
 
     /**
      * Returns the destination rank.
-     * 
+     *
      * @return The destination rank
      */
     public int getDestRank() {
@@ -77,7 +78,7 @@ public class CommEvent extends Event {
 
     /**
      * Sets the destination rank.
-     * 
+     *
      * @param destRank
      *            The destination rank
      */

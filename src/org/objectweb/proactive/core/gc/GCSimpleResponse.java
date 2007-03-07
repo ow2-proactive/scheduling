@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.gc;
 
 import java.io.Serializable;
 
+
 public class GCSimpleResponse implements Serializable {
     protected final Activity consensusActivity;
 

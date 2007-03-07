@@ -79,7 +79,8 @@ public class Philosopher implements org.objectweb.proactive.RunActive {
      */
     public void getForks() {
         layout.update(id, 1); // set to waiting
-        // do a synchronous call
+                              // do a synchronous call
+
         table.getForks(id);
         hasBothForks = true;
     }
@@ -130,5 +131,4 @@ public class Philosopher implements org.objectweb.proactive.RunActive {
         }
     }
 }
-
 //:~Philosopher

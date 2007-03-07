@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import org.apache.log4j.Logger;
+import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.net.UnknownHostException;
 
 
 public class ProActiveMPIComm {

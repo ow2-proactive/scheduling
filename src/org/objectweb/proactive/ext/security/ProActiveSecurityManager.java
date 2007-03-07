@@ -103,7 +103,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER);
 
     /* contains all active sessions for the current active object */
-    protected Hashtable<Long,Session> sessions;
+    protected Hashtable<Long, Session> sessions;
 
     /* random generator used for generating sesssion key */
     protected transient RandomLongGenerator randomLongGenerator;
@@ -131,7 +131,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * This a the default constructor to use with the ProActiveSecurityManager
      */
     public ProActiveSecurityManager() {
-        this.sessions = new Hashtable<Long,Session>();
+        this.sessions = new Hashtable<Long, Session>();
         this.policyServer = null;
     }
 
@@ -139,7 +139,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         throws java.io.IOException, InvalidPolicyFile {
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         Security.addProvider(myProvider);
-        sessions = new Hashtable<Long,Session>();
+        sessions = new Hashtable<Long, Session>();
 
         if ((new File(file)).exists()) {
             this.policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
@@ -216,8 +216,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * @throws AuthenticationException
      */
     public void initiateSession(int type, SecurityEntity distantSecurityEntity)
-        throws CommunicationForbiddenException, 
-            org.objectweb.proactive.ext.security.crypto.AuthenticationException, 
+        throws CommunicationForbiddenException,
+            org.objectweb.proactive.ext.security.crypto.AuthenticationException,
             RenegotiateSessionException, SecurityNotAvailableException {
         // client side 
         Communication localPolicy = null;
@@ -307,15 +307,15 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                     session.setDistantOACertificate(distantBodyCertificate);
                     sessions.put(new Long(sessionID), session);
                     sessionAccepted = true;
-                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("adding new session " +
-                        sessionID);
+                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
+                                   .debug("adding new session " + sessionID);
                 } else if (this.getCertificate().equals(distantBodyCertificate)) {
                     // send a secured message to myself ... why not
                     //session.distantSecureEntity = distantSecurityEntity;
                     session.setDistantOACertificate(distantBodyCertificate);
                     sessionAccepted = true;
-                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("adding new session : " +
-                        sessionID);
+                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
+                                   .debug("adding new session : " + sessionID);
                 }
 
                 //   }
@@ -330,12 +330,14 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             if (distantBodyCertificate != null) {
                 session.setDistantOAPublicKey(distantBodyCertificate.getPublicKey());
             } else {
-                ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("WARNING remote object scertificate is null");
+                ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
+                               .debug("WARNING remote object scertificate is null");
                 session.setDistantOAPublicKey(distantSecurityEntity.getPublicKey());
             }
 
-            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("adding new session " +
-                sessionID + " distant object is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
+                           .debug("adding new session " + sessionID +
+                " distant object is " +
                 distantSecurityEntity.getCertificate().getSubjectDN() +
                 "\n local object is " + this.getCertificate().getSubjectDN());
 
@@ -404,8 +406,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             e.printStackTrace();
         }
 
-        ProActiveLogger.getLogger(Loggers.SECURITY).debug("starting a new session : " +
-            id);
+        ProActiveLogger.getLogger(Loggers.SECURITY)
+                       .debug("starting a new session : " + id);
         return id;
     }
 
@@ -426,7 +428,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                     Thread.sleep(50);
                 }
 
-                ProActiveLogger.getLogger(Loggers.SECURITY).debug("Ciphering object, session is " +
+                ProActiveLogger.getLogger(Loggers.SECURITY)
+                               .debug("Ciphering object, session is " +
                     sessionID);
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 MarshalOutputStream out = new MarshalOutputStream(bout);
@@ -1048,7 +1051,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
     public byte[][] publicKeyExchange(long sessionID, byte[] pub_key,
         byte[] cert, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException {
         // server side
         // Step two..
@@ -1436,7 +1439,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         //  	System.out.println(o + "Target :" + cert.getSubjectDN());
         Session session = null;
         if (sessions == null) {
-            ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO).debug("sessions field is null");
+            ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO)
+                           .debug("sessions field is null");
             return (long) 0;
         }
 
@@ -1480,13 +1484,13 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     //    public void setParentCertificate(X509Certificate certificate) {
     //        parentCertificate = certificate;
     //    }
-    public Hashtable<Long,String> getOpenedConnexion() {
-        Hashtable<Long,String> table = null;
+    public Hashtable<Long, String> getOpenedConnexion() {
+        Hashtable<Long, String> table = null;
         if (sessions == null) {
             return table;
         }
 
-        table = new Hashtable<Long,String>();
+        table = new Hashtable<Long, String>();
 
         for (Enumeration e = sessions.keys(); e.hasMoreElements();) {
             Long l = (Long) e.nextElement();
@@ -1635,7 +1639,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             KeyPair siblingKeyPair = KeyTools.genKeys(1024);
             X509Certificate cert;
 
-            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("generate sibling scurity manager for " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
+                           .debug("generate sibling scurity manager for " +
                 siblingName);
 
             cert = CertTools.genCert(siblingName, 65 * 24 * 360L, null,
@@ -1644,7 +1649,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                     ((X509Certificate) this.policyServer.getKeyStore()
                      .getCertificate(SecurityConstants.KEYSTORE_APPLICATION_PATH)).getSubjectDN()
                      .toString(),
-                    (PrivateKey) this.policyServer.getKeyStore().getKey(SecurityConstants.KEYSTORE_APPLICATION_PATH,
+                    (PrivateKey) this.policyServer.getKeyStore()
+                                                  .getKey(SecurityConstants.KEYSTORE_APPLICATION_PATH,
                         null),
                     this.policyServer.getKeyStore()
                                      .getCertificate(SecurityConstants.KEYSTORE_APPLICATION_PATH)
@@ -1652,7 +1658,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
             this.keyStore = KeyTools.createP12(SecurityConstants.KEYSTORE_ENTITY_PATH,
                     siblingKeyPair.getPrivate(), cert,
-                    this.policyServer.getKeyStore().getCertificateChain(SecurityConstants.KEYSTORE_APPLICATION_PATH));
+                    this.policyServer.getKeyStore()
+                                     .getCertificateChain(SecurityConstants.KEYSTORE_APPLICATION_PATH));
         } catch (InvalidKeyException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

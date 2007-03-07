@@ -274,11 +274,11 @@ public class FlowShopTask extends Task {
                 }
                 int currentMakespan;
 
-                 if (com) {
-                 fsr.makespan = ((FlowShopResult) this.bestKnownSolution).makespan;
-                 fsr.permutation = ((FlowShopResult) this.bestKnownSolution).permutation;
-                 } 
-                 
+                if (com) {
+                    fsr.makespan = ((FlowShopResult) this.bestKnownSolution).makespan;
+                    fsr.permutation = ((FlowShopResult) this.bestKnownSolution).permutation;
+                }
+
                 if ((currentMakespan = FlowShopTask.computeConditionalMakespan(
                                 fs, currentPerm,
                                 ((FlowShopResult) this.bestKnownSolution).makespan,

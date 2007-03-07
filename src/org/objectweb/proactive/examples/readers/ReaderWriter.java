@@ -175,8 +175,7 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
      * Filter that will accept the first Request for methodA only if there is no Request for method B
      * before it.
      */
-    private class MyRequestFilter
-        implements org.objectweb.proactive.core.body.request.RequestFilter {
+    private class MyRequestFilter implements org.objectweb.proactive.core.body.request.RequestFilter {
         private String methodNameA;
         private String methodNameB;
         private boolean foundMethodB;

@@ -33,30 +33,27 @@ package org.objectweb.proactive.jmx.listeners;
 import javax.management.Notification;
 import javax.management.NotificationListener;
 
+
 /**
- * 
+ *
  * @author ProActive Team
  *
  */
-public class ListenerAdapter implements NotificationListener{
+public class ListenerAdapter implements NotificationListener {
+    private NotificationListener listener;
 
-	private NotificationListener listener;
-	
-	/**
-	 * 
-	 * @param listener
-	 */
-	public ListenerAdapter ( NotificationListener listener) {
-		this.listener = listener;
-	}
-	
-	/**
-	 * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
-	 */
-	public void handleNotification(Notification notification, Object handback) {
-		this.listener.handleNotification(notification, handback);
-		
-	}
+    /**
+     *
+     * @param listener
+     */
+    public ListenerAdapter(NotificationListener listener) {
+        this.listener = listener;
+    }
 
+    /**
+     * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
+     */
+    public void handleNotification(Notification notification, Object handback) {
+        this.listener.handleNotification(notification, handback);
+    }
 }
- 

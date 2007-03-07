@@ -122,7 +122,8 @@ public abstract class ReflectRequest extends HttpMessage {
                     paramtypes = ((Method) allSameMethod.get(i)).getParameterTypes();
 
                     for (int j = 0; j < paramsearchsize; j++) {
-                        Class<? extends Object> classtest = paramsearch.get(j).getClass();
+                        Class<?extends Object> classtest = paramsearch.get(j)
+                                                                      .getClass();
 
                         if (paramtypes[j] != classtest) {
                             isgood = false;

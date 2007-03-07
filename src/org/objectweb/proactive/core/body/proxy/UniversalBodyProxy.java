@@ -64,23 +64,21 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
-public class UniversalBodyProxy extends AbstractBodyProxy
-    implements java.io.Serializable {
+public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     // note that we do not want to serialize this member but rather handle
     // the serialization by ourselve
     protected transient UniversalBody universalBody;
     protected transient boolean isLocal;
-
     private transient GCTag tag;
-    
-    private static ThreadLocal<Collection<UniversalBodyProxy>> incomingReferences = new ThreadLocal<Collection<UniversalBodyProxy>>() {
-    	protected synchronized Collection<UniversalBodyProxy> initialValue() {
-            return new Vector<UniversalBodyProxy>();
-        }
-    };
-    
+    private static ThreadLocal<Collection<UniversalBodyProxy>> incomingReferences =
+        new ThreadLocal<Collection<UniversalBodyProxy>>() {
+            protected synchronized Collection<UniversalBodyProxy> initialValue() {
+                return new Vector<UniversalBodyProxy>();
+            }
+        };
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -162,7 +160,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         }
 
         if (GarbageCollector.dgcIsEnabled()) {
-        	((AbstractBody)ProActive.getBodyOnThis()).updateReference(this);
+            ((AbstractBody) ProActive.getBodyOnThis()).updateReference(this);
         }
     }
 
@@ -276,7 +274,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         // TODO if component request and shortcut : update body ref
         // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
         // Maybe we could use some optimisation here
-    	//UniqueID id = universalBody.getID();
+        //UniqueID id = universalBody.getID();
         UniversalBody newBody = sourceBody.checkNewLocation(bodyID);
         if (newBody != null) {
             universalBody = newBody;
@@ -337,9 +335,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     }
 
     public static Collection<UniversalBodyProxy> getIncomingReferences() {
-    	Collection<UniversalBodyProxy> res = incomingReferences.get();
-    	incomingReferences.set(new Vector<UniversalBodyProxy>());
-    	return res;
+        Collection<UniversalBodyProxy> res = incomingReferences.get();
+        incomingReferences.set(new Vector<UniversalBodyProxy>());
+        return res;
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -363,14 +361,14 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         if (logger.isDebugEnabled()) {
             logger.debug("universalBody is " + universalBody);
         }
-        
+
         if (GarbageCollector.dgcIsEnabled()) {
-        	incomingReferences.get().add(this);
+            incomingReferences.get().add(this);
         }
     }
-    
+
     public void setGCTag(GCTag tag) {
-    	assert this.tag == null;
-    	this.tag = tag;
+        assert this.tag == null;
+        this.tag = tag;
     }
 }

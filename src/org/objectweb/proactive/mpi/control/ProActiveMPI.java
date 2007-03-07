@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.mpi.control;
 
+import java.util.ArrayList;
+import java.util.Vector;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
-
-import java.util.ArrayList;
-import java.util.Vector;
 
 
 public class ProActiveMPI {
@@ -47,12 +47,12 @@ public class ProActiveMPI {
             try {
                 manager = (ProActiveMPIManager) ProActive.newActive(ProActiveMPIManager.class.getName(),
                         new Object[] {  });
-              //  VectorResult vres = 
+                //  VectorResult vres = 
                 manager.deploy(spmdList);
                 return null;
                 // get a future and wait on future
                 // System.out.println("[PROACTIVEMPI] RETURNS VECTOR OF FUTURES ");
-              //  return vres.getVectorResult();
+                //  return vres.getVectorResult();
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {

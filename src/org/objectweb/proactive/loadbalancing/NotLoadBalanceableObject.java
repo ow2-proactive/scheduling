@@ -33,7 +33,7 @@ package org.objectweb.proactive.loadbalancing;
 
 /**
  * <p>
- * This interface has to be implemented for ActiveObjects which don't have to 
+ * This interface has to be implemented for ActiveObjects which don't have to
  * be load balance
  * </p>
  *
@@ -41,5 +41,4 @@ package org.objectweb.proactive.loadbalancing;
  *
  */
 public interface NotLoadBalanceableObject {
-
 }

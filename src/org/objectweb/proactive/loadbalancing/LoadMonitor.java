@@ -52,8 +52,9 @@ import org.objectweb.proactive.loadbalancing.metrics.Metric;
  * @author Javier.Bustos@sophia.inria.fr
  *
  */
-public class LoadMonitor implements Runnable,ProActiveInternalObject {
+public class LoadMonitor implements Runnable, ProActiveInternalObject {
     static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
+
     //protected double load = 0;
     protected LoadBalancer lb;
     protected Metric metric;
@@ -61,18 +62,17 @@ public class LoadMonitor implements Runnable,ProActiveInternalObject {
     public LoadMonitor(LoadBalancer lb, Metric metric) {
         this.lb = lb;
         this.metric = metric;
-    	
     }
-        
-	public synchronized void killMePlease() {
-		Thread.currentThread().interrupt();
-		}
+
+    public synchronized void killMePlease() {
+        Thread.currentThread().interrupt();
+    }
 
     public void run() {
         Random r = new Random();
         do {
-        	this.metric.takeDecision(lb);
-        	try {
+            this.metric.takeDecision(lb);
+            try {
                 double sl;
                 sl = LoadBalancingConstants.UPDATE_TIME * r.nextDouble();
                 /*

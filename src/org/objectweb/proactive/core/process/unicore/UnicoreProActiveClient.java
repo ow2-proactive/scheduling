@@ -79,8 +79,7 @@ public class UnicoreProActiveClient {
 
     // Unicore Site conf parameters
     private UnicoreParameters uParam;
-    static final String CLIENTUSAGE =
-        "-jobName JobName -keypassword KeyPassWord -keyfilepath KeyFilePath " +
+    static final String CLIENTUSAGE = "-jobName JobName -keypassword KeyPassWord -keyfilepath KeyFilePath " +
         "-unicoredir UnicoreDir -submitJob [true|false] -saveJob [true|false] " +
         "-usitename Name -usitetype [CLASSIC|REGISTRY] -usiteurl Url " +
         "-vsitename Name -vsitenodes Nodes -vsiteprocessors Processors " +
@@ -213,7 +212,8 @@ public class UnicoreProActiveClient {
         jc.setName(name); //Internal job name
         jc.setFilename(filename); //Filename when saved
         jc.setIgnoreFailure(false); //Set ignore failure flag
-        //jc.setDependencies(); //Set dependencies
+                                    //jc.setDependencies(); //Set dependencies
+
         return jc;
     }
 

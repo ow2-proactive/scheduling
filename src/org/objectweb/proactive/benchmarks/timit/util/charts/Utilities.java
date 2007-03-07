@@ -48,9 +48,10 @@ import org.objectweb.proactive.benchmarks.timit.config.ConfigChart;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.w3c.dom.DOMImplementation;
 
+
 /**
  * Give some utilities to manage charts
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class Utilities {
@@ -58,7 +59,7 @@ public class Utilities {
     /**
      * For each tag <chart> in configuration file, try to generate a chart
      * according to its parameters
-     * 
+     *
      * @param serieResults
      *            merged values
      * @param bstats
@@ -67,22 +68,23 @@ public class Utilities {
      *            array from <chart> tags in configuration file
      */
     public static void generatingCharts(Element eTimitResult,
-            BenchmarkStatistics bstats, ConfigChart[] charts) {
-
-        if( charts == null ) return;
+        BenchmarkStatistics bstats, ConfigChart[] charts) {
+        if (charts == null) {
+            return;
+        }
         TimIt.message(2, "Generating charts...");
         String className = null;
 
         for (ConfigChart cChart : charts) {
-            TimIt.message(4, "Generating " + cChart.get("title") + " ["
-                    + cChart.get("subtitle") + "]" + "...");
+            TimIt.message(4,
+                "Generating " + cChart.get("title") + " [" +
+                cChart.get("subtitle") + "]" + "...");
             try {
-                className = Utilities.class.getPackage().getName() + "."
-                        + cChart.get("type");
+                className = Utilities.class.getPackage().getName() + "." +
+                    cChart.get("type");
                 Class chartClass = Class.forName(className);
                 Chart chart = (Chart) chartClass.newInstance();
                 chart.generateChart(eTimitResult, bstats, cChart);
-
             } catch (ClassNotFoundException e) {
                 System.err.println("  Fail: Unknown chart type: " + className);
             } catch (InstantiationException e) {
@@ -95,7 +97,7 @@ public class Utilities {
 
     /**
      * Exports a JFreeChart to a SVG file.
-     * 
+     *
      * @param chart
      *            JFreeChart to export
      * @param bounds
@@ -106,26 +108,27 @@ public class Utilities {
      *             if writing the svgFile fails.
      */
     public static void saveChartAsSVG(JFreeChart chart, Rectangle bounds,
-            File svgFile) throws IOException {
+        File svgFile) throws IOException {
         try {
-            Class GDI = Class
-                    .forName("org.apache.batik.dom.GenericDOMImplementation");
+            Class GDI = Class.forName(
+                    "org.apache.batik.dom.GenericDOMImplementation");
 
             // Get a DOMImplementation and create an XML document
             Method getDOMImplementation = GDI.getMethod("getDOMImplementation",
                     new Class[0]);
-            DOMImplementation domImpl = (DOMImplementation) getDOMImplementation
-                    .invoke(null, new Object[0]);
+            DOMImplementation domImpl = (DOMImplementation) getDOMImplementation.invoke(null,
+                    new Object[0]);
 
             org.w3c.dom.Document document = domImpl.createDocument(null, "svg",
                     null);
 
             // Create an instance of the SVG Generator
             Class SG2D = Class.forName("org.apache.batik.svggen.SVGGraphics2D");
-            Method streamMethod = SG2D.getMethod("stream", new Class[] {
-                    Writer.class, boolean.class });
-            Constructor SG2DConstr = SG2D
-                    .getConstructor(new Class[] { org.w3c.dom.Document.class });
+            Method streamMethod = SG2D.getMethod("stream",
+                    new Class[] { Writer.class, boolean.class });
+            Constructor SG2DConstr = SG2D.getConstructor(new Class[] {
+                        org.w3c.dom.Document.class
+                    });
             Object svgGenerator = SG2DConstr.newInstance(document);
 
             // draw the chart in the SVG generator
@@ -135,11 +138,10 @@ public class Utilities {
             OutputStream outputStream = new FileOutputStream(svgFile);
             Writer out = new OutputStreamWriter(outputStream, "UTF-8");
             streamMethod.invoke(svgGenerator,
-                    new Object[] { out, true /* use css */});
+                new Object[] { out, true /* use css */});
             outputStream.flush();
             outputStream.close();
             out.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }

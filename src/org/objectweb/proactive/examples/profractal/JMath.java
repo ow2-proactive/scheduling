@@ -940,7 +940,6 @@ public final class JMath {
             /* sin(Inf or NaN) is NaN */
             return x - x;
         } else {
-
             /* argument reduction needed */
             n = __ieee754_rem_pio2(x, y);
             switch (n & 3) {
@@ -1720,15 +1719,12 @@ public final class JMath {
         /* compute y/x */
         k = (iy - ix) >> 20;
         if (k > 60) {
-
             /* |y/x| >  2**60 */
             z = pi_o_2 + (0.5 * pi_lo);
         } else if ((hx < 0) && (k < -60)) {
-
             /* |y|/x < -2**60 */
             z = 0.0;
         } else {
-
             /* safe to do y/x */
             z = atan(abs(y / x));
         }
@@ -1772,6 +1768,7 @@ public final class JMath {
      * Accuracy:
      *        TRIG(x) returns trig(x) nearly rounded
      */
+
     /*
      * Table of constants for 2/pi, 396 Hex digits (476 decimal) of 2/pi
      */
@@ -1827,7 +1824,6 @@ public final class JMath {
         hx = __HI(x); /* high word of x */
         ix = hx & 0x7fffffff;
         if (ix <= 0x3fe921fb) {
-
             /* |x| ~<= pi/4 , no need for reduction */
             y[0] = x;
             y[1] = 0;
@@ -1904,7 +1900,6 @@ public final class JMath {
          * all other (large) arguments
          */
         if (ix >= 0x7ff00000) {
-
             /* x is inf or NaN */
             y[0] = y[1] = x - x;
             return 0;
@@ -2044,6 +2039,7 @@ public final class JMath {
      *                it also indicates the *sign* of the result.
      *
      */
+
     /*
      * Constants:
      * The hexadecimal values are the intended ones for the following

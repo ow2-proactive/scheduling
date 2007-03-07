@@ -122,8 +122,9 @@ public class ProActiveComponentImpl extends BasicComponent
             }
             String cardinality = (virtualNode.endsWith("*")
                 ? VirtualNode.MULTIPLE : VirtualNode.SINGLE);
-            ExportedVirtualNodesList.instance().addLeafVirtualNode(getName(),
-                virtualNode, cardinality);
+            ExportedVirtualNodesList.instance()
+                                    .addLeafVirtualNode(getName(), virtualNode,
+                cardinality);
             List listeners = getOwner().getListeners();
             for (int i = 0; i < listeners.size(); ++i) {
                 Object l = listeners.get(i);
@@ -161,15 +162,17 @@ public class ProActiveComponentImpl extends BasicComponent
             throw new IllegalArgumentException();
         }
 
-        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance().getNode(getName(),
+        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance()
+                                                        .getNode(getName(),
                 virtualNodeName, false);
         if ((lvn == null) && (composingVirtualNodes == null)) {
             addExportedVirtualNode("", "");
         }
         if (lvn == null) {
             // create a lvn
-            lvn = ExportedVirtualNodesList.instance().getNode(getName(),
-                    virtualNodeName, true);
+            lvn = ExportedVirtualNodesList.instance()
+                                          .getNode(getName(), virtualNodeName,
+                    true);
         }
 
         // going to compare strings with no spaces and final ';' removed
@@ -188,10 +191,12 @@ public class ProActiveComponentImpl extends BasicComponent
                 l.canChangeExportedVirtualNode(this, virtualNodeName);
             }
             if (composingVirtualNodes == null) {
-                ExportedVirtualNodesList.instance().removeExportedVirtualNode(getName(),
+                ExportedVirtualNodesList.instance()
+                                        .removeExportedVirtualNode(getName(),
                     virtualNodeName);
             } else {
-                ExportedVirtualNodesList.instance().addExportedVirtualNode(getName(),
+                ExportedVirtualNodesList.instance()
+                                        .addExportedVirtualNode(getName(),
                     virtualNodeName, composingVirtualNodes);
             }
             List listeners = getOwner().getListeners();
@@ -217,37 +222,41 @@ public class ProActiveComponentImpl extends BasicComponent
 
     public String getExportedVirtualNodeNameAfterComposition(
         String exportedVNName) {
-        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance().getNode(getName(),
+        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance()
+                                                        .getNode(getName(),
                 exportedVNName, false);
         return lvn.getExportedVirtualNodeNameAfterComposition();
     }
 
     public List getComposingVirtualNodes(String exportedVirtualNodeName) {
-        return ExportedVirtualNodesList.instance().getComposingVirtualNodes(getName(),
+        return ExportedVirtualNodesList.instance()
+                                       .getComposingVirtualNodes(getName(),
             exportedVirtualNodeName);
     }
 
     public void setComposingVirtualNodes(String virtualNodeName,
         String composingVirtualNodes) {
         ExportedVirtualNodesList.checkComposingVirtualNodesSyntax(composingVirtualNodes);
-        ExportedVirtualNodesList.instance().setComposingVirtualNodes(getName(),
+        ExportedVirtualNodesList.instance()
+                                .setComposingVirtualNodes(getName(),
             virtualNodeName, composingVirtualNodes);
     }
 
     public void removeExportedVirtualNode(String exportedVirtualNodeName) {
-        ExportedVirtualNodesList.instance().removeExportedVirtualNode(getName(),
+        ExportedVirtualNodesList.instance()
+                                .removeExportedVirtualNode(getName(),
             exportedVirtualNodeName);
     }
 
     public String getComposingVirtualNodesAsString(String virtualNodeName) {
-        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance().getNode(getName(),
+        LinkedVirtualNode lvn = ExportedVirtualNodesList.instance()
+                                                        .getNode(getName(),
                 virtualNodeName, false);
         if (lvn == null) {
             return null;
         }
         return lvn.getComposingVirtualNodesAsString();
     }
-
 
     /**
      *

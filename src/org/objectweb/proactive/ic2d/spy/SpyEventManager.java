@@ -131,11 +131,13 @@ public class SpyEventManager {
     }
 
     void addFutureEventListener() {
-        FutureProxy.getFutureEventProducer().addFutureEventListener(futureEventListener);
+        FutureProxy.getFutureEventProducer()
+                   .addFutureEventListener(futureEventListener);
     }
 
     void removeFutureEventListener() {
-        FutureProxy.getFutureEventProducer().addFutureEventListener(futureEventListener);
+        FutureProxy.getFutureEventProducer()
+                   .addFutureEventListener(futureEventListener);
     }
 
     SpyEvent[] createSpyEventForExistingBodies(Body spyBody) {
@@ -172,7 +174,8 @@ public class SpyEventManager {
     //
     private void addListenersToNewBody(Body body) {
         if (body.getRequestQueue() != null) {
-            body.getRequestQueue().addRequestQueueEventListener(requestQueueEventListener);
+            body.getRequestQueue()
+                .addRequestQueueEventListener(requestQueueEventListener);
         }
 
         // we don't add it by default but wait until the order is sent   
@@ -181,7 +184,8 @@ public class SpyEventManager {
 
     private void removeListenersFromDeadBody(Body body) {
         if (body.getRequestQueue() != null) {
-            body.getRequestQueue().removeRequestQueueEventListener(requestQueueEventListener);
+            body.getRequestQueue()
+                .removeRequestQueueEventListener(requestQueueEventListener);
         }
         removeMessageEventListener(body);
     }

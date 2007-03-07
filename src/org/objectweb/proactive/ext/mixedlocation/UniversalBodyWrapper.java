@@ -270,7 +270,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     public long startNewSession(Communication policy)
-        throws java.io.IOException, RenegotiateSessionException, 
+        throws java.io.IOException, RenegotiateSessionException,
             SecurityNotAvailableException {
         return wrappedBody.startNewSession(policy);
     }
@@ -281,14 +281,14 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws IOException, SecurityNotAvailableException, 
+        throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException {
         return wrappedBody.randomValue(sessionID, cl_rand);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] my_pub,
         byte[] my_cert, byte[] sig_code)
-        throws IOException, SecurityNotAvailableException, 
+        throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException, KeyExchangeException {
         return wrappedBody.publicKeyExchange(sessionID, my_pub, my_cert,
             sig_code);
@@ -296,7 +296,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws IOException, SecurityNotAvailableException, 
+        throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException {
         return wrappedBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
             tmp4);
@@ -331,13 +331,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
-    	return this.wrappedBody.receiveGCMessage(msg);
+        return this.wrappedBody.receiveGCMessage(msg);
     }
-    
+
     public void setRegistered(boolean registered) throws IOException {
-    	this.wrappedBody.setRegistered(registered);
+        this.wrappedBody.setRegistered(registered);
     }
-    
+
     public void createShortcut(Shortcut shortcut) throws IOException {
         // TODO implement
         throw new ProActiveRuntimeException(

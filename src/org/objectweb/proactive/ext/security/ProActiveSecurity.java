@@ -111,8 +111,7 @@ public class ProActiveSecurity {
     public static Object[] genCert(String dn, long validity, String policyId,
         PrivateKey privKey, PublicKey pubKey, boolean isCA, String caDn,
         PrivateKey caPrivateKey, PublicKey acPubKey)
-        throws NoSuchAlgorithmException, SignatureException, 
-            InvalidKeyException {
+        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();
@@ -439,6 +438,7 @@ public class ProActiveSecurity {
         try {
             CertificateFactory cf = null;
             cf = CertificateFactory.getInstance("X.509");
+
             // X509Certificate[] serverCerts = {certLevel2, certLevel1};
             // X509Certificate[] serverCerts = { acCert };
             List<X509Certificate> mylist = new ArrayList<X509Certificate>();
@@ -528,12 +528,12 @@ public class ProActiveSecurity {
     }
 
     public static X509Certificate getMyCertificate() {
-    	ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
-    	if (psm != null) {
-    		return psm.getCertificate();
+        ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+        if (psm != null) {
+            return psm.getCertificate();
         }
-    	
-    	return null;
+
+        return null;
     }
 
     public static X509Certificate[] getMyCertificateChain() {

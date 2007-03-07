@@ -83,8 +83,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * @author cdelbe
  * @since ProActive 2.2
  */
-public class FTManagerCIC
-    extends org.objectweb.proactive.core.body.ft.protocols.FTManager {
+public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols.FTManager {
 
     /** Value returned by an object if the recieved message must be send again */
     public static final int RESEND_MESSAGE = -3;
@@ -503,7 +502,8 @@ public class FTManagerCIC
         this.lastCommitedIndex = cic.lastCommitedIndex;
         // historized requests are supposed to be "already received"
         this.deliveredRequestsCounter = cic.lastCommitedIndex; //cic.lastRcvdRequestIndex;
-        // new history then begin at the end of the history of the checkpoint
+                                                               // new history then begin at the end of the history of the checkpoint
+
         this.historyBaseIndex = cic.lastCommitedIndex + 1; //;cic.lastRcvdRequestIndex+1;
 
         // HERE, we need a proof that running in "histo mode" is equivalent that 
@@ -559,16 +559,18 @@ public class FTManagerCIC
         return 0;
     }
 
-    public void updateLocationAtServer(UniqueID ownerID, UniversalBody remoteBodyAdapter) {
+    public void updateLocationAtServer(UniqueID ownerID,
+        UniversalBody remoteBodyAdapter) {
         try {
             // update servers
             this.location.updateLocation(ownerID, remoteBodyAdapter);
-//            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
+            //            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
         } catch (RemoteException e) {
             logger.error("Unable to connect with location server");
             e.printStackTrace();
         }
     }
+
     /*
      * search for an awaited request from r.source.
      * if any, unfreeze ar and remove it from awaitedRequests list.

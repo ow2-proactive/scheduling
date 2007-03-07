@@ -208,7 +208,6 @@ public class LauncherWindow extends JFrame {
         launchedTable.setCellEditor(null);
         launchedTable.setRowSelectionAllowed(true);
         jScrollPane1.setViewportView(launchedTable);
-        
     }
 
     public static void main(String[] args) {
@@ -250,9 +249,9 @@ public class LauncherWindow extends JFrame {
     /**
      * popup actions when clicking on the descriptor list
      * @param e
-     * @throws IOException 
+     * @throws IOException
      */
-    public void doPopupCall(ActionEvent e)  {
+    public void doPopupCall(ActionEvent e) {
         String command = e.getActionCommand();
         Launcher launcher = (Launcher) (descriptorMap.get(descriptorList.getSelectedValue()));
         if (command.equals("Launch the application")) {
@@ -295,36 +294,39 @@ public class LauncherWindow extends JFrame {
             descriptorMap.remove(cell);
             descriptorsToLaunch.remove(cell);
             descriptorList.setListData(descriptorsToLaunch);
-            
-        }else if (command.equals("View")) {
-        	try {
-        		//gets the path and the name of the xml descripor
-        		String descripContent = new String(), buf;
-        		String path = ((ListCell) descriptorList.getSelectedValue()).getContent();
-        		if(path.endsWith("- activated")) {
-        			path = path.substring(0, path.indexOf(" - activated"));
-        		}
-        		String [] tab = path.split(System.getProperty("file.separator"));
-        		String name = tab[tab.length-1];
-        		
-        		//reads the xml descriptor
-				BufferedReader br = new BufferedReader(new FileReader(new File(path)));		
-				while ((buf = br.readLine()) != null){ 
-					descripContent += (buf + "\n");
-				}
-				
-				jTextDescriptor.setText(descripContent);
-				jTextDescriptor.setEditable(false);
-				JScrollPane scrollPane = new JScrollPane(jTextDescriptor);
-				JFrame frame = new JFrame (name);
-				frame.getContentPane().add(scrollPane);
-				frame.setBounds(200, 100, 900, 800);
-				frame.setVisible(true);
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			}catch (IOException e2) {
-				e2.printStackTrace();
-			}
+        } else if (command.equals("View")) {
+            try {
+                //gets the path and the name of the xml descripor
+                String descripContent = new String();
+
+                //gets the path and the name of the xml descripor
+                String buf;
+                String path = ((ListCell) descriptorList.getSelectedValue()).getContent();
+                if (path.endsWith("- activated")) {
+                    path = path.substring(0, path.indexOf(" - activated"));
+                }
+                String[] tab = path.split(System.getProperty("file.separator"));
+                String name = tab[tab.length - 1];
+
+                //reads the xml descriptor
+                BufferedReader br = new BufferedReader(new FileReader(
+                            new File(path)));
+                while ((buf = br.readLine()) != null) {
+                    descripContent += (buf + "\n");
+                }
+
+                jTextDescriptor.setText(descripContent);
+                jTextDescriptor.setEditable(false);
+                JScrollPane scrollPane = new JScrollPane(jTextDescriptor);
+                JFrame frame = new JFrame(name);
+                frame.getContentPane().add(scrollPane);
+                frame.setBounds(200, 100, 900, 800);
+                frame.setVisible(true);
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
         } else if (command.equals("Kill")) {
             try {
                 if (launcher.isActivated()) {
@@ -351,7 +353,8 @@ public class LauncherWindow extends JFrame {
             int index = descriptorList.locationToIndex(e.getPoint());
             Rectangle rectangle = descriptorList.getCellBounds(index, index);
             if ((rectangle != null) &&
-                    descriptorList.getCellBounds(index, index).contains(e.getPoint())) {
+                    descriptorList.getCellBounds(index, index)
+                                      .contains(e.getPoint())) {
                 descriptorList.setSelectedIndex(index);
             } else {
                 descriptorList.clearSelection();
@@ -374,7 +377,7 @@ public class LauncherWindow extends JFrame {
                 menuItem.addActionListener(new GUI_PopupMenuItem_ActionListener(
                         this));
                 popup.add(menuItem);
-                
+
                 menuItem = new JMenuItem("View");
                 menuItem.addActionListener(new GUI_PopupMenuItem_ActionListener(
                         this));

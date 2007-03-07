@@ -218,6 +218,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(
                 service));
     }
+
     private Random randomizer = new Random();
 
     /**

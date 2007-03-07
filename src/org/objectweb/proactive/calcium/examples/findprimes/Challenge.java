@@ -33,23 +33,26 @@ package org.objectweb.proactive.calcium.examples.findprimes;
 import java.io.Serializable;
 import java.util.Vector;
 
-class Challenge implements Serializable{
 
-	public int max, min, solvableSize;
+class Challenge implements Serializable {
+    public int max;
+    public int min;
+    public int solvableSize;
 
-	/**
-	 * Creates a new finding primes challenge.
-	 * @param min  Number from which to start.
-	 * @param max  Maximum number to stop
-	 * @param solvableSize Size of problems to solve 
-	 */
-	public Challenge(int min, int max, int solvableSize){
-		this.min=min;
-		this.max=max;
-		this.solvableSize=solvableSize;;
-	}
-	
-	public String toString(){
-		return "Params: "+min+"<?<"+max;
-	}
+    /**
+     * Creates a new finding primes challenge.
+     * @param min  Number from which to start.
+     * @param max  Maximum number to stop
+     * @param solvableSize Size of problems to solve
+     */
+    public Challenge(int min, int max, int solvableSize) {
+        this.min = min;
+        this.max = max;
+        this.solvableSize = solvableSize;
+        ;
+    }
+
+    public String toString() {
+        return "Params: " + min + "<?<" + max;
+    }
 }

@@ -30,71 +30,67 @@
  */
 package org.objectweb.proactive.calcium;
 
-import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.Skernel;
+import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
+
 /**
  * This class corresponds to the entry point of the skeleton framework.
- * 
+ *
  * In order to instantiate this class, a resource Manager must be provided.
  * This Manager must extend the AbstractManager class. The skeleton
  * kernel can be used with different Managers, for example: Monothreaded, Multihreaded
  * or Distributed (ProActive).
- * 
- * 
+ *
+ *
  * @author The ProActive Team (mleyton)
  *
  */
 public class Calcium {
+    private Facade facade;
+    private Skernel skernel;
+    private ResourceManager manager;
 
-	private Facade facade;
-	private Skernel skernel;
-	private ResourceManager manager;
+    public Calcium(ResourceManager manager) {
+        this.skernel = new Skernel();
+        this.facade = new Facade();
+        this.manager = manager;
+    }
 
-	
-	public Calcium(ResourceManager manager){
-		this.skernel=new Skernel();
-		this.facade = new Facade();
-		this.manager=manager;
-	}
-	
-	/**
-	 * This method is used to instantiate a new stream from the framework.
-	 * The stream is then used to input T into the framework, and
-	 * then retrieve the results (T) from the framework.
-	 * 
-	 * All the T inputed into this stream will be computed using the 
-	 * skeleton strucutre specified as parameter.
-	 * 
-	 * @param <T> The type of the T this stream will work with.
-	 * @param root This skeleton represents the structured code that will 
-	 * be executed for each T inputted into the stream.
-	 * @param <T> Th
-	 * @return A Stream that can input and output T from the framework.
-	 */
-	public <T,R> Stream<T,R> newStream(Skeleton<T,R> root){
-		
-		return new Stream<T,R>(facade, root);
-	}
+    /**
+     * This method is used to instantiate a new stream from the framework.
+     * The stream is then used to input T into the framework, and
+     * then retrieve the results (T) from the framework.
+     *
+     * All the T inputed into this stream will be computed using the
+     * skeleton strucutre specified as parameter.
+     *
+     * @param <T> The type of the T this stream will work with.
+     * @param root This skeleton represents the structured code that will
+     * be executed for each T inputted into the stream.
+     * @param <T> Th
+     * @return A Stream that can input and output T from the framework.
+     */
+    public <T, R> Stream<T, R> newStream(Skeleton<T, R> root) {
+        return new Stream<T, R>(facade, root);
+    }
 
+    public void boot() {
+        skernel = manager.boot(skernel);
+        facade.setSkernel(skernel);
+    }
 
-	public void boot() {
+    public void shutdown() {
+        manager.shutdown();
+    }
 
-		skernel=manager.boot(skernel);
-		facade.setSkernel(skernel);
-	}
-
-	public void shutdown() {
-		manager.shutdown();
-	}
-	
-	/**
-	 * @return The current status of the global statistics.
-	 */
-	public StatsGlobal getStatsGlobal() {
-		return skernel.getStatsGlobal();
-	}
+    /**
+     * @return The current status of the global statistics.
+     */
+    public StatsGlobal getStatsGlobal() {
+        return skernel.getStatsGlobal();
+    }
 }

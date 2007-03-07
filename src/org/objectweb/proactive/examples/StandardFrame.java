@@ -134,7 +134,8 @@ public abstract class StandardFrame extends javax.swing.JFrame {
 
     protected javax.swing.JPanel createMessageZonePanel(
         final javax.swing.JTextPane area) {
-        Style styleDef = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        Style styleDef = StyleContext.getDefaultStyleContext()
+                                     .getStyle(StyleContext.DEFAULT_STYLE);
         regularStyle = area.addStyle("regular", styleDef);
         area.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 10));
 

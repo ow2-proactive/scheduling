@@ -32,8 +32,8 @@ package org.objectweb.proactive.examples.webservices.c3dWS.ws;
 
 import javax.xml.namespace.QName;
 
-public class Service1Locator extends org.apache.axis.client.Service
-    implements org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1 {
+
+public class Service1Locator extends org.apache.axis.client.Service implements org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1 {
     // Use to get a proxy class for Service1Soap
     private java.lang.String Service1Soap_address = "http://atacama/TestWS/Service1.asmx";
 

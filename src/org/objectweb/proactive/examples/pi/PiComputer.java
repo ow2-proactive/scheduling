@@ -30,20 +30,19 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+
 /**
  * This class handles a partial computation of PI. It is also used for workers in the component version of the application.
- * 
+ *
  * @author Matthieu Morel
  *
  */
-public class PiComputer implements PiComp{
-
+public class PiComputer implements PiComp {
     private static final int ROUND_MODE = BigDecimal.ROUND_HALF_EVEN;
     private BigDecimal ZERO = new BigDecimal("0");
     private BigDecimal ONE = new BigDecimal("1");
@@ -69,16 +68,14 @@ public class PiComputer implements PiComp{
      */
     public PiComputer(Integer scaleObject) {
         try {
-            System.out
-                    .println("created PiComputer on host "
-                            + InetAddress.getLocalHost().getHostName());
+            System.out.println("created PiComputer on host " +
+                InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException ignored) {
         }
         setScale(scaleObject);
     }
-    
+
     public void setScale(Integer scale) {
-        
         ZERO = ZERO.setScale(scale);
         ONE = ONE.setScale(scale);
         OPPOSITE_ONE = OPPOSITE_ONE.setScale(scale);
@@ -91,14 +88,11 @@ public class PiComputer implements PiComp{
         OPPOSITE_EIGHT = OPPOSITE_EIGHT.setScale(scale);
     }
 
-
     public Result compute(Interval interval) {
         try {
-            System.out
-                    .println("Starting computation for interval ["
-                            + interval.getBeginning() + " , "
-                            + interval.getEnd() + "] on host : "
-                            + InetAddress.getLocalHost().getHostName());
+            System.out.println("Starting computation for interval [" +
+                interval.getBeginning() + " , " + interval.getEnd() +
+                "] on host : " + InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException ignored) {
             ignored.printStackTrace();
         }
@@ -107,9 +101,8 @@ public class PiComputer implements PiComp{
         BigDecimal bd = ZERO;
 
         // BBP formula for the given interval
-    
-        for (int k = interval.getBeginning().intValue(); k <= interval.getEnd()
-                .intValue(); k++) {        	
+        for (int k = interval.getBeginning().intValue();
+                k <= interval.getEnd().intValue(); k++) {
             bd = bd.add(f(k));
         }
 
@@ -119,8 +112,7 @@ public class PiComputer implements PiComp{
     private BigDecimal f(int k) {
         BigDecimal K = new BigDecimal(k);
         BigDecimal EIGHT_K = EIGHT.multiply(K);
-        BigDecimal FIRST = ONE.divide(new BigDecimal(SIXTEEN.pow(k)),
-                ROUND_MODE);
+        BigDecimal FIRST = ONE.divide(new BigDecimal(SIXTEEN.pow(k)), ROUND_MODE);
         BigDecimal SECOND = FOUR.divide(EIGHT_K.add(ONE), ROUND_MODE);
         BigDecimal THIRD = OPPOSITE_TWO.divide(EIGHT_K.add(FOUR), ROUND_MODE);
         BigDecimal FOURTH = OPPOSITE_ONE.divide(EIGHT_K.add(FIVE), ROUND_MODE);

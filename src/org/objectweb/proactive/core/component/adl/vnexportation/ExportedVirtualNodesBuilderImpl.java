@@ -65,7 +65,8 @@ public class ExportedVirtualNodesBuilderImpl
                             " , but there is no virtual node defined in this component",
                             null);
                     }
-                    if (!currentComponentVN.getName().equals(composing_vns[j].getName())) {
+                    if (!currentComponentVN.getName()
+                                               .equals(composing_vns[j].getName())) {
                         throw new ADLException(
                             "Trying to compose a virtual node from " +
                             composing_vns[i].getName() +
@@ -79,12 +80,14 @@ public class ExportedVirtualNodesBuilderImpl
                     composing_vns[j].setComponent(componentName);
                 }
                 if ((currentComponentVN != null) &&
-                        currentComponentVN.getCardinality().equals(VirtualNode.MULTIPLE)) {
+                        currentComponentVN.getCardinality()
+                                              .equals(VirtualNode.MULTIPLE)) {
                     composing_vn_is_multiple = true;
                 }
 
                 //                /System.out.println("COMPOSING : " + componentName + "." + exportedVirtualNodes[i].getName() + "--> " + composing_vns[j].getComponent() + "." + composing_vns[j].getName());
-                ExportedVirtualNodesList.instance().compose(componentName,
+                ExportedVirtualNodesList.instance()
+                                        .compose(componentName,
                     exportedVirtualNodes[i], composing_vns[j],
                     composing_vn_is_multiple);
                 //System.out.println("COMPOSED VN LIST : " +ExportedVirtualNodesList.instance().toString());

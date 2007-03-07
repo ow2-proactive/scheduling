@@ -34,41 +34,32 @@ import java.util.Vector;
 
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 
+
 /**
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class DefaultEventData implements EventData {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8362004552051089021L;
-
     public static final int MIN = 0;
-
     public static final int MAX = 1;
-
     public static final int AVERAGE = 2;
-
     public static final int SUM = 3;
-
     private String name;
-
     private int collapseOperation;
-
     private int notifyOperation;
-
-    private double value, result;
-
+    private double value;
+    private double result;
     private int nbNotify;
-
     private Vector<Object> collapsedValues;
 
     /** Creates a new instance of DefaultStatData */
     public DefaultEventData(String name, int collapseOperation,
-            int notifyOperation) {
-
+        int notifyOperation) {
         this.name = name;
         this.collapseOperation = collapseOperation;
         this.notifyOperation = notifyOperation;
@@ -144,17 +135,15 @@ public class DefaultEventData implements EventData {
         case DefaultEventData.MIN:
             this.result = Double.MAX_VALUE;
             for (int i = 0; i < this.collapsedValues.size(); i++) {
-                this.result = ((Double) this.collapsedValues.get(i) < this.result ? (Double) this.collapsedValues
-                        .get(i)
-                        : this.result);
+                this.result = (((Double) this.collapsedValues.get(i) < this.result)
+                    ? (Double) this.collapsedValues.get(i) : this.result);
             }
             break;
         case DefaultEventData.MAX:
             this.result = Double.MIN_VALUE;
             for (int i = 0; i < this.collapsedValues.size(); i++) {
-                this.result = ((Double) this.collapsedValues.get(i) > this.result ? (Double) this.collapsedValues
-                        .get(i)
-                        : this.result);
+                this.result = (((Double) this.collapsedValues.get(i) > this.result)
+                    ? (Double) this.collapsedValues.get(i) : this.result);
             }
             break;
         case DefaultEventData.AVERAGE:

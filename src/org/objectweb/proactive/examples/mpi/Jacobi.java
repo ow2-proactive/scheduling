@@ -31,7 +31,6 @@
 package org.objectweb.proactive.examples.mpi;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;

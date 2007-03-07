@@ -37,8 +37,7 @@ import org.objectweb.proactive.core.component.adl.Launcher;
 public class StartFromADL {
     public static void main(final String[] args) throws Exception {
         if (args.length != 2) {
-            System.out.println(
-                "Parameters : descriptor_file fractal_ADL_file " +
+            System.out.println("Parameters : descriptor_file fractal_ADL_file " +
                 "\n        The first file describes your deployment of computing nodes." +
                 "\n                You may want to try ../../../descriptors/components/C3D_all.xml" +
                 "\n        The second file describes your components layout. " +

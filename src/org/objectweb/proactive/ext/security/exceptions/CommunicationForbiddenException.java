@@ -36,8 +36,9 @@ package org.objectweb.proactive.ext.security.exceptions;
  * with another one without accreditation.
  */
 public class CommunicationForbiddenException extends Exception {
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6854171458569221401L;
 

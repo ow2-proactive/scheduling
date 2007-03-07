@@ -120,8 +120,7 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @param functionalItfID the id of the interface on which the shortcut is available
      * @return the body that is the target of this shortcut for this interface
      */
-    public UniversalBody getShortcutTargetBody(
-        ItfID functionalItfID);
+    public UniversalBody getShortcutTargetBody(ItfID functionalItfID);
 
     /**
      * set the policy server of the active object

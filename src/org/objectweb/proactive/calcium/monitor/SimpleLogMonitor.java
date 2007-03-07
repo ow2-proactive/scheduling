@@ -35,7 +35,7 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 
 public class SimpleLogMonitor implements Monitor {
-	Calcium calcium;
+    Calcium calcium;
     int frequency;
     boolean stoped;
     MonitoringThread thread;
@@ -44,7 +44,7 @@ public class SimpleLogMonitor implements Monitor {
         this.calcium = calcium;
         this.frequency = frequency;
         this.stoped = true;
-        thread=null;
+        thread = null;
     }
 
     public synchronized void stop() {
@@ -54,19 +54,19 @@ public class SimpleLogMonitor implements Monitor {
     }
 
     public synchronized void start() {
-    	if(thread!=null) return;
+        if (thread != null) {
+            return;
+        }
         stoped = false;
-    	thread= new MonitoringThread();
-    	thread.start();
-
+        thread = new MonitoringThread();
+        thread.start();
     }
 
     public synchronized boolean isStoped() {
         return stoped;
     }
-    
-    class MonitoringThread extends Thread{
-    	
+
+    class MonitoringThread extends Thread {
         public void run() {
             while (!isStoped()) {
                 try {

@@ -98,11 +98,11 @@ public class ProActiveGUIBackend implements ProActiveImplementationBuilder,
         }
 
         // convert to Julia's format
-        Component c = (Component) createComponent(type, name, definition,controllerDesc.getHierarchicalType(),
+        Component c = (Component) createComponent(type, name, definition,
+                controllerDesc.getHierarchicalType(),
                 contentDesc.getClassName(), context);
 
         if (c instanceof ProActiveComponent) {
-
             // add the virtual node
             if (string_vn != null) {
                 ((ProActiveComponent) c).setVirtualNode(string_vn);

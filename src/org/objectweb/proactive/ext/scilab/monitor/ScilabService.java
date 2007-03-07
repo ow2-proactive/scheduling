@@ -48,6 +48,7 @@ import org.objectweb.proactive.ext.scilab.SciEngine;
 import org.objectweb.proactive.ext.scilab.SciResult;
 import org.objectweb.proactive.ext.scilab.SciTask;
 
+
 /**
  * This class is used to offer a set of services:
  * 1. to deploy, activate, and manage Scilab Engines over the Grid,
@@ -56,499 +57,497 @@ import org.objectweb.proactive.ext.scilab.SciTask;
  * 4. to notify the user application of each event.
  * @author ProActive Team (amangin)
  */
+public class ScilabService implements Serializable {
+    private HashMap<String, SciEngineInfo> mapEngine;
+    private ArrayList<String> listIdEngineFree;
+    private ArrayList<SciTaskInfo> listTaskWait;
+    private HashMap<String, SciTaskInfo> mapTaskRun;
+    private HashMap<String, SciTaskInfo> mapTaskEnd;
+    private long countIdTask;
+    private long countIdEngine;
+    private SciEventSource taskObservable;
+    private SciEventSource engineObservable;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_SERVICE);
 
-public class ScilabService implements Serializable{
+    /**
+     * constructor
+     */
+    public ScilabService() {
+        this.mapEngine = new HashMap<String, SciEngineInfo>();
+        this.listIdEngineFree = new ArrayList<String>();
 
-	private HashMap<String, SciEngineInfo> mapEngine;
-	private ArrayList<String> listIdEngineFree;
-	
-	private ArrayList<SciTaskInfo> listTaskWait;
-	private HashMap<String, SciTaskInfo> mapTaskRun;
-	private HashMap<String, SciTaskInfo> mapTaskEnd;
-	
-	private long countIdTask;
-	private long countIdEngine;
+        this.listTaskWait = new ArrayList<SciTaskInfo>();
+        this.mapTaskRun = new HashMap<String, SciTaskInfo>();
+        this.mapTaskEnd = new HashMap<String, SciTaskInfo>();
 
-	private SciEventSource taskObservable;
-	private SciEventSource engineObservable;
-	
-	private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_SERVICE);
-	
-	/**
-	 * constructor
-	 */
-	public ScilabService() {	
-		this.mapEngine = new HashMap<String, SciEngineInfo>();
-		this.listIdEngineFree = new ArrayList<String>();
-		
-		this.listTaskWait = new ArrayList<SciTaskInfo>();
-		this.mapTaskRun = new HashMap<String, SciTaskInfo>();
-		this.mapTaskEnd = new HashMap<String, SciTaskInfo>();
-		
-		this.taskObservable = new SciEventSource();
-		this.engineObservable = new SciEventSource();
-		
-		(new Thread(){
-			public void run(){
-				executeTasks();
-			}
-		}).start();
-		
-		
-		(new Thread(){
-			public void run(){
-				retrieveResults();
-			}
-		}).start();
-	}
-	
-	/**
-	 * Deploy engines over each node defined in the the file descriptor
-	 * @param nameVirtualNode
-	 * @param pathDescriptor
-	 * @param arrayIdEngine
-	 * @return the number of deployed engine 
-	 */
-	
-	public synchronized int deployEngine(String nameVirtualNode, String pathDescriptor, String arrayIdEngine[]){
-		logger.debug("->ScilabService In:deployEngine:" + nameVirtualNode);
-		HashMap<String, SciEngine> mapNewEngine = SciDeployEngine.deploy(nameVirtualNode, pathDescriptor, arrayIdEngine); 
-		SciEngine sciEngine;
-		String idEngine;
-		BooleanWrapper isActivate;
-		
-		for(int i=0; i<arrayIdEngine.length; i++){
-			idEngine = arrayIdEngine[i];
-			sciEngine = mapNewEngine.get(idEngine);
-			
-			if(sciEngine == null)
-				continue;
-			
-			isActivate = sciEngine.activate();
-			mapEngine.put(idEngine, new SciEngineInfo(idEngine, sciEngine, isActivate));
-		}
-		
-		this.listIdEngineFree.addAll(mapNewEngine.keySet());
-		this.engineObservable.fireSciEvent(null);
-		notifyAll();
-		return mapNewEngine.size();
-	}
-	
-	public synchronized int deployEngine(String nameVirtualNode, String pathDescriptor){
-		long countTmp = this.countIdEngine;
-		int nbEngine = SciDeployEngine.getNbMappedNodes(nameVirtualNode, pathDescriptor);
-		String arrayIdEngine[] = new String[nbEngine];
-		for(int i=0; i<arrayIdEngine.length; i++){
-			arrayIdEngine[i] = "Engine" + countTmp++;
-		}
-		
-		nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor, arrayIdEngine);
-		this.countIdEngine += nbEngine;
-		return nbEngine;
-	}
-	
-	public synchronized int deployEngine(String nameVirtualNode, String pathDescriptor, int nbEngine){
-		long countTmp = this.countIdEngine;
-		String arrayIdEngine[] = new String[nbEngine];
-		for(int i=0; i<arrayIdEngine.length; i++){
-			arrayIdEngine[i] = "Engine" + countTmp++;
-		}
-		
-		nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor, arrayIdEngine);
-		this.countIdEngine += nbEngine;
-		return nbEngine;
-	}
-	
-	/**
-	 * Put the task in a queue of pending tasks. The task will be sent when a Scilab Engine will be free.
-	 * An event notify the user application of the effective sending . 
-	 * @param sciTask
-	 */
-	public synchronized void sendTask(SciTask sciTask){
-		logger.debug("->ScilabService In:sendTask:" + sciTask.getId());
-		SciTaskInfo sciTaskInfo = new SciTaskInfo(sciTask);
-		sciTaskInfo.setState(SciTaskInfo.PENDING);
-		this.listTaskWait.add(sciTaskInfo);
-		this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-		notifyAll();
-	}
-	
-	public synchronized void sendTask(String pathScript, String jobInit, String dataOut[]) throws IOException{
-		this.sendTask(pathScript, jobInit, dataOut, SciTaskInfo.NORMAL);
-	}
-	
-	public synchronized void sendTask(String pathScript, String jobInit, String dataOut[], int Priority) throws IOException{
-		logger.debug("->ScilabService In:sendTask");
-		
-		
-		SciTask sciTask = new SciTask("Task" + this.countIdTask++);
-		
-		File f = new File(pathScript);
-		
-		sciTask.setJob(f);
-		sciTask.setJobInit(jobInit);
-		
-		for(int i=0; i< dataOut.length; i++){
-			logger.debug("->ScilabService DataOut:sendTask:" + dataOut[i]);
-			if(dataOut[i].trim().equals("")){
-				continue;
-			}
-			sciTask.addDataOut(new SciData(dataOut[i]));
-		}
-	
-		SciTaskInfo sciTaskInfo = new SciTaskInfo(sciTask);
-		sciTaskInfo.setFileScript(f);
-		
-		sciTaskInfo.setState(SciTaskInfo.PENDING);
-		sciTaskInfo.setPriority(Priority);
-		
-		this.listTaskWait.add(sciTaskInfo);
-		this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-		notifyAll();
-		
-	}
-	
-	/**
-	 * Kill a running task
-	 * @param idTask
-	 */
-	public synchronized void killTask(String idTask){
-		logger.debug("->ScilabService In:killTask:" + idTask);
-		
-		SciTaskInfo sciTaskInfo = this.mapTaskRun.remove(idTask);
-		
-		if(sciTaskInfo == null){
-			return;
-		}
-		
-		String idEngine = sciTaskInfo.getIdEngine();
-		SciEngineInfo sciEngineInfo = mapEngine.get(idEngine);
-		
-		
-		SciEngine sciEngine = sciEngineInfo.getSciEngine();
-		sciEngine.killWorker();
-		
-		BooleanWrapper isActivate = sciEngine.activate();
-		sciEngineInfo.setIsActivate(isActivate);
-		sciEngineInfo.setIdCurrentTask(null);
-		
-		sciTaskInfo.setState(SciTaskInfo.KILLED);
-		
-		this.listIdEngineFree.add(idEngine);
-		this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-	}
-	
-	/**
-	 * Restart a Scilab Engine
-	 * @param idEngine
-	 */
-	public synchronized void restartEngine(String idEngine){
-		logger.debug("->ScilabService In:restartEngine:" + idEngine);
+        this.taskObservable = new SciEventSource();
+        this.engineObservable = new SciEventSource();
 
-		SciEngineInfo sciEngineInfo = this.mapEngine.get(idEngine);
-		
-		if(sciEngineInfo == null){
-			return;
-		}
-		
-		String idTask = sciEngineInfo.getIdCurrentTask();
-		SciTaskInfo sciTaskInfo;
-		
-		if(idTask != null){
-			sciTaskInfo = this.mapTaskRun.remove(idTask);
-			sciTaskInfo.setState(SciTaskInfo.KILLED);
-			sciEngineInfo.setIdCurrentTask(null);
-			this.listIdEngineFree.add(idEngine);
-			this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-		}
-		
-		SciEngine sciEngine = sciEngineInfo.getSciEngine();
-		sciEngine.killWorker();
-		BooleanWrapper isActivate = sciEngine.activate();
-		sciEngineInfo.setIsActivate(isActivate);
-	}
-	
-	
-	/**
-	 * Cancel a pending task
-	 * @param idTask
-	 */
-	public synchronized void cancelTask(String idTask){
-		logger.debug("->ScilabService In:cancelTask:" + idTask);
-		SciTaskInfo sciTaskInfo;
-		for(int i=0; i<this.listTaskWait.size(); i++){
-			sciTaskInfo = this.listTaskWait.get(i);
-			
-			if(idTask.equals(sciTaskInfo.getIdTask())){
-				this.listTaskWait.remove(i);
-				sciTaskInfo.setState(SciTaskInfo.CANCELLED);
-				this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-				break;
-			}
-		}
-	}
-	
-	/**
-	 * Remove a terminated task
-	 * @param idTask
-	 */
-	public synchronized void removeTask(String idTask){
-		logger.debug("->ScilabService In:removeTask:" + idTask);
-		SciTaskInfo sciTaskInfo = this.mapTaskEnd.remove(idTask);
-		sciTaskInfo.setState(SciTaskInfo.REMOVED);
-		this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-	}
-		
-	
-	private synchronized void retrieveResults(){
-		logger.debug("->ScilabService In:retrieveResult");
-		SciResult sciResult;
-		SciTaskInfo sciTaskInfo;
-		String idEngine;
-		SciEngineInfo sciEngineInfo;
-		Object keys[]; 
+        (new Thread() {
+                public void run() {
+                    executeTasks();
+                }
+            }).start();
 
-		while (true) {
-			keys= this.mapTaskRun.keySet().toArray();
-			for (int i = 0; i < keys.length; i++) {
-				sciTaskInfo = this.mapTaskRun.get(keys[i]);
-				sciResult = sciTaskInfo.getSciResult();
-				if (!ProActive.isAwaited(sciResult)) {
-					logger.debug("->ScilabService loop:retrieveResult:" + keys[i]);
-					
-					this.mapTaskRun.remove(keys[i]);
-					sciTaskInfo.setState(sciResult.getState());
-					
-					idEngine = sciTaskInfo.getIdEngine();
-					sciEngineInfo = mapEngine.get(idEngine);
-					
-					sciEngineInfo.setIdCurrentTask(null);
-					this.listIdEngineFree.add(idEngine);
-					sciTaskInfo.setDateEnd();
-					this.mapTaskEnd.put(sciTaskInfo.getIdTask(), sciTaskInfo);
-					this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-					notifyAll();
-				}
-			}
-			try {
-				wait(1000);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
-	
-	private SciTaskInfo getNextTask(){
-		logger.debug("->ScilabService loop:getNextTask");
-		SciTaskInfo sciTaskInfo;
-			
-		if (this.listTaskWait.size() == 0) return null;
-		
-		for(int i=0; i<this.listTaskWait.size(); i++){
-			sciTaskInfo = this.listTaskWait.get(i);
-			
-			if(sciTaskInfo.getPriority() == SciTaskInfo.HIGH){
-				return this.listTaskWait.remove(i);
-			}	
-		}
-		
-		for(int i=0; i<this.listTaskWait.size(); i++){
-			sciTaskInfo = this.listTaskWait.get(i);
-			
-			if(sciTaskInfo.getPriority() == SciTaskInfo.NORMAL){
-				return this.listTaskWait.remove(i);
-			}	
-		}
-		
-		return this.listTaskWait.remove(0);
-	}
-	
-	
-	private SciEngineInfo getNextEngine(){
-		logger.debug("->ScilabService loop:getNextEngine");
-		String idEngine;
-		SciEngineInfo sciEngineInfo;
-		BooleanWrapper isActivate;
-		int i = 0;
-		int count = this.listIdEngineFree.size();
-		
-		while (i<count){
-			idEngine = this.listIdEngineFree.remove(0);
-			sciEngineInfo = mapEngine.get(idEngine);
-			isActivate = sciEngineInfo.getIsActivate();
-			logger.debug("->ScilabService test0:getNextEngine:" + idEngine);
-			if(ProActive.isAwaited(isActivate)){
-				logger.debug("->ScilabService test1:getNextEngine:" + idEngine);
-				this.listIdEngineFree.add(idEngine);
-			}
-			else if(isActivate.booleanValue()){
-				logger.debug("->ScilabService test2:getNextEngine:" + idEngine);
-				return sciEngineInfo;
-			}else{
-				logger.debug("->ScilabService test3:getNextEngine:" + idEngine);
-				this.listIdEngineFree.add(idEngine);
-				SciEngine sciEngine = sciEngineInfo.getSciEngine();
-				sciEngineInfo.setIsActivate(sciEngine.activate());
-			}
-			i++;
-		}
-		return null;
-	}
-	
-	
-	private synchronized void executeTasks(){
-		logger.debug("->ScilabService In:executeTasks");
-		
-		SciTaskInfo sciTaskInfo;
-		SciEngineInfo sciEngineInfo;
-		
-		
-		while(true){
-			if (this.listTaskWait.size() == 0) {
-				try {
-					logger.debug("->ScilabService test0:executeTask");
-					wait();
-				} catch (InterruptedException e) {
-				}
+        (new Thread() {
+                public void run() {
+                    retrieveResults();
+                }
+            }).start();
+    }
 
-				continue;
-			}
-			
-			sciEngineInfo = this.getNextEngine();
-			if(sciEngineInfo == null){
-				try {
-					logger.debug("->ScilabService test1:executeTask");
-					wait(1000);
-				} catch (InterruptedException e) {
-				}
-				continue;
-			}
-			
-			sciTaskInfo = this.getNextTask();
-			if(sciTaskInfo == null){
-				try {
-					logger.debug("->ScilabService test2:executeTask");
-					wait(1000);
-				} catch (InterruptedException e) {
-				}
-				continue;
-			}
-			
-			this.executeTask(sciEngineInfo, sciTaskInfo);
-		}	
-	}
-	
-	private synchronized void executeTask(SciEngineInfo sciEngineInfo, SciTaskInfo sciTaskInfo) {
-		logger.debug("->ScilabService In:executeTask");
-		SciResult sciResult;
-		SciEngine sciEngine;
-		
-		sciEngineInfo.setIdCurrentTask(sciTaskInfo.getIdTask());
-		
-		sciEngine = sciEngineInfo.getSciEngine();
-		sciTaskInfo.setIdEngine(sciEngineInfo.getIdEngine());
-		sciTaskInfo.setState(SciTaskInfo.RUNNING);
-		sciResult = sciEngine.execute(sciTaskInfo.getSciTask());
-		
-		sciTaskInfo.setSciResult(sciResult);
-		this.mapTaskRun.put(sciTaskInfo.getIdTask(), sciTaskInfo);
-		this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
-		notifyAll();
-	}
-	
-	
-	public synchronized void addEventListenerTask(SciEventListener evtListener){
-		taskObservable.addSciEventListener(evtListener);
-	}
-	
-	public synchronized void addEventListenerEngine(SciEventListener evtListener){
-		engineObservable.addSciEventListener(evtListener);
-	}
-	
-	public synchronized void removeEventListenerTask(SciEventListener evtListener){
-		taskObservable.removeSciEventListener(evtListener);
-	}
-	
-	public synchronized void removeAllEventListenerTask(){
-		taskObservable = null;
-		taskObservable = new SciEventSource();
-	}
-	
-	public synchronized void removeAllEventListenerEngine(){
-		engineObservable = null;
-		engineObservable = new SciEventSource();
-	}
-	
-	public synchronized void removeEventListenerEngine(SciEventListener evtListener){
-		engineObservable.removeSciEventListener(evtListener);
-	}
-	
-	/**
-	 * @param idTask of the terminated task
-	 * @return return the task
-	 */
-	public synchronized SciTaskInfo getTaskEnd(String idTask){
-		return mapTaskEnd.get(idTask);
-	}
-	
-	/**
-	 * @return the number of deployed engine
-	 */
-	public synchronized int getNbEngine(){
-		return mapEngine.size();
-	}
-	
-	/**
-	 * 
-	 * @return a Map of terminated task
-	 */
-	@SuppressWarnings("unchecked")
-	public synchronized HashMap<String, SciTaskInfo> getMapTaskEnd() {
-		return (HashMap<String, SciTaskInfo>) mapTaskEnd.clone();
-	}
+    /**
+     * Deploy engines over each node defined in the the file descriptor
+     * @param nameVirtualNode
+     * @param pathDescriptor
+     * @param arrayIdEngine
+     * @return the number of deployed engine
+     */
+    public synchronized int deployEngine(String nameVirtualNode,
+        String pathDescriptor, String[] arrayIdEngine) {
+        logger.debug("->ScilabService In:deployEngine:" + nameVirtualNode);
+        HashMap<String, SciEngine> mapNewEngine = SciDeployEngine.deploy(nameVirtualNode,
+                pathDescriptor, arrayIdEngine);
+        SciEngine sciEngine;
+        String idEngine;
+        BooleanWrapper isActivate;
 
-	
-	/**
-	 * @return a Map of running task
-	 */
-	@SuppressWarnings("unchecked")
-	public synchronized HashMap<String, SciTaskInfo> getMapTaskRun() {
-		return  (HashMap<String, SciTaskInfo>) mapTaskRun.clone();
-	}
+        for (int i = 0; i < arrayIdEngine.length; i++) {
+            idEngine = arrayIdEngine[i];
+            sciEngine = mapNewEngine.get(idEngine);
 
-	/**
-	 * @return a Map of Deployed Engine
-	 */
-	@SuppressWarnings("unchecked")
-	public synchronized HashMap<String, SciEngineInfo> getMapEngine() {
-		return (HashMap<String, SciEngineInfo>) mapEngine.clone();
-	}
+            if (sciEngine == null) {
+                continue;
+            }
 
-	/**
-	 * @return a List of pending tasks
-	 */
-	@SuppressWarnings("unchecked")
-	public synchronized ArrayList<SciTaskInfo> getListTaskWait() {
-		return (ArrayList<SciTaskInfo>) listTaskWait.clone();
-	}
-	
-	/**
-	 * exit the monitor and free each deployed engine
-	 *
-	 */
-	public synchronized void exit(){
-		logger.debug("->ScilabService In:exit");
-		SciEngineInfo sciEngineInfo;
-		SciEngine sciEngine;
-		
-		Object keys[] = mapEngine.keySet().toArray();
-		for(int i=0; i<keys.length; i++){
-			sciEngineInfo = mapEngine.get(keys[i]);
-			sciEngine = sciEngineInfo.getSciEngine();
-			try{
-			sciEngine.exit();
-			}catch(RuntimeException e ){
-				
-			}
-		}
-	}
+            isActivate = sciEngine.activate();
+            mapEngine.put(idEngine,
+                new SciEngineInfo(idEngine, sciEngine, isActivate));
+        }
+
+        this.listIdEngineFree.addAll(mapNewEngine.keySet());
+        this.engineObservable.fireSciEvent(null);
+        notifyAll();
+        return mapNewEngine.size();
+    }
+
+    public synchronized int deployEngine(String nameVirtualNode,
+        String pathDescriptor) {
+        long countTmp = this.countIdEngine;
+        int nbEngine = SciDeployEngine.getNbMappedNodes(nameVirtualNode,
+                pathDescriptor);
+        String[] arrayIdEngine = new String[nbEngine];
+        for (int i = 0; i < arrayIdEngine.length; i++) {
+            arrayIdEngine[i] = "Engine" + countTmp++;
+        }
+
+        nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor,
+                arrayIdEngine);
+        this.countIdEngine += nbEngine;
+        return nbEngine;
+    }
+
+    public synchronized int deployEngine(String nameVirtualNode,
+        String pathDescriptor, int nbEngine) {
+        long countTmp = this.countIdEngine;
+        String[] arrayIdEngine = new String[nbEngine];
+        for (int i = 0; i < arrayIdEngine.length; i++) {
+            arrayIdEngine[i] = "Engine" + countTmp++;
+        }
+
+        nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor,
+                arrayIdEngine);
+        this.countIdEngine += nbEngine;
+        return nbEngine;
+    }
+
+    /**
+     * Put the task in a queue of pending tasks. The task will be sent when a Scilab Engine will be free.
+     * An event notify the user application of the effective sending .
+     * @param sciTask
+     */
+    public synchronized void sendTask(SciTask sciTask) {
+        logger.debug("->ScilabService In:sendTask:" + sciTask.getId());
+        SciTaskInfo sciTaskInfo = new SciTaskInfo(sciTask);
+        sciTaskInfo.setState(SciTaskInfo.PENDING);
+        this.listTaskWait.add(sciTaskInfo);
+        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        notifyAll();
+    }
+
+    public synchronized void sendTask(String pathScript, String jobInit,
+        String[] dataOut) throws IOException {
+        this.sendTask(pathScript, jobInit, dataOut, SciTaskInfo.NORMAL);
+    }
+
+    public synchronized void sendTask(String pathScript, String jobInit,
+        String[] dataOut, int Priority) throws IOException {
+        logger.debug("->ScilabService In:sendTask");
+
+        SciTask sciTask = new SciTask("Task" + this.countIdTask++);
+
+        File f = new File(pathScript);
+
+        sciTask.setJob(f);
+        sciTask.setJobInit(jobInit);
+
+        for (int i = 0; i < dataOut.length; i++) {
+            logger.debug("->ScilabService DataOut:sendTask:" + dataOut[i]);
+            if (dataOut[i].trim().equals("")) {
+                continue;
+            }
+            sciTask.addDataOut(new SciData(dataOut[i]));
+        }
+
+        SciTaskInfo sciTaskInfo = new SciTaskInfo(sciTask);
+        sciTaskInfo.setFileScript(f);
+
+        sciTaskInfo.setState(SciTaskInfo.PENDING);
+        sciTaskInfo.setPriority(Priority);
+
+        this.listTaskWait.add(sciTaskInfo);
+        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        notifyAll();
+    }
+
+    /**
+     * Kill a running task
+     * @param idTask
+     */
+    public synchronized void killTask(String idTask) {
+        logger.debug("->ScilabService In:killTask:" + idTask);
+
+        SciTaskInfo sciTaskInfo = this.mapTaskRun.remove(idTask);
+
+        if (sciTaskInfo == null) {
+            return;
+        }
+
+        String idEngine = sciTaskInfo.getIdEngine();
+        SciEngineInfo sciEngineInfo = mapEngine.get(idEngine);
+
+        SciEngine sciEngine = sciEngineInfo.getSciEngine();
+        sciEngine.killWorker();
+
+        BooleanWrapper isActivate = sciEngine.activate();
+        sciEngineInfo.setIsActivate(isActivate);
+        sciEngineInfo.setIdCurrentTask(null);
+
+        sciTaskInfo.setState(SciTaskInfo.KILLED);
+
+        this.listIdEngineFree.add(idEngine);
+        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+    }
+
+    /**
+     * Restart a Scilab Engine
+     * @param idEngine
+     */
+    public synchronized void restartEngine(String idEngine) {
+        logger.debug("->ScilabService In:restartEngine:" + idEngine);
+
+        SciEngineInfo sciEngineInfo = this.mapEngine.get(idEngine);
+
+        if (sciEngineInfo == null) {
+            return;
+        }
+
+        String idTask = sciEngineInfo.getIdCurrentTask();
+        SciTaskInfo sciTaskInfo;
+
+        if (idTask != null) {
+            sciTaskInfo = this.mapTaskRun.remove(idTask);
+            sciTaskInfo.setState(SciTaskInfo.KILLED);
+            sciEngineInfo.setIdCurrentTask(null);
+            this.listIdEngineFree.add(idEngine);
+            this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        }
+
+        SciEngine sciEngine = sciEngineInfo.getSciEngine();
+        sciEngine.killWorker();
+        BooleanWrapper isActivate = sciEngine.activate();
+        sciEngineInfo.setIsActivate(isActivate);
+    }
+
+    /**
+     * Cancel a pending task
+     * @param idTask
+     */
+    public synchronized void cancelTask(String idTask) {
+        logger.debug("->ScilabService In:cancelTask:" + idTask);
+        SciTaskInfo sciTaskInfo;
+        for (int i = 0; i < this.listTaskWait.size(); i++) {
+            sciTaskInfo = this.listTaskWait.get(i);
+
+            if (idTask.equals(sciTaskInfo.getIdTask())) {
+                this.listTaskWait.remove(i);
+                sciTaskInfo.setState(SciTaskInfo.CANCELLED);
+                this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+                break;
+            }
+        }
+    }
+
+    /**
+     * Remove a terminated task
+     * @param idTask
+     */
+    public synchronized void removeTask(String idTask) {
+        logger.debug("->ScilabService In:removeTask:" + idTask);
+        SciTaskInfo sciTaskInfo = this.mapTaskEnd.remove(idTask);
+        sciTaskInfo.setState(SciTaskInfo.REMOVED);
+        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+    }
+
+    private synchronized void retrieveResults() {
+        logger.debug("->ScilabService In:retrieveResult");
+        SciResult sciResult;
+        SciTaskInfo sciTaskInfo;
+        String idEngine;
+        SciEngineInfo sciEngineInfo;
+        Object[] keys;
+
+        while (true) {
+            keys = this.mapTaskRun.keySet().toArray();
+            for (int i = 0; i < keys.length; i++) {
+                sciTaskInfo = this.mapTaskRun.get(keys[i]);
+                sciResult = sciTaskInfo.getSciResult();
+                if (!ProActive.isAwaited(sciResult)) {
+                    logger.debug("->ScilabService loop:retrieveResult:" +
+                        keys[i]);
+
+                    this.mapTaskRun.remove(keys[i]);
+                    sciTaskInfo.setState(sciResult.getState());
+
+                    idEngine = sciTaskInfo.getIdEngine();
+                    sciEngineInfo = mapEngine.get(idEngine);
+
+                    sciEngineInfo.setIdCurrentTask(null);
+                    this.listIdEngineFree.add(idEngine);
+                    sciTaskInfo.setDateEnd();
+                    this.mapTaskEnd.put(sciTaskInfo.getIdTask(), sciTaskInfo);
+                    this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+                    notifyAll();
+                }
+            }
+            try {
+                wait(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    private SciTaskInfo getNextTask() {
+        logger.debug("->ScilabService loop:getNextTask");
+        SciTaskInfo sciTaskInfo;
+
+        if (this.listTaskWait.size() == 0) {
+            return null;
+        }
+
+        for (int i = 0; i < this.listTaskWait.size(); i++) {
+            sciTaskInfo = this.listTaskWait.get(i);
+
+            if (sciTaskInfo.getPriority() == SciTaskInfo.HIGH) {
+                return this.listTaskWait.remove(i);
+            }
+        }
+
+        for (int i = 0; i < this.listTaskWait.size(); i++) {
+            sciTaskInfo = this.listTaskWait.get(i);
+
+            if (sciTaskInfo.getPriority() == SciTaskInfo.NORMAL) {
+                return this.listTaskWait.remove(i);
+            }
+        }
+
+        return this.listTaskWait.remove(0);
+    }
+
+    private SciEngineInfo getNextEngine() {
+        logger.debug("->ScilabService loop:getNextEngine");
+        String idEngine;
+        SciEngineInfo sciEngineInfo;
+        BooleanWrapper isActivate;
+        int i = 0;
+        int count = this.listIdEngineFree.size();
+
+        while (i < count) {
+            idEngine = this.listIdEngineFree.remove(0);
+            sciEngineInfo = mapEngine.get(idEngine);
+            isActivate = sciEngineInfo.getIsActivate();
+            logger.debug("->ScilabService test0:getNextEngine:" + idEngine);
+            if (ProActive.isAwaited(isActivate)) {
+                logger.debug("->ScilabService test1:getNextEngine:" + idEngine);
+                this.listIdEngineFree.add(idEngine);
+            } else if (isActivate.booleanValue()) {
+                logger.debug("->ScilabService test2:getNextEngine:" + idEngine);
+                return sciEngineInfo;
+            } else {
+                logger.debug("->ScilabService test3:getNextEngine:" + idEngine);
+                this.listIdEngineFree.add(idEngine);
+                SciEngine sciEngine = sciEngineInfo.getSciEngine();
+                sciEngineInfo.setIsActivate(sciEngine.activate());
+            }
+            i++;
+        }
+        return null;
+    }
+
+    private synchronized void executeTasks() {
+        logger.debug("->ScilabService In:executeTasks");
+
+        SciTaskInfo sciTaskInfo;
+        SciEngineInfo sciEngineInfo;
+
+        while (true) {
+            if (this.listTaskWait.size() == 0) {
+                try {
+                    logger.debug("->ScilabService test0:executeTask");
+                    wait();
+                } catch (InterruptedException e) {
+                }
+
+                continue;
+            }
+
+            sciEngineInfo = this.getNextEngine();
+            if (sciEngineInfo == null) {
+                try {
+                    logger.debug("->ScilabService test1:executeTask");
+                    wait(1000);
+                } catch (InterruptedException e) {
+                }
+                continue;
+            }
+
+            sciTaskInfo = this.getNextTask();
+            if (sciTaskInfo == null) {
+                try {
+                    logger.debug("->ScilabService test2:executeTask");
+                    wait(1000);
+                } catch (InterruptedException e) {
+                }
+                continue;
+            }
+
+            this.executeTask(sciEngineInfo, sciTaskInfo);
+        }
+    }
+
+    private synchronized void executeTask(SciEngineInfo sciEngineInfo,
+        SciTaskInfo sciTaskInfo) {
+        logger.debug("->ScilabService In:executeTask");
+        SciResult sciResult;
+        SciEngine sciEngine;
+
+        sciEngineInfo.setIdCurrentTask(sciTaskInfo.getIdTask());
+
+        sciEngine = sciEngineInfo.getSciEngine();
+        sciTaskInfo.setIdEngine(sciEngineInfo.getIdEngine());
+        sciTaskInfo.setState(SciTaskInfo.RUNNING);
+        sciResult = sciEngine.execute(sciTaskInfo.getSciTask());
+
+        sciTaskInfo.setSciResult(sciResult);
+        this.mapTaskRun.put(sciTaskInfo.getIdTask(), sciTaskInfo);
+        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        notifyAll();
+    }
+
+    public synchronized void addEventListenerTask(SciEventListener evtListener) {
+        taskObservable.addSciEventListener(evtListener);
+    }
+
+    public synchronized void addEventListenerEngine(
+        SciEventListener evtListener) {
+        engineObservable.addSciEventListener(evtListener);
+    }
+
+    public synchronized void removeEventListenerTask(
+        SciEventListener evtListener) {
+        taskObservable.removeSciEventListener(evtListener);
+    }
+
+    public synchronized void removeAllEventListenerTask() {
+        taskObservable = null;
+        taskObservable = new SciEventSource();
+    }
+
+    public synchronized void removeAllEventListenerEngine() {
+        engineObservable = null;
+        engineObservable = new SciEventSource();
+    }
+
+    public synchronized void removeEventListenerEngine(
+        SciEventListener evtListener) {
+        engineObservable.removeSciEventListener(evtListener);
+    }
+
+    /**
+     * @param idTask of the terminated task
+     * @return return the task
+     */
+    public synchronized SciTaskInfo getTaskEnd(String idTask) {
+        return mapTaskEnd.get(idTask);
+    }
+
+    /**
+     * @return the number of deployed engine
+     */
+    public synchronized int getNbEngine() {
+        return mapEngine.size();
+    }
+
+    /**
+     *
+     * @return a Map of terminated task
+     */
+    @SuppressWarnings("unchecked")
+    public synchronized HashMap<String, SciTaskInfo> getMapTaskEnd() {
+        return (HashMap<String, SciTaskInfo>) mapTaskEnd.clone();
+    }
+
+    /**
+     * @return a Map of running task
+     */
+    @SuppressWarnings("unchecked")
+    public synchronized HashMap<String, SciTaskInfo> getMapTaskRun() {
+        return (HashMap<String, SciTaskInfo>) mapTaskRun.clone();
+    }
+
+    /**
+     * @return a Map of Deployed Engine
+     */
+    @SuppressWarnings("unchecked")
+    public synchronized HashMap<String, SciEngineInfo> getMapEngine() {
+        return (HashMap<String, SciEngineInfo>) mapEngine.clone();
+    }
+
+    /**
+     * @return a List of pending tasks
+     */
+    @SuppressWarnings("unchecked")
+    public synchronized ArrayList<SciTaskInfo> getListTaskWait() {
+        return (ArrayList<SciTaskInfo>) listTaskWait.clone();
+    }
+
+    /**
+     * exit the monitor and free each deployed engine
+     *
+     */
+    public synchronized void exit() {
+        logger.debug("->ScilabService In:exit");
+        SciEngineInfo sciEngineInfo;
+        SciEngine sciEngine;
+
+        Object[] keys = mapEngine.keySet().toArray();
+        for (int i = 0; i < keys.length; i++) {
+            sciEngineInfo = mapEngine.get(keys[i]);
+            sciEngine = sciEngineInfo.getSciEngine();
+            try {
+                sciEngine.exit();
+            } catch (RuntimeException e) {
+            }
+        }
+    }
 }

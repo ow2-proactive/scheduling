@@ -34,10 +34,11 @@ import org.jdom.Element;
 import org.objectweb.proactive.benchmarks.timit.config.ConfigChart;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 
+
 /**
  * This class represent a chart to generate with specific legend format and
  * scale mode.
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public interface Chart extends java.io.Serializable {
@@ -53,9 +54,12 @@ public interface Chart extends java.io.Serializable {
      * become 977K
      * </ul>
      */
-    public static enum LegendFormat {
-        DEFAULT, NONE, POW10, POW2
-    };
+    public static enum LegendFormat {DEFAULT,
+        NONE,
+        POW10,
+        POW2;
+    }
+    ;
 
     /**
      * The chart can have a specific scale:
@@ -65,15 +69,17 @@ public interface Chart extends java.io.Serializable {
      * <li>LOGARITHMIC create a chart with a logarithmic scale
      * </ul>
      */
-    public static enum Scale {
-        DEFAULT, LINEAR, LOGARITHMIC
-    };
+    public static enum Scale {DEFAULT,
+        LINEAR,
+        LOGARITHMIC;
+    }
+    ;
 
     /**
      * Generate a chart from the root Element of finalized benchmark serie, or a
      * BenchmarkStatistics if values can't be store in a convenient way in XML
      * serie result file (like communication pattern event datas)
-     * 
+     *
      * @param eTimit
      *            the root Element of the XML serie result file
      * @param bstats
@@ -82,5 +88,5 @@ public interface Chart extends java.io.Serializable {
      *            the parameters of the chart
      */
     public void generateChart(Element eTimit, BenchmarkStatistics bstats,
-            ConfigChart cChart);
+        ConfigChart cChart);
 }

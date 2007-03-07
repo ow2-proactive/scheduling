@@ -77,7 +77,7 @@ public class FloatWrapper implements Serializable {
     public String toString() {
         return this.value + "";
     }
-    
+
     @Override
     public boolean equals(Object arg0) {
         if (arg0 instanceof FloatWrapper) {
@@ -90,5 +90,4 @@ public class FloatWrapper implements Serializable {
     public int hashCode() {
         return new Float(this.value).hashCode();
     }
-
 }

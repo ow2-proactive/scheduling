@@ -34,17 +34,16 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.muscle.Conquer;
 
-public class ConquerBoard implements Conquer<Result,Result>{
-	
-	public Result conquer(Vector<Result> result) {
 
-		Result r = new Result(result.get(0).n);
-		for(Result b:result){
-			for(int i=0;i<r.n;i++){
-				r.solutions[i]+=b.solutions[i];
-			}	
-		}
+public class ConquerBoard implements Conquer<Result, Result> {
+    public Result conquer(Vector<Result> result) {
+        Result r = new Result(result.get(0).n);
+        for (Result b : result) {
+            for (int i = 0; i < r.n; i++) {
+                r.solutions[i] += b.solutions[i];
+            }
+        }
 
-		return r;
-	}
+        return r;
+    }
 }

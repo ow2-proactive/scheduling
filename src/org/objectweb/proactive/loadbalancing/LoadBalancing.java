@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.loadbalancing;
 
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -39,83 +39,84 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
 
+
 public class LoadBalancing {
-	private static ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-	private static MetricFactory mf;
-	private static boolean activated = false;
-	private static InformationRecover ir;
-	
-	public static void activateOn(Node[] nodes, MetricFactory mf) {
-		LoadBalancing.mf = mf;
-		activated = true;
-		LoadBalancer lb = null;
+    private static ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
+    private static MetricFactory mf;
+    private static boolean activated = false;
+    private static InformationRecover ir;
 
-		try {
-			ir = (InformationRecover) ProActive.newActive(
-					InformationRecover.class.getName(), null);
+    public static void activateOn(Node[] nodes, MetricFactory mf) {
+        LoadBalancing.mf = mf;
+        activated = true;
+        LoadBalancer lb = null;
 
-			for (int i = 0; i < nodes.length; i++) {
-				lb = (LoadBalancer) ProActive.newActive(LoadBalancer.class
-						.getName(), new Object[]{mf}, nodes[i]);
-				loadBalancers.add(lb);
+        try {
+            ir = (InformationRecover) ProActive.newActive(InformationRecover.class.getName(),
+                    null);
 
-				lb = null;
-			}
+            for (int i = 0; i < nodes.length; i++) {
+                lb = (LoadBalancer) ProActive.newActive(LoadBalancer.class.getName(),
+                        new Object[] { mf }, nodes[i]);
+                loadBalancers.add(lb);
 
-			Iterator<LoadBalancer> it = loadBalancers.iterator();
-			while (it.hasNext()) {
-				lb = it.next();
-				lb.init(loadBalancers,ir);
-				lb = null;
+                lb = null;
+            }
 
-			}
-		} 
-		catch (ActiveObjectCreationException e) 	{e.printStackTrace();}
-		catch (NodeException e) 					{e.printStackTrace();}
+            Iterator<LoadBalancer> it = loadBalancers.iterator();
+            while (it.hasNext()) {
+                lb = it.next();
+                lb.init(loadBalancers, ir);
+                lb = null;
+            }
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+    }
 
-	}
-	
-	public static void activate(MetricFactory mf) {
-		LoadBalancing.mf = mf;
-		activated = true;
+    public static void activate(MetricFactory mf) {
+        LoadBalancing.mf = mf;
+        activated = true;
 
-		try {
-			ir = (InformationRecover) ProActive.newActive(
-					InformationRecover.class.getName(), null);
+        try {
+            ir = (InformationRecover) ProActive.newActive(InformationRecover.class.getName(),
+                    null);
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+    }
 
-			
-		} 
-		catch (ActiveObjectCreationException e) 	{e.printStackTrace();}
-		catch (NodeException e) 					{e.printStackTrace();}
+    public static void kill() {
+        activated = false;
 
-	}
-	
-	public static void kill() {
-		activated = false;
+        ProActive.terminateActiveObject(ir, true);
+        LoadBalancer lb;
+        Iterator<LoadBalancer> it = loadBalancers.iterator();
+        while (it.hasNext()) {
+            lb = it.next();
+            ProActive.terminateActiveObject(lb, true);
+        }
+    }
 
-		ProActive.terminateActiveObject(ir,true);
-		LoadBalancer lb;
-		Iterator<LoadBalancer> it = loadBalancers.iterator();
-		while (it.hasNext()) {
-			lb = it.next();
-			ProActive.terminateActiveObject(lb,true);
-		}
-	}
-	
-	public static void addNode(Node node){
-		if(! activated)
-			return; // TO DO : it's better to throw an exception
-		
-		try {
-			LoadBalancer lb = (LoadBalancer) ProActive.newActive(LoadBalancer.class
-					.getName(), new Object[]{mf}, node);
-			loadBalancers.add(lb);
-			lb.init(loadBalancers,ir);
-			lb.notifyLoadBalancers();
-			
-		}
-		catch (ActiveObjectCreationException e) 	{e.printStackTrace();}
-		catch (NodeException e) 					{e.printStackTrace();}
-		
-	}
+    public static void addNode(Node node) {
+        if (!activated) {
+            return; // TO DO : it's better to throw an exception
+        }
+
+        try {
+            LoadBalancer lb = (LoadBalancer) ProActive.newActive(LoadBalancer.class.getName(),
+                    new Object[] { mf }, node);
+            loadBalancers.add(lb);
+            lb.init(loadBalancers, ir);
+            lb.notifyLoadBalancers();
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+    }
 }

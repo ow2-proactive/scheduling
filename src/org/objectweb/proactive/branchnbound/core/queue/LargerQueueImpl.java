@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 /**
  * This queue provides tasks in a Breath First Search order.
- * 
+ *
  * @author Alexandre di Costanzo
  *
  * Created on Nov 3, 2005

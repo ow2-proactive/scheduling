@@ -32,6 +32,8 @@ package org.objectweb.proactive.ext.scilab.test;
 
 import java.io.Serializable;
 import java.util.Vector;
+
+
 /*
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
@@ -52,73 +54,74 @@ import org.objectweb.proactive.ext.scilab.SciEngineWorker;
 import org.objectweb.proactive.ext.scilab.SciResult;
 import org.objectweb.proactive.ext.scilab.SciTask;
 */
-public class SciTestCalcium implements Serializable{
-/*
-	private Skeleton<SciTask> root;
-	private String descriptorPath;
-	private String nameVN;
-	
-	private class SciExecute implements Execute<SciTask>{
-		public SciTask execute(SciTask sciTask) {
-			SciResult sciResult = SciEngineWorker.executeTask(sciTask);
-			sciTask.setListDataOut(sciResult.getList());
-			return sciTask;
-		}
-	}
-	
-	public SciTestCalcium(String nameVN, String descriptorPath){
-		this.nameVN = nameVN;
-		this.descriptorPath = descriptorPath;
-	}
-	
-	public void solve() throws Exception{
-		ResourceManager manager= new ProActiveManager(descriptorPath, nameVN);
-		//ResourceManager manager= new MultiThreadedManager(1);
-		
-		Calcium calcium = new Calcium(manager);
-		this.root = new Farm<SciTask>(new Seq<SciTask>(new SciExecute()));
-		Stream<SciTask> stream = calcium.newStream(root);
+public class SciTestCalcium implements Serializable {
 
-		
-		SciTask sciTask;
-		Vector<Future<SciTask>> futures= new Vector<Future<SciTask>>(10);
-		for(int i=0; i<10; i++){
-			sciTask = new SciTask("ScilabTask" + i);
-			SciDoubleMatrix sciMatrix = new SciDoubleMatrix("M", 1, 1, new double[]{i});
-			
-			sciTask.addDataIn(sciMatrix);
-			sciTask.addDataOut(sciMatrix);
-			sciTask.setJob(sciMatrix.getName() + "=" +  sciMatrix.getName() + "* 2;");
-			futures.add(stream.input(sciTask));
-		}
-		
-		calcium.boot();
+    /*
+            private Skeleton<SciTask> root;
+            private String descriptorPath;
+            private String nameVN;
 
-		try {
-			for(Future<SciTask> future:futures){
-				SciTask res = future.get();
-				for(int i=0; i< res.getListDataOut().size(); i++){
-					SciData sciData = (SciData) res.getListDataOut().get(i);
-					System.out.println(sciData.toString());
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		calcium.shutdown();
-		StatsGlobal stats = calcium.getStatsGlobal();
-		System.out.println(stats);
-	}
-	
-	public static void main(String[] args) throws Exception{
-		if(args.length !=2){
-			System.out.println("Invalid number of parameter : " + args.length);
-			return;
-		}
-		
-		SciTestCalcium st = new SciTestCalcium(args[0], args[1]);
-		st.solve();
-	}
-	
-*/
+            private class SciExecute implements Execute<SciTask>{
+                    public SciTask execute(SciTask sciTask) {
+                            SciResult sciResult = SciEngineWorker.executeTask(sciTask);
+                            sciTask.setListDataOut(sciResult.getList());
+                            return sciTask;
+                    }
+            }
+
+            public SciTestCalcium(String nameVN, String descriptorPath){
+                    this.nameVN = nameVN;
+                    this.descriptorPath = descriptorPath;
+            }
+
+            public void solve() throws Exception{
+                    ResourceManager manager= new ProActiveManager(descriptorPath, nameVN);
+                    //ResourceManager manager= new MultiThreadedManager(1);
+
+                    Calcium calcium = new Calcium(manager);
+                    this.root = new Farm<SciTask>(new Seq<SciTask>(new SciExecute()));
+                    Stream<SciTask> stream = calcium.newStream(root);
+
+
+                    SciTask sciTask;
+                    Vector<Future<SciTask>> futures= new Vector<Future<SciTask>>(10);
+                    for(int i=0; i<10; i++){
+                            sciTask = new SciTask("ScilabTask" + i);
+                            SciDoubleMatrix sciMatrix = new SciDoubleMatrix("M", 1, 1, new double[]{i});
+
+                            sciTask.addDataIn(sciMatrix);
+                            sciTask.addDataOut(sciMatrix);
+                            sciTask.setJob(sciMatrix.getName() + "=" +  sciMatrix.getName() + "* 2;");
+                            futures.add(stream.input(sciTask));
+                    }
+
+                    calcium.boot();
+
+                    try {
+                            for(Future<SciTask> future:futures){
+                                    SciTask res = future.get();
+                                    for(int i=0; i< res.getListDataOut().size(); i++){
+                                            SciData sciData = (SciData) res.getListDataOut().get(i);
+                                            System.out.println(sciData.toString());
+                                    }
+                            }
+                    } catch (Exception e) {
+                            e.printStackTrace();
+                    }
+                    calcium.shutdown();
+                    StatsGlobal stats = calcium.getStatsGlobal();
+                    System.out.println(stats);
+            }
+
+            public static void main(String[] args) throws Exception{
+                    if(args.length !=2){
+                            System.out.println("Invalid number of parameter : " + args.length);
+                            return;
+                    }
+
+                    SciTestCalcium st = new SciTestCalcium(args[0], args[1]);
+                    st.solve();
+            }
+
+    */
 }

@@ -40,10 +40,10 @@ public interface NFEProducer {
 
     public int fireNFE(NonFunctionalException e);
 }
-
 /*
  * To implement this interface, the following "mixin" can be copy/pasted:
  */
+
 //     // NFEProducer implementation
 //     private NFEListenerList nfeListeners = null;
 //     public void addNFEListener(NFEListener listener) {
@@ -63,4 +63,3 @@ public interface NFEProducer {
 //         }
 //         return 0;
 //     }
-

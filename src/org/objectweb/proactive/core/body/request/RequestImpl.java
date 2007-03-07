@@ -89,30 +89,26 @@ public class RequestImpl extends MessageImpl implements Request,
     //Non Functional requests
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
-    
-	/**
-	 * indicates how many times we will try to send the request
-	 */
-	private static final int MAX_TRIES = 15;
 
-	transient protected LocationServer server;
+    /**
+     * indicates how many times we will try to send the request
+     */
+    private static final int MAX_TRIES = 15;
+    transient protected LocationServer server;
 
-    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    
-    
+
     // Constructor of simple requests
     public RequestImpl(MethodCall methodCall, UniversalBody sender,
         boolean isOneWay, long nextSequenceID) {
-    	super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
+        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
         this.isNFRequest = false;
-        
-        if (enableStackTrace == null) {
 
+        if (enableStackTrace == null) {
             /* First time */
             enableStackTrace = new Boolean(!"false".equals(System.getProperty(
                             "proactive.stack_trace")));
@@ -124,15 +120,14 @@ public class RequestImpl extends MessageImpl implements Request,
 
     // Constructor of non functional requests without priority
     public RequestImpl(MethodCall methodCall, UniversalBody sender,
-            boolean isOneWay, long nextSequenceID, boolean isNFRequest) {
-    	super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
+        boolean isOneWay, long nextSequenceID, boolean isNFRequest) {
+        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = Request.NFREQUEST_NO_PRIORITY;
-        
-        if (enableStackTrace == null) {
 
+        if (enableStackTrace == null) {
             /* First time */
             enableStackTrace = new Boolean(!"false".equals(System.getProperty(
                             "proactive.stack_trace")));
@@ -141,18 +136,18 @@ public class RequestImpl extends MessageImpl implements Request,
             this.stackTrace = new Exception().getStackTrace();
         }
     }
-    
+
     // Constructor of non functional requests with priority
     public RequestImpl(MethodCall methodCall, UniversalBody sender,
-            boolean isOneWay, long nextSequenceID, boolean isNFRequest, int nfRequestPriority) {
-    	super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
+        boolean isOneWay, long nextSequenceID, boolean isNFRequest,
+        int nfRequestPriority) {
+        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;
-        
-        if (enableStackTrace == null) {
 
+        if (enableStackTrace == null) {
             /* First time */
             enableStackTrace = new Boolean(!"false".equals(System.getProperty(
                             "proactive.stack_trace")));
@@ -161,7 +156,7 @@ public class RequestImpl extends MessageImpl implements Request,
             this.stackTrace = new Exception().getStackTrace();
         }
     }
-    
+
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -279,7 +274,8 @@ public class RequestImpl extends MessageImpl implements Request,
         UniversalBody destinationBody) throws RenegotiateSessionException {
         try {
             if (logger.isDebugEnabled()) {
-                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(" sending request " +
+                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
+                               .debug(" sending request " +
                     methodCall.getName());
             }
             if (!ciphered && !hasBeenForwarded()) {
@@ -318,102 +314,102 @@ public class RequestImpl extends MessageImpl implements Request,
 
     protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException {
-    	ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
-    	if (psm != null) {
+        ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+        if (psm != null) {
             this.crypt(psm, destinationBody);
         }
 
         int ftres = FTManager.NON_FT;
         try {
-			ftres = destinationBody.receiveRequest(this);
-		} catch (Exception e) {
-			/*
-			 * The exception is catched, we have to try 
-			 * our backupSolution 
-			 */
-			try {
-				backupSolution(destinationBody);
-			}catch (IOException ioex)
-			{
-				throw new IOException(e.getMessage()+ioex.getMessage());
-			}
-		}
+            ftres = destinationBody.receiveRequest(this);
+        } catch (Exception e) {
 
-		if (logger.isDebugEnabled()) {
+            /*
+             * The exception is catched, we have to try
+             * our backupSolution
+             */
+            try {
+                backupSolution(destinationBody);
+            } catch (IOException ioex) {
+                throw new IOException(e.getMessage() + ioex.getMessage());
+            }
+        }
+
+        if (logger.isDebugEnabled()) {
             logger.debug(" sending request finished");
         }
         return ftres;
     }
 
     /**
-	 * Implements the backup solution
-	 */
-	protected void backupSolution(UniversalBody destinationBody)
-			throws java.io.IOException {
-		int tries = 0;
-		
-		UniqueID bodyID = destinationBody.getID();
-		while (tries < MAX_TRIES) {
-			UniversalBody remoteBody = null;
-			try {
-				// get the new location from the server
-				UniversalBody mobile = queryServer(bodyID);
+         * Implements the backup solution
+         */
+    protected void backupSolution(UniversalBody destinationBody)
+        throws java.io.IOException {
+        int tries = 0;
 
-				// we want to bypass the stub/proxy
-				FutureProxy futureProxy = (FutureProxy) ((StubObject) mobile)
-				.getProxy();
-				remoteBody = (UniversalBody) futureProxy.getResult();
-				
-				if (remoteBody == null)
-					throw new IOException("remoteBody is null");
-				
-				remoteBody.receiveRequest(this);
+        UniqueID bodyID = destinationBody.getID();
+        while (tries < MAX_TRIES) {
+            UniversalBody remoteBody = null;
+            try {
+                // get the new location from the server
+                UniversalBody mobile = queryServer(bodyID);
 
-				// everything went fine, we have to update the current location
-				// of the object
-				// so that next requests don't go through the server
-				if (sender != null) {
-					sender.updateLocation(bodyID, remoteBody);
-				} else {
-					LocalBodyStore.getInstance()
-							.getLocalBody(getSourceBodyID()).updateLocation(
-									bodyID, remoteBody);
-				}
-				return;
-			} catch (Exception e) {
-				
-				tries++;
+                // we want to bypass the stub/proxy
+                FutureProxy futureProxy = (FutureProxy) ((StubObject) mobile).getProxy();
+                remoteBody = (UniversalBody) futureProxy.getResult();
 
-				/*
-				 * The location server has been perform to block the request if
-				 * it has to send the same location of the object so we don't
-				 * have to wait between two requests 
-				 * try { Thread.sleep(500); }
-				 * catch (InterruptedException e1) { e1.printStackTrace(); }
-				 */
-				if(tries == MAX_TRIES){
-					logger.error("FAILED = " + " for method " + methodName
-							+ " exception :" + e.getClass().getName());
-				
-					throw new IOException("FAILED = " + " for method " + methodName
-							+ " exception :" + e.getClass().getName()+"("+e.getMessage()+")");
-				}
-			}
-		}
-	}
+                if (remoteBody == null) {
+                    throw new IOException("remoteBody is null");
+                }
 
-	protected UniversalBody queryServer(UniqueID bodyID) throws IOException {
-		if (server == null) {
-			server = LocationServerFactory.getLocationServer();
-		}
-		if (server == null){
-			throw new IOException("No server found");
-		}
-		UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
-		//logger.info("backupSolution() server has sent an answer");
-		ProActive.waitFor(mobile);
-		return mobile;
-	}
+                remoteBody.receiveRequest(this);
+
+                // everything went fine, we have to update the current location
+                // of the object
+                // so that next requests don't go through the server
+                if (sender != null) {
+                    sender.updateLocation(bodyID, remoteBody);
+                } else {
+                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID())
+                                  .updateLocation(bodyID, remoteBody);
+                }
+                return;
+            } catch (Exception e) {
+                tries++;
+
+                /*
+                 * The location server has been perform to block the request if
+                 * it has to send the same location of the object so we don't
+                 * have to wait between two requests
+                 * try { Thread.sleep(500); }
+                 * catch (InterruptedException e1) { e1.printStackTrace(); }
+                 */
+                if (tries == MAX_TRIES) {
+                    logger.error("FAILED = " + " for method " + methodName +
+                        " exception :" + e.getClass().getName());
+
+                    throw new IOException("FAILED = " + " for method " +
+                        methodName + " exception :" + e.getClass().getName() +
+                        "(" + e.getMessage() + ")");
+                }
+            }
+        }
+    }
+
+    protected UniversalBody queryServer(UniqueID bodyID)
+        throws IOException {
+        if (server == null) {
+            server = LocationServerFactory.getLocationServer();
+        }
+        if (server == null) {
+            throw new IOException("No server found");
+        }
+        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+        //logger.info("backupSolution() server has sent an answer");
+        ProActive.waitFor(mobile);
+        return mobile;
+    }
 
     // security issue
     public boolean isCiphered() {
@@ -424,13 +420,15 @@ public class RequestImpl extends MessageImpl implements Request,
         throws RenegotiateSessionException {
         //  String localCodeBase = null;
         //     if (ciphered) {
-        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(" RequestImpl " +
-            sessionID + " decrypt : methodcallciphered " + methodCallCiphered +
+        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
+                       .debug(" RequestImpl " + sessionID +
+            " decrypt : methodcallciphered " + methodCallCiphered +
             ", ciphered " + ciphered + ", methodCall " + methodCall);
 
         if ((ciphered) && (psm != null)) {
             try {
-                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug("ReceiveRequest : this body is " +
+                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
+                               .debug("ReceiveRequest : this body is " +
                     psm.getCertificate().getSubjectDN() + " " +
                     psm.getCertificate().getPublicKey());
                 byte[] decryptedMethodCall = psm.decrypt(sessionID,
@@ -495,24 +493,23 @@ public class RequestImpl extends MessageImpl implements Request,
         in.defaultReadObject();
         sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }
-    
+
     //
     // -- METHODS DEALING WITH NON FUNCTIONAL REQUESTS
     //
-    
-	public boolean isFunctionalRequest() {
-		return isNFRequest;
-	}
+    public boolean isFunctionalRequest() {
+        return isNFRequest;
+    }
 
-	public void setFunctionalRequest(boolean isFunctionalRequest) {
-	   this.isNFRequest = isFunctionalRequest; 
-	}
+    public void setFunctionalRequest(boolean isFunctionalRequest) {
+        this.isNFRequest = isFunctionalRequest;
+    }
 
-	public void setNFRequestPriority(int nfReqPriority) {
-		this.nfRequestPriority = nfReqPriority;
-	}
+    public void setNFRequestPriority(int nfReqPriority) {
+        this.nfRequestPriority = nfReqPriority;
+    }
 
-	public int getNFRequestPriority() {
-		return nfRequestPriority;
-	}
+    public int getNFRequestPriority() {
+        return nfRequestPriority;
+    }
 }

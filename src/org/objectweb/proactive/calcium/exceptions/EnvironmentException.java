@@ -30,19 +30,19 @@
  */
 package org.objectweb.proactive.calcium.exceptions;
 
+
 /**
  * This exception is thrown when a task encounters environment
  * problems that normally would not be present on other hosts.
- * 
- * Re-executing the task on another (more proper) host should lead to a 
+ *
+ * Re-executing the task on another (more proper) host should lead to a
  * successful execution.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */
 public class EnvironmentException extends Exception {
-
-	public EnvironmentException(String msg){
-		super(msg);
-	}
+    public EnvironmentException(String msg) {
+        super(msg);
+    }
 }

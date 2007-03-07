@@ -38,8 +38,8 @@ import org.objectweb.proactive.core.event.*;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 
-public class RequestQueueImpl extends AbstractEventProducer
-    implements java.io.Serializable, RequestQueue {
+public class RequestQueueImpl extends AbstractEventProducer implements java.io.Serializable,
+    RequestQueue {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -48,7 +48,7 @@ public class RequestQueueImpl extends AbstractEventProducer
     protected RequestFilterOnMethodName requestFilterOnMethodName;
     protected static final boolean SEND_ADD_REMOVE_EVENT = false;
     protected NonFunctionalRequestsProcessor nfRequestsProcessor;
-    
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -90,9 +90,9 @@ public class RequestQueueImpl extends AbstractEventProducer
         if (requestQueue.isEmpty()) {
             return null;
             //serves the non functional requests first.
-        } else if(!nfRequestsProcessor.isEmpty()){
-        	return nfRequestsProcessor.getOldestPriorityNFRequest(false);
-        } 
+        } else if (!nfRequestsProcessor.isEmpty()) {
+            return nfRequestsProcessor.getOldestPriorityNFRequest(false);
+        }
         return (Request) requestQueue.get(0);
     }
 
@@ -109,11 +109,11 @@ public class RequestQueueImpl extends AbstractEventProducer
         if (requestQueue.isEmpty()) {
             return null;
         } else if (!nfRequestsProcessor.isEmpty()) {
-        	Request r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
-        	requestQueue.remove(r);
-        	return r;
+            Request r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
+            requestQueue.remove(r);
+            return r;
         }
-        
+
         Request r = (Request) requestQueue.remove(0);
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
@@ -134,8 +134,8 @@ public class RequestQueueImpl extends AbstractEventProducer
     public synchronized Request getYoungest() {
         if (requestQueue.isEmpty()) {
             return null;
-        } else if (!nfRequestsProcessor.isEmpty()){
-        	return nfRequestsProcessor.getYoungestPriorityNFRequest(false);
+        } else if (!nfRequestsProcessor.isEmpty()) {
+            return nfRequestsProcessor.getYoungestPriorityNFRequest(false);
         }
         return (Request) requestQueue.get(requestQueue.size() - 1);
     }
@@ -152,10 +152,10 @@ public class RequestQueueImpl extends AbstractEventProducer
     public synchronized Request removeYoungest() {
         if (requestQueue.isEmpty()) {
             return null;
-        }else if (!nfRequestsProcessor.isEmpty()) {
-        	Request r = nfRequestsProcessor.getYoungestPriorityNFRequest(true);
-        	requestQueue.remove(r);
-        	return r;
+        } else if (!nfRequestsProcessor.isEmpty()) {
+            Request r = nfRequestsProcessor.getYoungestPriorityNFRequest(true);
+            requestQueue.remove(r);
+            return r;
         }
         Request r = (Request) requestQueue.remove(requestQueue.size() - 1);
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
@@ -186,13 +186,14 @@ public class RequestQueueImpl extends AbstractEventProducer
                 return ftres;
             }
         }
-        
+
         //if the request is non functional and priority, a reference on it is added in a nonFunctionalRequestsQueue.
         int priority = request.getNFRequestPriority();
-        if(priority == Request.NFREQUEST_IMMEDIATE_PRIORITY || priority == Request.NFREQUEST_PRIORITY) {
-        	nfRequestsProcessor.addToNFRequestsQueue(request);
+        if ((priority == Request.NFREQUEST_IMMEDIATE_PRIORITY) ||
+                (priority == Request.NFREQUEST_PRIORITY)) {
+            nfRequestsProcessor.addToNFRequestsQueue(request);
         }
-       
+
         requestQueue.add(request);
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
@@ -204,13 +205,14 @@ public class RequestQueueImpl extends AbstractEventProducer
 
     public synchronized int addToFront(Request request) {
         int ftres = 0;
-        
+
         //if the request is non functional and priority, a reference on it is added in a nonFunctionalRequestsQueue.
         int priority = request.getNFRequestPriority();
-        if(priority == Request.NFREQUEST_IMMEDIATE_PRIORITY || priority == Request.NFREQUEST_PRIORITY) {
-        	nfRequestsProcessor.addToNFRequestsQueue(request);
+        if ((priority == Request.NFREQUEST_IMMEDIATE_PRIORITY) ||
+                (priority == Request.NFREQUEST_PRIORITY)) {
+            nfRequestsProcessor.addToNFRequestsQueue(request);
         }
-        
+
         requestQueue.add(0, request);
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
@@ -222,19 +224,18 @@ public class RequestQueueImpl extends AbstractEventProducer
     public synchronized void processRequests(RequestProcessor processor,
         Body body) {
         for (int i = 0; i < requestQueue.size(); i++) {
-            Request r ;
-            
+            Request r;
+
             // First, we deal with priotity non functional requests
             while (!nfRequestsProcessor.isEmpty()) {
-            	r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
-            	LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
-            	requestQueue.remove(r);	
+                r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
+                LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
+                requestQueue.remove(r);
             }
-            if(requestQueue.isEmpty()) {
-            	return;
+            if (requestQueue.isEmpty()) {
+                return;
             }
-            
-            
+
             r = (Request) requestQueue.get(i);
             int result = processor.processRequest(r);
             switch (result) {
@@ -263,7 +264,8 @@ public class RequestQueueImpl extends AbstractEventProducer
 
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("--- RequestQueueImpl n=").append(requestQueue.size()).append("   requests --- ->\n");
+        sb.append("--- RequestQueueImpl n=").append(requestQueue.size())
+          .append("   requests --- ->\n");
         int count = 0;
         java.util.Iterator iterator = requestQueue.iterator();
         while (iterator.hasNext()) {
@@ -274,7 +276,7 @@ public class RequestQueueImpl extends AbstractEventProducer
         }
         sb.append("--- End RequestQueueImpl ---");
         sb.append("\n" + nfRequestsProcessor.toString());
-        return sb.toString(); 
+        return sb.toString();
     }
 
     public void addRequestQueueEventListener(RequestQueueEventListener listener) {
@@ -307,22 +309,22 @@ public class RequestQueueImpl extends AbstractEventProducer
      * @return the oldest matching request or null
      */
     private Request findOldest(RequestFilter requestFilter, boolean shouldRemove) {
-    	java.util.Iterator iterator;
+        java.util.Iterator iterator;
         Request r;
-        
+
         //First, we deal with priority non functional requests
-        if(shouldRemove) {
-        	while (!nfRequestsProcessor.isEmpty()) {
-        		r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
-        		LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
-        		requestQueue.remove(r);	
-        	}
+        if (shouldRemove) {
+            while (!nfRequestsProcessor.isEmpty()) {
+                r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
+                LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
+                requestQueue.remove(r);
+            }
         }
-        
-         iterator = requestQueue.iterator();
+
+        iterator = requestQueue.iterator();
         //then we look for the oldest request fullfilling the criteria defined by the given filter
         while (iterator.hasNext()) {
-             r = (Request) iterator.next();
+            r = (Request) iterator.next();
             if (requestFilter.acceptRequest(r)) {
                 if (shouldRemove) {
                     iterator.remove();
@@ -347,19 +349,18 @@ public class RequestQueueImpl extends AbstractEventProducer
      */
     private Request findYoungest(RequestFilter requestFilter,
         boolean shouldRemove) {
-    	Request r;
-    	
-    	//First, we deal with priotity non functional requests
+        Request r;
+
+        //First, we deal with priotity non functional requests
         while (!nfRequestsProcessor.isEmpty()) {
-        	r = nfRequestsProcessor.getYoungestPriorityNFRequest(true);
-        	LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
-        	requestQueue.remove(r);	
+            r = nfRequestsProcessor.getYoungestPriorityNFRequest(true);
+            LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
+            requestQueue.remove(r);
         }
-        
-        
+
         java.util.ListIterator iterator = requestQueue.listIterator(requestQueue.size());
         while (iterator.hasPrevious()) {
-             r = (Request) iterator.previous();
+            r = (Request) iterator.previous();
             if (requestFilter.acceptRequest(r)) {
                 if (shouldRemove) {
                     iterator.remove();
@@ -383,7 +384,6 @@ public class RequestQueueImpl extends AbstractEventProducer
         out.defaultWriteObject();
     }
 
-      
     //
     // -- INNER CLASSES -----------------------------------------------
     //

@@ -39,79 +39,78 @@ import java.util.ArrayList;
 
 import javasci.SciData;
 
+
 /**
  * This class represents a Scilab task
  */
 public class SciTask implements Serializable {
-	
-	private String id;
-	private ArrayList<SciData> listDataIn;
-	private ArrayList<SciData> listDataOut;
-	private String job;
-	private String jobInit;
+    private String id;
+    private ArrayList<SciData> listDataIn;
+    private ArrayList<SciData> listDataOut;
+    private String job;
+    private String jobInit;
 
-	public SciTask(String id) {
-		this.id = id;
-		this.listDataIn = new ArrayList<SciData>();
-		this.listDataOut = new ArrayList<SciData>();
-	}
-	
-	public String getJob() {
-		return job;
-	}
+    public SciTask(String id) {
+        this.id = id;
+        this.listDataIn = new ArrayList<SciData>();
+        this.listDataOut = new ArrayList<SciData>();
+    }
 
-	public void setJob(String job) {
-		this.job = job;
-	}
-	
-	public void setJobInit(String jobInit){
-		this.jobInit = jobInit;
-	}
-	
-	public void setJob(File fileJob) throws FileNotFoundException, IOException{
-		StringBuffer strBuffer = new StringBuffer();
-	
-		FileReader reader = new FileReader(fileJob);
-		int c;
-		
-		while((c = reader.read()) != -1){
-			strBuffer.append((char)c);
-		}
-		this.job = strBuffer.toString();
-		
-		reader.close();
-	}
+    public String getJob() {
+        return job;
+    }
 
-	public ArrayList<SciData> getListDataIn() {
-		return listDataIn;
-	}
+    public void setJob(String job) {
+        this.job = job;
+    }
 
-	public void setListDataIn(ArrayList<SciData> listDataIn) {
-		this.listDataIn = listDataIn;
-	}
+    public void setJobInit(String jobInit) {
+        this.jobInit = jobInit;
+    }
 
-	public void addDataIn(SciData data) {
-		this.listDataIn.add(data);
-	}
-	
-	public ArrayList<SciData> getListDataOut() {
-		return listDataOut;
-	}
+    public void setJob(File fileJob) throws FileNotFoundException, IOException {
+        StringBuffer strBuffer = new StringBuffer();
 
-	public void setListDataOut(ArrayList<SciData> listDataOut) {
-		this.listDataOut = listDataOut;
-	}
-	
-	public void addDataOut(SciData data) {
-		this.listDataOut.add(data);
-	}
+        FileReader reader = new FileReader(fileJob);
+        int c;
 
-	public String getId() {
-		return id;
-	}
+        while ((c = reader.read()) != -1) {
+            strBuffer.append((char) c);
+        }
+        this.job = strBuffer.toString();
 
-	public String getJobInit() {
-		return jobInit;
-	}
-	
+        reader.close();
+    }
+
+    public ArrayList<SciData> getListDataIn() {
+        return listDataIn;
+    }
+
+    public void setListDataIn(ArrayList<SciData> listDataIn) {
+        this.listDataIn = listDataIn;
+    }
+
+    public void addDataIn(SciData data) {
+        this.listDataIn.add(data);
+    }
+
+    public ArrayList<SciData> getListDataOut() {
+        return listDataOut;
+    }
+
+    public void setListDataOut(ArrayList<SciData> listDataOut) {
+        this.listDataOut = listDataOut;
+    }
+
+    public void addDataOut(SciData data) {
+        this.listDataOut.add(data);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getJobInit() {
+        return jobInit;
+    }
 }

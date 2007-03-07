@@ -58,12 +58,12 @@ public abstract class BodyAdapter implements UniversalBody, Serializable {
     protected String jobID;
 
     /**
-     * List all the Objects  (Runtimes, VN, Active Objects, Components...) registered in a registry. 
-     * @param url the url of the host 
+     * List all the Objects  (Runtimes, VN, Active Objects, Components...) registered in a registry.
+     * @param url the url of the host
      * @return String [] containing the names of the Objects registered in the registry
      * @exception java.io.IOException if the given url does not harbour a registry
      */
-    public abstract String [] list(String url) throws java.io.IOException;
+    public abstract String[] list(String url) throws java.io.IOException;
 
     /**
      * Looks-up an active object previously registered in a registry. In fact it is the

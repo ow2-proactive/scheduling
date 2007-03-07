@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.core.process;
 
+import java.util.ArrayList;
+
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
-
-import java.util.ArrayList;
 
 
 /**

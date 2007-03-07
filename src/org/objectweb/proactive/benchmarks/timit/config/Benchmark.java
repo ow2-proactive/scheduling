@@ -41,8 +41,8 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 
-public class Benchmark extends Tag {
 
+public class Benchmark extends Tag {
     private HashMap<String, String> variables;
 
     public Benchmark(Element eBench) {
@@ -51,8 +51,8 @@ public class Benchmark extends Tag {
         Iterator it = eBench.getChildren("descriptorVariable").iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
-            this.variables.put(var.getAttributeValue("name"), var
-                    .getAttributeValue("value"));
+            this.variables.put(var.getAttributeValue("name"),
+                var.getAttributeValue("value"));
         }
     }
 
@@ -78,14 +78,14 @@ public class Benchmark extends Tag {
             return "false";
         }
         if (name.equals("writeeveryrun")) {
-        	return "true";
+            return "true";
         }
         if (name.equals("descriptorgenerated")) {
             return "";
         }
 
-        throw new RuntimeException("Variable benchmark.'" + name
-                + "' missing in configuration file");
+        throw new RuntimeException("Variable benchmark.'" + name +
+            "' missing in configuration file");
     }
 
     public HashMap<String, String> getVariables() {
@@ -106,10 +106,10 @@ public class Benchmark extends Tag {
             seqList = new ArrayList<String>();
 
             // 1 : searching sequences in attributes, then in descVariables
-            searchSequences( eBench, p, seqList );
+            searchSequences(eBench, p, seqList);
             Iterator itVars = eBench.getChildren().iterator();
             while (itVars.hasNext()) {
-                searchSequences( (Element) itVars.next(), p, seqList );
+                searchSequences((Element) itVars.next(), p, seqList);
             }
 
             // 2 : expanding sequences (recursive call)
@@ -122,9 +122,9 @@ public class Benchmark extends Tag {
 
         return result.toArray(new Benchmark[1]);
     }
-    
-    private static void searchSequences(
-            Element elt, Pattern p, ArrayList<String> seqList ) {
+
+    private static void searchSequences(Element elt, Pattern p,
+        ArrayList<String> seqList) {
         Iterator itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
@@ -139,27 +139,25 @@ public class Benchmark extends Tag {
     }
 
     private static void expand(Element eBench, ArrayList<String> seqList,
-            int index, ArrayList<Benchmark> out) {
-
+        int index, ArrayList<Benchmark> out) {
         String seq = seqList.get(index);
         String[] values = seq.split(",");
 
         for (String value : values) {
             Element eBenchClone = (Element) eBench.clone();
-            XMLHelper.replaceAll(
-                    eBenchClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
-                    value);
+            XMLHelper.replaceAll(eBenchClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
+                value);
             Iterator itDesc = eBenchClone.getDescendants();
-            while( itDesc.hasNext() ) {
+            while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();
-                if( eDesc instanceof Element ) {
-                XMLHelper.replaceAll(
-                        (Element) eDesc, "\\x23\\x7B" + seq + "\\x7D", // #{*},
+                if (eDesc instanceof Element) {
+                    XMLHelper.replaceAll((Element) eDesc,
+                        "\\x23\\x7B" + seq + "\\x7D", // #{*},
                         value);
                 }
             }
 
-            if (index + 1 < seqList.size()) {
+            if ((index + 1) < seqList.size()) {
                 expand(eBenchClone, seqList, index + 1, out);
             } else {
                 out.add(new Benchmark(eBenchClone));

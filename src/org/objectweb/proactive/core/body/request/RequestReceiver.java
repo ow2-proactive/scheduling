@@ -46,6 +46,6 @@ public interface RequestReceiver {
 
     public void removeImmediateService(String methodName,
         Class[] parametersTypes) throws java.io.IOException;
-    
+
     public boolean isInImmediateService() throws java.io.IOException;
 }

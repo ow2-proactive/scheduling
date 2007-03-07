@@ -145,13 +145,13 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             }
             if (!isToString(methodCall) &&
                     syncCallLogger.isEnabledFor(Level.DEBUG)) {
-                String msg = "[WARNING: synchronous call] All calls to the method below are synchronous "
-                		+ "(not an error, but may lead to performance issues or deadlocks):" 
-                    + System.getProperty("line.separator") +
-                    methodCall.getReifiedMethod()
-                    + System.getProperty("line.separator") + 
+                String msg = "[WARNING: synchronous call] All calls to the method below are synchronous " +
+                    "(not an error, but may lead to performance issues or deadlocks):" +
+                    System.getProperty("line.separator") +
+                    methodCall.getReifiedMethod() +
+                    System.getProperty("line.separator") +
                     "They are synchronous for the following reason: " + reason;
-;
+                ;
                 if (loggedSyncCalls.add(msg)) {
                     syncCallLogger.debug(msg);
                 }
@@ -229,13 +229,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             Class returnType = null;
             Type t = methodCall.getReifiedMethod().getGenericReturnType();
             if (t instanceof TypeVariable) {
-            	returnType = methodCall.getGenericTypesMapping().get(t);
+                returnType = methodCall.getGenericTypesMapping().get(t);
             } else {
-            	returnType = methodCall.getReifiedMethod().getReturnType();
+                returnType = methodCall.getReifiedMethod().getReturnType();
             }
-            
 
-            
             if (returnType.equals(java.lang.Void.TYPE)) {
                 /* A future for a void call is used to put the potential exception inside */
                 futureobject = (StubObject) MOP.newInstance(VoidFuture.class,

@@ -42,18 +42,19 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
+
 /**
  * Utility methods
- * 
+ *
  * @author Matthieu Morel
  *
  */
 public class Utils {
 
     /**
-     * @return null if clientItfName does not begin with the name of a collection interface, 
-     *         the name of the collection interface otherwise 
-     */ 
+     * @return null if clientItfName does not begin with the name of a collection interface,
+     *         the name of the collection interface otherwise
+     */
     public static String pertainsToACollectionInterface(String clientItfName,
         Component owner) {
         InterfaceType[] itfTypes = (((ComponentType) owner.getFcType()).getFcInterfaceTypes());
@@ -67,7 +68,8 @@ public class Utils {
         return null;
     }
 
-    public static InterfaceType getItfType(String itfName, Component owner) throws NoSuchInterfaceException {
+    public static InterfaceType getItfType(String itfName, Component owner)
+        throws NoSuchInterfaceException {
         InterfaceType[] itfTypes = (((ComponentType) owner.getFcType()).getFcInterfaceTypes());
         for (int i = 0; i < itfTypes.length; i++) {
             if (itfTypes[i].isFcCollectionItf()) {
@@ -139,11 +141,10 @@ public class Utils {
         result = result.substring(result.indexOf(m.getName()));
         return result;
     }
-    
-    public static boolean isControllerInterfaceName(String itfName) {
-    	// according to Fractal spec v2.0 , section 4.1
-        return ((itfName != null) && 
-        		(itfName.endsWith("-controller") || itfName.equals("component")));
-    }
 
+    public static boolean isControllerInterfaceName(String itfName) {
+        // according to Fractal spec v2.0 , section 4.1
+        return ((itfName != null) &&
+        (itfName.endsWith("-controller") || itfName.equals("component")));
+    }
 }

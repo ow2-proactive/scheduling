@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.jmx.server; 
+package org.objectweb.proactive.jmx.server;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -57,7 +57,6 @@ import com.sun.jmx.remote.util.EnvHelp;
  * @author ProActive Team
  */
 public class ProActiveConnectorServer extends JMXConnectorServer {
-	
     private JMXServiceURL address;
     private ProActiveServerImpl paServer;
     private Map<String, Object> attributes;
@@ -158,9 +157,9 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         }
 
         //Server registrations
-//        String url = ClassServer.getUrl();
-//        String url = "";
-//        System.out.println("url = " + url);
+        //        String url = ClassServer.getUrl();
+        //        String url = "";
+        //        System.out.println("url = " + url);
         String url = ProActiveJMXConstants.SERVER_REGISTERED_NAME;
         ProActive.register(this.paServer, url);
         state = STARTED;

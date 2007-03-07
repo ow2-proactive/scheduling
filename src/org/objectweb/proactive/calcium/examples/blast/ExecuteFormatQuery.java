@@ -39,35 +39,39 @@ import org.objectweb.proactive.calcium.muscle.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class ExecuteFormatQuery extends AbstractExecuteCommand implements Execute<BlastParameters,BlastParameters> {
-	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
-	
-	public BlastParameters execute(BlastParameters param) throws EnvironmentException {
-		
-		if(logger.isDebugEnabled()){
-			logger.debug("Formating query file:"+param.getQueryFile().getAbsolutePath());
-		}
 
-		super.execProcess(param.getFormatQueryString(), param.getWorkingDirectory());
-		
-		return param;
-	}
+public class ExecuteFormatQuery extends AbstractExecuteCommand
+    implements Execute<BlastParameters, BlastParameters> {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-	@Override
-	public URL getProgramURL() throws EnvironmentException {
+    public BlastParameters execute(BlastParameters param)
+        throws EnvironmentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Formating query file:" +
+                param.getQueryFile().getAbsolutePath());
+        }
 
-		String osName = System.getProperty("os.name");
-		
-		if(!osName.equals("Linux")){
-			throw new EnvironmentException("Linux machines are required");
-		}
-		
-		URL url = Blast.class.getClass().getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/formatdb");
-		
-		if(url==null){
-			throw new MuscleException("Unable to find formatdb binary");
-		}
-		
-		return url;
-	}
+        super.execProcess(param.getFormatQueryString(),
+            param.getWorkingDirectory());
+
+        return param;
+    }
+
+    @Override
+    public URL getProgramURL() throws EnvironmentException {
+        String osName = System.getProperty("os.name");
+
+        if (!osName.equals("Linux")) {
+            throw new EnvironmentException("Linux machines are required");
+        }
+
+        URL url = Blast.class.getClass()
+                             .getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/formatdb");
+
+        if (url == null) {
+            throw new MuscleException("Unable to find formatdb binary");
+        }
+
+        return url;
+    }
 }

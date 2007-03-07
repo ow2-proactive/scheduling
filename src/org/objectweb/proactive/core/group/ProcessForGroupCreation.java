@@ -48,8 +48,8 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     private Node node;
     private int index;
 
-    public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className, Class[] genericParameters,
-        Object[] param, Node node, int index) {
+    public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className,
+        Class[] genericParameters, Object[] param, Node node, int index) {
         this.proxyGroup = proxyGroup;
         this.className = className;
         this.genericParameters = genericParameters;

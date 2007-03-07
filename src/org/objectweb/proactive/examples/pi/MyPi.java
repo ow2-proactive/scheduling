@@ -30,13 +30,9 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-
 public class MyPi {
-
-	public static void main(String args[]) throws Exception{
-
-		Integer numberOfDecimals =  new Integer(args[0]);
-		String descriptorPath = args[1];
-		
-	}
+    public static void main(String[] args) throws Exception {
+        Integer numberOfDecimals = new Integer(args[0]);
+        String descriptorPath = args[1];
+    }
 }

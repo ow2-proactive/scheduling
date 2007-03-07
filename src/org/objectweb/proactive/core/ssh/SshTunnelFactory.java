@@ -134,7 +134,7 @@ public class SshTunnelFactory {
     private synchronized void GC() {
         java.util.Enumeration<String> keys = _unused.keys();
         for (; keys.hasMoreElements();) {
-            String key =  keys.nextElement();
+            String key = keys.nextElement();
             UnusedTunnel tunnel = _unused.get(key);
             if (tunnel.isOldEnough()) {
                 try {

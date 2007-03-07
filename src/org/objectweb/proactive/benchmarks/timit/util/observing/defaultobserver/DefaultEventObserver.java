@@ -35,14 +35,15 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObservable;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 
+
 /**
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class DefaultEventObserver implements EventObserver {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1090600979208050233L;
     private DefaultEventData eventData;
@@ -50,17 +51,18 @@ public class DefaultEventObserver implements EventObserver {
 
     /** Creates a new instance of DefaultEventObserver */
     public DefaultEventObserver(String name) {
-        this(name,DefaultEventData.SUM,DefaultEventData.SUM);
+        this(name, DefaultEventData.SUM, DefaultEventData.SUM);
     }
+
     public DefaultEventObserver(String name, int collapseOperation,
-            int notifyOperation) {
+        int notifyOperation) {
         this.eventData = new DefaultEventData(name, collapseOperation,
                 notifyOperation);
         this.name = name;
     }
 
     public void update(EventObservable o, Object arg) {
-        if (arg instanceof Event && ((Event) arg).getObserver() == this) {
+        if (arg instanceof Event && (((Event) arg).getObserver() == this)) {
             this.eventData.performNotifyOperation(((Event) arg).getValue());
         }
     }
@@ -68,8 +70,7 @@ public class DefaultEventObserver implements EventObserver {
     public EventData getEventData() {
         return this.eventData;
     }
-    
-    
+
     /**
      * Return the name of this event observer
      */

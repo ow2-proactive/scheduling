@@ -40,36 +40,34 @@ import java.io.Serializable;
 
 
 public class Force implements Serializable {
-    
+
     /** Vector of the force */
     public double x = 0;
-    
+
     /** Vector of the force */
     public double y = 0;
-    
+
     /** Vector of the force */
     public double z = 0;
-    
+
     /** Gravitational constant */
-    public final double G = 9.81; 
+    public final double G = 9.81;
 
+    //    public Force() {
+    //    }
 
-//    public Force() {
-//    }
-    
     /**
      * Creation of a new Force
      * @param ux parameter x
      * @param uy parameter y
      * @param uz parameter z
      */
-    public Force(double ux, double uy, double uz)  {
-        this.x = ux ;
-        this.y = uy ;
-        this.z = uz ;
+    public Force(double ux, double uy, double uz) {
+        this.x = ux;
+        this.y = uy;
+        this.z = uz;
     }
 
- 
     /**
      * Adds up the force of the parameter force to this.
      * @param f the force to be added to this
@@ -81,6 +79,7 @@ public class Force implements Serializable {
     }
 
     public String toString() {
-        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z + ">";
+        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z +
+        ">";
     }
 }

@@ -74,9 +74,9 @@ public class RequestReceiverImpl implements RequestReceiver,
                 }
                 this.inImmediateService.incrementAndGet();
                 try {
-                	bodyReceiver.serve(request);
+                    bodyReceiver.serve(request);
                 } finally {
-                	this.inImmediateService.decrementAndGet();
+                    this.inImmediateService.decrementAndGet();
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("end of service for " +
@@ -172,7 +172,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         }
     }
 
-	public boolean isInImmediateService() throws IOException {
-		return this.inImmediateService.intValue() > 0;
-	}
+    public boolean isInImmediateService() throws IOException {
+        return this.inImmediateService.intValue() > 0;
+    }
 }

@@ -33,27 +33,27 @@ package org.objectweb.proactive.calcium.examples.findprimes;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.muscle.Execute;
 
-public class SolveChallenge implements Execute<Challenge,Primes>{
-	
-	
-	public Primes execute(Challenge param) throws RuntimeException, EnvironmentException  {
-		
-		Primes primes = new Primes();
-		
-		for(int i=param.min;i<=param.max;i++){
-			if(isPrime(i)){
-				primes.primes.add(new Integer(i));
-			}
-		}
-		
-		return primes;
-	}
-	
-	private boolean isPrime(int p){
-		
-		for(int i=2;i<p;i++){
-			if(p%i==0) return false;
-		}
-		return true;
-	}
+
+public class SolveChallenge implements Execute<Challenge, Primes> {
+    public Primes execute(Challenge param)
+        throws RuntimeException, EnvironmentException {
+        Primes primes = new Primes();
+
+        for (int i = param.min; i <= param.max; i++) {
+            if (isPrime(i)) {
+                primes.primes.add(new Integer(i));
+            }
+        }
+
+        return primes;
+    }
+
+    private boolean isPrime(int p) {
+        for (int i = 2; i < p; i++) {
+            if ((p % i) == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

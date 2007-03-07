@@ -45,6 +45,7 @@ import org.objectweb.proactive.ic2d.spy.Spy;
 public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener {
     private VMObject vmObject;
     protected PanelPopupMenu popup;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //

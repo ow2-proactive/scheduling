@@ -47,7 +47,6 @@ public interface Constants {
     public final static String MULTICAST_CONTROLLER = "multicast-controller";
     public final static String GATHERCAST_CONTROLLER = "gathercast-controller";
     public final static String MIGRATION_CONTROLLER = "migration-controller";
-    
     public final static String COMPONENT = "component";
     public final static String CYCLIC_NODE_SUFFIX = "-cyclicInstanceNumber-";
 

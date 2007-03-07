@@ -55,7 +55,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-
 /**
  *
  * <p><Manage and control the Branch and Bound computation.</p>
@@ -286,8 +285,8 @@ public class Manager implements Serializable, InitActive {
                     !this.freeWorkerList.isEmpty()) {
                 Task tReallocated = this.toReallocTaskList.remove(0);
                 try {
-                    this.assignTaskToWorker(this.freeWorkerList.remove(
-                            0), tReallocated);
+                    this.assignTaskToWorker(this.freeWorkerList.remove(0),
+                        tReallocated);
                     logger.info("A task just reallocated");
                 } catch (Exception e) {
                     logger.info("A worker is down");
@@ -587,7 +586,8 @@ public class Manager implements Serializable, InitActive {
         long startTime;
         long endTime;
 
-        public VnThread(VirtualNode virtualNode, Object[] args, Group<Worker> vnGroup) {
+        public VnThread(VirtualNode virtualNode, Object[] args,
+            Group<Worker> vnGroup) {
             this.vn = virtualNode;
             this.args = args;
             this.group = vnGroup;

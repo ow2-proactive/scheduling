@@ -55,68 +55,69 @@ public class SciTestLibrary {
     public SciTestLibrary(String nameVN, String pathDescriptor,
         String[] arrayEngine, String localSource, String remoteDest)
         throws ProActiveException {
-
         //Deployment
-         mapEngine = SciDeployEngine.deploy(nameVN, pathDescriptor, arrayEngine);
+        mapEngine = SciDeployEngine.deploy(nameVN, pathDescriptor, arrayEngine);
 
-          //Activation
-          Vector<BooleanWrapper> listStateEngine = new Vector<BooleanWrapper>();
-              for(int i=0; i<mapEngine.size(); i++){
-                      listStateEngine.add(((SciEngine) mapEngine.get(arrayEngine[i])).activate());
-              }
+        //Activation
+        Vector<BooleanWrapper> listStateEngine = new Vector<BooleanWrapper>();
+        for (int i = 0; i < mapEngine.size(); i++) {
+            listStateEngine.add(((SciEngine) mapEngine.get(arrayEngine[i])).activate());
+        }
 
-          ProActive.waitForAll(listStateEngine);
-          //Transfer
-          Object[] arrayKey = mapEngine.keySet().toArray();
-          try{
-                  FileVector fv;
-                  for(int i=0; i<arrayKey.length; i++){
-                          Node node = SciDeployEngine.getEngineNode((String)arrayKey[i]);
-                          System.out.println("Sending file to:"+node.getNodeInformation().getURL());
-                          fv=FileTransfer.pushFile(node, new File(localSource), new File(remoteDest));
-                          fv.waitForAll();
-                  }
-          }catch(Exception e){
-                  System.out.println("Printing exception");
-                  e.printStackTrace();
-          }
+        ProActive.waitForAll(listStateEngine);
+        //Transfer
+        Object[] arrayKey = mapEngine.keySet().toArray();
+        try {
+            FileVector fv;
+            for (int i = 0; i < arrayKey.length; i++) {
+                Node node = SciDeployEngine.getEngineNode((String) arrayKey[i]);
+                System.out.println("Sending file to:" +
+                    node.getNodeInformation().getURL());
+                fv = FileTransfer.pushFile(node, new File(localSource),
+                        new File(remoteDest));
+                fv.waitForAll();
+            }
+        } catch (Exception e) {
+            System.out.println("Printing exception");
+            e.printStackTrace();
+        }
 
+        //Loading
+        SciTask sciTaskEnv;
+        SciEngine sciEngine;
+        for (int i = 0; i < arrayKey.length; i++) {
+            sciTaskEnv = new SciTask("sciEnv" + arrayKey[i]);
+            sciTaskEnv.setJob("exec('" + remoteDest + "');");
+            sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
+            sciEngine.execute(sciTaskEnv);
+        }
 
-          //Loading
-          SciTask sciTaskEnv;
-          SciEngine sciEngine;
-          for(int i=0; i<arrayKey.length; i++){
-                  sciTaskEnv = new SciTask("sciEnv" + arrayKey[i]);
-                      sciTaskEnv.setJob("exec('" + remoteDest + "');");
-                      sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
-                      sciEngine.execute(sciTaskEnv);
-          }
+        //Call Function
+        SciTask sciTaskCallFun;
+        SciResult sciResult;
+        SciData dataIn;
+        SciData dataOut;
+        for (int i = 0; i < arrayKey.length; i++) {
+            sciTaskCallFun = new SciTask("sciCallFun" + arrayKey[i]);
+            dataIn = new SciDoubleMatrix("x", 1, 1, new double[] { i });
+            dataOut = new SciData("z");
+            sciTaskCallFun.addDataIn(dataIn);
+            sciTaskCallFun.addDataOut(dataOut);
+            sciTaskCallFun.setJob(dataOut.getName() + "= mult(" +
+                dataIn.getName() + "," + dataIn.getName() + ");");
+            sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
+            sciResult = sciEngine.execute(sciTaskCallFun);
+            System.out.println(sciResult.get(dataOut.getName()));
+        }
 
-          //Call Function
-              SciTask sciTaskCallFun;
-              SciResult sciResult;
-              SciData dataIn;
-              SciData dataOut;
-              for(int i=0; i<arrayKey.length; i++){
-                      sciTaskCallFun = new SciTask("sciCallFun" + arrayKey[i]);
-                      dataIn = new SciDoubleMatrix("x", 1, 1, new double[]{i});
-                      dataOut = new SciData("z");
-                      sciTaskCallFun.addDataIn(dataIn);
-                      sciTaskCallFun.addDataOut(dataOut);
-                      sciTaskCallFun.setJob(dataOut.getName() + "= mult(" + dataIn.getName() + "," +  dataIn.getName() + ");");
-                      sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
-                      sciResult = sciEngine.execute(sciTaskCallFun);
-                      System.out.println(sciResult.get(dataOut.getName()));
-              }
-              
-              for(int i=0; i<arrayKey.length; i++){
-            	  sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
-            		try{
-            			sciEngine.exit();
-            		}catch(RuntimeException e ){
-            		}
-              }
-              System.exit(0);
+        for (int i = 0; i < arrayKey.length; i++) {
+            sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
+            try {
+                sciEngine.exit();
+            } catch (RuntimeException e) {
+            }
+        }
+        System.exit(0);
     }
 
     public static void main(String[] args) throws ProActiveException {

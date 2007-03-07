@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
 
+
 /**
  * This class is a utility class for checking that a method invocation can be
  * passed from a client multicast interface to a connected server interface.<br>
@@ -51,12 +52,12 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
  * A request can be transferred from a client multicast interface to a server
  * interface if there is a match between the signature of the invoked method in
  * the (annotated) multicast interface and a method in the server interface.
- * 
+ *
  * @author Matthieu Morel
- * 
+ *
  */
 public class MulticastBindingChecker implements Serializable {
-    
+
     /**
      * client method List&lst;A&gt; foo (B, List<C>) throws E; <br>
      * must be matched by <br>
@@ -68,40 +69,45 @@ public class MulticastBindingChecker implements Serializable {
      * @throws ParameterDispatchException
      * @throws NoSuchMethodException
      */
-    public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods, boolean serverItfIsGathercast, Interface serverSideItf) throws ParameterDispatchException, NoSuchMethodException {
+    public static Method searchMatchingMethod(Method clientSideMethod,
+        Method[] serverSideMethods, boolean serverItfIsGathercast,
+        Interface serverSideItf)
+        throws ParameterDispatchException, NoSuchMethodException {
         Method result = null;
         Type clientSideReturnType = clientSideMethod.getGenericReturnType();
         Type[] clientSideParametersTypes = clientSideMethod.getGenericParameterTypes();
         Class[] clientSideExceptionTypes = clientSideMethod.getExceptionTypes();
         ParamDispatch[] paramDispatchModes = getDispatchModes(clientSideMethod);
 
-
-        serverSideMethodsLoop:
+serverSideMethodsLoop: 
         for (Method serverSideMethod : serverSideMethods) {
-        	if (serverItfIsGathercast) {
-        		// look for corresponding method in the gather proxy itf
-        		Type[] genericParamTypes = serverSideMethod.getGenericParameterTypes();
-        		Class[] correspondingParamTypes = new Class[genericParamTypes.length];
-        		for (int i = 0; i < genericParamTypes.length; i++) {
-					ParameterizedType t = (ParameterizedType)genericParamTypes[i];
-					correspondingParamTypes[i] = (Class)t.getActualTypeArguments()[0];
-				}
-        		serverSideMethod = serverSideItf.getClass().getMethod(serverSideMethod.getName(), correspondingParamTypes);
-        	}
+            if (serverItfIsGathercast) {
+                // look for corresponding method in the gather proxy itf
+                Type[] genericParamTypes = serverSideMethod.getGenericParameterTypes();
+                Class[] correspondingParamTypes = new Class[genericParamTypes.length];
+                for (int i = 0; i < genericParamTypes.length; i++) {
+                    ParameterizedType t = (ParameterizedType) genericParamTypes[i];
+                    correspondingParamTypes[i] = (Class) t.getActualTypeArguments()[0];
+                }
+                serverSideMethod = serverSideItf.getClass()
+                                                .getMethod(serverSideMethod.getName(),
+                        correspondingParamTypes);
+            }
+
             // 1. check names
-            if (! serverSideMethod.getName().equals(clientSideMethod.getName())) {
+            if (!serverSideMethod.getName().equals(clientSideMethod.getName())) {
                 continue serverSideMethodsLoop;
             }
 
             // 2. check return types
             if (!(clientSideReturnType == Void.TYPE)) {
-            	Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType()).getActualTypeArguments()[0];
-            	Class clientSideReturnTypeArgument = null; 
-            	if (cType instanceof ParameterizedType) { 
-            		clientSideReturnTypeArgument = (Class)((ParameterizedType)cType).getRawType();
-            	} else {
-            		clientSideReturnTypeArgument = (Class) cType;	
-            	}
+                Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType()).getActualTypeArguments()[0];
+                Class clientSideReturnTypeArgument = null;
+                if (cType instanceof ParameterizedType) {
+                    clientSideReturnTypeArgument = (Class) ((ParameterizedType) cType).getRawType();
+                } else {
+                    clientSideReturnTypeArgument = (Class) cType;
+                }
                 if (!(clientSideReturnTypeArgument.isAssignableFrom(
                             serverSideMethod.getReturnType()))) {
                     continue serverSideMethodsLoop;
@@ -115,10 +121,14 @@ public class MulticastBindingChecker implements Serializable {
             // 3. check parameters types
             Type[] serverSideParametersTypes = serverSideMethod.getGenericParameterTypes();
 
-            for (int i=0; i<serverSideMethod.getGenericParameterTypes().length; i++) {
-                    if (!(paramDispatchModes[i].match(clientSideParametersTypes[i], serverSideParametersTypes[i]))) {
-                        continue serverSideMethodsLoop;
-                    }
+            for (int i = 0;
+                    i < serverSideMethod.getGenericParameterTypes().length;
+                    i++) {
+                if (!(paramDispatchModes[i].match(
+                            clientSideParametersTypes[i],
+                            serverSideParametersTypes[i]))) {
+                    continue serverSideMethodsLoop;
+                }
             }
 
             // 4. check exception types
@@ -126,26 +136,33 @@ public class MulticastBindingChecker implements Serializable {
             for (Class clientExceptionType : clientSideExceptionTypes) {
                 boolean match = false;
                 for (Class serverExceptionType : serverSideExceptionTypes) {
-                    if (clientExceptionType.isAssignableFrom(serverExceptionType)) {
+                    if (clientExceptionType.isAssignableFrom(
+                                serverExceptionType)) {
                         match = true;
                         break;
                     }
                 }
                 if (!match) {
-                    throw new NoSuchMethodException("found a matching method in server interface for " + clientSideMethod.toGenericString() + " but the types of thrown exceptions do not match");
+                    throw new NoSuchMethodException(
+                        "found a matching method in server interface for " +
+                        clientSideMethod.toGenericString() +
+                        " but the types of thrown exceptions do not match");
                 }
             }
 
             if (result != null) {
-                throw new NoSuchMethodException("cannot find matching method for " + clientSideMethod.toGenericString() + " because there are several matches in the server interface ");
+                throw new NoSuchMethodException(
+                    "cannot find matching method for " +
+                    clientSideMethod.toGenericString() +
+                    " because there are several matches in the server interface ");
             } else {
                 result = serverSideMethod;
             }
-
         }
 
         if (result == null) {
-            throw new NoSuchMethodException("cannot find matching method for " + clientSideMethod.toGenericString());
+            throw new NoSuchMethodException("cannot find matching method for " +
+                clientSideMethod.toGenericString());
         }
 
         return result;
@@ -155,7 +172,7 @@ public class MulticastBindingChecker implements Serializable {
      * Returns the parameter dispatch mode specified by a {@link ParamDispatchMetadata ParamDispatchMetadata} annotation
      * @param a annotation
      * @return the parameters dipatch mode
-     * @throws ParameterDispatchException 
+     * @throws ParameterDispatchException
      */
     public static ParamDispatch getParamDispatchMode(ParamDispatchMetadata a)
         throws ParameterDispatchException {
@@ -168,17 +185,16 @@ public class MulticastBindingChecker implements Serializable {
 
         if (mode.equals(ParamDispatchMode.CUSTOM)) {
             try {
-                mode = (ParamDispatch) ((ParamDispatchMetadata) a).customMode().newInstance();
+                mode = (ParamDispatch) ((ParamDispatchMetadata) a).customMode()
+                                        .newInstance();
             } catch (InstantiationException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    ((ParamDispatchMetadata) a).customMode(),
-                    e);
+                    ((ParamDispatchMetadata) a).customMode(), e);
             } catch (IllegalAccessException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    ((ParamDispatchMetadata) a).customMode(),
-                    e);
+                    ((ParamDispatchMetadata) a).customMode(), e);
             }
         }
 
@@ -191,7 +207,9 @@ public class MulticastBindingChecker implements Serializable {
      * @return an array of dispatch modes (default for non-annotated parameters is broadcast)
      * @throws ParameterDispatchException
      */
-    public static ParamDispatch[] getDispatchModes(Method matchingMethodInClientInterface) throws ParameterDispatchException {
+    public static ParamDispatch[] getDispatchModes(
+        Method matchingMethodInClientInterface)
+        throws ParameterDispatchException {
         ParamDispatch[] result = new ParamDispatch[matchingMethodInClientInterface.getParameterTypes().length];
 
         Annotation[] classAnnotations = matchingMethodInClientInterface.getDeclaringClass()
@@ -201,9 +219,11 @@ public class MulticastBindingChecker implements Serializable {
 
         // class annotation
         for (Annotation annotation : classAnnotations) {
-            if (ClassDispatchMetadata.class.isAssignableFrom(annotation.annotationType())) {
-                for (int i = 0; i < matchingMethodInClientInterface.getParameterTypes().length;
-                     i++) {
+            if (ClassDispatchMetadata.class.isAssignableFrom(
+                        annotation.annotationType())) {
+                for (int i = 0;
+                        i < matchingMethodInClientInterface.getParameterTypes().length;
+                        i++) {
                     result[i] = getParamDispatchMode(((ClassDispatchMetadata) annotation).mode());
                     if (result[i] == null) {
                         result[i] = ParamDispatchMode.BROADCAST;
@@ -215,9 +235,11 @@ public class MulticastBindingChecker implements Serializable {
 
         // method annotation
         for (Annotation annotation : methodAnnotations) {
-            if (MethodDispatchMetadata.class.isAssignableFrom(annotation.annotationType())) {
-                for (int i = 0; i < matchingMethodInClientInterface.getParameterTypes().length;
-                     i++) {
+            if (MethodDispatchMetadata.class.isAssignableFrom(
+                        annotation.annotationType())) {
+                for (int i = 0;
+                        i < matchingMethodInClientInterface.getParameterTypes().length;
+                        i++) {
                     result[i] = getParamDispatchMode(((MethodDispatchMetadata) annotation).mode());
                     if (result[i] == null) {
                         result[i] = ParamDispatchMode.BROADCAST;
@@ -228,22 +250,23 @@ public class MulticastBindingChecker implements Serializable {
         }
 
         // param annotation
-        for (int i = 0; i < matchingMethodInClientInterface.getParameterTypes().length; i++) {
+        for (int i = 0;
+                i < matchingMethodInClientInterface.getParameterTypes().length;
+                i++) {
             Annotation[] currentParamAnnotations = paramsAnnotations[i];
             for (int j = 0; j < currentParamAnnotations.length; j++) {
                 if ((currentParamAnnotations[j] != null) &&
                         ParamDispatchMetadata.class.isAssignableFrom(
                             currentParamAnnotations[j].annotationType())) {
-                        result[i] = getParamDispatchMode((ParamDispatchMetadata) currentParamAnnotations[j]);
-                        if (result[i] == null) {
-                            result[i] = ParamDispatchMode.BROADCAST;
-                        }
+                    result[i] = getParamDispatchMode((ParamDispatchMetadata) currentParamAnnotations[j]);
+                    if (result[i] == null) {
+                        result[i] = ParamDispatchMode.BROADCAST;
+                    }
                 }
             }
             if (result[i] == null) {
-                    result[i] = ParamDispatchMode.BROADCAST; // default mode
+                result[i] = ParamDispatchMode.BROADCAST; // default mode
             }
-
         }
 
         return result;

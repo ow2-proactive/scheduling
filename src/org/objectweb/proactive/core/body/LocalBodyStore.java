@@ -234,9 +234,10 @@ public class LocalBodyStore {
     void unregisterBody(AbstractBody body) {
         localBodyMap.removeBody(body.bodyID);
         bodyEventProducer.fireBodyRemoved(body);
-        if (this.localBodyMap.size() == 0 && "true".equals(System.getProperty("proactive.exit_on_empty"))) {
+        if ((this.localBodyMap.size() == 0) &&
+                "true".equals(System.getProperty("proactive.exit_on_empty"))) {
             ProActive.exitSuccess();
-    	}
+        }
     }
 
     void registerHalfBody(AbstractBody body) {

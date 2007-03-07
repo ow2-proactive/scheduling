@@ -31,25 +31,23 @@
 package org.objectweb.proactive.benchmarks.timit.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 
+
 /**
  * This class is useful to share TimerCounter and EventObserver instances
  * between classes on the same Body (or VM if app is not in a ProActive context)
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class TimItStore {
-
     private static TimItStore vmInstance;
-    private static HashMap<Body, TimItStore> timerStoreMap =
-        new HashMap<Body, TimItStore>();
-
+    private static HashMap<Body, TimItStore> timerStoreMap = new HashMap<Body, TimItStore>();
     private String[] activation;
     private Timed timed;
     private ArrayList<TimerCounter> tcList;
@@ -57,15 +55,15 @@ public class TimItStore {
     /**
      * Used by getInstance to create an unique instance per Body
      */
-    private TimItStore( Timed timed ) {
+    private TimItStore(Timed timed) {
         String prop = System.getProperty("proactive.timit.activation");
-        if( prop == null ) {
+        if (prop == null) {
             this.activation = new String[0];
         } else {
             this.activation = prop.split(",");
         }
         Arrays.sort(this.activation);
-//        System.err.println("proactive.timit.activation = " + Arrays.toString(this.activation));
+        //        System.err.println("proactive.timit.activation = " + Arrays.toString(this.activation));
         this.tcList = new ArrayList<TimerCounter>();
         this.timed = timed;
     }
@@ -73,10 +71,10 @@ public class TimItStore {
     /**
      * Get a TimerStore instance for the current Body, or the VM if we are
      * not on an active object (ProActive context)
-     * 
+     *
      * @return an instance of TimerStore
      */
-    synchronized public static TimItStore getInstance( Timed timed ) {
+    synchronized public static TimItStore getInstance(Timed timed) {
         Body body = ProActive.getBodyOnThis();
 
         if (body == null) {
@@ -92,21 +90,21 @@ public class TimItStore {
         }
         return ts;
     }
-    
-    public TimerCounter addTimerCounter( TimerCounter tc ) {
-        if( Arrays.binarySearch(this.activation, tc.getName()) >= 0 ) {
+
+    public TimerCounter addTimerCounter(TimerCounter tc) {
+        if (Arrays.binarySearch(this.activation, tc.getName()) >= 0) {
             this.tcList.add(tc);
         }
         return tc;
     }
-    
-    public EventObserver addEventObserver( EventObserver eo ) {
-        if( Arrays.binarySearch(this.activation, eo.getName()) > 0 ) {
+
+    public EventObserver addEventObserver(EventObserver eo) {
+        if (Arrays.binarySearch(this.activation, eo.getName()) > 0) {
             this.timed.getEventObservable().addObserver(eo);
         }
         return eo;
     }
-    
+
     public void activation() {
         TimerCounter[] tcActivate = this.tcList.toArray(new TimerCounter[0]);
         this.timed.activate(tcActivate);

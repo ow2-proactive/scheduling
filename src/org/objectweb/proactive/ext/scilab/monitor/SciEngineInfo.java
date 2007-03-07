@@ -30,52 +30,52 @@
  */
 package org.objectweb.proactive.ext.scilab.monitor;
 
-import org.objectweb.proactive.ext.scilab.SciEngine;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.ext.scilab.SciEngine;
 
 
 /**
  * SciEngineInfo contains all methods to access to informations about a Scilab Engine
  */
 public class SciEngineInfo {
-	private String idEngine;
-	private String idCurrentTask;
-	private SciEngine sciEngine;
-	private BooleanWrapper isActivate; //a future to test if the Scilab engine is activated
-	
-	public SciEngineInfo (String idEngine, SciEngine sciEngine, BooleanWrapper isActivate){
-		this.idEngine = idEngine;
-		this.sciEngine = sciEngine;
-		this.isActivate = isActivate;
-	}
-	
-	public String getIdEngine() {
-		return idEngine;
-	}
+    private String idEngine;
+    private String idCurrentTask;
+    private SciEngine sciEngine;
+    private BooleanWrapper isActivate; //a future to test if the Scilab engine is activated
 
-	public SciEngine getSciEngine() {
-		return sciEngine;
-	}
-	
-	public String getSciEngineUrl(){
-		return ProActive.getActiveObjectNodeUrl(this.sciEngine);
-	}
+    public SciEngineInfo(String idEngine, SciEngine sciEngine,
+        BooleanWrapper isActivate) {
+        this.idEngine = idEngine;
+        this.sciEngine = sciEngine;
+        this.isActivate = isActivate;
+    }
 
-	public BooleanWrapper getIsActivate() {
-		return isActivate;
-	}
+    public String getIdEngine() {
+        return idEngine;
+    }
 
-	public void setIsActivate(BooleanWrapper isActivate) {
-		this.isActivate = isActivate;
-	}
+    public SciEngine getSciEngine() {
+        return sciEngine;
+    }
 
-	public String getIdCurrentTask() {
-		return idCurrentTask;
-	}
+    public String getSciEngineUrl() {
+        return ProActive.getActiveObjectNodeUrl(this.sciEngine);
+    }
 
-	public void setIdCurrentTask(String idCurrentTask) {
-		this.idCurrentTask = idCurrentTask;
-	}
+    public BooleanWrapper getIsActivate() {
+        return isActivate;
+    }
+
+    public void setIsActivate(BooleanWrapper isActivate) {
+        this.isActivate = isActivate;
+    }
+
+    public String getIdCurrentTask() {
+        return idCurrentTask;
+    }
+
+    public void setIdCurrentTask(String idCurrentTask) {
+        this.idCurrentTask = idCurrentTask;
+    }
 }

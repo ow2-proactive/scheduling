@@ -36,9 +36,8 @@ import org.objectweb.fractal.api.type.TypeFactory;
 
 
 public interface ProActiveTypeFactory extends TypeFactory {
-    
-    public static final String SINGLETON_CARDINALITY="singleton";
-    public static final String COLLECTION_CARDINALITY="collection";
+    public static final String SINGLETON_CARDINALITY = "singleton";
+    public static final String COLLECTION_CARDINALITY = "collection";
     public static final String MULTICAST_CARDINALITY = "multicast";
     public static final String GATHER_CARDINALITY = "gathercast";
 
@@ -54,8 +53,8 @@ public interface ProActiveTypeFactory extends TypeFactory {
      *      client interfaces.
      * @param isOptional <tt>true</tt> if component interfaces of this type are
      *      optional interfaces.
-     * @param cardinality see { @link ProActiveInterfaceType#getFcCardinality() } 
-     * for a description of cardinalities 
+     * @param cardinality see { @link ProActiveInterfaceType#getFcCardinality() }
+     * for a description of cardinalities
      * @return an interface type initialized with the given values.
      * @throws InstantiationException if the interface type cannot be created.
      */

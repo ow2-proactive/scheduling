@@ -190,8 +190,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             } catch (NodeException e1) {
                 logger.log(e1, false);
             } catch (AlreadyBoundException e) {
-				e.printStackTrace();
-			}
+                e.printStackTrace();
+            }
         }
 
         String jobId = proActiveRuntimeRegistered.getJobID();
@@ -207,11 +207,13 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             ic2dPanel.getWorldPanel().monitoredHostAdded(full_host, protocol);
             ic2dPanel.getWorldPanel().getMonitorThread().updateHosts();
         } else {
-            ic2dPanel.getWorldPanel().getMonitorThread().addObjectToSkip(monitoredJob);
+            ic2dPanel.getWorldPanel().getMonitorThread()
+                     .addObjectToSkip(monitoredJob);
         }
         if (launcherFrame.isJobMonitoring()) {
-            jobMonitorFrame.getPanel().addMonitoredHost(UrlBuilder.removePortFromHost(
-                    host), UrlBuilder.getPortFromUrl(url));
+            jobMonitorFrame.getPanel()
+                           .addMonitoredHost(UrlBuilder.removePortFromHost(host),
+                UrlBuilder.getPortFromUrl(url));
             jobMonitorFrame.getPanel().updateHosts();
         } else {
             jobMonitorFrame.getPanel().addObjectToSkip(monitoredJob);
@@ -277,7 +279,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     //
     private javax.swing.JFrame createEventListFrame(javax.swing.JPanel panel) {
         // Create the timeLine panel
-        final javax.swing.JFrame frame = new javax.swing.JFrame("Methods on Request Queues");
+        final javax.swing.JFrame frame = new javax.swing.JFrame(
+                "Methods on Request Queues");
         frame.setLocation(new java.awt.Point(0, DEFAULT_HEIGHT));
         frame.setSize(new java.awt.Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT / 2));
         java.awt.Container c = frame.getContentPane();

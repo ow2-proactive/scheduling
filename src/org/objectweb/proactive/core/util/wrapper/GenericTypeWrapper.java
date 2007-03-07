@@ -73,17 +73,17 @@ public class GenericTypeWrapper<T extends Object> implements Serializable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object arg) {    	
-    	  if (arg  instanceof GenericTypeWrapper) {
-              return ((GenericTypeWrapper)arg).getObject().equals(this.o);
-          }
-          return false;
+    public boolean equals(Object arg) {
+        if (arg instanceof GenericTypeWrapper) {
+            return ((GenericTypeWrapper) arg).getObject().equals(this.o);
+        }
+        return false;
     }
-    
+
     /**
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-    	return this.o.hashCode();
+        return this.o.hashCode();
     }
 }

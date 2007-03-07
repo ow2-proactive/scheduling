@@ -232,23 +232,23 @@ public class LocalNode {
         }
     }
 
-   /**
-    * Put the specified key value in this property list.
-    * @param key the key to be placed into this property list.
-    * @param value the value corresponding to key.
-    * @return the previous value of the specified key in this property list,
-    * or <code>null</code> if it did not have one.
-    */
+    /**
+     * Put the specified key value in this property list.
+     * @param key the key to be placed into this property list.
+     * @param value the value corresponding to key.
+     * @return the previous value of the specified key in this property list,
+     * or <code>null</code> if it did not have one.
+     */
     public Object setProperty(String key, String value) {
         return this.localProperties.setProperty(key, value);
     }
 
-   /**
-    * Searches for the property with the specified key in this property list.
-    * The method returns <code>null</code> if the property is not found.
-    * @param key the hashtable key.
-    * @return the value in this property list with the specified key value.
-    */
+    /**
+     * Searches for the property with the specified key in this property list.
+     * The method returns <code>null</code> if the property is not found.
+     * @param key the hashtable key.
+     * @return the value in this property list with the specified key value.
+     */
     public String getProperty(String key) {
         return this.localProperties.getProperty(key);
     }

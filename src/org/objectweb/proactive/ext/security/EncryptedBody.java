@@ -269,7 +269,7 @@ public class EncryptedBody implements Body, Serializable {
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         return 0;
     }
@@ -303,7 +303,7 @@ public class EncryptedBody implements Body, Serializable {
      */
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         return null;
     }
@@ -390,14 +390,13 @@ public class EncryptedBody implements Body, Serializable {
     }
 
     public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
-    	return null;
+        return null;
     }
-    
+
     public void setRegistered(boolean registered) {
     }
 
-    public UniversalBody getShortcutTargetBody(
-        ItfID functionalItfID) {
+    public UniversalBody getShortcutTargetBody(ItfID functionalItfID) {
         return null;
     }
 
@@ -432,6 +431,4 @@ public class EncryptedBody implements Body, Serializable {
     public long getNextSequenceID() {
         return 0;
     }
-    
-    
 }

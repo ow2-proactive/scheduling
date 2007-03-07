@@ -409,13 +409,13 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
     public Object receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedRemoteBody.receiveFTMessage(ev);
     }
-    
+
     public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
-    	return proxiedRemoteBody.receiveGCMessage(msg);
+        return proxiedRemoteBody.receiveGCMessage(msg);
     }
-    
+
     public void setRegistered(boolean registered) throws IOException {
-    	proxiedRemoteBody.setRegistered(registered);
+        proxiedRemoteBody.setRegistered(registered);
     }
 
     //--------------------------------
@@ -466,10 +466,8 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
 
         return this;
     }
-    
-    
-    public String[] list(String url) throws IOException {
-        throw new IOException ("Lookup is not implemented yet for this Adapter");
-    }
 
+    public String[] list(String url) throws IOException {
+        throw new IOException("Lookup is not implemented yet for this Adapter");
+    }
 }

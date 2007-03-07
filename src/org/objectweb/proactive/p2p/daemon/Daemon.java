@@ -196,6 +196,7 @@ class Moment implements Comparable {
 
 
 class IntervalTime implements Comparable {
+
     /* <Debug> */
     private static Random random = new Random();
     private Moment start;
@@ -408,6 +409,7 @@ class WorkTime {
         }
 
         if (work.getStart().equals(Moment.START_OF_WEEK)) {
+
             /* Infinite */
             return -1;
         }
@@ -523,6 +525,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     }
 
     public void warning(SAXParseException e) throws SAXException {
+
         /* Ignore the warning */
     }
 
@@ -584,7 +587,8 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         java.net.URL url = null;
 
         try {
-            url = (new java.io.File(CONFIG_PREFIX + "proactivep2p.xsd")).toURI().toURL();
+            url = (new java.io.File(CONFIG_PREFIX + "proactivep2p.xsd")).toURI()
+                   .toURL();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -620,7 +624,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
             File file = new File(configFile);
             Reader reader = new FileReader(file);
             stream = new StreamReader(new InputSource(reader), this,
-                    new String[] {getXMLSchema().toString()}, this);
+                    new String[] { getXMLSchema().toString() }, this);
         } catch (IOException ioe) {
             return false;
         }
@@ -648,6 +652,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
 
         if (parseConfigFile(getDefaultConfig(true)) ||
                 parseConfigFile(getDefaultConfig(false))) {
+
             /* Nothing */
         }
 
@@ -855,6 +860,7 @@ public class Daemon {
             out.write("OK".getBytes("US-ASCII"));
             out.close();
         } catch (IOException e) {
+
             /* The client left, we won't process its request */
             return;
         }

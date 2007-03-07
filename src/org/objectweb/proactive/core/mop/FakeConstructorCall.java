@@ -78,7 +78,7 @@ class FakeConstructorCall implements ConstructorCall, java.io.Serializable {
      * @throws ConstructorCallExecutionFailedException
      */
     public Object execute()
-        throws InvocationTargetException, 
+        throws InvocationTargetException,
             ConstructorCallExecutionFailedException {
         return target;
     }

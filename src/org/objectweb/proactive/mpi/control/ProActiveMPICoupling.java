@@ -30,6 +30,12 @@
  */
 package org.objectweb.proactive.mpi.control;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Hashtable;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -39,14 +45,6 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import java.util.Hashtable;
 
 
 public class ProActiveMPICoupling implements Serializable, InitActive {
@@ -77,8 +75,8 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
 
     public ProActiveMPICoupling(String libName, ProActiveMPIManager manager,
         Integer jobNum)
-        throws ActiveObjectCreationException, NodeException, 
-            ClassNotFoundException, InstantiationException, 
+        throws ActiveObjectCreationException, NodeException,
+            ClassNotFoundException, InstantiationException,
             IllegalAccessException {
         this.manager = manager;
         this.jobID = jobNum.intValue();
@@ -221,8 +219,8 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     }
 
     public void sendToProActive(int jobID, ProActiveMPIData m_r)
-        throws IllegalArgumentException, IllegalAccessException, 
-            InvocationTargetException, SecurityException, NoSuchMethodException, 
+        throws IllegalArgumentException, IllegalAccessException,
+            InvocationTargetException, SecurityException, NoSuchMethodException,
             ClassNotFoundException {
         int dest = m_r.getDest();
         if (jobID < proxyMap.size()) {
@@ -239,12 +237,14 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
                 // its a ProSpmd Object
                 if (g != null) {
                     // extract the specified object from the group and call method on it
-                    ((Method) g.get(dest).getClass().getDeclaredMethod(m_r.getMethod(),
+                    ((Method) g.get(dest).getClass()
+                               .getDeclaredMethod(m_r.getMethod(),
                         new Class[] { ProActiveMPIData.class })).invoke(g.get(dest),
                         new Object[] { m_r });
                 } else {
                     if (((Object[]) proSpmdByClasses.get(m_r.getClazz()))[dest] != null) {
-                        ((Method) ((Object[]) proSpmdByClasses.get(m_r.getClazz()))[dest].getClass()
+                        ((Method) ((Object[]) proSpmdByClasses
+                                                                                         .get(m_r.getClazz()))[dest].getClass()
                                                                                          .getDeclaredMethod(m_r.getMethod(),
                             new Class[] { ProActiveMPIData.class })).invoke(((Object[]) proSpmdByClasses.get(
                                 m_r.getClazz()))[dest], new Object[] { m_r });

@@ -35,25 +35,27 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 
-public class LoadMonitorLinux{
+public class LoadMonitorLinux {
     private double normaLoad;
     private RandomAccessFile statfile;
 
     public LoadMonitorLinux(LoadBalancer lb) {
-       // this.lb = lb;
+        // this.lb = lb;
         this.normaLoad = 1.0;
         //load = 0;
         int nProcessors = 0;
         try {
-        	nProcessors = Runtime.getRuntime().availableProcessors();
-        	if (nProcessors > 1) this.normaLoad = 1/(1.0 * nProcessors);
+            nProcessors = Runtime.getRuntime().availableProcessors();
+            if (nProcessors > 1) {
+                this.normaLoad = 1 / (1.0 * nProcessors);
+            }
             statfile = new RandomAccessFile("/proc/loadavg", "r");
             calculateLoad();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (NumberFormatException e) {
             e.printStackTrace();
-		}
+        }
     }
 
     public synchronized double getLoad() {
@@ -66,16 +68,17 @@ public class LoadMonitorLinux{
         }
 
         double min1;
-        
-        java.util.StringTokenizer st = new java.util.StringTokenizer(cpuLine," ");
+
+        java.util.StringTokenizer st = new java.util.StringTokenizer(cpuLine,
+                " ");
         min1 = Double.parseDouble(st.nextToken());
 
-       return min1*normaLoad;
+        return min1 * normaLoad;
     }
 
     protected synchronized void calculateLoad() {
+        double newload = getLoad();
 
-    	double newload = getLoad();
-       // load = newload;
+        // load = newload;
     }
 }

@@ -120,8 +120,8 @@ public class CertTools {
     }
 
     /** BC X509Name contains some lookup tables that could maybe be used here. */
-    private static final HashMap<String,DERObjectIdentifier> oids = new HashMap<String,DERObjectIdentifier>();
-  
+    private static final HashMap<String, DERObjectIdentifier> oids = new HashMap<String, DERObjectIdentifier>();
+
     static {
         oids.put("c", X509Name.C);
         oids.put("dc", X509Name.DC);
@@ -416,8 +416,6 @@ public class CertTools {
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
-        
-     
     }
 
     /**
@@ -577,8 +575,8 @@ public class CertTools {
         log.debug(">isSelfSigned: cert: " + CertTools.getIssuerDN(cert) + "\n" +
             CertTools.getSubjectDN(cert));
 
-        boolean ret = CertTools.getSubjectDN(cert).equals(CertTools.getIssuerDN(
-                    cert));
+        boolean ret = CertTools.getSubjectDN(cert)
+                               .equals(CertTools.getIssuerDN(cert));
         log.debug("<isSelfSigned:" + ret);
 
         return ret;
@@ -602,8 +600,7 @@ public class CertTools {
      */
     public static X509Certificate genSelfCert(String dn, long validity,
         String policyId, PrivateKey privKey, PublicKey pubKey, boolean isCA)
-        throws NoSuchAlgorithmException, SignatureException, 
-            InvalidKeyException {
+        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();
@@ -680,8 +677,7 @@ public class CertTools {
     public static X509Certificate genCert(String dn, long validity,
         String policyId, PrivateKey privKey, PublicKey pubKey, boolean isCA,
         String caDn, PrivateKey caPrivateKey, PublicKey acPubKey)
-        throws NoSuchAlgorithmException, SignatureException, 
-            InvalidKeyException {
+        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();

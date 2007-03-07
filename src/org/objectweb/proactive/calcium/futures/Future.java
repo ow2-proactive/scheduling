@@ -33,14 +33,15 @@ package org.objectweb.proactive.calcium.futures;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.statistics.Stats;
 
-public interface Future<R>{
 
-	//public boolean cancel(boolean mayInterruptIfRunning);
-	//public boolean isCancelled();
-	public boolean isDone();
-	//public T get(long timeout, TimeUnit unit) throws InterruptedException, MuscleException, TimeoutException;
-	public R get() throws InterruptedException, MuscleException;
-	
-	public Stats getStats() throws InterruptedException;
-	//public Stats getStatus();
+public interface Future<R> {
+    //public boolean cancel(boolean mayInterruptIfRunning);
+    //public boolean isCancelled();
+    public boolean isDone();
+
+    //public T get(long timeout, TimeUnit unit) throws InterruptedException, MuscleException, TimeoutException;
+    public R get() throws InterruptedException, MuscleException;
+
+    public Stats getStats() throws InterruptedException;
+    //public Stats getStatus();
 }

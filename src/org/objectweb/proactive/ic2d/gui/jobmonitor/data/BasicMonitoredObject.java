@@ -128,7 +128,6 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
     private void computePrettyName(String prefix) {
         Map<String, String> prettyNames = getPrettyNames();
         if (prettyNames == null) {
-
             /* Special case for the root element */
             prettyName = null;
             return;
@@ -162,7 +161,6 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
 
     /* When an object is removed we also have to remove it in the sets that contain it */
     public List<MonitoredObjectSet> removeInReferences() {
-
         /*
          * The list is copied because, as we are removing the object in sets, the
          * list is updated, which would cause ConcurrentModificationException.

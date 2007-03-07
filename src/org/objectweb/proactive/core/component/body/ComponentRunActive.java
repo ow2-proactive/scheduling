@@ -36,17 +36,18 @@ import org.objectweb.proactive.Body;
 /**
  * This interface defines the activity of an active object which is a Fractal component.
  * It replaces the {@link org.objectweb.proactive.RunActive} when using Fractal components.
- * 
+ *
  * @author Matthieu Morel
  *
  */
 public interface ComponentRunActive extends ComponentActive {
+
     /**
      * See {@link org.objectweb.proactive.RunActive#runActivity(Body)}
-     * 
+     *
      * One should use a requests filter for separating component controller requests from
-     * component functional requests, notably for managing the lifecycle of the component. 
-     * 
+     * component functional requests, notably for managing the lifecycle of the component.
+     *
      */
     public void runComponentActivity(Body body);
 }

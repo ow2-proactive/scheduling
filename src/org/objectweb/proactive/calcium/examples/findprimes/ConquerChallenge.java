@@ -35,17 +35,16 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.muscle.Conquer;
 
-public class ConquerChallenge implements Conquer<Primes, Primes>{
-	
-	public Primes conquer(Vector<Primes> p) {
-		
-		Primes conquered = new Primes();
-		
-		for(Primes param:p){
-			conquered.primes.addAll(param.primes);
-		}
 
-		Collections.sort(conquered.primes);
-		return conquered;
-	}
+public class ConquerChallenge implements Conquer<Primes, Primes> {
+    public Primes conquer(Vector<Primes> p) {
+        Primes conquered = new Primes();
+
+        for (Primes param : p) {
+            conquered.primes.addAll(param.primes);
+        }
+
+        Collections.sort(conquered.primes);
+        return conquered;
+    }
 }

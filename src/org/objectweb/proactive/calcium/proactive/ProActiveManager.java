@@ -36,50 +36,51 @@ import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
+
 public class ProActiveManager extends AbstractProActiveManager {
-	
-	public ProActiveManager(Node[] nodes) {
-		super(nodes);
-	}
-	
-	public ProActiveManager(VirtualNode vn){
-		super(vn);
-	}
-	
-	public ProActiveManager(String descriptorPath, String virtualNodeName){
-		super(descriptorPath,virtualNodeName);
-	}
-	
-	@Override
-	public Skernel boot(Skernel skernel) {
-		ActiveObjectSkernel aom=null;
-		try{
-			if(logger.isDebugEnabled()){
-				logger.debug("Creating Active Object Skernel");
-			}
-			aom = (ActiveObjectSkernel)ProActive.newActive(ActiveObjectSkernel.class.getName(), new Object[]{skernel});
-		}catch (Exception e){
-			e.printStackTrace();
-		}
+    public ProActiveManager(Node[] nodes) {
+        super(nodes);
+    }
 
-		//copy already inputted tasks
-		while(skernel.hasReadyTask()){
-			aom.addReadyTask(skernel.getReadyTask(0));
-		}
+    public ProActiveManager(VirtualNode vn) {
+        super(vn);
+    }
 
-		try {
-			if(logger.isDebugEnabled()){
-				logger.debug("Creating Active Object Interpreters");
-			}
-			for(int i=0;i<nodes.length;i++){
-				ActiveObjectInterpreter interp=(ActiveObjectInterpreter)ProActive.newActive(ActiveObjectInterpreter.class.getName(),null,nodes[i]);
-				interp.start(aom);
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return aom;
-	}
+    public ProActiveManager(String descriptorPath, String virtualNodeName) {
+        super(descriptorPath, virtualNodeName);
+    }
+
+    @Override
+    public Skernel boot(Skernel skernel) {
+        ActiveObjectSkernel aom = null;
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Creating Active Object Skernel");
+            }
+            aom = (ActiveObjectSkernel) ProActive.newActive(ActiveObjectSkernel.class.getName(),
+                    new Object[] { skernel });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //copy already inputted tasks
+        while (skernel.hasReadyTask()) {
+            aom.addReadyTask(skernel.getReadyTask(0));
+        }
+
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Creating Active Object Interpreters");
+            }
+            for (int i = 0; i < nodes.length; i++) {
+                ActiveObjectInterpreter interp = (ActiveObjectInterpreter) ProActive.newActive(ActiveObjectInterpreter.class.getName(),
+                        null, nodes[i]);
+                interp.start(aom);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return aom;
+    }
 }

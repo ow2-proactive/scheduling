@@ -111,10 +111,11 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
         String VNname, String jobId)
         throws IOException, NodeException, AlreadyBoundException {
         if (urid == null) {
-        	return super.createLocalNode(nodeName, replacePreviousBinding, ps, VNname, jobId);
+            return super.createLocalNode(nodeName, replacePreviousBinding, ps,
+                VNname, jobId);
         } else {
-    	return proActiveRuntimeF.createLocalNode(urid, nodeName,
-            replacePreviousBinding, ps, VNname, jobId);
+            return proActiveRuntimeF.createLocalNode(urid, nodeName,
+                replacePreviousBinding, ps, VNname, jobId);
         }
     }
 

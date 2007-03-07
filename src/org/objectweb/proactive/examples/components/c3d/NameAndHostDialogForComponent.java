@@ -30,26 +30,25 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-import org.objectweb.fractal.api.NoSuchInterfaceException;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
+import javax.naming.NamingException;
+
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 
-import java.io.IOException;
-
-import java.net.UnknownHostException;
-
-import javax.naming.NamingException;
 
 /** Overide the AO NameAndHostDialog, to use proper conponent lookup. */
 public class NameAndHostDialogForComponent extends NameAndHostDialog {
     private static final String COMPONENT_ALIAS = "Dispatcher";
 
     public NameAndHostDialogForComponent() {
-        super();  
+        super();
     }
 
     /** Try to find a dispatcher, using the component methods, overiding the AO initial lookup.  */
@@ -62,8 +61,8 @@ public class NameAndHostDialogForComponent extends NameAndHostDialog {
             String protocol = UrlBuilder.getProtocol(hostNameTextField.getText());
 
             ProActiveComponentRepresentative a;
-            a = Fractive.lookup(UrlBuilder.buildUrl( hostName,
-                        COMPONENT_ALIAS, protocol, portNumber));
+            a = Fractive.lookup(UrlBuilder.buildUrl(hostName, COMPONENT_ALIAS,
+                        protocol, portNumber));
             this.c3dDispatcher = (Dispatcher) a.getFcInterface(
                     "user2dispatcher");
             setVisible(false);

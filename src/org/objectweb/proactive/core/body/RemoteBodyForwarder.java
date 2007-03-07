@@ -137,7 +137,7 @@ public interface RemoteBodyForwarder {
         throws SecurityNotAvailableException, IOException;
 
     public long startNewSession(UniqueID id, Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     public PublicKey getPublicKey(UniqueID id)
@@ -145,19 +145,19 @@ public interface RemoteBodyForwarder {
 
     public byte[] randomValue(UniqueID id, long sessionID,
         byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     public byte[][] publicKeyExchange(UniqueID id, long sessionID,
         byte[] myPublicKey, byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException;
 
     public byte[][] secretKeyExchange(UniqueID id, long sessionID,
         byte[] encodedAESKey, byte[] encodedIVParameters,
         byte[] encodedClientMacKey, byte[] encodedLockData,
         byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     public SecurityContext getPolicy(UniqueID id,
@@ -176,10 +176,12 @@ public interface RemoteBodyForwarder {
     public Object receiveFTMessage(UniqueID id, FTMessage fte)
         throws IOException;
 
-    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg) throws IOException;
+    public GCResponse receiveGCMessage(UniqueID id, GCMessage msg)
+        throws IOException;
 
-    public void setRegistered(UniqueID id, boolean registered) throws IOException;
-    
+    public void setRegistered(UniqueID id, boolean registered)
+        throws IOException;
+
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws java.io.IOException;
 

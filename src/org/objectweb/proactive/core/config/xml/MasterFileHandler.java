@@ -70,7 +70,6 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
 
             //System.out.println("FILENAME = " + filename);
             if (filename.startsWith("bundle://")) {
-
                 /* osgi mode, get the ProActiveConfiguration in the jar root */
                 filename = "/ProActiveConfiguration.xml";
                 //filename = "/org/objectweb/proactive/core/config/ProActiveConfiguration.xml";

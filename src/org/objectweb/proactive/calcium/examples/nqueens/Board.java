@@ -30,60 +30,57 @@
  */
 package org.objectweb.proactive.calcium.examples.nqueens;
 
-
 public class Board implements java.io.Serializable {
-	
-	//board dimension
-	public int n;
-	public int solvableSize;
-		
-	//solutions vector
-	//public long solutions[];
+    //board dimension
+    public int n;
+    public int solvableSize;
 
-	// the board
-	public int board[];
-	
-	
-	public int bound1, topbit, mask; 
-	
-	public int row; // fila de la ultima reina fijada
-	public int column; // columna de la ultima reina fijada
-	public int left; // vector de diagonales hacia la izquierda
-	public int down; // vector de columnas
-	public int right; // vector de diagonales hacia la derecha
-	
-	public Board (int n, int solvableSize){
-		this.n=n;
-		this.solvableSize=solvableSize;
-		
-		this.board = new int[n];
-	}
-	
-	public Board(int n, int solvableSize, int row, int left, int down, int right,
-			int bound1) {
-		
-		this(n,solvableSize);
-		this.row = row;
-		this.left = left;
-		this.right = right;
-		this.down = down;
-		this.bound1 = bound1;
-	}
-	
-	public boolean isRootBoard(){
-		return true;
-	}
-	
-	public boolean isBT1(){
-		return false;
-	}
-	/*
-	public Vector<Board> divide(){
-		
-		Vector<Board> v = new Vector<Board>();
-		v.addAll(initDivideBT1());
-		v.addAll(initDivideBT2());
-		return v;
-	}
-	*/
+    //solutions vector
+    //public long solutions[];
+
+    // the board
+    public int[] board;
+    public int bound1;
+    public int topbit;
+    public int mask;
+    public int row; // fila de la ultima reina fijada
+    public int column; // columna de la ultima reina fijada
+    public int left; // vector de diagonales hacia la izquierda
+    public int down; // vector de columnas
+    public int right; // vector de diagonales hacia la derecha
+
+    public Board(int n, int solvableSize) {
+        this.n = n;
+        this.solvableSize = solvableSize;
+
+        this.board = new int[n];
+    }
+
+    public Board(int n, int solvableSize, int row, int left, int down,
+        int right, int bound1) {
+        this(n, solvableSize);
+        this.row = row;
+        this.left = left;
+        this.right = right;
+        this.down = down;
+        this.bound1 = bound1;
+    }
+
+    public boolean isRootBoard() {
+        return true;
+    }
+
+    public boolean isBT1() {
+        return false;
+    }
+
+    /*
+    public Vector<Board> divide(){
+
+            Vector<Board> v = new Vector<Board>();
+            v.addAll(initDivideBT1());
+            v.addAll(initDivideBT2());
+            return v;
+    }
+    */
 }

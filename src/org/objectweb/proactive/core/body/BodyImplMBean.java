@@ -30,6 +30,5 @@
  */
 package org.objectweb.proactive.core.body;
 
-public interface BodyImplMBean extends UniversalBody{
-
+public interface BodyImplMBean extends UniversalBody {
 }

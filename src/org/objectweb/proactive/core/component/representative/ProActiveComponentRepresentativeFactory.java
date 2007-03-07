@@ -92,16 +92,16 @@ public class ProActiveComponentRepresentativeFactory {
      */
     public ProActiveComponentRepresentative createComponentRepresentative(
         Proxy proxy) throws Throwable {
-        ((BodyProxy) proxy).getBody().getRemoteAdapter().setImmediateService("getComponentParameters",
-            new Class[] {  });
+        ((BodyProxy) proxy).getBody().getRemoteAdapter()
+         .setImmediateService("getComponentParameters", new Class[] {  });
         ComponentParameters componentParameters = (ComponentParameters) proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
                     ComponentParametersController.class.getDeclaredMethod(
                         "getComponentParameters", new Class[] {  }),
-                    new Object[] {  }, null, 
+                    new Object[] {  }, null,
                     Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
                     ComponentRequest.STRICT_FIFO_PRIORITY));
-        ((BodyProxy) proxy).getBody().getRemoteAdapter().removeImmediateService("getComponentParameters",
-            new Class[] {  });
+        ((BodyProxy) proxy).getBody().getRemoteAdapter()
+         .removeImmediateService("getComponentParameters", new Class[] {  });
         return ProActiveComponentRepresentativeFactory.instance()
                                                       .createComponentRepresentative(componentParameters.getComponentType(),
             componentParameters.getHierarchicalType(), proxy,

@@ -69,7 +69,7 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * This identifier is build from the pad url appended with the pad's jobId.
      */
     public String getUrl();
-    
+
     /**
      * Returns the descriptor's location
      * @return the location of the xml proactive descriptor file used.
@@ -141,7 +141,8 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      */
     public Map getVirtualNodeMapping();
 
-    public void setMainDefinitionMapping(HashMap<String, MainDefinition> newMapping);
+    public void setMainDefinitionMapping(
+        HashMap<String, MainDefinition> newMapping);
 
     public void setVirtualNodeMapping(HashMap<String, VirtualNode> newMapping);
 
@@ -382,6 +383,5 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public void addTechnicalService(TechnicalServiceXmlType tsParsed)
         throws Exception;
 
-    public TechnicalService getTechnicalService(
-        String technicalServiceId);
+    public TechnicalService getTechnicalService(String technicalServiceId);
 }

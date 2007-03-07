@@ -71,7 +71,8 @@ public class FlowShop implements Serializable {
      * the fs
      */
     public static int computeMakespan(FlowShop fs, int[] permutation) {
-        return computePartialMakespan(fs, permutation, permutation.length)[fs.nbMachine - 1];
+        return computePartialMakespan(fs, permutation, permutation.length)[fs.nbMachine -
+        1];
     }
 
     /**
@@ -91,11 +92,9 @@ public class FlowShop implements Serializable {
             timeMachine[0] += currentJob[0];
             for (int j = 1; j < timeMachine.length; j++) {
                 if (timeMachine[j] > timeMachine[j - 1]) {
-                    timeMachine[j] = timeMachine[j] +
-                        currentJob[j];
+                    timeMachine[j] = timeMachine[j] + currentJob[j];
                 } else {
-                    timeMachine[j] = timeMachine[j - 1] +
-                        currentJob[j];
+                    timeMachine[j] = timeMachine[j - 1] + currentJob[j];
                 }
             }
         }
@@ -123,16 +122,13 @@ public class FlowShop implements Serializable {
             timeMachine[0] += currentJob[0];
             for (int j = 1; j < timeMachine.length; j++) {
                 if (timeMachine[j] > timeMachine[j - 1]) {
-                    timeMachine[j] = timeMachine[j] +
-                        currentJob[j];
+                    timeMachine[j] = timeMachine[j] + currentJob[j];
                 } else {
                     // the machine j is later than machine j-1 
-                    timeMachine[j] = timeMachine[j - 1] +
-                        currentJob[j];
+                    timeMachine[j] = timeMachine[j - 1] + currentJob[j];
                 }
             }
-            cumulateTimeOnLastMachine -= currentJob[timeMachine.length -
-                1];
+            cumulateTimeOnLastMachine -= currentJob[timeMachine.length - 1];
             if ((timeMachine[timeMachine.length - 1] +
                     cumulateTimeOnLastMachine) >= bound) {
                 return -(i + 1);

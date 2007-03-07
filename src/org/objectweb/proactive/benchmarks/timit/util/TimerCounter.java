@@ -32,29 +32,27 @@ package org.objectweb.proactive.benchmarks.timit.util;
 
 import java.io.Serializable;
 
+
 /**
  * Represent a counter used for timing procedures
- * 
+ *
  * @author Brian Amedro, Vladimir Bodnartchouk
- * 
+ *
  */
 public class TimerCounter implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6077443063543623646L;
-
     private int id;
-
     private String name;
-
     private HierarchicalTimer timer;
 
     /**
      * Create a counter with his name as it will be shown on output charts. The
      * counter is disabled by default.
-     * 
+     *
      * @param s
      */
     public TimerCounter(String s) {
@@ -65,7 +63,7 @@ public class TimerCounter implements Serializable {
 
     /**
      * Set the counter id
-     * 
+     *
      * @param n
      */
     public void setId(int n) {
@@ -74,7 +72,7 @@ public class TimerCounter implements Serializable {
 
     /**
      * Set the counter name
-     * 
+     *
      * @param s
      */
     public void setName(String s) {
@@ -83,7 +81,7 @@ public class TimerCounter implements Serializable {
 
     /**
      * Get the counter id
-     * 
+     *
      * @return counter id
      */
     public int getId() {
@@ -92,7 +90,7 @@ public class TimerCounter implements Serializable {
 
     /**
      * Get the counter name
-     * 
+     *
      * @return counter name
      */
     public String getName() {
@@ -101,7 +99,7 @@ public class TimerCounter implements Serializable {
 
     /**
      * Used by the Timer to register the counter
-     * 
+     *
      * @param timer
      */
     public void setTimer(HierarchicalTimer timer) {
@@ -136,7 +134,7 @@ public class TimerCounter implements Serializable {
     /**
      * Set a specific time value (in milliseconds) to the counter.<br>
      * Counter's parents will be modified to keep integrity
-     * 
+     *
      * @param t
      *            time value to set in millis
      */
@@ -147,7 +145,7 @@ public class TimerCounter implements Serializable {
     /**
      * Add a specific time value (in milliseconds) to the counter.<br>
      * Counter's parents will be modified to keep integrity
-     * 
+     *
      * @param t
      *            time value to add in millis
      */
@@ -158,7 +156,7 @@ public class TimerCounter implements Serializable {
     /**
      * Keep in mind that this method take a "little bit of time".<br>
      * Theorically, you don't need to use this method.
-     * 
+     *
      * @return true if counter is started, false otherwise
      */
     public boolean isStarted() {

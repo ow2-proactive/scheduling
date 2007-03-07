@@ -135,6 +135,4 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
     public Proxy getBodyProxy() {
         return bodyProxyDelegatee;
     }
-
- 
 }

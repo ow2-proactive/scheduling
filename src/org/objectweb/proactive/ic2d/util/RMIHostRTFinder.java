@@ -49,14 +49,15 @@ public class RMIHostRTFinder implements HostRTFinder {
     static Logger log4jlogger = ProActiveLogger.getLogger(Loggers.IC2D);
     private static final int DEFAULT_RMI_PORT = 1099;
     private IC2DMessageLogger logger;
-	private DefaultListModel skippedObjects;
+    private DefaultListModel skippedObjects;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public RMIHostRTFinder(IC2DMessageLogger logger, DefaultListModel skippedObjects) {
+    public RMIHostRTFinder(IC2DMessageLogger logger,
+        DefaultListModel skippedObjects) {
         this.logger = logger;
-        this.skippedObjects= skippedObjects;
+        this.skippedObjects = skippedObjects;
     }
 
     public RMIHostRTFinder() {
@@ -97,14 +98,13 @@ public class RMIHostRTFinder implements HostRTFinder {
                     part = new ProActiveRuntimeAdapterImpl(r);
                     runtimeArray.add(part);
                 } catch (Exception e) {
-                	//we build a jvmObject with depth of 0 since this jvm won't be monitored
-                	MonitoredJVM jvmObject = new MonitoredJVM(id, 0);
-                	if(! skippedObjects.contains(jvmObject)){
+                    //we build a jvmObject with depth of 0 since this jvm won't be monitored
+                    MonitoredJVM jvmObject = new MonitoredJVM(id, 0);
+                    if (!skippedObjects.contains(jvmObject)) {
                         log(e.getMessage(), e);
                         skippedObjects.addElement(jvmObject);
-                	}
-                	continue;
-                    
+                    }
+                    continue;
                 }
             }
         }

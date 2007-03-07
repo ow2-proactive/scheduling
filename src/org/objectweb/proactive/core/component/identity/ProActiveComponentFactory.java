@@ -41,7 +41,7 @@ import org.objectweb.proactive.Body;
  */
 public interface ProActiveComponentFactory {
 
-    /** 
+    /**
      * Factory for ProActiveComponent
      * @param myBody a reference on the body of the active object
      * @return a proactive component metaobject

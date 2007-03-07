@@ -34,17 +34,19 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * Resource Managers must extend this class to work with Calcium.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <T>
  */
-public abstract class ResourceManager{
-	protected static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_MANAGER);
-	protected static long DEFAULT_GET_READY_TASK_TIMEOUT=1000;
-	
-	abstract public  Skernel boot(Skernel skernel);
-	abstract public void shutdown();
+public abstract class ResourceManager {
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_MANAGER);
+    protected static long DEFAULT_GET_READY_TASK_TIMEOUT = 1000;
+
+    abstract public Skernel boot(Skernel skernel);
+
+    abstract public void shutdown();
 }

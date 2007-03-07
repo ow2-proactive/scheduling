@@ -45,237 +45,240 @@ import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 
+
 public class StubGenerator {
+    public static void main(String[] args) {
+        StubGenerator sg = new StubGenerator(args);
+        sg.run();
+    }
 
-	public static void main(String[] args) {
+    private File srcDir;
+    private String pkg = "";
+    private File destDir;
+    private String cl;
+    private boolean verbose = false;
 
-		StubGenerator sg = new StubGenerator(args);
-		sg.run();
-	}
+    public StubGenerator(String[] args) {
+        ClassPool pool = ClassPool.getDefault();
+        pool.insertClassPath(new ClassClassPath(this.getClass()));
 
-	private File srcDir;
+        int index = 0;
+        while (index < args.length) {
+            if (args[index].equals("-srcDir")) {
+                srcDir = new File(args[index + 1]);
+                index += 2;
+            } else if (args[index].equals("-pkg")) {
+                pkg = args[index + 1];
+                index += 2;
+            } else if (args[index].equals("-destDir")) {
+                destDir = new File(args[index + 1]);
+                index += 2;
+            } else if (args[index].equals("-class")) {
+                cl = args[index + 1];
+                index += 2;
+            } else if (args[index].equals("-verbose")) {
+                verbose = true;
+                index++;
+            } else {
+                usage();
+                System.exit(1);
+            }
+        }
+    }
 
-	private String pkg = "";
+    public void usage() {
+        System.out.println("Usage:");
+        System.out.println("\t-srcDir  directory where to find source classes");
+        System.out.println("\t-destDir directory where to put generated stubs");
+        System.out.println("\t-pkg     package name");
+        System.out.println("\t-class   generate only a stub for this class");
+        System.out.println("\t-verbose enable verbose mode");
+        System.out.println("");
+    }
 
-	private File destDir;
+    public void logAndExit(String str) {
+        System.err.println(str);
+        System.exit(2);
+    }
 
-	private String cl;
+    public void run() {
+        if (srcDir == null) {
+            logAndExit("srcDir attribute is not set");
+        }
+        if (!srcDir.exists()) {
+            logAndExit("Invalid srcDir attribute: " + srcDir.toString() +
+                " does not exist");
+        }
+        if (!srcDir.isDirectory()) {
+            logAndExit("Invalid srcDir attribute: " + srcDir.toString() +
+                " is not a directory");
+        }
 
-	private boolean verbose = false;
+        if (pkg == null) {
+            logAndExit("pkg attribute is not set");
+        }
+        File pkgDir = new File(srcDir.toString() + File.separator +
+                pkg.replace('.', File.separatorChar));
+        if (!pkgDir.exists()) {
+            logAndExit("Invalid pkg attribute: " + pkgDir.toString() +
+                " does not exist");
+        }
 
-	public StubGenerator(String[] args) {
-		ClassPool pool = ClassPool.getDefault();
-		pool.insertClassPath(new ClassClassPath(this.getClass()));
+        if (destDir == null) {
+            destDir = srcDir;
+        }
+        if (!destDir.isDirectory()) {
+            logAndExit("Invalid dest attribute: " + destDir.toString() +
+                " is not a directory");
+        }
+        if (!destDir.isDirectory()) {
+            logAndExit("Invalid src attribute: " + destDir.toString() +
+                " is not a directory");
+        }
 
-		int index = 0;
-		while (index < args.length) {
-			if (args[index].equals("-srcDir")) {
-				srcDir = new File(args[index + 1]);
-				index += 2;
-			} else if (args[index].equals("-pkg")) {
-				pkg = args[index + 1];
-				index += 2;
-			} else if (args[index].equals("-destDir")) {
-				destDir = new File(args[index + 1]);
-				index += 2;
-			} else if (args[index].equals("-class")) {
-				cl = args[index + 1];
-				index += 2;
-			} else if (args[index].equals("-verbose")) {
-				verbose = true;
-				index++;
-			} else {
-				usage();
-				System.exit(1);
-			}
-		}
-	}
+        List<File> files = new ArrayList<File>();
 
-	public void usage() {
-		System.out.println("Usage:");
-		System.out.println("\t-srcDir  directory where to find source classes");
-		System.out.println("\t-destDir directory where to put generated stubs");
-		System.out.println("\t-pkg     package name");
-		System.out.println("\t-class   generate only a stub for this class");
-		System.out.println("\t-verbose enable verbose mode");
-		System.out.println("");
-	}
+        if (cl == null) {
+            // Find all the classes in this package
+            files.addAll(exploreDirectory(pkgDir));
+        } else {
+            File file = new File(pkgDir + File.separator + cl + ".class");
+            if (!file.exists() || !file.isFile()) {
+                logAndExit("Invalid pkg or class attribute: " +
+                    file.toString() + " does not exist");
+            }
 
-	public void logAndExit(String str) {
-		System.err.println(str);
-		System.exit(2);
-	}
+            files.add(file);
+        }
 
-	public void run() {
-		if (srcDir == null)
-			logAndExit("srcDir attribute is not set");
-		if (!srcDir.exists())
-			logAndExit("Invalid srcDir attribute: " + srcDir.toString()
-					+ " does not exist");
-		if (!srcDir.isDirectory())
-			logAndExit("Invalid srcDir attribute: " + srcDir.toString()
-					+ " is not a directory");
+        PrintStream stderr = System.err;
+        PrintStream mute = new PrintStream(new MuteOutputStream());
 
-		if (pkg == null)
-			logAndExit("pkg attribute is not set");
-		File pkgDir = new File(srcDir.toString() + File.separator
-				+ pkg.replace('.', File.separatorChar));
-		if (!pkgDir.exists())
-			logAndExit("Invalid pkg attribute: " + pkgDir.toString()
-					+ " does not exist");
+        if (!verbose) {
+            System.setErr(mute);
+        }
 
-		if (destDir == null)
-			destDir = srcDir;
-		if (!destDir.isDirectory())
-			logAndExit("Invalid dest attribute: " + destDir.toString()
-					+ " is not a directory");
-		if (!destDir.isDirectory())
-			logAndExit("Invalid src attribute: " + destDir.toString()
-					+ " is not a directory");
+        ClassPool.releaseUnmodifiedClassFile = true;
 
-		List<File> files = new ArrayList<File>();
+        for (File file : files) {
+            String str = file.toString().replaceFirst(srcDir.toString(), "");
+            try {
+                if (!verbose) {
+                    System.setErr(mute);
+                }
 
-		if (cl == null) {
-			// Find all the classes in this package
-			files.addAll(exploreDirectory(pkgDir));
-		} else {
-			File file = new File(pkgDir + File.separator + cl + ".class");
-			if (!file.exists() || !file.isFile())
-				logAndExit("Invalid pkg or class attribute: " + file.toString()
-						+ " does not exist");
+                StubGenerator.generateClass(str,
+                    destDir.toString() + File.separator);
+            } catch (Throwable e) {
+                System.out.println("FAILED " + str);
+            }
+        }
 
-			files.add(file);
-		}
+        if (!verbose) {
+            System.setErr(stderr);
+        }
+    }
 
-		PrintStream stderr = System.err;
-		PrintStream mute = new PrintStream(new MuteOutputStream());
+    private List<File> exploreDirectory(File dir) {
+        List<File> files = new ArrayList<File>();
 
-		if (!verbose) {
-			System.setErr(mute);
-		}
+        for (File file : dir.listFiles()) {
+            if (file.isDirectory()) {
+                files.addAll(exploreDirectory(file));
+            }
 
-		ClassPool.releaseUnmodifiedClassFile = true;
+            if (!file.toString().endsWith(".class")) {
+                continue;
+            }
 
-		for (File file : files) {
-			String str = file.toString().replaceFirst(srcDir.toString(), "");
-			try {
-				if (!verbose)
-					System.setErr(mute);
+            files.add(file);
+        }
 
-				StubGenerator.generateClass(str, destDir.toString()
-						+ File.separator);
-			} catch (Throwable e) {
-				System.out.println("FAILED " + str);
-			}
-		}
+        return files;
+    }
 
-		if (!verbose) {
-			System.setErr(stderr);
-		}
-	}
+    /**
+     * @param arg
+     * @param directoryName
+     */
+    public static void generateClass(String arg, String directoryName) {
+        String className = processClassName(arg);
+        String fileName = null;
 
-	private List<File> exploreDirectory(File dir) {
-		List<File> files = new ArrayList<File>();
+        String stubClassName;
 
-		for (File file : dir.listFiles()) {
+        try {
+            // Generates the bytecode for the class
+            // ASM is now the default bytecode manipulator
+            byte[] data;
 
-			if (file.isDirectory())
-				files.addAll(exploreDirectory(file));
+            // if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
+            // ASMBytecodeStubBuilder bsb = new
+            // ASMBytecodeStubBuilder(className);
+            // data = bsb.create();
+            // stubClassName = Utils.convertClassNameToStubClassName(className);
+            // } else
+            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
+                data = JavassistByteCodeStubBuilder.create(className, null);
+                stubClassName = Utils.convertClassNameToStubClassName(className,
+                        null);
+            } else {
+                // that shouldn't happen, unless someone manually sets the
+                // BYTE_CODE_MANIPULATOR static variable
+                System.err.println(
+                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
+                System.err.println(
+                    "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
+                stubClassName = null;
+                data = null;
+            }
 
-			if (!file.toString().endsWith(".class"))
-				continue;
+            char sep = System.getProperty("file.separator").toCharArray()[0];
+            fileName = directoryName + stubClassName.replace('.', sep) +
+                ".class";
 
-			files.add(file);
-		}
+            // And writes it to a file
+            new File(fileName.substring(0, fileName.lastIndexOf(sep))).mkdirs();
 
-		return files;
-	}
+            // String fileName = directoryName + System.getProperty
+            // ("file.separator") +
+            File f = new File(fileName);
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(data);
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            System.err.println("Cannot write file " + fileName);
+            System.err.println("Reason is " + e);
+        }
+    }
 
-	/**
-	 * @param arg
-	 * @param directoryName
-	 */
-	public static void generateClass(String arg, String directoryName) {
-		String className = processClassName(arg);
-		String fileName = null;
+    /**
+     * Turn a file name into a class name if necessary. Remove the ending .class
+     * and change all the '/' into '.'
+     *
+     * @param name
+     */
+    protected static String processClassName(String name) {
+        int i = name.indexOf(".class");
+        String tmp = name;
+        if (i < 0) {
+            return name;
+        }
+        tmp = name.substring(0, i);
 
-		String stubClassName;
+        String tmp2 = tmp.replace(File.separatorChar, '.');
 
-		try {
-			// Generates the bytecode for the class
-			// ASM is now the default bytecode manipulator
-			byte[] data;
+        if (tmp2.indexOf('.') == 0) {
+            return tmp2.substring(1);
+        }
+        return tmp2;
+    }
 
-			// if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-			// ASMBytecodeStubBuilder bsb = new
-			// ASMBytecodeStubBuilder(className);
-			// data = bsb.create();
-			// stubClassName = Utils.convertClassNameToStubClassName(className);
-			// } else
-			if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-
-				data = JavassistByteCodeStubBuilder.create(className, null);
-				stubClassName = Utils.convertClassNameToStubClassName(
-						className, null);
-			} else {
-				// that shouldn't happen, unless someone manually sets the
-				// BYTE_CODE_MANIPULATOR static variable
-				System.err
-						.println("byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
-				System.err
-						.println("Any other setting will result in the use of javassist, the default bytecode manipulator framework");
-				stubClassName = null;
-				data = null;
-			}
-
-			char sep = System.getProperty("file.separator").toCharArray()[0];
-			fileName = directoryName + stubClassName.replace('.', sep)
-					+ ".class";
-
-			// And writes it to a file
-			new File(fileName.substring(0, fileName.lastIndexOf(sep))).mkdirs();
-
-			// String fileName = directoryName + System.getProperty
-			// ("file.separator") +
-			File f = new File(fileName);
-			FileOutputStream fos = new FileOutputStream(f);
-			fos.write(data);
-			fos.flush();
-			fos.close();
-		} catch (Exception e) {
-			System.err.println("Cannot write file " + fileName);
-			System.err.println("Reason is " + e);
-		}
-	}
-
-	/**
-	 * Turn a file name into a class name if necessary. Remove the ending .class
-	 * and change all the '/' into '.'
-	 * 
-	 * @param name
-	 */
-	protected static String processClassName(String name) {
-		int i = name.indexOf(".class");
-		String tmp = name;
-		if (i < 0) {
-			return name;
-		}
-		tmp = name.substring(0, i);
-
-		String tmp2 = tmp.replace(File.separatorChar, '.');
-
-		if (tmp2.indexOf('.') == 0) {
-			return tmp2.substring(1);
-		}
-		return tmp2;
-	}
-
-	public class MuteOutputStream extends OutputStream {
-
-		@Override
-		public void write(int b) throws IOException {
-			// Please shut up !
-		}
-
-	}
+    public class MuteOutputStream extends OutputStream {
+        @Override
+        public void write(int b) throws IOException {
+            // Please shut up !
+        }
+    }
 }

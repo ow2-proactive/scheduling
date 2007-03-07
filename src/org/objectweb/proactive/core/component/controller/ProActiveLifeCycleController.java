@@ -43,7 +43,6 @@ import org.objectweb.fractal.api.control.LifeCycleController;
  *
  */
 public interface ProActiveLifeCycleController extends LifeCycleController {
-    
     public String getFcState(short priority);
 
     public void startFc(short priority);

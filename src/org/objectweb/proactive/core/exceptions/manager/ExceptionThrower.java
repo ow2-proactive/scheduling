@@ -40,6 +40,7 @@ import javassist.CtNewMethod;
 /*
  * This is the nasty hack to bypass java checked exceptions
  */
+
 /*
  * This interface is the entry-point to the thrower, an object implementing this
  * interface will be built by reflection. By calling the throwException() method
@@ -60,9 +61,12 @@ public class ExceptionThrower {
 
     private static Class loadClassJavassist() {
         try {
-            CtClass throwerClass = ClassPool.getDefault().makeClass(THROWER_CLASS_FULLNAME);
-            throwerClass.addInterface(ClassPool.getDefault().get(Thrower.class.getName()));
-            throwerClass.addConstructor(CtNewConstructor.defaultConstructor(throwerClass));
+            CtClass throwerClass = ClassPool.getDefault()
+                                            .makeClass(THROWER_CLASS_FULLNAME);
+            throwerClass.addInterface(ClassPool.getDefault()
+                                               .get(Thrower.class.getName()));
+            throwerClass.addConstructor(CtNewConstructor.defaultConstructor(
+                    throwerClass));
             CtMethod throwException = CtNewMethod.make("" +
                     "public void throwException(Throwable t) {" +
                     "    throw t;}", throwerClass);

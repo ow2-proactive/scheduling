@@ -87,7 +87,6 @@ public class StartHierarchical {
         // (serialization for example), so we set property to help us.
         System.setProperty("proactive.hierarchicalRuntime", "true");
 
-    	
         if ("true".equals(System.getProperty("log4j.defaultInitOverride")) &&
                 (System.getProperty("log4j.configuration") != null)) {
             // configure log4j here to avoid classloading problems with log4j classes

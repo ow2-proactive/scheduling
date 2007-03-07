@@ -79,7 +79,6 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         }
     }
 
-
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
@@ -239,13 +238,13 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {
                 if (name.equals(CURRENTJVM_TAG)) {
-                	String protocol = (String) activeHandler.getResultObject();
-                	if (!checkNonEmpty(protocol)) {
-                		protocol = System.getProperty("proactive.communication.protocol");
-                	}
+                    String protocol = (String) activeHandler.getResultObject();
+                    if (!checkNonEmpty(protocol)) {
+                        protocol = System.getProperty(
+                                "proactive.communication.protocol");
+                    }
 
-                	vn.createNodeOnCurrentJvm(protocol);
-                    
+                    vn.createNodeOnCurrentJvm(protocol);
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }

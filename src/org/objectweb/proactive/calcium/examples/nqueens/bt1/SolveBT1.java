@@ -34,34 +34,38 @@ import org.objectweb.proactive.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.calcium.examples.nqueens.Result;
 import org.objectweb.proactive.calcium.examples.nqueens.SolveBoard;
 
+
 public class SolveBT1 extends SolveBoard {
+    public SolveBT1() {
+        super();
+    }
 
-	public SolveBT1() {
-		super();
-	}
+    public Result execute(Board board) {
+        n1 = board.n - 1;
+        n2 = n1 - 1;
+        BoardBT1 boardBT1 = (BoardBT1) board;
+        Result res = new Result(board.n);
+        backtrack1(res, boardBT1, boardBT1.row, boardBT1.left, boardBT1.down,
+            boardBT1.right);
+        return mixBoard(res, n1, n2);
+    }
 
-	public Result execute(Board board){
-       n1 = board.n - 1;
-       n2 = n1 - 1;
-       BoardBT1 boardBT1=(BoardBT1)board;
-       Result res=new Result(board.n);
-       backtrack1(res,boardBT1, boardBT1.row, boardBT1.left, boardBT1.down, boardBT1.right);
-       return mixBoard(res, n1, n2);
-	}
-	
-	/**
-     * Metodo que calcula las tareas de tipo BT1
-	 * @param res 
-     * @param y
-     * @param left
-     * @param down
-     * @param right
-     * @return
-     */
-    private void backtrack1(Result res, BoardBT1 board, int y, int left, int down, int right) {
+    /**
+    * Metodo que calcula las tareas de tipo BT1
+     * @param res
+    * @param y
+    * @param left
+    * @param down
+    * @param right
+    * @return
+    */
+    private void backtrack1(Result res, BoardBT1 board, int y, int left,
+        int down, int right) {
         int bitmap = board.mask & ~(left | down | right);
-        int bit,firstColumn, lastColumn;
-        
+        int bit;
+        int firstColumn;
+        int lastColumn;
+
         if (y == n1) {
             if (bitmap != 0) {
                 board.board[y] = bitmap;
@@ -84,7 +88,7 @@ public class SolveBT1 extends SolveBoard {
             }
             while (bitmap != 0) {
                 bitmap ^= (board.board[y] = bit = -bitmap & bitmap);
-                backtrack1(res,board, y + 1, (left | bit) << 1, down | bit,
+                backtrack1(res, board, y + 1, (left | bit) << 1, down | bit,
                     (right | bit) >> 1);
             }
         }

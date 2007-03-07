@@ -70,12 +70,12 @@ public class AsyncLogger implements Runnable {
     * The category name is "proactive.gc".
     */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.GC);
-    
+
     /**
      * The messages to log in the thread
      */
     private static final LinkedBlockingQueue<LogMessage> queue = new LinkedBlockingQueue<LogMessage>();
-    
+
     /**
      * The thread that will log all messages in FIFO order
      */
