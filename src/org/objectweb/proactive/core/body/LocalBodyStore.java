@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.BodyEventProducerImpl;
@@ -95,9 +96,6 @@ public class LocalBodyStore {
     private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
     private ThreadLocal<Body> bodyPerThread = new ThreadLocal<Body>();
     private MetaObjectFactory halfBodyMetaObjectFactory = null;
-
-    /** Should the JVM be killed when it has no more active bodies? */
-    private boolean exitOnEmpty = false;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -222,22 +220,6 @@ public class LocalBodyStore {
         bodyEventProducer.removeBodyEventListener(listener);
     }
 
-    private void checkExitOnEmpty() {
-    	if (this.exitOnEmpty && this.localBodyMap.size() == 0) {
-    		System.exit(0);
-    	}
-    }
-    
-    /**
-     * After this call, when the JVM has no more active objects
-     * it will be killed.
-     *
-     */
-    public void enableExitOnEmpty() {
-    	this.exitOnEmpty = true;
-    	checkExitOnEmpty();
-    }
-
     //
     // -- FRIENDLY METHODS -----------------------------------------------
     //
@@ -252,7 +234,9 @@ public class LocalBodyStore {
     void unregisterBody(AbstractBody body) {
         localBodyMap.removeBody(body.bodyID);
         bodyEventProducer.fireBodyRemoved(body);
-        checkExitOnEmpty();
+        if (this.localBodyMap.size() == 0 && "true".equals(System.getProperty("proactive.exit_on_empty"))) {
+            ProActive.exitSuccess();
+    	}
     }
 
     void registerHalfBody(AbstractBody body) {

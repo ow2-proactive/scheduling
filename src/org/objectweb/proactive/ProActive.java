@@ -2594,15 +2594,6 @@ public class ProActive {
     }
 
     /**
-     * After this call, when the JVM has no more active objects
-     * it will be killed.
-     *
-     */
-    public static void enableExitOnEmpty() {
-        LocalBodyStore.getInstance().enableExitOnEmpty();
-    }
-
-    /**
      * Returns the number of this version
      * @return String
      */
