@@ -32,8 +32,6 @@ package org.objectweb.proactive.calcium.skeletons;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
 
 /**
  * This class provides Farm parallelism (also known as Master/Slave).
@@ -42,11 +40,11 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
  * @author The ProActive Team (mleyton)
  *
  */
-public class Farm<T,R> implements Skeleton<T,R>{
+public class Farm<P,R> implements Skeleton<P,R>{
 
-	Skeleton<T,R> child;
+	Skeleton<P,R> child;
 	
-	public Farm(Skeleton<T,R> child){
+	public Farm(Skeleton<P,R> child){
 		this.child =child;
 	}
 

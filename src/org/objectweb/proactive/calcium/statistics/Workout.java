@@ -33,7 +33,7 @@ package org.objectweb.proactive.calcium.statistics;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.objectweb.proactive.calcium.interfaces.Muscle;
+import org.objectweb.proactive.calcium.muscle.Muscle;
 
 public class Workout implements Serializable{
 

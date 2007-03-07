@@ -28,24 +28,21 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.muscle;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.calcium.Task;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 
 /**
- * This inteface indicates that the skeletal instruction
- * can be interpreted.
+ * This interfaces is used to provide evaulation
+ * conditions in skeletons like: divide & conquer,
+ * if, and while.
  * @author The ProActive Team (mleyton)
  *
  * @param <T>
+ * 
  */
-public interface Instruction<T,R> extends Serializable{
+public interface Condition<P> extends Muscle<P, Boolean>{
 
-	public Task<R> compute(Task<T> t) throws Exception;
-	
-	public Task<?> computeUnknown(Task<?> t) throws Exception;
-	
+	public boolean evalCondition(P param) throws RuntimeException, EnvironmentException;
 }

@@ -33,9 +33,9 @@ package org.objectweb.proactive.calcium.examples.nqueens.bt1;
 import java.util.Vector;
 
 import org.objectweb.proactive.calcium.examples.nqueens.Board;
-import org.objectweb.proactive.calcium.interfaces.Divide;
+import org.objectweb.proactive.calcium.muscle.Divide;
 
-public class DivideBT1 implements Divide<Board>{
+public class DivideBT1 implements Divide<Board,Board>{
 
 	public Vector<Board> divide(Board board) {
 

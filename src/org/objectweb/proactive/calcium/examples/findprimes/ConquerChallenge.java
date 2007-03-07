@@ -33,9 +33,9 @@ package org.objectweb.proactive.calcium.examples.findprimes;
 import java.util.Collections;
 import java.util.Vector;
 
-import org.objectweb.proactive.calcium.interfaces.Conquer;
+import org.objectweb.proactive.calcium.muscle.Conquer;
 
-public class ConquerChallenge implements Conquer<Primes>{
+public class ConquerChallenge implements Conquer<Primes, Primes>{
 	
 	public Primes conquer(Vector<Primes> p) {
 		

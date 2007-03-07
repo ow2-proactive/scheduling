@@ -28,20 +28,24 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.skeletons;
 
-import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
+import java.io.Serializable;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
- * Classes implementing this interface can be executed.
- * The object of providing this method is indicating
- * what is the sequential code that must be run.
- * 
+ * This class is used to mark an object as a skeleton.
+ * A skeleton is able to return the stack of instructions
+ * nested inside the skeleton.
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
  */
-public interface Execute<T,R> extends Muscle{
+public interface Skeleton<T,R> extends Serializable{
+	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
 
-	public R execute(T param) throws RuntimeException, EnvironmentException;
+	public Vector<Instruction<?,?>> getInstructionStack();
 }

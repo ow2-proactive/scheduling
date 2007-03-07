@@ -39,10 +39,10 @@ import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.examples.nqueens.NQueens;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.skeletons.DaC;
 import org.objectweb.proactive.calcium.skeletons.Pipe;
 import org.objectweb.proactive.calcium.skeletons.Seq;
+import org.objectweb.proactive.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 import org.objectweb.proactive.calcium.futures.Future;
 

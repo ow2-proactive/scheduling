@@ -36,8 +36,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.futures.Future;
 import org.objectweb.proactive.calcium.futures.FutureImpl;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.skeletons.Instruction;
+import org.objectweb.proactive.calcium.skeletons.Skeleton;
 
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -49,14 +49,14 @@ public class Stream<T,R>{
 	private int streamId;
 	private Facade facade;
 	private Skeleton<T,R> skeleton;
-	private int lastPriority;
+	private int streamPriority;
 	
 	protected Stream(Facade facade,  Skeleton<T,R> skeleton){
 		
 		this.streamId=(int)(Math.random()*Integer.MAX_VALUE);
 		this.skeleton=skeleton;
 		this.facade=facade;
-		this.lastPriority=0;
+		this.streamPriority=Task.DEFAULT_PRIORITY;
 	}
 
 	/**
@@ -72,15 +72,14 @@ public class Stream<T,R>{
 
 		Vector<Instruction<?,?>> instructionStack = (Vector<Instruction<?,?>>) skeleton.getInstructionStack();
 		task.setStack(instructionStack);
-		task.setStreamId(streamId);
-		task.setPriority(lastPriority--);
+		task.setPriority(streamPriority);
 		
 		FutureImpl<R> future = new FutureImpl<R>(task.getId());
 		facade.putTask(task, future);
 
 		return (Future<R>)future;
 	}
-	
+
 	/**
 	 * Inputs a vector of T to be computed.
 	 * @param paramV A vector containing the T.

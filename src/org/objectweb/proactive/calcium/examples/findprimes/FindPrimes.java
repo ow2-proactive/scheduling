@@ -40,10 +40,10 @@ import org.objectweb.proactive.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.futures.Future;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.proactive.ProActiveThreadedManager;
 import org.objectweb.proactive.calcium.skeletons.DaC;
 import org.objectweb.proactive.calcium.skeletons.Seq;
+import org.objectweb.proactive.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 public class FindPrimes implements Serializable{

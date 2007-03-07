@@ -40,11 +40,11 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
-import org.objectweb.proactive.calcium.interfaces.Divide;
+import org.objectweb.proactive.calcium.muscle.Divide;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class DivideDB implements Divide<BlastParameters> {
+public class DivideDB implements Divide<BlastParameters,BlastParameters> {
 
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 	

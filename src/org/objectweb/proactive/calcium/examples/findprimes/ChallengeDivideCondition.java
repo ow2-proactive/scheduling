@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.calcium.examples.findprimes;
 
-import org.objectweb.proactive.calcium.interfaces.Condition;
+import org.objectweb.proactive.calcium.muscle.Condition;
 
 public class ChallengeDivideCondition implements  Condition<Challenge>{
 

@@ -31,9 +31,10 @@
 package org.objectweb.proactive.calcium.examples.findprimes;
 
 import java.util.Vector;
-import org.objectweb.proactive.calcium.interfaces.Divide;
 
-public class ChallengeDivide implements Divide<Challenge>{
+import org.objectweb.proactive.calcium.muscle.Divide;
+
+public class ChallengeDivide implements Divide<Challenge, Challenge>{
 	
 	public Vector<Challenge> divide(Challenge param) {
 		

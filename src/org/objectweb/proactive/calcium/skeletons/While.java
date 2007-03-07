@@ -33,9 +33,7 @@ package org.objectweb.proactive.calcium.skeletons;
 import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
-import org.objectweb.proactive.calcium.interfaces.Condition;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.muscle.Condition;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
@@ -45,14 +43,14 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  * 
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
+ * @param <P>
  */
-public class While<T> implements Instruction<T,T>, Skeleton<T,T> {
+public class While<P> implements Instruction<P,P>, Skeleton<P,P> {
 
-	Condition<T> cond;
-	Skeleton<T,T> child;
+	Condition<P> cond;
+	Skeleton<P,P> child;
 	
-	public While(Condition<T> cond, Skeleton<T,T> child){
+	public While(Condition<P> cond, Skeleton<P,P> child){
 		this.cond=cond;
 		this.child=child;
 	}
@@ -63,7 +61,7 @@ public class While<T> implements Instruction<T,T>, Skeleton<T,T> {
 		return v;
 	}
 	
-	public Task<T> compute(Task<T> task) throws Exception{
+	public Task<P> compute(Task<P> task) throws Exception{
 		Timer timer = new Timer();
 		boolean evalCondition=cond.evalCondition(task.getObject());
 		timer.stop();
@@ -86,6 +84,6 @@ public class While<T> implements Instruction<T,T>, Skeleton<T,T> {
 	}
 
 	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<T>) t);
+		return compute((Task<P>) t);
 	}
 }

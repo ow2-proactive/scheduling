@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
+import org.objectweb.proactive.calcium.skeletons.Instruction;
 import org.objectweb.proactive.calcium.statistics.Timer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;

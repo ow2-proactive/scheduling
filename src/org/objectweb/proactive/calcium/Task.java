@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
+import org.objectweb.proactive.calcium.skeletons.Instruction;
 import org.objectweb.proactive.calcium.statistics.StatsImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -57,7 +57,8 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS);
 	
 	public static int DEFAULT_PRIORITY=0;
-	static private int DEFAULT_STREAM_ID,DEFAULT_ROOT_PARENT_ID=-1;
+	public static int DEFAULT_INTRA_FAMILY_PRIORITY=0;
+	static private int DEFAULT_ROOT_PARENT_ID=-1;
 
 	
 	//Rebirth preserved parameters
@@ -66,11 +67,12 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	private T param;
 	
 	private int id;
-	private int priority; //higher number, higher priority
+	private int priority; //higher number => higher priority
+	private int intraFamilyPri; //higher number => higher priority
 	private boolean isTainted;
 	private boolean isDummy;
 	private StatsImpl stats;
-	private int streamId;
+	//private int streamId;
 	
 	//The program stack. Higher indexed elements are served first (LIFO).
 	private Vector<Instruction<?,?>> stack;
@@ -83,18 +85,18 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	private Vector<Task<T>> childrenFinished;
 	private Exception exception;
 	
-		
 	public Task(){
 		
 	}
 	
-	private Task(T object, int id, int priority, int parentId,  int familyId, int streamId) {
+	private Task(T object, int id, int priority, int intraFamilyPriority, int parentId,  int familyId) {
 		this.param = object;
 		this.id = id;
 		this.priority = priority;
+		this.intraFamilyPri=intraFamilyPriority;
 		this.parentId= parentId;
 		this.familyId=familyId;
-		this.streamId=streamId;
+		
 		
 		isDummy=false;
 		stats = new StatsImpl();
@@ -107,11 +109,10 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	}
 		
 	public Task(T object){
-		this(object, (int)(Math.random()*Integer.MAX_VALUE), DEFAULT_PRIORITY, 
-				DEFAULT_ROOT_PARENT_ID, DEFAULT_ROOT_PARENT_ID, DEFAULT_STREAM_ID);
+		this(object, (int)(Math.random()*Integer.MAX_VALUE), DEFAULT_PRIORITY, DEFAULT_INTRA_FAMILY_PRIORITY,
+				DEFAULT_ROOT_PARENT_ID, DEFAULT_ROOT_PARENT_ID );
 		this.familyId=this.id; //Root task, head of the family
 	}
-	
 	
 	
 	/**
@@ -123,20 +124,8 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	 * @param object The new object to be hold in this task.
 	 * @return A new birth of the current task containting object
 	 */
-	/*public Task<T,R> reBirth(T object){
-		Task<T,R> newMe = new Task<T,R>(object,id, priority,parentId, familyId,streamId);
-		newMe.setStack(this.stack);
-		
-		newMe.isDummy=this.isDummy;
-		newMe.isTainted=this.isTainted;
-		
-		newMe.stats=this.stats;
-		
-		return newMe;
-	}*/
-	
 	public <R> Task<R> reBirth(R object){
-		Task<R> newMe = new Task<R>(object,id, priority,parentId, familyId,streamId);
+		Task<R> newMe = new Task<R>(object,id, priority, intraFamilyPri,parentId, familyId);
 		newMe.setStack(this.stack);
 		
 		newMe.isDummy=this.isDummy;
@@ -148,7 +137,19 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	}
 	
 	public int compareTo(Task task){
-		return task.priority - this.priority;
+		//return task.priority - this.priority;
+		int comp;
+		
+		//priority tasks go first
+		comp = task.priority - this.priority;
+		if(comp !=0) return comp;
+
+		//if priority is tied then consider fifo order of root task
+		comp= task.familyId - this.familyId;
+		if(comp !=0) return comp;
+		
+		//if two tasks belong to the same famility then consider family hierarchy
+		return task.intraFamilyPri-this.intraFamilyPri;
 	}
 	
 	@Override
@@ -221,7 +222,7 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		this.parentId = parentId;
 	}
 
-	private void setFamily(int familyId) {
+	public void setFamily(int familyId) {
 		this.familyId=familyId;
 	}
 	
@@ -296,11 +297,12 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	 * and also with a priority higher than it's parent.
 	 * @param child The sub task.
 	 */
-	public synchronized void addReadyChild(Task<T> child){
-		child.setPriority(getPriority()+1); //child has better priority than parent
+	public synchronized void addReadyChild(Task<?> child){
+		child.setPriority(getPriority()); //child has better priority than parent
 		child.setParent(getId());
 		child.setFamily(getFamilyId());
-		this.childrenReady.add(child);
+		child.setIntraFamilyPri(getIntraFamilyPri());
+		this.childrenReady.add((Task<T>)child);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -354,12 +356,12 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	}
 	
 	public boolean isRootTask(){
-		return this.familyId==this.id;
+		return this.parentId==DEFAULT_ROOT_PARENT_ID;
 	}
 	
 	@Override
 	public String toString(){
-		return this.familyId+"/"+parentId+"."+this.id;
+		return this.familyId+"|"+parentId+"."+this.id;
 	}
 
 	public boolean isDummy() {
@@ -419,16 +421,16 @@ public class Task<T> implements Serializable, Comparable<Task>{
 	}
 
 	/**
-	 * @return Returns the id of the stream that created this task.
+	 * @param intraFamilyPri the intraFamilyPri to set
 	 */
-	public int getStreamId() {
-		return streamId;
+	public void setIntraFamilyPri(int intraFamilyPri) {
+		this.intraFamilyPri = intraFamilyPri;
 	}
 
 	/**
-	 * @param streamId Sets the id of the stream that created this task.
+	 * @return the intraFamilyPri
 	 */
-	public void setStreamId(int streamId) {
-		this.streamId = streamId;
+	public int getIntraFamilyPri() {
+		return intraFamilyPri;
 	}
 }

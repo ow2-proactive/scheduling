@@ -42,10 +42,8 @@ import java.util.Vector;
 import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.calcium.interfaces.Conquer;
-import org.objectweb.proactive.calcium.interfaces.Divide;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.muscle.Conquer;
+import org.objectweb.proactive.calcium.muscle.Divide;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
@@ -58,13 +56,13 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  *  
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
+ * @param <P>
  */
-public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
+public class Fork<P,R> implements Skeleton<P,R>, Instruction<P,P> {
 
-	Divide<T> div;
-	Conquer<R> conq;
-	Vector<Skeleton<T,R>> stages;
+	Divide<P,?> div;
+	Conquer<?,R> conq;
+	Vector<Skeleton<?,?>> stages;
 	
 	/**
 	 * Creates a Fork skeleton structure. The default divition of the parameters
@@ -76,9 +74,9 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 	 * @param conq The conquering (reduction) used to consolidate the results
 	 * of the sub-skeletons into a single result.
 	 * @param stages The sub-skeletons that can be computed in parallel.	 */
-	public Fork(Conquer<R> conq, Skeleton<T,R>... args){
+	public <X> Fork(Conquer<X,R> conq, Skeleton<P,X>... args){
 		this(null,conq, Arrays.asList(args));
-		this.div=new ForkDefaultDivide<T>(args.length);
+		this.div=new ForkDefaultDivide<P>(args.length);
 	}
 	
 	/**
@@ -92,14 +90,14 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 	 * of the sub-skeletons into a single result.
 	 * @param stages The sub-skeletons that can be computed in parallel.
 	 */
-	public Fork(Divide<T> div, Conquer<R> conq, List<Skeleton<T,R>> stages){
+	public <X,Y> Fork(Divide<P,X> div, Conquer<Y,R> conq, List<Skeleton<X,Y>> stages){
 		if(stages.size() <=0 ) {
 			throw new IllegalArgumentException("Fork must have at least one stage");
 		}
 		
 		this.div=div;
 		this.conq=conq;
-		this.stages = new Vector<Skeleton<T,R>>();
+		this.stages = new Vector<Skeleton<?,?>>();
 		this.stages.addAll(stages);
 	}	
 	
@@ -111,7 +109,7 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 		return v;
 	}
 
-	public Task<T> compute(Task<T> t) throws EnvironmentException{
+	public Task<P> compute(Task<P> t) throws EnvironmentException{
 		
 		t.pushInstruction(new DaC.ConquerInst(conq));
 		t.pushInstruction(new DivideInst(div,stages));
@@ -128,7 +126,7 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 	 * It simply deep copies the parameters N times.
 	 * @author The ProActive Team (mleyton)
 	 */
-	static class ForkDefaultDivide<T> implements Divide<T>{
+	static class ForkDefaultDivide<T> implements Divide<T,T>{
 
 		int number;
 		
@@ -172,12 +170,12 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 		}
 	}
 	
-    static class DivideInst<T> implements Instruction<T,T> {
+    static class DivideInst<T,X> implements Instruction<T,T> {
 		
-		private Divide<T> div;
+		private Divide<T,X> div;
 		private Vector<Skeleton<T, ?>> stages;
 
-		public DivideInst(Divide<T> div, Vector<Skeleton<T, ?>> stages) {
+		public DivideInst(Divide<T,X> div, Vector<Skeleton<T, ?>> stages) {
 			this.div = div;
 			this.stages=stages;
 		}
@@ -185,7 +183,7 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 		public Task<T> compute(Task<T> parent) throws Exception {
 			
 			Timer timer = new Timer();
-			Vector<T> childObjects= div.divide(parent.getObject());
+			Vector<X> childObjects= div.divide(parent.getObject());
 			timer.stop();
 			
 			if(childObjects.size()!=stages.size()){
@@ -196,7 +194,7 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 			}
 			
 			for(int i=0;i<stages.size(); i++){
-				Task<T> child = new Task<T>(childObjects.elementAt(i));
+				Task<X> child = new Task<X>(childObjects.elementAt(i));
 				child.setStack(stages.elementAt(i).getInstructionStack()); //Each child task executes a different sub-skeleton
 				parent.addReadyChild(child); //parent remebers it's children
 			}
@@ -212,6 +210,6 @@ public class Fork<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 	}
 
 	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<T>) t);
+		return compute((Task<P>) t);
 	}
 }

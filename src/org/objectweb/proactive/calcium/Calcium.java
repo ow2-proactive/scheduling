@@ -33,7 +33,7 @@ package org.objectweb.proactive.calcium;
 import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.Skernel;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 /**
@@ -72,12 +72,14 @@ public class Calcium {
 	 * @param <T> The type of the T this stream will work with.
 	 * @param root This skeleton represents the structured code that will 
 	 * be executed for each T inputted into the stream.
+	 * @param <T> Th
 	 * @return A Stream that can input and output T from the framework.
 	 */
 	public <T,R> Stream<T,R> newStream(Skeleton<T,R> root){
 		
 		return new Stream<T,R>(facade, root);
 	}
+
 
 	public void boot() {
 

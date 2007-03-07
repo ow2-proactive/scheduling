@@ -28,22 +28,8 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.muscle;
 
-import java.util.Vector;
+public interface Muscle<P,R> extends java.io.Serializable{
 
-import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-
-/**
- * This class is used to divide a parameter
- * into a vector of parameteres. It is used
- * in skeletons such as: divide&conquer, and map
- * 
- * @author The ProActive Team (mleyton)
- *
- * @param <T>
- */
-public interface Divide<T> extends Muscle{
-
-	public Vector<T> divide(T param) throws RuntimeException, EnvironmentException;
 }

@@ -57,11 +57,13 @@ public class Facade {
 	private Skernel skernel;
 	private FutureUpdateThread results;
 	private PanicException panic;
+	private int counter;
 	
 	public Facade(){
 		this.skernel=null;
 		this.results=null;
 		this.panic=null;
+		this.counter=0;
 	}
 	
 	public synchronized void putTask(Task<?> task, FutureImpl<?> future)  throws InterruptedException, PanicException{
@@ -70,6 +72,8 @@ public class Facade {
 			wait();
 		}
 		
+		task.setFamily(counter*(-1));
+		counter++;
 		skernel.addReadyTask(task);
 		results.put(future);
 	}
@@ -94,7 +98,6 @@ public class Facade {
 		
 		public FutureUpdateThread(){
 			pending = new Hashtable<Integer, FutureImpl<?>>();
-
 		}
 		
 		/**
@@ -102,7 +105,7 @@ public class Facade {
 		 * The stream id must be stored inside the task before storing it.
 		 * @param task The task to store.
 		 */
-		public synchronized void put(FutureImpl<?> future){
+		synchronized void put(FutureImpl<?> future){
 			int taskId=future.getTaskId();
 
 			if(pending.containsKey(taskId)){
@@ -113,7 +116,7 @@ public class Facade {
 			pending.put(taskId, future);
 		}
 		
-		public synchronized void updateFuture(Task<?> task){
+		private synchronized void updateFuture(Task<?> task){
 						 
 			if(!pending.containsKey(task.getId())){
 				logger.error("No future is waiting for task:"+task.getId());
@@ -123,17 +126,7 @@ public class Facade {
 			FutureImpl<?> future=pending.remove(task.getId());
 			future.setFinishedTask(task);
 		}
-		
-		/**
-		 * This method can be used to determine if tasks are available
-		 * for this stream.
-		 * @param streamId The stream id we wish to evaluate.
-		 * @return True if there is a task available, false otherwise.
-		 */
-		public synchronized boolean isEmpty(int streamId){
-			return !pending.containsKey(streamId);
-		}
-		
+
 		/**
 		 * @return The number of total elements on this structure.
 		 */

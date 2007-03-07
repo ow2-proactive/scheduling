@@ -28,22 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
-
-import java.util.Vector;
+package org.objectweb.proactive.calcium.muscle;
 
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 /**
- * This class is used to conquer a vector of parameters
- * into a single parameters. It is usefull for skeletons
- * such as: divide&conquer and map.
+ * Classes implementing this interface can be executed.
+ * The object of providing this method is indicating
+ * what is the sequential code that must be run.
  * 
  * @author The ProActive Team (mleyton)
  *
  * @param <T>
  */
-public interface Conquer<R> extends Muscle{
+public interface Execute<P,R> extends Muscle<P,R>{
 
-	public R conquer(Vector<R> param) throws RuntimeException, EnvironmentException;
+	public R execute(P param) throws RuntimeException, EnvironmentException;
 }

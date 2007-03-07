@@ -28,24 +28,22 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.muscle;
 
-import java.io.Serializable;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 /**
- * This class is used to mark an object as a skeleton.
- * A skeleton is able to return the stack of instructions
- * nested inside the skeleton.
+ * This class is used to conquer a vector of parameters
+ * into a single parameters. It is usefull for skeletons
+ * such as: divide&conquer and map.
+ * 
  * @author The ProActive Team (mleyton)
  *
+ * @param <T>
  */
-public interface Skeleton<T,R> extends Serializable{
-	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
+public interface Conquer<P,R> extends Muscle<Vector<P>, R>{
 
-	public Vector<Instruction<?,?>> getInstructionStack();
+	public R conquer(Vector<P> param) throws RuntimeException, EnvironmentException;
 }

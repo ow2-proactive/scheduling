@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.calcium.statistics;
 
-import org.objectweb.proactive.calcium.interfaces.Muscle;
+import org.objectweb.proactive.calcium.muscle.Muscle;
 
 public class StatsImpl implements Stats {
 	

@@ -32,7 +32,7 @@ package org.objectweb.proactive.calcium.examples.blast;
 
 import java.io.File;
 
-import org.objectweb.proactive.calcium.interfaces.Condition;
+import org.objectweb.proactive.calcium.muscle.Condition;
 
 public class DivideDBCondition implements Condition<BlastParameters>{
 

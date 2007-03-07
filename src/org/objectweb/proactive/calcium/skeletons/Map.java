@@ -34,10 +34,8 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.calcium.interfaces.Conquer;
-import org.objectweb.proactive.calcium.interfaces.Divide;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.muscle.Conquer;
+import org.objectweb.proactive.calcium.muscle.Divide;
 import org.objectweb.proactive.calcium.skeletons.DaC.ConquerInst;
 import org.objectweb.proactive.calcium.skeletons.DaC.DivideInst;
 import org.objectweb.proactive.calcium.statistics.Timer;
@@ -53,15 +51,15 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  * @author The ProActive Team (mleyton)
  *
  */
-public class Map<T,R> extends DaC<T,R> {
+public class Map<P,R> extends DaC<P,R> {
 	
-	public Map(Divide<T> div, Skeleton<T,R> child, Conquer<R> conq){
+	public <X,Y> Map(Divide<P,X> div, Skeleton<X,Y> child, Conquer<Y,R> conq){
 		
-		super(div, null,child,conq);
+		super((Divide<P,P>)div, null,(Skeleton<P,R>)child, (Conquer<R,R>)conq);
 	}
 	
 	//Override parent method to avoid using the condition
-	public Task<T> compute(Task<T> t) throws EnvironmentException {
+	public Task<P> compute(Task<P> t) throws EnvironmentException {
 		
 		t.pushInstruction(new ConquerInst(conq));
 		t.pushInstruction(new DivideInst(div,child));

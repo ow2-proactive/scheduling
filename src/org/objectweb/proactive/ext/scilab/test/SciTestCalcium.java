@@ -32,7 +32,7 @@ package org.objectweb.proactive.ext.scilab.test;
 
 import java.io.Serializable;
 import java.util.Vector;
-
+/*
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
@@ -51,7 +51,7 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 import org.objectweb.proactive.ext.scilab.SciEngineWorker;
 import org.objectweb.proactive.ext.scilab.SciResult;
 import org.objectweb.proactive.ext.scilab.SciTask;
-
+*/
 public class SciTestCalcium implements Serializable{
 /*
 	private Skeleton<SciTask> root;

@@ -33,9 +33,7 @@ package org.objectweb.proactive.calcium.skeletons;
 import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
-import org.objectweb.proactive.calcium.interfaces.Condition;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.muscle.Condition;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
@@ -45,13 +43,13 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  * 
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
+ * @param <P>
  */
-public class If<T> implements Skeleton<T,T>, Instruction<T,T> {
+public class If<P,R> implements Skeleton<P,R>, Instruction<P,P> {
 
-	Condition<T> cond;
-	Skeleton<T,?> ifChild, elseChild;
-	public <R> If(Condition<T> cond, Skeleton<T,R> ifChild, Skeleton<T,R> elseChild){
+	Condition<P> cond;
+	Skeleton<P,?> ifChild, elseChild;
+	public If(Condition<P> cond, Skeleton<P,R> ifChild, Skeleton<P,R> elseChild){
 	
 		this.cond=cond;
 		this.ifChild=ifChild;
@@ -66,7 +64,7 @@ public class If<T> implements Skeleton<T,T>, Instruction<T,T> {
 	}
 
 	
-	public Task<T> compute(Task<T> t) throws Exception{
+	public Task<P> compute(Task<P> t) throws Exception{
 		
 		Vector<Instruction<?,?>> childStack;
 		Timer timer = new Timer();
@@ -89,6 +87,6 @@ public class If<T> implements Skeleton<T,T>, Instruction<T,T> {
 	}
 	
 	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<T>) t);
+		return compute((Task<P>) t);
 	}
 }

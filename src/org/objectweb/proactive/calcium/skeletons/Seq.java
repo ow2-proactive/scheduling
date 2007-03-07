@@ -34,9 +34,7 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.calcium.interfaces.Execute;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.muscle.Execute;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
 
@@ -47,14 +45,14 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  * 
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
+ * @param <P>
  */
-public class Seq<T,R> implements Skeleton<T,R>, Instruction<T,R> {
+public class Seq<P,R> implements Skeleton<P,R>, Instruction<P,R> {
 
-	Execute<T,R> secCode;
+	Execute<P,R> secCode;
 	int muscleId;
 	
-	public Seq(Execute<T,R> secCode){
+	public Seq(Execute<P,R> secCode){
 		this.secCode=secCode;
 		muscleId=0;
 	}
@@ -66,7 +64,7 @@ public class Seq<T,R> implements Skeleton<T,R>, Instruction<T,R> {
 		return v;
 	}
 
-	public Task<R> compute(Task<T> t) throws RuntimeException, EnvironmentException {
+	public Task<R> compute(Task<P> t) throws RuntimeException, EnvironmentException {
 		
 		Timer timer = new Timer();
 		R resultObject= secCode.execute(t.getObject());
@@ -88,6 +86,6 @@ public class Seq<T,R> implements Skeleton<T,R>, Instruction<T,R> {
 	}
 
 	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<T>) t);
+		return compute((Task<P>) t);
 	}
 }

@@ -28,8 +28,24 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.skeletons;
 
-public interface Muscle extends java.io.Serializable{
+import java.io.Serializable;
 
+import org.objectweb.proactive.calcium.Task;
+
+
+/**
+ * This inteface indicates that the skeletal instruction
+ * can be interpreted.
+ * @author The ProActive Team (mleyton)
+ *
+ * @param <T>
+ */
+public interface Instruction<T,R> extends Serializable{
+
+	public Task<R> compute(Task<T> t) throws Exception;
+	
+	public Task<?> computeUnknown(Task<?> t) throws Exception;
+	
 }

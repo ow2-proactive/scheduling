@@ -35,8 +35,6 @@ import java.util.List;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
 
 /**
  * The Pipe skeleton represents staged computation.
@@ -44,11 +42,11 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
  * 
  * @author The ProActive Team (mleyton)
  */
-public class Pipe<T,R> implements Skeleton<T,R> {
+public class Pipe<P,R> implements Skeleton<P,R> {
 	
 	Vector<Skeleton<?,?>> stages;
 	
-	public <X> Pipe(Skeleton<T,X> child1, Skeleton<X,R> child2){
+	public <X> Pipe(Skeleton<P,X> child1, Skeleton<X,R> child2){
 		
 		stages = new Vector<Skeleton<?,?>>();
 		
@@ -56,7 +54,16 @@ public class Pipe<T,R> implements Skeleton<T,R> {
 		stages.add(child2);
 	}
 	
-	public <X,Y,Z> Pipe(Skeleton<T,X> child1, Skeleton<X,Y> child2, Skeleton<Y,Z> child3, Skeleton<Z,R> child4){
+	public <X,Y> Pipe(Skeleton<P,X> child1, Skeleton<X,Y> child2, Skeleton<Y,R> child3){
+		
+		stages = new Vector<Skeleton<?,?>>();
+		
+		stages.add(child1);
+		stages.add(child2);
+		stages.add(child3);
+	}
+	
+	public <X,Y,Z> Pipe(Skeleton<P,X> child1, Skeleton<X,Y> child2, Skeleton<Y,Z> child3, Skeleton<Z,R> child4){
 		
 		stages = new Vector<Skeleton<?,?>>();
 		
@@ -66,7 +73,6 @@ public class Pipe<T,R> implements Skeleton<T,R> {
 		stages.add(child4);
 	}
 	
-
 	/*public Pipe(Skeleton<T>... args){
 		this(Arrays.asList(args));
 	}

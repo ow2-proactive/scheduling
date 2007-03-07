@@ -33,7 +33,7 @@ package org.objectweb.proactive.calcium.examples.blast;
 import java.io.File;
 
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.calcium.interfaces.Execute;
+import org.objectweb.proactive.calcium.muscle.Execute;
 
 public class CleanBlast implements Execute<BlastParameters,BlastParameters> {
 

@@ -35,7 +35,7 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
-import org.objectweb.proactive.calcium.interfaces.Execute;
+import org.objectweb.proactive.calcium.muscle.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

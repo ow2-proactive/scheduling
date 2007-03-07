@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.calcium.examples.nqueens;
 
-import org.objectweb.proactive.calcium.interfaces.Execute;
+import org.objectweb.proactive.calcium.muscle.Execute;
 
 
 abstract public class SolveBoard implements Execute<Board,Result> {

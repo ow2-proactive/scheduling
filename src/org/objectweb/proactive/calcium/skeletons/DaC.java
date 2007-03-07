@@ -35,11 +35,9 @@ import java.util.Vector;
 import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.calcium.interfaces.Condition;
-import org.objectweb.proactive.calcium.interfaces.Conquer;
-import org.objectweb.proactive.calcium.interfaces.Divide;
-import org.objectweb.proactive.calcium.interfaces.Instruction;
-import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.muscle.Condition;
+import org.objectweb.proactive.calcium.muscle.Conquer;
+import org.objectweb.proactive.calcium.muscle.Divide;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
@@ -54,14 +52,14 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  * 
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
+ * @param <P>
  */
-public class DaC<T,R> implements Skeleton<T,R>, Instruction<T,T> {
+public class DaC<P,R> implements Skeleton<P,R>, Instruction<P,P> {
 
-	Divide<T> div;
-	Conquer<R> conq;
-	Condition<T> cond;
-	Skeleton<T,R> child;
+	Divide<P,P> div;
+	Conquer<R,R> conq;
+	Condition<P> cond;
+	Skeleton<P,R> child;
 	
 	/**
 	 * Creates a Divide and Conquer skeleton structure
@@ -70,7 +68,7 @@ public class DaC<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 	 * @param child The skeleton that should be applied to the subtasks.
 	 * @param conq Conqueres the computed subtasks into a single task.
 	 */
-	public DaC(Divide<T> div, Condition<T> cond, Skeleton<T,R> child, Conquer<R> conq){
+	public DaC(Divide<P, P> div, Condition<P> cond, Skeleton<P,R> child, Conquer<R, R> conq){
 	
 		this.div=div;
 		this.cond=cond;
@@ -86,7 +84,7 @@ public class DaC<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 		return v;
 	}
 
-	public Task<T> compute(Task<T> t) throws EnvironmentException{
+	public Task<P> compute(Task<P> t) throws EnvironmentException{
 
 		Timer timer = new Timer();
 		boolean evalCondition=cond.evalCondition(t.getObject());
@@ -108,18 +106,18 @@ public class DaC<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 	}
 	
 	public String toString(){
-		return "D&C";
+		return "DaC";
 	}
 	
 	public Task<?> computeUnknown(Task<?> t) throws Exception {
-		return compute((Task<T>) t);
+		return compute((Task<P>) t);
 	}
 	
 	static class ConquerInst<R> implements Instruction<R,R> {
 
-		private Conquer<R> conq;
+		private Conquer<R,R> conq;
 
-		public ConquerInst(Conquer<R> conq) {
+		public ConquerInst(Conquer<R,R> conq) {
 			this.conq = conq;
 		}
 		
@@ -168,10 +166,10 @@ public class DaC<T,R> implements Skeleton<T,R>, Instruction<T,T> {
 	 */
 	static class DivideInst<T> implements Instruction<T,T> {
 		
-		private Divide<T> div;
+		private Divide<T,T> div;
 		private Skeleton<T,?> skel;
 
-		public DivideInst(Divide<T> div, Skeleton<T, ?> skel) {
+		public DivideInst(Divide<T,T> div, Skeleton<T, ?> skel) {
 			this.div = div;
 			this.skel=skel;
 		}

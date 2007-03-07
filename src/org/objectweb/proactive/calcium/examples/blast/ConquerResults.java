@@ -40,11 +40,11 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
-import org.objectweb.proactive.calcium.interfaces.Conquer;
+import org.objectweb.proactive.calcium.muscle.Conquer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class ConquerResults implements Conquer<BlastParameters> {
+public class ConquerResults implements Conquer<BlastParameters,BlastParameters> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
     public BlastParameters conquer(Vector<BlastParameters> param) {

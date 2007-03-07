@@ -32,9 +32,9 @@ package org.objectweb.proactive.calcium.examples.nqueens;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.calcium.interfaces.Conquer;
+import org.objectweb.proactive.calcium.muscle.Conquer;
 
-public class ConquerBoard implements Conquer<Result>{
+public class ConquerBoard implements Conquer<Result,Result>{
 	
 	public Result conquer(Vector<Result> result) {
 
