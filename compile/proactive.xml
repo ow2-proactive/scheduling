@@ -619,7 +619,7 @@
 					</classpath>
 			</taskdef>
 
-			<jalopy classpathref="project.classpath" convention="proactiveJalopy.xml">
+			<jalopy classpathref="project.classpath" convention="${basedir}/proactiveJalopy.xml">
 				<fileset dir="@{srcDir}">
 					<include name="**/*.java" />
 				</fileset>
