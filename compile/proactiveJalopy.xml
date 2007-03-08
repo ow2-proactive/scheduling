@@ -10,7 +10,7 @@
         </style>
     </general>
     <inspector>
-        <enable>true</enable>
+        <enable>false</enable>
         <naming>
             <classes>
                 <abstract>[A-Z][a-zA-Z0-9]+</abstract>
