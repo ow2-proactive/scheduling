@@ -18,7 +18,7 @@
 	<property name="docs.dir" value="${base.dir}/docs" />
 	<property name="docs.tmp.dir" value="${docs.dir}/tmp" />
 	<property name="docs.mainFile" value="PA_index.xml" />
-
+	<property name="tmp.dir" value="tmp-dir"/>
 	<property name="proactive.dir" value="org/objectweb/proactive" />
 	<property name="proactive.core.dir" value="${proactive.dir}/core" />
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext" />
@@ -95,6 +95,27 @@
 	</path>
 
 
+	<target name="check" depends="init,util">
+		
+		<!-- Check that sources are correctly formated -->
+		<copy todir="${tmp.dir}">
+			<fileset dir="${src.dir}"/>
+		</copy>
+
+		<format_m srcDir="${tmp.dir}/org/objectweb/proactive" />
+		
+		<java fork="true" resultproperty="diffReturnVal" classname="util.diff.DiffJavaDir">
+			<classpath refid="project.classpath"/>
+			<arg value="${src.dir}"/>
+			<arg value="${tmp.dir}"/>
+		</java>
+		
+		<delete dir="${tmp.dir}" />
+		<if name="diffReturnVal" value="1">
+			<fail message="Please use Jalopy"/>
+		</if>
+	</target>
+	
 	<!-- ================================================================ -->
 	<!--                       Initialisation                             -->
 	<!--  =============================================================== -->
@@ -396,6 +417,7 @@
 		<delete dir="${docs.dir}" />
 		<delete dir="${classlibs.dir}" />
 		<delete dir="${test.classes.dir}" />
+		<delete dir="${tmp.dir}" />
         <delete file="tests.log" />
         <delete file="descriptors/examples/DescriptorExamples.xsd"/>
 	</target>
@@ -581,26 +603,32 @@
 	<!-- ================================================================ -->
 	<!--            Formats the project sources                           -->
 	<!-- ================================================================ -->
+	<macrodef name="format_m">
+		<attribute name="srcDir" />
+		<attribute name="loglevel" default="WARN"/>
+		<sequential>
+			<!-- declare the Jalopy task -->
+			<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
+				<classpath>
+					<fileset dir="${base.dir}/dev/lib">
+						<include name="*.jar" />
+					</fileset>
+					<fileset dir="${lib.dir}">
+						<include name="log4j.jar" />
+							</fileset>
+					</classpath>
+			</taskdef>
+
+			<jalopy classpathref="project.classpath" convention="proactiveJalopy.xml">
+				<fileset dir="@{srcDir}">
+					<include name="**/*.java" />
+				</fileset>
+			</jalopy>
+		</sequential>
+	</macrodef>
+	
 	<target name="format" description="Formats the project source files">
-
-		<!-- declare the Jalopy task -->
-		<taskdef name="jalopy" classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
-			<classpath>
-				<fileset dir="${base.dir}/dev/lib">
-					<include name="*.jar" />
-				</fileset>
-				<fileset dir="${lib.dir}">
-					<include name="log4j.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
-
-		<jalopy classpathref="project.classpath" convention="proactiveJalopy.xml">
-			<fileset dir="${src.dir}/org/objectweb/proactive">
-				<include name="**/*.java" />
-			</fileset>
-		</jalopy>
-
+		<format_m srcdir="{src.dir}/org/objectweb/proactive"/>
 	</target>
 
 
