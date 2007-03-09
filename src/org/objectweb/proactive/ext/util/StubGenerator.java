@@ -158,7 +158,7 @@ public class StubGenerator {
             System.setErr(mute);
         }
 
-        ClassPool.releaseUnmodifiedClassFile = true;
+//        ClassPool.releaseUnmodifiedClassFile = true;
 
         for (File file : files) {
             String str = file.toString().replaceFirst(srcDir.toString(), "");
