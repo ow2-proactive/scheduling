@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
 import testsuite.manager.AbstractManager;
+import testsuite.manager.AbstractManagerConstants;
 
 
 /**
@@ -56,15 +57,15 @@ public class ResultHandler extends BasicUnmarshaller
         String type = (String) attributes.getValue("type");
         String file = (String) attributes.getValue("file");
         if (type.equalsIgnoreCase("html")) {
-            this.manager.setResultType(AbstractManager.HTML);
+            this.manager.setResultType(AbstractManagerConstants.HTML);
             this.manager.setOutputPath(file);
         } else if (type.equalsIgnoreCase("text")) {
-            this.manager.setResultType(AbstractManager.TEXT);
+            this.manager.setResultType(AbstractManagerConstants.TEXT);
             this.manager.setOutputPath(file);
         } else if (type.equalsIgnoreCase("console")) {
-            this.manager.setResultType(AbstractManager.CONSOLE);
+            this.manager.setResultType(AbstractManagerConstants.CONSOLE);
         } else if (type.equalsIgnoreCase("xml")) {
-            this.manager.setResultType(AbstractManager.XML);
+            this.manager.setResultType(AbstractManagerConstants.XML);
             this.manager.setOutputPath(file);
         }
     }

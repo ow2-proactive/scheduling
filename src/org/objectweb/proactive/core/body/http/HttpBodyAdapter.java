@@ -195,7 +195,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
     @Override
     public String[] list(String url) throws java.io.IOException {
         String[] names = null;
-        names = new String[this.urnBodys.size()];
+        names = new String[HttpBodyAdapter.urnBodys.size()];
         Enumeration<String> e = urnBodys.keys();
         int i = 0;
         while (e.hasMoreElements()) {

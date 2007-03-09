@@ -35,6 +35,7 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers.FTManagerPMLRB;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryJob;
@@ -74,7 +75,7 @@ public class RecoveryProcessPMLRB extends RecoveryProcessImpl {
 
             //if (node==null)return;
             RecoveryJob job = new RecoveryJob(toSend,
-                    FTManagerPMLRB.DEFAULT_TTC_VALUE, node);
+                    FTManager.DEFAULT_TTC_VALUE, node);
             this.submitJob(job);
         } catch (RemoteException e) {
             logger.error("[RECOVERY] **ERROR** Cannot contact other servers : ");

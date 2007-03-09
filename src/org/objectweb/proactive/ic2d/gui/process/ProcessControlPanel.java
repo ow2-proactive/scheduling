@@ -33,7 +33,11 @@ package org.objectweb.proactive.ic2d.gui.process;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.process.AbstractUniversalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.rsh.RSHProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -45,7 +49,7 @@ import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 
 public class ProcessControlPanel extends javax.swing.JPanel {
     private static final String[] DEFAULT_ENVIRONMENT = {
-            "DISPLAY=" + RSHProcess.DEFAULT_HOSTNAME + ":0"
+            "DISPLAY=" + AbstractUniversalProcess.DEFAULT_HOSTNAME + ":0"
         };
     private static final java.awt.Color FINISHED_PROCESS_COLOR = new java.awt.Color(211,
             32, 47);
@@ -216,7 +220,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
                 });
 
             javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(processesJList);
-            scrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             add(scrollPane, java.awt.BorderLayout.CENTER);
             // stop button
             stopProcessButton = new javax.swing.JButton("Stop selected process");
@@ -257,8 +261,8 @@ public class ProcessControlPanel extends javax.swing.JPanel {
         implements MonitoredRSHProcessObserver {
         //ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         String localRuntimeUrl;
-        private javax.swing.JTextField hostnameField = new javax.swing.JTextField(RSHProcess.DEFAULT_HOSTNAME);
-        private javax.swing.JTextField usernameField = new javax.swing.JTextField(RSHProcess.DEFAULT_USERNAME);
+        private javax.swing.JTextField hostnameField = new javax.swing.JTextField(AbstractUniversalProcess.DEFAULT_HOSTNAME);
+        private javax.swing.JTextField usernameField = new javax.swing.JTextField(AbstractUniversalProcess.DEFAULT_USERNAME);
         private javax.swing.JTextField javaPathField = new javax.swing.JTextField(JVMProcessImpl.DEFAULT_JAVAPATH);
         private javax.swing.JTextField policyFileField = new javax.swing.JTextField(JVMProcessImpl.DEFAULT_POLICY_FILE);
         private javax.swing.JTextField classnameField = new javax.swing.JTextField(
@@ -290,22 +294,22 @@ public class ProcessControlPanel extends javax.swing.JPanel {
                 javax.swing.JPanel fieldPanel = new javax.swing.JPanel(new java.awt.GridLayout(
                             0, 1));
                 labelPanel.add(new javax.swing.JLabel("hostname ",
-                        javax.swing.JLabel.RIGHT));
+                        SwingConstants.RIGHT));
                 fieldPanel.add(hostnameField);
                 labelPanel.add(new javax.swing.JLabel("username ",
-                        javax.swing.JLabel.RIGHT));
+                        SwingConstants.RIGHT));
                 fieldPanel.add(usernameField);
                 labelPanel.add(new javax.swing.JLabel("java command path ",
-                        javax.swing.JLabel.RIGHT));
+                        SwingConstants.RIGHT));
                 fieldPanel.add(javaPathField);
                 labelPanel.add(new javax.swing.JLabel("policy file path ",
-                        javax.swing.JLabel.RIGHT));
+                        SwingConstants.RIGHT));
                 fieldPanel.add(policyFileField);
                 labelPanel.add(new javax.swing.JLabel("classname to start ",
-                        javax.swing.JLabel.RIGHT));
+                        SwingConstants.RIGHT));
                 fieldPanel.add(classnameField);
                 labelPanel.add(new javax.swing.JLabel(
-                        "parameters of the class ", javax.swing.JLabel.RIGHT));
+                        "parameters of the class ", SwingConstants.RIGHT));
                 fieldPanel.add(parametersField);
                 northPanel.add(labelPanel, java.awt.BorderLayout.WEST);
                 northPanel.add(fieldPanel, java.awt.BorderLayout.CENTER);
@@ -319,11 +323,11 @@ public class ProcessControlPanel extends javax.swing.JPanel {
                 javax.swing.JPanel fieldPanel = new javax.swing.JPanel(new java.awt.GridLayout(
                             0, 1));
                 labelPanel.add(new javax.swing.JLabel("classpath ",
-                        javax.swing.JLabel.RIGHT));
+                        SwingConstants.RIGHT));
                 fieldPanel.add(createScrollWrapper(classpathField));
                 classpathField.setLineWrap(true);
                 labelPanel.add(new javax.swing.JLabel("environment ",
-                        javax.swing.JLabel.RIGHT));
+                        SwingConstants.RIGHT));
                 fieldPanel.add(createScrollWrapper(environmentField));
                 environmentField.setLineWrap(false);
                 add(labelPanel, java.awt.BorderLayout.WEST);
@@ -452,7 +456,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
         private javax.swing.JScrollPane createScrollWrapper(
             javax.swing.JTextArea textArea) {
             javax.swing.JScrollPane areaScrollPane = new javax.swing.JScrollPane(textArea);
-            areaScrollPane.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            areaScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
             areaScrollPane.setBorder(javax.swing.BorderFactory.createLineBorder(
                     java.awt.Color.black));
             return areaScrollPane;

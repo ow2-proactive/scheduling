@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
+import javax.swing.ScrollPaneConstants;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
@@ -76,8 +78,8 @@ public class IC2DPanel extends AbstractDataObjectPanel
 
         // create panel to host WorldPanel
         javax.swing.JScrollPane scrollableWorldPanel = new javax.swing.JScrollPane(worldPanel,
-                javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollableWorldPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(
                 "World Panel"));
         scrollableWorldPanel.setBackground(java.awt.Color.white);

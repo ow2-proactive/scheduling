@@ -117,7 +117,7 @@ public class ProActiveProvider extends WSConstants implements Provider {
 
         byte[] serObj = (byte[]) props.get("Stub");
 
-        boolean isInterfaceComponent = ((String) props.get(ProActiveDeployer.COMPONENT_INTERFACE)).equals(
+        boolean isInterfaceComponent = ((String) props.get(WSConstants.COMPONENT_INTERFACE)).equals(
                 "true");
 
         try {

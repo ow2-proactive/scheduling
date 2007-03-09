@@ -502,7 +502,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     protected void showResult() {
         if (this.getResultType() != 0) {
             switch (this.getResultType()) {
-            case AbstractManager.HTML:
+            case AbstractManagerConstants.HTML:
                 try {
                     this.toHTML(new File(this.getOutputPath()));
                 } catch (ParserConfigurationException e) {
@@ -513,7 +513,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
                     logger.warn("IO error", e);
                 }
                 break;
-            case AbstractManager.TEXT:
+            case AbstractManagerConstants.TEXT:
                 try {
                     this.toOutPutStream(new FileOutputStream(
                             this.getOutputPath()));
@@ -523,14 +523,14 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
                     logger.warn("IO error", e);
                 }
                 break;
-            case AbstractManager.CONSOLE:
+            case AbstractManagerConstants.CONSOLE:
                 try {
                     this.toOutPutStream(System.out);
                 } catch (IOException e) {
                     logger.warn("Can't write results in the console", e);
                 }
                 break;
-            case AbstractManager.XML:
+            case AbstractManagerConstants.XML:
                 try {
                     Document document = this.toXML();
                     String xslPath = "/" +

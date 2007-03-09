@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.process.globus;
 
 import org.apache.log4j.Logger;
 import org.globus.gram.*;
+import org.globus.gram.internal.GRAMConstants;
 import org.globus.io.gass.server.*;
 
 //import org.globus.security.*;
@@ -195,7 +196,7 @@ public class GridJob implements GramJobListener {
         logger.info("status changed " + status);
 
         try {
-            if (job.getStatus() == GramJob.STATUS_ACTIVE) {
+            if (job.getStatus() == GRAMConstants.STATUS_ACTIVE) {
                 // notify waiting thread when job ready
                 m_jobOutput = "Job sent. url=" + job.getIDAsString();
                 logger.info(m_jobOutput);

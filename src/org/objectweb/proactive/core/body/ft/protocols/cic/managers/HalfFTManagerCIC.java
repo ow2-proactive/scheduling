@@ -135,7 +135,7 @@ public class HalfFTManagerCIC extends FTManager {
             try {
                 request.resetSendCounter();
                 request.setIgnoreIt(false);
-                Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
+                Thread.sleep(FTManager.TIME_TO_RESEND);
                 int rdvValueBis = sendRequest(request, destination);
                 return this.onSendRequestAfter(request, rdvValueBis, destination);
             } catch (RenegotiateSessionException e1) {
@@ -153,7 +153,7 @@ public class HalfFTManagerCIC extends FTManager {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
                 reply.setIgnoreIt(false);
-                Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
+                Thread.sleep(FTManager.TIME_TO_RESEND);
                 int rdvValueBis = sendReply(reply, destination);
                 return this.onSendReplyAfter(reply, rdvValueBis, destination);
             } catch (InterruptedException e) {

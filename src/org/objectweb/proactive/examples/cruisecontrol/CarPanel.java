@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
+import javax.swing.SwingConstants;
+
 
 /** This class displays the speed, the acceleration of the car
  * and holds the buttons for the interaction between the driver and the car
@@ -89,13 +91,11 @@ public class CarPanel extends javax.swing.JPanel {
         javax.swing.JButton UpAlpha = new javax.swing.JButton("Up");
         javax.swing.JButton DownAlpha = new javax.swing.JButton("Down");
 
-        accBar = new javax.swing.JProgressBar(javax.swing.JProgressBar.VERTICAL,
-                0, 50);
+        accBar = new javax.swing.JProgressBar(SwingConstants.VERTICAL, 0, 50);
         accBar.setValue(0);
         accBar.setStringPainted(true);
 
-        roadBar = new javax.swing.JProgressBar(javax.swing.JProgressBar.VERTICAL,
-                -60, 60);
+        roadBar = new javax.swing.JProgressBar(SwingConstants.VERTICAL, -60, 60);
         roadBar.setValue(0);
         roadBar.setStringPainted(true);
 

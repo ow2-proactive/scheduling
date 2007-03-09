@@ -46,6 +46,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
@@ -201,7 +202,7 @@ public class Legend extends JFrame {
                             g.setColor(ActiveObjectPanel.COLOR_REQUEST_SINGLE);
                             g.fillRect(x, y, 4, 4);
                         }
-                    }, JLabel.LEFT));
+                    }, SwingConstants.LEFT));
                 requestQueuePanel2.add(new JLabel(ActiveObjectPanel.NUMBER_OF_REQUESTS_FOR_SEVERAL +
                         "  ",
                         new Icon() {
@@ -218,7 +219,7 @@ public class Legend extends JFrame {
                             g.setColor(ActiveObjectPanel.COLOR_REQUEST_SEVERAL);
                             g.fillRect(x, y, 4, 4);
                         }
-                    }, JLabel.LEFT));
+                    }, SwingConstants.LEFT));
                 requestQueuePanel2.add(new JLabel(ActiveObjectPanel.NUMBER_OF_REQUESTS_FOR_MANY +
                         "  ",
                         new Icon() {
@@ -235,7 +236,7 @@ public class Legend extends JFrame {
                             g.setColor(ActiveObjectPanel.COLOR_REQUEST_MANY);
                             g.fillRect(x, y, 4, 4);
                         }
-                    }, JLabel.LEFT));
+                    }, SwingConstants.LEFT));
             }
 
             JPanel nodePanel = new JPanel(new GridLayout(-1, 2, 5, 5));

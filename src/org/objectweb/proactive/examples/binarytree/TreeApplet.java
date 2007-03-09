@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.binarytree;
 
 import java.io.IOException;
+import java.text.CharacterIterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -424,7 +425,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                 // Analyse of the key size to paint the node
                 int keySize = 5;
                 java.text.StringCharacterIterator it1 = new java.text.StringCharacterIterator(tree.getKey());
-                while (it1.current() != java.text.StringCharacterIterator.DONE) {
+                while (it1.current() != CharacterIterator.DONE) {
                     char currentChar = it1.next();
                     if ((currentChar == 'i') || (currentChar == 'l')) {
                         keySize = keySize + 3;
@@ -440,7 +441,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                 // Analyse of the value size to paint the node
                 int valueSize = 5;
                 java.text.StringCharacterIterator it2 = new java.text.StringCharacterIterator(tree.getValue());
-                while (it2.current() != java.text.StringCharacterIterator.DONE) {
+                while (it2.current() != CharacterIterator.DONE) {
                     char currentChar = it2.next();
                     if ((currentChar == 'i') || (currentChar == 'l')) {
                         valueSize = valueSize + 3;

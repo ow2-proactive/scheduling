@@ -208,7 +208,7 @@ public class SpyEventManager {
                         (requestReceiverID.equals(
                             replyReceivedEvent.getSourceBodyID()))) {
                     l.remove();
-                    return new SpyMessageEvent(SpyMessageEvent.REPLY_RECEIVED_MESSAGE_TYPE,
+                    return new SpyMessageEvent(SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE,
                         replyReceivedEvent);
                 }
             }

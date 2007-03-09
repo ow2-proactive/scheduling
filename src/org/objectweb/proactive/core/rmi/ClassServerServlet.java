@@ -53,9 +53,9 @@ public class ClassServerServlet extends HttpServlet {
 
     public ClassServerServlet(int newport) {
         System.out.println("New Class Server Servlet");
-        this.port = newport;
+        ClassServerServlet.port = newport;
         ClassServerHelper helper = new ClassServerHelper();
-        System.setProperty("proactive.http.port", this.port + "");
+        System.setProperty("proactive.http.port", ClassServerServlet.port + "");
         try {
             helper.initializeClassServer();
         } catch (IOException e) {

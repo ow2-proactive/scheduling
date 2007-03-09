@@ -192,8 +192,8 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
         this.bodyID = id;
         this.proxiedRemoteBody = localBody.proxiedRemoteBody;
 
-        if (BodyAdapter.bodyLogger.isDebugEnabled()) {
-            BodyAdapter.bodyLogger.debug(proxiedRemoteBody.getClass());
+        if (UniversalBody.bodyLogger.isDebugEnabled()) {
+            UniversalBody.bodyLogger.debug(proxiedRemoteBody.getClass());
         }
 
         this.bodyID = remoteBody.getID();

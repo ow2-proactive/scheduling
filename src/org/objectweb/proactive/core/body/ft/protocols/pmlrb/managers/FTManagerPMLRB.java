@@ -402,7 +402,7 @@ public class FTManagerPMLRB extends FTManager {
             // attach infos
             c.setCheckpointInfo(ci);
             // send it to server
-            this.storage.storeCheckpoint(c, FTManagerPMLRB.DEFAULT_TTC_VALUE); // SEE INC VALUE !
+            this.storage.storeCheckpoint(c, FTManager.DEFAULT_TTC_VALUE); // SEE INC VALUE !
 
             // reninit checkpoint values
             this.checkpointTimer = System.currentTimeMillis();

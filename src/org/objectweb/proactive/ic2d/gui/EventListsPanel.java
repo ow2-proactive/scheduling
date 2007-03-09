@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
@@ -698,7 +701,7 @@ public class EventListsPanel extends javax.swing.JPanel
             setSize(150, 200);
             // Title
             javax.swing.JLabel lTitle = new javax.swing.JLabel(activeObject.getName(),
-                    javax.swing.JLabel.CENTER);
+                    SwingConstants.CENTER);
             lTitle.setForeground(java.awt.Color.white);
             lTitle.setBackground(LIST_BG_COLOR);
             lTitle.setOpaque(true);
@@ -710,8 +713,8 @@ public class EventListsPanel extends javax.swing.JPanel
             list = new javax.swing.JList(listModel);
             list.addListSelectionListener(new MyListSelectionListener());
             javax.swing.JScrollPane scList = new javax.swing.JScrollPane(list,
-                    javax.swing.JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             verticalScrollBar = scList.getVerticalScrollBar();
             list.setCellRenderer(new TimeCellRenderer());
             list.setBackground(java.awt.Color.white);
@@ -784,22 +787,22 @@ public class EventListsPanel extends javax.swing.JPanel
         public LegendPanel() {
             setLayout(new java.awt.GridLayout(0, 1, 0, 0));
             add(new javax.swing.JLabel("Object waiting for request",
-                    waitingForRequestIcon, javax.swing.JLabel.LEFT));
+                    waitingForRequestIcon, SwingConstants.LEFT));
             add(new javax.swing.JLabel(
                     "Object waiting for result (wait by necessity)",
-                    waitByNecessityIcon, javax.swing.JLabel.LEFT));
+                    waitByNecessityIcon, SwingConstants.LEFT));
             add(new javax.swing.JLabel("Object sent a request",
-                    requestSentIcon, javax.swing.JLabel.LEFT));
+                    requestSentIcon, SwingConstants.LEFT));
             add(new javax.swing.JLabel("Object received a request",
-                    requestReceivedIcon, javax.swing.JLabel.LEFT));
+                    requestReceivedIcon, SwingConstants.LEFT));
             add(new javax.swing.JLabel(
                     "Object finished serving a request (void return type)",
-                    voidRequestServedIcon, javax.swing.JLabel.LEFT));
+                    voidRequestServedIcon, SwingConstants.LEFT));
             add(new javax.swing.JLabel(
                     "Object finished serving a request and sent a reply",
-                    replySentIcon, javax.swing.JLabel.LEFT));
+                    replySentIcon, SwingConstants.LEFT));
             add(new javax.swing.JLabel("Object received a reply",
-                    replyReceivedIcon, javax.swing.JLabel.LEFT));
+                    replyReceivedIcon, SwingConstants.LEFT));
             add(new javax.swing.JLabel());
             // populate panels
             for (int i = SHADES.length - 1; i >= 0; i--) {
@@ -807,7 +810,7 @@ public class EventListsPanel extends javax.swing.JPanel
                         ? "Event you clicked on"
                         : ((i == (SHADES.length - 5)) ? "Older events"
                                                       : ((i == 5)
-                        ? "Newer events" : "")), javax.swing.JLabel.CENTER);
+                        ? "Newer events" : "")), SwingConstants.CENTER);
                 l.setBackground(SHADES[i]);
                 l.setOpaque(true);
                 l.setVerticalAlignment(javax.swing.SwingConstants.CENTER);

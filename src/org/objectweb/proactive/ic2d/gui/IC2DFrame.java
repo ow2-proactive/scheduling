@@ -33,6 +33,8 @@ package org.objectweb.proactive.ic2d.gui;
 import java.rmi.AlreadyBoundException;
 import java.util.Random;
 
+import javax.swing.ScrollPaneConstants;
+
 import org.globus.ogce.gui.gram.gui.SubmitJobPanel;
 import org.objectweb.fractal.gui.FractalGUI;
 import org.objectweb.proactive.ProActive;
@@ -287,7 +289,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         java.awt.Container c = frame.getContentPane();
         c.setLayout(new java.awt.GridLayout(1, 1));
         javax.swing.JScrollPane scrollingEventListsPanel = new javax.swing.JScrollPane(panel);
-        scrollingEventListsPanel.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollingEventListsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         c.add(scrollingEventListsPanel);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
