@@ -1,63 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:noNamespaceSchemaLocation=
-"http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="local"/>
+			<virtualNode name="local" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="local">
 				<jvmSet>
-					<vmName value="JvmNode"/>
-					<vmName value="JvmNode2"/>
-					<vmName value="JvmNode3"/>
-					<vmName value="JvmNode4"/>
+					<vmName value="JvmNode" />
+					<vmName value="JvmNode2" />
+					<vmName value="JvmNode3" />
+					<vmName value="JvmNode4" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="JvmNode">
 				<creation>
-					<processReference refid="localJVM"/>
+					<processReference refid="localJVM" />
 				</creation>
 			</jvm>
 			<jvm name="JvmNode2">
 				<creation>
-					<processReference refid="localJVM2"/>
+					<processReference refid="localJVM2" />
 				</creation>
 			</jvm>
 			<jvm name="JvmNode3">
 				<creation>
-					<processReference refid="localJVM3"/>
+					<processReference refid="localJVM3" />
 				</creation>
 			</jvm>
 			<jvm name="JvmNode4">
 				<creation>
-					<processReference refid="localJVM4"/>
+					<processReference refid="localJVM4" />
 				</creation>
 			</jvm>
-			
+
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
 			</processDefinition>
 			<processDefinition id="localJVM2">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-			</processDefinition>	
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
+			</processDefinition>
 			<processDefinition id="localJVM3">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-			</processDefinition>	
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
+			</processDefinition>
 			<processDefinition id="localJVM4">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-			</processDefinition>	
-			
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
+			</processDefinition>
+
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

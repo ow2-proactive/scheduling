@@ -1,87 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- HOSTNAMES MUST BE SET BEFORE USING THIS FAULT-TOLERANT DESCRIPTOR -->
-<ProActiveDescriptor 
-	schemaVersion="3.3"
+<ProActiveDescriptor schemaVersion="3.3"
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
 
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="Workers" property="multiple" ftServiceId="appli"/>
-			<virtualNode name="Failed" property="multiple" ftServiceId="ressource"/>
+			<virtualNode name="Workers" property="multiple"
+				ftServiceId="appli" />
+			<virtualNode name="Failed" property="multiple"
+				ftServiceId="ressource" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="Workers">
 				<jvmSet>
-					<vmName value="Jvm1"/>
-					<vmName value="Jvm2"/>
-					<vmName value="Jvm3"/>
-					<vmName value="Jvm4"/>
-	                <vmName value="Jvm5"/>
-					<vmName value="Jvm6"/>
-					<vmName value="Jvm7"/>
-					<vmName value="Jvm8"/>
+					<vmName value="Jvm1" />
+					<vmName value="Jvm2" />
+					<vmName value="Jvm3" />
+					<vmName value="Jvm4" />
+					<vmName value="Jvm5" />
+					<vmName value="Jvm6" />
+					<vmName value="Jvm7" />
+					<vmName value="Jvm8" />
 				</jvmSet>
 			</map>
 			<map virtualNode="Failed">
 				<jvmSet>
-					<vmName value="JvmS1"/>
-					<vmName value="JvmS2"/>
+					<vmName value="JvmS1" />
+					<vmName value="JvmS2" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="jvmAppli1"/>
+					<processReference refid="jvmAppli1" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<creation>
-					<processReference refid="jvmAppli2"/>
+					<processReference refid="jvmAppli2" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
 				<creation>
-					<processReference refid="jvmAppli3"/>
+					<processReference refid="jvmAppli3" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
 				<creation>
-					<processReference refid="jvmAppli4"/>
+					<processReference refid="jvmAppli4" />
 				</creation>
 			</jvm>
-	                <jvm name="Jvm5">
+			<jvm name="Jvm5">
 				<creation>
-					<processReference refid="jvmAppli5"/>
+					<processReference refid="jvmAppli5" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm6">
 				<creation>
-					<processReference refid="jvmAppli6"/>
+					<processReference refid="jvmAppli6" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm7">
 				<creation>
-					<processReference refid="jvmAppli7"/>
+					<processReference refid="jvmAppli7" />
 				</creation>
 			</jvm>
 			<jvm name="Jvm8">
 				<creation>
-					<processReference refid="jvmAppli8"/>
+					<processReference refid="jvmAppli8" />
 				</creation>
 			</jvm>
 			<jvm name="JvmS1">
 				<creation>
-					<processReference refid="jvmFailed1"/>
+					<processReference refid="jvmFailed1" />
 				</creation>
 			</jvm>
 			<jvm name="JvmS2">
 				<creation>
-					<processReference refid="jvmFailed2"/>
+					<processReference refid="jvmFailed2" />
 				</creation>
 			</jvm>
 		</jvms>
@@ -89,58 +90,79 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="jvmProcess">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 				</jvmProcess>
 			</processDefinition>
 			<!-- HOSTNAMES MUST BE SET HERE -->
 			<processDefinition id="jvmAppli1">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="noadcoco">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="noadcoco">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli2">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="predadab">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli3">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="nahuel">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="nahuel">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli4">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="crusoe">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="crusoe">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
-                	<processDefinition id="jvmAppli5">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sidonie">
-					<processReference refid="jvmProcess"/>
+			<processDefinition id="jvmAppli5">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="sidonie">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli6">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amstel">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="amstel">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli7">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="psychoquack">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="psychoquack">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli8">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="macyavel">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="macyavel">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed1">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="apple">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="apple">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed2">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amda">
-					<processReference refid="jvmProcess"/>
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="amda">
+					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 		</processes>
@@ -157,7 +179,9 @@
 				<faultTolerance>
 					<protocol type="cic"></protocol>
 					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
-					<resourceServer url="rmi://trinidad:1334/FTServer"></resourceServer>
+					<resourceServer
+						url="rmi://trinidad:1334/FTServer">
+					</resourceServer>
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>

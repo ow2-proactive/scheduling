@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.doctor;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.jmx.server.ServerConnector;
 
 
 public class Office {

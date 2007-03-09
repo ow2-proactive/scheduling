@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../descriptors/DescriptorSchema.xsd">
-<!-- ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"-->
+<ProActiveDescriptor schemaVersion="3.3"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd">
 	<variables>
-		<javaPropertyVariable name="proactive.dir"/>
-		<descriptorVariable name="PROACTIVE_HOME" value="/tmp/ProActive"/>
-		<descriptorVariable name="JAVA_HOME" value="/auto/pollux/u/pollux/home/mleyton/NOSAVE/jdk1.5.0_05"/>
-		<descriptorDefaultVariable name="HOST_NAME" value="sea.inria.fr"/>
-	    <descriptorVariable name="RMI_PORT" value="3012"/>
+		<javaPropertyVariable name="proactive.dir" />
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/tmp/ProActive" />
+		<descriptorVariable name="JAVA_HOME"
+			value="/auto/pollux/u/pollux/home/mleyton/NOSAVE/jdk1.5.0_05" />
+		<descriptorDefaultVariable name="HOST_NAME"
+			value="sea.inria.fr" />
+		<descriptorVariable name="RMI_PORT" value="3012" />
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -17,76 +22,104 @@
 		<mapping>
 			<map virtualNode="computers-vn">
 				<jvmSet>
-					<vmName value="sshJVMNode"/>
+					<vmName value="sshJVMNode" />
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
 			<jvm name="JvmNode">
 				<creation>
-					<processReference refid="localJVM"/>
+					<processReference refid="localJVM" />
 				</creation>
 			</jvm>
 			<jvm name="sshJVMNode">
 				<creation>
-					<processReference refid="sshProcess"/>
+					<processReference refid="sshProcess" />
 				</creation>
-			</jvm>			
+			</jvm>
 		</jvms>
 	</deployment>
 	<fileTransferDefinitions>
 		<fileTransfer id="ProActiveLite">
 			<!-- dir src="${PROACTIVE_LITE}" dest="${PROACTIVE_HOME}" /-->
-			<file src="${proactive.dir}/dist/ProActive/ProActive.jar" dest="${PROACTIVE_HOME}/ProActive.jar" />
-			<file src="${proactive.dir}/lib/log4j.jar" dest="${PROACTIVE_HOME}/log4j.jar" />
-			<file src="${proactive.dir}/lib/components/fractal.jar" dest="${PROACTIVE_HOME}/fractal.jar" />
-			<file src="${proactive.dir}/lib/xercesImpl.jar" dest="${PROACTIVE_HOME}/xercesImpl.jar" />
-			<file src="${proactive.dir}/lib/bouncycastle.jar" dest="${PROACTIVE_HOME}/bouncycastle.jar" />
-			<file src="${proactive.dir}/lib/jsch.jar" dest="${PROACTIVE_HOME}/jsch.jar" />
-			<file src="${proactive.dir}/lib/javassist.jar" dest="${PROACTIVE_HOME}/javassist.jar" />
-			<file src="${proactive.dir}/scripts/proactive.java.policy" dest="${PROACTIVE_HOME}/proactive.java.policy" />
-			<file src="${proactive.dir}/scripts/proactive-log4j" dest="${PROACTIVE_HOME}/proactive-log4j" />
+			<file src="${proactive.dir}/dist/ProActive/ProActive.jar"
+				dest="${PROACTIVE_HOME}/ProActive.jar" />
+			<file src="${proactive.dir}/lib/log4j.jar"
+				dest="${PROACTIVE_HOME}/log4j.jar" />
+			<file src="${proactive.dir}/lib/components/fractal.jar"
+				dest="${PROACTIVE_HOME}/fractal.jar" />
+			<file src="${proactive.dir}/lib/xercesImpl.jar"
+				dest="${PROACTIVE_HOME}/xercesImpl.jar" />
+			<file src="${proactive.dir}/lib/bouncycastle.jar"
+				dest="${PROACTIVE_HOME}/bouncycastle.jar" />
+			<file src="${proactive.dir}/lib/jsch.jar"
+				dest="${PROACTIVE_HOME}/jsch.jar" />
+			<file src="${proactive.dir}/lib/javassist.jar"
+				dest="${PROACTIVE_HOME}/javassist.jar" />
+			<file src="${proactive.dir}/scripts/proactive.java.policy"
+				dest="${PROACTIVE_HOME}/proactive.java.policy" />
+			<file src="${proactive.dir}/scripts/proactive-log4j"
+				dest="${PROACTIVE_HOME}/proactive-log4j" />
 		</fileTransfer>
 	</fileTransferDefinitions>
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="${HOST_NAME}">
-					<processReference refid="remoteJVM"/> 
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="${HOST_NAME}">
+					<processReference refid="remoteJVM" />
 					<fileTransferDeploy refid="ProActiveLite">
 						<copyProtocol>rcp,scp</copyProtocol>
-						<destinationInfo prefix="/tmp"/>
+						<destinationInfo prefix="/tmp" />
 					</fileTransferDeploy>
 				</sshProcess>
 			</processDefinition>
 			<processDefinition id="remoteJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-			<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/bin/"/>
-						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
-						<absolutePath value="${PROACTIVE_HOME}/ProActive.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/xercesImpl.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/jsch.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/javassist.jar"/>
-				</classpath>
-					<javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath>
-                <policyFile>
-					<absolutePath value="${PROACTIVE_HOME}/proactive.java.policy" />
-			    </policyFile>
-				<log4jpropertiesFile>
-					<absolutePath value="${PROACTIVE_HOME}/proactive-log4j" />
-				</log4jpropertiesFile>
-				<jvmParameters>
-					<parameter value="-Dproactive.rmi.port=${RMI_PORT}" />
-					<parameter value="-Dproactive.communication.protocol=rmissh" />
-				</jvmParameters>
-				</jvmProcess>			
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="${PROACTIVE_HOME}/bin/" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/classes/" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/ProActive.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/log4j.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/fractal.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/xercesImpl.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/bouncycastle.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/jsch.jar" />
+						<absolutePath
+							value="${PROACTIVE_HOME}/javassist.jar" />
+					</classpath>
+					<javaPath>
+						<absolutePath value="${JAVA_HOME}/bin/java" />
+					</javaPath>
+					<policyFile>
+						<absolutePath
+							value="${PROACTIVE_HOME}/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath
+							value="${PROACTIVE_HOME}/proactive-log4j" />
+					</log4jpropertiesFile>
+					<jvmParameters>
+						<parameter
+							value="-Dproactive.rmi.port=${RMI_PORT}" />
+						<parameter
+							value="-Dproactive.communication.protocol=rmissh" />
+					</jvmParameters>
+				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"></jvmProcess>
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				</jvmProcess>
 			</processDefinition>
 		</processes>
 	</infrastructure>
