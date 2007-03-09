@@ -1569,6 +1569,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                                                .toString().substring(3),
                     policyServer.getApplicationCertificate(),
                     this.getCertificate());
+            break;
         default:
             break;
         }
