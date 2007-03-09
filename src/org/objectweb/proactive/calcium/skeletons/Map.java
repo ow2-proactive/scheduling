@@ -38,52 +38,49 @@ import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.muscle.Conquer;
 import org.objectweb.proactive.calcium.muscle.Divide;
 
+
 /**
  * Map is only a special case of Divide and Conquer, and therfore
  * represents data parallelism.
- * 
+ *
  * A taks is Divided once into subtaks (without evaluating a condition),
- * the subtasks are then executed using the child skeleton, and then the 
+ * the subtasks are then executed using the child skeleton, and then the
  * results are conquered using the Conquer object.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */
-public class Map<P,R> implements Skeleton<P,R>, Instruction<P,P> {
-	
-	Divide<P,?> div;
-	Skeleton child;
-	Conquer<?,R> conq;
-	ConquerInst<?,R> conquerInst;
-	DivideSIMD<?,R> divideInst;
-	
-	@SuppressWarnings("unchecked")
-	public <X,Y> Map(Divide<P,X> div, Skeleton<X,Y> child, Conquer<Y,R> conq){
-		
-		this.div=div;
-		this.child=child;
-		this.conq = conq;
+public class Map<P, R> implements Skeleton<P, R>, Instruction<P, P> {
+    Divide<P, ?> div;
+    Skeleton child;
+    Conquer<?, R> conq;
+    ConquerInst<?, R> conquerInst;
+    DivideSIMD<?, R> divideInst;
 
-		conquerInst = new ConquerInst<Y,R>(conq);
-		divideInst  = new DivideSIMD(div, child.getInstructionStack());
-	}
-	
-	public Stack<Instruction> getInstructionStack() {
+    @SuppressWarnings("unchecked")
+    public <X, Y>Map(Divide<P, X> div, Skeleton<X, Y> child, Conquer<Y, R> conq) {
+        this.div = div;
+        this.child = child;
+        this.conq = conq;
 
-		Stack<Instruction> v= new Stack<Instruction>();
-		v.add(this);
-		
-		return v;
-	}
-	
-	public Task<P> compute(Task<P> t) throws EnvironmentException {
-		
-		t.pushInstruction(conquerInst);
-		t.pushInstruction(divideInst);
-		return t;
-	}
+        conquerInst = new ConquerInst<Y, R>(conq);
+        divideInst = new DivideSIMD(div, child.getInstructionStack());
+    }
 
-	public String toString(){
-		return "Map";
-	}
+    public Stack<Instruction> getInstructionStack() {
+        Stack<Instruction> v = new Stack<Instruction>();
+        v.add(this);
+
+        return v;
+    }
+
+    public Task<P> compute(Task<P> t) throws EnvironmentException {
+        t.pushInstruction(conquerInst);
+        t.pushInstruction(divideInst);
+        return t;
+    }
+
+    public String toString() {
+        return "Map";
+    }
 }

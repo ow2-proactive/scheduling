@@ -37,50 +37,50 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.muscle.Condition;
 import org.objectweb.proactive.calcium.statistics.Timer;
 
+
 /**
  * The while skeleton represents conditioned iteration.
  * The child skeleton will be executed while the Condition
  * holds true.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <P>
  */
-public class While<P> implements Instruction<P,P>, Skeleton<P,P> {
+public class While<P> implements Instruction<P, P>, Skeleton<P, P> {
+    Condition<P> cond;
+    Skeleton<P, P> child;
 
-	Condition<P> cond;
-	Skeleton<P,P> child;
-	
-	public While(Condition<P> cond, Skeleton<P,P> child){
-		this.cond=cond;
-		this.child=child;
-	}
-	
-	public Stack<Instruction> getInstructionStack() {
-		Stack<Instruction> v = new Stack<Instruction>();
-		v.add(this);
-		return v;
-	}
-	
-	public Task<P> compute(Task<P> task) throws Exception{
-		Timer timer = new Timer();
-		boolean evalCondition=cond.evalCondition(task.getObject());
-		timer.stop();
-		task.getStats().getWorkout().track(cond, timer);
-		
-		if(evalCondition){
-			//Get Child stack
-			Vector<Instruction> childStack=child.getInstructionStack();
-			
-			//Add me to evaluate while condition after executing child
-			childStack.add(0,this); 
-			
-			//Add new elements to the task's stack
-			Vector<Instruction> taskStack=task.getStack();
-			taskStack.addAll(childStack);
-			task.setStack(taskStack);
-		}
+    public While(Condition<P> cond, Skeleton<P, P> child) {
+        this.cond = cond;
+        this.child = child;
+    }
 
-		return task;
-	}
+    public Stack<Instruction> getInstructionStack() {
+        Stack<Instruction> v = new Stack<Instruction>();
+        v.add(this);
+        return v;
+    }
+
+    public Task<P> compute(Task<P> task) throws Exception {
+        Timer timer = new Timer();
+        boolean evalCondition = cond.evalCondition(task.getObject());
+        timer.stop();
+        task.getStats().getWorkout().track(cond, timer);
+
+        if (evalCondition) {
+            //Get Child stack
+            Vector<Instruction> childStack = child.getInstructionStack();
+
+            //Add me to evaluate while condition after executing child
+            childStack.add(0, this);
+
+            //Add new elements to the task's stack
+            Vector<Instruction> taskStack = task.getStack();
+            taskStack.addAll(childStack);
+            task.setStack(taskStack);
+        }
+
+        return task;
+    }
 }

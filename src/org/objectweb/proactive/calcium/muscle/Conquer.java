@@ -34,16 +34,17 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
+
 /**
  * This class is used to conquer a vector of parameters
  * into a single parameters. It is usefull for skeletons
  * such as: divide&conquer and map.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <P,R>
  */
-public interface Conquer<Y,R> extends Muscle<Vector<Y>, R>{
-
-	public R conquer(Vector<Y> param) throws RuntimeException, EnvironmentException;
+public interface Conquer<Y, R> extends Muscle<Vector<Y>, R> {
+    public R conquer(Vector<Y> param)
+        throws RuntimeException, EnvironmentException;
 }

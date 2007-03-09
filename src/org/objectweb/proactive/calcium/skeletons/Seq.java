@@ -43,41 +43,39 @@ import org.objectweb.proactive.calcium.statistics.Timer;
  * The Seq skeleton is a wrapper for the user inputed
  * sequential code. This class allows the code to be nested
  * inside other skeletons.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  * @param <P>
  */
-public class Seq<P,R> implements Skeleton<P,R>, Instruction<P,R> {
+public class Seq<P, R> implements Skeleton<P, R>, Instruction<P, R> {
+    Execute<P, R> secCode;
+    int muscleId;
 
-	Execute<P,R> secCode;
-	int muscleId;
-	
-	public Seq(Execute<P,R> secCode){
-		this.secCode=secCode;
-		muscleId=0;
-	}
-	
-	public Stack<Instruction> getInstructionStack() {
-		
-		Stack<Instruction> v=new Stack<Instruction>();
-		v.add(this);
-		return v;
-	}
+    public Seq(Execute<P, R> secCode) {
+        this.secCode = secCode;
+        muscleId = 0;
+    }
 
-	public Task<R> compute(Task<P> t) throws RuntimeException, EnvironmentException {
-		
-		Timer timer = new Timer();
-		R resultObject= secCode.execute(t.getObject());
-		timer.stop();
-			
-		Task<R> newtask = t.reBirth(resultObject); 
-		
-		t.getStats().getWorkout().track(secCode,timer);
-		return newtask;
-	}
+    public Stack<Instruction> getInstructionStack() {
+        Stack<Instruction> v = new Stack<Instruction>();
+        v.add(this);
+        return v;
+    }
 
-	public String toString(){
-		return "Seq("+this.secCode.getClass()+")";
-	}
+    public Task<R> compute(Task<P> t)
+        throws RuntimeException, EnvironmentException {
+        Timer timer = new Timer();
+        R resultObject = secCode.execute(t.getObject());
+        timer.stop();
+
+        Task<R> newtask = t.reBirth(resultObject);
+
+        t.getStats().getWorkout().track(secCode, timer);
+        return newtask;
+    }
+
+    public String toString() {
+        return "Seq(" + this.secCode.getClass() + ")";
+    }
 }

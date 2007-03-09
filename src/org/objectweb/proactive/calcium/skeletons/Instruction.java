@@ -42,7 +42,6 @@ import org.objectweb.proactive.calcium.Task;
  *
  * @param <T>
  */
-public interface Instruction<P,R> extends Serializable{
-
-	public Task<R> compute(Task<P> t) throws Exception;
+public interface Instruction<P, R> extends Serializable {
+    public Task<R> compute(Task<P> t) throws Exception;
 }
