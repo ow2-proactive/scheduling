@@ -628,7 +628,7 @@
 	</macrodef>
 	
 	<target name="format" description="Formats the project source files">
-		<format_m srcdir="{src.dir}/org/objectweb/proactive"/>
+		<format_m srcdir="${src.dir}/org/objectweb/proactive"/>
 	</target>
 
 
