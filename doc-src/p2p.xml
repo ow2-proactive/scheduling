@@ -1341,18 +1341,18 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 ...
 // This constructor uses a file with address of peers
 // See the Javadoc to choose different parameters
-StartP2PService startServiceP2P = new StartP2PService(p2pFile)
+StartP2PService startServiceP2P = new StartP2PService(p2pFile);
 // Start the P2P Service on the local host
 startServiceP2P.start();
 // Get the reference on the P2P Service
 P2PService serviceP2P = startServiceP2P.getP2PService();
 // By the application's P2P Service ask to the P2P infrastructure
 // for getting nodes.
-P2PNodeLookup p2pNodeLookup = p2pService.getNodes(nNodes,
+P2PNodeLookup p2pNodeLookup = serviceP2P.getNodes(nNodes,
  virtualNodeName, JobID);
 // You can migrate the P2P node lookup from the p2p service
 // to an another node:
-p2pNodeLookup.moveTo('//localhost/localNode');
+p2pNodeLookup.moveTo("//localhost/localNode");
 // Use method from p2pNodeLookup to get nodes
 // such as
 while (! p2pNodeLookup.allArrived()) {
