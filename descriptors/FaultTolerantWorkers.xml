@@ -179,9 +179,7 @@
 				<faultTolerance>
 					<protocol type="cic"></protocol>
 					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
-					<resourceServer
-						url="rmi://trinidad:1334/FTServer">
-					</resourceServer>
+					<resourceServer url="rmi://trinidad:1334/FTServer" />
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>
