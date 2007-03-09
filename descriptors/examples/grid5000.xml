@@ -6,11 +6,11 @@
 
 	<variables>
 
-		<javaPropertyVariable name="USER_HOME" value="user.home" />
+		<javaPropertyVariable name="user.home"/>
 		<descriptorVariable name="PROACTIVE_HOME"
-			value="${USER_HOME}/ProActive" /> <!--CHANGE ME!!!! -->
+			value="${user.home}/ProActive" /> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA"
-			value="${USER_HOME}/OASIS/jdk/java" /> <!--CHANGE ME!!!! -->
+			value="${user.home}/OASIS/jdk/java" /> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="RMI_PORT" value="5000" />
 		<descriptorVariable name="COM_PROTO" value="rmi" />
 
