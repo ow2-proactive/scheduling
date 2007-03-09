@@ -992,6 +992,7 @@ public abstract class MOP {
             this.genericParameters = genericParameters;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (!(o instanceof GenericStubKey)) {
                 return false;
@@ -1003,6 +1004,7 @@ public abstract class MOP {
                 ((GenericStubKey) o).getGenericParameters())));
         }
 
+        @Override
         public int hashCode() {
             return className.hashCode() +
             Arrays.deepHashCode(genericParameters);

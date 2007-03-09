@@ -136,6 +136,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     // ****** static toggle for OC [TEST] *******
     private final static boolean isOCEnable = false;
 
+    @Override
     public int init(AbstractBody owner) throws ProActiveException {
         super.init(owner);
         this.incarnation = 1;
@@ -164,11 +165,13 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0;
     }
 
+    @Override
     public int onReceiveReply(Reply reply) {
         reply.setFTManager(this);
         return this.incarnationTest(reply);
     }
 
+    @Override
     public int onReceiveRequest(Request request) {
         request.setFTManager(this);
         return this.incarnationTest(request);
@@ -196,6 +199,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0; //This value is not returned to the sender
     }
 
+    @Override
     public synchronized int onDeliverReply(Reply reply) {
         int currentCheckpointIndex = this.checkpointIndex;
         if (this.isSignificant(reply)) {
@@ -211,6 +215,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return currentCheckpointIndex;
     }
 
+    @Override
     public synchronized int onDeliverRequest(Request request) {
         int currentCheckpointIndex = this.checkpointIndex;
 
@@ -304,6 +309,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         }
     }
 
+    @Override
     public synchronized int onSendReplyBefore(Reply reply) {
         // set message info values
         this.forSentReply.checkpointIndex = (char) this.checkpointIndex;
@@ -332,6 +338,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0;
     }
 
+    @Override
     public synchronized int onSendRequestBefore(Request request) {
         // set message info values
         this.forSentRequest.checkpointIndex = (char) this.checkpointIndex;
@@ -378,6 +385,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         }
     }
 
+    @Override
     public synchronized int onSendReplyAfter(Reply reply, int rdvValue,
         UniversalBody destination) {
         // if return value is RESEND, receiver have to recover --> resend the message
@@ -425,6 +433,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0;
     }
 
+    @Override
     public synchronized int onSendRequestAfter(Request request, int rdvValue,
         UniversalBody destination) throws RenegotiateSessionException {
         //	if return value is RESEDN, receiver have to recover --> resend the message
@@ -467,6 +476,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0;
     }
 
+    @Override
     public int onServeRequestBefore(Request request) {
         // checkpoint if needed
         while (this.haveToCheckpoint()) {
@@ -486,11 +496,13 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0;
     }
 
+    @Override
     public int onServeRequestAfter(Request request) {
         return 0;
     }
 
     // Active Object is created but not started 
+    @Override
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
         CheckpointInfoCIC cic = (CheckpointInfoCIC) ci;
         BlockingRequestQueue queue = ((AbstractBody) owner).getRequestQueue();
@@ -559,6 +571,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0;
     }
 
+    @Override
     public void updateLocationAtServer(UniqueID ownerID,
         UniversalBody remoteBodyAdapter) {
         try {
@@ -894,6 +907,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         }
     }
 
+    @Override
     public String toString() {
         String ret = " Incarnation = ";
         ret += this.incarnation;
@@ -913,6 +927,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     ///////// HANDLING EVENTS ////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////
     // Double Dispatch pattern
+    @Override
     public Object handleFTMessage(FTMessage fte) {
         return fte.handleFTMessage(this);
     }

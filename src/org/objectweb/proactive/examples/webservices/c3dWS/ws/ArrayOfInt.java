@@ -82,6 +82,7 @@ public class ArrayOfInt implements java.io.Serializable {
         this._int[i] = value;
     }
 
+    @Override
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof ArrayOfInt)) {
             return false;
@@ -113,6 +114,7 @@ public class ArrayOfInt implements java.io.Serializable {
         return _equals;
     }
 
+    @Override
     public synchronized int hashCode() {
         if (__hashCodeCalc) {
             return 0;

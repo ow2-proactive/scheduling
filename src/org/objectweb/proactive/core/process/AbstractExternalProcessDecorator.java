@@ -74,6 +74,7 @@ public abstract class AbstractExternalProcessDecorator
         setOutputMessageSink(targetProcess.getOutputMessageSink());
     }
 
+    @Override
     public int getCompositionType() {
         return compositionType;
     }
@@ -86,6 +87,7 @@ public abstract class AbstractExternalProcessDecorator
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void toString(StringBuilder sb) {
         super.toString(sb);
         sb.append(" ---- Target Process ----- \n");
@@ -97,6 +99,7 @@ public abstract class AbstractExternalProcessDecorator
         sb.append(" -------------- \n");
     }
 
+    @Override
     protected String buildCommand() {
         if ((compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) ||
                 (compositionType == GIVE_COMMAND_AS_PARAMETER) ||
@@ -120,6 +123,7 @@ public abstract class AbstractExternalProcessDecorator
 
     protected abstract String internalBuildCommand();
 
+    @Override
     protected void internalStartProcess(String command)
         throws java.io.IOException {
         super.internalStartProcess(command);
@@ -134,6 +138,7 @@ public abstract class AbstractExternalProcessDecorator
         }
     }
 
+    @Override
     protected void handleOutput(java.io.BufferedWriter out) {
         if (compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) {
             if (outputMessageSink == null) {

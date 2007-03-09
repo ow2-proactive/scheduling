@@ -90,9 +90,11 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Standa
         activeObject.initialize();
     }
 
+    @Override
     protected void start() {
     }
 
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.GridLayout(
                     1, 1));

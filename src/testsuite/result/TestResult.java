@@ -61,7 +61,8 @@ public class TestResult extends AbstractResult {
         this.test = test;
     }
 
-    public Node toXMLNode(Document document) {
+    @Override
+	public Node toXMLNode(Document document) {
         Element root = document.createElement("Result");
         root.setAttribute("type", getType() + "");
 
@@ -129,7 +130,8 @@ public class TestResult extends AbstractResult {
     /**
      *
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String res = ((test != null) ? test.getName() : "") +
             " : Empty message";
 

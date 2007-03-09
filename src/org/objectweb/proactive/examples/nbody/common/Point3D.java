@@ -63,6 +63,7 @@ public class Point3D implements Serializable {
     }
 
     /** For displaying a Point3D */
+    @Override
     public String toString() {
         return x + ", " + y + ", " + z;
     }

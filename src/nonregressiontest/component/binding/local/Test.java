@@ -82,7 +82,8 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         testAdd();
         testContainsBindingOn();
         testGetExternalClientBindings();
@@ -93,7 +94,8 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         System.setProperty("fractal.provider",
             "org.objectweb.proactive.core.component.Fractive");
         Component boot = Fractal.getBootstrapComponent();
@@ -131,10 +133,12 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return true;
     }
 

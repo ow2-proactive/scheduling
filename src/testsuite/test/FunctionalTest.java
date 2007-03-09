@@ -97,7 +97,8 @@ public abstract class FunctionalTest extends AbstractTest
      * If preconditions are not verified the tes don't run and is failed.</p>
      * @see testsuite.test.AbstractTest#preConditions()
      */
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         return true;
     }
 
@@ -107,7 +108,8 @@ public abstract class FunctionalTest extends AbstractTest
      * If postconditions are not verified the test is failed.</p>
      * @see testsuite.test.AbstractTest#postConditions()
      */
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return true;
     }
 
@@ -118,7 +120,8 @@ public abstract class FunctionalTest extends AbstractTest
      * <p>To know if a test run successfully call the method <code>isFailled()</code></p>
      * @see testsuite.test.AbstractTest#runTest()
      */
-    public TestResult runTest() {
+    @Override
+	public TestResult runTest() {
         try {
             initTest();
         } catch (Exception e) {
@@ -336,7 +339,8 @@ public abstract class FunctionalTest extends AbstractTest
      * <p><b>Warning : </b>if you don't have already run the test, this method return <b>false</b>.</p>
      * @return <b>true</b> if a test run successfully, <b>false</b> else.
      */
-    public boolean isFailed() {
+    @Override
+	public boolean isFailed() {
         return failed;
     }
 

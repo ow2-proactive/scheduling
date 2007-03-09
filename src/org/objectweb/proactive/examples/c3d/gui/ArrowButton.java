@@ -84,10 +84,12 @@ public class ArrowButton extends JButton {
     }
 
     // Implemented so that the button stays with the original size ==> Button has fixed size 
+    @Override
     public Dimension getMaximumSize() {
         return dimension;
     }
 
+    @Override
     public Dimension getMinimumSize() {
         return dimension;
     }

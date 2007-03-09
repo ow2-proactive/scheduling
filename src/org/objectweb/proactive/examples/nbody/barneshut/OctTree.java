@@ -395,6 +395,7 @@ public class OctTree implements Serializable {
     /**
      * For displaying a OctTree (debug)
      */
+    @Override
     public String toString() {
         String ch = "Masse : " + this.mass + "\n";
         ch += ("Cube x : " + cube.x + " - Cube y : " + cube.y + " - Cube z : " +

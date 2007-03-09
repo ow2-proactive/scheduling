@@ -153,6 +153,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String internalBuildCommand() {
         return buildEnvironmentCommand() + buildRLoginCommand();
     }
@@ -168,6 +169,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
         return command;
     }
 
+    @Override
     protected void internalStartProcess(String command)
         throws java.io.IOException {
         super.internalStartProcess(command);
@@ -176,10 +178,12 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
         }
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
 
+    @Override
     public void setUsername(String username) {
         this.username = username;
     }

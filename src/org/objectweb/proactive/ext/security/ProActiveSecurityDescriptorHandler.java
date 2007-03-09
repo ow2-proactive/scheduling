@@ -111,6 +111,7 @@ public class ProActiveSecurityDescriptorHandler
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
      */
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
         //        if (name.equals(PRIVATE_KEY_TAG)) {
@@ -185,6 +186,7 @@ public class ProActiveSecurityDescriptorHandler
             }
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             // new handler otherwise all policies reference the same object, maybe there is another thing to do
@@ -230,6 +232,7 @@ public class ProActiveSecurityDescriptorHandler
             throws org.xml.sax.SAXException {
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equals(PROACTIVE_SECURITY_TAG)) {
@@ -265,6 +268,7 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(ENTITY_FROM_TAG)) {
@@ -314,6 +318,7 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             entities.add(activeHandler.getResultObject());
@@ -344,6 +349,7 @@ public class ProActiveSecurityDescriptorHandler
             super();
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             if (attributes.getValue("type").equals("VN")) {
@@ -357,6 +363,7 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
+        @Override
         public Object getResultObject() throws SAXException {
             return entity;
         }
@@ -377,6 +384,7 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(RULE_COMMUNICATION_FROM_TAG)) {
@@ -422,6 +430,7 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(RULE_COMMUNICATION_ATTRIBUTES_TAG)) {
@@ -448,6 +457,7 @@ public class ProActiveSecurityDescriptorHandler
             super();
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             communication = new Communication(convert(attributes.getValue(
@@ -459,6 +469,7 @@ public class ProActiveSecurityDescriptorHandler
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
+        @Override
         public Object getResultObject() throws SAXException {
             return communication;
         }

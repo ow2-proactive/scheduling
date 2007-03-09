@@ -41,6 +41,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class IconRenderer extends DefaultTableCellRenderer {
     JLabel res = new JLabel();
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
         boolean isSelected, boolean hasFocus, int row, int column) {
         res.setHorizontalAlignment(JLabel.CENTER);

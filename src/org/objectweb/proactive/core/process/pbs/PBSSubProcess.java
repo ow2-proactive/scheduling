@@ -100,6 +100,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
     //  ----------------------------------------------------------------------------------------
     //-----------------------Extends AbstractExternalProcessDecorator-------------------------
     //  ----------------------------------------------------------------------------------------
+    @Override
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());
@@ -258,10 +259,12 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         return result;
     }
 
+    @Override
     protected String internalBuildCommand() {
         return buildEnvironmentCommand(); // + buildPSubCommand();
     }
 
+    @Override
     protected void internalStartProcess(String commandToExecute) {
         //java does not seem to be able to deal with command
         //where there are quotation marks
@@ -318,6 +321,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         }
     }
 
+    @Override
     protected String buildCommand() {
         StringBuilder qsubCommand = new StringBuilder();
         qsubCommand.append(command_path).append(" ");

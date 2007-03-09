@@ -62,6 +62,7 @@ public class SpyMessageEvent extends SpyEvent implements java.io.Serializable {
         this.requestQueueLength = message.getRequestQueueLength();
     }
 
+    @Override
     public String toString() {
         return super.toString() + " methodName=" + methodName +
         " requestQueue=" + requestQueueLength;

@@ -56,6 +56,7 @@ public class AppletEntrance extends org.objectweb.proactive.examples.StandardFra
         new AppletEntrance("The salishan problems", 600, 300);
     }
 
+    @Override
     public void start() {
         receiveMessage("Please wait while initializing remote objects");
         try {
@@ -70,6 +71,7 @@ public class AppletEntrance extends org.objectweb.proactive.examples.StandardFra
         }
     }
 
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
         rootPanel.setBackground(java.awt.Color.white);

@@ -123,6 +123,7 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String internalBuildCommand() {
         return buildSSHCommand() + buildEnvironmentCommand();
     }

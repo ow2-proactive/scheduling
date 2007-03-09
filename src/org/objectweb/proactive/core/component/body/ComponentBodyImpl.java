@@ -123,6 +123,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * default result for isActive() (unoverriden)
      *
      */
+    @Override
     public boolean isActive() {
         if (insideFunctionalActivity) {
             try {

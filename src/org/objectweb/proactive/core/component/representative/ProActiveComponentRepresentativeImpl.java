@@ -354,6 +354,7 @@ public class ProActiveComponentRepresentativeImpl
      *  The comparison of component references is actually a comparison of unique
      * identifiers accross jvms.
      */
+    @Override
     public boolean equals(Object component) {
         Object result = reifyCall(Object.class.getName(), "equals",
                 new Class[] { Object.class }, new Object[] { component },
@@ -361,6 +362,7 @@ public class ProActiveComponentRepresentativeImpl
         return ((Boolean) result).booleanValue();
     }
 
+    @Override
     public int hashCode() {
         // reified as a standard invocation (not a component one)
         Object result;

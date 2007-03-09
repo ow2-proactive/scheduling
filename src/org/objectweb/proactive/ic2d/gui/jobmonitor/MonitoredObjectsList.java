@@ -131,6 +131,7 @@ public class MonitoredObjectsList extends JDialog {
                 javax.swing.BoxLayout.Y_AXIS));
 
         addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent evt) {
                     cancel();
                 }
@@ -222,6 +223,7 @@ public class MonitoredObjectsList extends JDialog {
 
 class MonitoredObjectsListCellRenderer extends DefaultListCellRenderer
     implements JobMonitorConstants {
+    @Override
     public Component getListCellRendererComponent(JList list, Object value,
         int index, boolean isSelected, boolean cellHasFocus) {
         super.getListCellRendererComponent(list, value, index, isSelected,

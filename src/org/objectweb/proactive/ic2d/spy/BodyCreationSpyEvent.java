@@ -61,6 +61,7 @@ public class BodyCreationSpyEvent extends BodySpyEvent implements java.io.Serial
         return nodeURL;
     }
 
+    @Override
     public String toString() {
         return super.toString() + "\n\tnodeName:" + nodeURL +
         " Type: NEW OBJECT class: " + className;

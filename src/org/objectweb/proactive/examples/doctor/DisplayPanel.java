@@ -79,6 +79,7 @@ public class DisplayPanel extends javax.swing.JPanel implements Runnable {
         }
     }
 
+    @Override
     public Dimension getPreferredSize() {
         Graphics g = getGraphics();
 
@@ -91,10 +92,12 @@ public class DisplayPanel extends javax.swing.JPanel implements Runnable {
             80 + ((h + 10) * (Office.NB_PAT - 1)));
     }
 
+    @Override
     public Dimension getMinimumSize() {
         return new Dimension(100, 100);
     }
 
+    @Override
     protected void paintComponent(java.awt.Graphics g) {
         super.paintComponent(g);
         int i;

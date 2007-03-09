@@ -128,6 +128,7 @@ public abstract class ProActiveInterfaceImpl implements java.io.Serializable,
      */
     public abstract void setFcItfImpl(final Object impl);
 
+    @Override
     public String toString() {
         String string = "name : " + getFcItfName() + "\n" + //            "componentIdentity : " + getFcItfOwner() + "\n" + "type : " +
             getFcItfType() + "\n" + "isInternal : " + isFcInternalItf() + "\n";

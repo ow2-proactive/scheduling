@@ -35,6 +35,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 
 public class HostNameConsoleAppender extends ConsoleAppender {
+    @Override
     public void append(LoggingEvent event) {
         super.append(event);
     }

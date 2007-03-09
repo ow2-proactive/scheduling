@@ -72,6 +72,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addAll(java.util.Collection)
      */
+    @Override
     public void addAll(Collection tasks) {
         if (tasks.size() > 0) {
             queue.addAll(tasks);
@@ -85,6 +86,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#size()
      */
+    @Override
     public IntMutableWrapper size() {
         return new IntMutableWrapper(this.queue.size());
     }
@@ -92,6 +94,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#hasNext()
      */
+    @Override
     public BooleanMutableWrapper hasNext() {
         return new BooleanMutableWrapper(this.queue.size() > 0);
     }
@@ -99,6 +102,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#next()
      */
+    @Override
     public Task next() {
         return (Task) this.queue.remove(0);
     }
@@ -106,6 +110,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#flushAll()
      */
+    @Override
     public void flushAll() {
         queue = new Vector();
         hungryLevel = 0;
@@ -117,6 +122,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#isHungry()
      */
+    @Override
     public BooleanWrapper isHungry() {
         if (logger.isDebugEnabled()) {
             logger.debug("Queue size is " + this.queue.size() +
@@ -128,6 +134,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#setHungryLevel(int)
      */
+    @Override
     public void setHungryLevel(int level) {
         this.hungryLevel = level;
     }
@@ -135,6 +142,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#backupTasks(org.objectweb.proactive.branchnbound.core.Task, java.util.Vector, java.io.OutputStream)
      */
+    @Override
     public void backupTasks(Task rootTask, Vector pendingTasks,
         OutputStream backupOutputStream) {
         try {
@@ -159,6 +167,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#loadTasks(java.io.InputStream)
      */
+    @Override
     public void loadTasks(InputStream taskInputStream) {
         try {
             ObjectInputStream ois = new ObjectInputStream(taskInputStream);
@@ -187,6 +196,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#getRootTaskFromBackup()
      */
+    @Override
     public Task getRootTaskFromBackup() {
         return this.rootTaskFromBackup;
     }
@@ -194,6 +204,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addResult(org.objectweb.proactive.branchnbound.core.Result)
      */
+    @Override
     public void addResult(Result result) {
         this.allResults.add(result);
     }
@@ -201,6 +212,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#howManyResults()
      */
+    @Override
     public IntMutableWrapper howManyResults() {
         return new IntMutableWrapper(this.allResults.size());
     }
@@ -208,6 +220,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#getAllResults()
      */
+    @Override
     public Collection getAllResults() {
         return this.allResults;
     }
@@ -215,6 +228,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#backupResults(java.io.OutputStream)
      */
+    @Override
     public void backupResults(OutputStream backupResultOutputStream) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(backupResultOutputStream);
@@ -233,6 +247,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#loadResults(java.io.InputStream)
      */
+    @Override
     public void loadResults(InputStream backupResultInputStream) {
         try {
             ObjectInputStream ois = new ObjectInputStream(backupResultInputStream);
@@ -250,6 +265,7 @@ public class BasicQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addTask(org.objectweb.proactive.branchnbound.core.Task)
      */
+    @Override
     public void addTask(Task t) {
         queue.add(t);
     }

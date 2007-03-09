@@ -55,16 +55,19 @@ public class Test extends FunctionalTest {
             "create a group with active nd non-ctive object then launch method calls");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.resultTypedGroup = this.typedGroup.asynchronousCall();
         this.resultTypedGroup.asynchronousCall();
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -88,7 +91,8 @@ public class Test extends FunctionalTest {
         return (this.typedGroup != null);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         // was the result group created ?
         if (this.resultTypedGroup == null) {
             return false;
@@ -112,7 +116,8 @@ public class Test extends FunctionalTest {
         return rightRankingOfResults;
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // nothing to do : ProActive methods can not be used here
     }
 }

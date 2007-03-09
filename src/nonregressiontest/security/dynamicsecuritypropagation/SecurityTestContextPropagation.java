@@ -60,7 +60,8 @@ public class SecurityTestContextPropagation extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         A a = (A) ProActive.newActive("nonregressiontest.security.A",
                 new Object[] {  });
 
@@ -71,7 +72,8 @@ public class SecurityTestContextPropagation extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(
                 "../src/nonregressiontest/security/applicationPolicy.xml");
         psm = new ProActiveSecurityManager(ps);
@@ -80,10 +82,12 @@ public class SecurityTestContextPropagation extends FunctionalTest {
         ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return isTestValide;
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 }

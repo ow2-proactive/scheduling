@@ -183,6 +183,7 @@ public class Complex implements java.io.Serializable, Cloneable {
      *        @param        obj        The object to compare with.
      *        @return True if the objects are the same; false otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -197,6 +198,7 @@ public class Complex implements java.io.Serializable, Cloneable {
      *        Returns a hashcode for this Complex.
      *        @return  A hash code value for this object.
      */
+    @Override
     public int hashCode() {
         long re_bits = Double.doubleToLongBits(re);
         long im_bits = Double.doubleToLongBits(im);
@@ -1219,6 +1221,7 @@ public class Complex implements java.io.Serializable, Cloneable {
      *        Returns a String representation for the specified Complex.
      *        @return A String representation for this object.
      */
+    @Override
     public String toString() {
         if (im == 0.0) {
             return String.valueOf(re);

@@ -110,6 +110,7 @@ public class ActiveQueue extends Thread {
      * The run method of the thread. Serve jobs in a FIFO manner until
      * <code>killMe()</code> is called.
      */
+    @Override
     public void run() {
         while (true) {
             // if there is no job to do, wait...

@@ -136,6 +136,7 @@ public class LauncherFrame extends JFrame {
         setVisible(false);
     }
 
+    @Override
     public void setVisible(boolean b) {
         if (b) {
             // display the window at the middle of the screen

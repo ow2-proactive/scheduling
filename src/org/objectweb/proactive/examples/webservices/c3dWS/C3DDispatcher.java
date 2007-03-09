@@ -1696,10 +1696,12 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             }
         }
 
+        @Override
         public void paint(Graphics g) {
             update(g);
         }
 
+        @Override
         public void update(Graphics g) {
             i_top = this.getInsets().top;
             g.setColor(Color.gray);
@@ -1752,6 +1754,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
          * AWT 1.1 event handling for window events
          */
         class MyWindowListener extends WindowAdapter {
+            @Override
             public void windowClosing(WindowEvent e) {
                 exit();
             }
@@ -1795,6 +1798,7 @@ class Election extends Thread {
         this.start();
     }
 
+    @Override
     public synchronized void run() {
         try {
             wait(WAITSECS * 1000);

@@ -297,6 +297,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void notifyOneListener(ProActiveListener listener,
         ProActiveEvent event) {
         MigrationEvent migrationEvent = (MigrationEvent) event;
@@ -329,6 +330,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
             this.body = body;
         }
 
+        @Override
         public void run() {
             this.body.enterInThreadStore(); // make sure that the body isn't
                                             // trying to migrate
@@ -355,6 +357,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
             this.creationTime = System.currentTimeMillis();
         }
 
+        @Override
         public void run() {
             if (this.migrationManager.updatingForwarder) {
                 this.migrationManager.updateLocation(this.migratedBody.getRemoteAdapter());

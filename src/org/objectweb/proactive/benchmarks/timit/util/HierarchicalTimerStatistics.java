@@ -146,6 +146,7 @@ public class HierarchicalTimerStatistics implements Serializable {
     /**
      * Construct a well formatted String which show timers value with hierarchy
      */
+    @Override
     public String toString() {
         if (this.empty || (this.timerName.length == 0)) {
             return "";

@@ -71,6 +71,7 @@ public class HalfFTManagerPMLRB extends FTManager {
      * FTManager initialization.
      * @param owner the attached body.
      */
+    @Override
     public int init(AbstractBody owner) throws ProActiveException {
         //super.init(owner);        
         try {
@@ -108,6 +109,7 @@ public class HalfFTManagerPMLRB extends FTManager {
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onReceiveReply(org.objectweb.proactive.core.body.reply.Reply)
      */
+    @Override
     public int onReceiveReply(Reply reply) {
         reply.setFTManager(this);
         return 0;
@@ -116,6 +118,7 @@ public class HalfFTManagerPMLRB extends FTManager {
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onDeliverReply(org.objectweb.proactive.core.body.reply.Reply)
      */
+    @Override
     public int onDeliverReply(Reply reply) {
         return FTManager.NON_FT;
     }
@@ -123,6 +126,7 @@ public class HalfFTManagerPMLRB extends FTManager {
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendReplyBefore(org.objectweb.proactive.core.body.reply.Reply)
      */
+    @Override
     public int onSendReplyBefore(Reply reply) {
         return 0;
     }
@@ -130,6 +134,7 @@ public class HalfFTManagerPMLRB extends FTManager {
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendReplyAfter(org.objectweb.proactive.core.body.reply.Reply, int, org.objectweb.proactive.core.body.UniversalBody)
      */
+    @Override
     public int onSendReplyAfter(Reply reply, int rdvValue,
         UniversalBody destination) {
         return 0;
@@ -138,6 +143,7 @@ public class HalfFTManagerPMLRB extends FTManager {
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendRequestBefore(org.objectweb.proactive.core.body.request.Request)
      */
+    @Override
     public int onSendRequestBefore(Request request) {
         this.requestInfos.sentSequenceNumber = this.getNextSendNumber();
         request.setMessageInfo(this.requestInfos);
@@ -147,6 +153,7 @@ public class HalfFTManagerPMLRB extends FTManager {
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendRequestAfter(org.objectweb.proactive.core.body.request.Request, int, org.objectweb.proactive.core.body.UniversalBody)
      */
+    @Override
     public int onSendRequestAfter(Request request, int rdvValue,
         UniversalBody destination) throws RenegotiateSessionException {
         return 0;
@@ -159,22 +166,27 @@ public class HalfFTManagerPMLRB extends FTManager {
     ////////////////////////
     // UNCALLABLE METHODS //
     ////////////////////////
+    @Override
     public int onReceiveRequest(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int onDeliverRequest(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int onServeRequestBefore(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int onServeRequestAfter(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
@@ -183,6 +195,7 @@ public class HalfFTManagerPMLRB extends FTManager {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public Object handleFTMessage(FTMessage fte) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }

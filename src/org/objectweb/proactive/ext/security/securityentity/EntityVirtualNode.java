@@ -78,10 +78,12 @@ public class EntityVirtualNode extends Entity implements Serializable {
     //   super();
     //   virtualNodeName = name;
     //  }
+    @Override
     public String getName() {
         return virtualNodeName;
     }
 
+    @Override
     public String toString() {
         String s = null;
         s = virtualNodeName;
@@ -90,6 +92,7 @@ public class EntityVirtualNode extends Entity implements Serializable {
         return s;
     }
 
+    @Override
     public boolean equals(Entity e) {
         if (e instanceof EntityVirtualNode) {
             if (applicationCertificate == null) {

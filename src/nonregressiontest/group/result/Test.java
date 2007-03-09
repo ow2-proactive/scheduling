@@ -54,20 +54,24 @@ public class Test extends FunctionalTest {
             "do a oneway call and an (a)synchronous call on a result group");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.resultTypedGroup.onewayCall();
         this.resultResultTypedGroup = this.resultTypedGroup.asynchronousCall();
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // nothing to do
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         Group group = ProActiveGroup.getGroup(this.resultTypedGroup);
         Group groupResult = ProActiveGroup.getGroup(this.resultResultTypedGroup);
 
@@ -95,7 +99,8 @@ public class Test extends FunctionalTest {
         return rightRankingOfResults;
     }
 
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },

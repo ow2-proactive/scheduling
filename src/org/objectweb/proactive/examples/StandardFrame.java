@@ -188,6 +188,7 @@ public abstract class StandardFrame extends javax.swing.JFrame {
         setSize(width, height + MESSAGE_ZONE_HEIGHT);
         setLocation(30, 30);
         addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     System.exit(0);
                 }

@@ -573,6 +573,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         public RMIKillerThread() {
         }
 
+        @Override
         public void run() {
             try {
                 while (RegistryHelper.getRegistry().list().length > 0) {

@@ -112,6 +112,7 @@ public class Service {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public String toString() {
         return "Service\n  Body=" + body.toString() + "\n  RequestQueue=" +
         requestQueue.toString();

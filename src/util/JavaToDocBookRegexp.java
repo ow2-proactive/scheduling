@@ -61,7 +61,8 @@ public class JavaToDocBookRegexp extends RegexpHighLighter {
 
     /** Add tags around java keywords.
      * @param string some java code to highlight, cannot contain \n */
-    protected String decorate(String string) {
+    @Override
+	protected String decorate(String string) {
         assert string.indexOf('\n') == -1 : "Hey, decorate can't work with newlines in the input String!";
 
         String result = string;
@@ -173,7 +174,8 @@ public class JavaToDocBookRegexp extends RegexpHighLighter {
     }
 
     /** Puts all variables back to their original state */
-    protected void reset() {
+    @Override
+	protected void reset() {
         this.inComment = false;
         this.inString = false;
         this.inXmlTag = false;

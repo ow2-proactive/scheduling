@@ -41,7 +41,8 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
  * @author Matthieu Morel
  */
 public class PrimitiveComponentDbis extends PrimitiveComponentD {
-    public void bindFc(String clientItfName, Object serverItf) {
+    @Override
+	public void bindFc(String clientItfName, Object serverItf) {
         if (clientItfName.startsWith(I2_ITF_NAME)) {
             i2Group.addNamedElement(clientItfName, serverItf);
         } else {
@@ -49,12 +50,14 @@ public class PrimitiveComponentDbis extends PrimitiveComponentD {
         }
     }
 
-    public String[] listFc() {
+    @Override
+	public String[] listFc() {
         Set itf_names = i2Group.keySet();
         return (String[]) itf_names.toArray(new String[itf_names.size()]);
     }
 
-    public void unbindFc(String clientItf)
+    @Override
+	public void unbindFc(String clientItf)
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
         if (i2Group.containsKey(clientItf)) {
@@ -64,7 +67,8 @@ public class PrimitiveComponentDbis extends PrimitiveComponentD {
         }
     }
 
-    public Object lookupFc(String clientItf) throws NoSuchInterfaceException {
+    @Override
+	public Object lookupFc(String clientItf) throws NoSuchInterfaceException {
         if (i2Group.containsKey(clientItf)) {
             return i2Group.getNamedElement(clientItf);
         } else {

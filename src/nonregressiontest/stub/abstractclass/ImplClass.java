@@ -38,6 +38,7 @@ public class ImplClass extends AbstractClass {
 //		System.out.println("GreenWidget : foo");
 	}
 	
+	@Override
 	public void gee() {
 //		System.out.println("GreenWidget : gee");
 	}

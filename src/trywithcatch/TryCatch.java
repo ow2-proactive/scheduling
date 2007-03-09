@@ -61,11 +61,13 @@ public class TryCatch extends Anything {
         return addPackageName ? (PACKAGE + ".") : "";
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "" + tryTerminal + tryBlock + catchBlocks + finallyBlock;
     }
 
-    protected void prettyPrint(int indent) {
+    @Override
+	protected void prettyPrint(int indent) {
         super.prettyPrint(indent);
         System.out.print("tryWithCatch (");
         for (Catch c : catchBlocks) {
@@ -111,7 +113,8 @@ public class TryCatch extends Anything {
         return call + ");";
     }
 
-    public void work(Catcher c) throws IOException {
+    @Override
+	public void work(Catcher c) throws IOException {
         if (!catchBlocks.isEmpty()) {
             String call = getTryWithCatchCall();
             String indent = Catcher.getNewline(tryTerminal);

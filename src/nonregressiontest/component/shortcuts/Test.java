@@ -62,7 +62,8 @@ public class Test extends ComponentTest {
             "Shortcut communications through composite components");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         initializeComponentSystems();
 
         //System.out.println("testing unwrapped system");
@@ -211,18 +212,21 @@ public class Test extends ComponentTest {
         return wrapper;
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         System.setProperty("proactive.components.use_shortcuts", "true");
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         System.setProperty("proactive.components.use_shortcuts", "false");
     }
 
     /*
      * @see testsuite.test.AbstractTest#postConditions()
      */
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         Assertions.assertEquals(expectedResult, ((Message) ProActive.getFutureValue(result4)).getMessage());
         Assertions.assertEquals(expectedResult, ((Message) ProActive.getFutureValue(result3)).getMessage());
         Assertions.assertEquals(expectedResult,((Message) ProActive.getFutureValue(result2)).getMessage());

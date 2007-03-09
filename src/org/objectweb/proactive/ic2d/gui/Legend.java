@@ -76,6 +76,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -90,6 +91,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -105,6 +107,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -120,6 +123,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -135,6 +139,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -158,6 +163,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -242,6 +248,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -256,6 +263,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -270,6 +278,7 @@ public class Legend extends JFrame {
             }
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -285,6 +294,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -311,6 +321,7 @@ public class Legend extends JFrame {
                         private int w = 100;
                         private int h = 50;
 
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -328,6 +339,7 @@ public class Legend extends JFrame {
                         private int w = 100;
                         private int h = 50;
 
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -368,6 +380,7 @@ public class Legend extends JFrame {
                         private int w = 100;
                         private int h = 50;
 
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -390,6 +403,7 @@ public class Legend extends JFrame {
 
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;
@@ -403,6 +417,7 @@ public class Legend extends JFrame {
             }
             {
                 JComponent comp = new JPanel() {
+                        @Override
                         public void paintComponent(Graphics g) {
                             Dimension dim = getSize();
                             int w = dim.width;

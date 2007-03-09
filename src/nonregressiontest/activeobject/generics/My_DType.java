@@ -46,7 +46,8 @@ public class My_DType implements Serializable {
         this.str = str;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return str;
     }
 }

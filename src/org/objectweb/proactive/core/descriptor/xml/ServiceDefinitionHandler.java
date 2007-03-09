@@ -60,6 +60,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
      */
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
         UniversalService service = (UniversalService) activeHandler.getResultObject();
@@ -69,6 +70,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
      */
+    @Override
     public void startContextElement(String name, Attributes attributes)
         throws SAXException {
         this.serviceId = attributes.getValue("id");
@@ -78,6 +80,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         public RMILookupHandler() {
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String lookupUrl = attributes.getValue("url");
@@ -96,6 +99,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             this.addHandler(PEERS_SET_TAG, ch);
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             p2pDescriptorService = new P2PDescriptorService();
@@ -151,12 +155,14 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             }
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             String[] peerList = (String[]) activeHandler.getResultObject();
             p2pDescriptorService.setPeerList(peerList);
         }
 
+        @Override
         public Object getResultObject() throws org.xml.sax.SAXException {
             return p2pDescriptorService;
         }
@@ -176,16 +182,19 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             this.addHandler(FT_PROTO_TAG, ftch);
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             this.ftService = new FaultToleranceService();
         }
 
+        @Override
         public Object getResultObject() throws org.xml.sax.SAXException {
             return this.ftService;
         }
 
         protected class FTConfigHandler extends BasicUnmarshaller {
+            @Override
             public void startContextElement(String name, Attributes attributes)
                 throws org.xml.sax.SAXException {
                 if (FT_RECPROCESS_TAG.equals(name)) {

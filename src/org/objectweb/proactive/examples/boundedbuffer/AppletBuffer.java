@@ -67,6 +67,7 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
         new AppletBuffer("Bounded Buffer", 500, 300);
     }
 
+    @Override
     public void start() {
         cells[0].setIn(true);
         cells[0].setOut(true);
@@ -126,6 +127,7 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         javax.swing.JPanel rootPanel = new javax.swing.JPanel();
         rootPanel.setBackground(java.awt.Color.white);
@@ -215,6 +217,7 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
             caption.setText(str);
         }
 
+        @Override
         protected void paintComponent(java.awt.Graphics g) {
             super.paintComponent(g);
             if (empty) {

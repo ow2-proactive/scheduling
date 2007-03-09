@@ -134,6 +134,7 @@ public class FlowShopResult implements Comparable, Serializable {
         return 0;
     }
 
+    @Override
     public String toString() {
         return "FSR : permutation " + Permutation.string(permutation) +
         ", makespan " + makespan + " and time " + time;

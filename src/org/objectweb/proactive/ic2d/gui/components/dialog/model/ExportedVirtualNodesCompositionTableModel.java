@@ -84,6 +84,7 @@ public class ExportedVirtualNodesCompositionTableModel
         return 3;
     }
 
+    @Override
     public String getColumnName(final int column) {
         //return column == 0 ? "Exported Virtual Node" : "Composing Virtual Nodes (syntax : component1.vn1;component2.vn2)";
         switch (column) {
@@ -98,6 +99,7 @@ public class ExportedVirtualNodesCompositionTableModel
         }
     }
 
+    @Override
     public boolean isCellEditable(final int rowIndex, final int columnIndex) {
         if (columnIndex == 2) {
             return false;
@@ -121,6 +123,7 @@ public class ExportedVirtualNodesCompositionTableModel
         }
     }
 
+    @Override
     public void setValueAt(final Object aValue, final int rowIndex,
         final int columnIndex) {
         try {

@@ -50,7 +50,8 @@ public class Test extends FunctionalTest {
         super("Exception", "Test exceptions");
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         if (counter == 14) {
             return true;
         }
@@ -171,7 +172,8 @@ public class Test extends FunctionalTest {
         }
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
 
         /* Server */
         Exc r = (Exc) org.objectweb.proactive.ProActive.newActive(Exc.class.getName(),
@@ -224,11 +226,13 @@ public class Test extends FunctionalTest {
         testMechanism(r);
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // TODO Auto-generated method stub
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // TODO Auto-generated method stub
     }
 

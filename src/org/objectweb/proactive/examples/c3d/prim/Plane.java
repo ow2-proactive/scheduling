@@ -52,6 +52,7 @@ public class Plane extends Primitive {
      * The normal vector at the point pnt on the plane.
      *@see org.objectweb.proactive.examples.c3d.prim.Primitive#normal(org.objectweb.proactive.examples.c3d.geom.Vec)
      */
+    @Override
     public Vec normal(Vec pnt) {
         Vec normal = new Vec(base.x, base.y, base.z);
         normal.normalize();
@@ -61,6 +62,7 @@ public class Plane extends Primitive {
     /**
      * @see org.objectweb.proactive.examples.c3d.prim.Primitive#intersect(org.objectweb.proactive.examples.c3d.geom.Ray)
      */
+    @Override
     public Isect intersect(Ray ray) {
         double div = (ray.D.x * base.x) + (ray.D.y * base.y) +
             (ray.D.z * base.z);
@@ -79,6 +81,7 @@ public class Plane extends Primitive {
         return null;
     }
 
+    @Override
     public String toString() {
         return base + " d=" + d;
     }
@@ -87,6 +90,7 @@ public class Plane extends Primitive {
      * Rotate the Plane.
      * @see org.objectweb.proactive.examples.c3d.prim.Primitive#rotate(org.objectweb.proactive.examples.c3d.geom.Vec)
      */
+    @Override
     public void rotate(Vec vec) {
         double phi;
         double l;

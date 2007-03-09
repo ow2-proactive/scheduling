@@ -49,7 +49,8 @@ public class OutputInterceptor1Impl extends AbstractProActiveController
         super(owner);
     }
 
-    protected void setControllerItfType() {
+    @Override
+	protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
                     OutputInterceptor1.class.getName(), TypeFactory.SERVER,

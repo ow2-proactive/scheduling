@@ -62,6 +62,7 @@ public class NonFunctionalException extends RuntimeException
         return smallName;
     }
 
+    @Override
     public String toString() {
         String str = "NFE[" + getNodeURL() + "]";
         for (Throwable cause = this; cause != null; cause = cause.getCause()) {

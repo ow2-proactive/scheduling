@@ -243,6 +243,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     }
 
     /** Explicit destructor : Interrupts the threads in the threadpool */
+    @Override
     public void finalize() {
         this.threadpool.clean();
     }
@@ -521,6 +522,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param o the Object for wich we test the equality.
      * @return <code>true</code> if <code>o</code> is the same Group as <code>this</code>.
      */
+    @Override
     public boolean equals(Object o) {
         ProxyForGroup p = ProActiveGroup.findProxyForGroup(o);
         if (p != null) {
@@ -535,6 +537,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * Returns the hash code value for this Group.
      * @return the hash code value for this Group.
      */
+    @Override
     public int hashCode() {
         return this.memberList.hashCode();
     }

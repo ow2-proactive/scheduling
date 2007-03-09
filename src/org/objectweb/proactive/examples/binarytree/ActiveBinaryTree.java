@@ -48,6 +48,7 @@ public class ActiveBinaryTree extends BinaryTree {
        for a given depth n of the tree (so that there cannot
        be more that 2**n active objects)
      */
+    @Override
     protected void createChildren() {
         try {
             String s = this.getClass().getName();

@@ -52,7 +52,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         //System.out.println( "Property "+System.getProperty("proactive.future.ac"));
         String initial_ca_setting = System.getProperty("proactive.future.ac");
         if (!"enable".equals(initial_ca_setting)) {
@@ -67,22 +68,26 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return (futureByResult && a.isSuccessful() &&
         a.getFinalResult().equals("dummy") && lastA.getIdName().equals("e"));
     }
 
     private class ACThread extends Thread {
-        public void run() {
+        @Override
+		public void run() {
             try {
                 a = (A) ProActive.newActive(A.class.getName(),
                         new Object[] { "principal" });

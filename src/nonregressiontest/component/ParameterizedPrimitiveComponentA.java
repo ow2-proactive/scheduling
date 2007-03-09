@@ -56,7 +56,8 @@ public class ParameterizedPrimitiveComponentA extends PrimitiveComponentA
         this.message = message;
     }
 
-    public Message processInputMessage(Message message) {
+    @Override
+	public Message processInputMessage(Message message) {
         //      /logger.info("transferring message :" + message.toString());
         if (i2 != null) {
             return (i2.processOutputMessage(message.append(message))).append(message);

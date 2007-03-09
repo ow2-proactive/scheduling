@@ -60,28 +60,34 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         this.name = name;
     }
 
+    @Override
     public void start() {
         this.activeTimer.start();
     }
 
+    @Override
     public void resume() {
         this.activeTimer.resume();
     }
 
+    @Override
     public void pause() {
         this.activeTimer.pause();
     }
 
+    @Override
     public void stop() {
         if (this.activeTimer != null) {
             this.activeTimer.stop();
         }
     }
 
+    @Override
     public void reset() {
         this.activeTimer.reset();
     }
 
+    @Override
     public long getCumulatedTime() {
         long time = 0;
         Iterator<Timer> it = timerMap.values().iterator();
@@ -92,6 +98,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         return time;
     }
 
+    @Override
     public int getNumberOfValues() {
         int values = 0;
         Iterator<Timer> it = timerMap.values().iterator();
@@ -105,6 +112,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     /**
      * return the average time of all the timers
      */
+    @Override
     public double getAverage() {
         int values = 0;
         long time = 0;
@@ -117,6 +125,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         return ((values > 0) ? ((double) time / values) : (-1));
     }
 
+    @Override
     public String toString() {
         StringBuilder tmp = new StringBuilder();
 
@@ -140,6 +149,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         return tmp.toString();
     }
 
+    @Override
     public void dump() {
         int ln = name.length();
         StringBuilder tmp = new StringBuilder();

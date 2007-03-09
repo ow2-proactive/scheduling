@@ -55,16 +55,19 @@ public class Test extends FunctionalTest {
 				"Tests conditions for variables of type JavaPropertiesDescriptor");
 	}
 
+	@Override
 	public boolean postConditions() throws Exception {
 	
 		return true;
 	}
 
+	@Override
 	public void initTest() throws Exception {
 		bogusFromDescriptor=true;
 		bogusFromProgram=true;
 	}
 	
+	@Override
 	public void endTest() throws Exception {
 		
 		if (pad != null) {
@@ -72,6 +75,7 @@ public class Test extends FunctionalTest {
 		}
 	}
 
+	@Override
 	public void action() throws Exception {
 		
 		VariableContract variableContract= new VariableContract();

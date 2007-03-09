@@ -71,6 +71,7 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
      * the default loader for this method.
      * @see RMIClassLoaderSpi#loadClass(java.lang.String, java.lang.String, java.lang.ClassLoader)
      */
+    @Override
     public Class<?> loadClass(String codebase, String name,
         ClassLoader defaultLoader)
         throws MalformedURLException, ClassNotFoundException {
@@ -83,6 +84,7 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
      * the default loader for this method.
      * @see RMIClassLoaderSpi#loadProxyClass(java.lang.String, java.lang.String[], java.lang.ClassLoader)
      */
+    @Override
     public Class<?> loadProxyClass(String codebase, String[] interfaces,
         ClassLoader defaultLoader)
         throws MalformedURLException, ClassNotFoundException {
@@ -93,6 +95,7 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
     /*
      * @see RMIClassLoaderSpi#getClassLoader(java.lang.String)
      */
+    @Override
     public ClassLoader getClassLoader(String codebase)
         throws MalformedURLException {
         if (proActiveClassLoader != null) {
@@ -105,6 +108,7 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
     /*
      * @see RMIClassLoaderSpi#getClassAnnotation(java.lang.Class)
      */
+    @Override
     public String getClassAnnotation(Class arg0) {
         return rmiClassLoaderSpi.getClassAnnotation(arg0);
     }

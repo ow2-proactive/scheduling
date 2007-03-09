@@ -61,7 +61,8 @@ public class Test extends FunctionalTest {
      *
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         // We try to parse an XML Deployment Descriptor with mistakes, an
         // exception must be thrown
         try {
@@ -103,7 +104,8 @@ public class Test extends FunctionalTest {
      *
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /*
@@ -111,10 +113,12 @@ public class Test extends FunctionalTest {
      *
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return testSuccess;
     }
 

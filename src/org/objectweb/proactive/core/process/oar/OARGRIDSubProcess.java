@@ -181,6 +181,7 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
         this.walltime = walltime;
     }
 
+    @Override
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
         ArrayList<String> al = new ArrayList<String>();
@@ -220,6 +221,7 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
      * script we thus rely on the following trick, the command has the form echo
      * "real command" | qsub -I ... oarStartRuntime.sh
      */
+    @Override
     protected String internalBuildCommand() {
         StringBuilder oarsubCommand = new StringBuilder();
         oarsubCommand.append(

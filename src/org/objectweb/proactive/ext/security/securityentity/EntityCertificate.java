@@ -52,6 +52,7 @@ public class EntityCertificate extends Entity implements Serializable {
         this.certificate = certificate;
     }
 
+    @Override
     public String getName() {
         return null;
     }
@@ -59,6 +60,7 @@ public class EntityCertificate extends Entity implements Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.ext.security.Entity#equals(org.objectweb.proactive.ext.security.Entity)
      */
+    @Override
     public boolean equals(Entity e) {
         return e.getCertificate().equals(certificate);
     }

@@ -103,6 +103,7 @@ public class ComponentRequestImpl extends RequestImpl
      * a functional interface in the case of a composite (no preprocessing in that case), or directly executes the invocation
      * on the base object if this component is a primitive component and the invocation is a functional invocation.
      */
+    @Override
     protected FutureResult serveInternal(Body targetBody)
         throws ServeException {
         Object result = null;
@@ -271,6 +272,7 @@ public class ComponentRequestImpl extends RequestImpl
         "startFc".equals(getMethodName()));
     }
 
+    @Override
     public void notifyReception(UniversalBody bodyReceiver)
         throws IOException {
         if (getShortcut() != null) {

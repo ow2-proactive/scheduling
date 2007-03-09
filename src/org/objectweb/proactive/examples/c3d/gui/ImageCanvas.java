@@ -63,6 +63,7 @@ public class ImageCanvas extends Canvas {
     /** Drawing the Component with a double-buffer.
      *  Thanks to "Graphics and Double-buffering Made Easy" , by Ian McFarland, July 1997
      */
+    @Override
     public void update(Graphics g) {
         Graphics gr;
 
@@ -90,6 +91,7 @@ public class ImageCanvas extends Canvas {
     }
 
     /** Declares how the Component should draw itself */
+    @Override
     public void paint(Graphics g) {
         Graphics2D graphics = (Graphics2D) g;
         Dimension dim = this.getSize(); // the drawable area
@@ -134,10 +136,12 @@ public class ImageCanvas extends Canvas {
         return new Dimension(this.my_HEIGHT, this.my_WIDTH);
     }
 
+    @Override
     public void setPreferredSize(Dimension preferredSize) {
         this.preferedSize = preferredSize;
     }
 
+    @Override
     public Dimension getPreferredSize() {
         return this.preferedSize;
     }

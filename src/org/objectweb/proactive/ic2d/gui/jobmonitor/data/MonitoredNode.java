@@ -41,10 +41,12 @@ public class MonitoredNode extends BasicMonitoredObject {
     static protected Map prettyNames = new HashMap();
     protected Node node;
 
+    @Override
     protected int incLastID() {
         return ++lastID;
     }
 
+    @Override
     protected Map getPrettyNames() {
         return prettyNames;
     }

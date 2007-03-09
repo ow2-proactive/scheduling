@@ -70,7 +70,8 @@ public class TestAPI extends FunctionalTest {
             "Tests the two main methods of the File Transfer API.");
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         
     	long fileTestSum = checkSum(fileTest);
         long filePulledSum = checkSum(filePulled);
@@ -89,7 +90,8 @@ public class TestAPI extends FunctionalTest {
        
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         cleanIfNecessary();
 
         if (logger.isDebugEnabled()) {
@@ -100,7 +102,8 @@ public class TestAPI extends FunctionalTest {
         createRandomContentFile(fileTest.getAbsolutePath(), FILE_SIZE);
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
@@ -108,7 +111,8 @@ public class TestAPI extends FunctionalTest {
         cleanIfNecessary();
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }

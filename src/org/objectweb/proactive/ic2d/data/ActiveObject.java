@@ -80,6 +80,7 @@ public class ActiveObject extends AbstractDataObject {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public String toString() {
         return "Object " + name + " ID#" + id + "\n" +
         "  class :                    " + className + "\n" +
@@ -135,6 +136,7 @@ public class ActiveObject extends AbstractDataObject {
         }
     }
 
+    @Override
     public ActiveObject findActiveObjectById(UniqueID id) {
         if (id == this.id) {
             return this;
@@ -155,6 +157,7 @@ public class ActiveObject extends AbstractDataObject {
         }
     }
 
+    @Override
     public void destroyObject() {
         getTypedParent().removeActiveObject(id);
     }
@@ -193,6 +196,7 @@ public class ActiveObject extends AbstractDataObject {
     //
     // -- implements MessageMonitoringController -----------------------------------------------
     //
+    @Override
     public void monitorRequestReceiver(boolean shouldMonitor) {
         if (isDestroyed) {
             return;
@@ -218,6 +222,7 @@ public class ActiveObject extends AbstractDataObject {
         }
     }
 
+    @Override
     public void monitorRequestSender(boolean shouldMonitor) {
         if (isDestroyed) {
             return;
@@ -243,6 +248,7 @@ public class ActiveObject extends AbstractDataObject {
         }
     }
 
+    @Override
     public void monitorReplyReceiver(boolean shouldMonitor) {
         if (isDestroyed) {
             return;
@@ -268,6 +274,7 @@ public class ActiveObject extends AbstractDataObject {
         }
     }
 
+    @Override
     public void monitorReplySender(boolean shouldMonitor) {
         if (isDestroyed) {
             return;
@@ -298,6 +305,7 @@ public class ActiveObject extends AbstractDataObject {
         return (NodeObject) parent;
     }
 
+    @Override
     protected boolean destroy() {
         destroyCachedObject(id);
         return super.destroy();

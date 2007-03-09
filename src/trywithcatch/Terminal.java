@@ -46,11 +46,13 @@ public class Terminal extends Anything {
         str = s;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return str + "@" + left + "";
     }
 
-    protected void prettyPrint(int indent) {
+    @Override
+	protected void prettyPrint(int indent) {
         super.prettyPrint(indent);
         System.out.println(this);
     }
@@ -67,7 +69,8 @@ public class Terminal extends Anything {
         return column;
     }
 
-    public void work(Catcher c) throws IOException {
+    @Override
+	public void work(Catcher c) throws IOException {
         c.removeCallAtOffset(left - column);
     }
 }

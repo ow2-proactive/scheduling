@@ -126,6 +126,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
         addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     ic2dObject.getWorldObject().destroyObject();
                     System.exit(0);
@@ -289,6 +290,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         scrollingEventListsPanel.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         c.add(scrollingEventListsPanel);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     frame.setVisible(!frame.isVisible());
                 }
@@ -302,6 +304,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         frame.setLocation(new java.awt.Point(DEFAULT_WIDTH, 0));
         // Listeners
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     frame.setVisible(!frame.isVisible());
                 }
@@ -314,6 +317,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         frame.setLocation(new java.awt.Point(DEFAULT_WIDTH, 0));
         // Listeners
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     frame.setVisible(!frame.isVisible());
                 }

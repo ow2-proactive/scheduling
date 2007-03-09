@@ -119,6 +119,7 @@ public class MiniDescrClient {
                 buf.append('0');
         }
 
+        @Override
         public void run() {
             try {
                 // Create remote object on the node

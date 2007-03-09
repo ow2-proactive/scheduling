@@ -46,6 +46,7 @@ import org.objectweb.fractal.adl.types.TypeLoader;
  * in these nodes exist.
  */
 public class ProActiveTypeLoader extends TypeLoader {
+    @Override
     protected void checkInterfaceContainer(final InterfaceContainer container,
         final boolean extend, final Map context) throws ADLException {
         Interface[] itfs = container.getInterfaces();

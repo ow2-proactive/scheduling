@@ -64,11 +64,13 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
         this.server = server;
     }
 
+    @Override
     public Reply serve(Body targetBody) throws ServeException {
         Reply r = super.serve(targetBody);
         return r;
     }
 
+    @Override
     protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException {
         int ftres = FTManager.NON_FT;
@@ -86,6 +88,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     /**
      * Implements the backup solution
      */
+    @Override
     protected void backupSolution(UniversalBody destinationBody)
         throws java.io.IOException {
         boolean ok = false;
@@ -119,6 +122,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
         }
     }
 
+    @Override
     protected UniversalBody queryServer(UniqueID bodyID) {
         if (server == null) {
             server = LocationServerFactory.getLocationServer();

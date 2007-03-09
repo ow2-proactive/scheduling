@@ -50,6 +50,7 @@ public class Producer extends ConsumerProducer {
         super("Producer", listener, buffer);
     }
 
+    @Override
     protected void doStuff(boolean wasSuspended) {
         if (isSuspended) {
             if (!wasSuspended) {

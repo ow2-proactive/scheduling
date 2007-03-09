@@ -362,6 +362,7 @@ public class MatrixChart implements Chart {
          *
          * @return The item color.
          */
+        @Override
         public Paint getItemPaint(final int series, final int item) {
             int value = 0;
             if (this.legendMode) {
@@ -419,6 +420,7 @@ public class MatrixChart implements Chart {
          * @param pass
          *            the pass index.
          */
+        @Override
         public void drawItem(Graphics2D g2, XYItemRendererState state,
             Rectangle2D dataArea, PlotRenderingInfo info, XYPlot plot,
             ValueAxis domainAxis, ValueAxis rangeAxis, XYDataset dataset,
@@ -494,6 +496,7 @@ public class MatrixChart implements Chart {
          * @return A list of ticks.
          *
          */
+        @Override
         public List<NumberTick> refreshTicks(Graphics2D g2, AxisState state,
             Rectangle2D dataArea, RectangleEdge edge) {
             List<NumberTick> result = new java.util.ArrayList<NumberTick>();
@@ -538,6 +541,7 @@ public class MatrixChart implements Chart {
          *
          * @return The formatted string.
          */
+        @Override
         public String valueToString(double value) {
             if (MatrixChart.this.legendFormatMode == Chart.LegendFormat.POW10) {
                 return (((value >= 0) &&

@@ -127,6 +127,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         this.outputMessageSink = outputMessageSink;
     }
 
+    @Override
     public FileTransferWorkShop getFileTransferWorkShopDeploy() {
         if (ftsDeploy == null) {
             ftsDeploy = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
@@ -135,6 +136,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         return ftsDeploy;
     }
 
+    @Override
     public FileTransferWorkShop getFileTransferWorkShopRetrieve() {
         if (ftsRetrieve == null) {
             ftsRetrieve = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
@@ -154,6 +156,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected abstract String buildCommand();
 
     protected String buildEnvironmentCommand() {
@@ -191,6 +194,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         return sb.toString();
     }
 
+    @Override
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
         try {
@@ -209,6 +213,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         }
     }
 
+    @Override
     protected void internalStopProcess() {
         shouldRun = false;
 
@@ -220,10 +225,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         }
     }
 
+    @Override
     protected int internalWaitFor() throws InterruptedException {
         return externalProcess.waitFor();
     }
 
+    @Override
     protected int internalExitValue() throws IllegalThreadStateException {
         return externalProcess.exitValue();
     }
@@ -231,6 +238,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     /**
      * Try all the protocols until one is successful.
      */
+    @Override
     protected void internalStartFileTransfer(FileTransferWorkShop fts) {
         CopyProtocol[] copyProtocol = fts.getCopyProtocols();
         boolean success = false;

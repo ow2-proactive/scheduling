@@ -63,7 +63,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         //      new active with '_' in classname of a parametized type.
         //pa.stub.parameterized.nonregressiontest.activeobject.generics.Stub_Pair_Generics_[nonregressiontest_activeobject_generics_My_Type5org_objectweb_proactive_core_util_wrapper_IntWrapper]
         Pair<My_DType, IntWrapper> p_ = (Pair<My_DType, IntWrapper>) ProActive.newActive(Pair.class.getName(),
@@ -173,16 +174,19 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return true;
     }
 

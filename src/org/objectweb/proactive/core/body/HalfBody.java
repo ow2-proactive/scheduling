@@ -143,6 +143,7 @@ public class HalfBody extends AbstractBody {
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
+    @Override
     protected int internalReceiveRequest(Request request)
         throws java.io.IOException {
         throw new ProActiveRuntimeException(
@@ -154,6 +155,7 @@ public class HalfBody extends AbstractBody {
      * @param reply the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
+    @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         try {
             if (reply.isCiphered()) {
@@ -179,6 +181,7 @@ public class HalfBody extends AbstractBody {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public boolean isInImmediateService() {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
@@ -186,6 +189,7 @@ public class HalfBody extends AbstractBody {
     /**
      *  @see org.objectweb.proactive.Job#getJobID()
      */
+    @Override
     public String getJobID() {
         return getRuntimeJobID();
     }
@@ -289,6 +293,7 @@ public class HalfBody extends AbstractBody {
     // NFEProducer implementation
     private NFEListenerList nfeListeners = null;
 
+    @Override
     public void addNFEListener(NFEListener listener) {
         if (nfeListeners == null) {
             nfeListeners = new NFEListenerList();
@@ -296,12 +301,14 @@ public class HalfBody extends AbstractBody {
         nfeListeners.addNFEListener(listener);
     }
 
+    @Override
     public void removeNFEListener(NFEListener listener) {
         if (nfeListeners != null) {
             nfeListeners.removeNFEListener(listener);
         }
     }
 
+    @Override
     public int fireNFE(NonFunctionalException e) {
         if (nfeListeners != null) {
             return nfeListeners.fireNFE(e);

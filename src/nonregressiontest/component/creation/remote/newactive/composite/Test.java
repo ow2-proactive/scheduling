@@ -103,7 +103,8 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         throw new testsuite.exception.NotStandAloneException();
     }
 
@@ -151,16 +152,19 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         String p1_name = Fractal.getNameController(p1).getFcName();
         String p2_name = Fractal.getNameController(p2).getFcName();
         String c1_name = Fractal.getNameController(c1).getFcName();

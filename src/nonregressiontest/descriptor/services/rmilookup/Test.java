@@ -62,7 +62,8 @@ public class Test extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         pad = ProActive.getProactiveDescriptor(ONEVM_XML_LOCATION_UNIX);
         pad.activateMappings();
         Thread.sleep(5000);
@@ -75,17 +76,20 @@ public class Test extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         pad.killall(false);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return node.getProActiveRuntime().getVMInformation().getName().equals("PA_JVM1");
     }
 

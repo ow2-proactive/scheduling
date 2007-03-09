@@ -82,6 +82,7 @@ public class DoubleMutableWrapper implements Serializable {
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return this.value + "";
     }
@@ -89,6 +90,7 @@ public class DoubleMutableWrapper implements Serializable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object arg0) {
         if (arg0 instanceof DoubleMutableWrapper) {
             return ((DoubleMutableWrapper) arg0).doubleValue() == this.value;
@@ -99,6 +101,7 @@ public class DoubleMutableWrapper implements Serializable {
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return new Double(this.value).hashCode();
     }

@@ -60,7 +60,8 @@ public class TestArrayOfArray extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         try {
             this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                     new Object[][] {
@@ -85,13 +86,15 @@ public class TestArrayOfArray extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         ProActiveDescriptor padForActiving = ProActive.getProactiveDescriptor(XML_PATH);
         this.vn = padForActiving.getVirtualNode("Workers03");
         this.vn.activate();
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         if ((this.aos == null) || (this.aos.length != 4)) {
             this.vn.killAll(false);
             return false;
@@ -100,6 +103,7 @@ public class TestArrayOfArray extends FunctionalTest {
         return true;
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 }

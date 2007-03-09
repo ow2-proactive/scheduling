@@ -319,7 +319,8 @@ public class Group {
      * @see java.lang.Object#toString()
      * @return a string with the name and the description.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return name + " : " + description;
     }
 

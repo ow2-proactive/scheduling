@@ -80,6 +80,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected synchronized ProActiveRuntime getProtocolSpecificRuntimeImpl()
         throws ProActiveException {
         //return createRuntimeAdapter(s,false);
@@ -91,6 +92,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
         return defaultJiniRuntime;
     }
 
+    @Override
     protected ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException {
         runtimeLogger.info("> JiniRuntimeFactory.getJiniRuntimeImpl(" + s +
@@ -196,6 +198,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
         //    }
     }
 
+    @Override
     protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         JiniRuntimeImpl impl;

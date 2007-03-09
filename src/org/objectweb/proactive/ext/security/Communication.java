@@ -140,6 +140,7 @@ public class Communication implements Serializable {
         return communication == 1;
     }
 
+    @Override
     public String toString() {
         return "Com : " + communication + " Auth : " + authentication +
         " Conf : " + confidentiality + " Integrity : " + integrity + "\n";

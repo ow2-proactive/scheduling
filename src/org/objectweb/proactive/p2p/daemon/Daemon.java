@@ -176,6 +176,7 @@ class Moment implements Comparable {
         return absoluteMinutes - m.absoluteMinutes;
     }
 
+    @Override
     public boolean equals(Object o) {
         return compareTo(o) == 0;
     }
@@ -187,6 +188,7 @@ class Moment implements Comparable {
     }
 
     /* <Debug> */
+    @Override
     public String toString() {
         return "<" + day + ", " + hour + ", " + minute + ">";
     }
@@ -240,6 +242,7 @@ class IntervalTime implements Comparable {
         return start.compareTo(it.start);
     }
 
+    @Override
     public boolean equals(Object o) {
         IntervalTime interval = (IntervalTime) o;
 
@@ -262,6 +265,7 @@ class IntervalTime implements Comparable {
         this.start = start;
     }
 
+    @Override
     public String toString() {
         return "[" + start + " - " + end + "]";
     }
@@ -451,6 +455,7 @@ class WorkTime {
         return true;
     }
 
+    @Override
     public String toString() {
         if (intervals.isEmpty()) {
             return "()";
@@ -529,6 +534,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         /* Ignore the warning */
     }
 
+    @Override
     public void startElement(String name, Attributes attributes)
         throws SAXException {
         if (parsed) {
@@ -569,6 +575,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         }
     }
 
+    @Override
     public void endElement(String name) throws SAXException {
         if (parsed) {
             return;

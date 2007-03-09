@@ -581,6 +581,7 @@ public class EventListsPanel extends javax.swing.JPanel
         /**
          * This method sorts the events
          */
+        @Override
         public java.awt.Component getListCellRendererComponent(
             javax.swing.JList list, Object val, int index, boolean isSelected,
             boolean cellHasFocus) {
@@ -730,6 +731,7 @@ public class EventListsPanel extends javax.swing.JPanel
             verticalScrollBar.setValue(verticalScrollBar.getMaximum() + 50);
         }
 
+        @Override
         public java.awt.Dimension getPreferredSize() {
             java.awt.Dimension d = super.getPreferredSize();
             d.width = 150;
@@ -759,12 +761,14 @@ public class EventListsPanel extends javax.swing.JPanel
         // -- INNER CLASSES -------------------------------------------------
         //
         private class MyMouseListener extends java.awt.event.MouseAdapter {
+            @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     show(e.getComponent(), e.getX(), e.getY());
                 }
             }
 
+            @Override
             public void mouseReleased(java.awt.event.MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     show(e.getComponent(), e.getX(), e.getY());
@@ -826,6 +830,7 @@ public class EventListsPanel extends javax.swing.JPanel
          * On the other hand it is the responsability of this method to call the acceptDrop and dropComplete
          * when accepting the drop and returning true
          */
+        @Override
         protected boolean processDrop(java.awt.dnd.DropTargetDropEvent event,
             UniqueID uniqueID) {
             ActiveObject activeObject = ic2dObject.findActiveObjectById(uniqueID);
@@ -845,18 +850,21 @@ public class EventListsPanel extends javax.swing.JPanel
         /**
          * Displays a user feed back to show that the drag is going on
          */
+        @Override
         protected void showDragFeedBack() {
         }
 
         /**
          * Displays a user feed back to show that the drop is going on
          */
+        @Override
         protected void showDropFeedBack() {
         }
 
         /**
          * Removes the user feed back that shows the drag
          */
+        @Override
         protected void hideDnDFeedBack() {
         }
     } // end inner class MyDropTargetListener
@@ -916,10 +924,12 @@ public class EventListsPanel extends javax.swing.JPanel
             fixedSize = size;
         }
 
+        @Override
         public void ensureCapacity(int minCapacity) {
             // size is fixed
         }
 
+        @Override
         public boolean add(Object o) {
             modCount++;
             array[tail] = o;
@@ -932,6 +942,7 @@ public class EventListsPanel extends javax.swing.JPanel
             return true;
         }
 
+        @Override
         public boolean addAll(java.util.Collection c) {
             modCount++;
             int numNew = Math.min(c.size(), fixedSize);

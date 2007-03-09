@@ -44,6 +44,7 @@ public class RmiSshProActiveRuntimeForwarder
         super(csf, ssf);
     }
 
+    @Override
     protected String getProtocol() {
         return Constants.RMISSH_PROTOCOL_IDENTIFIER;
     }

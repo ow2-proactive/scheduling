@@ -92,6 +92,7 @@ class StatusCell extends JPanel implements JobMonitorConstants {
         }
     }
 
+    @Override
     public void repaint() {
         if (name != null) {
             name.repaint();

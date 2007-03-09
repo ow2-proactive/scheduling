@@ -66,6 +66,7 @@ public class UnicoreParameters implements java.io.Serializable {
     private ArrayList<String> retrieveFiles; //not yet supported
     private String fileSep;
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("jobName=>").append(jobName).append("\n");

@@ -120,7 +120,8 @@ public class Validate extends DefaultHandler implements LexicalHandler {
     }
 
     /** When an error is encountered, store it for future recall */
-    public void error(SAXParseException exc) {
+    @Override
+	public void error(SAXParseException exc) {
         String message = exc.getMessage();
         this.errorBuffer.append("[ERROR] " + this.inputFile + "[" +
             exc.getLineNumber() + "] " + message + "\n");
@@ -135,7 +136,8 @@ public class Validate extends DefaultHandler implements LexicalHandler {
     }
 
     /** When a warning is encountered, store it for future recall */
-    public void warning(SAXParseException exc) {
+    @Override
+	public void warning(SAXParseException exc) {
         this.errorBuffer.append("[WARNING] " + this.inputFile + "[" +
                 exc.getLineNumber() + "] " + exc.getMessage() + "\n");
         this.troubleFound = true;

@@ -46,6 +46,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
     public MethodCallControlForGroup() {
     }
 
+    @Override
     public Method getReifiedMethod() {
         return null;
     }
@@ -55,6 +56,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      * @return 0
      * @see org.objectweb.proactive.core.mop.MethodCall#getNumberOfParameter()
      */
+    @Override
     public int getNumberOfParameter() {
         return 0;
     }
@@ -67,6 +69,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
         this.writeTheObject(out);
     }
 
+    @Override
     protected void writeTheObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         out.defaultWriteObject();
@@ -77,6 +80,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
         this.readTheObject(in);
     }
 
+    @Override
     protected void readTheObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -84,10 +88,12 @@ public abstract class MethodCallControlForGroup extends MethodCall {
 
     // Overloaded to avoid this MethodCallControlForGroup object
     // go inside the recycling pool of MethodCall.
+    @Override
     protected void finalize() {
     }
 
     // return null
+    @Override
     public Object execute(Object targetObject)
         throws InvocationTargetException, MethodCallExecutionFailedException {
         return null;
@@ -98,6 +104,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      * @return <code>false</code>
      * @see org.objectweb.proactive.core.mop.MethodCall#isAsynchronousWayCall()
      */
+    @Override
     public boolean isAsynchronousWayCall() {
         return false;
     }
@@ -107,6 +114,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      * @return <code>true</code>
      * @see org.objectweb.proactive.core.mop.MethodCall#isOneWayCall()
      */
+    @Override
     public boolean isOneWayCall() {
         return true;
     }
@@ -115,6 +123,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      * This method does nothing, because control messages are not subject to be bloqued by barriers
      * @param barrierTags unsed parameter
      */
+    @Override
     public void setBarrierTags(LinkedList barrierTags) {
     }
 
@@ -122,6 +131,7 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      * Control messages are never tagged
      * @return null
      */
+    @Override
     public LinkedList getBarrierTags() {
         return null;
     }

@@ -157,6 +157,7 @@ public class FileTransferDefinition implements Serializable {
         this.name = name;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -206,6 +207,7 @@ public class FileTransferDefinition implements Serializable {
             }
         }
 
+        @Override
         public String toString() {
             return "src:" + srcName + " dest:" + destName;
         }
@@ -245,10 +247,12 @@ public class FileTransferDefinition implements Serializable {
             this.excludes = excludes;
         }
 
+        @Override
         public String toString() {
             return super.toString() + " inc:" + includes + " exc:" + excludes;
         }
 
+        @Override
         public boolean isDir() {
             return true;
         }

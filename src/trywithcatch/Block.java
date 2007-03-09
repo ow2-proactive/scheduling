@@ -45,11 +45,13 @@ public class Block extends Anything {
         this.things = things;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return "{@" + start.getLeft() + "-" + end.getRight() + "}";
     }
 
-    public boolean isEmpty() {
+    @Override
+	public boolean isEmpty() {
         for (Anything a : things) {
         	if (!a.isEmpty()) {
                 return false;
@@ -59,7 +61,8 @@ public class Block extends Anything {
         return true;
     }
 
-    protected void prettyPrint(int indent) {
+    @Override
+	protected void prettyPrint(int indent) {
         start.prettyPrint(indent);
         indent++;
         for (Anything a : things) {
@@ -69,7 +72,8 @@ public class Block extends Anything {
         end.prettyPrint(indent);
     }
 
-    public void work(Catcher c) throws IOException {
+    @Override
+	public void work(Catcher c) throws IOException {
     	for (Anything a : things) {
     		 a.work(c);
     	}

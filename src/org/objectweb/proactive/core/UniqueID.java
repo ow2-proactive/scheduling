@@ -112,6 +112,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * Returns a string representation of this UniqueID.
      * @return a string representation of this UniqueID
      */
+    @Override
     public String toString() {
         if (logger.isDebugEnabled()) {
             return "<" +
@@ -140,6 +141,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * Overrides hashCode to take into account the two part of this UniqueID.
      * @return the hashcode of this object
      */
+    @Override
     public int hashCode() {
         return id.hashCode() + vmID.hashCode();
     }
@@ -148,6 +150,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * Overrides equals to take into account the two part of this UniqueID.
      * @return the true if and only if o is an UniqueID equals to this UniqueID
      */
+    @Override
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof UniqueID) {

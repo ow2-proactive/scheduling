@@ -115,6 +115,7 @@ public class CruiseControlPanel extends JPanel {
     // Methods
 
     /** Displays the desired speed  and of the state of the controller */
+    @Override
     public void paintComponent(java.awt.Graphics g) {
         super.paintComponent(g);
 

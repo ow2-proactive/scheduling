@@ -59,6 +59,7 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
      * Returns the name of the call
      * @return the String "MethodCallBarrier"
      */
+    @Override
     public String getName() {
         return "MethodCallBarrier";
     }
@@ -76,6 +77,7 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
      * @param target this object is not used.
      * @return null
      */
+    @Override
     public Object execute(Object target)
         throws InvocationTargetException, MethodCallExecutionFailedException {
         ProActiveSPMDGroupManager spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();

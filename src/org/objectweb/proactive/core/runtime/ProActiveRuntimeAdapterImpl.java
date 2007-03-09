@@ -130,6 +130,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof ProActiveRuntimeAdapterImpl)) {
             return false;
@@ -140,6 +141,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
         return proActiveRuntime.equals(runtime.proActiveRuntime);
     }
 
+    @Override
     public int hashCode() {
         return proActiveRuntime.hashCode();
     }

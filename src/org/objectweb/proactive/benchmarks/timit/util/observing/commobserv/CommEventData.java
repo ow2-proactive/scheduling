@@ -166,6 +166,7 @@ public class CommEventData implements EventData {
      * @return An empty string if values are not yet finalized, the
      *         pretty-printed description of the finalized data otherwise.
      */
+    @Override
     public String toString() {
         if (this.allValues == null) {
             return "";

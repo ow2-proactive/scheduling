@@ -59,7 +59,8 @@ public class PropertiesHandler extends AbstractUnmarshallerDecorator
         throws org.xml.sax.SAXException {
     }
 
-    protected void notifyEndActiveHandler(String name,
+    @Override
+	protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
     }
 
@@ -85,7 +86,8 @@ public class PropertiesHandler extends AbstractUnmarshallerDecorator
             }
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
     }

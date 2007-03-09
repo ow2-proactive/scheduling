@@ -47,7 +47,8 @@ public class SecurityTests extends FunctionalTest {
         super("Security Tests");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         FunctionalTest test = null;
 
         test = new SecurityTestKeyGen();
@@ -64,13 +65,16 @@ public class SecurityTests extends FunctionalTest {
         new SecurityTestSessionKeyExchange().runTest();
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return testSucceed;
     }
 }

@@ -40,6 +40,7 @@ public class AuthenticationException extends Exception {
     public AuthenticationException() {
     }
 
+    @Override
     public String toString() {
         return type;
     }

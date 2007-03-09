@@ -58,6 +58,7 @@ public class ProActiveOpenAction extends OpenAction {
         super();
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e) {
         try {
             File storage = null;
@@ -148,6 +149,7 @@ public class ProActiveOpenAction extends OpenAction {
         /**
          *
          */
+        @Override
         public void run() {
             java.awt.Component glassPane = rootPane.getGlassPane();
             rootPane.setGlassPane(new WaitGlassPane());

@@ -77,7 +77,8 @@ public class Test extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         launcher = new Launcher(XML_LOCATION);
         launcher.activate();
   //      Thread.sleep(5000);
@@ -86,20 +87,23 @@ public class Test extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // kill the runtimes where the nodes are deployed.
         part.getVirtualNode("lVN1").killAll(true);
         part.getVirtualNode("lVN2").killAll(true);
         vnMain.killAll(true);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         pad = launcher.getProActiveDescriptor();
         vnMain = pad.getVirtualNode("lVNmain");
         mainNode = vnMain.getNode();

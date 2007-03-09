@@ -127,6 +127,7 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String internalBuildCommand() {
         return buildRSHCommand() + buildEnvironmentCommand();
     }

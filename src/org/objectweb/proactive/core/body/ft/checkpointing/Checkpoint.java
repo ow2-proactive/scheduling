@@ -134,6 +134,7 @@ public class Checkpoint implements java.io.Serializable {
     /**
      * Pretty printing
      */
+    @Override
     public String toString() {
         return "Checkpoint for body " + this.bodyID;
     }
@@ -158,6 +159,7 @@ public class Checkpoint implements java.io.Serializable {
         /*
          * Write the codebase in the stream.
          */
+        @Override
         protected void annotateClass(Class cl) throws IOException {
             writeObject(this.codebase);
         }
@@ -166,6 +168,7 @@ public class Checkpoint implements java.io.Serializable {
          * Checks for objects that are instances of java.rmi.Remote
          * that need to be serialized as RMI stubs !
          */
+        @Override
         protected final Object replaceObject(Object obj)
             throws IOException {
             if ((obj instanceof RemoteObject) && !(obj instanceof RemoteStub)) {

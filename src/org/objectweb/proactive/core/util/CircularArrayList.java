@@ -87,6 +87,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         c.toArray(array);
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("CircularArray size=");
@@ -125,6 +126,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         logger.info(c.toString());
     }
 
+    @Override
     public boolean isEmpty() {
         return head == tail; // or size == 0
     }
@@ -148,16 +150,19 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         }
     }
 
+    @Override
     public int size() {
         // the size can also be worked out each time as:
         // (tail + array.length - head) % array.length
         return size;
     }
 
+    @Override
     public boolean contains(Object elem) {
         return indexOf(elem) >= 0;
     }
 
+    @Override
     public int indexOf(Object elem) {
         if (elem == null) {
             for (int i = 0; i < size; i++)
@@ -173,6 +178,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         return -1;
     }
 
+    @Override
     public int lastIndexOf(Object elem) {
         if (elem == null) {
             for (int i = size - 1; i >= 0; i--)
@@ -188,10 +194,12 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         return -1;
     }
 
+    @Override
     public Object[] toArray() {
         return toArray(new Object[size]);
     }
 
+    @Override
     public Object[] toArray(Object[] a) {
         //System.out.println("head="+head+" tail="+tail+" size="+size);
         if (size == 0) {
@@ -214,11 +222,13 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         return a;
     }
 
+    @Override
     public Object get(int index) {
         rangeCheck(index);
         return array[convert(index)];
     }
 
+    @Override
     public Object set(int index, Object element) {
         modCount++;
         rangeCheck(index);
@@ -228,6 +238,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         return oldValue;
     }
 
+    @Override
     public boolean add(Object o) {
         modCount++;
         // We have to have at least one empty space
@@ -241,6 +252,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     // This method is the main reason we re-wrote the class.
     // It is optimized for removing first and last elements
     // but also allows you to remove in the middle of the list.
+    @Override
     public Object remove(int index) {
         modCount++;
         rangeCheck(index);
@@ -273,6 +285,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         }
     }
 
+    @Override
     public void clear() {
         modCount++;
         // Let gc do its work
@@ -282,6 +295,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         head = tail = size = 0;
     }
 
+    @Override
     public boolean addAll(java.util.Collection c) {
         modCount++;
         int numNew = c.size();
@@ -297,6 +311,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         return numNew != 0;
     }
 
+    @Override
     public void add(int index, Object element) {
         if (index == size) {
             add(element);
@@ -326,6 +341,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         size++;
     }
 
+    @Override
     public boolean addAll(int index, java.util.Collection c) {
         boolean result = true;
         Iterator it = c.iterator();

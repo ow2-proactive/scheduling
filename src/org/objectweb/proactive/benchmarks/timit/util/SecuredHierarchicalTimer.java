@@ -76,6 +76,7 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
      * @param n
      *            the counter id
      */
+    @Override
     public void resetCounter(int n) {
         this.checkRange(n);
         super.resetCounter(n);
@@ -87,6 +88,7 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
      * @param n
      *            The integer that identify the timer to stop.
      */
+    @Override
     public void start(int n) {
         this.checkRange(n);
         if (this.internalIsStarted(n)) {
@@ -113,6 +115,7 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
      * @param n
      *            The integer that idetifies the timer to stop.
      */
+    @Override
     public void stop(int n) {
         this.checkRange(n);
         if (!this.isJustStarted(n)) {
@@ -137,6 +140,7 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
     /**
      * Returns the value
      */
+    @Override
     public int readTimer(int i, int j, int k) {
         this.checkRange(i);
         this.checkRange(j);

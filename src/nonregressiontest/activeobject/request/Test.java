@@ -48,7 +48,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         activeA = (A) ProActive.newActive(A.class.getName(), new Object[0]);
         activeA.method1();
         javaA = activeA.method2();
@@ -59,16 +60,19 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return ((counterA == 1) && (counterActiveA == 3));
     }
 }

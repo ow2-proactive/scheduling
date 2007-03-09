@@ -322,6 +322,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
         public WeakReferenceListenerList() {
         }
 
+        @Override
         public boolean contains(ProActiveListener listener) {
             java.util.Iterator iterator = iterator();
             while (iterator.hasNext()) {
@@ -332,10 +333,12 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             return false;
         }
 
+        @Override
         public boolean add(ProActiveListener listener) {
             return list.add(new java.lang.ref.WeakReference(listener));
         }
 
+        @Override
         public boolean remove(ProActiveListener listener) {
             java.util.Iterator iterator = iterator();
             while (iterator.hasNext()) {
@@ -347,6 +350,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             return false;
         }
 
+        @Override
         public java.util.Iterator iterator() {
             return new WeakReferenceIterator(list.iterator());
         }

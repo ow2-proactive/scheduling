@@ -72,6 +72,7 @@ public class ProActiveLifeCycleControllerImpl
         super(owner);
     }
 
+    @Override
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()

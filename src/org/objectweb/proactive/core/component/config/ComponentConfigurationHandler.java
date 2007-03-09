@@ -115,6 +115,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
     /**
      * see {@link org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)}
      */
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
     }
@@ -146,6 +147,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
             return componentConfigurationHandler;
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
@@ -162,6 +164,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
                 new ControllerHandler());
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws SAXException {
         }
@@ -169,6 +172,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(ComponentConfigurationConstants.CONTROLLER_ELEMENT)) {
@@ -179,6 +183,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
          */
+        @Override
         public Object getResultObject() throws SAXException {
             return null;
         }
@@ -207,6 +212,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
             }
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(INTERFACE_ELEMENT)) {

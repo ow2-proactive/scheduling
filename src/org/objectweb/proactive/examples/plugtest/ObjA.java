@@ -78,6 +78,7 @@ public class ObjA implements InitActive, EndActive {
         return node;
     }
 
+    @Override
     public String toString() {
         return s;
     }

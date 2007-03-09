@@ -67,6 +67,7 @@ public class SimpleLogMonitor implements Monitor {
     }
 
     class MonitoringThread extends Thread {
+        @Override
         public void run() {
             while (!isStoped()) {
                 try {

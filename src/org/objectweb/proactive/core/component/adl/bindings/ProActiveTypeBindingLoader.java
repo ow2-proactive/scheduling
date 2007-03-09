@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.component.adl.types.ProActiveTypeInterface;
  * @author Matthieu Morel
  */
 public class ProActiveTypeBindingLoader extends TypeBindingLoader {
+    @Override
     protected void checkNode(final Object node, final Map context)
         throws ADLException {
         try {
@@ -64,6 +65,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
         }
     }
 
+    @Override
     protected void checkBinding(final Binding binding, final Interface fromItf,
         final Interface toItf, final Map context) throws ADLException {
         try {

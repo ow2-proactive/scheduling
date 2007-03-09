@@ -113,6 +113,7 @@ public class Result implements Serializable {
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return this.theSolution.toString();
     }

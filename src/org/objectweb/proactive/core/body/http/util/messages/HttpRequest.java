@@ -62,6 +62,7 @@ public class HttpRequest extends HttpMessage implements Serializable {
     /**
      *
      */
+    @Override
     public Object processMessage() {
         if (this.request != null) {
             try {

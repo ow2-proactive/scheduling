@@ -51,6 +51,7 @@ public class UserImpl extends C3DUser implements BindingController, User {
     /** Tells what are the operations to perform before starting the activity of the AO.
      * Registering the component and some empty fields filling in is done here.
      * We also state that if migration asked, procedure  is : saveData, migrate, rebuild */
+    @Override
     public void initActivity(Body body) {
         // Maybe 'binding to dispatcher' has been done before
         if (this.c3ddispatcher == null) {

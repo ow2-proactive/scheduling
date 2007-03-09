@@ -90,6 +90,7 @@ public class ProActiveClassLoader extends URLClassLoader {
      * the search to a ProActiveClassLoaderHelper
      * @see ClassLoader#findClass(java.lang.String)
      */
+    @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         Class c = null;
         try {
@@ -123,6 +124,7 @@ public class ProActiveClassLoader extends URLClassLoader {
     /*
      * see ClassLoader#loadClass(java.lang.String)
      */
+    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         Class c = null;
         if ((c = findLoadedClass(name)) != null) {

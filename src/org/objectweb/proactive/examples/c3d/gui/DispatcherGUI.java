@@ -96,6 +96,7 @@ public class DispatcherGUI implements ActionListener {
         this.mainFrame.setVisible(true);
         this.c3dDispatcher = c3dDispatcher;
         mainFrame.addWindowListener(new WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent e) {
                     c3dDispatcher.exit();
                     trash();

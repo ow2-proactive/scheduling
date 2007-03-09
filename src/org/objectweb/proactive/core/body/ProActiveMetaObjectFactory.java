@@ -469,6 +469,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return proActiveSecurityManager;
     }
 
+    @Override
     public Object clone() throws CloneNotSupportedException {
         ProActiveMetaObjectFactory clone = null;
 

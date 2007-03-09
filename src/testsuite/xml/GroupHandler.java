@@ -80,7 +80,8 @@ public class GroupHandler {
             manager.add(group);
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equalsIgnoreCase(UNIT_TEST_TAG)) {
                 group.add((AbstractTest) activeHandler.getResultObject());
@@ -139,7 +140,8 @@ public class GroupHandler {
             manager.add(group);
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equalsIgnoreCase(UNIT_TEST_TAG)) {
                 AbstractTest test = (AbstractTest) activeHandler.getResultObject();
@@ -207,7 +209,8 @@ public class GroupHandler {
             }
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
     }

@@ -48,6 +48,7 @@ import org.apache.soap.server.DeploymentDescriptor;
  * @author vlegrand
  */
 public class WsdlServlet extends HttpServlet {
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)
         throws IOException {
         DefaultConfigManager cm = new DefaultConfigManager();

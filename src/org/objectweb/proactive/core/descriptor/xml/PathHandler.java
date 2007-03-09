@@ -72,10 +72,12 @@ public class PathHandler extends BasicUnmarshaller
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
+    @Override
     public Object getResultObject() throws org.xml.sax.SAXException {
         return super.getResultObject();
     }
 
+    @Override
     public void startContextElement(String name, Attributes attributes)
         throws org.xml.sax.SAXException {
         // read from XML

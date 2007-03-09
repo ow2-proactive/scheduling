@@ -76,14 +76,16 @@ public class MainManager extends FunctionalTestManager {
     /**
      * @see testsuite.manager.AbstractManager#initManager()
      */
-    public void initManager() throws Exception {
+    @Override
+	public void initManager() throws Exception {
         // nothing to do
     }
 
     /**
      * @see testsuite.manager.AbstractManager#endManager()
      */
-    public void endManager() throws Exception {
+    @Override
+	public void endManager() throws Exception {
         // delete all nodes
         //TestNodes.killNodes();
     }

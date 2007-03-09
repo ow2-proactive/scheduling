@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.node.StartNode;
 
 
 public class NodeLauncher extends AbstractLauncher {
+    @Override
     public void run(int i) {
         System.out.println(wi);
         if (i == 0) {

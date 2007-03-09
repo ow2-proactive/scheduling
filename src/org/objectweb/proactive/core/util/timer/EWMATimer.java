@@ -47,6 +47,7 @@ public class EWMATimer extends AverageMicroTimer {
         this.alpha = alpha;
     }
 
+    @Override
     public void stop() {
         if (running) {
             timer.stop();
@@ -60,10 +61,12 @@ public class EWMATimer extends AverageMicroTimer {
         }
     }
 
+    @Override
     public double getAverage() {
         return this.average;
     }
 
+    @Override
     public void reset() {
         super.reset();
         this.average = 0;

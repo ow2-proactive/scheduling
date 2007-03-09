@@ -52,6 +52,7 @@ public class NameAndHostDialogForComponent extends NameAndHostDialog {
     }
 
     /** Try to find a dispatcher, using the component methods, overiding the AO initial lookup.  */
+    @Override
     protected void tryTheLookup() {
         String hostName = null;
         try {

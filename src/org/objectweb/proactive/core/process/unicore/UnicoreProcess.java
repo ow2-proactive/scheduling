@@ -67,6 +67,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
         uParam = new UnicoreParameters();
     }
 
+    @Override
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
         if (logger.isDebugEnabled()) {
@@ -107,6 +108,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
         }
     }
 
+    @Override
     protected String internalBuildCommand() {
         uParam.setScriptContent(targetProcess.getCommand());
 
@@ -114,6 +116,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
         return uParam.getCommandString();
     }
 
+    @Override
     protected boolean internalFileTransferDefaultProtocol() {
         FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
         FileTransferDefinition[] ftDefinitions = fts.getAllFileTransferDefinitions();
@@ -183,6 +186,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
         return targetProcess.getFinalProcess();
     }
 
+    @Override
     public String getFileTransferDefaultCopyProtocol() {
         return FILE_TRANSFER_DEFAULT_PROTOCOL;
     }

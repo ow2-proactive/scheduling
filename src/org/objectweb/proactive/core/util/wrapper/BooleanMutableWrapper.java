@@ -82,6 +82,7 @@ public class BooleanMutableWrapper implements Serializable {
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
         return this.value + "";
     }
@@ -89,6 +90,7 @@ public class BooleanMutableWrapper implements Serializable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object arg0) {
         if (arg0 instanceof BooleanMutableWrapper) {
             return ((BooleanMutableWrapper) arg0).booleanValue() == this.value;
@@ -99,6 +101,7 @@ public class BooleanMutableWrapper implements Serializable {
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return new Boolean(this.value).hashCode();
     }

@@ -72,6 +72,7 @@ public class ProxyForComponentGroup extends ProxyForGroup {
     /*
      * @see org.objectweb.proactive.core.group.Group#getGroupByType()
      */
+    @Override
     public Object getGroupByType() {
         try {
             Component result = ProActiveComponentGroup.newComponentRepresentativeGroup(componentType,

@@ -64,6 +64,7 @@ public class RecoveryProcessPMLRB extends RecoveryProcessImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl#recover(org.objectweb.proactive.core.UniqueID)
      */
+    @Override
     protected void recover(UniqueID failed) {
         try {
             Checkpoint toSend = this.server.getLastCheckpoint(failed);

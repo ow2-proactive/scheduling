@@ -138,6 +138,7 @@ public class BodyRequest extends MessageImpl implements Request,
         return null;
     }
 
+    @Override
     public boolean isOneWay() {
         return true;
     }

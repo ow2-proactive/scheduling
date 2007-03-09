@@ -58,10 +58,12 @@ public class PenguinApplet extends StandardFrame
         init(600, 300);
     }
 
+    @Override
     public void start() {
         receiveMessage("Started...");
     }
 
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
 
@@ -336,6 +338,7 @@ public class PenguinApplet extends StandardFrame
             penguin.setItinerary(intineraryArray);
         }
 
+        @Override
         public String toString() {
             return name;
         }

@@ -94,6 +94,7 @@ public class NewGlobusHostDialog extends JDialog implements ActionListener {
         setName("Acquire GLOBUS Host Dialog");
 
         addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent evt) {
                     closeDialog(false);
                 }
@@ -140,6 +141,7 @@ public class NewGlobusHostDialog extends JDialog implements ActionListener {
         // Ok button 
         btOk = new JButton("OK");
         btOk.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseReleased(MouseEvent evt) {
                     if (tfHost.getText().length() != 0) {
                         host = tfHost.getText();
@@ -152,6 +154,7 @@ public class NewGlobusHostDialog extends JDialog implements ActionListener {
         // Cancel button
         btCancel = new JButton("Cancel");
         btCancel.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseReleased(MouseEvent e) {
                     closeDialog(false);
                 }

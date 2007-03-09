@@ -78,7 +78,8 @@ public class Test extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
         process1.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
@@ -102,16 +103,19 @@ public class Test extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         boolean resultTest = (nodeTab.length == 3);
         try {
             this.process.stopProcess();

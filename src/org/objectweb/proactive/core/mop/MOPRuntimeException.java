@@ -75,6 +75,7 @@ public abstract class MOPRuntimeException extends RuntimeException {
      * Returns the detail message, including the message from the nested
      * exception if there is one.
      */
+    @Override
     public String getMessage() {
         if (detail == null) {
             return super.getMessage();
@@ -97,6 +98,7 @@ public abstract class MOPRuntimeException extends RuntimeException {
      * the specified stream <code>ps</code>.
      * @param ps the print stream
      */
+    @Override
     public void printStackTrace(java.io.PrintStream ps) {
         if (detail == null) {
             super.printStackTrace(ps);
@@ -111,6 +113,7 @@ public abstract class MOPRuntimeException extends RuntimeException {
     /**
      * Prints the composite message to <code>System.err</code>.
      */
+    @Override
     public void printStackTrace() {
         printStackTrace(System.err);
     }
@@ -120,6 +123,7 @@ public abstract class MOPRuntimeException extends RuntimeException {
      * the specified print writer <code>pw</code>.
      * @param pw the print writer
      */
+    @Override
     public void printStackTrace(java.io.PrintWriter pw) {
         if (detail == null) {
             super.printStackTrace(pw);

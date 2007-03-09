@@ -240,6 +240,7 @@ public class Matrix implements java.io.Serializable {
     }
 
     //Udab: Modifie pour tests
+    @Override
     public String toString() {
         //System.out.println("Methode Matrix::toString");
         String s = new String("");

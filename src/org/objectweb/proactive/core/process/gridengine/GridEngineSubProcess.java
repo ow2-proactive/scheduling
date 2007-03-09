@@ -97,6 +97,7 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     //----------------------------------------------------------------------------------------
     //-----------------------Extends AbstractExternalProcessDecorator-------------------------
     //  ----------------------------------------------------------------------------------------
+    @Override
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());
@@ -257,10 +258,12 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         return result;
     }
 
+    @Override
     protected String internalBuildCommand() {
         return buildEnvironmentCommand(); // + buildPSubCommand();
     }
 
+    @Override
     protected String buildCommand() {
         StringBuilder qsubCommand = new StringBuilder();
 

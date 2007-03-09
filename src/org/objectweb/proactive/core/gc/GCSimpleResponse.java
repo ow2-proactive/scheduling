@@ -40,6 +40,7 @@ public class GCSimpleResponse implements Serializable {
         this.consensusActivity = consensusActivity;
     }
 
+    @Override
     public String toString() {
         return "GCREP[" + this.consensusActivity + "]";
     }
@@ -52,6 +53,7 @@ public class GCSimpleResponse implements Serializable {
         return false;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof GCSimpleResponse) {
             return this.consensusActivity.equals(((GCSimpleResponse) o).consensusActivity);

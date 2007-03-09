@@ -63,6 +63,7 @@ public class JiniRemoteBodyImpl extends RmiRemoteBodyImpl
         this.body = body;
     }
 
+    @Override
     public void unreferenced() {
         bodyLogger.info("JiniRemoteBodyImpl: unreferenced()");
         // System.gc();

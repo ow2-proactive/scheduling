@@ -45,6 +45,7 @@ public class ProActiveUndoManager extends BasicUndoManager
         final String oldValue) {
         if (configuration.getRootComponent().contains(component)) {
             addAction(new Action(component, 1) {
+                    @Override
                     protected void run() {
                         ((ProActiveComponent) target).setVirtualNode(oldValue);
                     }
@@ -56,6 +57,7 @@ public class ProActiveUndoManager extends BasicUndoManager
         final String virtualNodeName, final String oldValue) {
         if (configuration.getRootComponent().contains(component)) {
             addAction(new Action(component, 1) {
+                    @Override
                     protected void run() {
                         ((ProActiveComponent) target).setComposingVirtualNodes(virtualNodeName,
                             oldValue);

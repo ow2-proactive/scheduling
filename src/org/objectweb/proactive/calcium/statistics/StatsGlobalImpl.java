@@ -85,6 +85,7 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal {
         }
     }
 
+    @Override
     public String toString() {
         String ls = System.getProperty("line.separator");
 

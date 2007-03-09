@@ -69,6 +69,7 @@ public class CheckpointInfoCIC implements org.objectweb.proactive.core.body.ft.c
     /**
      * "Pretty" printing
      */
+    @Override
     public String toString() {
         StringBuffer r = new StringBuffer();
         r.append("---------------------------------------------\n");

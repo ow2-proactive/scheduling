@@ -244,7 +244,8 @@ public class DiffPrint {
         /** Print a hunk of a normal diff.
            This is a contiguous portion of a complete edit script,
            describing changes in consecutive lines.  */
-        protected void print_hunk(Diff.change hunk) {
+        @Override
+		protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
             if ((deletes == 0) && (inserts == 0)) {
@@ -285,7 +286,8 @@ public class DiffPrint {
         }
 
         /** Print a hunk of an ed diff */
-        protected void print_hunk(Diff.change hunk) {
+        @Override
+		protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
             if ((deletes == 0) && (inserts == 0)) {
@@ -355,7 +357,8 @@ public class DiffPrint {
             }
         }
 
-        public void print_header(String filea, String fileb) {
+        @Override
+		public void print_header(String filea, String fileb) {
             print_context_label("***", new File(filea), filea);
             print_context_label("---", new File(fileb), fileb);
         }
@@ -374,7 +377,8 @@ public class DiffPrint {
             }
         }
 
-        protected void print_hunk(Diff.change hunk) {
+        @Override
+		protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
 
@@ -459,7 +463,8 @@ public class DiffPrint {
             super(a, b);
         }
 
-        public void print_header(String filea, String fileb) {
+        @Override
+		public void print_header(String filea, String fileb) {
             print_context_label("---", new File(filea), filea);
             print_context_label("+++", new File(fileb), fileb);
         }
@@ -477,7 +482,8 @@ public class DiffPrint {
             }
         }
 
-        protected void print_hunk(Diff.change hunk) {
+        @Override
+		protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
 

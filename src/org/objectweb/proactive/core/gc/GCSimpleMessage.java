@@ -49,6 +49,7 @@ public class GCSimpleMessage implements Serializable {
         this.lastActivity = lastActivity;
     }
 
+    @Override
     public String toString() {
         String s = sender.shortString();
         return "GCMSG[" + s + "(" + lastActivity + "):" + this.consensus + "]";

@@ -76,7 +76,8 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         throw new testsuite.exception.NotStandAloneException();
     }
 
@@ -107,16 +108,19 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return (message.toString().equals(Test.MESSAGE +
             PrimitiveComponentA.MESSAGE + PrimitiveComponentB.MESSAGE +
             PrimitiveComponentA.MESSAGE + Test.MESSAGE));

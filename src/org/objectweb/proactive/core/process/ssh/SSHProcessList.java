@@ -53,6 +53,7 @@ public class SSHProcessList extends AbstractListProcessDecorator {
     /**
      * @see org.objectweb.proactive.core.process.AbstractListProcessDecorator#createProcess()
      */
+    @Override
     protected ExternalProcessDecorator createProcess() {
         return new SSHProcess();
     }

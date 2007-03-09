@@ -136,10 +136,12 @@ public class IC2DPanel extends AbstractDataObjectPanel
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     public AbstractDataObject getAbstractDataObject() {
         return ic2dObject;
     }
 
+    @Override
     protected Object[][] getDataObjectInfo() {
         return new Object[][] {  };
     }

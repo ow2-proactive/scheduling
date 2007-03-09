@@ -48,6 +48,7 @@ import org.objectweb.fractal.gui.repository.lib.XMLFileStorage;
  * @author Matthieu Morel
  */
 public class ProActiveXMLFileStorage extends XMLFileStorage {
+    @Override
     public void store(final String name, final Object value)
         throws Exception {
         if (storage == null) {
@@ -68,6 +69,7 @@ public class ProActiveXMLFileStorage extends XMLFileStorage {
         pw.close();
     }
 
+    @Override
     public void close() throws Exception {
         if (storage == null) {
             throw new Exception("Storage not opened");

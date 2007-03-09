@@ -62,6 +62,7 @@ public class SshSocket extends Socket {
         return _tryCache;
     }
 
+    @Override
     protected void finalize() throws Throwable {
         super.finalize();
         logger.debug("finalizing SshSocket for tunnel " + _tunnel.getPort());
@@ -102,15 +103,18 @@ public class SshSocket extends Socket {
         //assert false;
     }
 
+    @Override
     public void connect(SocketAddress endpoint, int timeout)
         throws IOException {
         // assert false;
     }
 
+    @Override
     public void bind(SocketAddress bindpoint) throws IOException {
         // assert false;
     }
 
+    @Override
     public InetAddress getInetAddress() {
         try {
             return _tunnel.getInetAddress();
@@ -119,117 +123,145 @@ public class SshSocket extends Socket {
         }
     }
 
+    @Override
     public InetAddress getLocalAddress() {
         return _socket.getLocalAddress();
     }
 
+    @Override
     public int getPort() {
         return _tunnel.getPort();
     }
 
+    @Override
     public int getLocalPort() {
         return _socket.getLocalPort();
     }
 
+    @Override
     public SocketAddress getRemoteSocketAddress() {
         return new InetSocketAddress(getInetAddress(), getPort());
     }
 
+    @Override
     public SocketAddress getLocalSocketAddress() {
         return new InetSocketAddress(getLocalAddress(), getLocalPort());
     }
 
+    @Override
     public SocketChannel getChannel() {
         return _socket.getChannel();
     }
 
+    @Override
     public InputStream getInputStream() throws IOException {
         return _socket.getInputStream();
     }
 
+    @Override
     public OutputStream getOutputStream() throws IOException {
         return _socket.getOutputStream();
     }
 
+    @Override
     public void setTcpNoDelay(boolean on) throws SocketException {
         _socket.setTcpNoDelay(on);
     }
 
+    @Override
     public boolean getTcpNoDelay() throws SocketException {
         return _socket.getTcpNoDelay();
     }
 
+    @Override
     public void setSoLinger(boolean on, int linger) throws SocketException {
         _socket.setSoLinger(on, linger);
     }
 
+    @Override
     public int getSoLinger() throws SocketException {
         return _socket.getSoLinger();
     }
 
+    @Override
     public void sendUrgentData(int data) throws IOException {
         _socket.sendUrgentData(data);
     }
 
+    @Override
     public void setOOBInline(boolean on) throws SocketException {
         _socket.setOOBInline(on);
     }
 
+    @Override
     public boolean getOOBInline() throws SocketException {
         return _socket.getOOBInline();
     }
 
+    @Override
     public synchronized void setSoTimeout(int timeout)
         throws SocketException {
         _socket.setSoTimeout(timeout);
     }
 
+    @Override
     public synchronized int getSoTimeout() throws SocketException {
         return _socket.getSoTimeout();
     }
 
+    @Override
     public synchronized void setSendBufferSize(int size)
         throws SocketException {
         _socket.setSendBufferSize(size);
     }
 
+    @Override
     public synchronized int getSendBufferSize() throws SocketException {
         return _socket.getSendBufferSize();
     }
 
+    @Override
     public synchronized void setReceiveBufferSize(int size)
         throws SocketException {
         _socket.setReceiveBufferSize(size);
     }
 
+    @Override
     public synchronized int getReceiveBufferSize() throws SocketException {
         return _socket.getReceiveBufferSize();
     }
 
+    @Override
     public void setKeepAlive(boolean on) throws SocketException {
         _socket.setKeepAlive(on);
     }
 
+    @Override
     public boolean getKeepAlive() throws SocketException {
         return _socket.getKeepAlive();
     }
 
+    @Override
     public void setTrafficClass(int tc) throws SocketException {
         _socket.setTrafficClass(tc);
     }
 
+    @Override
     public int getTrafficClass() throws SocketException {
         return _socket.getTrafficClass();
     }
 
+    @Override
     public void setReuseAddress(boolean on) throws SocketException {
         _socket.setReuseAddress(on);
     }
 
+    @Override
     public boolean getReuseAddress() throws SocketException {
         return _socket.getReuseAddress();
     }
 
+    @Override
     public synchronized void close() throws IOException {
         _socket.close();
         try {
@@ -240,34 +272,42 @@ public class SshSocket extends Socket {
         _tunnel = null;
     }
 
+    @Override
     public void shutdownInput() throws IOException {
         _socket.shutdownInput();
     }
 
+    @Override
     public void shutdownOutput() throws IOException {
         _socket.shutdownOutput();
     }
 
+    @Override
     public String toString() {
         return _socket.toString();
     }
 
+    @Override
     public boolean isConnected() {
         return _socket.isConnected();
     }
 
+    @Override
     public boolean isBound() {
         return _socket.isBound();
     }
 
+    @Override
     public boolean isClosed() {
         return _socket.isClosed();
     }
 
+    @Override
     public boolean isInputShutdown() {
         return _socket.isInputShutdown();
     }
 
+    @Override
     public boolean isOutputShutdown() {
         return _socket.isOutputShutdown();
     }

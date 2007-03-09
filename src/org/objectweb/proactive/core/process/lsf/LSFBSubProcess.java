@@ -113,12 +113,14 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public void setInputMessageLogger(
         RemoteProcessMessageLogger inputMessageLogger) {
         super.setInputMessageLogger(new CompositeMessageLogger(
                 new ParserMessageLogger(), inputMessageLogger));
     }
 
+    @Override
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());
@@ -271,6 +273,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String internalBuildCommand() {
         return buildEnvironmentCommand() + buildBSubCommand();
     }

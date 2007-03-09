@@ -200,7 +200,8 @@ public abstract class AbstractTest implements Serializable, Beanable {
      * Return a String with the name and the description of a test.
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return name + " : " + description;
     }
 
@@ -280,7 +281,8 @@ public abstract class AbstractTest implements Serializable, Beanable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if (this.getClass().getName().compareTo(obj.getClass().getName()) == 0) {
             return true;
         } else {

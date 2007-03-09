@@ -132,6 +132,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                     c.add(tab);
 
                     f.addWindowListener(new WindowAdapter() {
+                            @Override
                             public void windowClosing(WindowEvent e) {
                                 tabs.addTab(title, tab);
                                 frames.remove(f);
@@ -150,6 +151,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             tabs.addTab(views[i].getLabel(), views[i].getPane());
 
         tabs.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mousePressed(MouseEvent e) {
                     if (e.isPopupTrigger()) {
                         Component menu = extractMenu.getComponent(0);
@@ -190,6 +192,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                 });
     }
 
+    @Override
     protected void finalize() throws Throwable {
         stopRefreshing();
         super.finalize();
@@ -494,6 +497,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             left.add(pane, BorderLayout.CENTER);
 
             tree.addMouseListener(new MouseAdapter() {
+                    @Override
                     public void mousePressed(MouseEvent e) {
                         TreePath[] selection = tree.getSelectionPaths();
                         if (e.isPopupTrigger()) {
@@ -502,6 +506,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                         }
                     }
 
+                    @Override
                     public void mouseReleased(java.awt.event.MouseEvent e) {
                         TreePath[] selection = tree.getSelectionPaths();
                         if (e.isPopupTrigger()) {

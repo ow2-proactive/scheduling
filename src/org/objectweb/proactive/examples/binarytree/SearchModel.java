@@ -41,6 +41,7 @@ public class SearchModel extends javax.swing.table.AbstractTableModel {
         data = new java.util.Vector();
     }
 
+    @Override
     public String getColumnName(int column) {
         switch (column) {
         case 0:

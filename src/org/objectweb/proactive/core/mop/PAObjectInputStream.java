@@ -42,6 +42,7 @@ public class PAObjectInputStream extends MarshalInputStream {
         super(in);
     }
 
+    @Override
     protected Class<?> resolveClass(ObjectStreamClass desc)
         throws IOException, ClassNotFoundException {
         try {

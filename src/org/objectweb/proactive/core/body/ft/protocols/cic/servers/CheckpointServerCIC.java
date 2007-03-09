@@ -508,6 +508,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /**
      * Reintialize the server.
      */
+    @Override
     public void initialize() throws RemoteException {
         super.initialize();
         this.stateMonitor = new Hashtable();

@@ -73,6 +73,7 @@ public class Exercise implements Serializable {
         this.numberExecutedTimes += exercise.numberExecutedTimes;
     }
 
+    @Override
     public String toString() {
         return computationTime + "/" + numberExecutedTimes;
     }

@@ -282,6 +282,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     // -- PROTECTED METHODS
     // ------------------------------------------------------
     //
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
 
@@ -322,6 +323,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             throws org.xml.sax.SAXException {
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
@@ -337,6 +339,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             this.pad = pad;
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             // create and register a VirtualNode
@@ -414,6 +417,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         private VirtualNodeLookupHandler() {
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             // create and register a VirtualNode
@@ -468,6 +472,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             this.proActiveDescriptor = proActiveDescriptor;
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             // create and register a VirtualNode

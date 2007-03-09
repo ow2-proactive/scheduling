@@ -57,7 +57,8 @@ public class TestTypeFactory extends TestCase {
     super(name);
   }
 
-  protected void setUp () throws Exception {
+  @Override
+protected void setUp () throws Exception {
     boot = Fractal.getBootstrapComponent();
     tf = Fractal.getTypeFactory(boot);
     gf = Fractal.getGenericFactory(boot);

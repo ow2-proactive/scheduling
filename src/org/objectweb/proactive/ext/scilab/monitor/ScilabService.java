@@ -84,12 +84,14 @@ public class ScilabService implements Serializable {
         this.engineObservable = new SciEventSource();
 
         (new Thread() {
+                @Override
                 public void run() {
                     executeTasks();
                 }
             }).start();
 
         (new Thread() {
+                @Override
                 public void run() {
                     retrieveResults();
                 }

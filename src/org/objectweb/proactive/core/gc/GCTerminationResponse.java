@@ -40,10 +40,12 @@ public class GCTerminationResponse extends GCSimpleResponse {
         super(lastActivity);
     }
 
+    @Override
     boolean isTerminationResponse() {
         return true;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof GCTerminationResponse) {
             return this.consensusActivity.equals(((GCTerminationResponse) o).consensusActivity);

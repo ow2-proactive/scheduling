@@ -50,6 +50,7 @@ public class Surface implements java.io.Serializable {
         ior = 1.0;
     }
 
+    @Override
     public String toString() {
         return "Surface { color=" + color + "}";
     }

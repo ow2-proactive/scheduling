@@ -72,6 +72,7 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
     //        return defaultRmiRuntime;
     //    }
     // return a Runtime object "stub" (ie: a client)
+    @Override
     protected ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException {
         String host;
@@ -97,6 +98,7 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
     /**
      * @see org.objectweb.proactive.core.runtime.RuntimeFactory#createRuntimeAdapter()
      */
+    @Override
     protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         RmiProActiveRuntimeImpl impl;
@@ -112,6 +114,7 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
         return new ProActiveRuntimeAdapterImpl(impl);
     }
 
+    @Override
     protected ProActiveRuntimeAdapterForwarderImpl createRuntimeAdapterForwarder()
         throws ProActiveException {
         RmiSshProActiveRuntimeForwarder impl;

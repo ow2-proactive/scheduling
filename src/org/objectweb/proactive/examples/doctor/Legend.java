@@ -49,6 +49,7 @@ public class Legend extends Dialog {
             display = _display;
         }
 
+        @Override
         public void update(Graphics g) {
             FontMetrics fm = g.getFontMetrics();
             int h = fm.getAscent();
@@ -69,10 +70,12 @@ public class Legend extends Dialog {
             g.drawString("Patient with doctor", 40 + h, 50 + (2 * h));
         }
 
+        @Override
         public Dimension getPreferredSize() {
             return new Dimension(200, 90);
         }
 
+        @Override
         public void paint(Graphics g) {
             update(g);
         }
@@ -90,6 +93,7 @@ public class Legend extends Dialog {
         pack();
 
         this.addWindowListener(new WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent e) {
                     setVisible(false);
                 }

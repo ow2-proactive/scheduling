@@ -71,6 +71,7 @@ public class JiniBodyAdapter extends BodyAdapterImpl {
      * @param url the url under which the jini body is registered.
      * @exception java.io.IOException if the jini body cannot be registered
      */
+    @Override
     public void register(String url) throws java.io.IOException {
         java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
     }
@@ -80,6 +81,7 @@ public class JiniBodyAdapter extends BodyAdapterImpl {
      * @param url the url under which the active object is registered.
      * @exception java.io.IOException if the jini object cannot be removed from the registry
      */
+    @Override
     public void unregister(String url) throws java.io.IOException {
         try {
             java.rmi.Naming.unbind(url);
@@ -98,6 +100,7 @@ public class JiniBodyAdapter extends BodyAdapterImpl {
      * @exception java.io.IOException if the jini body cannot be found under the given url
      *      or if the object found is not of type RmiRemoteBody
      */
+    @Override
     public UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;
 

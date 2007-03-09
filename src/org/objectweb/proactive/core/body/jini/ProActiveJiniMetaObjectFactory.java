@@ -88,6 +88,7 @@ public class ProActiveJiniMetaObjectFactory extends ProActiveMetaObjectFactory
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
         return new RemoteJiniBodyFactoryImpl();
     }

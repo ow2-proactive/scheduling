@@ -158,6 +158,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     public AbstractDataObject getAbstractDataObject() {
         return vmObject;
     }
@@ -166,6 +167,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         return (NodePanel) getChild(nodeObject);
     }
 
+    @Override
     protected Object[][] getDataObjectInfo() {
         int timeNotResponding = 0;
         if (vmObject.getFirstNotRespondingTime() > 0) {
@@ -180,6 +182,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         };
     }
 
+    @Override
     protected void setFontSize(java.awt.Font font) {
         super.setFontSize(font);
         createBorder(name);

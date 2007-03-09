@@ -210,6 +210,7 @@ public class NBody2DFrame extends JFrame implements Serializable,
             this.bkground = bkground;
         }
 
+        @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
             iter++;

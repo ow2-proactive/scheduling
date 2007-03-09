@@ -80,6 +80,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         fcSubComponents = new ArrayList<Component>();
     }
 
+    @Override
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()

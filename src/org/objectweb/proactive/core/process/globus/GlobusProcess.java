@@ -76,6 +76,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.process.AbstractExternalProcessDecorator#internalBuildCommand()
      */
+    @Override
     protected String internalBuildCommand() {
         return buildRSLCommand();
     }
@@ -92,6 +93,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
         //System.out.println(jobOut);
     }
 
+    @Override
     protected void internalStartProcess(String rslCommand)
         throws java.io.IOException {
         GridJob Job1 = new GridJob(hostname, false);
@@ -140,6 +142,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
         return RSLCommand;
     }
 
+    @Override
     protected String buildEnvironmentCommand() {
         if (environment == null) {
             return "";

@@ -92,6 +92,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         return "mpi";
     }
 
+    @Override
     protected String internalBuildCommand() {
         return buildMPICommand();
     }
@@ -224,6 +225,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
     }
 
     /** @see org.objectweb.proactive.core.process.UniversalProcess#isDependent() */
+    @Override
     public boolean isDependent() {
         return true;
     }

@@ -96,6 +96,7 @@ public class FileTransferWorkShop implements Serializable {
         dstInfoParams = new StructureInformation();
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
@@ -547,6 +548,7 @@ public class FileTransferWorkShop implements Serializable {
             }
         }
 
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
 

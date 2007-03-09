@@ -117,6 +117,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
     //
     // -- PUBLICS METHODS -----------------------------------------------
     //
+    @Override
     public java.awt.Dimension getMinimumSize() {
         if (childs.isEmpty()) {
             java.awt.Dimension d = getMinimumSizeInternal();
@@ -130,6 +131,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         }
     }
 
+    @Override
     public java.awt.Dimension getPreferredSize() {
         if (childs.isEmpty()) {
             java.awt.Dimension d = getMinimumSizeInternal();
@@ -295,11 +297,13 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         return panel;
     }
 
+    @Override
     public void revalidate() {
         //just in case we want to introduce some finer behaviour here
         super.revalidate();
     }
 
+    @Override
     public void repaint() {
         //just in case we want to introduce some finer behaviour here
         super.repaint();
@@ -410,6 +414,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
             return new MyMouseListener();
         }
 
+        @Override
         public void setName(String name) {
             super.setName(name);
             titleItem.setText(name);
@@ -428,6 +433,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         // -- INNER CLASSES -------------------------------------------------
         //
         private class MyMouseListener extends java.awt.event.MouseAdapter {
+            @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     coherentMenu();
@@ -435,6 +441,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
                 }
             }
 
+            @Override
             public void mouseReleased(java.awt.event.MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     coherentMenu();

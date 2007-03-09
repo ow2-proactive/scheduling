@@ -301,6 +301,7 @@ public class C3DRenderingEngine implements java.io.Serializable,
     }
 
     /** A textual representation of the renderer */
+    @Override
     public String toString() {
         return this.name;
     }

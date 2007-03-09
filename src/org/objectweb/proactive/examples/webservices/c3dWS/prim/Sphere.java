@@ -54,6 +54,7 @@ public class Sphere extends Primitive implements java.io.Serializable {
      * @author Doyon Florian
      * @author Wilfried Klauser
      */
+    @Override
     public Isect intersect(Ray ry) {
         double b;
         double disc;
@@ -83,6 +84,7 @@ public class Sphere extends Primitive implements java.io.Serializable {
         return ip;
     }
 
+    @Override
     public Vec normal(Vec p) {
         Vec r;
         r = Vec.sub(p, c);
@@ -91,14 +93,17 @@ public class Sphere extends Primitive implements java.io.Serializable {
         return r;
     }
 
+    @Override
     public String toString() {
         return "Sphere {" + c.toString() + "," + r + "}";
     }
 
+    @Override
     public Vec getCenter() {
         return c;
     }
 
+    @Override
     public void setCenter(Vec c) {
         this.c = c;
     }

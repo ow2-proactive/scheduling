@@ -45,6 +45,7 @@ public class ProcessReferenceHandler extends BasicUnmarshaller {
     public ProcessReferenceHandler() {
     }
 
+    @Override
     public void startContextElement(String name, Attributes attributes)
         throws org.xml.sax.SAXException {
         String refid = attributes.getValue("refid");

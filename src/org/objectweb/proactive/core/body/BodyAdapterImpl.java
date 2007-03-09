@@ -83,6 +83,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
      * @param newBody the body referenced after the call
      * @exception java.io.IOException if a pb occurs during this method call
      */
+    @Override
     public void changeProxiedBody(Body newBody) throws IOException {
         this.proxiedRemoteBody.changeProxiedBody(newBody);
     }
@@ -96,6 +97,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
      * @exception java.io.IOException if the remote body cannot be found under the given url
      *      or if the object found is not of type RemoteBody
      */
+    @Override
     public abstract UniversalBody lookup(String url) throws java.io.IOException;
 
     /**
@@ -105,6 +107,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
      * @param url the url under which the remote body is registered.
      * @exception java.io.IOException if the remote body cannot be registered
      */
+    @Override
     public abstract void register(String url) throws java.io.IOException;
 
     /**
@@ -112,8 +115,10 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
      * @param url the url under which the active object is registered.
      * @exception java.io.IOException if the remote object cannot be removed from the registry
      */
+    @Override
     public abstract void unregister(String url) throws java.io.IOException;
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof BodyAdapter)) {
             return false;
@@ -124,6 +129,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
         return proxiedRemoteBody.equals(rba.proxiedRemoteBody);
     }
 
+    @Override
     public int hashCode() {
         return proxiedRemoteBody.hashCode();
     }
@@ -467,6 +473,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
         return this;
     }
 
+    @Override
     public String[] list(String url) throws IOException {
         throw new IOException("Lookup is not implemented yet for this Adapter");
     }

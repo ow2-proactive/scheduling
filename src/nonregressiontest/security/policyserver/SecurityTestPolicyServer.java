@@ -61,7 +61,8 @@ public class SecurityTestPolicyServer extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ObjectOutput out = new ObjectOutputStream(bout);
 
@@ -81,18 +82,21 @@ public class SecurityTestPolicyServer extends FunctionalTest {
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(
                 "../src/nonregressiontest/security/applicationPolicy.xml");
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         if (ps != null) {
             return true;
         }
         return false;
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 }

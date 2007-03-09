@@ -184,6 +184,7 @@ public class ProActiveMPIComm {
         return myRank;
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("\n Class: ");

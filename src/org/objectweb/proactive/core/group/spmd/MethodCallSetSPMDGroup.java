@@ -57,6 +57,7 @@ public class MethodCallSetSPMDGroup extends MethodCallControlForGroup {
      * Returns the name of the call
      * @return the String "MethodCallSetSPMDGroup";
      */
+    @Override
     public String getName() {
         return "MethodCallSetSPMDGroup";
     }
@@ -66,6 +67,7 @@ public class MethodCallSetSPMDGroup extends MethodCallControlForGroup {
      * @return 1
      * @see org.objectweb.proactive.core.mop.MethodCall#getNumberOfParameter()
      */
+    @Override
     public int getNumberOfParameter() {
         return 1;
     }
@@ -74,6 +76,7 @@ public class MethodCallSetSPMDGroup extends MethodCallControlForGroup {
      * Executes the call.
      * @see org.objectweb.proactive.core.mop.MethodCall#execute(java.lang.Object)
      */
+    @Override
     public Object execute(Object targetObject)
         throws InvocationTargetException, MethodCallExecutionFailedException {
         AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();

@@ -165,6 +165,7 @@ public class Vec implements java.io.Serializable {
         return len;
     }
 
+    @Override
     public final String toString() {
         return "<" + x + "," + y + "," + z + ">";
     }
@@ -186,6 +187,7 @@ public class Vec implements java.io.Serializable {
         return new Vec(xx, yy, zz);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Vec) {
             Vec v = (Vec) o;

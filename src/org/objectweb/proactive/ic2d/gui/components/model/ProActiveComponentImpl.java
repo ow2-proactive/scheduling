@@ -73,6 +73,7 @@ public class ProActiveComponentImpl extends BasicComponent
      *
      * In ProActive, a collective server interface can be seen as one group.
      */
+    @Override
     public Interface getServerInterface(final String name) {
         // TODO make things clearer ! how should we see a group itf?
         // TODO display an external itf connection point

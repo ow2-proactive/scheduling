@@ -70,6 +70,7 @@ public class BodyEventProducerImpl extends AbstractEventProducer {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void notifyOneListener(ProActiveListener listener,
         ProActiveEvent event) {
         BodyEvent bodyEvent = (BodyEvent) event;

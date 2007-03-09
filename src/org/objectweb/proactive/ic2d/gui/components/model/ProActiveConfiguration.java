@@ -49,6 +49,7 @@ public class ProActiveConfiguration extends BasicConfiguration {
         listeners.put("", new ProActiveStatusManager());
     }
 
+    @Override
     public Component createComponent() {
         return new ProActiveComponentImpl(this);
     }

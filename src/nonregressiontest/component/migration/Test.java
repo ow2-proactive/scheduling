@@ -54,7 +54,8 @@ public class Test extends ComponentTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         TestAO testAO = (TestAO) ProActive.newActive(TestAO.class.getName(),
                 new Object[] {  });
         testAO.go();
@@ -63,17 +64,20 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         //        Launcher.killNodes(false);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return true;
     }
 

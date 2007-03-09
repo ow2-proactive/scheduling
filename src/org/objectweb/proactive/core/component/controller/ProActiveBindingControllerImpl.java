@@ -88,6 +88,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         bindings = new Bindings();
     }
 
+    @Override
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()

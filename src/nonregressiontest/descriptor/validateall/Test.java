@@ -65,7 +65,8 @@ public class Test extends FunctionalTest {
      *
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         URL baseurl = Test.class.getResource("/nonregressiontest/");
         URI baseuri = baseurl.toURI();
 
@@ -142,7 +143,8 @@ public class Test extends FunctionalTest {
      *
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         //To validate with a SAXParser, create a SAXParser. The SAXParser class is a subclass of the XMLParser class.
         parser = new SAXParser();
 
@@ -172,10 +174,12 @@ public class Test extends FunctionalTest {
      *
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return !handler.validationError;
     }
 
@@ -195,19 +199,22 @@ public class Test extends FunctionalTest {
         public boolean validationError = false;
         public SAXParseException saxParseException = null;
 
-        public void error(SAXParseException exception)
+        @Override
+		public void error(SAXParseException exception)
             throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
-        public void fatalError(SAXParseException exception)
+        @Override
+		public void fatalError(SAXParseException exception)
             throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
-        public void warning(SAXParseException exception)
+        @Override
+		public void warning(SAXParseException exception)
             throws SAXException {
         }
     }

@@ -62,6 +62,7 @@ public class DummyCopyProtocol extends AbstractCopyProtocol {
      * Always returns true for DummyProtocol.
      * Overrides the parent abstract method definition.
      */
+    @Override
     public boolean isDummyProtocol() {
         return true;
     }

@@ -146,6 +146,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
     /*
      * @see org.objectweb.proactive.core.group.Group#getGroupByType()
      */
+    @Override
     public Object getGroupByType() {
         try {
             Interface result = ProActiveComponentGroup.newComponentInterfaceGroup(interfaceType,

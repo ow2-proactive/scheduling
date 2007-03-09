@@ -90,6 +90,7 @@ public class UniqueRuntimeID implements java.io.Serializable {
      * Returns a string representation of this UniqueID.
      * @return a string representation of this UniqueID
      */
+    @Override
     public String toString() {
         return "" + vmName + " " + vmID;
     }
@@ -99,6 +100,7 @@ public class UniqueRuntimeID implements java.io.Serializable {
      * computation.
      * @return the hashcode of this object
      */
+    @Override
     public int hashCode() {
         return vmName.hashCode();
     }
@@ -107,6 +109,7 @@ public class UniqueRuntimeID implements java.io.Serializable {
      * Overrides equals to take into account the two part of this UniqueRuntimeID.
      * @return the true if and only if o is an UniqueID equals to this UniqueRuntimeID
      */
+    @Override
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof UniqueRuntimeID) {

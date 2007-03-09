@@ -63,7 +63,8 @@ public class Test extends FunctionalTest {
             "compares active objects, groups and standard objects using with the equals method");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         a1 = (A) ProActive.newActive(A.class.getName(), new Object[] { "a1" },
                 TestNodes.getSameVMNode());
         a2 = (A) ProActive.newActive(A.class.getName(), new Object[] { "a2" },
@@ -88,15 +89,18 @@ public class Test extends FunctionalTest {
         ProActiveGroup.getGroup(group3).add(a1);
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // nothing to do
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         Assertions.assertEquals(group1, group2);
         Assertions.assertEquals(new Integer(group1.hashCode()),
             new Integer(group2.hashCode()));

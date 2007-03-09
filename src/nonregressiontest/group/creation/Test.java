@@ -66,7 +66,8 @@ public class Test extends FunctionalTest {
         return this.typedGroup;
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.createGroup();
     }
 
@@ -74,15 +75,18 @@ public class Test extends FunctionalTest {
         return this.createGroup();
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // nothing to do
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         // was the group created ?
         if (this.typedGroup == null) {
             return false;

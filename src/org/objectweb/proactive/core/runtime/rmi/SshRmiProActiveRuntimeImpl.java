@@ -47,6 +47,7 @@ public class SshRmiProActiveRuntimeImpl extends RmiProActiveRuntimeImpl {
         super(csf, ssf);
     }
 
+    @Override
     protected String getProtocol() {
         return Constants.RMISSH_PROTOCOL_IDENTIFIER;
     }

@@ -56,7 +56,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         NodeFactory.createNode(rmiURL);
         NodeFactory.createNode(jiniURL);
         //        NodeFactory.createNode("ibis://localhost/IBISNode");
@@ -65,7 +66,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         String port = System.getProperty("proactive.rmi.port");
         if (port != null) {
             rmiURL = UrlBuilder.buildUrl("localhost",
@@ -80,12 +82,14 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         NodeFactory.killNode(rmiURL);
         NodeFactory.killNode(jiniURL);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         rmiNode = NodeFactory.getNode(rmiURL);
         jiniNode = NodeFactory.getNode(jiniURL);
         //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");

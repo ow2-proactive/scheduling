@@ -45,6 +45,7 @@ public class FutureImpl<R> implements Future<R> {
         this.taskId = taskId;
     }
 
+    @Override
     public int hashCode() {
         return taskId;
     }

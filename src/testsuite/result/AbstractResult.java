@@ -88,7 +88,8 @@ public abstract class AbstractResult {
     /**
      * @see java.lang.Object#toString()
      */
-    public abstract String toString();
+    @Override
+	public abstract String toString();
 
     /**
      * @return

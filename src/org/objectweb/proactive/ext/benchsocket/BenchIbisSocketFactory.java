@@ -61,11 +61,13 @@ public class BenchIbisSocketFactory extends IbisSocketFactory
         }
     }
 
+    @Override
     public Socket accept(ServerSocket a) throws IOException {
         Socket s = a.accept();
         return s;
     }
 
+    @Override
     public void close(InputStream in, OutputStream out, Socket s) {
         try {
             if (in != null) {
@@ -83,25 +85,30 @@ public class BenchIbisSocketFactory extends IbisSocketFactory
         }
     }
 
+    @Override
     public int allocLocalPort() {
         return 0;
     }
 
+    @Override
     public ServerSocket createServerSocket(int port, int backlog,
         InetAddress addr) throws IOException {
         return new BenchServerSocket(port, addr, this);
     }
 
+    @Override
     public Socket createSocket(InetAddress rAddr, int rPort)
         throws IOException {
         return new BenchClientSocket(rAddr, rPort, this);
     }
 
+    @Override
     public Socket createSocket(InetAddress dest, int port, InetAddress localIP,
         long timeoutMillis) throws IOException {
         return new BenchClientSocket(dest, port, this);
     }
 
+    @Override
     public ServerSocket createServerSocket(int port, InetAddress localAddress,
         boolean retry) throws IOException {
         return new BenchServerSocket(port, localAddress, this);

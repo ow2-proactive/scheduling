@@ -56,6 +56,7 @@ public class Sphere extends Primitive implements java.io.Serializable {
      * @author Doyon Florian
      * @author Wilfried Klauser
      */
+    @Override
     public Isect intersect(Ray ray) {
         Isect ip;
         tmp.sub2(c, ray.P);
@@ -79,12 +80,14 @@ public class Sphere extends Primitive implements java.io.Serializable {
     /**
      * Normal (outwards) vector at point P of the sphere.
      */
+    @Override
     public Vec normal(Vec p) {
         Vec normal = Vec.sub(p, c);
         normal.normalize();
         return normal;
     }
 
+    @Override
     public String toString() {
         return "Sphere {" + c.toString() + ", radius " + r + "}";
     }
@@ -101,6 +104,7 @@ public class Sphere extends Primitive implements java.io.Serializable {
      * Rotates the Sphere.
      * @see org.objectweb.proactive.examples.c3d.prim.Primitive#rotate(org.objectweb.proactive.examples.c3d.geom.Vec)
      */
+    @Override
     public void rotate(Vec vec) {
         double phi;
         double l;

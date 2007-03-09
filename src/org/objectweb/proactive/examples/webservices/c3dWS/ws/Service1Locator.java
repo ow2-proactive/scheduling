@@ -93,6 +93,7 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
+    @Override
     public java.rmi.Remote getPort(Class serviceEndpointInterface)
         throws javax.xml.rpc.ServiceException {
         try {
@@ -120,6 +121,7 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
+    @Override
     public java.rmi.Remote getPort(javax.xml.namespace.QName portName,
         Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         if (portName == null) {
@@ -138,10 +140,12 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
         }
     }
 
+    @Override
     public javax.xml.namespace.QName getServiceName() {
         return new javax.xml.namespace.QName("http://tempuri.org/", "Service1");
     }
 
+    @Override
     public java.util.Iterator<QName> getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet<QName>();

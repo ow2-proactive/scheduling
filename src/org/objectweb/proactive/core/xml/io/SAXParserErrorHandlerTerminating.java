@@ -42,15 +42,18 @@ public class SAXParserErrorHandlerTerminating extends SAXParserErrorHandler {
     public SAXParserErrorHandlerTerminating() {
     }
 
+    @Override
     public void warning(SAXParseException ex) throws SAXException {
         super.warning(ex);
     }
 
+    @Override
     public void error(SAXParseException ex) throws SAXException {
         super.error(ex);
         throw new SAXException(ex.getMessage());
     }
 
+    @Override
     public void fatalError(SAXParseException ex) throws SAXException {
         super.fatalError(ex);
         throw new SAXException(ex.getMessage());

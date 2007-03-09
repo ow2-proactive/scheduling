@@ -82,7 +82,8 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
         manager.addInterLinkedGroup(group);
     }
 
-    protected void notifyEndActiveHandler(String name,
+    @Override
+	protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         if (name.equalsIgnoreCase(ID_TEST_TAG)) {
             group.add((FunctionalTest) activeHandler.getResultObject());
@@ -127,7 +128,8 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
             }
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
     }
@@ -150,7 +152,8 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
             throws org.xml.sax.SAXException {
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equalsIgnoreCase(LINK_TAG)) {
                 activeHandler.getResultObject();
@@ -183,7 +186,8 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
             this.test = (FunctionalTest) this.table.get(id);
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equalsIgnoreCase(PARENT_TAG)) {
                 this.parents.add(activeHandler.getResultObject());
@@ -211,7 +215,8 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
             this.test = (FunctionalTest) this.table.get(id);
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
     }

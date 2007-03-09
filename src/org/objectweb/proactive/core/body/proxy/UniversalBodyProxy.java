@@ -74,6 +74,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     private transient GCTag tag;
     private static ThreadLocal<Collection<UniversalBodyProxy>> incomingReferences =
         new ThreadLocal<Collection<UniversalBodyProxy>>() {
+            @Override
             protected synchronized Collection<UniversalBodyProxy> initialValue() {
                 return new Vector<UniversalBodyProxy>();
             }
@@ -167,6 +168,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof UniversalBodyProxy)) {
             return false;
@@ -176,6 +178,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         return universalBody.equals(proxy.universalBody);
     }
 
+    @Override
     public int hashCode() {
         return universalBody.hashCode();
     }
@@ -246,6 +249,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
     }
 
+    @Override
     protected void sendRequest(MethodCall methodCall, Future future)
         throws java.io.IOException, RenegotiateSessionException {
         // Determines the body that is at the root of the subsystem from which the
@@ -268,6 +272,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
     }
 
+    @Override
     protected void sendRequest(MethodCall methodCall, Future future,
         Body sourceBody)
         throws java.io.IOException, RenegotiateSessionException {

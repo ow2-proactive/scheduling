@@ -205,6 +205,7 @@ public class JobMonitorFrame extends JFrame {
         return menuBar;
     }
 
+    @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
         if (b) {

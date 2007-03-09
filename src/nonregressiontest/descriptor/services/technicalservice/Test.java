@@ -49,12 +49,14 @@ public class Test extends FunctionalTest {
         super("Technical Service", "Deployment descriptor technical services.");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.vn1 = this.pad.getVirtualNode("VN1");
         this.vn2 = this.pad.getVirtualNode("VN2");
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         String vn1Arg1 = this.vn1.getNode().getProperty("arg1");
         String vn1Arg2 = this.vn1.getNode().getProperty("arg2");
         String vn2Arg1 = this.vn2.getNode().getProperty("arg1");
@@ -63,12 +65,14 @@ public class Test extends FunctionalTest {
         vn2Arg1.equals("bbb") && vn2Arg2.equals("ccc");
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         this.pad = ProActive.getProactiveDescriptor(XML_LOCATION);
         this.pad.activateMappings();
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         this.pad.killall(false);
     }
 }

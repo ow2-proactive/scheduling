@@ -68,6 +68,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         return _tryCache;
     }
 
+    @Override
     protected void finalize() throws Throwable {
         super.finalize();
         SshTunnelFactory.reportUnusedTunnel(_tunnel);
@@ -90,11 +91,13 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public Map<String, List<String>> getRequestProperties() {
         checkNotConnected();
         return _properties;
     }
 
+    @Override
     public String getRequestProperty(String key) {
         checkNotConnected();
         if (key == null) {
@@ -108,6 +111,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         return retval;
     }
 
+    @Override
     public void setRequestProperty(String key, String value) {
         checkNotConnected();
         checkNullKey(key);
@@ -116,6 +120,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         _properties.put(key, list);
     }
 
+    @Override
     public void addRequestProperty(String key, String value) {
         checkNotConnected();
         checkNullKey(key);
@@ -127,6 +132,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         _properties.put(key, list);
     }
 
+    @Override
     public void setInstanceFollowRedirects(boolean followRedirects) {
         super.setInstanceFollowRedirects(followRedirects);
         if (_httpConnection != null) {
@@ -134,6 +140,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public void setRequestMethod(String method) throws ProtocolException {
         super.setRequestMethod(method);
         if (_httpConnection != null) {
@@ -141,21 +148,25 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public int getResponseCode() throws IOException {
         ensureTunnel();
         return _httpConnection.getResponseCode();
     }
 
+    @Override
     public void connect() throws IOException {
         ensureTunnel();
         _httpConnection.connect();
         connected = true;
     }
 
+    @Override
     public void disconnect() {
         connected = false;
     }
 
+    @Override
     public boolean usingProxy() {
         if (_httpConnection != null) {
             return _httpConnection.usingProxy();
@@ -164,6 +175,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public InputStream getErrorStream() {
         if (!connected) {
             return null;
@@ -173,6 +185,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public String getHeaderField(String name) {
         try {
             ensureTunnel();
@@ -182,6 +195,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public String getHeaderField(int n) {
         try {
             ensureTunnel();
@@ -191,6 +205,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public String getHeaderFieldKey(int n) {
         try {
             ensureTunnel();
@@ -200,6 +215,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public Map<String, List<String>> getHeaderFields() {
         try {
             ensureTunnel();
@@ -209,16 +225,19 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
+    @Override
     public InputStream getInputStream() throws IOException {
         ensureTunnel();
         return _httpConnection.getInputStream();
     }
 
+    @Override
     public OutputStream getOutputStream() throws IOException {
         ensureTunnel();
         return _httpConnection.getOutputStream();
     }
 
+    @Override
     public String toString() {
         return HttpSshUrlConnection.class.getName() + ":" + url.toString();
     }

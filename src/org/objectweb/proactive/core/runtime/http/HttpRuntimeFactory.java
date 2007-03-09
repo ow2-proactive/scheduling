@@ -48,6 +48,7 @@ public class HttpRuntimeFactory extends RuntimeFactory {
     /**
      * @see org.objectweb.proactive.core.runtime.RuntimeFactory#getProtocolSpecificRuntimeImpl()
      */
+    @Override
     protected ProActiveRuntime getProtocolSpecificRuntimeImpl()
         throws ProActiveException {
         if (defaultRuntime == null) {
@@ -59,6 +60,7 @@ public class HttpRuntimeFactory extends RuntimeFactory {
     /**
      * @see org.objectweb.proactive.core.runtime.RuntimeFactory#getRemoteRuntimeImpl(java.lang.String)
      */
+    @Override
     protected ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException {
         // Here we do a lookup of the RemoteRuntime 
@@ -74,6 +76,7 @@ public class HttpRuntimeFactory extends RuntimeFactory {
     /**
      * @see org.objectweb.proactive.core.runtime.RuntimeFactory#createRuntimeAdapter()
      */
+    @Override
     protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         RemoteProActiveRuntime remoteProActiveRuntime = new HttpProActiveRuntime();

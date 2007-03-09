@@ -54,7 +54,8 @@ public class Test extends FunctionalTest {
             "distributes the parameters of a method call to member");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -83,14 +84,17 @@ public class Test extends FunctionalTest {
         ProActiveGroup.unsetScatterGroup(this.parameterGroup);
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         // was the result group created ?
         if (this.resultTypedGroup == null) {
             return false;

@@ -84,6 +84,7 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     //
     // -- Implements MigrationManager -----------------------------------------------
     //
+    @Override
     public UniversalBody migrateTo(Node node, Body body)
         throws MigrationException {
         locationServer = null;
@@ -103,11 +104,13 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     //        super.startingAfterMigration(body);
     //        updateLocation(body);
     //    }
+    @Override
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
         RequestReceiver currentRequestReceiver) {
         return new BouncingRequestReceiver();
     }
 
+    @Override
     public ReplyReceiver createReplyReceiver(UniversalBody remoteBody,
         ReplyReceiver currentReplyReceiver) {
         return currentReplyReceiver;

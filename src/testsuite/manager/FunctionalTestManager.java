@@ -77,7 +77,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
     /**
      * @see testsuite.manager.AbstractManager#execute()
      */
-    public void execute(boolean useAttributesFile) {
+    @Override
+	public void execute(boolean useAttributesFile) {
         if (logger.isInfoEnabled()) {
             logger.info("Starting ...");
         }
@@ -473,7 +474,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
     /**
      * @see testsuite.manager.AbstractManager#execute()
      */
-    public void execute() {
+    @Override
+	public void execute() {
         super.execute();
     }
 

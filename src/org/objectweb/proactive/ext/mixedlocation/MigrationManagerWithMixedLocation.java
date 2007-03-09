@@ -73,12 +73,14 @@ public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
         }
     }
 
+    @Override
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
         RequestReceiver currentRequestReceiver) {
         this.createWrapper(remoteBody);
         return new RequestReceiverForwarder(wrapper);
     }
 
+    @Override
     public ReplyReceiver createReplyReceiver(UniversalBody remoteBody,
         ReplyReceiver currentReplyReceiver) {
         this.createWrapper(wrapper);
@@ -94,6 +96,7 @@ public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
         }
     }
 
+    @Override
     public void startingAfterMigration(Body body) {
         super.startingAfterMigration(body);
         //we update our location

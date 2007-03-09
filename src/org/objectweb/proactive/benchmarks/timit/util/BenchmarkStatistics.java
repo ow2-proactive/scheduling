@@ -117,6 +117,7 @@ public class BenchmarkStatistics implements Serializable {
         return this.information;
     }
 
+    @Override
     public String toString() {
         return "\n" +
         (((this.time != null) && (this.time.toString().length() != 0))

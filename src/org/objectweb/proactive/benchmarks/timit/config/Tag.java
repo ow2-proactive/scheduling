@@ -89,6 +89,7 @@ public abstract class Tag {
     /**
      * Construct a pretty printed tag. For debug purpose
      */
+    @Override
     public String toString() {
         String result = "[";
         Iterator<String> it = this.attributes.keySet().iterator();

@@ -81,6 +81,7 @@ public class BenchInputStream extends InputStream implements BenchStream {
     /* (non-Javadoc)
      * @see java.io.InputStream#available()
      */
+    @Override
     public int available() throws IOException {
         return this.realInputStream.available();
     }
@@ -88,6 +89,7 @@ public class BenchInputStream extends InputStream implements BenchStream {
     /* (non-Javadoc)
      * @see java.io.InputStream#close()
      */
+    @Override
     public void close() throws IOException {
         //    		if (ShutdownThread.removeStream(this)){
         //    			this.realInputStream.close();
@@ -119,6 +121,7 @@ public class BenchInputStream extends InputStream implements BenchStream {
     /* (non-Javadoc)
      * @see java.io.InputStream#mark(int)
      */
+    @Override
     public synchronized void mark(int readlimit) {
         this.realInputStream.mark(readlimit);
     }
@@ -126,10 +129,12 @@ public class BenchInputStream extends InputStream implements BenchStream {
     /* (non-Javadoc)
      * @see java.io.InputStream#markSupported()
      */
+    @Override
     public boolean markSupported() {
         return this.realInputStream.markSupported();
     }
 
+    @Override
     public int read() throws IOException {
         int tmp = this.realInputStream.read();
 
@@ -145,6 +150,7 @@ public class BenchInputStream extends InputStream implements BenchStream {
     /* (non-Javadoc)
      * @see java.io.InputStream#read(byte[], int, int)
      */
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int tmp = this.realInputStream.read(b, off, len);
 
@@ -158,6 +164,7 @@ public class BenchInputStream extends InputStream implements BenchStream {
     /* (non-Javadoc)
      * @see java.io.InputStream#read(byte[])
      */
+    @Override
     public int read(byte[] b) throws IOException {
         int tmp = this.realInputStream.read(b);
 
@@ -171,10 +178,12 @@ public class BenchInputStream extends InputStream implements BenchStream {
     /* (non-Javadoc)
      * @see java.io.InputStream#reset()
      */
+    @Override
     public synchronized void reset() throws IOException {
         this.realInputStream.reset();
     }
 
+    @Override
     public long skip(long n) throws IOException {
         return this.realInputStream.skip(n);
     }

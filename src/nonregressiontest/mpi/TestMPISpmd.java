@@ -55,21 +55,25 @@ public class TestMPISpmd extends FunctionalTest {
             "Tests if dependency is well ensured between processes. That is MPISpmd object is created from a Virtual Node.");
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         String status = mpi_spmd.getStatus();
         return (status.equals(MPIConstants.MPI_DEFAULT_STATUS));
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_FILE);
         }

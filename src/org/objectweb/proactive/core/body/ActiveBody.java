@@ -219,6 +219,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
     /**
      * Signals that the activity of this body, managed by the active thread has just stopped.
      */
+    @Override
     protected void activityStopped() {
         super.activityStopped();
         runActive = null;

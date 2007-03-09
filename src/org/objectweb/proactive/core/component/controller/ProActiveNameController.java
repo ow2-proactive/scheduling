@@ -57,6 +57,7 @@ public class ProActiveNameController extends AbstractProActiveController
         super(owner);
     }
 
+    @Override
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()

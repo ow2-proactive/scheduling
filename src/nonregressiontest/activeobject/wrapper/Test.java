@@ -73,18 +73,21 @@ public class Test extends FunctionalTest {
             "Test if a futre is created for primitive wrappers");
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         this.ao = (A) ProActive.newActive(A.class.getName(), null);
     }
 
     /**
      * @see testsuite.test.FunctionalTest#postConditions()
      */
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         return this.ao != null;
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.boolMutable = this.ao.testBooleanMutableWrapper();
         this.dbleMutable = this.ao.testDoubleMutableWrapper();
         this.integerMutable = this.ao.testIntMutableWrapper();
@@ -103,7 +106,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#preConditions()
      */
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return ProActive.isAwaited(this.boolMutable) &&
         ProActive.isAwaited(this.dbleMutable) &&
         ProActive.isAwaited(this.integerMutable) &&
@@ -115,7 +119,8 @@ public class Test extends FunctionalTest {
         ProActive.isAwaited(this.string) && ProActive.isAwaited(this.flt);
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         this.ao.terminate();
         this.ao = null;
     }

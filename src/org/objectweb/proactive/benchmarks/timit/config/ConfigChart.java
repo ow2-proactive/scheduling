@@ -39,6 +39,7 @@ public class ConfigChart extends Tag {
         super(eChart);
     }
 
+    @Override
     public String get(String name) {
         name = name.toLowerCase();
         String value = super.get(name);

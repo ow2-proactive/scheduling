@@ -133,6 +133,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
     }
 
     /** Redraw the component */
+    @Override
     public void paintComponent(java.awt.Graphics g) {
         java.awt.Graphics2D g2 = (java.awt.Graphics2D) g; // ebe subtypying for antialiasing and better rendering
         super.paintComponent(g2);
@@ -247,27 +248,33 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         repaint();
     }
 
+    @Override
     public AbstractDataObject getAbstractDataObject() {
         return activeObject;
     }
 
+    @Override
     protected void activeObjectAddedToFilter() {
         setVisibleFromFilter();
     }
 
+    @Override
     protected void activeObjectRemovedFromFilter() {
         setVisibleFromFilter();
     }
 
+    @Override
     protected void setFontSize(java.awt.Font font) {
         super.setFontSize(font);
         nameLabel.setFont(font);
     }
 
+    @Override
     protected java.awt.Dimension getMinimumSizeInternal() {
         return null;
     }
 
+    @Override
     protected Object[][] getDataObjectInfo() {
         return new Object[][] {
             { "Class", name },
@@ -275,6 +282,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         };
     }
 
+    @Override
     protected ActiveObjectPanel findActiveObjectPanelByActiveObject(
         ActiveObject activeObject) {
         if (activeObject == this.activeObject) {
@@ -284,10 +292,12 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         }
     }
 
+    @Override
     protected void addAllActiveObjectsToWatcher() {
         activeObjectWatcher.addActiveObject(activeObject);
     }
 
+    @Override
     protected void removeAllActiveObjectsFromWatcher() {
         activeObjectWatcher.removeActiveObject(activeObject);
     }

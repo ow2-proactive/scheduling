@@ -263,6 +263,7 @@ public class SciFrame extends javax.swing.JFrame {
                     }
                 });
             treeEngine.addMouseListener(new MouseAdapter() {
+                    @Override
                     public void mouseClicked(MouseEvent evt) {
                         treeEngineMouseClicked(evt);
                     }
@@ -308,6 +309,7 @@ public class SciFrame extends javax.swing.JFrame {
                         });
 
                 tableTaskWait = new JTable() {
+                            @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
                                 return false;
@@ -323,6 +325,7 @@ public class SciFrame extends javax.swing.JFrame {
                              .setCellRenderer(new IconRenderer());
                 tableTaskWait.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 tableTaskWait.addMouseListener(new MouseAdapter() {
+                        @Override
                         public void mouseClicked(MouseEvent evt) {
                             tableTaskWaitMouseClicked(evt);
                         }
@@ -372,6 +375,7 @@ public class SciFrame extends javax.swing.JFrame {
                         });
 
                 tableTaskRun = new JTable() {
+                            @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
                                 return false;
@@ -389,6 +393,7 @@ public class SciFrame extends javax.swing.JFrame {
                             .setCellRenderer(new IconRenderer());
                 tableTaskRun.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 tableTaskRun.addMouseListener(new MouseAdapter() {
+                        @Override
                         public void mouseClicked(MouseEvent evt) {
                             tableTaskRunMouseClicked(evt);
                         }
@@ -447,6 +452,7 @@ public class SciFrame extends javax.swing.JFrame {
                         });
 
                 tableTaskEnd = new JTable() {
+                            @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
                                 return false;
@@ -461,6 +467,7 @@ public class SciFrame extends javax.swing.JFrame {
                             .setCellRenderer(new IconRenderer());
                 tableTaskEnd.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 tableTaskEnd.addMouseListener(new MouseAdapter() {
+                        @Override
                         public void mouseClicked(MouseEvent evt) {
                             tableTaskEndMouseClicked(evt);
                         }
@@ -527,6 +534,7 @@ public class SciFrame extends javax.swing.JFrame {
                         pnlLogo.setSize(802, 60);
                         pnlLogo.setPreferredSize(new java.awt.Dimension(802, 60));
                         pnlProActive = new JPanel() {
+                                    @Override
                                     public void paintComponent(Graphics g) {
                                         super.paintComponent(g);
 
@@ -542,6 +550,7 @@ public class SciFrame extends javax.swing.JFrame {
                                 200, 30));
                         pnlProActive.setSize(200, 70);
                         pnlScilab = new JPanel() {
+                                    @Override
                                     public void paintComponent(Graphics g) {
                                         super.paintComponent(g);
 
@@ -633,6 +642,7 @@ public class SciFrame extends javax.swing.JFrame {
             {
                 chooserDescriptor = new JFileChooser();
                 FileFilter filter = new FileFilter() {
+                        @Override
                         public boolean accept(File f) {
                             if (f == null) {
                                 return false;
@@ -645,6 +655,7 @@ public class SciFrame extends javax.swing.JFrame {
                             return f.getName().endsWith(".xml");
                         }
 
+                        @Override
                         public String getDescription() {
                             return "XML Filter";
                         }
@@ -703,6 +714,7 @@ public class SciFrame extends javax.swing.JFrame {
 
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             this.addWindowListener(new WindowAdapter() {
+                    @Override
                     public void windowClosing(WindowEvent evt) {
                         if (service != null) {
                             service.exit();
@@ -934,6 +946,7 @@ public class SciFrame extends javax.swing.JFrame {
         (new Thread() {
                 private String path = pathDescriptor;
 
+                @Override
                 public void run() {
                     service.deployEngine(nameVn, path);
                     txtLog.append("->Deployment is successfull:" + path + "\n");
@@ -1171,6 +1184,7 @@ public class SciFrame extends javax.swing.JFrame {
     private void setComponentPopupMenu(final java.awt.Component parent,
         final javax.swing.JPopupMenu menu) {
         parent.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
                 public void mousePressed(java.awt.event.MouseEvent e) {
                     if (e.isPopupTrigger()) {
                         menu.show(parent, e.getX(), e.getY());
@@ -1189,6 +1203,7 @@ public class SciFrame extends javax.swing.JFrame {
                     }
                 }
 
+                @Override
                 public void mouseReleased(java.awt.event.MouseEvent e) {
                     if (e.isPopupTrigger()) {
                         menu.show(parent, e.getX(), e.getY());

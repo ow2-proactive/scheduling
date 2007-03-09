@@ -48,6 +48,7 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
         new AppletReader("Reader/Writer", 400, 300);
     }
 
+    @Override
     public void start() {
         receiveMessage("Creating active objects");
         try {
@@ -62,6 +63,7 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.BorderLayout());
         readerPanel = new ReadCanvas();

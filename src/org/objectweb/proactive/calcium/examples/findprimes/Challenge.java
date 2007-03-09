@@ -52,6 +52,7 @@ class Challenge implements Serializable {
         ;
     }
 
+    @Override
     public String toString() {
         return "Params: " + min + "<?<" + max;
     }

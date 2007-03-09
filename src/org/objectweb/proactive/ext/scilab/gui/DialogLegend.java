@@ -99,6 +99,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlLegendWait.setLayout(pnlLegendWaitLayout);
                 pnlTaskWait.add(pnlLegendWait);
                 pnlIconWait = new JPanel() {
+                            @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
 
@@ -117,6 +118,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendWait.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendWait.setSize(100, 28);
                 pnlIconCancel = new JPanel() {
+                            @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
 
@@ -152,6 +154,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlLegendRun.setLayout(pnlLegendRunLayout);
                 pnlTaskRun.add(pnlLegendRun);
                 pnlIconRun = new JPanel() {
+                            @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
 
@@ -170,6 +173,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendRun.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendRun.setSize(100, 28);
                 pnlIconKill = new JPanel() {
+                            @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
 
@@ -203,6 +207,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlLegendEnd.setLayout(pnlLegendEndLayout);
                 pnlTaskEnd.add(pnlLegendEnd);
                 pnlIconSuccess = new JPanel() {
+                            @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
 
@@ -221,6 +226,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendSuccess.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendSuccess.setSize(100, 28);
                 pnlIconAbort = new JPanel() {
+                            @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
 

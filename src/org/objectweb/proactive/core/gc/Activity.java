@@ -67,6 +67,7 @@ public class Activity implements Serializable {
         return this.bodyID.getCanonString().compareTo(a.bodyID.getCanonString()) > 0;
     }
 
+    @Override
     public String toString() {
         return bodyID.shortString() + ":" + activityCounter;
     }
@@ -74,6 +75,7 @@ public class Activity implements Serializable {
     /**
      * Same counter and ID
      */
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Activity) {
             Activity a = (Activity) o;

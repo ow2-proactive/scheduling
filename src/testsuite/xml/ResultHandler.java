@@ -50,7 +50,8 @@ public class ResultHandler extends BasicUnmarshaller
         this.manager = manager;
     }
 
-    public void startContextElement(String name, Attributes attributes)
+    @Override
+	public void startContextElement(String name, Attributes attributes)
         throws org.xml.sax.SAXException {
         String type = (String) attributes.getValue("type");
         String file = (String) attributes.getValue("file");

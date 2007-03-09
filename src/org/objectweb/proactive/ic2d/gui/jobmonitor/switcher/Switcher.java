@@ -74,6 +74,7 @@ public class Switcher extends Box implements JobMonitorConstants {
 
             l.setOpaque(true);
             l.addMouseListener(new MouseAdapter() {
+                    @Override
                     public void mousePressed(MouseEvent e) {
                         popupmenu.removeAll();
                         final JCheckBoxMenuItem hide = new JCheckBoxMenuItem(

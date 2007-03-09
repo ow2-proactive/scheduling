@@ -50,6 +50,7 @@ public class SingleValueUnmarshaller extends BasicUnmarshaller {
      * This method is called several times by {@link org.objectweb.proactive.core.xml.io.DefaultHandlerAdapter#characters(char[], int, int)}
      * if the data is split into several chunks.
      */
+    @Override
     public void readValue(String value) throws SAXException {
 
         /*

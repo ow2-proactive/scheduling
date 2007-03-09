@@ -161,16 +161,19 @@ public abstract class AbstractUnmarshallerDecorator
     // -- INNER CLASSES ------------------------------------------------------
     //
     private class NullUnmarshallerHandler extends BasicUnmarshaller {
+        @Override
         public void startElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             //System.out.println(name+"  ignored");
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             //System.out.println(name+"  ignored");
         }
 
+        @Override
         public Object getResultObject() throws org.xml.sax.SAXException {
             return null;
         }

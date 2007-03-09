@@ -60,10 +60,12 @@ public class MutableInteger implements Serializable {
         return this.value;
     }
 
+    @Override
     public int hashCode() {
         return this.value;
     }
 
+    @Override
     public boolean equals(Object mi) {
         if (mi instanceof MutableInteger) {
             return this.value == ((MutableInteger) mi).getValue();

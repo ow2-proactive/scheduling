@@ -61,6 +61,7 @@ public class PropertiesHandler extends AbstractUnmarshallerDecorator
         throws org.xml.sax.SAXException {
     }
 
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
     }
@@ -95,6 +96,7 @@ public class PropertiesHandler extends AbstractUnmarshallerDecorator
             config.propertyFound(key, value);
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }

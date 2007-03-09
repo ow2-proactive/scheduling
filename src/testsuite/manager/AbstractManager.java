@@ -409,7 +409,8 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     /**
      * @see testsuite.result.ResultsExporter#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return results.toString();
     }
 

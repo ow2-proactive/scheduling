@@ -142,7 +142,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /** Default handler operation when start document is encountered */
-    public void startDocument() throws SAXException {
+    @Override
+	public void startDocument() throws SAXException {
         // Create the output file
         try {
             out = new BufferedWriter(new OutputStreamWriter(
@@ -158,7 +159,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /** Default handler operation when end document is encountered */
-    public void endDocument() throws SAXException {
+    @Override
+	public void endDocument() throws SAXException {
         try {
             out.close();
         } catch (IOException e) {
@@ -167,7 +169,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /** Default handler operation when new tag is encountered */
-    public void startElement(String namespaceURI, String localName,
+    @Override
+	public void startElement(String namespaceURI, String localName,
         String realName, Attributes attrs) throws SAXException {
         String tagName = localName; // element name
         boolean filerefChanged = false;
@@ -322,7 +325,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /** Default handler operation when a tag is closed */
-    public void endElement(String namespaceURI, String localName,
+    @Override
+	public void endElement(String namespaceURI, String localName,
         String realName) throws SAXException {
         // Code to add remembered elements in the src appendix 
         if (this.listOFids != null) {
@@ -365,7 +369,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     }
 
     /** Default handler operation when a string of characters is encountered */
-    public void characters(char[] buf, int offset, int len)
+    @Override
+	public void characters(char[] buf, int offset, int len)
         throws SAXException {
         String s = new String(buf, offset, len);
         print(s.replaceAll("&", "&amp;").replaceAll("<", "&lt;"));

@@ -86,10 +86,12 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected RequestFactory newRequestFactorySingleton() {
         return new RequestWithMixedLocationFactory();
     }
 
+    @Override
     protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
         return new MigrationManagerFactoryImpl();
     }
@@ -116,6 +118,7 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
         }
     }
 
+    @Override
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
         if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
             if (logger.isDebugEnabled()) {

@@ -36,6 +36,7 @@ package org.objectweb.proactive.core.ssh.httpssh;
  *
  */
 public class Handler extends java.net.URLStreamHandler {
+    @Override
     protected java.net.URLConnection openConnection(java.net.URL u)
         throws java.io.IOException {
         HttpSshUrlConnection connection = new HttpSshUrlConnection(u);

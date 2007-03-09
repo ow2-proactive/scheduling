@@ -239,6 +239,7 @@ public class FlowShopTask extends Task {
      *
      * @see org.objectweb.proactive.branchnbound.core.Task#execute()
      */
+    @Override
     public Result execute() {
         int[] timeMachine = new int[fs.nbMachine];
         long time = System.currentTimeMillis();
@@ -342,6 +343,7 @@ public class FlowShopTask extends Task {
      *
      * @see org.objectweb.proactive.branchnbound.core.Task#split()
      */
+    @Override
     public Vector split() {
         int nbTasks = fs.jobs.length - depth;
 
@@ -383,6 +385,7 @@ public class FlowShopTask extends Task {
      * @throws NoResultsException
      * @see org.objectweb.proactive.branchnbound.core.Task#gather(org.objectweb.proactive.branchnbound.core.Result[])
      */
+    @Override
     public Result gather(Result[] results) {
         Result r = super.gather(results);
         long nbPerm = 0;
@@ -409,6 +412,7 @@ public class FlowShopTask extends Task {
         return r;
     }
 
+    @Override
     public void initLowerBound() {
         if (lowerBound == -1) {
             lowerBound = FlowShop.computeLowerBound(this.fs);
@@ -416,6 +420,7 @@ public class FlowShopTask extends Task {
         }
     }
 
+    @Override
     public void initUpperBound() {
         int[] randomPerm = (int[]) currentPerm.clone();
         for (int i = depth + 1; i < randomPerm.length; i++) {
@@ -440,6 +445,7 @@ public class FlowShopTask extends Task {
         com = b;
     }
 
+    @Override
     public String toString() {
         return "FSTask: makespan " +
         ((fsr.permutation == null) ? ""

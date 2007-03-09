@@ -157,6 +157,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
      * @param state
      *            the renderer state.
      */
+    @Override
     protected void calculateBarWidth(CategoryPlot plot, Rectangle2D dataArea,
         int rendererIndex, CategoryItemRendererState state) {
         // calculate the bar width - this calculation differs from the
@@ -209,6 +210,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
      * @param pass
      *            the pass index.
      */
+    @Override
     public void drawItem(Graphics2D g2, CategoryItemRendererState state,
         Rectangle2D dataArea, CategoryPlot plot, CategoryAxis domainAxis,
         ValueAxis rangeAxis, CategoryDataset data, int row, int column, int pass) {

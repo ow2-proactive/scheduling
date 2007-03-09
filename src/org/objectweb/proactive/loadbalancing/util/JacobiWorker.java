@@ -468,6 +468,7 @@ public class JacobiWorker implements java.io.Serializable {
         System.out.println("         * nbNeighbours = " + this.nbNeighbours);
     }
 
+    @Override
     public String toString() {
         return " Worker " + id + " at iter " + this.iteration;
     }

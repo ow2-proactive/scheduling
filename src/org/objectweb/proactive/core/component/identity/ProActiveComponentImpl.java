@@ -419,6 +419,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     /**
      * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
      */
+    @Override
     public String getFcItfName() {
         return Constants.COMPONENT;
     }
@@ -426,6 +427,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     /**
      * see {@link org.objectweb.fractal.api.Interface#getFcItfOwner()}
      */
+    @Override
     public Component getFcItfOwner() {
         return (Component) this;
     }

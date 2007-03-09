@@ -130,6 +130,7 @@ public class WorldObject extends AbstractDataObject {
         return (HostObject) getChild(hostname);
     }
 
+    @Override
     public void destroyObject() {
         destroy();
     }
@@ -144,6 +145,7 @@ public class WorldObject extends AbstractDataObject {
     /**
      * destroy this object
      */
+    @Override
     protected synchronized boolean destroy() {
         if (super.destroy()) {
             listener = null;

@@ -158,7 +158,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     /**
      * @see testsuite.manager.AbstractManager#execute()
      */
-    public void execute(boolean useAttributesFile) {
+    @Override
+	public void execute(boolean useAttributesFile) {
         ResultsCollections results = getResults();
         try {
             results.add(AbstractResult.IMP_MSG,
@@ -189,7 +190,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     /**
      * @see testsuite.manager.FunctionalTestManager#execute(testsuite.group.Group, testsuite.test.FunctionalTest)
      */
-    public void execute(Group group, FunctionalTest lastestTest,
+    @Override
+	public void execute(Group group, FunctionalTest lastestTest,
         boolean useAttributesFile) {
         ResultsCollections results = getResults();
         try {
@@ -220,7 +222,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     /**
      * @see testsuite.manager.AbstractManager#endManager()
      */
-    public void endManager() throws Exception {
+    @Override
+	public void endManager() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
@@ -256,7 +259,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
         return virtualNodes;
     }
 
-    public void initManager() throws Exception {
+    @Override
+	public void initManager() throws Exception {
         // do nothing
     }
 

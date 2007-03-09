@@ -151,22 +151,27 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     //------------------------------------------
     // Adpater Methods
     //------------------------------------------
+    @Override
     public void changeProxiedBody(Body newBody) throws IOException {
         this.proxiedRemoteBody.changeProxiedBody(bodyID, newBody);
     }
 
+    @Override
     public UniversalBody lookup(String url) throws java.io.IOException {
         return this.proxiedRemoteBody.lookup(bodyID, url);
     }
 
+    @Override
     public void register(String url) throws java.io.IOException {
         this.proxiedRemoteBody.register(bodyID, url);
     }
 
+    @Override
     public void unregister(String url) throws java.io.IOException {
         this.proxiedRemoteBody.unregister(bodyID, url);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof BodyAdapterForwarder)) {
             return false;
@@ -177,6 +182,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
         return rba.bodyID == this.bodyID;
     }
 
+    @Override
     public int hashCode() {
         return bodyID.hashCode();
     }
@@ -455,6 +461,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     /**
      * List all the existing objects registered in a registry.
      */
+    @Override
     public String[] list(String url) throws IOException {
         throw new IOException("Lookup is not implemented for this Adapter");
     }

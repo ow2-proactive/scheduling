@@ -279,6 +279,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         }
     }
 
+    @Override
     protected String internalBuildCommand() {
         return buildGLiteCommand();
     }

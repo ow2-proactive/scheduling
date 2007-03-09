@@ -129,6 +129,7 @@ public class AverageMicroTimer implements Timer, Serializable {
         System.out.println(tmp.append("\n").toString());
     }
 
+    @Override
     public String toString() {
         StringBuilder tmp = new StringBuilder();
         tmp.append("Number of measures: ").append(this.getNumberOfValues());

@@ -81,6 +81,7 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
     /**
      * Start element.
      */
+    @Override
     public void startElement(String namespaceURI, String localName,
         String qName, org.xml.sax.Attributes atts)
         throws org.xml.sax.SAXException {
@@ -91,6 +92,7 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
     /**
      * end element.
      */
+    @Override
     public void endElement(String namespaceURI, String localName, String qName)
         throws org.xml.sax.SAXException {
         //System.out.println("DefaultHandlerAdaptor endElement localName="+localName+" qName="+qName);
@@ -111,6 +113,7 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
     /**
      * Characters.
      */
+    @Override
     public void characters(char[] ch, int start, int length)
         throws org.xml.sax.SAXException {
         if (length > 0) {

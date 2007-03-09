@@ -73,6 +73,7 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
      * Performs the lookup
      * @return The Object associated with the urn
      */
+    @Override
     public Object processMessage() {
         if (this.urn != null) {
             UniversalBody ub = HttpBodyAdapter.getBodyFromUrn(urn);

@@ -74,6 +74,7 @@ public class SshTunnelFactory {
         _unused = new java.util.Hashtable<String, UnusedTunnel>();
         if (SshParameters.getUseTunnelGC()) {
             Thread gcThread = new Thread() {
+                    @Override
                     public void run() {
                         while (true) {
                             try {

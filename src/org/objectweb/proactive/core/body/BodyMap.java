@@ -145,6 +145,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         return idToBodyMap.values().iterator();
     }
 
+    @Override
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
 
@@ -165,6 +166,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     //
     // -- implements Cloneable -----------------------------------------------
     //
+    @Override
     public Object clone() {
         BodyMap newLocationTable = new BodyMap();
         newLocationTable.idToBodyMap = (Hashtable<UniqueID, UniversalBody>) idToBodyMap.clone();
@@ -232,6 +234,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void notifyOneListener(ProActiveListener listener,
         ProActiveEvent event) {
         BodyEvent bodyEvent = (BodyEvent) event;

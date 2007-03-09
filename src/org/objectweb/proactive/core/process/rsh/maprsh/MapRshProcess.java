@@ -134,6 +134,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String internalBuildCommand() {
         return buildMapRshCommand() + buildEnvironmentCommand();
     }

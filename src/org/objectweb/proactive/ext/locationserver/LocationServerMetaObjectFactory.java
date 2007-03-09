@@ -82,10 +82,12 @@ public class LocationServerMetaObjectFactory
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected RequestFactory newRequestFactorySingleton() {
         return new RequestWithLocationServerFactory();
     }
 
+    @Override
     protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
         return new MigrationManagerFactoryImpl();
     }

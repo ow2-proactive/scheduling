@@ -71,6 +71,7 @@ public class CNLSFProcess extends LSFBSubProcess {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
         ArrayList<String> al = new ArrayList<String>();
@@ -105,6 +106,7 @@ public class CNLSFProcess extends LSFBSubProcess {
         }
     }
 
+    @Override
     protected String internalBuildCommand() {
         return buildCNBSubCommand();
     }

@@ -122,6 +122,7 @@ public class Fork<P, R> implements Skeleton<P, R>, Instruction<P, P> {
         return t;
     }
 
+    @Override
     public String toString() {
         return "Fork";
     }

@@ -73,6 +73,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
             new IncludePropertiesFileHandler());
     }
 
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         //Once the variables have been defined, we load pending values from the javaproperties
@@ -121,6 +122,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
             this.varStringType = varStringType;
         }
 
+        @Override
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
             if (this.varType == null) {
@@ -147,6 +149,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         IncludeXMLFileHandler() {
         }
 
+        @Override
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
             String file = attributes.getValue("location");
@@ -162,6 +165,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         IncludePropertiesFileHandler() {
         }
 
+        @Override
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
             String file = attributes.getValue("location");

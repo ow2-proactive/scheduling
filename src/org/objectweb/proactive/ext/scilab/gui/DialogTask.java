@@ -89,6 +89,7 @@ public class DialogTask extends javax.swing.JDialog {
             {
                 chooserScript = new JFileChooser();
                 FileFilter filter = new FileFilter() {
+                        @Override
                         public boolean accept(File f) {
                             if (f == null) {
                                 return false;
@@ -102,6 +103,7 @@ public class DialogTask extends javax.swing.JDialog {
                             f.getName().endsWith(".sce");
                         }
 
+                        @Override
                         public String getDescription() {
                             return "Scilab Filter";
                         }
@@ -242,6 +244,7 @@ public class DialogTask extends javax.swing.JDialog {
             }
 
             this.addWindowListener(new WindowAdapter() {
+                    @Override
                     public void windowClosing(WindowEvent e) {
                         state = DialogTask.CANCEL;
                     }

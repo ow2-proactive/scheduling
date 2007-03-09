@@ -105,6 +105,7 @@ public class HalfBodies extends GarbageCollector {
     /**
      * Called by the broadcasting thread to ping all known referenced
      */
+    @Override
     protected synchronized Collection<GCSimpleMessage> iteration() {
         if (this.isFinished()) {
             return null;
@@ -123,6 +124,7 @@ public class HalfBodies extends GarbageCollector {
     /**
      * A half body is here to keep its referenced busy
      */
+    @Override
     protected boolean isBusy() {
         return !this.references.isEmpty();
     }
@@ -130,6 +132,7 @@ public class HalfBodies extends GarbageCollector {
     /**
      * Find the actual half body, and attach the referenced
      */
+    @Override
     public synchronized void addProxy(AbstractBody body,
         UniversalBodyProxy proxy) {
         if (this.isFinished()) {

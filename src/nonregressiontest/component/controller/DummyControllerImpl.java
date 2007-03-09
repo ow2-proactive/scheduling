@@ -53,7 +53,8 @@ public class DummyControllerImpl extends AbstractProActiveController
         super(owner);
   }
     
-        protected void setControllerItfType() {
+        @Override
+		protected void setControllerItfType() {
             try {
                 setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(DummyController.DUMMY_CONTROLLER_NAME,
                         DummyController.class.getName(), TypeFactory.SERVER,

@@ -121,6 +121,7 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
         // throw new SecurityException();
     }
 
+    @Override
     public ProActiveSecurityManager getProActiveSecurityManager() {
         return this;
     }
@@ -130,6 +131,7 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
         return new PolicyRule();
     }
 
+    @Override
     public Communication getPolicyTo(String type, String from, String to) {
         //   logger.info("asked for my policy TO, replied default policy");
         return new Communication();

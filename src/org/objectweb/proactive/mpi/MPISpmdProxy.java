@@ -179,6 +179,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         return this.name;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(target.toString());
         sb.append("\n Status: ");

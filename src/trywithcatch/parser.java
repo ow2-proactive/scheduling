@@ -64,7 +64,8 @@ public class parser extends trywithcatch.java_cup.runtime.lr_parser {
             });
 
     /** Access to production table. */
-    public short[][] production_table() {
+    @Override
+	public short[][] production_table() {
         return _production_table;
     }
 
@@ -99,7 +100,8 @@ public class parser extends trywithcatch.java_cup.runtime.lr_parser {
             });
 
     /** Access to parse-action table. */
-    public short[][] action_table() {
+    @Override
+	public short[][] action_table() {
         return _action_table;
     }
 
@@ -117,7 +119,8 @@ public class parser extends trywithcatch.java_cup.runtime.lr_parser {
             });
 
     /** Access to <code>reduce_goto</code> table. */
-    public short[][] reduce_table() {
+    @Override
+	public short[][] reduce_table() {
         return _reduce_table;
     }
 
@@ -125,12 +128,14 @@ public class parser extends trywithcatch.java_cup.runtime.lr_parser {
     protected CUP$parser$actions action_obj;
 
     /** Action encapsulation object initializer. */
-    protected void init_actions() {
+    @Override
+	protected void init_actions() {
         action_obj = new CUP$parser$actions(this);
     }
 
     /** Invoke a user supplied parse action. */
-    public trywithcatch.java_cup.runtime.Symbol do_action(int act_num,
+    @Override
+	public trywithcatch.java_cup.runtime.Symbol do_action(int act_num,
         trywithcatch.java_cup.runtime.lr_parser parser, java.util.Stack stack,
         int top) throws java.lang.Exception {
 
@@ -139,22 +144,26 @@ public class parser extends trywithcatch.java_cup.runtime.lr_parser {
     }
 
     /** Indicates start state. */
-    public int start_state() {
+    @Override
+	public int start_state() {
         return 0;
     }
 
     /** Indicates start production. */
-    public int start_production() {
+    @Override
+	public int start_production() {
         return 1;
     }
 
     /** <code>EOF</code> Symbol index. */
-    public int EOF_sym() {
+    @Override
+	public int EOF_sym() {
         return 0;
     }
 
     /** <code>error</code> Symbol index. */
-    public int error_sym() {
+    @Override
+	public int error_sym() {
         return 1;
     }
 }

@@ -51,6 +51,7 @@ public class ClusterForkProcess extends AbstractExternalProcessDecorator {
     }
 
     /* ==== AbstractExternalProcessDecorator ==== */
+    @Override
     protected String internalBuildCommand() {
         if (logger.isDebugEnabled()) {
             logger.debug("cluster-fork command is " + command_path);

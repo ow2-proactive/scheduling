@@ -211,6 +211,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         }
     }
 
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(target.toString());

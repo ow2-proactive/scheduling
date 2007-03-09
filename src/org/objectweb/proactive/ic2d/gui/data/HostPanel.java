@@ -126,6 +126,7 @@ public class HostPanel extends AbstractDataObjectPanel
         addMouseListener(popup.getMenuMouseListener());
 
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+                @Override
                 public void mouseDragged(java.awt.event.MouseEvent e) {
                     if (controller.isLayoutAutomatic()) {
                         return;
@@ -140,6 +141,7 @@ public class HostPanel extends AbstractDataObjectPanel
                 }
             });
         addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
                 public void mouseReleased(java.awt.event.MouseEvent e) {
                     HostPanel.this.parentDataObjectPanel.revalidate();
                     HostPanel.this.parentDataObjectPanel.repaint();
@@ -223,6 +225,7 @@ public class HostPanel extends AbstractDataObjectPanel
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     public AbstractDataObject getAbstractDataObject() {
         return hostObject;
     }
@@ -231,16 +234,19 @@ public class HostPanel extends AbstractDataObjectPanel
         return (VMPanel) getChild(vmObject);
     }
 
+    @Override
     protected Object[][] getDataObjectInfo() {
         return new Object[][] {
             { "Hostname", name }
         };
     }
 
+    @Override
     protected java.awt.Dimension getMinimumSizeInternal() {
         return minimumSize;
     }
 
+    @Override
     protected void setFontSize(java.awt.Font font) {
         super.setFontSize(font);
         createBorder(hostObject.getOperatingSystem());

@@ -59,6 +59,7 @@ public class NodeObject extends AbstractDataObject {
     //
     // -- PUBLIC METHOD -----------------------------------------------
     //
+    @Override
     public String toString() {
         return "Url= " + node.getNodeInformation().getURL() + "\n" +
         super.toString();
@@ -88,6 +89,7 @@ public class NodeObject extends AbstractDataObject {
         getURL().equals(o.getURL());
     }
 
+    @Override
     public ActiveObject findActiveObjectById(UniqueID id) {
         return getActiveObject(id);
     }
@@ -156,6 +158,7 @@ public class NodeObject extends AbstractDataObject {
         return (ActiveObject) getChild(id);
     }
 
+    @Override
     public void destroyObject() {
         getTypedParent().removeNodeObject(getName());
     }
@@ -163,6 +166,7 @@ public class NodeObject extends AbstractDataObject {
     //
     // -- PROTECTED METHOD -----------------------------------------------
     //
+    @Override
     protected synchronized boolean destroy() {
         if (super.destroy()) {
             listener = null;

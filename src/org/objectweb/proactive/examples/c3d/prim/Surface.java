@@ -95,6 +95,7 @@ public class Surface implements java.io.Serializable {
             Math.random(), Math.random(), Math.random() * 20.0, 0., 1.);
     }
 
+    @Override
     public String toString() {
         return "Surface { color=" + color + "}";
     }

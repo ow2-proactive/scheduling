@@ -67,6 +67,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
         this.server = server;
     }
 
+    @Override
     public Reply serve(Body targetBody) throws ServeException {
         MicroTimer timer = new MicroTimer();
         timer.start();
@@ -78,6 +79,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
         return r;
     }
 
+    @Override
     protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException {
         System.out.println("TimedRequestWithLocationServer: sending to remote " +
@@ -111,6 +113,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
     /**
      * Implements the backup solution
      */
+    @Override
     protected void backupSolution(UniversalBody destinationBody)
         throws java.io.IOException {
         //   long startTimeGamma1=0;
@@ -162,6 +165,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
         }
     }
 
+    @Override
     protected UniversalBody queryServer(UniqueID bodyID) {
         long startTimeBackupSolution = System.currentTimeMillis();
         if (server == null) {

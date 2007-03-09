@@ -124,6 +124,7 @@ public class ProActiveDialogView extends BasicDialogView
         add(virtualNodePanel);
     }
 
+    @Override
     public void bindFc(final String clientItfName, final Object serverItf) {
         super.bindFc(clientItfName, serverItf);
         if (DIALOG_MODEL_BINDING.equals(clientItfName)) {
@@ -276,11 +277,13 @@ public class ProActiveDialogView extends BasicDialogView
         }
     }
 
+    @Override
     public EventListener[] getListeners(Class aClass) {
         return new EventListener[0];
     }
 
     protected class ProActiveListListener extends ListListener {
+        @Override
         public void valueChanged(final ListSelectionEvent e) {
             super.valueChanged(e);
             ListSelectionModel l;
@@ -294,6 +297,7 @@ public class ProActiveDialogView extends BasicDialogView
     }
 
     protected class ProActiveButtonListener extends ButtonListener {
+        @Override
         public void actionPerformed(final ActionEvent e) {
             super.actionPerformed(e);
             Object o = e.getSource();

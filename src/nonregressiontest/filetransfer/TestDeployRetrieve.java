@@ -71,12 +71,14 @@ public class TestDeployRetrieve extends FunctionalTest {
             "Tests that both schems work using the ProActive FileTransfer API");
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
     	//depricated when using the assertions patter
         return true;
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug("Creating "+filesize+"Mb random test file in /tmp");
@@ -93,7 +95,8 @@ public class TestDeployRetrieve extends FunctionalTest {
         
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
@@ -105,7 +108,8 @@ public class TestDeployRetrieve extends FunctionalTest {
         cleanIfNecessary(this.fileRetrieved);
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
     	
     	long fileTestSum = TestAPI.checkSum(fileTest);
     	

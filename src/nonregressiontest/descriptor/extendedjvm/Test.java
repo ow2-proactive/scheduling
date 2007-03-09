@@ -57,7 +57,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         VirtualNode vn1 = descriptor.getVirtualNode("evn1");
         VirtualNode vn2 = descriptor.getVirtualNode("evn2");
         VirtualNode vn3 = descriptor.getVirtualNode("evn3");
@@ -72,7 +73,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         String fileName = null;
 
         if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
@@ -105,11 +107,13 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         descriptor.killall(false);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         if ((a2.getTiti() != null) || (a2.getTata() == null) ||
                 (a3.getTiti() == null) || (a3.getToto() == null)) {
             return false;

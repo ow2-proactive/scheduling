@@ -60,19 +60,22 @@ public class TestVnActivated extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                 new Object[] { "toto" }, vn);
     }
 
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         return this.vn.isActivated();
     }
 
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         ProActiveDescriptor padForActiving = ProActive.getProactiveDescriptor(XML_PATH);
         this.vn = padForActiving.getVirtualNode("Workers01");
         this.vn.activate();
@@ -81,10 +84,12 @@ public class TestVnActivated extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         if ((this.aos == null) || (this.aos.length != 4)) {
             this.vn.killAll(false);
             return false;

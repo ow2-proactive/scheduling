@@ -64,10 +64,12 @@ public class MutableLong implements Serializable {
         return this.value < l.getValue();
     }
 
+    @Override
     public int hashCode() {
         return (int) this.value;
     }
 
+    @Override
     public boolean equals(Object mi) {
         if (mi instanceof MutableLong) {
             return this.value == ((MutableLong) mi).getValue();

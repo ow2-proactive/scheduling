@@ -60,7 +60,8 @@ public class Message implements Serializable {
         return this;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return message;
     }
 

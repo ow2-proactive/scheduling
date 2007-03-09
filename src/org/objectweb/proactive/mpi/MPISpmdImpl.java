@@ -186,6 +186,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         return this.name;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n Class: ");

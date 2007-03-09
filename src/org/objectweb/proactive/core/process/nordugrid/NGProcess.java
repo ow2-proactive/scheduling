@@ -112,12 +112,14 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         this.jobname = jobname;
     }
 
+    @Override
     protected String internalBuildCommand() {
         buildExecutable();
         command_buffer = new ArrayList<String>();
         return buildNGSUBCommand() + " " + buildXRSLCommand();
     }
 
+    @Override
     protected void internalStartProcess(String xRslCommand)
         throws java.io.IOException {
         String[] ng_command = command_buffer.toArray(new String[] {  });
@@ -144,6 +146,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         }
     }
 
+    @Override
     protected boolean internalFileTransferDefaultProtocol() {
         FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
         FileTransferDefinition[] ftDefinitions = fts.getAllFileTransferDefinitions();

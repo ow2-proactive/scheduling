@@ -58,7 +58,8 @@ public class InputInterceptor1Impl extends AbstractProActiveController
         super(owner);
     }
 
-    protected void setControllerItfType() {
+    @Override
+	protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()
                                            .createFcItfType(InputInterceptor1.INPUT_INTERCEPTOR1_NAME,

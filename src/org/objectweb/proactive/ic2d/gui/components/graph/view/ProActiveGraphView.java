@@ -50,6 +50,7 @@ public class ProActiveGraphView extends BasicGraphView
         redraw();
     }
 
+    @Override
     public EventListener[] getListeners(Class aClass) {
         return new EventListener[0];
     }

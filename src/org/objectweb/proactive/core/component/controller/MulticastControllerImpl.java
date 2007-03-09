@@ -83,6 +83,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
         super(owner);
     }
 
+    @Override
     public void init() {
         // this method is called once the component is fully instantiated with all its interfaces created
         InterfaceType[] itfTypes = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
@@ -182,6 +183,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
         }
     }
 
+    @Override
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()

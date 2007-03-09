@@ -55,6 +55,7 @@ public class ExceptionMaskStack {
      * optimized way of doing this thread local thing
      */
     private static ThreadLocal threadLocalMask = new ThreadLocal() {
+            @Override
             protected synchronized Object initialValue() {
                 return new ExceptionMaskStack();
             }

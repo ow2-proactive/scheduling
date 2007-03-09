@@ -104,6 +104,7 @@ public class MonitorThread {
                 });
     }
 
+    @Override
     protected void finalize() throws Throwable {
         stopRefreshing();
         super.finalize();

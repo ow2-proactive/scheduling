@@ -66,6 +66,7 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
      */
+    @Override
     public String getProcessId() {
         return "mpidp";
     }

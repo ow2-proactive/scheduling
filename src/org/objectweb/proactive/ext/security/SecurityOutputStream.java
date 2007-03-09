@@ -75,6 +75,7 @@ public class SecurityOutputStream extends ObjectOutputStream {
      * that need to be serialized as proxy objects.  RemoteProxy.getProxy
      * is called to check for and find the stub.
      */
+    @Override
     protected Object replaceObject(Object obj) throws IOException {
         System.out.println(
             " */*/*/*/*/*/*/* /*/*/**//**/ Inside replaceObject /*/**/*//*/**//*/*/**//*/*");

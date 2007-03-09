@@ -45,21 +45,26 @@ public class FakeTimer extends HierarchicalTimer {
     private static final long serialVersionUID = -4023758257227790549L;
     private static HierarchicalTimer timer = new FakeTimer();
 
+    @Override
     public void start(int n) {
     }
 
+    @Override
     public void stop(int n) {
     }
 
     public void resetTimer(int n) {
     }
 
+    @Override
     public void setValue(int n, int t) {
     }
 
+    @Override
     public void addValue(int n, int t) {
     }
 
+    @Override
     public boolean isStarted(int n) {
         return false;
     }

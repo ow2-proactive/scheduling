@@ -57,7 +57,8 @@ public class Test extends ComponentTest {
             "registration and lookup");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory typeFactory = Fractal.getTypeFactory(boot);
         GenericFactory componentFactory = Fractal.getGenericFactory(boot);
@@ -76,13 +77,16 @@ public class Test extends ComponentTest {
         Assertions.assertEquals(componentA, retreived);
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return true;
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 }

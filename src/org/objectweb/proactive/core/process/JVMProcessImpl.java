@@ -285,6 +285,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String buildCommand() {
         return buildJavaCommand();
     }

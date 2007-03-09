@@ -74,6 +74,7 @@ public class Torus extends Ring { // implements Topology2D {
      * Return the max size of the Ring
      * @return the max size of the one-dimensional topology group (i.e. the Ring)
      */
+    @Override
     public int getWidth() {
         return this.width;
     }
@@ -109,6 +110,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param o - the object
      * @return the position (in X) of the object in the Torus
      */
+    @Override
     public int getX(Object o) {
         return this.indexOf(o) % this.getWidth();
     }
@@ -201,6 +203,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param o - the specified object
      * @return the object at the left of <code>o<code>.
      */
+    @Override
     public Object left(Object o) {
         int pos = this.indexOf(o);
         if ((pos % this.getWidth()) == 0) {
@@ -215,6 +218,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param o - the specified object
      * @return the object at the right of <code>o<code>.
      */
+    @Override
     public Object right(Object o) {
         int pos = this.indexOf(o);
         if ((pos % this.getWidth()) == (this.getWidth() - 1)) {

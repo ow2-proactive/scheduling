@@ -61,6 +61,7 @@ public class ProActiveTextFieldModel extends TextFieldModel {
      * @param s the new component's name, type, implementation... depending on the
      *      {@link #type} of this model.
      */
+    @Override
     protected void setComponentText(final String s) {
         if (model == null) {
             return;
@@ -89,6 +90,7 @@ public class ProActiveTextFieldModel extends TextFieldModel {
      *
      * @param model a component.
      */
+    @Override
     protected void setComponentModel(final Component model) {
         this.model = model;
         String s = null;

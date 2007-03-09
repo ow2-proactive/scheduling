@@ -48,10 +48,12 @@ public class DefaultEntity extends Entity implements Serializable {
         super();
     }
 
+    @Override
     public String getName() {
         return "defaultEntity";
     }
 
+    @Override
     public boolean equals(Entity e) {
         return true;
     }

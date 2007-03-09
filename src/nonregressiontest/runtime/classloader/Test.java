@@ -69,7 +69,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         A a = (A) ProActive.newActive("nonregressiontest.runtime.classloader.A",
                 new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
         a.createActiveObjectB();
@@ -78,7 +79,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         System.setProperty("proactive.classloader", "enable");
         String oldFilePath = getClass()
                                  .getResource("/nonregressiontest/runtime/classloader/deployment.xml")
@@ -105,12 +107,14 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         descriptor.killall(false);
         System.setProperty("proactive.classloader", "disable");
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return true;
     }
 

@@ -59,10 +59,12 @@ public class ItfID implements Serializable {
         return componentBodyID;
     }
 
+    @Override
     public int hashCode() {
         return componentBodyID.hashCode() + itfName.hashCode();
     }
 
+    @Override
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof ItfID) {

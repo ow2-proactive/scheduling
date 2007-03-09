@@ -125,7 +125,8 @@ public class Symbol {
   /*****************************
     Printing this token out. (Override for pretty-print).
     ****************************/
-  public String toString() { return "#"+sym; }
+  @Override
+public String toString() { return "#"+sym; }
 }
 
 

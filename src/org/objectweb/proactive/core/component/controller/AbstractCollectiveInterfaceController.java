@@ -48,6 +48,7 @@ public abstract class AbstractCollectiveInterfaceController
     /**
      * called after creation of all controllers and interfaces
      */
+    @Override
     public abstract void init();
 
     public AbstractCollectiveInterfaceController(Component owner) {

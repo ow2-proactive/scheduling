@@ -91,6 +91,7 @@ public class OutputInterceptorClassGenerator
         return generated;
     }
 
+    @Override
     public ProActiveInterface generateInterface(final String interfaceName,
         Component owner, ProActiveInterfaceType interfaceType,
         boolean isInternal, boolean isFunctionalInterface)

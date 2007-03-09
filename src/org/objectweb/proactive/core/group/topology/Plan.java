@@ -74,6 +74,7 @@ public class Plan extends Line { // implements Topology2D {
      * Return the size of the lines
      * @return the size of the the lines
      */
+    @Override
     public int getWidth() {
         return this.width;
     }
@@ -109,6 +110,7 @@ public class Plan extends Line { // implements Topology2D {
      * @param o - the specified object
      * @return the object at the left of <code>o<code>. If there is no object at the left of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object left(Object o) {
         int pos = this.indexOf(o);
         if ((pos % this.getWidth()) == 0) {
@@ -123,6 +125,7 @@ public class Plan extends Line { // implements Topology2D {
      * @param o - the object
      * @return the position (in X) of the object in the Plan
      */
+    @Override
     public int getX(Object o) {
         return this.indexOf(o) % this.getWidth();
     }
@@ -141,6 +144,7 @@ public class Plan extends Line { // implements Topology2D {
      * @param o - the specified object
      * @return the object at the right of <code>o<code>. If there is no object at the right of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object right(Object o) {
         int pos = this.indexOf(o);
         if ((pos % this.getWidth()) == (this.getWidth() - 1)) {

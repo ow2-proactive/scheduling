@@ -75,6 +75,7 @@ public class Seq<P, R> implements Skeleton<P, R>, Instruction<P, R> {
         return newtask;
     }
 
+    @Override
     public String toString() {
         return "Seq(" + this.secCode.getClass() + ")";
     }

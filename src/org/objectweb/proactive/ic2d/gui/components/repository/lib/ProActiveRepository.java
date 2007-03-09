@@ -40,6 +40,7 @@ import org.objectweb.fractal.gui.repository.lib.BasicRepository;
  *
  */
 public class ProActiveRepository extends BasicRepository {
+    @Override
     public String storeComponent(final Component component,
         final GraphModel graph, final Object hints) throws Exception {
         ProActiveAdlWriter writer = new ProActiveAdlWriter();

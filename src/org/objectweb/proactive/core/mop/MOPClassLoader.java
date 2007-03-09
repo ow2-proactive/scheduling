@@ -148,10 +148,12 @@ public class MOPClassLoader extends URLClassLoader {
         return new MOPClassLoader(currentClassLoader, urls);
     }
 
+    @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         return super.findClass(name);
     }
 
+    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         return this.loadClass(name, null, null, false);
     }

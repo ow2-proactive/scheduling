@@ -385,6 +385,7 @@ public class HierarchicalTimer implements Serializable {
      *
      * @return The description of the current hierarchical timer.
      */
+    @Override
     public String toString() {
         String result = "";
         int i;

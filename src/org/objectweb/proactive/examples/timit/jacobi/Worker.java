@@ -578,6 +578,7 @@ public class Worker extends Timed implements java.io.Serializable {
      *
      * @return The description of this worker
      */
+    @Override
     public String toString() {
         return " Worker " + this.id + " at iter " + this.iteration;
     }

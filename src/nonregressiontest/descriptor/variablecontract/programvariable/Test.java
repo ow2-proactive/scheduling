@@ -54,6 +54,7 @@ public class Test extends FunctionalTest {
 				"Tests conditions for variables of type ProgramVariable");
 	}
 
+	@Override
 	public boolean postConditions() throws Exception {
 
 		VariableContract variableContract=pad.getVariableContract();
@@ -70,12 +71,14 @@ public class Test extends FunctionalTest {
 				variableContract.checkContract();
 	}
 
+	@Override
 	public void initTest() throws Exception {
 		bogusFromDescriptor=true;
 		bogusCheckContract=true;
 		bogusFromProgram=true;
 	}
 	
+	@Override
 	public void endTest() throws Exception {
 		
 		if (pad != null) {
@@ -83,6 +86,7 @@ public class Test extends FunctionalTest {
 		}
 	}
 
+	@Override
 	public void action() throws Exception {
 		
 		VariableContract variableContract= new VariableContract();

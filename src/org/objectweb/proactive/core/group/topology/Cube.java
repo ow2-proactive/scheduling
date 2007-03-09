@@ -65,6 +65,7 @@ public class Cube extends Plan { // implements Topology3D {
      * Returns the width of the three-dimensional topology group (number of cloumns)
      * @return the width of the three-dimensional topology group
      */
+    @Override
     public int getWidth() {
         return this.width;
     }
@@ -73,6 +74,7 @@ public class Cube extends Plan { // implements Topology3D {
      * Returns the height of the three-dimensional topology group (number of lines)
      * @return the height of the three-dimensional topology group
      */
+    @Override
     public int getHeight() {
         return this.height;
     }
@@ -117,6 +119,7 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the left of <code>o<code>. If there is no object at the left of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object left(Object o) {
         int position = this.indexOf(o);
         int positionX = this.getX(position);
@@ -132,6 +135,7 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the right of <code>o<code>. If there is no object at the right of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object right(Object o) {
         int position = this.indexOf(o);
         int positionX = this.getX(position);
@@ -147,6 +151,7 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the up of <code>o<code>. If there is no object at the up of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object up(Object o) {
         int position = this.indexOf(o);
         int positionY = this.getY(position);
@@ -162,6 +167,7 @@ public class Cube extends Plan { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the down of <code>o<code>. If there is no object at the down of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object down(Object o) {
         int position = this.indexOf(o);
         int positionY = this.getY(position);

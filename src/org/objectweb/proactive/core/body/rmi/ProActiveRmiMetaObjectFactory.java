@@ -47,6 +47,7 @@ public class ProActiveRmiMetaObjectFactory extends ProActiveMetaObjectFactory
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
+    @Override
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
         return new RemoteRmiBodyFactoryImpl();
     }

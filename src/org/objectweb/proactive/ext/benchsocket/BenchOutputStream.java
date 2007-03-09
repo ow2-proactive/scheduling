@@ -63,6 +63,7 @@ public class BenchOutputStream extends OutputStream implements BenchStream {
         this.parent = parent;
     }
 
+    @Override
     public void write(int b) throws IOException {
         if (BenchSocketFactory.measure) {
             total++;
@@ -70,6 +71,7 @@ public class BenchOutputStream extends OutputStream implements BenchStream {
         this.realOutputStream.write(b);
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
         if (BenchSocketFactory.measure) {
             total += len;
@@ -78,6 +80,7 @@ public class BenchOutputStream extends OutputStream implements BenchStream {
         this.realOutputStream.write(b, off, len);
     }
 
+    @Override
     public void write(byte[] b) throws IOException {
         if (BenchSocketFactory.measure) {
             total += b.length;
@@ -103,6 +106,7 @@ public class BenchOutputStream extends OutputStream implements BenchStream {
         }
     }
 
+    @Override
     public void close() throws IOException {
         //	if (ShutdownThread.removeStream(this)){
         if (this.realOutputStream != null) {

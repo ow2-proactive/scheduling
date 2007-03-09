@@ -77,6 +77,7 @@ public class ProActiveDialogModelImpl extends BasicDialogModel
     /**
      *
      */
+    @Override
     public void rootComponentChanged(Component arg0) {
         super.rootComponentChanged(arg0);
         final Component root = configuration.getRootComponent();

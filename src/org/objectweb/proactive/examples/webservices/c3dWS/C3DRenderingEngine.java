@@ -422,6 +422,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
      * Destructor
      * @exception Throwable exception requested by RMI
      */
+    @Override
     protected void finalize() throws Throwable {
         //System.out.println("Engine halted and released");
         super.finalize();

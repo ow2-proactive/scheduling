@@ -44,15 +44,18 @@ public class SAXParserErrorHandler extends DefaultHandler {
     public SAXParserErrorHandler() {
     }
 
+    @Override
     public void warning(SAXParseException ex) throws SAXException {
         logger.warn("WARNING: " + ex.getMessage());
     }
 
+    @Override
     public void error(SAXParseException ex) throws SAXException {
         logger.error("ERROR: " + ex.getSystemId() + " Line:" +
             ex.getLineNumber() + " Message:" + ex.getMessage());
     }
 
+    @Override
     public void fatalError(SAXParseException ex) throws SAXException {
         logger.fatal("FATAL ERROR: " + ex.getMessage());
     }

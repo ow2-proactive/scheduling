@@ -45,10 +45,12 @@ public class MonitoredJVM extends BasicMonitoredObject {
     private int depth;
     private int port;
 
+    @Override
     protected int incLastID() {
         return ++lastID;
     }
 
+    @Override
     protected Map getPrettyNames() {
         return prettyNames;
     }
@@ -75,6 +77,7 @@ public class MonitoredJVM extends BasicMonitoredObject {
         this.port = UrlBuilder.getPortFromUrl(url);
     }
 
+    @Override
     public void copyInto(BasicMonitoredObject o) {
         super.copyInto(o);
         MonitoredJVM jvmObject = (MonitoredJVM) o;

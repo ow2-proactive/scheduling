@@ -88,6 +88,7 @@ public class RepresentativeInterfaceClassGenerator
         }
     }
 
+    @Override
     public ProActiveInterface generateInterface(final String interfaceName,
         Component owner, ProActiveInterfaceType interfaceType,
         boolean isInternal, boolean isFunctionalInterface)

@@ -39,10 +39,12 @@ class EqualButton extends Button {
         super(label);
     }
 
+    @Override
     public Dimension getPreferredSize() {
         return new Dimension(80, super.getPreferredSize().height);
     }
 
+    @Override
     public Dimension getMinimumSize() {
         return new Dimension(80, super.getMinimumSize().height);
     }

@@ -51,7 +51,8 @@ public class Test extends FunctionalTest {
         super("barrier", "perform a barrier call on an SPMD group");
     }
 
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -68,11 +69,13 @@ public class Test extends FunctionalTest {
         (ProActiveGroup.size(this.spmdgroup) == 3));
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.spmdgroup.start();
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         String errors = "";
         Iterator it = ProActiveGroup.getGroup(this.spmdgroup).iterator();
         while (it.hasNext()) {
@@ -82,11 +85,13 @@ public class Test extends FunctionalTest {
         return "".equals(errors);
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // nothing to do : ProActive methods can not be used here
     }
 }

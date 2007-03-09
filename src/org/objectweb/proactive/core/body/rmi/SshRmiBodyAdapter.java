@@ -64,6 +64,7 @@ public class SshRmiBodyAdapter extends RmiBodyAdapter {
         }
     }
 
+    @Override
     public UniversalBody lookup(String url) throws java.io.IOException {
         String host;
         try {

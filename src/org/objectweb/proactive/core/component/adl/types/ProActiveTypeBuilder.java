@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * @author Matthieu Morel
  */
 public class ProActiveTypeBuilder extends FractalTypeBuilder {
+    @Override
     public Object createInterfaceType(final String name,
         final String signature, final String role, final String contingency,
         final String cardinality, final Object context)

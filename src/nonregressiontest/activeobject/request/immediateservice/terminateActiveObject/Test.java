@@ -42,19 +42,23 @@ public class Test extends FunctionalTest {
             "Test immediate termination of an active object");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         b = (B) ProActive.newActive(B.class.getName(), new Object[] { "blue" });
         b.changeColor("red");
         ProActive.terminateActiveObject(b, true);
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
     }
 
-    public boolean postConditions() {
+    @Override
+	public boolean postConditions() {
         try {
             b.getColor();
         } catch (Exception e) {

@@ -1241,10 +1241,12 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             }
         }
 
+        @Override
         public void paint(Graphics g) {
             update(g);
         }
 
+        @Override
         public void update(Graphics g) {
             i_top = this.getInsets().top;
             g.setColor(Color.gray);
@@ -1257,11 +1259,13 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
          * AWT 1.1 event handling for window events
          */
         class MyWindowListener extends WindowAdapter implements java.io.Serializable {
+            @Override
             public void windowClosing(WindowEvent e) {
                 setVisible(false);
                 exit();
             }
 
+            @Override
             public void windowOpened(WindowEvent e) {
                 if (b_isBot) {
                     s_username = "Benchmarking bot";
@@ -1380,10 +1384,12 @@ class MyImageContainer extends Canvas implements java.io.Serializable {
         insets = p.getInsets();
     }
 
+    @Override
     public void paint(Graphics g) {
         g.drawImage(scaled_img, insets.left, insets.top, this);
     }
 
+    @Override
     public Dimension getPreferredSize() {
         insets = p.getInsets();
 
@@ -1391,6 +1397,7 @@ class MyImageContainer extends Canvas implements java.io.Serializable {
             minheight + insets.left + insets.right);
     }
 
+    @Override
     public Dimension getMinimumSize() {
         insets = p.getInsets();
 
@@ -1398,6 +1405,7 @@ class MyImageContainer extends Canvas implements java.io.Serializable {
             minheight + insets.left + insets.right);
     }
 
+    @Override
     public void validate() {
         insets = p.getInsets();
 

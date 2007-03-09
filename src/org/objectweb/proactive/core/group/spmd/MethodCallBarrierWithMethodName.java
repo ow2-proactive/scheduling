@@ -51,6 +51,7 @@ public class MethodCallBarrierWithMethodName extends MethodCallControlForGroup {
      * Returns the name of the method call
      * @return "MethodCallBarrierWithMethodName"
      */
+    @Override
     public String getName() {
         return "MethodCallBarrierWithMethodName";
     }

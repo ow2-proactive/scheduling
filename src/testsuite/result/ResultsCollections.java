@@ -113,7 +113,8 @@ public class ResultsCollections implements ResultsExporter {
     /**
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String res = "";
         Iterator it = iterator();
         if (verbatim) {

@@ -49,6 +49,7 @@ public class WelcomeDialog extends JDialog {
         logo = Toolkit.getDefaultToolkit()
                       .getImage(getClass().getResource("img/logo.jpg"));
         panelLogo = new JPanel() {
+                    @Override
                     public void paintComponent(Graphics g) {
                         super.paintComponent(g);
 

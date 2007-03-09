@@ -121,6 +121,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
     /**
      * Signals that the activity of this body, managed by the active thread has just started.
      */
+    @Override
     protected void activityStarted() {
         super.activityStarted();
 

@@ -104,6 +104,7 @@ public class MonitoredObjectSet implements Cloneable {
         return first;
     }
 
+    @Override
     public Object clone() {
         MonitoredObjectSet copy = new MonitoredObjectSet(parent);
         copy.addAll(this);

@@ -81,6 +81,7 @@ public class ProActiveEvent extends java.util.EventObject implements java.io.Ser
         return type;
     }
 
+    @Override
     public String toString() {
         return "ProActiveEvent@" + timeStamp + " type=" + type;
     }

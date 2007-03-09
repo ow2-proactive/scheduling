@@ -248,6 +248,7 @@ public class LinkedVirtualNode {
         return isLeaf;
     }
 
+    @Override
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         if (composer == this) {

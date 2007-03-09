@@ -183,6 +183,7 @@ public class NodePanel extends AbstractDataObjectPanel
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     public AbstractDataObject getAbstractDataObject() {
         return nodeObject;
     }
@@ -191,6 +192,7 @@ public class NodePanel extends AbstractDataObjectPanel
         return (ActiveObjectPanel) getChild(activeObject);
     }
 
+    @Override
     protected Object[][] getDataObjectInfo() {
         return new Object[][] {
             { "Url", name },
@@ -198,6 +200,7 @@ public class NodePanel extends AbstractDataObjectPanel
         };
     }
 
+    @Override
     protected void setFontSize(java.awt.Font font) {
         super.setFontSize(font);
         currentTitledBorder.setTitleFont(font);
@@ -253,6 +256,7 @@ public class NodePanel extends AbstractDataObjectPanel
          * On the other hand it is the responsability of this method to call the acceptDrop and dropComplete
          * when accepting the drop and returning true
          */
+        @Override
         protected boolean processDrop(java.awt.dnd.DropTargetDropEvent event,
             UniqueID uniqueID) {
             // check if not the same node
@@ -291,6 +295,7 @@ public class NodePanel extends AbstractDataObjectPanel
         /**
          * Displays a user feed back to show that the drag is going on
          */
+        @Override
         protected void showDragFeedBack() {
             showBorder(ACCEPT_LINE_BORDER);
         }
@@ -298,6 +303,7 @@ public class NodePanel extends AbstractDataObjectPanel
         /**
          * Displays a user feed back to show that the drop is going on
          */
+        @Override
         protected void showDropFeedBack() {
             showBorder(ACCEPTED_LINE_BORDER);
         }
@@ -305,6 +311,7 @@ public class NodePanel extends AbstractDataObjectPanel
         /**
          * Removes the user feed back that shows the drag
          */
+        @Override
         protected void hideDnDFeedBack() {
             showBorder(STANDARD_LINE_BORDER);
         }

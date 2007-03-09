@@ -67,6 +67,7 @@ public class HttpReply extends HttpMessage implements Serializable {
         return 0; // or throws an exception ...
     }
 
+    @Override
     public Object processMessage() {
         try {
             Body body = HttpUtils.getBody(idBody);

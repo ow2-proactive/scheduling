@@ -433,6 +433,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         " is invalid: " + e);
         }*/}
 
+    @Override
     protected void finalize() {
         MethodCall.setMethodCall(this);
     }
@@ -771,6 +772,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 encapsulated);
         }
 
+        @Override
         public String toString() {
             return "FixWrapper: " + encapsulated.toString();
         }

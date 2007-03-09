@@ -75,7 +75,8 @@ public class Test extends ComponentTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
 //        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
 //            throw new Exception("automatic continuations are not set");
 //        }
@@ -120,19 +121,22 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
 //        Launcher.killNodes(false);
         Registry.instance().clear();
         deploymentDescriptor.killall(false);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         //        		System.out.println("\nMESSAGE IS : ");
         //        		System.out.println("-------------------------------------------------");
         //        		message.printToStream(System.out);

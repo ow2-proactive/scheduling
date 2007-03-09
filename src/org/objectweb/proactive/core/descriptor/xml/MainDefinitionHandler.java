@@ -67,6 +67,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
             new MapToVirtualNodeHandler(proActiveDescriptor));
     }
 
+    @Override
     public void startContextElement(String name, Attributes attributes)
         throws org.xml.sax.SAXException {
         String id = attributes.getValue("id");
@@ -83,6 +84,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
         proActiveDescriptor.mainDefinitionSetMainClass(className);
     }
 
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         if (name.equals(ARG_TAG)) {
@@ -113,6 +115,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
             this.proActiveDescriptor = proActiveDescriptor;
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String arg = attributes.getValue("value");
@@ -134,6 +137,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
             this.proActiveDescriptor = proActiveDescriptor;
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String virtualNode = attributes.getValue("value");

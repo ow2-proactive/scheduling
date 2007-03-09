@@ -56,6 +56,7 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
         addHandler(FILE_TRANSFER_TAG, new FileTransferHandler());
     }
 
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
     }
@@ -73,6 +74,7 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
             fileTransfer = null;
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws SAXException {
             String fileTransferId = attributes.getValue("id");
@@ -96,12 +98,14 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
             fileTransfer = proActiveDescriptor.getFileTransfer(fileTransferId);
         }
 
+        @Override
         public Object getResultObject() throws SAXException {
             return fileTransfer; //not really used for now
         }
 
         public class FileHandler extends BasicUnmarshaller
             implements ProActiveDescriptorConstants {
+            @Override
             public void startContextElement(String name, Attributes attributes)
                 throws SAXException {
                 String source = attributes.getValue("src");
@@ -123,6 +127,7 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
 
         public class DirHandler extends BasicUnmarshaller
             implements ProActiveDescriptorConstants {
+            @Override
             public void startContextElement(String name, Attributes attributes)
                 throws SAXException {
                 String source = attributes.getValue("src");

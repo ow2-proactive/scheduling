@@ -49,6 +49,7 @@ final public class Ray implements java.io.Serializable {
         return new Vec(P.x + (D.x * t), P.y + (D.y * t), P.z + (D.z * t));
     }
 
+    @Override
     public String toString() {
         return "{" + P.toString() + " -> " + D.toString() + "}";
     }

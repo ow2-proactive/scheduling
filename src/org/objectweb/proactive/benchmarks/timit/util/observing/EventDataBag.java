@@ -95,6 +95,7 @@ public class EventDataBag implements java.io.Serializable {
         return new EventStatistics(counterName, value, this.size(), this);
     }
 
+    @Override
     public String toString() {
         String res = "";
         for (int i = 0; i < this.bag.size(); i++) {

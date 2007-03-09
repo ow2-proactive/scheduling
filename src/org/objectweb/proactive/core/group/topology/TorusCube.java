@@ -65,6 +65,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * Returns the width of the three-dimensional topology group (number of cloumns)
      * @return the width of the three-dimensional topology group
      */
+    @Override
     public int getWidth() {
         return this.width;
     }
@@ -73,6 +74,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * Returns the height of the three-dimensional topology group (number of Rings)
      * @return the height of the three-dimensional topology group
      */
+    @Override
     public int getHeight() {
         return this.height;
     }
@@ -117,6 +119,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the left of <code>o<code>. If there is no object at the left of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object left(Object o) {
         int positionX = this.getX(this.indexOf(o));
         if (positionX != 0) {
@@ -131,6 +134,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the right of <code>o<code>. If there is no object at the right of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object right(Object o) {
         int positionX = this.getX(this.indexOf(o));
         if (positionX != this.getWidth()) {
@@ -145,6 +149,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the up of <code>o<code>. If there is no object at the up of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object up(Object o) {
         int positionY = this.getY(this.indexOf(o));
         if (positionY != 0) {
@@ -159,6 +164,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * @param o - the specified object
      * @return the object at the down of <code>o<code>. If there is no object at the down of <code>o</code>, return <code>null</code>
      */
+    @Override
     public Object down(Object o) {
         int positionY = this.getY(this.indexOf(o));
         if (positionY != this.getHeight()) {

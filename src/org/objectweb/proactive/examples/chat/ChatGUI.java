@@ -127,11 +127,13 @@ public class ChatGUI extends JFrame {
 
         addWindowListener(new WindowAdapter() {
                 // Focus on the edit message field
+                @Override
                 public void windowOpened(WindowEvent e) {
                     message.requestFocus();
                 }
 
                 // Pop a windows to confirm the close of the application
+                @Override
                 public void windowClosing(WindowEvent e) {
                     int reponse = JOptionPane.showConfirmDialog(ChatGUI.this,
                             "Are you sure you want to quit ?", "Quit the chat",

@@ -138,6 +138,7 @@ public class VMObject extends AbstractDataObject {
     //
     // -- PUBLIC METHOD -----------------------------------------------
     //
+    @Override
     public String toString() {
         return "VM id=" + vmid + "\n" + super.toString();
     }
@@ -272,6 +273,7 @@ public class VMObject extends AbstractDataObject {
         return baseNode.getProActiveRuntime().getURL();
     }
 
+    @Override
     public void destroyObject() {
         getTypedParent().removeVMObject(vmid);
     }
@@ -312,6 +314,7 @@ public class VMObject extends AbstractDataObject {
         objectNodeMap.remove(id);
     }
 
+    @Override
     protected synchronized boolean destroy() {
         if (super.destroy()) {
             try {
@@ -331,6 +334,7 @@ public class VMObject extends AbstractDataObject {
         }
     }
 
+    @Override
     protected void monitoringMessageEventChanged(ActiveObject object,
         boolean value) {
         try {

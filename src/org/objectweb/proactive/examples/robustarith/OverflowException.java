@@ -50,6 +50,7 @@ public class OverflowException extends Exception {
         this.b = b;
     }
 
+    @Override
     public String toString() {
         return "Overflow in " + a + " " + op + " " + b;
     }

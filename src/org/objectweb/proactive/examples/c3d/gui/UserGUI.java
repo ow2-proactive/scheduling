@@ -102,6 +102,7 @@ public class UserGUI implements ActionListener {
 
         this.c3dUser = c3dUser;
         mainFrame.addWindowListener(new WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent e) {
                     c3dUser.terminate();
                     trash();

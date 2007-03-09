@@ -43,6 +43,7 @@ public class Workout implements Serializable {
         muscleWorkout = new HashMap<Class, Exercise>(initHashSize);
     }
 
+    @Override
     public String toString() {
         String workout = "Workout: ";
         java.util.Iterator<Class> it = muscleWorkout.keySet().iterator();

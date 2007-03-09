@@ -143,6 +143,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof ProActiveRuntimeAdapterForwarderImpl)) {
             return false;
@@ -153,6 +154,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
         return this.urid.equals(runtime.urid);
     }
 
+    @Override
     public int hashCode() {
         return urid.hashCode();
     }

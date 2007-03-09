@@ -124,6 +124,7 @@ public class PlayerFrameTimeLine extends javax.swing.JFrame {
         setContentPane(c);
         //this.show();
         addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     setVisible(!isVisible());
                 }

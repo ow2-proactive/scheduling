@@ -173,11 +173,13 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     //
     // --- OVERIDING SOME METHODS
     //
+    @Override
     public void setParent(ProActiveRuntime parentPARuntime) {
         this.parentRuntime = parentPARuntime;
         super.setParent(parentPARuntime);
     }
 
+    @Override
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) {
@@ -214,6 +216,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         return padURL + "??" + vmName;
     }
 
+    @Override
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
         String padURL) throws ProActiveException {

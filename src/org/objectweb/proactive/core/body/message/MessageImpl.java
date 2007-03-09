@@ -95,6 +95,7 @@ public class MessageImpl implements Message, java.io.Serializable {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("method=").append(methodName).append(", ");

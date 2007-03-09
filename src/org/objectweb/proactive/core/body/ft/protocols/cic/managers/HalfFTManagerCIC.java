@@ -69,6 +69,7 @@ public class HalfFTManagerCIC extends FTManager {
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#init(org.objectweb.proactive.core.body.AbstractBody)
      */
+    @Override
     public int init(AbstractBody owner) throws ProActiveException {
         //super.init(owner);
         // a half body need only a location server...
@@ -104,25 +105,30 @@ public class HalfFTManagerCIC extends FTManager {
         return 0;
     }
 
+    @Override
     public int onReceiveReply(Reply reply) {
         reply.setFTManager(this);
         return 0;
     }
 
+    @Override
     public int onDeliverReply(Reply reply) {
         return FTManager.NON_FT;
     }
 
+    @Override
     public int onSendRequestBefore(Request request) {
         request.setMessageInfo(this.forSentMessage);
         return 0;
     }
 
+    @Override
     public int onSendReplyBefore(Reply reply) {
         reply.setMessageInfo(this.forSentMessage);
         return 0;
     }
 
+    @Override
     public int onSendRequestAfter(Request request, int rdvValue,
         UniversalBody destination) throws RenegotiateSessionException {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
@@ -141,6 +147,7 @@ public class HalfFTManagerCIC extends FTManager {
         return 0;
     }
 
+    @Override
     public synchronized int onSendReplyAfter(Reply reply, int rdvValue,
         UniversalBody destination) {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
@@ -159,22 +166,27 @@ public class HalfFTManagerCIC extends FTManager {
     ////////////////////////
     // UNCALLABLE METHODS //
     ////////////////////////
+    @Override
     public int onReceiveRequest(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int onDeliverRequest(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int onServeRequestBefore(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int onServeRequestAfter(Request request) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
@@ -183,6 +195,7 @@ public class HalfFTManagerCIC extends FTManager {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    @Override
     public Object handleFTMessage(FTMessage fte) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }

@@ -53,6 +53,7 @@ public class TimedRequestWithMixedLocation
         super(methodCall, sender, isOneWay, nextSequenceID, server);
     }
 
+    @Override
     protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException {
         System.out.println("RequestWithMixedLocation: sending to universal " +
@@ -70,6 +71,7 @@ public class TimedRequestWithMixedLocation
     /**
      * Implements the backup solution
      */
+    @Override
     protected void backupSolution(UniversalBody destinationBody)
         throws java.io.IOException {
         boolean ok = false;

@@ -78,6 +78,7 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
     }
 
     /* Called by AppletWrapper before creating the toplevel Frame: */
+    @Override
     protected void start() {
     }
 
@@ -89,6 +90,7 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
      * abstract method of AppletWrapper.
      * result: the JPanel to be inserted in the upper part of the Main Frame.
      */
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         // Get the images
         javax.swing.Icon[] imgArray = new javax.swing.Icon[5];

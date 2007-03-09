@@ -54,7 +54,8 @@ public class Test extends FunctionalTest {
             "add and remove member in a group to see the threadpool vary");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         Group g = ProActiveGroup.getGroup(this.typedGroup);
 
         this.typedGroup.onewayCall();
@@ -72,7 +73,8 @@ public class Test extends FunctionalTest {
         this.typedGroup.onewayCall();
     }
 
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -88,11 +90,13 @@ public class Test extends FunctionalTest {
         return (this.typedGroup != null);
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // nothing to do : ProActive methods can not be used here
     }
 }

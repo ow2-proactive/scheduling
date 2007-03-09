@@ -67,6 +67,7 @@ public class ClassServerServlet extends HttpServlet {
         return port;
     }
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         //        try { 
         //        System.out.println(
@@ -85,6 +86,7 @@ public class ClassServerServlet extends HttpServlet {
         //        }
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             this.request = request;

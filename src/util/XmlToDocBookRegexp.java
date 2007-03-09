@@ -64,7 +64,8 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
 
     /** Add tags around xml constructs in the given string
      * @return the initial string with xml tags highlighting parts of it */
-    protected String decorate(String xmlString) {
+    @Override
+	protected String decorate(String xmlString) {
         String result = xmlString; // the returned highlighted string
 
         if (this.docBookTag != null) {
@@ -131,7 +132,8 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
     }
 
     /** Put all fields back to inital value */
-    protected void reset() {
+    @Override
+	protected void reset() {
         this.inComment = false;
         this.docBookTag = null;
     }

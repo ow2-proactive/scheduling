@@ -65,6 +65,7 @@ public class VariableContract implements Serializable {
         public VariableContractType type;
         public String setFrom; //Descriptor, Program
 
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
 
@@ -445,6 +446,7 @@ public class VariableContract implements Serializable {
         return retval;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 

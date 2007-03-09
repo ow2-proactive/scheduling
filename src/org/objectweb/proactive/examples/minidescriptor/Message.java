@@ -57,6 +57,7 @@ public class Message implements Serializable {
     /**
      * Returns the String corresponding to the Message
      */
+    @Override
     public String toString() {
         return s;
     }

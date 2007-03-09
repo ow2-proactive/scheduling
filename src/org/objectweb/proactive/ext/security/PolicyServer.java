@@ -315,6 +315,7 @@ public class PolicyServer implements Serializable, Cloneable {
         }
     }
 
+    @Override
     public String toString() {
         String s = null;
         s = "ApplicationName : " + applicationName + "\nfile: " +
@@ -439,6 +440,7 @@ public class PolicyServer implements Serializable, Cloneable {
         return applicationName;
     }
 
+    @Override
     public Object clone() throws CloneNotSupportedException {
         PolicyServer clone = null;
 

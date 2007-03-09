@@ -144,6 +144,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
         return ((immediateNFReqNumber == 0) && (priorityNFReqNumber == 0));
     }
 
+    @Override
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer("NFRequests Queue : ");
         sb.append("--- NonFunctionalRequestQueue n=")

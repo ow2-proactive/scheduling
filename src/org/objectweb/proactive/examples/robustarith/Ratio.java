@@ -73,6 +73,7 @@ public class Ratio implements Serializable {
         this.denum = denum;
     }
 
+    @Override
     public String toString() {
         return num + " / " + denum;
     }

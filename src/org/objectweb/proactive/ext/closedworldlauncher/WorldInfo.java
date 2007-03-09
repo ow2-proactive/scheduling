@@ -86,6 +86,7 @@ public class WorldInfo {
         return tmp.toArray(new String[] { "" });
     }
 
+    @Override
     public String toString() {
         StringBuffer tmp = new StringBuffer();
         tmp.append(TOTAL_HOSTS_NUMBER_PROPERTY).append(" = ")

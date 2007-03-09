@@ -493,6 +493,7 @@ public class TimIt {
             }
         }
 
+        @Override
         public void run() {
             try {
                 synchronized (this) {

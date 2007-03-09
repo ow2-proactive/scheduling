@@ -133,6 +133,7 @@ public class SimpleExternalProcess extends AbstractExternalProcess {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String buildCommand() {
         return targetCommand;
     }

@@ -53,6 +53,7 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
         this.name = name;
     }
 
+    @Override
     public void stop() {
         if (running) {
             timer.stop();
@@ -113,12 +114,14 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
         return Math.sqrt(this.getVariance());
     }
 
+    @Override
     public void reset() {
         super.reset();
         this.memory = new long[10];
         this.position = 0;
     }
 
+    @Override
     public void dump() {
         System.out.println("Dumping memory");
         for (int i = 0; i < this.position; i++) {

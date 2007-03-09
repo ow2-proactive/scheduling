@@ -60,6 +60,7 @@ public class ComponentParametersControllerImpl
         super(owner);
     }
 
+    @Override
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()

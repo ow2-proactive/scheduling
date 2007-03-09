@@ -74,6 +74,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame 
         new HelloApplet("Hello applet", 300, 200, nodeURL);
     }
 
+    @Override
     public void start() {
         receiveMessage("Applet creating active objects");
         receiveMessage("on node " +
@@ -99,6 +100,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame 
         lMessage.setText("Applet stopped");
     }
 
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         javax.swing.JPanel rootPanel = new javax.swing.JPanel();
 

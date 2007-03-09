@@ -53,19 +53,23 @@ public class Test extends FunctionalTest {
             "do a oneway call on a previously created group");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         this.typedGroup.onewayCall();
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         // nothing to do : ProActive methods can not be used here
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         boolean allOnewayCallDone = true;
         Group group = ProActiveGroup.getGroup(this.typedGroup);
         Iterator it = group.iterator();
@@ -75,7 +79,8 @@ public class Test extends FunctionalTest {
         return allOnewayCallDone;
     }
 
-    public boolean preConditions() throws Exception {
+    @Override
+	public boolean preConditions() throws Exception {
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },

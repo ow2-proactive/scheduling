@@ -70,6 +70,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("ConstructorCallImpl\n");

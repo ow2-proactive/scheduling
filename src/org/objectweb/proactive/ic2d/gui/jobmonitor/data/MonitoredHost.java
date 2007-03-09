@@ -40,14 +40,17 @@ public class MonitoredHost extends BasicMonitoredObject {
     private int port;
     private String monitorProtocol;
 
+    @Override
     protected int incLastID() {
         return ++lastID;
     }
 
+    @Override
     protected Map getPrettyNames() {
         return prettyNames;
     }
 
+    @Override
     public void copyInto(BasicMonitoredObject o) {
         super.copyInto(o);
         MonitoredHost hostObject = (MonitoredHost) o;

@@ -94,6 +94,7 @@ public class Cube implements Serializable {
     }
 
     /** For displaying a Point3D */
+    @Override
     public String toString() {
         return "x=" + x + " y=" + y + " y=" + y + " width=" + width +
         " height=" + height + " depth=" + depth;

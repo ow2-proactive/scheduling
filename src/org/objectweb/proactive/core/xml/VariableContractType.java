@@ -83,6 +83,7 @@ public class VariableContractType {
         this.setEmptyAbility = setEmptyAbility;
     }
 
+    @Override
     public boolean equals(Object o) {
         return equals((VariableContractType) o);
     }
@@ -91,6 +92,7 @@ public class VariableContractType {
         return this.type == b.type;
     }
 
+    @Override
     public String toString() {
         if (type == 0) {
             return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG;

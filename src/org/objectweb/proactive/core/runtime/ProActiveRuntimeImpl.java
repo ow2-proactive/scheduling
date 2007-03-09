@@ -1252,6 +1252,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             launchMain = true;
         }
 
+        @Override
         public void run() {
             if (launchMain) {
                 try {

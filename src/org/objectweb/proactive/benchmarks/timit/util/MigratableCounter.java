@@ -64,6 +64,7 @@ public class MigratableCounter extends TimerCounter {
     /**
      * Used by the Timer to know if a counter can be migrated
      */
+    @Override
     public boolean isMigratable() {
         return true;
     }
@@ -82,6 +83,7 @@ public class MigratableCounter extends TimerCounter {
     /**
      * Start the counter (perform a distant method call)
      */
+    @Override
     public void start() {
         this.latency = System.currentTimeMillis();
         this.elapsed = this.netclock.getCurrentTimeMillis(); // ask time to
@@ -95,6 +97,7 @@ public class MigratableCounter extends TimerCounter {
     /**
      * Stop the counter (perform a distant method call)
      */
+    @Override
     public void stop() {
         this.latency = System.currentTimeMillis();
         this.elapsed = this.netclock.getCurrentTimeMillis() - this.elapsed;

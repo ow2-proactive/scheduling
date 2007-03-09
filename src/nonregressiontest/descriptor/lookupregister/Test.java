@@ -63,7 +63,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         proActiveDescriptorAgent = ProActive.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
@@ -78,17 +79,20 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         proActiveDescriptorAgent.killall(false);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return (a.getName().equals("local"));
     }
 

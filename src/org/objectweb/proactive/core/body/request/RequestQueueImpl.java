@@ -262,6 +262,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         }
     }
 
+    @Override
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("--- RequestQueueImpl n=").append(requestQueue.size())
@@ -291,6 +292,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void notifyOneListener(ProActiveListener listener,
         ProActiveEvent event) {
         ((RequestQueueEventListener) listener).requestQueueModified((RequestQueueEvent) event);

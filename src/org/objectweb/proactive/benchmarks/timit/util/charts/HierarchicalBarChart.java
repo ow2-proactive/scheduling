@@ -243,6 +243,7 @@ public class HierarchicalBarChart implements Chart {
             this.value += value;
         }
 
+        @Override
         public String toString() {
             return "[" + this.name + "=" + this.value + "]";
         }

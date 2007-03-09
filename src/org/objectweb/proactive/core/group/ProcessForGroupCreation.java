@@ -68,6 +68,7 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
         }
     }
 
+    @Override
     public int getMemberListSize() {
         return 1;
     }

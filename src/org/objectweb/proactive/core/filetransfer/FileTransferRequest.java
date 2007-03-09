@@ -105,6 +105,7 @@ public class FileTransferRequest implements Serializable {
         this.operationFuture = futureDstFile;
     }
 
+    @Override
     public boolean equals(Object o) {
         FileTransferRequest ftr = (FileTransferRequest) o;
         return getDstFile().equals(ftr.getDstFile()) &&
@@ -119,6 +120,7 @@ public class FileTransferRequest implements Serializable {
         this.sourceFTS = sourceFTS;
     }
 
+    @Override
     public String toString() {
         return getSrcFile().getAbsolutePath() + "->" +
         getDstFile().getAbsolutePath();

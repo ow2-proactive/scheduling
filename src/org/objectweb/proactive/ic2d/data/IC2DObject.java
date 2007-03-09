@@ -80,6 +80,7 @@ public class IC2DObject extends AbstractDataObject {
         return worldObject;
     }
 
+    @Override
     public void destroyObject() {
         worldObject.destroyObject();
     }

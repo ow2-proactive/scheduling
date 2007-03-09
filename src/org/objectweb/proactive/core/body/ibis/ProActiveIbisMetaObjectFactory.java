@@ -91,6 +91,7 @@ public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
         return new RemoteIbisBodyFactoryImpl();
     }

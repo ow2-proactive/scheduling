@@ -61,6 +61,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
         super();
     }
 
+    @Override
     public int receiveRequest(Request r, Body bodyReceiver)
         throws IOException {
         if (r instanceof ComponentRequest) {

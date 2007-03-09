@@ -42,6 +42,7 @@ public class ServerImpl implements Service, ServiceAttributes {
 
     public void print(final String msg) {
         new Exception() {
+                @Override
                 public String toString() {
                     return "Server: print method called";
                 }

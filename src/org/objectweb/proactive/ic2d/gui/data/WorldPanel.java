@@ -193,6 +193,7 @@ public class WorldPanel extends AbstractDataObjectPanel
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public void paint(java.awt.Graphics g) {
         Dimension dim = getSize();
         int w2 = dim.width;
@@ -332,6 +333,7 @@ public class WorldPanel extends AbstractDataObjectPanel
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     public AbstractDataObject getAbstractDataObject() {
         return worldObject;
     }
@@ -340,10 +342,12 @@ public class WorldPanel extends AbstractDataObjectPanel
         return (HostPanel) getChild(hostObject);
     }
 
+    @Override
     protected Object[][] getDataObjectInfo() {
         return new Object[][] {  };
     }
 
+    @Override
     protected void filterChangeParentNotification(String qname) {
         activeObjectAddedToFilter();
         revalidate();
@@ -402,6 +406,7 @@ public class WorldPanel extends AbstractDataObjectPanel
          * @see java.awt.Container
          * @see java.awt.Container#doLayout
          */
+        @Override
         public void layoutContainer(java.awt.Container target) {
             if (controller.isLayoutAutomatic()) {
                 super.layoutContainer(target);
@@ -429,6 +434,7 @@ public class WorldPanel extends AbstractDataObjectPanel
          * @see #minimumLayoutSize
          * @see java.awt.Container#getPreferredSize
          */
+        @Override
         public java.awt.Dimension preferredLayoutSize(java.awt.Container target) {
             synchronized (target.getTreeLock()) {
                 int maxX = 0;
@@ -466,6 +472,7 @@ public class WorldPanel extends AbstractDataObjectPanel
          * @see java.awt.Container
          * @see java.awt.Container#doLayout
          */
+        @Override
         public java.awt.Dimension minimumLayoutSize(java.awt.Container target) {
             return preferredLayoutSize(target);
         }

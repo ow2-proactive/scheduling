@@ -87,6 +87,7 @@ public class HostObject extends AbstractDataObject {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public String toString() {
         return "Host: " + hostname + "\n" + super.toString();
     }
@@ -221,6 +222,7 @@ public class HostObject extends AbstractDataObject {
         return (VMObject) getChild(id);
     }
 
+    @Override
     public void destroyObject() {
         getTypedParent().removeHostObject(hostname);
     }
@@ -253,6 +255,7 @@ public class HostObject extends AbstractDataObject {
         return (WorldObject) parent;
     }
 
+    @Override
     protected synchronized boolean destroy() {
         // destroy all childs
         if (super.destroy()) {

@@ -101,6 +101,7 @@ public class fractParallel extends Frame {
         super("Parallel fractal image generation with ProActive");
         setResizable(true);
         addWindowListener(new WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent e) {
                     dispose();
                     System.exit(0);
@@ -492,6 +493,7 @@ public class fractParallel extends Frame {
      * @param g: a Graphics Object
      * @return void
      */
+    @Override
     public void paint(Graphics g) {
         this.setResizable(true);
         g.setColor(Color.black);

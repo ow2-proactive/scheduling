@@ -96,6 +96,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     /*
      * @see org.objectweb.proactive.core.component.controller.ProActiveController#getFcItfName()
      */
+    @Override
     public String getFcItfName() {
         return interfaceType.getFcItfName();
     }

@@ -45,6 +45,7 @@ public abstract class Primitive implements java.io.Serializable {
 
     public abstract Isect intersect(Ray ry);
 
+    @Override
     public abstract String toString();
 
     public abstract Vec getCenter();

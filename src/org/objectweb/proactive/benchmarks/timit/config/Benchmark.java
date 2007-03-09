@@ -56,6 +56,7 @@ public class Benchmark extends Tag {
         }
     }
 
+    @Override
     public String get(String name) {
         name = name.toLowerCase();
         String value = super.get(name);

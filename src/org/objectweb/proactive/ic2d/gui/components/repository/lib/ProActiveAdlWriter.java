@@ -52,6 +52,7 @@ import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 public class ProActiveAdlWriter extends FractalAdlWriter {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GUI);
 
+    @Override
     public void saveComponent(final Component c, final AdlNode comp,
         final String name, final boolean internalType, final Map sharing)
         throws Exception {

@@ -102,6 +102,7 @@ public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
     //
     // -- PROTECTED METHODS ------------------------------------------------------
     //
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         Object o = activeHandler.getResultObject();

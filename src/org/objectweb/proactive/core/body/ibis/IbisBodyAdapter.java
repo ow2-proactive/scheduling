@@ -75,6 +75,7 @@ public class IbisBodyAdapter extends BodyAdapterImpl {
      * @param url the url under which the remote body is registered.
      * @exception java.io.IOException if the remote body cannot be registered
      */
+    @Override
     public void register(String url) throws java.io.IOException {
         ibis.rmi.Naming.rebind(url, (IbisRemoteBody) proxiedRemoteBody);
     }
@@ -84,6 +85,7 @@ public class IbisBodyAdapter extends BodyAdapterImpl {
      * @param url the url under which the active object is registered.
      * @exception java.io.IOException if the remote object cannot be removed from the registry
      */
+    @Override
     public void unregister(String url) throws java.io.IOException {
         try {
             ibis.rmi.Naming.unbind(url);
@@ -102,6 +104,7 @@ public class IbisBodyAdapter extends BodyAdapterImpl {
      * @exception java.io.IOException if the remote body cannot be found under the given url
      *      or if the object found is not of type IbisRemoteBody
      */
+    @Override
     public UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;
 

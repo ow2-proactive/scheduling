@@ -42,6 +42,7 @@ public class Row extends Vector implements Serializable, Cloneable {
         super(tab);
     }
 
+    @Override
     public synchronized void display() {
         int j;
 

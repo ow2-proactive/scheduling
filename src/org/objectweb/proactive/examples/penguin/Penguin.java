@@ -87,6 +87,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
         }
     }
 
+    @Override
     public String toString() {
         return this.name;
     }

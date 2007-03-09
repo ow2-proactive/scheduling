@@ -117,6 +117,7 @@ public class MessageEvent extends ProActiveEvent implements Message,
      * Returns a string representation of this event
      * @return a string representation of this event
      */
+    @Override
     public String toString() {
         return "methodName=" + getMethodName() + " sourceID=" +
         getSourceBodyID() + " destinationID=" + getDestinationBodyID() +

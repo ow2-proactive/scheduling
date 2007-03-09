@@ -53,7 +53,8 @@ public class Test extends FunctionalTest {
             "do an (a)synchronous call that rise exception");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -69,14 +70,17 @@ public class Test extends FunctionalTest {
         this.resultTypedGroup = this.typedGroup.asynchronousCallException();
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         // nothing to do
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         // was the result group created ?
         if (this.resultTypedGroup == null) {
             System.err.println(

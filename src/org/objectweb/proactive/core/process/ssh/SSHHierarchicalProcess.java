@@ -62,16 +62,19 @@ public class SSHHierarchicalProcess extends SSHProcess
     }
 
     /** @see org.objectweb.proactive.core.process.UniversalProcess#isHierarchical() */
+    @Override
     public boolean isHierarchical() {
         return true;
     }
 
     /** @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber() */
+    @Override
     public int getNodeNumber() {
         return hierarchicalProcess.getNodeNumber();
     }
 
     /** @see org.objectweb.proactive.core.process.UniversalProcess#startProcess() */
+    @Override
     public void startProcess() throws IOException {
         JVMProcess finalProcess = (JVMProcess) getFinalProcess();
         String bClass = finalProcess.getClassname();

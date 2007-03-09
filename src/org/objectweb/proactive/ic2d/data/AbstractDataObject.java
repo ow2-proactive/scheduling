@@ -83,6 +83,7 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
     //
     // -- PUBLICS METHODS -----------------------------------------------
     //
+    @Override
     public String toString() {
         return "DataObject " + abstractDataObjectName + "\n" +
         childs.toString();

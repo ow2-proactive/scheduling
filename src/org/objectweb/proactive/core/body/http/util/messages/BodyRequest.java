@@ -92,6 +92,7 @@ public class BodyRequest extends ReflectRequest implements Serializable {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
+    @Override
     public Object processMessage() throws Exception {
         Object result = null;
 

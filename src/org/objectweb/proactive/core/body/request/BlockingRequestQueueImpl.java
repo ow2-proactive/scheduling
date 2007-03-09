@@ -79,6 +79,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         return !shouldWait;
     }
 
+    @Override
     public synchronized int add(Request r) {
         int ftres = super.add(r);
         if (logger.isDebugEnabled()) {
@@ -123,6 +124,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         return ftres;
     }
 
+    @Override
     public synchronized int addToFront(Request r) {
         int ftres = super.addToFront(r);
         this.notifyAll();

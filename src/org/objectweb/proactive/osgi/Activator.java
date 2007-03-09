@@ -39,6 +39,7 @@ import org.ungoverned.gravity.servicebinder.GenericActivator;
  * This is the entry point of the proActiveBundle
  */
 public class Activator extends GenericActivator {
+    @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
         context.registerService(org.ungoverned.osgi.service.shell.Command.class.getName(),

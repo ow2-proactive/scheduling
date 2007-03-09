@@ -38,10 +38,12 @@ public class MonitoredVN extends BasicMonitoredObject {
     static protected int lastID = 0;
     static protected Map prettyNames = new HashMap();
 
+    @Override
     protected int incLastID() {
         return ++lastID;
     }
 
+    @Override
     protected Map getPrettyNames() {
         return prettyNames;
     }

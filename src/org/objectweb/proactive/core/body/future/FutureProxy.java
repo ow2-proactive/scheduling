@@ -211,6 +211,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    @Override
     public boolean equals(Object obj) {
         //we test if we have a future object
         if (isFutureObject(obj)) {
@@ -442,6 +443,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void finalize() {
         returnFutureProxy(this);
     }

@@ -124,6 +124,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     //        super.setInputMessageLogger(new CompositeMessageLogger(
     //                new ParserMessageLogger(), inputMessageLogger));
     //    }
+    @Override
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());
@@ -188,6 +189,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.process.UniversalProcess#stopProcess()
      */
+    @Override
     public void stopProcess() {
         //System.out.println("PrunSubProcess.stopProcess()");
         super.stopProcess();
@@ -351,6 +353,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected String internalBuildCommand() {
         return buildEnvironmentCommand(); // + buildPSubCommand();
     }
@@ -359,6 +362,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         //   outputMessageSink.setMessage(buildBJobsCommand());
     }
 
+    @Override
     protected void internalStartProcess(String command)
         throws java.io.IOException {
         //        System.out.println(
@@ -371,6 +375,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         super.internalStartProcess(command);
     }
 
+    @Override
     protected String buildCommand() {
         StringBuilder prunCommand = new StringBuilder();
         prunCommand.append(command_path);
@@ -421,6 +426,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         return result;
     }
 
+    @Override
     public String getFileTransferDefaultCopyProtocol() {
         return FILE_TRANSFER_DEFAULT_PROTOCOL;
     }

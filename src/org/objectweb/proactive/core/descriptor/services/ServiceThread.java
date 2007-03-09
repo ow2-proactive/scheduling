@@ -80,6 +80,7 @@ public class ServiceThread extends Thread {
         this.localRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
     }
 
+    @Override
     public void run() {
         ProActiveRuntime[] part = null;
 

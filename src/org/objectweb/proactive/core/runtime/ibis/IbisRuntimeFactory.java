@@ -93,6 +93,7 @@ public class IbisRuntimeFactory extends RuntimeFactory {
     //  protected ProActiveRuntime createRemoteRuntimeImpl(String s, boolean replacePreviousBinding) throws ProActiveException {
     //    return createRuntimeAdapter(s, replacePreviousBinding);
     //  }
+    @Override
     protected synchronized ProActiveRuntime getProtocolSpecificRuntimeImpl()
         throws ProActiveException {
         //return createRuntimeAdapter(s,false);
@@ -103,6 +104,7 @@ public class IbisRuntimeFactory extends RuntimeFactory {
         return defaultRmiRuntime;
     }
 
+    @Override
     protected ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException {
         //if (s == null) return null;
@@ -128,6 +130,7 @@ public class IbisRuntimeFactory extends RuntimeFactory {
         }
     }
 
+    @Override
     protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         IbisProActiveRuntimeImpl impl;

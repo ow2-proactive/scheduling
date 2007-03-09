@@ -99,7 +99,8 @@ public class TestConformWrapper extends ComponentTest {
     public void initTest() throws Exception {
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return success;
     }
 

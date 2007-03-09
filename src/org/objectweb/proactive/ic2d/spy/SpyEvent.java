@@ -71,6 +71,7 @@ public class SpyEvent extends ProActiveEvent implements java.io.Serializable {
         pos = v;
     }
 
+    @Override
     public String toString() {
         return "SpyEvent " + eventTypeAsString(type) + " body=" + bodyID;
     }

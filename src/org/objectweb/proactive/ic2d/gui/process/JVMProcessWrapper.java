@@ -114,6 +114,7 @@ public class JVMProcessWrapper {
         return username;
     }
 
+    @Override
     public String toString() {
         return name;
     }

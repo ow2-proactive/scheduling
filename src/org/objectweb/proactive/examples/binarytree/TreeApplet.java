@@ -86,6 +86,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     public TreeApplet(String name, Integer width, Integer height) {
         super(name, width.intValue(), height.intValue());
         verticalSplitPane.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
                 public void mouseEntered(java.awt.event.MouseEvent e) {
                     refresh();
                 }
@@ -120,9 +121,11 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         }
     }
 
+    @Override
     protected void start() {
     }
 
+    @Override
     protected javax.swing.JPanel createRootPanel() {
         rootPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
 
@@ -346,12 +349,14 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
             setVisible(true);
             setBackground(java.awt.Color.white);
             addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
                     public void mouseEntered(java.awt.event.MouseEvent e) {
                         refresh();
                     }
                 });
         }
 
+        @Override
         public void repaint() {
             logger.info(Thread.currentThread());
             super.repaint();
@@ -361,6 +366,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
             this.display = display;
         }
 
+        @Override
         public void paintComponent(java.awt.Graphics g) {
             super.paintComponent(g);
             try {
@@ -542,6 +548,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
             this.list = list;
         }
 
+        @Override
         public void run() {
             java.util.Iterator<String[]> it = list.iterator();
             while (it.hasNext()) {

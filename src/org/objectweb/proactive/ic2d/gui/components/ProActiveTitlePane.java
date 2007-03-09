@@ -54,6 +54,7 @@ public class ProActiveTitlePane extends TitlePane
         updateTitle(component);
     }
 
+    @Override
     public EventListener[] getListeners(Class aClass) {
         return new EventListener[0];
     }

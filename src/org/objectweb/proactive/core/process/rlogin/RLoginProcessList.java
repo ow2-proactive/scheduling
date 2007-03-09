@@ -53,6 +53,7 @@ public class RLoginProcessList extends AbstractListProcessDecorator {
     /**
      * @see org.objectweb.proactive.core.process.AbstractListProcessDecorator#createProcess()
      */
+    @Override
     protected ExternalProcessDecorator createProcess() {
         return new RLoginProcess();
     }

@@ -63,6 +63,7 @@ public class Serie extends Tag {
         this.benchmarks = Benchmark.toArray(benchList);
     }
 
+    @Override
     public String get(String name) {
         name = name.toLowerCase();
         String value = super.get(name);
@@ -90,6 +91,7 @@ public class Serie extends Tag {
         return this.charts.clone();
     }
 
+    @Override
     public String toString() {
         return super.toString() + Arrays.toString(this.charts) + "  -  " +
         Arrays.toString(this.benchmarks) + "\n";

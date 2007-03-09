@@ -55,6 +55,7 @@ public class BenchServerSocket extends ServerSocket {
         this.parent = parent;
     }
 
+    @Override
     public Socket accept() throws IOException {
         Socket s = new Socket();
         implAccept(s);

@@ -74,6 +74,7 @@ public class MessageEventProducerImpl extends AbstractEventProducer
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    @Override
     protected void notifyOneListener(ProActiveListener listener,
         ProActiveEvent event) {
         MessageEvent messageEvent = (MessageEvent) event;

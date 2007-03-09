@@ -74,6 +74,7 @@ public class GathercastControllerImpl extends AbstractProActiveController
     /*
      * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#init()
      */
+    @Override
     public void init() {
         if (gatherRequestsHandler == null) {
             gatherRequestsHandler = new GatherRequestsQueues((ProActiveComponent) owner);

@@ -434,6 +434,7 @@ public class LauncherWindow extends JFrame {
         doGraphicalMonitoring = graphicalCheckBox.isSelected();
     }
 
+    @Override
     public void setVisible(boolean b) {
         if (b) {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -511,6 +512,7 @@ class GUI_descriptorlistpopup_mouseAdapter extends MouseAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         adaptee.descriptorList_popup(e);
     }
@@ -524,6 +526,7 @@ class GUI_launchedTable_mouseAdapter extends MouseAdapter {
         this.adaptee = adaptee;
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         adaptee.launchedTable_popup(e);
     }
@@ -579,6 +582,7 @@ class MyJTable extends JTable {
         super(rowData, columnNames);
     }
 
+    @Override
     public boolean isCellEditable(int row, int column) {
         return false;
     }
@@ -606,6 +610,7 @@ class ListCell {
         this.content = content;
     }
 
+    @Override
     public String toString() {
         return content;
     }

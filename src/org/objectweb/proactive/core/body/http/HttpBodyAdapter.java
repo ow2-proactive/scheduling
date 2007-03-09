@@ -83,6 +83,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @param urn The urn of the body (in fact his url + his name)
      * @exception java.io.IOException if the remote body cannot be registered
      */
+    @Override
     public void register(String urn) throws java.io.IOException {
         URL u = null;
         String url = null;
@@ -111,6 +112,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * Unregisters an active object previously registered into the bodys table
      * @param urn the urn under which the active object has been registered
      */
+    @Override
     public void unregister(String urn) throws java.io.IOException {
         urnBodys.put(urn, null);
     }
@@ -120,6 +122,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @param urn the urn (in fact its url + name)  the remote Body is registered to
      * @return a UniversalBody
      */
+    @Override
     public UniversalBody lookup(String urn) throws java.io.IOException {
         //        try {
         URL u = null;
@@ -191,6 +194,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.BodyAdapterImpl#list(java.lang.String)
      */
+    @Override
     public String[] list(String url) throws java.io.IOException {
         String[] names = null;
         names = new String[this.urnBodys.size()];

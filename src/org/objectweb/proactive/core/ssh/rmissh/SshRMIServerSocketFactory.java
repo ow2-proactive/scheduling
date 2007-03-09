@@ -44,6 +44,7 @@ public class SshRMIServerSocketFactory implements RMIServerSocketFactory,
         return new ServerSocket(port);
     }
 
+    @Override
     public boolean equals(Object obj) {
         // the equals method is class based, since all instances are functionally equivalent.
         // We could if needed compare on an instance basic for instance with the host and port
@@ -51,6 +52,7 @@ public class SshRMIServerSocketFactory implements RMIServerSocketFactory,
         return this.getClass().equals(obj.getClass());
     }
 
+    @Override
     public int hashCode() {
         return this.getClass().hashCode();
     }

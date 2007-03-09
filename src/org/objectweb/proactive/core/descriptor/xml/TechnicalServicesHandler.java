@@ -56,6 +56,7 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
     /**
      * @see org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
      */
+    @Override
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
         try {
@@ -79,6 +80,7 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
         /**
          * @see org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
          */
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws SAXException {
             this.technicalService.setId(attributes.getValue("id"));
@@ -93,6 +95,7 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
         /**
          * @see org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             this.technicalService.setArgs(this.argsMap);
@@ -101,12 +104,14 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
         /**
          * @see org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller#getResultObject()
          */
+        @Override
         public Object getResultObject() throws SAXException {
             return this.technicalService;
         }
 
         // INNNER INNER
         public class TechnicalServiceArgHandler extends BasicUnmarshaller {
+            @Override
             public void startContextElement(String name, Attributes attributes)
                 throws SAXException {
                 String argName = attributes.getValue("name");

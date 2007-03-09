@@ -179,6 +179,7 @@ public class Vec implements java.io.Serializable {
         return len;
     }
 
+    @Override
     public final String toString() {
         return "<" + x + "," + y + "," + z + ">";
     }

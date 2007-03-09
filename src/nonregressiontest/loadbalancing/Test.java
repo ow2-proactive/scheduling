@@ -53,13 +53,15 @@ public class Test extends FunctionalTest {
         super("load balancing", "Test load balancing");
     }
 
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), null, nodeOne);
 
         Thread.sleep(1000);
     }
 
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
         this.pad = ProActive.getProactiveDescriptor(XML_LOCATION);
         this.pad.activateMappings();
         this.vn1 = this.pad.getVirtualNode("VN");
@@ -71,11 +73,13 @@ public class Test extends FunctionalTest {
             new CurrentTimeMillisMetricFactory());
     }
 
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         this.pad.killall(false);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
         return a.getNodeUrl().equals(nodeTwo.getNodeInformation().getURL());
     }
 }

@@ -98,6 +98,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         //Handle window closing correctly.
         addWindowListener(new WindowAdapter() {
+                @Override
                 public void windowClosing(WindowEvent we) {
                     // handle closing behavior in propertyChange () 
                     optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
@@ -106,6 +107,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         //Ensure the text field always gets the first focus.
         addComponentListener(new ComponentAdapter() {
+                @Override
                 public void componentShown(ComponentEvent ce) {
                     userTextField.requestFocusInWindow();
                 }

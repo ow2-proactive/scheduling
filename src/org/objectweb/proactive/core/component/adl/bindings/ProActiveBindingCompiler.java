@@ -58,6 +58,7 @@ public class ProActiveBindingCompiler extends BindingCompiler {
     // --------------------------------------------------------------------------
     // Implementation of the Compiler interface
     // --------------------------------------------------------------------------
+    @Override
     public void compile(final List path, final ComponentContainer container,
         final TaskMap tasks, final Map context) throws ADLException {
         Map subComponents = new HashMap();

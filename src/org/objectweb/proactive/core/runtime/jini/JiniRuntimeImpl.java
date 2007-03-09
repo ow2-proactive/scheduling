@@ -120,6 +120,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
     //
     // -- Implements JiniRuntime -----------------------------------------------
     //
+    @Override
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
         String padURL) throws ProActiveException, IOException {
@@ -127,6 +128,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
             creatorID, vmName, padURL);
     }
 
+    @Override
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String vnname, String jobId)
@@ -161,6 +163,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         return nodeURL;
     }
 
+    @Override
     public void killAllNodes() throws RemoteException, ProActiveException {
         for (java.util.Enumeration<String> e = jiniNodeMap.keys();
                 e.hasMoreElements();) {
@@ -170,6 +173,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         proActiveRuntime.killAllNodes();
     }
 
+    @Override
     public void killNode(String nodeName)
         throws RemoteException, ProActiveException {
         String nodeUrl = null;
@@ -184,6 +188,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         proActiveRuntime.killNode(name);
     }
 
+    @Override
     public void killRT(boolean softly) throws Exception {
         killAllNodes();
         unregisterAllVirtualNodes();
@@ -191,10 +196,12 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         proActiveRuntime.killRT(false);
     }
 
+    @Override
     public String getURL() {
         return proActiveRuntimeURL;
     }
 
+    @Override
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) throws RemoteException {
         String virtualNodeURL = null;
@@ -221,6 +228,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         jiniVirtualNodeMap.put(virtualNodeURL, registerService(virtualNodeURL));
     }
 
+    @Override
     public void unregisterVirtualNode(String virtualNodeName)
         throws RemoteException, ProActiveException {
         String virtualNodeURL = null;
@@ -236,6 +244,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         }
     }
 
+    @Override
     public void unregisterAllVirtualNodes()
         throws RemoteException, ProActiveException {
         for (java.util.Enumeration<String> e = jiniVirtualNodeMap.keys();

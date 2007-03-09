@@ -82,6 +82,7 @@ public class MOPException extends Exception {
      * Returns the detail message, including the message from the nested
      * exception if there is one.
      */
+    @Override
     public String getMessage() {
         if (detail == null) {
             return super.getMessage();
@@ -100,6 +101,7 @@ public class MOPException extends Exception {
      * the specified stream <code>ps</code>.
      * @param ps the print stream
      */
+    @Override
     public void printStackTrace(java.io.PrintStream ps) {
         if (detail == null) {
             super.printStackTrace(ps);
@@ -114,6 +116,7 @@ public class MOPException extends Exception {
     /**
      * Prints the composite message to <code>System.err</code>.
      */
+    @Override
     public void printStackTrace() {
         printStackTrace(System.err);
     }
@@ -123,6 +126,7 @@ public class MOPException extends Exception {
      * the specified print writer <code>pw</code>.
      * @param pw the print writer
      */
+    @Override
     public void printStackTrace(java.io.PrintWriter pw) {
         if (detail == null) {
             super.printStackTrace(pw);

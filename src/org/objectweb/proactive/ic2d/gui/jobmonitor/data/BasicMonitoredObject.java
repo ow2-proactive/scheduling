@@ -207,6 +207,7 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
         return new BasicMonitoredObject(key);
     }
 
+    @Override
     public boolean equals(Object value) {
         return compareTo(value) == 0;
     }

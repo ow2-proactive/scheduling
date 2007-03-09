@@ -162,6 +162,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
         public ProcessListCellRenderer() {
         }
 
+        @Override
         public java.awt.Component getListCellRendererComponent(
             javax.swing.JList list, Object o, int index, boolean isSelected,
             boolean cellHasFocus) {

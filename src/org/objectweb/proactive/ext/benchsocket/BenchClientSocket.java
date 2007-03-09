@@ -104,14 +104,17 @@ public class BenchClientSocket extends Socket {
         this.parent.addStream(this.input);
     }
 
+    @Override
     public String toString() {
         return this.realSocket.toString();
     }
 
+    @Override
     public void bind(SocketAddress bindpoint) throws IOException {
         this.realSocket.bind(bindpoint);
     }
 
+    @Override
     public synchronized void close() throws IOException {
         if (this.input != null) {
             this.input.close();
@@ -130,6 +133,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#connect(java.net.SocketAddress, int)
      */
+    @Override
     public void connect(SocketAddress endpoint, int timeout)
         throws IOException {
         this.realSocket.connect(endpoint, timeout);
@@ -138,6 +142,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#connect(java.net.SocketAddress)
      */
+    @Override
     public void connect(SocketAddress endpoint) throws IOException {
         this.realSocket.connect(endpoint);
     }
@@ -145,6 +150,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getChannel()
      */
+    @Override
     public SocketChannel getChannel() {
         return this.realSocket.getChannel();
     }
@@ -152,6 +158,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getInetAddress()
      */
+    @Override
     public InetAddress getInetAddress() {
         return this.realSocket.getInetAddress();
     }
@@ -159,6 +166,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getInputStream()
      */
+    @Override
     public InputStream getInputStream() throws IOException {
         //    	System.out.println("getInputtStream()");
         //  return this.realSocket.getInputStream();
@@ -168,6 +176,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getKeepAlive()
      */
+    @Override
     public boolean getKeepAlive() throws SocketException {
         return this.realSocket.getKeepAlive();
     }
@@ -175,6 +184,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getLocalAddress()
      */
+    @Override
     public InetAddress getLocalAddress() {
         return this.realSocket.getLocalAddress();
     }
@@ -182,6 +192,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getLocalPort()
      */
+    @Override
     public int getLocalPort() {
         return this.realSocket.getLocalPort();
     }
@@ -189,6 +200,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getLocalSocketAddress()
      */
+    @Override
     public SocketAddress getLocalSocketAddress() {
         return this.realSocket.getLocalSocketAddress();
     }
@@ -196,6 +208,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getOOBInline()
      */
+    @Override
     public boolean getOOBInline() throws SocketException {
         return this.realSocket.getOOBInline();
     }
@@ -203,6 +216,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getOutputStream()
      */
+    @Override
     public OutputStream getOutputStream() throws IOException {
         //  return this.realSocket.getOutputStream();
         //    	System.out.println("getOutputStream()");
@@ -212,6 +226,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getPort()
      */
+    @Override
     public int getPort() {
         return this.realSocket.getPort();
     }
@@ -219,6 +234,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getReceiveBufferSize()
      */
+    @Override
     public synchronized int getReceiveBufferSize() throws SocketException {
         return this.realSocket.getReceiveBufferSize();
     }
@@ -226,6 +242,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getRemoteSocketAddress()
      */
+    @Override
     public SocketAddress getRemoteSocketAddress() {
         return this.realSocket.getRemoteSocketAddress();
     }
@@ -233,6 +250,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getReuseAddress()
      */
+    @Override
     public boolean getReuseAddress() throws SocketException {
         return this.realSocket.getReuseAddress();
     }
@@ -240,6 +258,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getSendBufferSize()
      */
+    @Override
     public synchronized int getSendBufferSize() throws SocketException {
         return this.realSocket.getSendBufferSize();
     }
@@ -247,6 +266,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getSoLinger()
      */
+    @Override
     public int getSoLinger() throws SocketException {
         return this.realSocket.getSoLinger();
     }
@@ -254,6 +274,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getSoTimeout()
      */
+    @Override
     public synchronized int getSoTimeout() throws SocketException {
         return this.realSocket.getSoTimeout();
     }
@@ -261,6 +282,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getTcpNoDelay()
      */
+    @Override
     public boolean getTcpNoDelay() throws SocketException {
         return this.realSocket.getTcpNoDelay();
     }
@@ -268,6 +290,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#getTrafficClass()
      */
+    @Override
     public int getTrafficClass() throws SocketException {
         return this.realSocket.getTrafficClass();
     }
@@ -275,6 +298,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#isBound()
      */
+    @Override
     public boolean isBound() {
         return this.realSocket.isBound();
     }
@@ -282,6 +306,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#isClosed()
      */
+    @Override
     public boolean isClosed() {
         return this.realSocket.isClosed();
     }
@@ -289,6 +314,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#isConnected()
      */
+    @Override
     public boolean isConnected() {
         return this.realSocket.isConnected();
     }
@@ -296,6 +322,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#isInputShutdown()
      */
+    @Override
     public boolean isInputShutdown() {
         return this.realSocket.isInputShutdown();
     }
@@ -303,6 +330,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#isOutputShutdown()
      */
+    @Override
     public boolean isOutputShutdown() {
         return this.realSocket.isOutputShutdown();
     }
@@ -310,6 +338,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#sendUrgentData(int)
      */
+    @Override
     public void sendUrgentData(int data) throws IOException {
         this.realSocket.sendUrgentData(data);
     }
@@ -317,6 +346,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setKeepAlive(boolean)
      */
+    @Override
     public void setKeepAlive(boolean on) throws SocketException {
         this.realSocket.setKeepAlive(on);
     }
@@ -324,6 +354,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setOOBInline(boolean)
      */
+    @Override
     public void setOOBInline(boolean on) throws SocketException {
         this.realSocket.setOOBInline(on);
     }
@@ -331,6 +362,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setReceiveBufferSize(int)
      */
+    @Override
     public synchronized void setReceiveBufferSize(int size)
         throws SocketException {
         this.realSocket.setReceiveBufferSize(size);
@@ -339,6 +371,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setReuseAddress(boolean)
      */
+    @Override
     public void setReuseAddress(boolean on) throws SocketException {
         this.realSocket.setReuseAddress(on);
     }
@@ -346,6 +379,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setSendBufferSize(int)
      */
+    @Override
     public synchronized void setSendBufferSize(int size)
         throws SocketException {
         this.realSocket.setSendBufferSize(size);
@@ -354,6 +388,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setSoLinger(boolean, int)
      */
+    @Override
     public void setSoLinger(boolean on, int linger) throws SocketException {
         this.realSocket.setSoLinger(on, linger);
     }
@@ -361,6 +396,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setSoTimeout(int)
      */
+    @Override
     public synchronized void setSoTimeout(int timeout)
         throws SocketException {
         this.realSocket.setSoTimeout(timeout);
@@ -369,6 +405,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setTcpNoDelay(boolean)
      */
+    @Override
     public void setTcpNoDelay(boolean on) throws SocketException {
         this.realSocket.setTcpNoDelay(on);
     }
@@ -376,6 +413,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#setTrafficClass(int)
      */
+    @Override
     public void setTrafficClass(int tc) throws SocketException {
         this.realSocket.setTrafficClass(tc);
     }
@@ -383,6 +421,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#shutdownInput()
      */
+    @Override
     public void shutdownInput() throws IOException {
         this.realSocket.shutdownInput();
     }
@@ -390,6 +429,7 @@ public class BenchClientSocket extends Socket {
     /* (non-Javadoc)
      * @see java.net.Socket#shutdownOutput()
      */
+    @Override
     public void shutdownOutput() throws IOException {
         this.realSocket.shutdownOutput();
     }

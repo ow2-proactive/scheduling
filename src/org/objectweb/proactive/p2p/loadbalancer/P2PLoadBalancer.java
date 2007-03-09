@@ -238,6 +238,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
      * This method use the P2P infrastructure to search nodes which can
      * receive its active objects.  Method extended from LoadBalancer class.
      */
+    @Override
     public void startBalancing() {
         int size = forBalancing.size();
         if (size < 1) {
@@ -275,6 +276,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
     * This method use the P2P infrastructure to search nodes which I
     * can steal work.  Method extended from LoadBalancer class.
     */
+    @Override
     public void stealWork() {
         int size = forStealing.size();
         if (size < 1) {
@@ -301,6 +303,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
         }
     }
 
+    @Override
     public void sendActiveObjectsTo(Node remoteNode, double remoteRanking) {
         if (this.ranking < (remoteRanking * LoadBalancingConstants.STEAL_FACTOR)) { // it's better than me!
             sendActiveObjectsTo(remoteNode);

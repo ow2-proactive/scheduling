@@ -221,6 +221,7 @@ public class CarPanel extends javax.swing.JPanel {
     ////////////////////////////////////////////////////////////////
 
     /** Displays the car, the speedometer */
+    @Override
     public void paintComponent(java.awt.Graphics g) {
         super.paintComponent(g);
         if (state == INACTIVE) {

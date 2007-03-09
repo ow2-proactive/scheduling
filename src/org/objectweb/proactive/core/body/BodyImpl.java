@@ -255,6 +255,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
+    @Override
     protected int internalReceiveRequest(Request request)
         throws java.io.IOException, RenegotiateSessionException {
         if (messageEventProducer != null) {
@@ -273,6 +274,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @param reply the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
+    @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         //System.out.print("Body receives Reply -> ");
         if (messageEventProducer != null) {
@@ -291,6 +293,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     /**
      * Signals that the activity of this body, managed by the active thread has just stopped.
      */
+    @Override
     protected void activityStopped() {
         super.activityStopped();
         messageEventProducer = null;
@@ -320,6 +323,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.nodeURL = newNodeURL;
     }
 
+    @Override
     public boolean isInImmediateService() throws IOException {
         return this.requestReceiver.isInImmediateService();
     }

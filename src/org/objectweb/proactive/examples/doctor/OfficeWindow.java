@@ -64,6 +64,7 @@ public class OfficeWindow extends javax.swing.JFrame implements java.awt.event.A
         bExit.addActionListener(this);
 
         this.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     System.exit(0);
                 }

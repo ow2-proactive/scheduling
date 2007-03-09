@@ -95,6 +95,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         private RegisterHandler() {
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String vn = attributes.getValue("virtualNode");
@@ -126,6 +127,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         private LookupHandler() {
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String vnLookup = attributes.getValue("virtualNode");
@@ -188,6 +190,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             this.addHandler(JVMSET_TAG, new JvmSetHandler());
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             // create and register a VirtualNode
@@ -201,6 +204,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             vn = proActiveDescriptor.createVirtualNode(vnName, false);
         }
 
+        @Override
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equals(JVMSET_TAG)) {
@@ -234,6 +238,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 this.addHandler(CURRENTJVM_TAG, new CurrentJvmHandler());
             }
 
+            @Override
             protected void notifyEndActiveHandler(String name,
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {
@@ -255,6 +260,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 private VmNameHandler() {
                 }
 
+                @Override
                 public void startContextElement(String name,
                     Attributes attributes) throws org.xml.sax.SAXException {
                     String vmName = attributes.getValue("value");
@@ -272,6 +278,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 private CurrentJvmHandler() {
                 }
 
+                @Override
                 public void startContextElement(String name,
                     Attributes attributes) throws org.xml.sax.SAXException {
                     String protocol = attributes.getValue("protocol");
@@ -294,6 +301,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             this.addHandler(CREATION_PROCESS_TAG, new CreationHandler());
         }
 
+        @Override
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             // create and register a VirtualNode
@@ -326,6 +334,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                     new ProcessReferenceHandler());
             }
 
+            @Override
             protected void notifyEndActiveHandler(String name,
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {
@@ -376,6 +385,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                     new ProcessReferenceHandler());
             }
 
+            @Override
             protected void notifyEndActiveHandler(String name,
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {

@@ -64,7 +64,8 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
-    public void action() throws Exception {
+    @Override
+	public void action() throws Exception {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         // We activate the mapping in reverse order
@@ -81,17 +82,20 @@ public class Test extends FunctionalTest {
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
-    public void initTest() throws Exception {
+    @Override
+	public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
-    public void endTest() throws Exception {
+    @Override
+	public void endTest() throws Exception {
         proActiveDescriptor.killall(false);
     }
 
-    public boolean postConditions() throws Exception {
+    @Override
+	public boolean postConditions() throws Exception {
     	VirtualNode vn1 = proActiveDescriptor.getVirtualNode("covn1");
     	VirtualMachine vm = vn1.getVirtualMachine();
         return node1.getProActiveRuntime().getURL().equals(node2.getProActiveRuntime()

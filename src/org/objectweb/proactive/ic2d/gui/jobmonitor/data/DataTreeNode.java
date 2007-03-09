@@ -205,6 +205,7 @@ public class DataTreeNode extends DefaultMutableTreeNode
         return object.getPrettyName();
     }
 
+    @Override
     public String toString() {
         if (object == null) {
             return null;

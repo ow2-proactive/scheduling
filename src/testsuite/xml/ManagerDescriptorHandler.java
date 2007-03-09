@@ -94,7 +94,8 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
     /**
      * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
      */
-    protected void notifyEndActiveHandler(String name,
+    @Override
+	protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
         if (name.equalsIgnoreCase(MANAGER_NAME_TAG)) {
             this.manager.setName((String) activeHandler.getResultObject());
@@ -144,7 +145,8 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
             throws org.xml.sax.SAXException {
         }
 
-        protected void notifyEndActiveHandler(String name,
+        @Override
+		protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
     }
