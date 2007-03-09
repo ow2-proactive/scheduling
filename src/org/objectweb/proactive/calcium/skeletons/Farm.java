@@ -30,24 +30,25 @@
  */
 package org.objectweb.proactive.calcium.skeletons;
 
-import java.util.Vector;
-
+import java.util.Stack;
 
 /**
  * This class provides Farm parallelism (also known as Master/Slave).
  * A task will execute the child skeleton.
- *
+ * 
  * @author The ProActive Team (mleyton)
  *
  */
-public class Farm<P, R> implements Skeleton<P, R> {
-    Skeleton<P, R> child;
+public class Farm<P,R> implements Skeleton<P,R>{
 
-    public Farm(Skeleton<P, R> child) {
-        this.child = child;
-    }
+	Skeleton<P,R> child;
+	
+	public Farm(Skeleton<P,R> child){
+		this.child =child;
+	}
 
-    public Vector<Instruction<?, ?>> getInstructionStack() {
-        return child.getInstructionStack();
-    }
+	public Stack<Instruction> getInstructionStack() {
+		
+		return child.getInstructionStack();
+	}
 }

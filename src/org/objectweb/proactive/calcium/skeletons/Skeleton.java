@@ -31,12 +31,11 @@
 package org.objectweb.proactive.calcium.skeletons;
 
 import java.io.Serializable;
-import java.util.Vector;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 
 /**
  * This class is used to mark an object as a skeleton.
@@ -45,8 +44,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team (mleyton)
  *
  */
-public interface Skeleton<T, R> extends Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
+public interface Skeleton<T,R> extends Serializable{
+	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
 
-    public Vector<Instruction<?, ?>> getInstructionStack();
+	Stack<Instruction> getInstructionStack();
 }

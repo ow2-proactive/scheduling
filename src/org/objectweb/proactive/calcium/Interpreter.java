@@ -39,79 +39,77 @@ import org.objectweb.proactive.calcium.statistics.Timer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-
 /**
  * This class corresponds to a skeleton interpreter, which
  * can be seen as a worker of the skeleton framework.
- *
+ * 
  * The interpreter will loop taking the top skeletal instruction
  * from the task's instruction stack and execute it.
- *
+ * 
  * When the instruction is executed, the task's stack can be
  * modified. For example the "if" skeleton will choose which
  * branch must be computed and place this branch in the
  * task's stack.
- *
+ * 
  * The loop will continue to execute until a task is found
  * to have children tasks, or the task has no more instructions.
  * In either case, the task (and it's children) will be returned.
- *
+ * 
  * @author The ProActive Team (mleyton)
  *
  */
 public class Interpreter implements Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
+	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
+	
+	public Interpreter(){
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Task<?> interpret(Task<?> task){
+		
+		Timer timer=new Timer(true);
+		while(task.hasInstruction()){
+			if(logger.isDebugEnabled()){
+				logger.debug("--Stack Top-- Task="+task.getId()+" "+task.getObject());
+				String tmp="";
+				for(Instruction c:task.getStack()) tmp=c+"\n"+tmp;
+				tmp=tmp.trim();
+				logger.debug(tmp);
+			}
 
-    public Interpreter() {
-    }
+			//Take the top instruction
+			Instruction inst = task.popInstruction();
 
-    public Task<?> interpret(Task<?> task) {
-        Timer timer = new Timer(true);
-        while (task.hasInstruction()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("--Stack Top-- Task=" + task.getId() + " " +
-                    task.getObject());
-                String tmp = "";
-                for (Instruction c : task.getStack())
-                    tmp = c + "\n" + tmp;
-                tmp = tmp.trim();
-                logger.debug(tmp);
-            }
+			//Compute the instruction
+			int oldId=task.getId();
+			
+			try {
+				task= inst.compute(task);
+			} catch (Exception e) {  		//If an exception happend, we report the exception in the task
+				task.pushInstruction(inst); //we put back the instruction that generated the exception
+				task.setException(e);		//then we add the exception to the task
+				return task;
+			}
 
-            //Take the top instruction
-            Instruction<?, ?> inst = task.popInstruction();
+			if(oldId!=task.getId()){
+				String msg = "Panic error, task id changed while interpreting! "+oldId+"->"+task.getId();
+				task.pushInstruction(inst);
+				task.setException(new PanicException(msg));
+				logger.error(msg);
+				return task;
+			}
+			
+			//If child tasks are present, that's all folks (for now)
+			if(task.hasReadyChildTask()){
+				timer.stop();
+				task.getStats().addComputationTime(timer.getTime());
+				return task;
+			}
+		}//while
 
-            //Compute the instruction
-            int oldId = task.getId();
-
-            try {
-                task = inst.computeUnknown(task);
-            } catch (Exception e) { //If an exception happend, we report the exception in the task
-                task.pushInstruction(inst); //we put back the instruction that generated the exception
-                task.setException(e); //then we add the exception to the task
-                return task;
-            }
-
-            if (oldId != task.getId()) {
-                String msg = "Panic error, task id changed while interpreting! " +
-                    oldId + "->" + task.getId();
-                task.pushInstruction(inst);
-                task.setException(new PanicException(msg));
-                logger.error(msg);
-                return task;
-            }
-
-            //If child tasks are present, that's all folks (for now)
-            if (task.hasReadyChildTask()) {
-                timer.stop();
-                task.getStats().addComputationTime(timer.getTime());
-                return task;
-            }
-        } //while
-
-        //The task is finished
-        timer.stop();
-        task.getStats().addComputationTime(timer.getTime());
-        return task;
-    }
+		//The task is finished
+		timer.stop();
+		task.getStats().addComputationTime(timer.getTime());
+		return task;
+	}
 }
