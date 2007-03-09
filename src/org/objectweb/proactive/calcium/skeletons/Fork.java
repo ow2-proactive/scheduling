@@ -42,10 +42,8 @@ import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.muscle.Conquer;
 import org.objectweb.proactive.calcium.muscle.Divide;
-import org.objectweb.proactive.calcium.statistics.Timer;
 
 
 /**

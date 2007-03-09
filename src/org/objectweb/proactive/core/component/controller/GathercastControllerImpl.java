@@ -43,7 +43,6 @@ import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.ServeException;

@@ -42,7 +42,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.HalfBody;
-import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 
 

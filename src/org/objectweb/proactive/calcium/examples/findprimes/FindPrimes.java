@@ -36,7 +36,6 @@ import java.util.Vector;
 import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.Stream;
-import org.objectweb.proactive.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.futures.Future;

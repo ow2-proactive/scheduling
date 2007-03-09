@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.body.http;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.ConnectException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -44,7 +43,6 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedException;
 import org.objectweb.proactive.core.body.http.util.messages.HttpLookupMessage;
 import org.objectweb.proactive.core.rmi.ClassServer;
-import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 /**

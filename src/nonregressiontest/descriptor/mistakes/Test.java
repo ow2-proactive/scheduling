@@ -30,14 +30,10 @@
  */
 package nonregressiontest.descriptor.mistakes;
 
-import java.io.File;
-import java.net.URL;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.xml.VariableContract;
 
-import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 

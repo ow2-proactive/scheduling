@@ -82,7 +82,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 public class ProActiveSecurity {

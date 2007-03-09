@@ -32,9 +32,6 @@ package org.objectweb.proactive.core.descriptor.xml;
 
 import java.util.StringTokenizer;
 
-import javax.naming.directory.InvalidAttributeValueException;
-
-import org.glite.wms.jdlj.*;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.jacobi;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -39,7 +38,6 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;

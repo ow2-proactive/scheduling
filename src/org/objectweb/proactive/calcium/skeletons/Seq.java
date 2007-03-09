@@ -31,7 +31,6 @@
 package org.objectweb.proactive.calcium.skeletons;
 
 import java.util.Stack;
-import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;

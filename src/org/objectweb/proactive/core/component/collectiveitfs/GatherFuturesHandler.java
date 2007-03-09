@@ -39,8 +39,6 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionThrower;
 import org.objectweb.proactive.core.node.Node;

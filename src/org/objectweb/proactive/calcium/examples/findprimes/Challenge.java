@@ -31,7 +31,6 @@
 package org.objectweb.proactive.calcium.examples.findprimes;
 
 import java.io.Serializable;
-import java.util.Vector;
 
 
 class Challenge implements Serializable {

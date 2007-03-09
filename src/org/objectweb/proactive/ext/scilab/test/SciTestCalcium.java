@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ext.scilab.test;
 
 import java.io.Serializable;
-import java.util.Vector;
 
 
 /*
