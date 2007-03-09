@@ -435,6 +435,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
+    @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -459,6 +460,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
+    @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -485,6 +487,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
+    @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -510,6 +513,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
+    @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params, VirtualNode virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -532,6 +536,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
+    @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -556,6 +561,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
+    @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
@@ -582,6 +588,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
+    @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
         Object[] params, VirtualNode virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,

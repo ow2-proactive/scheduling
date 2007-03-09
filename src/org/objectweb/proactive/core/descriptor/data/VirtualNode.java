@@ -103,6 +103,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
     /**
      * @deprecated use {@link #getNumberOfCurrentlyCreatedNodes()} or {@link #getNumberOfCreatedNodesAfterDeployment()} instead
      */
+    @Deprecated
     public int createdNodeCount();
 
     /**
@@ -133,6 +134,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return Node the node at the specified index in the array of nodes mapped to this VirtualNode
      * @deprecated use {@link #getNode()} or {@link #getNodes()} instead
      */
+    @Deprecated
     public Node getNode(int index) throws NodeException;
 
     /**

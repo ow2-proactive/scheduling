@@ -691,6 +691,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * @deprecated use {@link #getNumberOfCurrentlyCreatedNodes()} or {@link #getNumberOfCreatedNodesAfterDeployment()} instead
      */
+    @Deprecated
     public int createdNodeCount() {
         throw new RuntimeException(
             "This method is deprecated, use getNumberOfCurrentlyCreatedNodes() or getNumberOfCreatedNodesAfterDeployment()");
