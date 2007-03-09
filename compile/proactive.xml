@@ -824,6 +824,7 @@
             	<jvmarg value="-Xdebug" />
             	<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
             	<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=@{nodeDescriptor}" />
+            	<jvmarg value="-Djava.home=${java.home}"/>
             	<jvmargs/>
             </java>
         </sequential>

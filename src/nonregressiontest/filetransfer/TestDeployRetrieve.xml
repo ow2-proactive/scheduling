@@ -7,8 +7,7 @@
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/user/mleyton/home/ProActive" />
-		<descriptorVariable name="JAVA_HOME"
-			value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6" />
+		<javaPropertyVariable name="java.home"/>
 		<descriptorDefaultVariable name="JVM_PROCESS" value="localJVM" />
 		<descriptorDefaultVariable name="HOST_NAME" value="localhost" />
 	</variables>
@@ -75,7 +74,7 @@
 			<processDefinition id="remoteJVM">
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<!-- javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath-->
+					<!-- javaPath><absolutePath value="${java.home}/bin/java"/></javaPath-->
 					<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/bin/" />
 						<absolutePath
