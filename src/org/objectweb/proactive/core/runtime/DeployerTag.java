@@ -65,6 +65,7 @@ public class DeployerTag implements java.io.Serializable {
         myGroup = Integer.parseInt(sa[1]);
     }
 
+    @Override
     public boolean equals(Object _gi) {
         if (this == _gi) {
             return true;
@@ -75,17 +76,15 @@ public class DeployerTag implements java.io.Serializable {
         }
 
         DeployerTag gi = (DeployerTag) _gi;
-        if ((gi.vmid == vmid) && (gi.myGroup == myGroup)) {
-            return true;
-        }
-
-        return true;
+        return gi.vmid.equals(vmid) && (gi.myGroup == myGroup);
     }
 
-    public int hashcode() {
+    @Override
+    public int hashCode() {
         return this.toString().hashCode();
     }
 
+    @Override
     public String toString() {
         return vmid + "~" + myGroup;
     }
