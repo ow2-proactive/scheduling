@@ -337,7 +337,8 @@ public class GarbageCollector {
 
         boolean isMyActivity = this.isLastActivityMine();
         Collection<Referenced> refs = this.referenced.values();
-        this.log(Level.DEBUG, "Sending GC Message to " + refs.size() + " referencers: " + refs);
+        this.log(Level.DEBUG,
+            "Sending GC Message to " + refs.size() + " referencers: " + refs);
         Vector<GCSimpleMessage> messages = new Vector<GCSimpleMessage>(refs.size());
         for (Referenced p : refs) {
             messages.add(buildMessageForProxy(isMyActivity, parent, p));
