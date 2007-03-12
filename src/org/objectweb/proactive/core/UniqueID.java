@@ -56,8 +56,8 @@ public class UniqueID implements java.io.Serializable, Comparable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
     // Optim
-    private final String cachedShortString;
-    private final String cachedCanonString;
+    private transient String cachedShortString;
+    private transient String cachedCanonString;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -69,9 +69,6 @@ public class UniqueID implements java.io.Serializable, Comparable {
     public UniqueID() {
         this.id = new java.rmi.server.UID();
         this.vmID = uniqueVMID;
-        this.cachedCanonString = "" + id + " " + vmID;
-        this.cachedShortString = "" +
-            Math.abs(cachedCanonString.hashCode() % 65536);
     }
 
     //
@@ -125,10 +122,19 @@ public class UniqueID implements java.io.Serializable, Comparable {
     }
 
     public String shortString() {
+        if (this.cachedShortString == null) {
+            this.cachedShortString = "" +
+                Math.abs(this.getCanonString().hashCode() % 65536);
+        }
+
         return this.cachedShortString;
     }
 
     public String getCanonString() {
+        if (this.cachedCanonString == null) {
+            this.cachedCanonString = "" + id + " " + vmID;
+        }
+
         return this.cachedCanonString;
     }
 
