@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.1"?>
 
-<product name="IC2D" id="org.objectweb.proactive.ic2d.product" application="org.objectweb.proactive.ic2d.application" useFeatures="false">
+<product name="IC2D" id="org.objectweb.proactive.ic2d.product" application="org.objectweb.proactive.ic2d.application" useFeatures="true">
 
    <aboutInfo>
       <image path="/org.objectweb.proactive.ic2d/icons/alt_about.gif"/>
+      <text>
+         %About.text
+      </text>
    </aboutInfo>
 
    <configIni use="default"/>
 
    <launcherArgs>
-      <vmArgs>-Dcom.sun.management.jmxremote -Xmx512M -Xms512M</vmArgs>
+      <vmArgs>-Dcom.sun.management.jmxremote -Xmx512M -Xms512M
+-Djava.security.policy=/user/jmlegait/home/proactive.java.policy</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.objectweb.proactive.ic2d/icons/alt_window_16.gif" i32="/org.objectweb.proactive.ic2d/icons/alt_window_32.gif"/>
 
    <splash
-      location="org.objectweb.proactive.ic2d"
-      startupProgressRect="0,300,455,20" />
+      location="org.objectweb.proactive.ic2d" />
    <launcher name="IC2D">
       <linux icon="/org.objectweb.proactive.ic2d/icons/alt_launcher.xpm"/>
       <solaris/>
@@ -25,6 +28,7 @@
          <bmp/>
       </win>
    </launcher>
+
 
    <plugins>
       <plugin id="com.ibm.icu"/>
@@ -85,11 +89,18 @@
       <plugin id="org.eclipse.update.ui"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
       <plugin id="org.objectweb.proactive.ic2d.console"/>
-      <plugin id="org.objectweb.proactive.ic2d.dgc"/>
       <plugin id="org.objectweb.proactive.ic2d.jobmonitoring"/>
       <plugin id="org.objectweb.proactive.ic2d.launcher"/>
       <plugin id="org.objectweb.proactive.ic2d.lib"/>
       <plugin id="org.objectweb.proactive.ic2d.monitoring"/>
    </plugins>
+
+   <features>
+      <feature id="org.eclipse.rcp" version="3.2.2.r322_v20070104-8pcviKVqd8J7C1U"/>
+      <feature id="org.objectweb.proactive.ic2d" version="1.0.0"/>
+      <feature id="org.objectweb.proactive.ic2d.base" version="1.0.0"/>
+      <feature id="org.objectweb.proactive.ic2d.core" version="1.0.0"/>
+      <feature id="org.objectweb.proactive.ic2d.monitoring" version="1.0.0"/>
+   </features>
 
 </product>

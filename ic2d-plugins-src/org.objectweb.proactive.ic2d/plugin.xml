@@ -12,23 +12,25 @@
       </application>
    </extension>
   
-   <extension
-         id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="org.objectweb.proactive.ic2d.application"
-            name="IC2D">
-         <property
-               name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
-         <property
-               name="aboutImage"
-               value="icons/alt_about.gif"/>
-         <property
-               name="startupProgressRect"
-               value="0,300,455,20"/>
-      </product>
-   </extension>
+ 
+  <extension
+        id="product"
+        point="org.eclipse.core.runtime.products">
+     <product
+           application="org.objectweb.proactive.ic2d.application"
+           name="IC2D">
+        <property
+              name="windowImages"
+              value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
+        <property
+              name="aboutImage"
+              value="icons/alt_about.gif"/>
+        <property
+              name="aboutText"
+              value="%About.text"/>
+     </product>
+  </extension>
+  
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -36,5 +38,5 @@
                id="org.objectweb.proactive.ic2d.DefaultPerspective"
                name="Default"/>
    </extension>
-
+   
 </plugin>

@@ -38,7 +38,6 @@ import java.util.Hashtable;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.ssh.httpssh.Handler;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.url.URLConstants;

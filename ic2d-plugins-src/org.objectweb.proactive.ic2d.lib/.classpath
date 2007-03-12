@@ -59,7 +59,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/ws/soap.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/xml-apis.jar"/>
-	<classpathentry exported="true" sourcepath="/ProActive" kind="lib" path="ProActive.jar"/>
+	<classpathentry exported="true" sourcepath="/auto/sea/u/sea/0/user/jmlegait/SVN4/ProActive" kind="lib" path="ProActive.jar"/>
 	<classpathentry kind="lib" path="lib/components/asm-2.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/timit/batik-awt-util.jar"/>
 	<classpathentry kind="lib" path="lib/timit/batik-dom.jar"/>

@@ -6,7 +6,6 @@ import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
-import org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
@@ -15,6 +14,10 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	public void initialize(IWorkbenchConfigurer configurer) {
+		/*// To restore window preferences
+		super.initialize(configurer);
+        configurer.setSaveAndRestore(true);
+        */
 		// Sets the look of the tabs like Eclipse 3.x
 		PlatformUI.getPreferenceStore().setValue(
 				IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
@@ -22,6 +25,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	public String getInitialWindowPerspectiveId() {
-		return MonitoringPerspective.ID /*DefaultPerspective.ID*/;
+		return "org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective";//MonitoringPerspective.ID /*DefaultPerspective.ID*/;
 	}
 }

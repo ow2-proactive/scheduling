@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Lib Plug-in
+Bundle-Name: ProActive Libraries
 Bundle-SymbolicName: org.objectweb.proactive.ic2d.lib
 Bundle-Version: 1.0.0
 Bundle-Localization: plugin
@@ -955,3 +955,4 @@ Export-Package: COM.claymoresystems.cert,
  xjava.lang,
  xjava.security,
  xjava.security.interfaces
+Bundle-Vendor: ProActive
