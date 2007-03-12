@@ -49,7 +49,13 @@ public class Referencer {
      */
     private long lastMessageTimestamp;
 
+    /**
+     * Did we notify this referencer that we were in a dead cycle?
+     */
+    private boolean notifiedCycle;
+
     Referencer() {
+        this.notifiedCycle = false;
     }
 
     long getLastMessageTimestamp() {
@@ -74,5 +80,13 @@ public class Referencer {
         }
 
         return false;
+    }
+
+    boolean isNotifiedCycle() {
+        return this.notifiedCycle;
+    }
+
+    void setNotifiedCycle() {
+        this.notifiedCycle = true;
     }
 }

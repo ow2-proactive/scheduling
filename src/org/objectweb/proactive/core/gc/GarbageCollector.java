@@ -76,16 +76,24 @@ public class GarbageCollector {
      * before changing it.
      * TODO: make it dynamic.
      */
-    static final int TTB = 30000;
+    static int TTB = 30000;
 
     /**
      * TimeToAlone
      * After this delay, we suppose we got a message from all our referencers.
      */
-    static final int TTA = 5 * TTB;
+    static int TTA = 5 * TTB;
 
     static {
+        String ttb = System.getProperty("proactive.dgc.ttb");
+        if (ttb != null) {
+            TTB = Integer.parseInt(ttb);
+            TTA = 5 * TTB;
+        }
+
         if (dgcIsEnabled()) {
+            AsyncLogger.queueLog(Level.INFO,
+                "Starting DGC, TTB:" + TTB + " TTA:" + TTA);
             GarbageCollectorThread.start();
         }
     }
@@ -162,6 +170,13 @@ public class GarbageCollector {
     private long aloneTimestamp;
 
     /**
+     * After a cycle is detected, the AO is kept alive for TTA ms to inform
+     * its known referencers of the consensus. This is needed because the last
+     * AO to be terminated could kill the JVM and disable this major optimization.
+     */
+    private long cycleTimestamp;
+
+    /**
      * The AO we belong to
      */
     protected final AbstractBody body;
@@ -185,6 +200,7 @@ public class GarbageCollector {
         this.newReferenced = new LinkedList<UniversalBodyProxy>();
         this.referencers = new HashMap<UniqueID, Referencer>();
         this.aloneTimestamp = System.currentTimeMillis();
+        this.cycleTimestamp = 0;
         this.body = body;
         this.previouslyBusy = true;
         body.addNFEListener(new TypedNFEListener(
@@ -397,16 +413,27 @@ public class GarbageCollector {
         }
         String goodbye = null;
 
-        /* Did someone notify us of a cycle? */
-        boolean consensusAlreadyReached = false;
-        for (Map.Entry<UniqueID, Referenced> entry : this.referenced.entrySet()) {
-            if (entry.getValue().hasTerminated()) {
-                goodbye = "####### Noticed of garbage cycle from " +
-                    entry.getKey().shortString() + " => PAF: " +
-                    this.lastActivity;
+        boolean consensusAlreadyReached = this.cycleTimestamp > 0;
+        if (consensusAlreadyReached) {
+            if ((System.currentTimeMillis() - this.cycleTimestamp) > TTA) {
+                goodbye = "####### Had the time to propagate the consensus to referencers => PAF";
                 this.setFinishedState(FinishedState.CYCLIC);
-                consensusAlreadyReached = true;
-                break;
+            } else {
+                return null;
+            }
+        }
+
+        /* Did someone notify us of a cycle? */
+        if (!consensusAlreadyReached) {
+            for (Map.Entry<UniqueID, Referenced> entry : this.referenced.entrySet()) {
+                if (entry.getValue().hasTerminated()) {
+                    goodbye = "####### Noticed of garbage cycle from " +
+                        entry.getKey().shortString() + " => PAF: " +
+                        this.lastActivity;
+                    this.cycleTimestamp = System.currentTimeMillis();
+                    consensusAlreadyReached = true;
+                    return goodbye;
+                }
             }
         }
 
@@ -435,7 +462,8 @@ public class GarbageCollector {
                     }
                     goodbye = "####### Detected garbage cycle => PAF: " +
                         this.lastActivity;
-                    this.setFinishedState(FinishedState.CYCLIC);
+                    this.cycleTimestamp = System.currentTimeMillis();
+                    return goodbye;
                 } else {
                     return null;
                 }
@@ -486,11 +514,12 @@ public class GarbageCollector {
         if (!this.isFinished() && this.body.isAlive()) {
             String goodbye = this.checkConsensus();
             this.iterations++;
-            if (this.isFinished()) {
+            if (goodbye != null) {
                 this.log(Level.INFO,
                     "Goodbye because: " + goodbye + " after " + iterations +
                     " iterations");
-            } else {
+            }
+            if ((this.cycleTimestamp == 0) && !this.isFinished()) {
                 return this.broadcast();
             }
         }
@@ -541,6 +570,16 @@ public class GarbageCollector {
         return gc.body.getID().shortString() + ": " + gc.getStatus();
     }
 
+    private boolean allReferencersNotifiedCycle() {
+        for (Referencer r : this.referencers.values()) {
+            if (!r.isNotifiedCycle()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * For IC2D
      */
@@ -573,10 +612,17 @@ public class GarbageCollector {
         UniqueID senderID = mesg.getSender();
         Referencer kr = this.referencers.get(senderID);
         GCSimpleResponse resp = null;
-        if (this.finished == FinishedState.CYCLIC) {
+        if (this.cycleTimestamp > 0) {
             this.log(Level.DEBUG, "cycle to " + mesg.getSender().shortString());
             if (kr == null) {
                 this.log(Level.FATAL, "Cycle notification to a newcomer");
+            }
+            kr.setNotifiedCycle();
+            if (allReferencersNotifiedCycle()) {
+                this.log(Level.INFO,
+                    "####### notified cycle to every known referencer => PAF");
+                this.setFinishedState(FinishedState.CYCLIC);
+                this.terminateBody();
             }
             resp = new GCTerminationResponse(this.lastActivity);
         } else if (this.finished == FinishedState.ACYCLIC) {
