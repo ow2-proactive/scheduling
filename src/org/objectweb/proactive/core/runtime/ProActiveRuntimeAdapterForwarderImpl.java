@@ -121,7 +121,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
             // on a forwarder and during the deserialization of a ProActiveAdapterForwarderImpl.
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
-            if (!partf.registeredRuntimes.containsKey(urid)) {
+            if ((urid != null) && !partf.registeredRuntimes.containsKey(urid)) {
                 try {
                     // Add this unknown runtime to the table of forwarded runtimes
                     partf.registeredRuntimes.put(urid,
