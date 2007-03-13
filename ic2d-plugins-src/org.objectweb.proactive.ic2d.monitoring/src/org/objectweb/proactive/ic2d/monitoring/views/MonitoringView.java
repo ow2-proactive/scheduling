@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.monitoring.actions.EnableDisableMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewViewAction;
@@ -428,6 +429,7 @@ public class MonitoringView extends ViewPart {
 		registry.registerAction(new RefreshJVMAction());
 		registry.registerAction(new RefreshNodeAction());
 		registry.registerAction(new StopMonitoringAction());
+		registry.registerAction(new KillVMAction());
 		registry.registerAction(new SetUpdateFrequenceAction(display));
 		registry.registerAction(new VerticalLayoutAction());
 		registry.registerAction(new HorizontalLayoutAction());

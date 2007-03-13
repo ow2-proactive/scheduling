@@ -98,6 +98,12 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
 		if (action.isEnabled())
 			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
 		
+		// Kill this VM
+		action = registry.getAction(KillVMAction.KILLVM);
+		if (action.isEnabled())
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		
+		
 		MenuManager layoutMenu = new MenuManager("Layout");
 		
 		// Vertical Layout

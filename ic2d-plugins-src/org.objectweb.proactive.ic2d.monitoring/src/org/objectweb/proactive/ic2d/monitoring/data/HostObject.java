@@ -31,8 +31,12 @@
 package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -103,12 +107,31 @@ public class HostObject extends AbstractDataObject {
 		HostRTFinder runtimeFinder = HostRTFinderFactory.createHostRTFinder(this.protocol);
 		List<ProActiveRuntime> foundRuntimes = runtimeFinder.findPARuntime(this);
 
+		Set<String> keysOfMonitoringObjects = new TreeSet<String>(monitoredChildren.keySet());
+
 		for (int i = 0; i < foundRuntimes.size(); ++i) {
 			ProActiveRuntime proActiveRuntime = foundRuntimes.get(i);
 			handleProActiveRuntime(proActiveRuntime, getWorld().getMonitorThread().getDepth());
+
+			String key = proActiveRuntime.getVMInformation().getName();
+			keysOfMonitoringObjects.remove(key);
 		}
 		if(monitoredChildren.size() == 0) { //we didn't find any child
 			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
+		}
+		if(keysOfMonitoringObjects.size()!=0){
+			Iterator<String> it = keysOfMonitoringObjects.iterator();
+			while(it.hasNext()){
+				String key = it.next();
+				VMObject vm = (VMObject)monitoredChildren.get(key);
+				try {
+					// To test if the VM is alive
+					if(vm.isAlive)
+						vm.getProActiveRuntime().getLocalNodeNames();
+				} catch (ProActiveException e) {
+					vm.notResponding();
+				}
+			}
 		}
 	}
 

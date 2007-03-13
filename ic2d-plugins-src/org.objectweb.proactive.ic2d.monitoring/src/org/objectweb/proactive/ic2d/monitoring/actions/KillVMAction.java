@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -32,28 +32,27 @@ package org.objectweb.proactive.ic2d.monitoring.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
+import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 
-public class StopMonitoringAction extends Action {
+public class KillVMAction extends Action {
 
-	public static final String STOP_MONITORING = "Stop monitoring";
+	public static final String KILLVM = "Kill this Virtual Machine";
 	
-	private AbstractDataObject object;
+	private VMObject jvm;
 	
-	public StopMonitoringAction() {
-		this.setId(STOP_MONITORING);
+	public KillVMAction(){
+		this.setId(KILLVM);
 		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "stop_monitoring.gif"));
+		this.setText("Kill this VM");
+		this.setToolTipText("Kill this VM");
 	}
 	
-	public void setObject(AbstractDataObject object) {
-		this.object = object;
-		this.setText("Stop monitoring this "+object.getType());
-		this.setToolTipText("Stop monitoring this "+object.getType());
+	public void setVM(VMObject jvm) {
+		this.jvm = jvm;
 	}
 	
 	@Override
 	public void run() {
-		object.stopMonitoring(true);
+		jvm.killVM();
 	}
-	
 }

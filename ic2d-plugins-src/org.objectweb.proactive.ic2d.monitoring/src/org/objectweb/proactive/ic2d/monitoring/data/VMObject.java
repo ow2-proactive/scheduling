@@ -87,7 +87,8 @@ public class VMObject extends AbstractDataObject {
 		try {
 			namesOfNodes = runtime.getLocalNodeNames();
 		} catch (ProActiveException e) {
-			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
+			notResponding();
 		}
 		for (int i = 0; i < namesOfNodes.length; ++i) {
 			String nodeName = namesOfNodes[i];
@@ -155,6 +156,18 @@ public class VMObject extends AbstractDataObject {
 		List<AbstractDataObject> childrenList = new ArrayList<AbstractDataObject>(monitoredChildren.values());
 		for(int i=0, size=childrenList.size(); i<size; i++)
 			((NodeObject)childrenList.get(i)).enableMonitoring(enable);
+	}
+
+	/**
+	 * Kill the virtual machine.
+	 */
+	public void killVM(){
+		try {
+			getRuntime().killRT(false);
+		} catch (Exception e) {
+			Console.getInstance(Activator.CONSOLE_NAME).log("Virtual Machine "+getFullName()+" on host "+getTypedParent()+" terminated!");
+			stopMonitoring(false);
+		}
 	}
 
 	//

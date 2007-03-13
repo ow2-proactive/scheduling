@@ -35,6 +35,7 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
@@ -97,6 +98,9 @@ public class AOListener implements MouseListener{
 			
 			// Stop monitoring this ...
 			registry.getAction(StopMonitoringAction.STOP_MONITORING).setEnabled(false);
+			
+			// Kill VM
+			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
 			
 			// Set update frequence...
 			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);

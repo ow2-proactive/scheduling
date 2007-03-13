@@ -67,16 +67,12 @@ public class RMIHostRTFinder implements HostRTFinder{
 			/* Hook the registry */
 			registry = LocateRegistry.getRegistry(host.getHostName(),host.getPort());
 
-			console.log("Listing bindings for " + registry);
+			console.debug("Listing bindings for " + registry);
 			/* Gets a snapshot of the names bounds in the 'registry' */
 			names = registry.list();
 
 		} catch (Exception e) {
 			if(e instanceof ConnectException || e instanceof ConnectIOException) {
-				List<AbstractDataObject> jvms = host.getMonitoredChildren();
-				for(int i=0, size=jvms.size() ; i<size ; i++) {
-					((VMObject)jvms.get(i)).notResponding();
-				}
 				console.debug(e);
 			}
 			else

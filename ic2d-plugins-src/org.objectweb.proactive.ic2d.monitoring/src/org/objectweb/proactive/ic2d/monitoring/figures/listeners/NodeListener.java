@@ -38,6 +38,7 @@ import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
+import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.RefreshHostAction;
@@ -93,6 +94,9 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 
 			// Look for new Nodes
 			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
+			
+			// Kill VM
+			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
 
 			// Look for new Active Objects
 			RefreshNodeAction refreshNodeAction = (RefreshNodeAction)registry.getAction(RefreshNodeAction.REFRESH_NODE);
