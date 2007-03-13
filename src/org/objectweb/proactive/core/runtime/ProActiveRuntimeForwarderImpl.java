@@ -1014,6 +1014,10 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         for (UniqueRuntimeID urid : registeredRuntimes.keySet()) {
             logger.warn("\t" + urid);
         }
+        logger.warn("Associated StackTrace");
+        for (StackTraceElement se : Thread.currentThread().getStackTrace()) {
+            logger.warn(se);
+        }
     }
 
     public String getLocalNodeProperty(UniqueRuntimeID runtimeID,
