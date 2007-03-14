@@ -64,7 +64,7 @@ public class WsdlServlet extends HttpServlet {
                 return;
             }
 
-            Hashtable options = new Hashtable();
+            Hashtable<String, String> options = new Hashtable<String, String>();
             String catalinaBase = System.getProperty("catalina.base");
             options.put("filename",
                 catalinaBase + "/webapps/soap/DeployedServices.ds");
