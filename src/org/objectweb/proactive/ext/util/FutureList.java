@@ -50,6 +50,7 @@ package org.objectweb.proactive.ext.util;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 @PublicAPI
 public class FutureList {
     private java.util.Vector<Object> futureList;

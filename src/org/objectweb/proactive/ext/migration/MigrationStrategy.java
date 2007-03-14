@@ -32,6 +32,7 @@ package org.objectweb.proactive.ext.migration;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 @PublicAPI
 public interface MigrationStrategy {
     public void add(Destination d);

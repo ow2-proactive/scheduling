@@ -30,12 +30,13 @@
  */
 package org.objectweb.proactive.calcium;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.Skernel;
 import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
-import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This class corresponds to the entry point of the skeleton framework.
