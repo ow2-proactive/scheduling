@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.util.profiling;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
+import util.timer.AverageMicroTimer;
 
 
 /**

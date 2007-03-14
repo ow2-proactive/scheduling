@@ -65,7 +65,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 
 
 public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
@@ -103,9 +102,6 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     /** A pool of thread to serve the request */
     transient protected ThreadPool threadpool;
 
-    /** Used for profiling */
-    protected CompositeAverageMicroTimer timer;
-
     /* ----------------------- CONSTRUCTORS ----------------------- */
     public ProxyForGroup(String nameOfClass)
         throws ConstructionOfReifiedObjectFailedException {
@@ -118,10 +114,6 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
         this.elementNames = new HashMap();
-        if (Profiling.GROUP) {
-            timer = new CompositeAverageMicroTimer("Group");
-            PAProfilerEngine.registerTimer(timer);
-        }
     }
 
     public ProxyForGroup(ConstructorCall c, Object[] p)
@@ -259,10 +251,6 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         throws InvocationTargetException {
         Object result;
         Body body = ProActive.getBodyOnThis();
-        if (Profiling.GROUP) {
-            timer.setTimer("asynchronousCallOnGroup." + mc.getName());
-            timer.start();
-        }
 
         // Creates a stub + ProxyForGroup for representing the result
         String returnTypeClassName = null;
@@ -331,9 +319,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         }
 
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
-        if (Profiling.GROUP) {
-            timer.stop();
-        }
+
         return result;
     }
 
@@ -379,10 +365,6 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     protected void oneWayCallOnGroup(MethodCall mc,
         ExceptionListException exceptionList) throws InvocationTargetException {
         Body body = ProActive.getBodyOnThis();
-        if (Profiling.GROUP) {
-            timer.setTimer("oneWayCallOnGroup." + mc.getName());
-            timer.start();
-        }
 
         // Creating Threads
         if (isDispatchingCall(mc) == false) {
@@ -415,10 +397,6 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         }
 
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
-
-        if (Profiling.GROUP) {
-            timer.stop();
-        }
     }
 
     /* ------------------- java.util.List methods------------------ */

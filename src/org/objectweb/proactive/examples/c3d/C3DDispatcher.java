@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Scene;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
@@ -62,6 +61,8 @@ import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.examples.c3d.prim.View;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
+
+import util.timer.AverageMicroTimer;
 
 
 /**

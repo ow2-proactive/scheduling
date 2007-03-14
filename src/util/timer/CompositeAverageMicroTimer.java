@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.util.timer;
+package util.timer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

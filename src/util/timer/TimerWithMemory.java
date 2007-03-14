@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.util.timer;
+package util.timer;
 
 import java.io.Serializable;
 

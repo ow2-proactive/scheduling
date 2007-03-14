@@ -73,7 +73,6 @@ import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -127,9 +126,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected RequestReceiver requestReceiver;
     protected MessageEventProducerImpl messageEventProducer;
 
-    /** Used for profiling */
-    private CompositeAverageMicroTimer timer;
-
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -159,10 +155,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 factory.newRequestQueueFactory().newRequestQueue(bodyID),
                 factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
-        if (Profiling.SERVICE) {
-            timer = new CompositeAverageMicroTimer("Service");
-            PAProfilerEngine.registerTimer(timer);
-        }
 
         // FAULT TOLERANCE
         String ftstate = ProActiveConfiguration.getFTState();
@@ -392,20 +384,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     getRequestQueue().size());
                 Reply reply = null;
                 try {
-                    if (Profiling.SERVICE) {
-                        timer.setTimer("serve." + request.getMethodName());
-                        timer.start();
-                    }
-
                     //If the request is not a "terminate Active Object" request, 
                     //it is served normally.
                     if (!isTerminateAORequest(request)) {
                         reply = request.serve(BodyImpl.this);
-                    }
-
-                    if (Profiling.SERVICE) {
-                        //timer.setTimer("serve."+this.getMethodName());
-                        timer.stop();
                     }
                 } catch (ServeException e) {
                     // Create a non functional exception encapsulating the service exception

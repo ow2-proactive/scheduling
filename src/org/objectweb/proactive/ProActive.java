@@ -103,7 +103,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
@@ -204,9 +203,6 @@ import ibis.rmi.RemoteException;
 public class ProActive {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);
-
-    /** Used for profiling */
-    private static CompositeAverageMicroTimer timer;
 
     static {
         ProActiveConfiguration.load();
@@ -707,15 +703,6 @@ public class ProActive {
             }
         }
 
-        if (Profiling.SECURITY) {
-            if (timer == null) {
-                timer = new CompositeAverageMicroTimer("newActiveSecurityTimer");
-                PAProfilerEngine.registerTimer(timer);
-            }
-            timer.setTimer("constructing certificate");
-            timer.start();
-        }
-
         MetaObjectFactory clonedFactory = factory;
 
         ProActiveSecurityManager factorySM = factory.getProActiveSecurityManager();
@@ -729,9 +716,6 @@ public class ProActive {
             ProActiveSecurityManager psm = clonedFactory.getProActiveSecurityManager();
             psm = psm.generateSiblingCertificate(classname);
             clonedFactory.setProActiveSecurityManager(psm);
-        }
-        if (Profiling.SECURITY) {
-            timer.stop();
         }
 
         //using default proactive node

@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
 
 
 /**
@@ -244,22 +243,8 @@ public class StartNode {
             JiniRuntimeFactory.setMulticastLocator(multicastLocator);
         }
 
-        AverageMicroTimer mt = null;
-
-        if (Profiling.STARTNODE) {
-            mt = new AverageMicroTimer("StartNode");
-            PAProfilerEngine.registerTimer(mt);
-            mt.start();
-        }
-
         // create node
         createNode(nodeURL, noRebind);
-
-        if (Profiling.STARTNODE) {
-            mt.stop();
-
-            //	mt.dump();
-        }
     }
 
     /**
