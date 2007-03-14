@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.ext.webservices.WebServices;
 
 
 /**
@@ -354,7 +355,7 @@ public class PiBBP implements Serializable {
                     new Object[] { args });
 
             if (piApplication.isWebService()) {
-                ProActive.exposeAsWebService(piApplication,
+                WebServices.exposeAsWebService(piApplication,
                     "http://localhost:8080/", "piComputation",
                     new String[] {
                         "runSimple", "runParallel", "runParallelDistributed",

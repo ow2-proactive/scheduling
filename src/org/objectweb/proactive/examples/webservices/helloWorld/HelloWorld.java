@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.webservices.helloWorld;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.ext.webservices.WebServices;
 
 
 /**
@@ -62,7 +63,7 @@ public class HelloWorld {
         try {
             HelloWorld hw = (HelloWorld) ProActive.newActive("org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld",
                     new Object[] {  });
-            ProActive.exposeAsWebService(hw, url, "helloWorld",
+            WebServices.exposeAsWebService(hw, url, "helloWorld",
                 new String[] { "helloWorld" });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();

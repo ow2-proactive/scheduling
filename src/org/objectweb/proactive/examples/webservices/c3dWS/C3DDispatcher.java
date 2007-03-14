@@ -74,6 +74,7 @@ import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
+import org.objectweb.proactive.ext.webservices.WebServices;
 
 
 /**
@@ -1089,7 +1090,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             String url = "http://" + hostWS;
             c3dd.setUrl(url);
             c3dd.setUrn(urn);
-            ProActive.exposeAsWebService(c3dd, url, urn, methods);
+            WebServices.exposeAsWebService(c3dd, url, urn, methods);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1679,7 +1680,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                 //				org.objectweb.proactive.ProActive.unregisterVirtualNode(
                 //					vn);
                 // System.out.println("undeploy : " + urn + " at : " + url);
-                ProActive.unExposeAsWebService(urn, url);
+                WebServices.unExposeAsWebService(urn, url);
                 proActiveDescriptor.killall(false);
             } catch (Exception e) {
                 trace("WARNING occurs when killing the application!");
