@@ -61,13 +61,13 @@ public class ProActiveMPIManager implements Serializable {
     private ArrayList mpiSpmdList;
 
     /*  Hashtable<jobID, ProActiveCoupling []> */
-    private Hashtable proxyMap;
+    private Hashtable<Integer, ProActiveMPICoupling[]> proxyMap;
 
     /*  Hashtable<jobID, ProSPMD ProActiveMPICoupling> */
-    private Hashtable spmdProxyMap;
+    private Hashtable<Integer, ProActiveMPICoupling> spmdProxyMap;
 
     /*  Hashtable<jobID, Hashtable<class, ProSPMD user class || user proxy array>> */
-    private Hashtable userProxyMap;
+    private Hashtable<Integer, Hashtable> userProxyMap;
 
     /*  ackToStart[jobID] = number of proxy registered */
     private int[] ackToStart;
@@ -80,9 +80,9 @@ public class ProActiveMPIManager implements Serializable {
 
     public void deploy(ArrayList spmdList) {
         this.mpiSpmdList = spmdList;
-        this.proxyMap = new Hashtable();
-        this.spmdProxyMap = new Hashtable();
-        this.userProxyMap = new Hashtable();
+        this.proxyMap = new Hashtable<Integer, ProActiveMPICoupling[]>();
+        this.spmdProxyMap = new Hashtable<Integer, ProActiveMPICoupling>();
+        this.userProxyMap = new Hashtable<Integer, Hashtable>();
         this.ackToStart = new int[spmdList.size()];
         this.ackToRecv = new int[spmdList.size()];
 
@@ -247,7 +247,7 @@ public class ProActiveMPIManager implements Serializable {
                 " deploy user classes");
             // get the table of parameters
             Hashtable paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getClassesParams();
-            Hashtable userProxyList = new Hashtable();
+            Hashtable<String, Object[]> userProxyList = new Hashtable<String, Object[]>();
             Iterator iterator = classes.iterator();
             while (iterator.hasNext()) {
                 String cl = (String) iterator.next();
@@ -281,7 +281,7 @@ public class ProActiveMPIManager implements Serializable {
                 " deploy user SPMD classes");
             // get the table of parameters
             Hashtable paramsTable = ((MPISpmd) mpiSpmdList.get(jobID)).getSpmdClassesParams();
-            Hashtable userProxyList = new Hashtable();
+            Hashtable<String, Object> userProxyList = new Hashtable<String, Object>();
             Iterator iterator = classes.iterator();
             while (iterator.hasNext()) {
                 String cl = (String) iterator.next();
