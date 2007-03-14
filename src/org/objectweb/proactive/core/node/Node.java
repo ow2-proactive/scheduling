@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.node;
 import java.io.IOException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
@@ -55,6 +56,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
  * @since   ProActive 0.9
  *
  */
+@PublicAPI
 public interface Node {
 
     /**

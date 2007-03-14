@@ -33,12 +33,14 @@ package org.objectweb.proactive.core.exceptions;
 import java.io.Serializable;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
  * The root class of non functional exceptions
  * @author  ProActive Team
  */
+@PublicAPI
 public class NonFunctionalException extends RuntimeException
     implements Serializable {
     private String nodeURL;

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ext.migration;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 
 
@@ -43,6 +44,7 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
  * @see org.objectweb.proactive.Body
  * @see MigrationException
  */
+@PublicAPI
 public interface MigrationStrategyManager {
     public void startStrategy(Body body) throws MigrationException;
 

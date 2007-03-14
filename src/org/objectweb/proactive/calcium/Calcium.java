@@ -35,7 +35,7 @@ import org.objectweb.proactive.calcium.Skernel;
 import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
-
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * This class corresponds to the entry point of the skeleton framework.
@@ -49,6 +49,7 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobal;
  * @author The ProActive Team (mleyton)
  *
  */
+@PublicAPI
 public class Calcium {
     private Facade facade;
     private Skernel skernel;

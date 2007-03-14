@@ -33,6 +33,7 @@ package org.objectweb.proactive.branchnbound;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.branchnbound.core.Manager;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.branchnbound.core.queue.TaskQueue;
@@ -57,6 +58,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * Created on Apr 20, 2005
  */
+@PublicAPI
 public class ProActiveBranchNBound {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS);
 

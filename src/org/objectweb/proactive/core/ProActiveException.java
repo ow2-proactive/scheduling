@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Generic exception root of all non runtime custom exceptions in ProActive
@@ -39,6 +41,7 @@ package org.objectweb.proactive.core;
  * @since   ProActive 0.9
  *
  */
+@PublicAPI
 public class ProActiveException extends Exception {
     public ProActiveException() {
         super();

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.descriptor.data;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -61,6 +62,7 @@ import org.objectweb.proactive.ext.security.PolicyServer;
  * @see VirtualNode
  * @see VirtualMachine
  */
+@PublicAPI
 public interface ProActiveDescriptor extends java.io.Serializable {
 
     /**

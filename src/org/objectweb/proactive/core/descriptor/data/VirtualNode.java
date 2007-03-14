@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -53,6 +54,7 @@ import org.objectweb.proactive.filetransfer.FileVector;
  * @see ProActiveDescriptor
  * @see VirtualMachine
  */
+@PublicAPI
 public interface VirtualNode extends java.io.Serializable, Job {
     public final static Logger vnLogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
 
