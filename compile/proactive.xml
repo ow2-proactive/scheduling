@@ -404,7 +404,9 @@
 	<!--                      Compile util                                -->
 	<!--  =============================================================== -->
 	<target name="util" depends="">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="util/**" deprecation="on" source="${javac.source}" debug="${javac.debug}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="util/**" deprecation="on" source="${javac.source}" debug="${javac.debug}">
+			<classpath refid="project.classpath" />
+		</javac>
 	</target>
 
 
