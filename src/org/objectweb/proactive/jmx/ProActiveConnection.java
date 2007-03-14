@@ -147,7 +147,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection 
     /**
      * @see javax.management.MBeanServerConnection#queryMBeans(javax.management.ObjectName, javax.management.QueryExp)
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused",
+        "unchecked"
+    })
     public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query)
         throws IOException {
         return this.mbs.queryMBeans(name, query);
