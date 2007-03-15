@@ -42,9 +42,8 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.util.timer.MicroTimer;
-import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
+
+import util.timer.MicroTimer;
 
 
 public class TimedRequestWithLocationServer extends RequestImpl implements java.io.Serializable {
