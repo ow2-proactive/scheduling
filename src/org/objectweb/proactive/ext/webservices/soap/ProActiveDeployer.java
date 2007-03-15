@@ -92,7 +92,7 @@ public class ProActiveDeployer extends WSConstants {
 
                     /* get all the public methods */
                     Method[] methods = interface_.getClass().getMethods();
-                    Vector meths = new Vector();
+                    Vector<String> meths = new Vector<String>();
 
                     for (int j = 0; j < methods.length; j++) {
                         String methodName = methods[j].getName();
@@ -190,16 +190,16 @@ public class ProActiveDeployer extends WSConstants {
             dd.setMethods(methods);
         } else {
             Method[] ms = o.getClass().getDeclaredMethods();
-            Vector mv = new Vector();
+            Vector<String> mv = new Vector<String>();
             for (int i = 0; i < ms.length; i++)
                 if (!disallowedMethods.contains(ms[i].getName())) {
                     mv.addElement(ms[i].getName());
                 }
             methods = new String[mv.size()];
-            Enumeration e = mv.elements();
+            Enumeration<String> e = mv.elements();
             int j = 0;
             while (e.hasMoreElements())
-                methods[j++] = (String) e.nextElement();
+                methods[j++] = e.nextElement();
 
             dd.setMethods(methods);
         }
@@ -207,7 +207,7 @@ public class ProActiveDeployer extends WSConstants {
         dd.setProviderClass(o.getClass().getName());
 
         /* Here we put the serialized stub into a dd property */
-        Hashtable props = new Hashtable();
+        Hashtable<String, Object> props = new Hashtable<String, Object>();
 
         props.put(WSDL_FILE, wsdl);
 
@@ -240,15 +240,15 @@ public class ProActiveDeployer extends WSConstants {
      * Only Java Beans are supported
      */
     private static TypeMapping[] getMappings(Class c, String[] methods) {
-        Vector tms = new Vector();
-        Vector sMethods = new Vector();
+        Vector<TypeMapping> tms = new Vector<TypeMapping>();
+        Vector<String> sMethods = new Vector<String>();
 
         if (methods != null) {
             for (int i = 0; i < methods.length; i++) {
                 sMethods.addElement(methods[i]);
             }
 
-            Vector mMethods = new Vector();
+            Vector<Method> mMethods = new Vector<Method>();
             Method[] ms = c.getDeclaredMethods();
 
             for (int i = 0; i < ms.length; i++) {

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ext.webservices.wsdl;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Vector;
 
 import javax.wsdl.WSDLException;
@@ -58,7 +57,6 @@ public class WSDLGenerator extends WSConstants {
      */
     public static String getWSDL(Class c, String serviceName, String urlRouter,
         String documentation, String[] methods) {
-        StringWriter sw = new StringWriter();
         String namespace = serviceName;
 
         try {
@@ -67,7 +65,7 @@ public class WSDLGenerator extends WSConstants {
             emitter.setDisallowedMethods(disallowedMethods);
 
             if (methods != null) {
-                Vector allowedMethods = new Vector(methods.length);
+                Vector<String> allowedMethods = new Vector<String>(methods.length);
                 for (int i = 0; i < methods.length; i++) {
                     allowedMethods.addElement(methods[i]);
                 }
