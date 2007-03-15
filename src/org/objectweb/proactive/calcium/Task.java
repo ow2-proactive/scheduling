@@ -289,6 +289,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
      * and also with a priority higher than it's parent.
      * @param child The sub task.
      */
+    @SuppressWarnings("unchecked")
     public synchronized void addReadyChild(Task<?> child) {
         child.setPriority(getPriority());
         child.setParent(getId());

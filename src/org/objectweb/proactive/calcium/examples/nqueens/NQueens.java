@@ -68,6 +68,7 @@ public class NQueens implements Serializable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public NQueens() {
         Skeleton<Board, Result> BT1 = new DaC<Board, Result>(new DivideBT1(),
                 new DivideCondition(), new Seq<Board, Result>(new SolveBT1()),
