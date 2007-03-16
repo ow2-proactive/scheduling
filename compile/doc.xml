@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ProActive Documentation" basedir=".">
+	
+	<import file="common.xml" />
+	
+	<!-- ================================================================ -->
+		<!--            Create docs, which is the javadoc + manual            -->
+		<!--  =============================================================== -->
+		<target name="docs" depends="java2html, javadoc, manual" description="Construct the javadoc and the manual" />
+
+
+		<!-- ================================================================ -->
+		<!--            Make the java files readable on the web               -->
+		<!--  =============================================================== -->
+		<!-- 
+		** Do not support Java 1.5 **
+		<target name="java2html">
+			<echo message="Converting java to html..." />
+			<java jar="${base.dir}/dev/lib/j2h.jar" fork="true">
+				<arg line="-d ${docs.dir}/ProActive_src_html" />
+				<arg line="-js ${src.dir}/${proactive.path}" />
+				<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api" />
+				<arg line="-t 2 -n '${name} source code'" />
+			</java>
+
+		</target>-->
+
+		<!-- TODO tempory fix for java 1.5, do not generate index.html -->
+		<!-- http://www.java2html.de /dev/lib/j2h.jar -->
+		<target name="java2html">
+			<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base.dir}/dev/lib/j2h.jar" />
+			<j2h srcdir="${src.dir}/${proactive.path}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="true" outputFormat="html" />
+		</target>
+
+
+		<!-- ================================================================ -->
+		<!--                     Create javadoc                               -->
+		<!-- ================================================================ -->
+		<target name="javadoc" description="Use javadoc to build information on the ProActive classes">
+			<!-- Create the javadoc directory -->
+			<mkdir dir="${docs.dir}/api" />
+			<copy todir="${docs.dir}/api">
+				<fileset dir="${src.proactive.dir}" includes="**/*.jpg"/>
+				<fileset dir="${src.modules.dir}"   includes="**/*.jpg"/>
+			</copy>
+			<mkdir dir="${docs.dir}/ic2d-api" />
+			<javadoc  destdir="${docs.dir}/api" verbose="true" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> <!-- -docfilessubdirs -excludedocfilessubdir  -->
+			    <packageset dir="${src.proactive.dir}" />
+				<packageset dir="${src.modules.dir}" />
+		      		
+				<classpath refid="project.classpath" />
+				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+				<bottom><![CDATA[<i>Copyright $$%%CopyrightYears%%$$ INRIA All Rights Reserved.</i>]]></bottom>
+				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
+				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
+				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
+				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
+				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
+				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
+				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
+				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
+				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
+				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
+				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
+				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
+				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
+				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
+				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+			</javadoc>
+			<javadoc packagenames="org.objectweb.proactive.ic2d.*" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API"  breakiterator="yes">
+				<sourcepath>
+					<pathelement path="${src.ic2d.dir}"/>
+					<pathelement path="${src.proactive.dir}"/>
+				</sourcepath>
+				<classpath refid="project.classpath" />
+				<doctitle><![CDATA[ProActive ${version} - IC2D]]></doctitle>
+				<bottom><![CDATA[<i>Copyright $$%%CopyrightYears%%$$ INRIA All Rights Reserved.</i>]]></bottom>
+				<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*" />
+			</javadoc>
+
+		</target>
+
+	<!-- ==================================================================== -->
+	<!--      The following docbook* are sub-tasks to build the Manual        -->
+	<!-- ==================================================================== -->
+	<xmlcatalog id="docbookcatalog">
+		<!-- If a needed file doesn't exist, it will be fetched on the web -->
+
+		<classpath>
+			<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
+			<pathelement location="/usr/local/docbook-xsl-1.69.1" />
+			<pathelement location="${base.dir}/dev/lib/docbook/docbook-xsl-1.69.1.zip" />
+		</classpath>
+
+		<dtd publicId="-//OASIS//DTD DocBook XML V4.2//EN" location="dtd-4.2/docbookx.dtd" />
+		<dtd publicId="http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" location="dtd-4.2/docbookx.dtd" />
+
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/profiling/profile.xsl" location="profiling/profile.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" location="html/chunk.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl" location="html/docbook.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" location="fo/docbook.xsl" />
+	</xmlcatalog>
+
+
+	<!-- ==================================================================== -->
+	<!--      Converts docbook xml into ??? - uses the trax processor         -->
+	<!-- ==================================================================== -->
+	<target name="-docbookTransform"	>
+		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
+		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/${docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
+			<param name="profile.os" expression="${docbook.profile}" />
+			<!--docbook.profile can be html, pdf or empty-->
+			<xmlcatalog refid="docbookcatalog" />
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${base.dir}/dev/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</xslt>
+
+		<!-- Do the real conversion, docbook to pdf or html -->
+		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp.dir}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
+			<xmlcatalog refid="docbookcatalog" />
+			<param name="TODAY" expression="${TODAY}" />
+			<!-- the date for the first page -->
+			<param name="VERSION" expression="${version}" />
+			<!-- the version number, for the first page -->
+			<classpath>
+				<fileset dir="${lib.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${base.dir}/dev/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</xslt>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!--          Generic task to transform docbook xml into pdf              -->
+	<!-- ==================================================================== -->
+	<target name="-docbookToPdf">
+		<property name="fo.output" value="${pdfOutputFile}.fo" />
+
+		<!--   First translate into intermediate fo format -->
+		<antcall target="-docbookTransform">
+			<param name="docbookOutputFile" value="${fo.output}" />
+			<param name="docbookStyle" value="${doc.src}/xsl/pdf.xsl" />
+			<param name="docbook.profile" value="pdf" />
+		</antcall>
+
+		<!-- declare how to transform fo xml file in pdf through a new 'fop' task -->
+		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
+			<classpath>
+				<pathelement location="${base.dir}/dev/lib/docbook/fop.jar" />
+				<pathelement location="${base.dir}/dev/lib/docbook/jimi.zip" />
+				<pathelement location="${base.dir}/dev/lib/docbook/avalon.jar" />
+				<pathelement location="${base.dir}/dev/lib/docbook/batik.jar" />
+				<pathelement location="${lib.dir}/ws/commons-logging.jar" />
+			</classpath>
+		</taskdef>
+
+		<!-- Then use the newly defined fop task to translate fo into pdf -->
+		<fop format="application/pdf" fofile="${fo.output}" outfile="${pdfOutputFile}" basedir="${doc.src}" />
+
+		<delete file="${fo.output}" />
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!--    Add some highlighting information to the docbook source code      -->
+	<!-- ==================================================================== -->
+	<target name="-docbookBeautify">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.utils.dir}" destdir="${cl.utils.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="doc/*.java" />
+		</javac>
+
+		<java classname="doc.DocBookize" fork="true">
+			<classpath refid="project.classpath"/>
+			
+			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
+			<!-- The xml file to parse -->
+			<arg value="ProActive_src_html/${proactive.path}/" />
+			<!-- The path to find java files in html -->
+			<arg value="${src.dir}/${proactive.path}/" />
+			<arg value="${src.proactive.dir}/org/objectweb/proactive/" />
+			<arg value="${src.examples.dir}/org/objectweb/proactive/" />
+			<arg value="${src.utils.dir}/" />
+
+			<!-- the path for java file inclusion -->
+			<arg value="${base.dir}/descriptors/" />
+			<!-- the path for xml file inclusion -->
+		</java>
+
+		<java classname="doc.Validate" fork="true">
+			<classpath refid="project.classpath" />
+			<classpath>
+				<fileset dir="${base.dir}/dev/lib/docbook/">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
+		</java>
+
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!-- preprocessing for the manual: copy files and add tags to source code -->
+	<!-- ==================================================================== -->
+	<target name="-docbookPreProcess">
+
+		<!-- as this file gets edited, make sure it's a fresh copy-->
+		<delete file="${docs.tmp.dir}/${docs.mainFile}" />
+
+		<!-- Copy the files needed for the html files (pics and maybe others) -->
+		<copy toDir="${docs.dir}/html/">
+			<fileset dir="${doc.src}">
+				<include name="**/*.png" />
+				<include name="**/*.jpg" />
+				<include name="ProActive.css" />
+			</fileset>
+		</copy>
+
+		<!-- Copying xml files so they can be edited (beautify programlistings) -->
+		<copy toDir="${docs.tmp.dir}" includeemptydirs="no">
+			<fileset dir="${doc.src}">
+				<include name="**/*" />
+				<exclude name="**/.svn" />
+				<exclude name="xsl" />
+			</fileset>
+		</copy>
+
+		<!-- Decorate the code a bit (code examples in programlistings) -->
+		<antcall target="-docbookBeautify">
+			<param name="docbookInputFile" value="${docs.mainFile}" />
+		</antcall>
+
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!--          Make just the html files for the manual                     -->
+	<!-- ==================================================================== -->
+	<target name="manualHtml" description="Make only the html files in the manual" depends="-docbookPreProcess">
+		<antcall target="-docbookTransform">
+			<param name="docbookInputFile" value="${docs.mainFile}" />
+			<param name="docbookOutputFile" value="${docs.dir}/html/index.html" />
+			<param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl" />
+			<param name="docbook.profile" value="html" />
+		</antcall>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!--               Make just the pdf files for the manual                 -->
+	<!-- ==================================================================== -->
+	<target name="manualPdf" description="Make only the pdf files in the manual" depends="-docbookPreProcess">
+		<antcall target="-docbookToPdf">
+			<param name="docbookInputFile" value="${docs.mainFile}" />
+			<param name="pdfOutputFile" value="${docs.dir}/pdf/ProActiveManual.pdf" />
+		</antcall>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!--           Make only one huge html-file from the doc                  -->
+	<!-- ==================================================================== -->
+	<target name="manualSingleHtml" description="Make only the big html file in the manual" depends="-docbookPreProcess">
+		<antcall target="-docbookTransform">
+			<param name="docbookInputFile" value="${docs.mainFile}" />
+			<param name="docbookOutputFile" value="${docs.dir}/html/ProActiveManual.html" />
+			<param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl" />
+			<param name="docbook.profile" value="html" />
+		</antcall>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!-- Construct the manual from the XML files in {docs.src}                -->
+	<!-- ==================================================================== -->
+	<target name="manual" description="Build all the different manual version: html, pdf... " depends="manualSingleHtml,manualHtml,manualPdf">
+		<!-- The generation of the files is done by the depends clause -->
+		<!-- Once the doc files have been generated, do some cleaning up -->
+		<delete dir="${docs.tmp.dir}" />
+		<copy todir="${docs.dir}/examples">
+			<!-- XML descriptor examples also available -->
+			<fileset dir="${base.dir}/descriptors/examples" />
+		</copy>
+	</target>
+
+			
+</project>
