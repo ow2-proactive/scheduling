@@ -39,7 +39,7 @@
 	<path id="test.classpath">
 		<pathelement location="${dist.dir}/ProActive/ProActive.jar"/>
 		<path refid="project.libs"/>
-		<pathelement location="${test.classes.dir}"/>
+		<pathelement location="${cl.test.dir}"/>
 	</path>
 	
 	<path id="examples.classpath">
@@ -227,8 +227,9 @@
 	<!--                      Compile Test Suite                         -->
 	<!--  =============================================================== -->
 	
-	<target name="testsuite">
-		<copy toDir="${test.classes.dir}">
+	<target name="testsuite" depends="core">
+		<!-- XXX Depends on core because of ProActiveLogger -->
+		<copy toDir="${cl.test.dir}/testsuite">
 			<fileset dir="${src.test.dir}/testsuite">
 				<include name="**/*.properties" />
 				<include name="**/*.css" />
@@ -238,7 +239,7 @@
 			</fileset>
 		</copy>
 		<mkdir dir="${test.classes.dir}"/>
-		<javac srcdir="${src.test.dir}" destdir="${test.classes.dir}" includes="testsuite/**" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="testsuite/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 	</target>
@@ -249,15 +250,15 @@
 	<!-- ================================================================ -->
 	
 	<target name="nonregressiontest" depends="testsuite, compile">
-		<copy toDir="${test.classes.dir}">
-			<fileset dir="${src.dir}">
+		<copy toDir="${cl.test.dir}">
+			<fileset dir="${src.test.dir}">
 				<include name="nonregressiontest/**/*.xml" />
 				<include name="nonregressiontest/**/*.fractal" />
 				<include name="nonregressiontest/**/*.properties" />
 				<include name="nonregressiontest/**/*.xsd" />
 			</fileset>
 		</copy>
-		<javac srcdir="${src.dir}" destdir="${test.classes.dir}" includes="nonregressiontest/**" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="nonregressiontest/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
 	</target>
