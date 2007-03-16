@@ -7,4 +7,4 @@ then
 else
   args=$@
 fi
-ANT_HOME=$currentDir $JAVA_HOME/bin/java  -Dant.home=\"$currentDir\" -Dant.library.dir=\"$currentDir/lib\" -Xmx256000000 -classpath $currentDir/lib/ant-launcher.jar org.apache.tools.ant.launch.Launcher -buildfile  $currentDir/proactive.xml $args
+ANT_HOME=$currentDir $JAVA_HOME/bin/java  -Dant.home=\"$currentDir\" -Dant.library.dir=\"$currentDir/lib\" -Xmx256000000 -classpath $currentDir/lib/ant-launcher.jar org.apache.tools.ant.launch.Launcher -buildfile  $currentDir/build.xml $args
