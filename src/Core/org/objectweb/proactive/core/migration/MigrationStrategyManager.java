@@ -28,26 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.migration;
+package org.objectweb.proactive.core.migration;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 
 
+/**
+ *
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2001/10/23
+ * @since   ProActive 0.9
+ * @see org.objectweb.proactive.Body
+ * @see MigrationException
+ */
 @PublicAPI
-public interface MigrationStrategy {
-    public void add(Destination d);
+public interface MigrationStrategyManager {
+    public void startStrategy(Body body) throws MigrationException;
 
-    public void add(String nodeURL, String method);
+    public MigrationStrategy getMigrationStrategy();
 
-    public void addNext(Destination d);
+    public void setMigrationStrategy(MigrationStrategy s);
 
-    public void addNext(String nodeURL, String method);
+    public void onDeparture(String s);
 
-    public void remove(Destination d);
-
-    public void remove(String nodeURL, String method);
-
-    public void reset();
-
-    public Destination next();
+    public void onArrival(String s);
 }

@@ -28,31 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.migration;
+package org.objectweb.proactive.core.migration;
 
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.body.migration.MigrationException;
+import java.io.Serializable;
 
 
-/**
- *
- *
- * @author  ProActive Team
- * @version 1.0,  2001/10/23
- * @since   ProActive 0.9
- * @see org.objectweb.proactive.Body
- * @see MigrationException
- */
-@PublicAPI
-public interface MigrationStrategyManager {
-    public void startStrategy(Body body) throws MigrationException;
+public class NodeDestination implements Destination, Serializable {
+    private String nodeURL;
+    private String methodName;
 
-    public MigrationStrategy getMigrationStrategy();
+    /**
+     * Construct a Roadmap with location l and methodName name.
+     * We don't use the parameters yet.
+     */
+    public NodeDestination(String nodeURL, String methodName) {
+        this.nodeURL = nodeURL;
+        this.methodName = methodName;
+    }
 
-    public void setMigrationStrategy(MigrationStrategy s);
+    /**
+     * Returns a string representing the node
+     */
+    public String getDestination() {
+        return nodeURL;
+    }
 
-    public void onDeparture(String s);
-
-    public void onArrival(String s);
+    /**
+     * Return the name of the Method
+     */
+    public String getMethodName() {
+        return methodName;
+    }
 }

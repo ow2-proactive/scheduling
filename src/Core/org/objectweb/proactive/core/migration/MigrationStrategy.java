@@ -28,17 +28,26 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.migration;
+package org.objectweb.proactive.core.migration;
 
-public interface Destination {
+import org.objectweb.proactive.annotation.PublicAPI;
 
-    /**
-     * Returns a string representing the destination
-     */
-    public String getDestination();
 
-    /**
-     * Return the name of the Method
-     */
-    public String getMethodName();
+@PublicAPI
+public interface MigrationStrategy {
+    public void add(Destination d);
+
+    public void add(String nodeURL, String method);
+
+    public void addNext(Destination d);
+
+    public void addNext(String nodeURL, String method);
+
+    public void remove(Destination d);
+
+    public void remove(String nodeURL, String method);
+
+    public void reset();
+
+    public Destination next();
 }

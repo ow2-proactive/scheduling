@@ -35,10 +35,10 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.body.migration.Migratable;
-import org.objectweb.proactive.ext.migration.MigrationStrategy;
-import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
-import org.objectweb.proactive.ext.migration.MigrationStrategyManager;
-import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
+import org.objectweb.proactive.core.migration.MigrationStrategy;
+import org.objectweb.proactive.core.migration.MigrationStrategyImpl;
+import org.objectweb.proactive.core.migration.MigrationStrategyManager;
+import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 
 
 public class A implements Serializable, RunActive {

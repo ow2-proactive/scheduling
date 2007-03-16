@@ -42,6 +42,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
@@ -51,7 +52,6 @@ import org.objectweb.proactive.examples.c3d.gui.UserGUI;
 import org.objectweb.proactive.examples.c3d.gui.WaitFrame;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
-import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 
 /**

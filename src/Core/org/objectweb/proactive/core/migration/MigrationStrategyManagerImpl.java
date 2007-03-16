@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.migration;
+package org.objectweb.proactive.core.migration;
 
 import java.lang.reflect.Method;
 

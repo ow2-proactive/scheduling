@@ -34,9 +34,9 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.migration.Destination;
+import org.objectweb.proactive.core.migration.MigrationStrategyImpl;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.ext.migration.Destination;
-import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
 
 
 public class Penguin implements org.objectweb.proactive.RunActive,
@@ -47,8 +47,8 @@ public class Penguin implements org.objectweb.proactive.RunActive,
     private PenguinMessageReceiver controler;
     private Penguin otherPenguin;
     private javax.swing.ImageIcon face;
-    private org.objectweb.proactive.ext.migration.MigrationStrategy myStrategy;
-    private org.objectweb.proactive.ext.migration.MigrationStrategyManager myStrategyManager;
+    private org.objectweb.proactive.core.migration.MigrationStrategy myStrategy;
+    private org.objectweb.proactive.core.migration.MigrationStrategyManager myStrategyManager;
     private int index;
     private String name;
     private String[] itinerary;
@@ -103,7 +103,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
         } catch (Exception e) {
             e.printStackTrace();
         }
-        myStrategyManager = new org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) org.objectweb.proactive.ProActive.getBodyOnThis());
+        myStrategyManager = new org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) org.objectweb.proactive.ProActive.getBodyOnThis());
         myStrategyManager.onDeparture("clean");
         myStrategy = new MigrationStrategyImpl();
         itinerary = s;

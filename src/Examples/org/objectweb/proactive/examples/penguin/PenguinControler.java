@@ -35,8 +35,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.util.CircularArrayList;
-import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 
 public class PenguinControler implements org.objectweb.proactive.RunActive,

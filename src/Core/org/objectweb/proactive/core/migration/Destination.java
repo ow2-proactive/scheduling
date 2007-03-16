@@ -28,35 +28,17 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.migration;
+package org.objectweb.proactive.core.migration;
 
-import java.io.Serializable;
-
-
-public class NodeDestination implements Destination, Serializable {
-    private String nodeURL;
-    private String methodName;
+public interface Destination {
 
     /**
-     * Construct a Roadmap with location l and methodName name.
-     * We don't use the parameters yet.
+     * Returns a string representing the destination
      */
-    public NodeDestination(String nodeURL, String methodName) {
-        this.nodeURL = nodeURL;
-        this.methodName = methodName;
-    }
-
-    /**
-     * Returns a string representing the node
-     */
-    public String getDestination() {
-        return nodeURL;
-    }
+    public String getDestination();
 
     /**
      * Return the name of the Method
      */
-    public String getMethodName() {
-        return methodName;
-    }
+    public String getMethodName();
 }
