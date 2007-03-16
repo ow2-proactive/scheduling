@@ -36,8 +36,8 @@ import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.ext.security.Securizable;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.Securizable;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 /**

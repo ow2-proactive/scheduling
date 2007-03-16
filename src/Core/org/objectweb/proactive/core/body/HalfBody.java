@@ -51,10 +51,10 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.security.InternalBodySecurity;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.InternalBodySecurity;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 public class HalfBody extends AbstractBody {

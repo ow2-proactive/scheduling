@@ -50,12 +50,12 @@ import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.ext.security.securityentity.Entity;
+import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 /**
@@ -334,7 +334,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
+     * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.core.security.Communication)
      */
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, IOException,
@@ -373,7 +373,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.core.security.SecurityContext)
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {

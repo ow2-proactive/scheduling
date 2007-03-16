@@ -71,9 +71,9 @@ import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException
 import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 /**

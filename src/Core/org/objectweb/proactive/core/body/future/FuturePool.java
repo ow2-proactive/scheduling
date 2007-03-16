@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
 import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.mop.Utils;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 
 public class FuturePool extends Object implements java.io.Serializable {

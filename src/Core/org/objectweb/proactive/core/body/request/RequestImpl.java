@@ -52,15 +52,15 @@ import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.security.ProActiveSecurity;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
-import org.objectweb.proactive.ext.security.ProActiveSecurity;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.crypto.Session;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import sun.rmi.server.MarshalInputStream;
 

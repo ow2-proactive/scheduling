@@ -40,8 +40,8 @@ import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
 /**

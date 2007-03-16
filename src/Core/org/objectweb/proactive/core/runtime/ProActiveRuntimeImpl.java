@@ -79,24 +79,24 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.rmi.FileProcess;
+import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
+import org.objectweb.proactive.core.security.ProActiveSecurity;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.SecurityEntity;
+import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.domain.SecurityDomain;
+import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entity;
+import org.objectweb.proactive.core.security.securityentity.EntityCertificate;
+import org.objectweb.proactive.core.security.securityentity.EntityVirtualNode;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.ext.security.ProActiveSecurity;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.SecurityEntity;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.domain.SecurityDomain;
-import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.ext.security.securityentity.Entity;
-import org.objectweb.proactive.ext.security.securityentity.EntityCertificate;
-import org.objectweb.proactive.ext.security.securityentity.EntityVirtualNode;
 
 
 /**

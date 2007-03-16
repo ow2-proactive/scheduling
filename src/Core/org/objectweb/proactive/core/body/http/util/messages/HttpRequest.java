@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.http.util.HttpMessage;
 import org.objectweb.proactive.core.body.http.util.HttpUtils;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 public class HttpRequest extends HttpMessage implements Serializable {

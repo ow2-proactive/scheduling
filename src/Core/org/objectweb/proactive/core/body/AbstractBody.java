@@ -58,23 +58,23 @@ import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
+import org.objectweb.proactive.core.security.InternalBodySecurity;
+import org.objectweb.proactive.core.security.PolicyServer;
+import org.objectweb.proactive.core.security.ProActiveSecurity;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.Secure;
+import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.crypto.AuthenticationException;
+import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.DefaultProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.InternalBodySecurity;
-import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.ext.security.ProActiveSecurity;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.Secure;
-import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**

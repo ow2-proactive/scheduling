@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 public interface RequestReceiver {

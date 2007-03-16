@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
+import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.xml.VariableContract;
-import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**

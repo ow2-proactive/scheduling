@@ -44,8 +44,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;

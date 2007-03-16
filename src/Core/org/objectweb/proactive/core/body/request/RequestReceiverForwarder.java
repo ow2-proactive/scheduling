@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 public class RequestReceiverForwarder implements RequestReceiver {

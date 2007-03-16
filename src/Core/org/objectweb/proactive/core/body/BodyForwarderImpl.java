@@ -49,11 +49,11 @@ import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 
 
 /**
@@ -142,7 +142,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#getCertificate() */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#getCertificate() */
     public X509Certificate getCertificate(UniqueID id)
         throws SecurityNotAvailableException, IOException {
         BodyAdapter rbody = bodies.get(id);
@@ -153,7 +153,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#getCertificate() */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#getCertificate() */
     public byte[] getCertificateEncoded(UniqueID id)
         throws SecurityNotAvailableException, IOException {
         BodyAdapter rbody = bodies.get(id);
@@ -164,7 +164,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#getEntities() */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#getEntities() */
     public ArrayList getEntities(UniqueID id)
         throws SecurityNotAvailableException, IOException {
         BodyAdapter rbody = bodies.get(id);
@@ -199,7 +199,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#getPolicy(SecurityContext) */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#getPolicy(SecurityContext) */
     public SecurityContext getPolicy(UniqueID id,
         SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
@@ -211,7 +211,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#getPublicKey() */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#getPublicKey() */
     public PublicKey getPublicKey(UniqueID id)
         throws SecurityNotAvailableException, IOException {
         BodyAdapter rbody = bodies.get(id);
@@ -229,7 +229,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         return new BodyAdapterForwarder(partf.getBodyAdapterForwarder(), rbody);
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#publicKeyExchange(long, byte[], byte[], byte[]) */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#publicKeyExchange(long, byte[], byte[], byte[]) */
     public byte[][] publicKeyExchange(UniqueID id, long sessionID,
         byte[] my_pub, byte[] my_cert, byte[] sig_code)
         throws SecurityNotAvailableException, RenegotiateSessionException,
@@ -320,7 +320,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[]) */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[]) */
     public byte[][] secretKeyExchange(UniqueID id, long sessionID, byte[] tmp,
         byte[] tmp1, byte[] tmp2, byte[] tmp3, byte[] tmp4)
         throws SecurityNotAvailableException, RenegotiateSessionException,
@@ -356,7 +356,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#startNewSession(Communication) */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#startNewSession(Communication) */
     public long startNewSession(UniqueID id, Communication policy)
         throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
@@ -379,7 +379,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#terminateSession(long) */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#terminateSession(long) */
     public void terminateSession(UniqueID id, long sessionID)
         throws IOException, SecurityNotAvailableException {
         BodyAdapter rbody = bodies.get(id);
@@ -390,7 +390,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see org.objectweb.proactive.ext.security.SecurityEntity#randomValue(long, byte[]) */
+    /** @see org.objectweb.proactive.core.security.SecurityEntity#randomValue(long, byte[]) */
     public byte[] randomValue(UniqueID id, long sessionID, byte[] cl_rand)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {

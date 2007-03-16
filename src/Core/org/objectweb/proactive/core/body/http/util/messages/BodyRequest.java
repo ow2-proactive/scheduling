@@ -39,7 +39,7 @@ import java.util.HashMap;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.http.util.HttpUtils;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 
 
 /**
