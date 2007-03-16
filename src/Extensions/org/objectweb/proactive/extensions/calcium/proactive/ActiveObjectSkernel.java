@@ -35,10 +35,10 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.extensions.calcium.Skernel;
-import org.objectweb.proactive.extensions.calcium.Task;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.extensions.calcium.Skernel;
+import org.objectweb.proactive.extensions.calcium.Task;
 
 
 public class ActiveObjectSkernel extends Skernel implements RunActive,

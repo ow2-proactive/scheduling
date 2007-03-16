@@ -34,13 +34,13 @@ import java.util.Stack;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
 import org.objectweb.proactive.extensions.calcium.skeletons.Instruction;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class Stream<T, R> {

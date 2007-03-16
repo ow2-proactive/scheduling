@@ -35,11 +35,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.calcium.Interpreter;
 import org.objectweb.proactive.extensions.calcium.Skernel;
 import org.objectweb.proactive.extensions.calcium.Task;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
 
 
 public class ProActiveThreadedManager extends AbstractProActiveManager {

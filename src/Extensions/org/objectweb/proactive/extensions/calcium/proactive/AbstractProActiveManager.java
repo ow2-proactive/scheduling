@@ -31,12 +31,12 @@
 package org.objectweb.proactive.extensions.calcium.proactive;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.extensions.calcium.ResourceManager;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.calcium.ResourceManager;
 
 
 public abstract class AbstractProActiveManager extends ResourceManager {

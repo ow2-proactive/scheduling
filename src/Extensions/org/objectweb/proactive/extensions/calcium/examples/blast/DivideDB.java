@@ -39,10 +39,10 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
-import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
+import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 
 
 public class DivideDB implements Divide<BlastParameters, BlastParameters> {

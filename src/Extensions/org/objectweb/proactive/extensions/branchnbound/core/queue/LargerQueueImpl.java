@@ -39,12 +39,12 @@ import java.util.Collection;
 import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.extensions.branchnbound.core.Result;
-import org.objectweb.proactive.extensions.branchnbound.core.Task;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.extensions.branchnbound.core.Result;
+import org.objectweb.proactive.extensions.branchnbound.core.Task;
 
 
 /**

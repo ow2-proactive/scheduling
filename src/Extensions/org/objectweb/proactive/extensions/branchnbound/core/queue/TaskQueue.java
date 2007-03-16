@@ -37,14 +37,14 @@ import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.extensions.branchnbound.core.Result;
-import org.objectweb.proactive.extensions.branchnbound.core.Task;
-import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
+import org.objectweb.proactive.extensions.branchnbound.core.Result;
+import org.objectweb.proactive.extensions.branchnbound.core.Task;
+import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsException;
 
 
 /**

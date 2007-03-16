@@ -31,9 +31,9 @@
 package org.objectweb.proactive.extensions.calcium.proactive;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.extensions.calcium.Skernel;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extensions.calcium.Skernel;
 
 
 public class ProActiveManager extends AbstractProActiveManager {

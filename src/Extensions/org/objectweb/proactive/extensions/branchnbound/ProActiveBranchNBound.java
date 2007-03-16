@@ -34,9 +34,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.branchnbound.core.Manager;
-import org.objectweb.proactive.extensions.branchnbound.core.Task;
-import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -44,6 +41,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.branchnbound.core.Manager;
+import org.objectweb.proactive.extensions.branchnbound.core.Task;
+import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
 
 
 /**

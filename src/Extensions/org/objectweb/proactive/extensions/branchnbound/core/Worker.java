@@ -36,14 +36,14 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsException;
-import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsException;
+import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
 
 
 /**
