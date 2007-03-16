@@ -28,12 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.monitor;
+package org.objectweb.proactive.extensions.scilab.monitor;
 
 import java.io.File;
 
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
 /**

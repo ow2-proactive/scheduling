@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab;
+package org.objectweb.proactive.extensions.scilab;
 
 import java.io.File;
 import java.io.FileNotFoundException;

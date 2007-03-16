@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.mixedlocation;
+package org.objectweb.proactive.extensions.mixedlocation;
 
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;

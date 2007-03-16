@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

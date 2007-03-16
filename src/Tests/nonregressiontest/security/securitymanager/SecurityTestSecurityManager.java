@@ -36,9 +36,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
-import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.PolicyServer;
+import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import testsuite.test.FunctionalTest;
 

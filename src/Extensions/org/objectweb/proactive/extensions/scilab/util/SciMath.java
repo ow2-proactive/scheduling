@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.util;
+package org.objectweb.proactive.extensions.scilab.util;
 
 public class SciMath {
     public static String formulaPi(String pi, int iBloc, int sizeBloc) {

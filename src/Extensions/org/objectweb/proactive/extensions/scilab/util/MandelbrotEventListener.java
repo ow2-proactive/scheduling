@@ -28,15 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.util;
+package org.objectweb.proactive.extensions.scilab.util;
 
 import javasci.SciDoubleMatrix;
 
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.monitor.SciEvent;
-import org.objectweb.proactive.ext.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.ext.scilab.monitor.SciTaskInfo;
-import org.objectweb.proactive.ext.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.SciTaskInfo;
+import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
 
 
 /**

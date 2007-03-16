@@ -28,18 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.util.ArrayList;
 
 import javasci.SciData;
 
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.SciTask;
-import org.objectweb.proactive.ext.scilab.monitor.SciEvent;
-import org.objectweb.proactive.ext.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.ext.scilab.monitor.SciTaskInfo;
-import org.objectweb.proactive.ext.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.SciTaskInfo;
+import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
 
 
 public class SciTest2 {

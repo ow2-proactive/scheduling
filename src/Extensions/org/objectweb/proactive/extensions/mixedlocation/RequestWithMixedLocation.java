@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.mixedlocation;
+package org.objectweb.proactive.extensions.mixedlocation;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.util;
+package org.objectweb.proactive.extensions.scilab.util;
 
 
 /**

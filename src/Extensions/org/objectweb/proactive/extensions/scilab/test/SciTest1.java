@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.util.ArrayList;
 
@@ -36,10 +36,10 @@ import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.ext.scilab.SciDeployEngine;
-import org.objectweb.proactive.ext.scilab.SciEngine;
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
+import org.objectweb.proactive.extensions.scilab.SciEngine;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
 public class SciTest1 {

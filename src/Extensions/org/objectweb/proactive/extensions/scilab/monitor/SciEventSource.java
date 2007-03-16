@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.monitor;
+package org.objectweb.proactive.extensions.scilab.monitor;
 
 
 /**

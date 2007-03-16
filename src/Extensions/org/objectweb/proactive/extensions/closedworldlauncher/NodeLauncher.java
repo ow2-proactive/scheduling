@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.closedworldlauncher;
+package org.objectweb.proactive.extensions.closedworldlauncher;
 
 import org.objectweb.proactive.core.node.StartNode;
 

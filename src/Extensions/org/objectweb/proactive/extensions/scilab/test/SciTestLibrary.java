@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.io.File;
 import java.util.HashMap;
@@ -41,10 +41,10 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.ext.scilab.SciDeployEngine;
-import org.objectweb.proactive.ext.scilab.SciEngine;
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
+import org.objectweb.proactive.extensions.scilab.SciEngine;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.SciTask;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 

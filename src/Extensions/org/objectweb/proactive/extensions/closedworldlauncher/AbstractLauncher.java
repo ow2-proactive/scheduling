@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.closedworldlauncher;
+package org.objectweb.proactive.extensions.closedworldlauncher;
 
 public abstract class AbstractLauncher implements Runnable {
     protected WorldInfo wi;

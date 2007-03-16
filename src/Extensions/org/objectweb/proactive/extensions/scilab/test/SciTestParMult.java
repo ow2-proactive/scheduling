@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -36,9 +36,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
-import org.objectweb.proactive.ext.scilab.monitor.ScilabService;
-import org.objectweb.proactive.ext.scilab.util.FutureDoubleMatrix;
-import org.objectweb.proactive.ext.scilab.util.GridMatrix;
+import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.util.FutureDoubleMatrix;
+import org.objectweb.proactive.extensions.scilab.util.GridMatrix;
 
 
 public class SciTestParMult {

@@ -28,11 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.monitor;
+package org.objectweb.proactive.extensions.scilab.monitor;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.ext.scilab.SciEngine;
+import org.objectweb.proactive.extensions.scilab.SciEngine;
 
 
 /**

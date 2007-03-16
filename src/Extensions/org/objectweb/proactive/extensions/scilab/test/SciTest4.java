@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -40,9 +40,9 @@ import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.ext.scilab.SciEngineWorker;
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.SciEngineWorker;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
 public class SciTest4 {

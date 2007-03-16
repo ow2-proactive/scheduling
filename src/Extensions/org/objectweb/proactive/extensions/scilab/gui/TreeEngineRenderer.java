@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.gui;
+package org.objectweb.proactive.extensions.scilab.gui;
 
 import java.awt.Color;
 import java.awt.Component;

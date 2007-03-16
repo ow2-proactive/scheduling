@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -39,7 +39,7 @@ import java.io.PrintWriter;
 import javasci.SciData;
 import javasci.Scilab;
 
-import org.objectweb.proactive.ext.scilab.util.SciMath;
+import org.objectweb.proactive.extensions.scilab.util.SciMath;
 
 
 class SciTestSeqPi {

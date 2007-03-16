@@ -30,8 +30,8 @@
  */
 package nonregressiontest.security.keygeneration;
 
-import org.objectweb.proactive.ext.security.KeyTools;
-import org.objectweb.proactive.ext.security.ProActiveSecurity;
+import org.objectweb.proactive.core.security.KeyTools;
+import org.objectweb.proactive.core.security.ProActiveSecurity;
 
 import testsuite.test.FunctionalTest;
 

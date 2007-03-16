@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab;
+package org.objectweb.proactive.extensions.scilab;
 
 import java.io.IOException;
 import java.io.Serializable;

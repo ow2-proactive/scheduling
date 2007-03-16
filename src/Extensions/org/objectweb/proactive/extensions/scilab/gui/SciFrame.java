@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.gui;
+package org.objectweb.proactive.extensions.scilab.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -80,12 +80,12 @@ import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
-import org.objectweb.proactive.ext.scilab.SciDeployEngine;
-import org.objectweb.proactive.ext.scilab.monitor.SciEngineInfo;
-import org.objectweb.proactive.ext.scilab.monitor.SciEvent;
-import org.objectweb.proactive.ext.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.ext.scilab.monitor.SciTaskInfo;
-import org.objectweb.proactive.ext.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
+import org.objectweb.proactive.extensions.scilab.monitor.SciEngineInfo;
+import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.SciTaskInfo;
+import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
 
 
 public class SciFrame extends javax.swing.JFrame {

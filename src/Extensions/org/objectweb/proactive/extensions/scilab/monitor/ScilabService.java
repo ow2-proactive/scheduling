@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.monitor;
+package org.objectweb.proactive.extensions.scilab.monitor;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,10 +43,10 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.ext.scilab.SciDeployEngine;
-import org.objectweb.proactive.ext.scilab.SciEngine;
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
+import org.objectweb.proactive.extensions.scilab.SciEngine;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
 /**

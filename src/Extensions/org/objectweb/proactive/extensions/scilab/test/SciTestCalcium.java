@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.scilab.test;
+package org.objectweb.proactive.extensions.scilab.test;
 
 import java.io.Serializable;
 
@@ -49,9 +49,9 @@ import org.objectweb.proactive.extensions.calcium.proactive.ProActiveManager;
 import org.objectweb.proactive.extensions.calcium.skeletons.Farm;
 import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
-import org.objectweb.proactive.ext.scilab.SciEngineWorker;
-import org.objectweb.proactive.ext.scilab.SciResult;
-import org.objectweb.proactive.ext.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.SciEngineWorker;
+import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.SciTask;
 */
 public class SciTestCalcium implements Serializable {
 

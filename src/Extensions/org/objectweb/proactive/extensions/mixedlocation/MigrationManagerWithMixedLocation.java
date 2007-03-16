@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.mixedlocation;
+package org.objectweb.proactive.extensions.mixedlocation;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
