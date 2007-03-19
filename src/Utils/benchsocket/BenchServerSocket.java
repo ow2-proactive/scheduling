@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.benchsocket;
+package benchsocket;
 
 import java.io.IOException;
 import java.net.InetAddress;

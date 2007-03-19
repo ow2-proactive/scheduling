@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.benchsocket;
+package benchsocket;
 
 
 /**

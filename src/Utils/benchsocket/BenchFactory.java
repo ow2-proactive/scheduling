@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.benchsocket;
+package benchsocket;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.benchsocket;
+package benchsocket;
 
 public interface BenchStream {
     public void displayTotal();

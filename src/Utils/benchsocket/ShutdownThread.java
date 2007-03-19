@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.benchsocket;
+package benchsocket;
 
 public class ShutdownThread extends Thread {
     //    //singleton pattern because of java bug #4533
