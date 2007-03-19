@@ -56,7 +56,7 @@
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
 
-	<target name="compile" depends="core, extensions, util, ic2d, examples" description="build the class files" />
+	<target name="compile" depends="core, extensions, extra, util, ic2d, examples" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -100,6 +100,7 @@
 
 		<checkDir dir="${src.proactive.dir}" />
 		<checkDir dir="${src.extensions.dir}" />
+		<checkDir dir="${src.extra.dir}" />
 		<checkDir dir="${src.examples.dir}" />
 	</target>
 
@@ -112,6 +113,7 @@
 		<mkdir dir="${classes.dir}" />
 		<mkdir dir="${cl.examples.dir}"/>
 		<mkdir dir="${cl.ic2d.dir}"/>
+		<mkdir dir="${cl.extra.dir}"/>
 		<mkdir dir="${cl.extensions.dir}"/>
 		<mkdir dir="${cl.proactive.dir}"/>
 		<mkdir dir="${cl.test.dir}"/>
@@ -191,7 +193,14 @@
 		</subant>
 	</target>
 
+	
+	<target name="extra" depends="core" description="Compile the ProActive extensions classes" >
+		<subant target="-compile" inheritall="yes" >
+			<fileset dir="${src.extra.dir}" includes="**/build.xml"/>
+		</subant>
+	</target>
 
+	
 	<target name="p2p_daemon">
 		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS">
 			<arg line="-Wall -g -o proactivep2p -x c proactivep2p.cpp proactivep2p.h" />
@@ -608,6 +617,7 @@
 	<target name="format" description="Formats the project source files">
 		<format_m srcdir="${src.proactive.dir}"/>
 		<format_m srcdir="${src.extensions.dir}"/>
+		<format_m srcdir="${src.extra.dir}"/>
 		<format_m srcdir="${src.examples.dir}"/>
 	</target>
 

@@ -6,7 +6,7 @@
 	
 	<target name="-compile">
 		
-		<compile_module module="calcium" />
+		<compile_extension module="calcium" />
 		
 		<echo>Compiling stubs for Calcium</echo>
 		<java classname="${stubgenerator.class}" fork="true">

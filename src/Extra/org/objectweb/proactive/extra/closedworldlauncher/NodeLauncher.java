@@ -28,23 +28,24 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.closedworldlauncher;
+package org.objectweb.proactive.extra.closedworldlauncher;
 
-public abstract class AbstractLauncher implements Runnable {
-    protected WorldInfo wi;
+import org.objectweb.proactive.core.node.StartNode;
 
-    public AbstractLauncher() {
-        wi = new WorldInfo();
-        wi.init();
+
+public class NodeLauncher extends AbstractLauncher {
+    @Override
+    public void run(int i) {
+        System.out.println(wi);
+        if (i == 0) {
+            StartNode.main(new String[0]);
+        } else {
+            System.err.println("Not on node 0, not starting anything");
+        }
     }
 
-    /**
-     * Should be implemented to start the needed classes
-     * for the current node number
-     */
-    public abstract void run(int i);
-
-    public void run() {
-        this.run(wi.getCurrenHostNumber());
+    public static void main(String[] args) {
+        NodeLauncher nl = new NodeLauncher();
+        new Thread(nl).start();
     }
 }

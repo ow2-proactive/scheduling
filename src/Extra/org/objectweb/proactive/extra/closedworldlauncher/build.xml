@@ -5,6 +5,6 @@
 	<target name="compile" depends="core,-compile"/>
 	
 	<target name="-compile">
-		<compile_module module="closedworldlauncher" />
+		<compile_extra module="closedworldlauncher" />
 	</target>
 </project>

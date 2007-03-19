@@ -5,6 +5,6 @@
 	<target name="compile" depends="core,-compile"/>
 	
 	<target name="-compile">
-		<compile_module module="webservices" />
+		<compile_extension module="webservices" />
 	</target>
 </project>

@@ -5,7 +5,7 @@
 	<target name="compile" depends="core,-compile"/>
 	
 	<target name="-compile">
-		<compile_module module="osgi" />
+		<compile_extension module="osgi" />
 	</target>
 </project>
 	

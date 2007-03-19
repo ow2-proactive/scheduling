@@ -17,6 +17,7 @@
 	
 	<property name="src.proactive.dir"  value="${src.dir}/Core" />
 	<property name="src.extensions.dir" value="${src.dir}/Extensions" />
+	<property name="src.extra.dir"      value="${src.dir}/Extra" />
 	<property name="src.examples.dir"   value="${src.dir}/Examples" />
 	<property name="src.ic2d.dir"       value="${src.dir}/IC2D-old" />
 	<property name="src.test.dir"       value="${src.dir}/Tests" />
@@ -24,13 +25,14 @@
 
 	<property name="cl.proactive.dir"   value="${classes.dir}/Core" />
 	<property name="cl.extensions.dir"  value="${classes.dir}/Extensions" />
+	<property name="cl.extra.dir"  value="${classes.dir}/Extra" />
 	<property name="cl.examples.dir"    value="${classes.dir}/Examples" />
 	<property name="cl.ic2d.dir"        value="${classes.dir}/IC2D-old" />
 	<property name="cl.test.dir"        value="${classes.dir}/Tests" />
 	<property name="cl.utils.dir"       value="${classes.dir}/Utils" />
 
-	<property name="extensions.dir"     value="${src.dir}/Extensions"/>
-	<property name="extensions.path"       value="org/objectweb/proactive/extensions"/>
+	<property name="extensions.path"    value="org/objectweb/proactive/extensions"/>
+	<property name="extra.path"    value="org/objectweb/proactive/extra"/>
 
 	<property name="doc.src"       value="${base.dir}/doc-src" />
 	<property name="docs.dir"      value="${base.dir}/docs" />
@@ -73,9 +75,33 @@
 		<path refid="project.libs"/>
 	</path>
 	
-
+	<macrodef name="compile_extra">
+		<attribute name="module" />
+		<sequential>
+			<compile_module 
+				module="@{module}" 
+				sourcepath="${src.extra.dir}"
+				package="${extra.path}"
+				dest="${cl.extra.dir}"/>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="compile_extension">
+		<attribute name="module" />
+		<sequential>
+			<compile_module 
+				module="@{module}" 
+				sourcepath="${src.extensions.dir}"
+				package="${extensions.path}"
+				dest="${cl.extensions.dir}"/>
+		</sequential>
+	</macrodef>
+	
 	<macrodef name="compile_module">
 		<attribute name="module" />
+		<attribute name="sourcepath"/>
+		<attribute name="package"/>
+		<attribute name="dest"/>
 		<sequential>			
 			<mkdir dir="${cl.extensions.dir}"/>
 			
@@ -89,13 +115,13 @@
 			<echo>Compiling  ___@{module}___</echo>
 			<!-- <echo>  [i] ProActive:  ${proactive.jar}</echo> -->
 
-			<echo>  [i] src:  ${src.extensions.dir}/${extensions.path}/@{module}</echo>
-			<echo>  [i] dest: ${cl.extensions.dir}</echo>
+			<echo>  [i] src:  @{sourcepath}/@{package}/@{module}</echo>
+			<echo>  [i] dest: @{dest}</echo>
 			<echo>  [i] cp:   ${proactive.jar}</echo>
 			
 			<javac 
-			 srcdir="${src.extensions.dir}" 
-			 destdir="${cl.extensions.dir}" 
+			 srcdir="@{sourcepath}" 
+			 destdir="@{dest}" 
 			 deprecation="on" 
 			 source="${source}" 
 			 debug="${debug}"
@@ -105,7 +131,7 @@
 					<path refid="project.libs"/>
 					<pathelement location="${proactive.jar}"/>
 				</classpath>
-				<include name="${extensions.path}/@{module}/**/*.java" />
+				<include name="@{package}/@{module}/**/*.java" />
 			</javac>
 		</sequential>
 	</macrodef>

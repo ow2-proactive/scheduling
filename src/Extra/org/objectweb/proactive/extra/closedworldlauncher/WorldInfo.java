@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.closedworldlauncher;
+package org.objectweb.proactive.extra.closedworldlauncher;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;

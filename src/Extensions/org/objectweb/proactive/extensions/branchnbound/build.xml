@@ -5,7 +5,7 @@
 	<target name="compile" depends="core, stubGenerator, -compile"/>
 	
 	<target name="-compile">
-		<compile_module module="branchnbound" />
+		<compile_extension module="branchnbound" />
 			
 		<java classname="${stubgenerator.class}" fork="true">
 			<classpath refid="project.classpath" />
