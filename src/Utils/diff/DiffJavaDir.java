@@ -1,4 +1,4 @@
-package util.diff;
+package diff;
 
 import java.io.File;
 import java.util.ArrayList;

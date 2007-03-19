@@ -16,7 +16,7 @@
  * Add GPL and copyright
  *
  */
-package util.diff;
+package diff;
 
 import java.util.Hashtable;
 

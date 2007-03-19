@@ -14,7 +14,7 @@
  * add GPL
  *
  */
-package util.diff;
+package diff;
 
 import java.io.BufferedReader;
 import java.io.File;
