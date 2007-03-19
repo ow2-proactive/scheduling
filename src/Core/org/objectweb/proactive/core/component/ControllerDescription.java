@@ -56,12 +56,12 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
  * @author Matthieu Morel
  */
 public class ControllerDescription implements Serializable {
-    private String hierarchicalType;
-    private String name;
-    private boolean synchronous = false;
+    protected String hierarchicalType;
+    protected String name;
+    protected boolean synchronous = false;
     public static final String DEFAULT_COMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-component-config.xml";
-    private String controllersConfigFileLocation;
-    private Map controllersSignatures;
+    protected String controllersConfigFileLocation;
+    protected Map controllersSignatures;
 
     /**
      * a no-arg constructor (used in the ProActive parser)
