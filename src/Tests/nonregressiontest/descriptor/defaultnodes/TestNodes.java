@@ -69,7 +69,6 @@ public class TestNodes extends FunctionalTest {
     }
            
 
-    private static String FS = System.getProperty("file.separator");
     private static ProActiveDescriptor proActiveDescriptor = null;
     private static VirtualNode[] virtualNodes = null;
     private static Node sameVMNode = null;
