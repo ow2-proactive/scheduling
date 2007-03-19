@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -297,6 +297,15 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         return newFcInstance(type, controllerDesc, contentDesc, (Node) null);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription)
+     */
+    public Component newNFcInstance(Type type,
+        NFControllerDescription controllerDesc, ContentDescription contentDesc)
+        throws InstantiationException {
+        return newNFcInstance(type, controllerDesc, contentDesc, (Node) null);
+    }
+
     /*
      *
      * @see org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.Type, java.lang.Object, java.lang.Object)
@@ -331,6 +340,54 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             if ("primitive".equals(controllerDesc) &&
                     (contentDesc instanceof String)) {
                 return newFcInstance(type,
+                    new ControllerDescription(null, Constants.PRIMITIVE),
+                    new ContentDescription((String) contentDesc));
+            }
+
+            // any other case
+            throw new InstantiationException(
+                "With this implementation, parameters must be of respective types : " +
+                Type.class.getName() + ',' +
+                ControllerDescription.class.getName() + ',' +
+                ContentDescription.class.getName());
+        }
+    }
+
+    /*
+    *
+    * @see org.objectweb.fractal.api.factory.GenericFactory#newNFcInstance(org.objectweb.fractal.api.Type, java.lang.Object, java.lang.Object)
+    */
+    public Component newNFcInstance(Type type, Object controllerDesc,
+        Object contentDesc) throws InstantiationException {
+        try {
+            return newNFcInstance(type,
+                (NFControllerDescription) controllerDesc,
+                (ContentDescription) contentDesc);
+        } catch (ClassCastException e) {
+            if ((type == null) && (controllerDesc == null) &&
+                    (contentDesc instanceof Map)) {
+                // for compatibility with the new
+                // org.objectweb.fractal.util.Fractal class
+                return this;
+            }
+            if ((controllerDesc instanceof ControllerDescription) &&
+                    ((contentDesc instanceof String) || (contentDesc == null))) {
+                // for the ADL, when only type and ControllerDescription are
+                // given
+                return newNFcInstance(type, controllerDesc,
+                    (contentDesc == null) ? null
+                                          : new ContentDescription(
+                        (String) contentDesc));
+            }
+
+            // code compatibility with Julia
+            if ("composite".equals(controllerDesc) && (contentDesc == null)) {
+                return newNFcInstance(type,
+                    new ControllerDescription(null, Constants.COMPOSITE), null);
+            }
+            if ("primitive".equals(controllerDesc) &&
+                    (contentDesc instanceof String)) {
+                return newNFcInstance(type,
                     new ControllerDescription(null, Constants.PRIMITIVE),
                     new ContentDescription((String) contentDesc));
             }
@@ -421,6 +478,82 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
+    *
+    * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription, org.objectweb.proactive.core.node.Node)
+    */
+    public Component newNFcInstance(Type type,
+        NFControllerDescription controllerDesc, ContentDescription contentDesc,
+        Node node) throws InstantiationException {
+        if (contentDesc == null) {
+            // either a parallel or a composite component, no
+            // activitiy/factory/node specified
+            if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
+                contentDesc = new ContentDescription(Composite.class.getName());
+            } else {
+                throw new InstantiationException(
+                    "Content can be null only if the hierarchical type of the component is composite");
+            }
+        }
+        try {
+            // instantiate the component metaobject factory with parameters of
+            // the component
+
+            // type must be a component type
+            if (!(type instanceof ComponentType)) {
+                throw new InstantiationException(
+                    "Argument type must be an instance of ComponentType");
+            }
+            ComponentParameters componentParameters = new ComponentParameters((ComponentType) type,
+                    controllerDesc);
+            if (contentDesc.getFactory() == null) {
+                // first create a map with the parameters
+                Map<String, Object> factory_params = new Hashtable<String, Object>(1);
+
+                factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
+                    componentParameters);
+                if (controllerDesc.isSynchronous() &&
+                        (Constants.COMPOSITE.equals(
+                            controllerDesc.getHierarchicalType()))) {
+                    factory_params.put(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY,
+                        Constants.SYNCHRONOUS);
+                }
+                contentDesc.setFactory(new ProActiveMetaObjectFactory(
+                        factory_params));
+                // factory =
+                // ProActiveComponentMetaObjectFactory.newInstance(componentParameters);
+            }
+
+            // TODO_M : add controllers in the component metaobject factory?
+            Object ao = null;
+
+            // 3 possibilities : either the component is created on a node (or
+            // null), it is created on a virtual node, or on multiple nodes
+            ao = ProActive.newActive(contentDesc.getClassName(), null,
+                    contentDesc.getConstructorParameters(), node,
+                    contentDesc.getActivity(), contentDesc.getFactory());
+
+            // Find the proxy
+            org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) ao).getProxy();
+            if (myProxy == null) {
+                throw new ProActiveRuntimeException(
+                    "Cannot find a Proxy on the stub object: " + ao);
+            }
+            ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
+                                                                                                     .createNFComponentRepresentative((ComponentType) type,
+                    componentParameters.getHierarchicalType(), myProxy,
+                    componentParameters.getControllerDescription()
+                                       .getControllersConfigFileLocation());
+            representative.setStubOnBaseObject((StubObject) ao);
+            return representative;
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+            throw new InstantiationException(e.getMessage());
+        } catch (NodeException e) {
+            throw new InstantiationException(e.getMessage());
+        }
+    }
+
+    /*
      *
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription, org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
@@ -437,6 +570,31 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                     "Cannot create component on virtual node as no node is associated with this virtual node");
             }
             return newFcInstance(type, controllerDesc, contentDesc,
+                virtualNode.getNode());
+        } catch (NodeException e) {
+            throw new InstantiationException(
+                "could not instantiate components due to a deployment problem : " +
+                e.getMessage());
+        }
+    }
+
+    /*
+    *
+    * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription, org.objectweb.proactive.core.descriptor.data.VirtualNode)
+    */
+    public Component newNFcInstance(Type type,
+        NFControllerDescription controllerDesc, ContentDescription contentDesc,
+        VirtualNode virtualNode) throws InstantiationException {
+        if (virtualNode == null) {
+            return newNFcInstance(type, controllerDesc, contentDesc, (Node) null);
+        }
+        try {
+            virtualNode.activate();
+            if (virtualNode.getNodes().length == 0) {
+                throw new InstantiationException(
+                    "Cannot create component on virtual node as no node is associated with this virtual node");
+            }
+            return newNFcInstance(type, controllerDesc, contentDesc,
                 virtualNode.getNode());
         } catch (NodeException e) {
             throw new InstantiationException(
@@ -470,6 +628,30 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
+     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
+     *      org.objectweb.proactive.core.component.ControllerDescription,
+     *      org.objectweb.proactive.core.component.ContentDescription,
+     *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
+     */
+    public List<Component> newNFcInstanceAsList(Type type,
+        NFControllerDescription controllerDesc, ContentDescription contentDesc,
+        VirtualNode virtualNode) throws InstantiationException {
+        if (virtualNode == null) {
+            return newNFcInstanceAsList(type, controllerDesc, contentDesc,
+                (Node[]) null);
+        }
+        try {
+            virtualNode.activate();
+            return newNFcInstanceAsList(type, controllerDesc, contentDesc,
+                virtualNode.getNodes());
+        } catch (NodeException e) {
+            throw new InstantiationException(
+                "could not instantiate components due to a deployment problem : " +
+                e.getMessage());
+        }
+    }
+
+    /*
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription,
@@ -481,6 +663,21 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         ContentDescription[] contentDescArray = new ContentDescription[nodes.length];
         Arrays.fill(contentDescArray, contentDesc);
         return newFcInstanceAsList(type, controllerDesc, contentDescArray, nodes);
+    }
+
+    /*
+     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
+     *      org.objectweb.proactive.core.component.ControllerDescription,
+     *      org.objectweb.proactive.core.component.ContentDescription,
+     *      org.objectweb.proactive.core.node.Node[])
+     */
+    public List<Component> newNFcInstanceAsList(Type type,
+        NFControllerDescription controllerDesc, ContentDescription contentDesc,
+        Node[] nodes) throws InstantiationException {
+        ContentDescription[] contentDescArray = new ContentDescription[nodes.length];
+        Arrays.fill(contentDescArray, contentDesc);
+        return newNFcInstanceAsList(type, controllerDesc, contentDescArray,
+            nodes);
     }
 
     /*
@@ -553,6 +750,76 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /*
+    *
+    * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription[], org.objectweb.proactive.core.node.Node[])
+    */
+    public List<Component> newNFcInstanceAsList(Type type,
+        NFControllerDescription controllerDesc,
+        ContentDescription[] contentDesc, Node[] nodes)
+        throws InstantiationException {
+        try {
+            Component components = ProActiveComponentGroup.newNFComponentRepresentativeGroup((ComponentType) type,
+                    controllerDesc);
+            List<Component> componentsList = ProActiveGroup.getGroup(components);
+            if (Constants.PRIMITIVE.equals(controllerDesc.getHierarchicalType())) {
+                if (contentDesc.length > 1) { // cyclic
+                                              // node
+                                              // + 1
+                                              // instance
+                                              // per
+                                              // node
+                                              // task = instantiate a component with a different name
+                                              // on each of the node mapped to the given virtual node
+                    String original_component_name = controllerDesc.getName();
+
+                    // TODO: reuse pool for whole class ?
+                    ExecutorService threadPool = Executors.newCachedThreadPool();
+
+                    List<InstantiationException> exceptions = new Vector<InstantiationException>();
+
+                    Component c = new MockComponent();
+
+                    for (int i = 0; i < nodes.length; i++) {
+                        componentsList.add(c);
+                    }
+
+                    for (int i = 0; i < nodes.length; i++) {
+                        NFComponentBuilderTask task = new NFComponentBuilderTask(exceptions,
+                                componentsList, i, type, controllerDesc,
+                                original_component_name, contentDesc, nodes);
+                        threadPool.execute(task);
+                    }
+                    threadPool.shutdown();
+                    try {
+                        threadPool.awaitTermination(new Integer(
+                                System.getProperty(
+                                    "components.creation.timeout")),
+                            TimeUnit.SECONDS);
+                    } catch (InterruptedException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    if (!exceptions.isEmpty()) {
+                        InstantiationException e = new InstantiationException(
+                                "Creation of some of the components failed");
+                        e.initCause(new InstantiationExceptionListException(
+                                exceptions));
+                        throw e;
+                    }
+                } else {
+                    // component is a composite : it will be
+                    // created on the first node from this virtual node
+                    componentsList.add(newNFcInstance(type, controllerDesc,
+                            contentDesc[0], nodes[0]));
+                }
+            }
+            return componentsList;
+        } catch (ClassNotFoundException e) {
+            throw new InstantiationException(e.getMessage());
+        }
+    }
+
+    /*
      *
      * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription[], org.objectweb.proactive.core.descriptor.data.VirtualNode)
      */
@@ -567,6 +834,30 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             virtualNode.activate();
 
             return newFcInstanceAsList(type, controllerDesc, contentDesc,
+                virtualNode.getNodes());
+        } catch (NodeException e) {
+            throw new InstantiationException(
+                "could not instantiate components due to a deployment problem : " +
+                e.getMessage());
+        }
+    }
+
+    /*
+    *
+    * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription[], org.objectweb.proactive.core.descriptor.data.VirtualNode)
+    */
+    public List<Component> newNFcInstanceAsList(Type type,
+        NFControllerDescription controllerDesc,
+        ContentDescription[] contentDesc, VirtualNode virtualNode)
+        throws InstantiationException {
+        if (virtualNode == null) {
+            return newNFcInstanceAsList(type, controllerDesc, contentDesc,
+                (Node[]) null);
+        }
+        try {
+            virtualNode.activate();
+
+            return newNFcInstanceAsList(type, controllerDesc, contentDesc,
                 virtualNode.getNodes());
         } catch (NodeException e) {
             throw new InstantiationException(
@@ -806,6 +1097,49 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             try {
                 instance = Fractive.instance()
                                    .newFcInstance(type, controllerDesc,
+                        contentDesc[indexInList],
+                        nodes[indexInList % nodes.length]);
+                //				System.out.println("[fractive] created component " + originalName + Constants.CYCLIC_NODE_SUFFIX + indexInList);
+                targetList.set(indexInList, instance);
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+                //				targetList.add(null);
+                exceptions.add(e);
+            }
+        }
+    }
+
+    private static class NFComponentBuilderTask implements Runnable {
+        List<InstantiationException> exceptions;
+        List<Component> targetList;
+        int indexInList;
+        Type type;
+        NFControllerDescription controllerDesc;
+        ContentDescription[] contentDesc;
+        String originalName;
+        Node[] nodes;
+
+        public NFComponentBuilderTask(List<InstantiationException> exceptions,
+            List<Component> targetList, int indexInList, Type type,
+            NFControllerDescription controllerDesc, String originalName,
+            ContentDescription[] contentDesc, Node[] nodes) {
+            this.exceptions = exceptions;
+            this.targetList = targetList;
+            this.indexInList = indexInList;
+            this.type = type;
+            this.controllerDesc = controllerDesc;
+            this.contentDesc = contentDesc;
+            this.originalName = originalName;
+            this.nodes = nodes;
+        }
+
+        public void run() {
+            controllerDesc.setName(originalName + Constants.CYCLIC_NODE_SUFFIX +
+                indexInList);
+            Component instance;
+            try {
+                instance = Fractive.instance()
+                                   .newNFcInstance(type, controllerDesc,
                         contentDesc[indexInList],
                         nodes[indexInList % nodes.length]);
                 //				System.out.println("[fractive] created component " + originalName + Constants.CYCLIC_NODE_SUFFIX + indexInList);
