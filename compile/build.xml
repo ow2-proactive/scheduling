@@ -75,33 +75,35 @@
 
 
 	<target name="check" depends="-init,util">
-		<property name="tmp.dir" value="${classes.dir}/tmp"/>
 		<macrodef name="checkDir">
 			<attribute name="dir" />
+			<attribute name="tmpdir"/>
 			<sequential>
-				<delete dir="${tmp.dir}" />
-				<copy todir="${tmp.dir}">
+				<delete dir="@{tmpdir}" />
+				<copy todir="@{tmpdir}">
 					<fileset dir="@{dir}" />
 				</copy>
 
-				<format_m srcDir="${tmp.dir}" />
+				<format_m srcDir="@{tmpdir}" />
 
 				<java fork="true" resultproperty="diffReturnVal" classname="diff.DiffJavaDir">
 					<classpath refid="project.classpath" />
 					<arg value="@{dir}" />
-					<arg value="${tmp.dir}" />
+					<arg value="@{tmpdir}" />
 				</java>
-				<delete dir="${tmp.dir}" />
+				<delete dir="@{tmpdir}" />
 				<if name="diffReturnVal" value="1">
 					<fail message="Please use Jalopy" />
 				</if>
 			</sequential>
 		</macrodef>
-
-		<checkDir dir="${src.proactive.dir}" />
-		<checkDir dir="${src.extensions.dir}" />
-		<checkDir dir="${src.extra.dir}" />
-		<checkDir dir="${src.examples.dir}" />
+		
+		<parallel threadsperprocessor="1">
+			<checkDir dir="${src.proactive.dir}"  tmpdir="${classes.dir}/tmp/ProActive"/>
+			<checkDir dir="${src.extensions.dir}" tmpdir="${classes.dir}/tmp/Extensions" />
+			<checkDir dir="${src.extra.dir}"      tmpdir="${classes.dir}/tmp/Extra" />
+			<checkDir dir="${src.examples.dir}"   tmpdir="${classes.dir}/tmp/Examples" />
+		</parallel>
 	</target>
 
 	<!-- ================================================================ -->
@@ -615,10 +617,12 @@
 	</macrodef>
 
 	<target name="format" description="Formats the project source files">
-		<format_m srcdir="${src.proactive.dir}"/>
-		<format_m srcdir="${src.extensions.dir}"/>
-		<format_m srcdir="${src.extra.dir}"/>
-		<format_m srcdir="${src.examples.dir}"/>
+		<parallel threadsperprocessor="1">
+			<format_m srcdir="${src.proactive.dir}"/>
+			<format_m srcdir="${src.extensions.dir}"/>
+			<format_m srcdir="${src.extra.dir}"/>
+			<format_m srcdir="${src.examples.dir}"/>
+		</parallel>
 	</target>
 
 	<!-- ================================================================ -->
