@@ -6,31 +6,7 @@
 	<!-- ================================================================ -->
 		<!--            Create docs, which is the javadoc + manual            -->
 		<!--  =============================================================== -->
-		<target name="docs" depends="java2html, javadoc, manual" description="Construct the javadoc and the manual" />
-
-
-		<!-- ================================================================ -->
-		<!--            Make the java files readable on the web               -->
-		<!--  =============================================================== -->
-		<!-- 
-		** Do not support Java 1.5 **
-		<target name="java2html">
-			<echo message="Converting java to html..." />
-			<java jar="${base.dir}/dev/lib/j2h.jar" fork="true">
-				<arg line="-d ${docs.dir}/ProActive_src_html" />
-				<arg line="-js ${src.dir}/${proactive.path}" />
-				<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api" />
-				<arg line="-t 2 -n '${name} source code'" />
-			</java>
-
-		</target>-->
-
-		<!-- TODO tempory fix for java 1.5, do not generate index.html -->
-		<!-- http://www.java2html.de /dev/lib/j2h.jar -->
-		<target name="java2html">
-			<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base.dir}/dev/lib/j2h.jar" />
-			<j2h srcdir="${src.dir}/${proactive.path}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="true" outputFormat="html" />
-		</target>
+		<target name="docs" depends="javadoc, manual" description="Construct the javadoc and the manual" />
 
 
 		<!-- ================================================================ -->
@@ -41,12 +17,12 @@
 			<mkdir dir="${docs.dir}/api" />
 			<copy todir="${docs.dir}/api">
 				<fileset dir="${src.proactive.dir}" includes="**/*.jpg"/>
-				<fileset dir="${src.modules.dir}"   includes="**/*.jpg"/>
+				<fileset dir="${src.extensions.dir}"   includes="**/*.jpg"/>
 			</copy>
 			<mkdir dir="${docs.dir}/ic2d-api" />
 			<javadoc  destdir="${docs.dir}/api" verbose="true" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> <!-- -docfilessubdirs -excludedocfilessubdir  -->
 			    <packageset dir="${src.proactive.dir}" />
-				<packageset dir="${src.modules.dir}" />
+				<packageset dir="${src.extensions.dir}" />
 		      		
 				<classpath refid="project.classpath" />
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
@@ -175,12 +151,8 @@
 	<!-- ==================================================================== -->
 	<!--    Add some highlighting information to the docbook source code      -->
 	<!-- ==================================================================== -->
-	<target name="-docbookBeautify">
-		<mkdir dir="${classes.dir}" />
-		<javac srcdir="${src.utils.dir}" destdir="${cl.utils.dir}" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-			<include name="doc/*.java" />
-		</javac>
+	<target name="-docbookBeautify" depends="util">
+		
 
 		<java classname="doc.DocBookize" fork="true">
 			<classpath refid="project.classpath"/>
