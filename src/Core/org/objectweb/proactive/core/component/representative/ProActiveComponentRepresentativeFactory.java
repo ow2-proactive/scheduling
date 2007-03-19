@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -84,6 +84,25 @@ public class ProActiveComponentRepresentativeFactory {
     }
 
     /**
+     * Creates a component representative according to the type of the non-functional component
+     * (it also generates the required functional interfaces), and connects the representative to
+     * the given proxy. It also takes into account a controller config file for generating references to
+     * the implementations of the controllers of this component.
+     * @param componentType the type of the component
+     * @param proxy the proxy to the active object
+     * @param controllerConfigFileLocation location of a file that contains the description of the controllers for this component. null will load the default configuration
+     * @return a corresponding component representative
+     */
+    public ProActiveComponentRepresentative createNFComponentRepresentative(
+        ComponentType componentType, String hierarchicalType, Proxy proxy,
+        String controllerConfigFileLocation) {
+        ProActiveComponentRepresentative representative = new ProActiveNFComponentRepresentativeImpl(componentType,
+                hierarchicalType, controllerConfigFileLocation);
+        representative.setProxy(proxy);
+        return representative;
+    }
+
+    /**
      * The creation of a component representative from a proxy object implies a remote invocation (immediate service) for
      * getting the parameters of the component, necessary for the construction of the representative
      * @param proxy a reference on a proxy pointing to a component
@@ -104,6 +123,32 @@ public class ProActiveComponentRepresentativeFactory {
          .removeImmediateService("getComponentParameters", new Class[] {  });
         return ProActiveComponentRepresentativeFactory.instance()
                                                       .createComponentRepresentative(componentParameters.getComponentType(),
+            componentParameters.getHierarchicalType(), proxy,
+            componentParameters.getControllerDescription()
+                               .getControllersConfigFileLocation());
+    }
+
+    /**
+     * The creation of a component representative (for a non-functional component) from a proxy object implies a remote invocation (immediate service) for
+     * getting the parameters of the component, necessary for the construction of the representative
+     * @param proxy a reference on a proxy pointing to a component
+     * @return a component representative for the pointed component
+     * @throws Throwable an exception
+     */
+    public ProActiveComponentRepresentative createNFComponentRepresentative(
+        Proxy proxy) throws Throwable {
+        ((BodyProxy) proxy).getBody().getRemoteAdapter()
+         .setImmediateService("getComponentParameters", new Class[] {  });
+        ComponentParameters componentParameters = (ComponentParameters) proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+                    ComponentParametersController.class.getDeclaredMethod(
+                        "getComponentParameters", new Class[] {  }),
+                    new Object[] {  }, null,
+                    Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
+                    ComponentRequest.STRICT_FIFO_PRIORITY));
+        ((BodyProxy) proxy).getBody().getRemoteAdapter()
+         .removeImmediateService("getComponentParameters", new Class[] {  });
+        return ProActiveComponentRepresentativeFactory.instance()
+                                                      .createNFComponentRepresentative(componentParameters.getComponentType(),
             componentParameters.getHierarchicalType(), proxy,
             componentParameters.getControllerDescription()
                                .getControllersConfigFileLocation());
