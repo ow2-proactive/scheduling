@@ -86,7 +86,7 @@
 
 				<format_m srcDir="${tmp.dir}" />
 
-				<java fork="true" resultproperty="diffReturnVal" classname="util.diff.DiffJavaDir">
+				<java fork="true" resultproperty="diffReturnVal" classname="diff.DiffJavaDir">
 					<classpath refid="project.classpath" />
 					<arg value="@{dir}" />
 					<arg value="${tmp.dir}" />
