@@ -55,7 +55,11 @@ import nonregressiontest.component.controller.DummyController;
  *
  */
 public class Test extends ComponentTest {
-    Component componentA;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -644817728440189096L;
+	Component componentA;
     Component componentB;
     String name;
     String nodeUrl;

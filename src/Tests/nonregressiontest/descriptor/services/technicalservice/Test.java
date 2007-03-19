@@ -38,7 +38,11 @@ import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {
-    private static String XML_LOCATION = Test.class.getResource(
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6092398365628948219L;
+	private static String XML_LOCATION = Test.class.getResource(
             "/nonregressiontest/descriptor/services/technicalservice/TechnicalService.xml")
                                                    .getPath();
     private ProActiveDescriptor pad;

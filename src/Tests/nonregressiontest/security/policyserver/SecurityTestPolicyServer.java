@@ -47,7 +47,11 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class SecurityTestPolicyServer extends FunctionalTest {
-    private PolicyServer policyServer = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8689457521948634564L;
+	private PolicyServer policyServer = null;
     private PolicyServer ps = null;
 
     /**

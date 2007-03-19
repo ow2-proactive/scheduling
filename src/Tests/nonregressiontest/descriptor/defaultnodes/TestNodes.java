@@ -44,7 +44,11 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class TestNodes extends FunctionalTest {
-    private static String XML_LOCATION;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7106378819266760591L;
+	private static String XML_LOCATION;
 
     static {
         String value = System.getProperty(

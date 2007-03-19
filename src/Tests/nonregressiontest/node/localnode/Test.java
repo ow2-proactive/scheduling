@@ -41,7 +41,11 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class Test extends FunctionalTest {
-    private A ao;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1626919410261919710L;
+	private A ao;
 
     /**
     * Constructor for Test.

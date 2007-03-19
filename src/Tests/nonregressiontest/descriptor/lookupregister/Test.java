@@ -39,7 +39,11 @@ import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
   
-   // private static String FS = System.getProperty("file.separator");
+   /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6581981842836211604L;
+	// private static String FS = System.getProperty("file.separator");
     private static String AGENT_XML_LOCATION_UNIX ;
     
   static {

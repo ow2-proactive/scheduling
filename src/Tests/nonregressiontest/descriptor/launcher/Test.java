@@ -45,7 +45,12 @@ import testsuite.test.FunctionalTest;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-    private static String XML_LOCATION;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2153432590156382257L;
+
+	private static String XML_LOCATION;
 
     static {
     	  if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {

@@ -61,7 +61,11 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
-    public static String MESSAGE = "-->m";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4791174213677002564L;
+	public static String MESSAGE = "-->m";
     private List<Message> messages;
 
     //ComponentsCache componentsCache;

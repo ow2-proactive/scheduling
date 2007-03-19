@@ -43,7 +43,11 @@ import testsuite.test.FunctionalTest;
  * @author rquilici
  */
 public class Test extends FunctionalTest {
-    String stubClassName;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2856204140856147300L;
+	String stubClassName;
     byte[] data;
 
     public Test() {

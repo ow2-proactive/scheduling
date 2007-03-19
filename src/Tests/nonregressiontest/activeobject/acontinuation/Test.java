@@ -37,7 +37,11 @@ import org.objectweb.proactive.ProActive;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    A a;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8272627897015121569L;
+	A a;
     A b;
     A lastA;
     Id idPrincipal;

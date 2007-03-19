@@ -53,7 +53,11 @@ import nonregressiontest.component.creation.ComponentInfo;
  * creates a new component
  */
 public class Test extends ComponentTest {
-    Component componentA;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8246601088194840413L;
+	Component componentA;
     String name;
     String nodeUrl;
 

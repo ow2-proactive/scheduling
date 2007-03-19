@@ -39,7 +39,11 @@ import org.objectweb.proactive.core.node.Node;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    ProActiveDescriptor proActiveDescriptor;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1869140219007735164L;
+	ProActiveDescriptor proActiveDescriptor;
     private static String FS = System.getProperty("file.separator");
     private static String AGENT_XML_LOCATION_UNIX = null;  
     static {

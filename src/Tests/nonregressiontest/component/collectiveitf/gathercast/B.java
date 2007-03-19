@@ -34,7 +34,11 @@ import java.io.Serializable;
 
 public class B implements Serializable {
     
-    int value;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -478206495332926111L;
+	int value;
     
     public B() {}
     

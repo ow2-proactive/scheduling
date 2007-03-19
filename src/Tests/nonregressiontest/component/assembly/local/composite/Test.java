@@ -63,7 +63,11 @@ import testsuite.test.Assertions;
  *
  */
 public class Test extends ComponentTest {
-    public static String MESSAGE = "-->Main";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2137029402382027456L;
+	public static String MESSAGE = "-->Main";
     Component p1;
     Component p2;
     Component c1;

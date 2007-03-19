@@ -38,7 +38,11 @@ import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {
-    private static String TESTMISTAKES_XML_LOCATION_UNIX = Test.class.getResource(
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8303982699999215955L;
+	private static String TESTMISTAKES_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/mistakes/testMistakes.xml").getPath();
     private static String TESTVARIABLES_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/mistakes/testVariables.xml").getPath();

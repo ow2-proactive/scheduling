@@ -35,7 +35,11 @@ import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {
-    B b;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -5501538868583034371L;
+	B b;
 
     public Test() {
         super("Active Object termination",

@@ -36,7 +36,11 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    ProActiveRuntime part;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4773910513232125220L;
+	ProActiveRuntime part;
 
     public Test() {
         super("defaultruntimecreation", "Test default runtime creation");

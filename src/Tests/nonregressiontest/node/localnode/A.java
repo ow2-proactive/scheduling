@@ -37,7 +37,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 public class A implements Serializable {
-    String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3486687166076491272L;
+	String name;
 
     public A() {
     }

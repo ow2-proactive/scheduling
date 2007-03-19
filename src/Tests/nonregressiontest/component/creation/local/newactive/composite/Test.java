@@ -79,7 +79,11 @@ import nonregressiontest.component.PrimitiveComponentB;
  *
  */
 public class Test extends ComponentTest {
-    private static final String P1_NAME = "primitive-component-1";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7002185868293478843L;
+	private static final String P1_NAME = "primitive-component-1";
     private static final String P2_NAME = "primitive-component-2";
     private static final String C1_NAME = "composite-component1";
     private static final String C2_NAME = "composite-component2";

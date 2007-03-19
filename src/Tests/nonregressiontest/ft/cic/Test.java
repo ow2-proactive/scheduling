@@ -47,7 +47,11 @@ import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {
-    private int result = 0;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 924490397928151804L;
+	private int result = 0;
     private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/ft/testFT_CIC.xml").getPath();

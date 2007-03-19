@@ -46,7 +46,11 @@ import testsuite.test.FunctionalTest;
  * @author Laurent Baduel
  */
 public class Test extends FunctionalTest {
-    private A typedGroup = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8599180613841630776L;
+	private A typedGroup = null;
 
     public Test() {
         super("one serialization of the methodcall object in a group communication",

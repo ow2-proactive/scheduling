@@ -44,7 +44,11 @@ import testsuite.test.FunctionalTest;
  * @author Laurent Baduel
  */
 public class Test extends FunctionalTest {
-    private A typedGroup = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1483216038924949402L;
+	private A typedGroup = null;
 
     public Test() {
         super("group creation", "create a group with 3 active objects");

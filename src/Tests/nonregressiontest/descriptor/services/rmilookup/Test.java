@@ -44,7 +44,11 @@ import testsuite.test.FunctionalTest;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-    private static String ONEVM_XML_LOCATION_UNIX = Test.class.getResource(
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6700674087317492737L;
+	private static String ONEVM_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/rmilookup/OneVM.xml")
                                                               .getPath();
     private static String LOOK_XML_LOCATION_UNIX = Test.class.getResource(

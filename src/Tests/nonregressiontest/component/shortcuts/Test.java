@@ -47,7 +47,11 @@ import nonregressiontest.component.*;
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
-    private static final int NB_WRAPPERS = 5;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8211123887252319212L;
+	private static final int NB_WRAPPERS = 5;
     private Message result1;
     private Message result2;
     private Message result3;

@@ -38,7 +38,11 @@ import nonregressiontest.descriptor.defaultnodes.TestNodes;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    A a;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7610928539081956490L;
+	A a;
     Node sameVmNode;
     Node localVmNode;
 

@@ -54,7 +54,11 @@ import testsuite.test.FunctionalTest;
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
-    ProActiveDescriptor descriptor;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3311965940327392139L;
+	ProActiveDescriptor descriptor;
 
     public Test() {
         super("Generic types", "Generic types");

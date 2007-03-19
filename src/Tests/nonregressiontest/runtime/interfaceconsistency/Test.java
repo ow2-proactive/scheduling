@@ -43,7 +43,11 @@ import testsuite.test.FunctionalTest;
  * @author Clement MATHIEU
  */
 public class Test extends FunctionalTest {
-    private boolean testPassed = true;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5837953575775986529L;
+	private boolean testPassed = true;
 
     public Test() {
         super("runtime interface consistency",

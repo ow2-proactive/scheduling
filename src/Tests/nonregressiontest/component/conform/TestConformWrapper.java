@@ -46,7 +46,11 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class TestConformWrapper extends ComponentTest {
-    static Result r;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7978027750915442971L;
+	static Result r;
     private boolean success = false;
 
     public TestConformWrapper() {

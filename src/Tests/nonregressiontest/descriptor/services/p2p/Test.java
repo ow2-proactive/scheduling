@@ -50,7 +50,11 @@ import testsuite.test.FunctionalTest;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-    private static String P2P_XML_LOCATION_UNIX = Test.class.getResource(
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3787507831019771599L;
+	private static String P2P_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/p2p/TestP2P.xml").getPath();
 
     static {

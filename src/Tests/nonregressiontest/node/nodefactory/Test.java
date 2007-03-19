@@ -37,7 +37,11 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    Node rmiNode;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -303170046021003591L;
+	Node rmiNode;
     Node jiniNode;
     private String rmiURL;
     private String jiniURL = "jini://localhost/JININode" +

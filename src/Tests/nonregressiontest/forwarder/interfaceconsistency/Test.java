@@ -51,7 +51,11 @@ import testsuite.test.FunctionalTest;
  * @author Clement MATHIEU
  */
 public class Test extends FunctionalTest {
-    private boolean testPassed = true;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6644436231779117625L;
+	private boolean testPassed = true;
 
     public Test() {
         super("interface consistency for forwarder",

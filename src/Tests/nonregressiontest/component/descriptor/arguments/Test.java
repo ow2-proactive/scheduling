@@ -50,7 +50,11 @@ import testsuite.test.Assertions;
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
-    Component dummy;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7744558732415529004L;
+	Component dummy;
 
     public Test() {
         super("Configuration with ADL arguments and AttributeController",

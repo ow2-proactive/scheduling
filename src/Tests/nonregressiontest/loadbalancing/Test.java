@@ -41,7 +41,11 @@ import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    private static String XML_LOCATION = Test.class.getResource(
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6456202200419791534L;
+	private static String XML_LOCATION = Test.class.getResource(
             "/nonregressiontest/loadbalancing/LoadBalancing.xml").getPath();
     private ProActiveDescriptor pad;
     private VirtualNode vn1;

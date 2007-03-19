@@ -45,7 +45,11 @@ import testsuite.test.FunctionalTest;
  * Created on Nov 8, 2005
  */
 public class TestVnNotActivated extends FunctionalTest {
-    private static final String XML_PATH = TestVnNotActivated.class.getResource(
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5834693623493317219L;
+	private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/nonregressiontest/activeobject/creation/parallel/4_local.xml")
                                                                    .getPath();
     private A[] aos;

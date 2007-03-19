@@ -41,7 +41,11 @@ import testsuite.test.FunctionalTest;
 
 
 public class SecurityTests extends FunctionalTest {
-    private boolean testSucceed = true;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5833323104163731463L;
+	private boolean testSucceed = true;
 
     public SecurityTests() {
         super("Security Tests");

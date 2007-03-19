@@ -44,7 +44,11 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class Test extends FunctionalTest {
-    int counter = 0;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4146928628360380282L;
+	int counter = 0;
 
     public Test() {
         super("Exception", "Test exceptions");
@@ -183,7 +187,12 @@ public class Test extends FunctionalTest {
         /* voidRT() */
         ProActive.addNFEListenerOnAO(r,
             new NFEListener() {
-                public boolean handleNFE(NonFunctionalException e) {
+                /**
+				 * 
+				 */
+				private static final long serialVersionUID = 2860995251769787397L;
+
+				public boolean handleNFE(NonFunctionalException e) {
                     good();
                     return true;
                 }

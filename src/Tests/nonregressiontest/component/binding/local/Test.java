@@ -53,7 +53,11 @@ import testsuite.test.Assertions;
  * a test for bindings / rebindings on client collective interfaces between remote components
  */
 public class Test extends ComponentTest {
-    Component compA;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4444015607362310548L;
+	Component compA;
     Component compB1;
     Component compB2;
     Component compD;

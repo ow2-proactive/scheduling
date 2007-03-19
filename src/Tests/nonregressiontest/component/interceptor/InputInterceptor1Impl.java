@@ -48,7 +48,11 @@ import nonregressiontest.component.controller.DummyController;
  */
 public class InputInterceptor1Impl extends AbstractProActiveController
     implements InputInterceptor1 {
-    private int beforeInvocationCounter = 0;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -855162283473328497L;
+	private int beforeInvocationCounter = 0;
     private int afterInvocationCounter = 0;
 
     /**

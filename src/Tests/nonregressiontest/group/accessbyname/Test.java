@@ -44,7 +44,11 @@ import testsuite.test.FunctionalTest;
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
-    A typedGroup;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3756826632109245192L;
+	A typedGroup;
 
     public Test() {
         super("access to group elements by their name",

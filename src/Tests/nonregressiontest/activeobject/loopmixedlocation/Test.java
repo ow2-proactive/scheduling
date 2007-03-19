@@ -46,7 +46,11 @@ import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {
-    A a;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8550542790438719546L;
+	A a;
     MigratableA migratableA;
     SimpleLocationServer server;
     UniqueID idA;

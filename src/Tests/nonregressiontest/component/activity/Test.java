@@ -48,7 +48,12 @@ import nonregressiontest.component.ComponentTest;
  * creates a new component
  */
 public class Test extends ComponentTest {
-    public Test() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4191411789650566643L;
+
+	public Test() {
         super("Encapsulation of functional activity within component activity",
             "Encapsulation of functional activity within component activity");
     }

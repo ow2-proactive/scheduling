@@ -44,7 +44,11 @@ import java.io.FileWriter;
 
 
 public class Test extends FunctionalTest {
-    ProActiveDescriptor descriptor;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6030295227851414810L;
+	ProActiveDescriptor descriptor;
     A a1;
     A a2;
     A a3;

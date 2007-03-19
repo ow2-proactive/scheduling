@@ -38,7 +38,11 @@ import org.objectweb.proactive.core.node.Node;
 
 
 public class MigratableA implements Serializable {
-    String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4068318564591662315L;
+	String name;
 
     public MigratableA() {
     }

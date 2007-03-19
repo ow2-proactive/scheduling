@@ -45,7 +45,11 @@ import testsuite.test.FunctionalTest;
  * @author Laurent Baduel
  */
 public class Test extends FunctionalTest {
-    private A spmdgroup = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6929428940280564107L;
+	private A spmdgroup = null;
 
     public Test() {
         super("barrier", "perform a barrier call on an SPMD group");

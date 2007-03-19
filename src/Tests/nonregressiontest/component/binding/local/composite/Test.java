@@ -59,7 +59,11 @@ import nonregressiontest.component.PrimitiveComponentB;
  *
  */
 public class Test extends ComponentTest {
-    public static String MESSAGE = "-->Main";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -348571654012032799L;
+	public static String MESSAGE = "-->Main";
     Component p1;
     Component p2;
     Component c1;

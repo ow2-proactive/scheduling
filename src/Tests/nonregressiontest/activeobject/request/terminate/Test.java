@@ -37,7 +37,11 @@ import nonregressiontest.activeobject.request.A;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    A a;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9207669520580816164L;
+	A a;
 
     public Test() {
         super("Active Object termination", "Test sending termination method");

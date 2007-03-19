@@ -41,7 +41,11 @@ import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {
-    A a;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7692998257754371205L;
+	A a;
     String name;
     String nodeUrl;
 

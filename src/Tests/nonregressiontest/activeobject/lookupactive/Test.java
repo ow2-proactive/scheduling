@@ -38,7 +38,12 @@ import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {
-    public Test() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6695388796855172951L;
+
+	public Test() {
         super("Lookup active", "Test register and lookup AOs");
     }
 

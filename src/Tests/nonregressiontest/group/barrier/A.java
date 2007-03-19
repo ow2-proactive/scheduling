@@ -35,7 +35,11 @@ import org.objectweb.proactive.core.group.spmd.ProSPMD;
 
 
 public class A implements Active, java.io.Serializable {
-    private String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6959297031183046321L;
+	private String name;
     private int fooCounter = 0;
     private int barCounter = 0;
     private int geeCounter = 0;

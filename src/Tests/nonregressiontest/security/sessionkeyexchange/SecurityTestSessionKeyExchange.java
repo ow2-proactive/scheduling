@@ -42,7 +42,11 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class SecurityTestSessionKeyExchange extends FunctionalTest {
-    private ProActiveSecurityManager psm = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7116369482051444133L;
+	private ProActiveSecurityManager psm = null;
     private boolean testSucceed = true;
 
     /**

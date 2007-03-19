@@ -59,7 +59,11 @@ import testsuite.test.FunctionalTest;
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
-    ProActiveDescriptor descriptor;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1636051750940227685L;
+	ProActiveDescriptor descriptor;
 
     public Test() {
         super("remote classloading with custom classloader",

@@ -43,7 +43,12 @@ import testsuite.test.Assertions;
  */
 public class Test extends ComponentTest {
 
-    /* (non-Javadoc)
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3599379824812275514L;
+
+	/* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override

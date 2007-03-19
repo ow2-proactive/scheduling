@@ -37,7 +37,11 @@ import nonregressiontest.descriptor.defaultnodes.TestNodes;
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {
-    A a;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1990961843638689934L;
+	A a;
 
     public Test() {
         super("multiple migration", "Test multiple migration with method call");

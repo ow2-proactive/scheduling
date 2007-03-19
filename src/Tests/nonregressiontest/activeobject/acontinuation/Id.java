@@ -31,7 +31,11 @@
 package nonregressiontest.activeobject.acontinuation;
 
 public class Id implements java.io.Serializable {
-    String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3782664958593451152L;
+	String name;
 
     public Id() {
     }

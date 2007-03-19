@@ -48,7 +48,11 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class SecurityTestSecurityManager extends FunctionalTest {
-    private ProActiveSecurityManager psm = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3414159361865609323L;
+	private ProActiveSecurityManager psm = null;
     private ProActiveSecurityManager psm2 = null;
 
     /**

@@ -41,7 +41,12 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class SecurityTestKeyGen extends FunctionalTest {
-    public SecurityTestKeyGen() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6453945881218909030L;
+
+	public SecurityTestKeyGen() {
         super("security setup - key generation ",
             "Test if the the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files is available");
     }

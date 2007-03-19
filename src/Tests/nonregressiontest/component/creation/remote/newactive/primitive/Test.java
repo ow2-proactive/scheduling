@@ -51,7 +51,11 @@ import nonregressiontest.descriptor.defaultnodes.TestNodes;
  * creates a primitive component on a remote node with ACs
  */
 public class Test extends ComponentTest {
-    Component componentA;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 9123267571116623375L;
+	Component componentA;
     String name;
     String nodeUrl;
     String remoteHost;

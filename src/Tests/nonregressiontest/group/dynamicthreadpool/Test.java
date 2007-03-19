@@ -44,7 +44,11 @@ import testsuite.test.FunctionalTest;
  * @author Laurent Baduel
  */
 public class Test extends FunctionalTest {
-    private A typedGroup = null;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8294278613480913623L;
+	private A typedGroup = null;
 
     /**
      *

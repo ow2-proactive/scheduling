@@ -41,7 +41,11 @@ import testsuite.test.FunctionalTest;
 
 // TODO: Test deployment from multiple VMs
 public class Test extends FunctionalTest {
-    private static String XML_LOCATION;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1955857833355837127L;
+	private static String XML_LOCATION;
 
     static {
         String value = System.getProperty(
