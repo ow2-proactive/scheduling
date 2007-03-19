@@ -35,8 +35,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
+import org.objectweb.proactive.extensions.mixedlocation.MixedLocationMetaObjectFactory;
 
 import nonregressiontest.activeobject.locationserver.A;
 import nonregressiontest.activeobject.locationserver.MigratableA;
@@ -60,17 +60,17 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         String serverUrl = ProActiveConfiguration.getLocationServerRmi();
         server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
         a = (A) ProActive.newActive(A.class.getName(), null,
-                new Object[] { "toto" }, TestNodes.getSameVMNode(),
-                null, MixedLocationMetaObjectFactory.newInstance());
+                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                MixedLocationMetaObjectFactory.newInstance());
         migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
-                null, new Object[] { "toto" }, TestNodes.getSameVMNode(),
-                null, MixedLocationMetaObjectFactory.newInstance());
+                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                MixedLocationMetaObjectFactory.newInstance());
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
         migratableA.moveTo(TestNodes.getLocalVMNode());
         Thread.sleep(3000);
@@ -80,18 +80,18 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return ((server.searchObject(idA) != null) &&
         a.getName(migratableA).equals("toto"));
     }
