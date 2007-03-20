@@ -44,6 +44,8 @@ import org.objectweb.fractal.adl.Factory;
 public class FactoryFactory {
     public final static String PROACTIVE_BACKEND = "org.objectweb.proactive.core.component.adl.ProActiveBackend";
     public final static String PROACTIVE_FACTORY = "org.objectweb.proactive.core.component.adl.ProActiveFactory";
+    public final static String PROACTIVE_NFBACKEND = "org.objectweb.proactive.core.component.adl.ProActiveNFBackend";
+    public final static String PROACTIVE_NFFACTORY = "org.objectweb.proactive.core.component.adl.ProActiveNFFactory";
 
     private FactoryFactory() {
     }
@@ -57,5 +59,16 @@ public class FactoryFactory {
     public static Factory getFactory() throws ADLException {
         return org.objectweb.fractal.adl.FactoryFactory.getFactory(PROACTIVE_FACTORY,
             PROACTIVE_BACKEND, new HashMap());
+    }
+
+    /**
+     * Returns a factory for the ProActive ADL.
+     *
+     * @see org.objectweb.fractal.adl.FactoryFactory#getFactory(java.lang.String,
+     *      java.lang.String, java.util.Map)
+     */
+    public static Factory getNFFactory() throws ADLException {
+        return org.objectweb.fractal.adl.FactoryFactory.getFactory(PROACTIVE_NFFACTORY,
+        		PROACTIVE_NFBACKEND, new HashMap());
     }
 }
