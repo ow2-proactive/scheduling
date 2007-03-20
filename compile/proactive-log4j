@@ -3,10 +3,12 @@
 
 # The default logging level is INFO
 # The root logger logs in the test.log file
-log4j.rootLogger= INFO,CONSOLE
+log4j.rootLogger= INFO,FILE
 
 #Both tests packages log on the console
+log4j.logger.nonregressiontest=INFO, CONSOLE
 #log4j.logger.nonregressiontest=DEBUG, CONSOLE
+log4j.logger.testsuite=INFO, CONSOLE
 
 ########### The following are existing categories in ProActive
 #log4j.logger.proactive = INFO, CONSOLE
@@ -29,7 +31,7 @@ log4j.rootLogger= INFO,CONSOLE
 #log4j.logger.proactive.ft.pml = DEBUG, CONSOLE
 #log4j.logger.proactive.communication.transport.http = DEBUG, CONSOLE
 #log4j.logger.proactive.communication.rmi = DEBUG, CONSOLE
-log4j.logger.proactive.communication.ssh = INFO, CONSOLE
+#log4j.logger.proactive.communication.ssh = DEBUG, CONSOLE
 #log4j.logger.proactive.communication.transport.http = DEBUG, CONSOLE
 #log4j.logger.proactive.migration = DEBUG, CONSOLE
 #log4j.logger.proactive.communication.requests = DEBUG, CONSOLE
