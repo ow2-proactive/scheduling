@@ -69,6 +69,6 @@ public class FactoryFactory {
      */
     public static Factory getNFFactory() throws ADLException {
         return org.objectweb.fractal.adl.FactoryFactory.getFactory(PROACTIVE_NFFACTORY,
-        		PROACTIVE_NFBACKEND, new HashMap());
+            PROACTIVE_NFBACKEND, new HashMap());
     }
 }
