@@ -41,11 +41,11 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public final static boolean DEFAULT_IS_MONITORING = true;
 	private boolean isMonitoring = DEFAULT_IS_MONITORING;
-	
+
 	private NodeObject nodeObject;
 
 	public SpyEventListenerImpl(){
-		
+
 	}
 
 	public SpyEventListenerImpl(NodeObject nodeObject){
@@ -55,17 +55,15 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 	public void enableMonitoring(boolean monitoring){
 		isMonitoring = monitoring;
 	}
-	
+
 	public boolean isMonitoring(){
 		return isMonitoring;
 	}
 
 	public void activeObjectAdded(UniqueID id, String jobID, String nodeURL, String className, boolean isActive) {
-		AOObject ao = getActiveObject(id);
-		if(ao==null){
-			ao = new AOObject(nodeObject, className.substring(className.lastIndexOf(".")+1), id, jobID);
+		AOObject ao = nodeObject.createAOObject(className.substring(className.lastIndexOf(".")+1), id, jobID, false);
+		if(ao!=null)
 			nodeObject.exploreChild(ao);
-		}
 	}
 
 	public void activeObjectChanged(UniqueID id, boolean isActive, boolean isAlive) {
@@ -73,10 +71,8 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		if(ao == null)
 			return;
 
-		if(!isActive){
-			ao.resetCommunications();
-			nodeObject.removeChild(ao);
-		}
+		if(!isAlive)
+			nodeObject.deleteChild(ao);
 	}
 
 	public void objectWaitingForRequest(UniqueID id, SpyEvent spyEvent) {
@@ -135,13 +131,15 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 			return;
 		ao.setState(State.ACTIVE);
 		ao.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
-		
+
 	}
 
 	public void requestMessageReceived(UniqueID id, SpyEvent spyEvent) {
 		if(!isMonitoring)
 			return;
 		AOObject target = nodeObject.findActiveObjectById(id);
+
+		// We didn't find the destination
 		if(target == null)
 			return;
 
@@ -153,22 +151,14 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 		target.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
 
 		UniqueID sourceId = ((SpyMessageEvent) spyEvent).getSourceBodyID();
-		
-		
+
 		AOObject source = target.getWorld().findActiveObjectById(sourceId);
-	
-		
+
 		// We didn't find the source
 		if(source == null)
 			return;
 
-		// We didn't find the destination
-		if(target == null)
-			return;
-
-		//long s = System.currentTimeMillis();
-		source.addCommunication(target);
-		//System.out.println("SpyEventListenerImpl.requestMessageReceived() = "+(System.currentTimeMillis()-s));		
+		source.addCommunication(target);	
 	}
 
 	public void replyMessageReceived(UniqueID id, SpyEvent spyEvent) {
@@ -184,7 +174,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 			return;
 		ao.setState(State.ACTIVE);
 		ao.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
-		
+
 	}
 
 	public void allEventsProcessed() {
@@ -205,7 +195,7 @@ public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 		ao.setState(State.SERVING_REQUEST);
 		ao.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
-		
+
 	}
 
 	public String getName(UniqueID id){

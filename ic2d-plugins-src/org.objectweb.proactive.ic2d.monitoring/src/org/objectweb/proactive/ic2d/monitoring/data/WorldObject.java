@@ -166,7 +166,9 @@ public class WorldObject extends AbstractDataObject {
 
 	@Override
 	public Map<String, AbstractDataObject> getAllMonitoredObjects(){
-		return this.allMonitoredObjects;
+		synchronized (allMonitoredObjects) {
+			return this.allMonitoredObjects;
+		}
 	}
 
 	/**
@@ -174,7 +176,9 @@ public class WorldObject extends AbstractDataObject {
 	 * @param object 
 	 */
 	public void addToMonitoredObject(AbstractDataObject object){
-		this.allMonitoredObjects.put(object.getKey(), object);
+		synchronized (allMonitoredObjects) {
+			this.allMonitoredObjects.put(object.getKey(), object);		
+		}
 	}
 
 	/**
@@ -182,7 +186,29 @@ public class WorldObject extends AbstractDataObject {
 	 * @param object
 	 */
 	public void removeFromMonitoredObjects(AbstractDataObject object){
-		this.allMonitoredObjects.remove(object.getKey());
+		if(object!=null){
+			String key = object.getKey();
+			if(key!=null){
+				AbstractDataObject ado = this.allMonitoredObjects.get(key);
+				// If the object is an active object associated with another node
+				// then it is a migration so we don't remove this object.
+				if (ado instanceof AOObject) {
+					AOObject ao = (AOObject) ado;
+					if(((NodeObject)ao.getParent()).getURL().equals(((NodeObject)object.getParent()).getURL())){
+						this.allMonitoredObjects.remove(key);
+					}
+					/*
+					else It is a migration
+					*/
+				}
+			}
+		}
+	}
+
+	public boolean allMonitoredObjectContainsKey(String key){
+		synchronized (allMonitoredObjects) {
+			return allMonitoredObjects.containsKey(key);
+		}
 	}
 
 	/**
@@ -260,7 +286,7 @@ public class WorldObject extends AbstractDataObject {
 	public boolean isP2PHidden(){
 		return this.hideP2P;
 	}
-
+	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//

@@ -132,6 +132,7 @@ public class MonitoringView extends ViewPart {
 		FormLayout form = new FormLayout ();
 		parent.setLayout (form);
 
+		final int topLimit = 46;
 		final int limit = 62;
 
 		virtualNodesGroup = new VirtualNodesGroup(parent);
@@ -140,7 +141,7 @@ public class MonitoringView extends ViewPart {
 		vnData.left = new FormAttachment (0, 0);
 		vnData.right = new FormAttachment (100, 0);
 		vnData.top = new FormAttachment (0, 0);
-		vnData.bottom = new FormAttachment (0, limit);
+		vnData.bottom = new FormAttachment (0, topLimit);
 		virtualNodesGroup.getGroup().setLayoutData(vnData);
 
 		createGraphicalViewer(parent);
@@ -402,7 +403,9 @@ public class MonitoringView extends ViewPart {
 		// configure the viewer
 		graphicalViewer.getControl().setBackground(ColorConstants.white);
 		ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
-		root.getFigure().addMouseListener(new WorldListener(this));
+		WorldListener listener = new WorldListener(this);
+		root.getFigure().addMouseListener(listener);
+		root.getFigure().addMouseMotionListener(listener);
 		graphicalViewer.setRootEditPart(root);
 
 		// activate the viewer as selection provider for Eclipse

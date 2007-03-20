@@ -46,6 +46,7 @@ import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
+import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 
 public class RMIHostRTFinder implements HostRTFinder{
 
@@ -80,7 +81,7 @@ public class RMIHostRTFinder implements HostRTFinder{
 			return runtimes;
 		}
 
-		/* Searchs all ProActve Runtimes */
+		/* Searchs all ProActive Runtimes */
 		for (int i = 0; i < names.length; ++i) {
 			String name = names[i];
 			if (name.indexOf("PA_JVM") != -1) {
@@ -89,11 +90,14 @@ public class RMIHostRTFinder implements HostRTFinder{
 					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
 					runtimes.add(proActiveRuntime);
 				} catch(Exception e) {
-					if(e instanceof ProActiveException){
+					//System.out.println("RMIHostRTFinder.findPARuntime() ***"+host.getFullName());
+					console.debug(e);
+					/*if(e instanceof ProActiveException){
 						console.debug("Serial Version UID is incompatible");
 					}
 					else
 						console.logException(e);
+					 */
 				}
 			}
 		}

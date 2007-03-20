@@ -231,6 +231,30 @@ public class NodeObject extends AbstractDataObject{
 	public void enableMonitoring(boolean enable){
 		activeSpyListener.enableMonitoring(enable);
 	}
+
+
+	/**
+	 * Create a new AOObject only if an active object not already exists with the same id.
+	 * @param name The name of the AOObject (ex: Domain)
+	 * @param id The id of the active object.
+	 * @param jobID The job id of the active object
+	 * @param everywhere The research level. true : Searches on all created objects. false : searches only on the children of this nodeObject.
+	 * It is very useful for the migration because an active object can be in 2 differents nodes at a same time during the migration. 
+	 * @return a AOObject created
+	 */
+	public synchronized AOObject createAOObject(String name, UniqueID id, String jobID, boolean everywhere){
+		if(everywhere){
+			if (getWorld().allMonitoredObjectContainsKey(id.toString()))
+				return null;
+		}
+		else{
+			AbstractDataObject object = getChildInAllChildren(id.toString());
+			if(object != null)
+				return null;
+		}
+		return new AOObject(this, name, id, jobID);
+	}
+
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
@@ -339,6 +363,13 @@ public class NodeObject extends AbstractDataObject{
 		}
 	}
 
+
+	@Override
+	public void deleteChild(AbstractDataObject child){
+		child.resetCommunications();
+		super.deleteChild(child);
+	}
+
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
@@ -362,12 +393,8 @@ public class NodeObject extends AbstractDataObject{
 			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			String className = (String) aoWrapper.get(1);
 
-			AOObject ao = null;
-
-			if (! getAllMonitoredObjects().containsKey(ub.getID().toString())) {
-				ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
-				exploreChild(ao);
-			}
+			AOObject ao = createAOObject(className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID(), true);
+			exploreChild(ao);
 		}
 	}
 }

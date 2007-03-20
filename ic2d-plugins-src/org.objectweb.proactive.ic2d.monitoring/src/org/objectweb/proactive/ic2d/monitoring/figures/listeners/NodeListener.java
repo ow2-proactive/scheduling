@@ -73,8 +73,7 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 
 	public void mousePressed(MouseEvent me) {
 		if(me.button == 1){
-			dnd.setDrag(false);
-			dnd.setDrop(false);
+			dnd.reset();
 		}
 		else if(me.button == 3) {
 			// Monitor a new host
@@ -94,7 +93,7 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 
 			// Look for new Nodes
 			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
-			
+
 			// Kill VM
 			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
 
@@ -123,46 +122,46 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 
 	public void mouseReleased(MouseEvent me) {
 		if(me.button == 1){
-			if(!dnd.canDrag())
-				return;
-			else{
-				dnd.setDrag(false);
-				final AOObject source = dnd.getSource();
-				if(source!=null){
-					if(node.getChild(source.getKey())!=null){
-						Console.getInstance(Activator.CONSOLE_NAME).warn("The active object originates from the same VM you're trying to migrate it to !");
-						figure.setHighlight(null);
-						return;
-					}					
-					/*------------ Migration ------------*/
-					 new Thread(new Runnable() {
-			                public void run() {
-			                   source.migrateTo(node.getURL());
-			                }
-			            }).start();
-					 /*----------------------------------*/
+			final AOObject source = dnd.getSource();
+			if(source != null){
+				if(node.getChild(source.getKey()) != null){
+					Console.getInstance(Activator.CONSOLE_NAME).warn("The active object originates from the same VM you're trying to migrate it to !");
 					figure.setHighlight(null);
-				}
+					dnd.reset();
+					return;
+				}					
+				/*------------ Migration ------------*/
+				new Thread(new Runnable() {
+					public void run() {
+						source.migrateTo(node.getURL());
+					}
+				}).start();
+				/*----------------------------------*/
+				figure.setHighlight(null);
+				dnd.reset();
 			}
 		}
 	}
 
 	//---- MouseMotionListener 
 
-	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
-
-	public void mouseEntered(MouseEvent me) {
-		if(dnd.canDrag)
+	public void mouseEntered(MouseEvent me) {		
+		if(dnd.getSource()!=null){
+			dnd.refresh(figure);
 			figure.setHighlight(ColorConstants.green);
+		}
 	}
 
 	public void mouseExited(MouseEvent me) {
-		if(dnd.canDrag){
+		if(dnd.getSource()!=null){
+			dnd.refresh(figure);
 			figure.setHighlight(null);
 			figure.repaint();
 		}
 	}
 
+	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
+	
 	public void mouseHover(MouseEvent me) { /* Do nothing */ }
 
 	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }

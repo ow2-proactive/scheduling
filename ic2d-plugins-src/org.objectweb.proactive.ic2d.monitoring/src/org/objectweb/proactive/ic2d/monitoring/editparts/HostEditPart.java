@@ -96,7 +96,9 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 	 */
 	protected IFigure createFigure() {
 		HostFigure figure = new HostFigure(getCastedModel().getFullName());
-		figure.addMouseListener(new HostListener(getCastedModel(), figure, getMonitoringView()));
+		HostListener listener = new HostListener(getCastedModel(), figure, getMonitoringView());
+		figure.addMouseListener(listener);
+		figure.addMouseMotionListener(listener);
 		return figure;
 	}
 

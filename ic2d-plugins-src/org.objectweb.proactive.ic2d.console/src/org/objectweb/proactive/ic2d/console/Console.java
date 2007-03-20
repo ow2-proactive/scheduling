@@ -93,10 +93,7 @@ public class Console extends MessageConsole {
 	 */
 	private Console(String title) {
 		super(title, null);
-		activate();
-		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
-				new IConsole[]{ this });
-		
+		activate();	
 		
 		// Add the standard output and standard error output stream to the Console.
 //		MessageConsole console = new MessageConsole("System output", null);
@@ -108,7 +105,7 @@ public class Console extends MessageConsole {
 //		System.setOut(new PrintStream(stream));
 //		System.setErr(new PrintStream(stream));
 
-		
+		//----- Log4j Console ------
 		// log4j output in the console
 		MessageConsole log4jConsole = new MessageConsole("log4j", null);
 		
@@ -117,10 +114,13 @@ public class Console extends MessageConsole {
 		Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 		WriterAppender app = new WriterAppender(new SimpleLayout(), log4jStream);
 		logger.addAppender(app);
-		
-		
+	
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
 				new IConsole[] { /*console,*/ log4jConsole });
+		//-------------------------
+		
+		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
+				new IConsole[]{ this });
 	}
 
 	//

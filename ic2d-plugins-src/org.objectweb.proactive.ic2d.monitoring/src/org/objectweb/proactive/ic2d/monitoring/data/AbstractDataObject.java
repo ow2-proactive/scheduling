@@ -250,12 +250,29 @@ public abstract class AbstractDataObject extends Observable {
 	}
 	
 	/**
-	 * Remove a child to this object.
+	 * Removes a child to this object, and add it to not monitored objects
 	 * @param child the object to remove
 	 */
 	public void removeChild(AbstractDataObject child) {
+		if(child == null)
+			return;
 		monitoredChildren.remove(child.getKey());
 		skippedChildren.put(child.getKey(), child);
+		setChanged();
+		notifyObservers();
+	}
+	
+	/**
+	 * Deletes a child from all recorded data.
+	 * @param child The child to delete.
+	 */
+	public void deleteChild(AbstractDataObject child){
+		if(child==null)
+			return;
+		String key = child.getKey();
+		monitoredChildren.remove(key);
+		getWorld().removeFromMonitoredObjects(child);
+		skippedChildren.remove(key);
 		setChanged();
 		notifyObservers();
 	}

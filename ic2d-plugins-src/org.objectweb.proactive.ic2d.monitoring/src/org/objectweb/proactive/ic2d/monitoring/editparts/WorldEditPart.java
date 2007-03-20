@@ -101,7 +101,9 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 		layout.setMinorSpacing(50);
 		layer.setLayoutManager(layout);
 		
-		layer.addMouseListener(new WorldListener(monitoringView));
+		WorldListener listener = new WorldListener(monitoringView); 
+		layer.addMouseListener(listener);
+		layer.addMouseMotionListener(listener);
 		
 		return layer;
 	}

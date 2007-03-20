@@ -30,19 +30,20 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
+import java.util.Set;
 
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.gef.EditPartViewer;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.AOListener;
 
 public class AOEditPart extends AbstractMonitoringEditPart{
@@ -88,33 +89,52 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 				});
 			}
 			// Add communication
-			else if(arg instanceof java.util.HashSet) {
+			else if(arg instanceof HashSet) {
 
-				final java.util.HashSet<AOObject> communications = (java.util.HashSet<AOObject>) arg;
+				final Set<AOObject> communications = (HashSet<AOObject>) arg;
+				
 				final AOFigure source = getCastedFigure();
 
-				final IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
+				final IFigure panel = getWorldEditPart().getFigure().getParent();
 
 				Display.getDefault().asyncExec(new Runnable() {
 					public void run () {
 						if (communications.isEmpty())
 							source.removeConnections(panel);
-
-						EditPartViewer view = getViewer();
-						if(view==null)
-							return;
-						Map registry = view.getEditPartRegistry();
-						if(registry==null)
-							return;
-						for (java.util.Iterator<AOObject> it = communications.iterator(); it.hasNext(); )
+						
+						for (Iterator<AOObject> it = communications.iterator(); it.hasNext(); )
 						{
-							AbstractGraphicalEditPart editPart = (AbstractGraphicalEditPart) registry.get(it.next());
+							AOObject  aoTarget = it.next();
+							AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoTarget);
+							
 							if(editPart!=null){
 								AOFigure target = (AOFigure) editPart.getFigure();
-								if(target!=null)
-									source.addConnection(target, panel, getArrowColor());		
+								if(target!=null){
+									source.addConnection(target, panel, getArrowColor());
+								}
+								else
+									System.out.println("[Error] Unable to find the target");
+							}
+							else{
+								System.out.println("[Error] Unable to draw the arrow : "+getCastedModel().getFullName()+" -->  "+aoTarget.getFullName());
 							}
 						}
+						
+//						EditPartViewer view = getViewer();
+//						if(view==null)
+//							return;
+//						Map registry = view.getEditPartRegistry();
+//						if(registry==null)
+//							return;
+//						for (java.util.Iterator<AOObject> it = communications.iterator(); it.hasNext(); )
+//						{
+//							AbstractGraphicalEditPart editPart = (AbstractGraphicalEditPart) registry.get(it.next());
+//							if(editPart!=null){
+//								AOFigure target = (AOFigure) editPart.getFigure();
+//								if(target!=null)
+//									source.addConnection(target, panel, getArrowColor());		
+//							}
+//						}
 					}});
 			}
 			// Request queue length has changed
@@ -143,7 +163,9 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 */
 	protected IFigure createFigure() {
 		AOFigure figure = new AOFigure(getCastedModel().getFullName());
-		figure.addMouseListener(new AOListener(getCastedModel(), figure,  getMonitoringView()));
+		AOListener listener = new AOListener(getCastedModel(), figure,  getMonitoringView(), getCastedParentFigure());
+		figure.addMouseListener(listener);
+		figure.addMouseMotionListener(listener);
 		return figure;
 	}
 
@@ -182,5 +204,13 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 */
 	public AOFigure getCastedFigure(){
 		return (AOFigure)getFigure();
+	}
+	
+	private NodeEditPart getCastedParentEditPart(){
+		return (NodeEditPart)getParent();
+	}
+	
+	private NodeFigure getCastedParentFigure(){
+		return (NodeFigure) getCastedParentEditPart().getFigure();
 	}
 }

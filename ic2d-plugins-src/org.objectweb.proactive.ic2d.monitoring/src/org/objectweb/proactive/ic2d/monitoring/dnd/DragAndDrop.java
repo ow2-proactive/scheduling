@@ -31,64 +31,79 @@
 package org.objectweb.proactive.ic2d.monitoring.dnd;
 
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 
 /**
  * This class allows us to make drag and drop.
  */
 public class DragAndDrop {
 
-	/** To know if we can drag or not */
-	public boolean canDrag = false;
-	
-	/** To know if we can drop or not */
-	public boolean canDrop = false;
-	
 	/** The source object */
 	private AOObject source;
 	
 	/** The source figure */
 	private AOFigure sourceFigure;
 	
-	/** The target object */
-	private NodeObject target;
+	/** The current nodeFigure */
+	private NodeFigure nodeFigure;
 	
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 	
-	public void setDrag(boolean canDrag){
-		this.canDrag = canDrag;
-		if(!canDrag && sourceFigure!=null)
-			sourceFigure.setHighlight(null);
-	}
-	
-	public boolean canDrag(){
-		return this.canDrag;
-	}
-	
-	public void setDrop(boolean canDrop){
-		this.canDrop = canDrop;
-	}
-	
-	public boolean canDrop(){
-		return this.canDrop;
-	}
-	
+	/**
+	 * Returns the source of the migration
+	 * @return the source of the migration
+	 */
 	public AOObject getSource(){
 		return this.source;
 	}
 	
+	/**
+	 * Sets the source of the migration
+	 * @param source The new source
+	 */
 	public void setSource(AOObject source){
 		this.source = source;
 	}
 	
+	/**
+	 * Returns the figure of the source of the migration
+	 * @return the figure of the source of the migration
+	 */
+	public AOFigure getSourceFigure(){
+		return this.sourceFigure;
+	}
+	
+	/**
+	 * Sets the figure of the source of the mirgation
+	 * @param figure The new figure
+	 */
 	public void setSourceFigure(AOFigure figure){
 		this.sourceFigure = figure;
 	}
 	
-	public NodeObject getTarget(){
-		return this.target;
+	/**
+	 * Highlights the new nodeFigure, and cleans the previous nodeFigure.
+	 * @param nodeFigure
+	 */
+	public void refresh(NodeFigure nodeFigure){
+		if(this.nodeFigure!=null)
+			this.nodeFigure.setHighlight(null);
+		this.nodeFigure = nodeFigure;
+	}
+	
+	/**
+	 * Resets all recorded data in order to allow a new migration.
+	 */
+	public void reset(){
+		setSource(null);
+		nodeFigure=null;
+		AOFigure figure = getSourceFigure();
+		if(figure != null){
+			figure.setHighlight(null);
+			setSourceFigure(null);
+		}
 	}
 }

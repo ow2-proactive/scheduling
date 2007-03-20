@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
@@ -49,29 +50,29 @@ import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public class AOListener implements MouseListener{
+public class AOListener implements MouseListener, MouseMotionListener{
 
 	private AOObject ao;
 	private AOFigure figure;
 	private ActionRegistry registry;
 	private DragAndDrop dnd;
+	private NodeFigure parentFigure;
 
-	public AOListener(AOObject ao, AOFigure figure, MonitoringView monitoringView) {
+	public AOListener(AOObject ao, AOFigure figure, MonitoringView monitoringView, NodeFigure parentFigure) {
 		this.ao = ao;
 		this.figure = figure;
+		this.parentFigure = parentFigure;
 		this.dnd = monitoringView.getDragAndDrop();
 		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 	}
-
-	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
 
 	public void mousePressed(MouseEvent me) {
 		if(me.button == 1){
 			dnd.setSource(ao);
 			dnd.setSourceFigure(figure);
-			dnd.setDrag(true);
 			figure.setHighlight(ColorConstants.green);
 		}
 		else if(me.button == 3) {
@@ -114,6 +115,21 @@ public class AOListener implements MouseListener{
 	}
 
 	public void mouseReleased(MouseEvent me) {
-		dnd.setDrag(false);
+		parentFigure.handleMouseReleased(me);
 	}
+
+	public void mouseEntered(MouseEvent me) {
+		parentFigure.handleMouseEntered(me);
+	}
+	public void mouseExited(MouseEvent me) {
+		parentFigure.handleMouseMoved(me);
+	}
+
+	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
+	
+	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
+	
+	public void mouseHover(MouseEvent me) {	/* Do nothing */ }
+
+	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
 }

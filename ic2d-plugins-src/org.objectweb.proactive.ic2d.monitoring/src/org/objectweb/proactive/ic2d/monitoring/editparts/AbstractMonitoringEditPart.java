@@ -1,5 +1,7 @@
 package org.objectweb.proactive.ic2d.monitoring.editparts;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -13,7 +15,8 @@ import org.objectweb.proactive.ic2d.monitoring.figures.AbstractFigure;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer, Runnable {
-
+	
+	protected static Map<AbstractDataObject, AbstractMonitoringEditPart> registry = new HashMap<AbstractDataObject, AbstractMonitoringEditPart>();
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -21,6 +24,7 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	
 	public AbstractMonitoringEditPart(AbstractDataObject model) {
 		setModel(model);
+		registry.put(model, this);
 	}
 	
 	

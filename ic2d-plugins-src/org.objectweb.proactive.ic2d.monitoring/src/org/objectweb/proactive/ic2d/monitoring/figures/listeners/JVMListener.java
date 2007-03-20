@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
@@ -49,7 +50,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public class JVMListener implements MouseListener {
+public class JVMListener implements MouseListener, MouseMotionListener {
 
 	private ActionRegistry registry;
 	private VMObject jvm;
@@ -66,8 +67,7 @@ public class JVMListener implements MouseListener {
 
 	public void mousePressed(MouseEvent me) {
 		if(me.button == 1){
-			dnd.setDrag(false);
-			dnd.setDrop(false);
+			dnd.reset();
 		}
 		else if(me.button == 3) {
 			// Monitor a new host
@@ -115,7 +115,24 @@ public class JVMListener implements MouseListener {
 	}
 
 	public void mouseReleased(MouseEvent me) {
-		dnd.setDrag(false);
+		dnd.reset();
+	}
+	
+	//---- MouseMotionListener 
+
+	public void mouseEntered(MouseEvent me) {		
+		if(dnd.getSource()!=null)
+			dnd.refresh(null);
 	}
 
+	public void mouseExited(MouseEvent me) {
+		if(dnd.getSource()!=null)
+			dnd.refresh(null);
+	}
+
+	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
+	
+	public void mouseHover(MouseEvent me) { /* Do nothing */ }
+
+	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
 }

@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -45,9 +48,9 @@ public class AOObject extends AbstractDataObject {
 	 * Counter used to add a number after the name of the object if counter=3,
 	 * and if the next object's name is "ao", then it's fullname will be "ao#3"
 	 */
-	private static int counter = 0;
+	private static Integer counter = 0;
 
-	private java.util.Set<AOObject> communications;
+	private Set<AOObject> communications;
 
 	private Thread dispatchThread;
 
@@ -82,13 +85,20 @@ public class AOObject extends AbstractDataObject {
 	//
 
 	/**
-	 * Creates a new AOObject
+	 * Creates a new AOObject.
+	 * WARGNING : Don't call directly, use instead createAOObject of NodeObject
 	 * @param parent The Node containing the active object
 	 * @param name The active object's name
 	 * @param id The active object's id
 	 */
-	public AOObject(NodeObject parent, String name, UniqueID id, String jobID) {
+	protected AOObject(NodeObject parent, String name, UniqueID id, String jobID) {
 		super(parent);
+		
+		this.id = id;
+		this.jobID = jobID;
+		this.requestQueueLength = -1;
+
+		getWorld().addToMonitoredObject(this);	
 
 		if (name == null)
 			name = this.getClass().getName();
@@ -97,31 +107,28 @@ public class AOObject extends AbstractDataObject {
 		Map<String, String> fullNames = getWorld().getRecordedFullNames();
 		String recordedName = fullNames.get(id.toString());
 
-		communications = java.util.Collections.synchronizedSet(new java.util.HashSet<AOObject>());
+		communications = Collections.synchronizedSet(new HashSet<AOObject>());
 
 		// If a name is already associated to this object
 		if (recordedName != null) {
 			this.fullName = recordedName;
+			initCommunicationThread();
 		} else {
-			// We shouldn't display this object, therefore we don't associate a number
 			if (!FilterProcess.getInstance().filter(this)){
-				this.fullName = name + "#" + counter();
-
-				/* For the communication thread */
-				this.dispatchThread = new Thread(new AOObjectRefresher());
-				this.dispatchThread.setName(this.fullName);
-				this.dispatchThread.start();
+				this.fullName = name + "#" + increaseCounter();
+				initCommunicationThread();
 			}
-			else
+			else // We shouldn't display this object, therefore we don't associate a number
 				this.fullName = name;
 			fullNames.put(id.toString(), fullName);
 		}
-		this.id = id;
-		this.jobID = jobID;
-		this.requestQueueLength = -1;
+	}
 
-		getAllMonitoredObjects().put(getKey(), this);
-		getWorld().addToMonitoredObject(this);
+	private void initCommunicationThread(){
+		/* For the communication thread */
+		this.dispatchThread = new Thread(new AOObjectRefresher());
+		this.dispatchThread.setName(getFullName());
+		this.dispatchThread.start();
 	}
 
 	//
@@ -192,9 +199,7 @@ public class AOObject extends AbstractDataObject {
 	 */
 	public void addCommunication(AOObject destination) {
 		synchronized (communications) {
-			if (!communications.contains(destination)) {
 				communications.add(destination);
-			}
 		}
 	}
 
@@ -238,16 +243,18 @@ public class AOObject extends AbstractDataObject {
 	 */
 	public boolean migrateTo(String nodeTargetURL) {
 		Console console = Console.getInstance(Activator.CONSOLE_NAME);
+		State oldState = getState();
 		try {
+			setState(State.MIGRATING);
 			((NodeObject) getParent()).migrateTo(id, nodeTargetURL);
 			console.log("Successfully migrated " + fullName + " to "
 					+ nodeTargetURL);
-			setState(State.MIGRATING);
 			return true;
 		} catch (MigrationException e) {
 			console
 			.err("Couldn't migrate " + fullName + " to "
 					+ nodeTargetURL);
+			setState(oldState);
 			console.logException(e);
 			return false;
 		}
@@ -258,10 +265,13 @@ public class AOObject extends AbstractDataObject {
 
 	@Override
 	public void resetCommunications() {
-		communications.clear();
+		synchronized (communications) {
+			communications.clear();
+		}
 		setChanged();
-		notifyObservers(new java.util.HashSet<AOObject>(communications));
+		notifyObservers(new HashSet<AOObject>());	
 	}
+
 
 	//
 	// -- PROTECTED METHODS ---------------------------------------------
@@ -291,7 +301,7 @@ public class AOObject extends AbstractDataObject {
 	protected void alreadyMonitored() {
 		Console.getInstance(Activator.CONSOLE_NAME).log(
 				"AOObject " + fullName + " already monitored");
-		AOObject.counter--;
+		reduceCounter();
 	}
 
 	//
@@ -299,40 +309,55 @@ public class AOObject extends AbstractDataObject {
 	//
 
 	/**
-	 * Returns the next number to use for the 'fullname' of the object.
+	 * Increase the counter. This counter is used to display the name of an active object (ex: ao#1)
+	 * @return the current number of the counter (ex: 1)
 	 */
-	private static synchronized int counter() {
-		return ++counter;
+	private static Integer increaseCounter() {
+		synchronized (counter) {
+			counter = counter + 1;
+			return counter;
+		}
+	}
+
+	/**
+	 * Reduce the counter.
+	 */
+	private static void reduceCounter(){
+		synchronized (counter) {
+			counter = counter-1;
+		}
 	}
 
 	/**
 	 * Performs the buffered communications
 	 */
-	private synchronized void performCommunications() {
-		if (super.isAlive) {
-			java.util.HashSet<AOObject> communicationsNew = new java.util.HashSet<AOObject>(communications);
-			communications.clear();
-			if (!communicationsNew.isEmpty()) {
-				setChanged();
-				notifyObservers(communicationsNew);
-			}
-			if (!state.equals(stateOld)) {
-				setChanged();
-				notifyObservers(state);
-				stateOld = state;
-			}
-			if (requestQueueLength != requestQueueLengthOld) {
-				setChanged();
-				notifyObservers(requestQueueLength);
-				requestQueueLengthOld = requestQueueLength;
-			}
+	private void performCommunications() {
+		synchronized (communications) {
+			if (super.isAlive) {
+				Set<AOObject> communicationsNew = new HashSet<AOObject>(communications);
+				if (!communicationsNew.isEmpty()) {
+					setChanged();
+					notifyObservers(communicationsNew);
+				}
+				if (!state.equals(stateOld)) {
+					setChanged();
+					notifyObservers(state);
+					stateOld = state;
+				}
+				if (requestQueueLength != requestQueueLengthOld) {
+					setChanged();
+					notifyObservers(requestQueueLength);
+					requestQueueLengthOld = requestQueueLength;
+				}
+				communications.clear();
+			}	
 		}
 	}
-	
+
 	//
 	// -- INNER CLASS -----------------------------------------------
 	//
-	
+
 	public static class AOComparator implements Comparator<String> {
 
 		/**
@@ -360,7 +385,7 @@ public class AOObject extends AbstractDataObject {
 				newTime = System.currentTimeMillis();
 				// Used for the auto reset time
 				if((getWorld().enableAutoResetTime())&&
-					(newTime - oldTime > (getWorld().getAutoResetTime() * 1000))){
+						(newTime - oldTime > (getWorld().getAutoResetTime() * 1000))){
 					resetCommunications();
 					oldTime = System.currentTimeMillis();
 				}
