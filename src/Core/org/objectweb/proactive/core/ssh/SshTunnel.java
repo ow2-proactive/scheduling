@@ -57,7 +57,6 @@ import com.jcraft.jsch.*;
 public class SshTunnel {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private static Random _random = new Random();
-    static private int lastTriedPort = _random.nextInt(65536 - 1024) + 1024;
     private int _localPort;
     private Session _session;
     private String _username;
@@ -105,43 +104,16 @@ public class SshTunnel {
                     distantHost + ":" + distantPort + "for " + username);
             }
 
-            /*
-             * We are under JSchSingle lock. lastTriedPort will not change until we release it.
-             *
-             * Try to find a free port by looping until we find a free port.
-             *
-             * Start search at the last allocated port and exit if we looped over all ports
-             */
-            int lport;
-            for (lport = (lastTriedPort == 65535) ? 1024 : (lastTriedPort + 1);
-                    lport != lastTriedPort;
-                    lport = (lport == 65535) ? 1024 : (lport + 1)) {
-                try {
-                    session.setPortForwardingL("127.0.0.1", lport, distantHost,
-                        distantPort);
-                    _session = session;
-                    _localPort = lport;
-                    _username = username;
-                    _distantHost = distantHost;
-                    _distantPort = distantPort;
-                    _sshPort = sshPort;
-                    break;
-                } catch (JSchException e) {
-                    // Port probably in use...
-                    logger.info(
-                        "Please ignore the previous line. Everithing is ok; JSch is just a bit too verbose");
-                }
-            }
-
-            if (lport == lastTriedPort) {
-                throw new IOException(
-                    "SSH tunnel failed (could not allocate port number): 127.0.0.1 -->" +
-                    distantHost + ":" + distantPort);
-            }
-
-            lastTriedPort = lport;
-        } catch (IOException e) {
-            throw e;
+            /* Since Jsch 0.1.31 TCP port will be assigned dynamically if lport==0 */
+            _localPort = session.setPortForwardingL("127.0.0.1", 0,
+                    distantHost, distantPort);
+            _session = session;
+            _username = username;
+            _distantHost = distantHost;
+            _distantPort = distantPort;
+            _sshPort = sshPort;
+        } catch (JSchException e) {
+            throw new IOException(e.getMessage());
         } finally {
             JSchSingleton.releaseLock();
         }
