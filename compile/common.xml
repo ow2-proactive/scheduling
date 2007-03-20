@@ -71,6 +71,7 @@
 	<path id="project.classpath">
 		<pathelement location="${cl.proactive.dir}" />
 		<pathelement location="${cl.extensions.dir}" />
+		<pathelement location="${cl.extra.dir}" />
 		<pathelement location="${cl.utils.dir}" />
 		<path refid="project.libs"/>
 	</path>
