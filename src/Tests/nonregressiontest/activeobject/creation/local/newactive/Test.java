@@ -32,10 +32,10 @@ package nonregressiontest.activeobject.creation.local.newactive;
 
 import java.net.InetAddress;
 
+import nonregressiontest.activeobject.creation.A;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import nonregressiontest.activeobject.creation.A;
 
 import testsuite.test.FunctionalTest;
 

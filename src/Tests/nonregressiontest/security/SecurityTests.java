@@ -36,7 +36,6 @@ import nonregressiontest.security.keygeneration.SecurityTestKeyGen;
 import nonregressiontest.security.policyserver.SecurityTestPolicyServer;
 import nonregressiontest.security.securitymanager.SecurityTestSecurityManager;
 import nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange;
-
 import testsuite.test.FunctionalTest;
 
 

@@ -30,6 +30,13 @@
  */
 package nonregressiontest.component.shortcuts;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentA;
+import nonregressiontest.component.PrimitiveComponentB;
+import nonregressiontest.component.Setup;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -39,8 +46,6 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ProActive;
 
 import testsuite.test.Assertions;
-
-import nonregressiontest.component.*;
 
 
 /**

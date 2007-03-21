@@ -30,9 +30,9 @@
  */
 package nonregressiontest.activeobject.migration.strategy;
 
-import org.objectweb.proactive.ProActive;
-
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
+import org.objectweb.proactive.ProActive;
 
 import testsuite.test.FunctionalTest;
 

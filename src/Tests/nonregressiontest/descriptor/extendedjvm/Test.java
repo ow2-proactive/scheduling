@@ -30,17 +30,17 @@
  */
 package nonregressiontest.descriptor.extendedjvm;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-
-import testsuite.test.FunctionalTest;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+
+import testsuite.test.FunctionalTest;
 
 
 public class Test extends FunctionalTest {

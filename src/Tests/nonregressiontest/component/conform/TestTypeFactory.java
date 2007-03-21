@@ -30,18 +30,16 @@
  */
 package nonregressiontest.component.conform;
 
+import junit.framework.TestCase;
+import nonregressiontest.component.conform.components.I;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-
-import nonregressiontest.component.conform.components.I;
-
 import org.objectweb.fractal.util.Fractal;
-
-import junit.framework.TestCase;
 
 public class TestTypeFactory extends TestCase {
 

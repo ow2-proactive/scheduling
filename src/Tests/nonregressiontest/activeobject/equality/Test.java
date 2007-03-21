@@ -30,12 +30,12 @@
  */
 package nonregressiontest.activeobject.equality;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+import nonregressiontest.group.A;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
 
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;

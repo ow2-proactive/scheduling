@@ -39,7 +39,7 @@ package org.objectweb.proactive.examples.profractal;
 /**
  * @author Daniele Di Felice
  */
-import java.io.*;
+import java.io.Serializable;
 
 
 /**

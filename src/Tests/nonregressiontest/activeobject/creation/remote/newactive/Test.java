@@ -30,10 +30,10 @@
  */
 package nonregressiontest.activeobject.creation.remote.newactive;
 
-import org.objectweb.proactive.ProActive;
-
 import nonregressiontest.activeobject.creation.A;
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
+import org.objectweb.proactive.ProActive;
 
 import testsuite.test.FunctionalTest;
 

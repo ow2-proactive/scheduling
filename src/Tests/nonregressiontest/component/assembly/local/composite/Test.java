@@ -32,10 +32,10 @@ package nonregressiontest.component.assembly.local.composite;
 
 import java.util.Arrays;
 
+import nonregressiontest.component.ComponentTest;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-
-import nonregressiontest.component.ComponentTest;
 
 import testsuite.test.Assertions;
 

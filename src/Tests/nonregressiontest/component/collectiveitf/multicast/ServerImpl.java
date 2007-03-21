@@ -32,9 +32,8 @@ package nonregressiontest.component.collectiveitf.multicast;
 
 import java.util.List;
 
-import testsuite.test.Assertions;
-
 import nonregressiontest.component.Message;
+import testsuite.test.Assertions;
 
 
 public class ServerImpl implements

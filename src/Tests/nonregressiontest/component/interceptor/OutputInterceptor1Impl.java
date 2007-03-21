@@ -30,6 +30,8 @@
  */
 package nonregressiontest.component.interceptor;
 
+import nonregressiontest.component.controller.DummyController;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -39,8 +41,6 @@ import org.objectweb.proactive.core.component.controller.AbstractProActiveContro
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
-
-import nonregressiontest.component.controller.DummyController;
 
 
 public class OutputInterceptor1Impl extends AbstractProActiveController

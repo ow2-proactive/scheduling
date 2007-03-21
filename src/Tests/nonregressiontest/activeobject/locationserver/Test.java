@@ -30,6 +30,8 @@
  */
 package nonregressiontest.activeobject.locationserver;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
@@ -37,8 +39,6 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
-
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import testsuite.test.FunctionalTest;
 

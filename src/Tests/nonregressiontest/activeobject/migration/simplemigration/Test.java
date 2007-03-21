@@ -30,10 +30,10 @@
  */
 package nonregressiontest.activeobject.migration.simplemigration;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import testsuite.test.FunctionalTest;
 

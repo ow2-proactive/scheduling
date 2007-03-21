@@ -32,11 +32,11 @@ package nonregressiontest.component.conform;
 
 import java.util.List;
 
+import nonregressiontest.component.ComponentTest;
+
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
-
-import nonregressiontest.component.ComponentTest;
 
 import testsuite.test.FunctionalTest;
 

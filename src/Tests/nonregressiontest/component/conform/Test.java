@@ -30,21 +30,19 @@
  */
 package nonregressiontest.component.conform;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import junit.framework.TestCase;
+import nonregressiontest.component.conform.components.I;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.control.ContentController;
-
-import nonregressiontest.component.conform.components.I;
-
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.util.Fractal;
-
-import junit.framework.TestCase;
-
-import java.util.Set;
-import java.util.Iterator;
-import java.util.HashSet;
 
 public abstract class Test extends TestCase {
                                      // FcItfName/FcItfSignature/isFcClientItf ^ internal, isFcOptionalItf, isFcCollectionItf

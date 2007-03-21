@@ -30,11 +30,11 @@
  */
 package nonregressiontest.activeobject.creation.parallel;
 
+import nonregressiontest.activeobject.creation.A;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-
-import nonregressiontest.activeobject.creation.A;
 
 import testsuite.test.FunctionalTest;
 

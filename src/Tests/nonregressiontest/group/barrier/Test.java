@@ -32,11 +32,11 @@ package nonregressiontest.group.barrier;
 
 import java.util.Iterator;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
-
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import testsuite.test.FunctionalTest;
 

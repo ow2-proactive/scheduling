@@ -30,14 +30,14 @@
  */
 package nonregressiontest.component.binding.remote.composite;
 
-import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.util.Fractal;
-
 import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
 import nonregressiontest.component.Message;
 import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
+
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.util.Fractal;
 
 
 /**

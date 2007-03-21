@@ -30,9 +30,9 @@
  */
 package nonregressiontest.activeobject.request.terminate;
 
-import org.objectweb.proactive.ProActive;
-
 import nonregressiontest.activeobject.request.A;
+
+import org.objectweb.proactive.ProActive;
 
 import testsuite.test.FunctionalTest;
 

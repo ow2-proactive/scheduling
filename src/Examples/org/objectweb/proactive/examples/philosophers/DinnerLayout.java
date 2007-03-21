@@ -32,7 +32,8 @@ package org.objectweb.proactive.examples.philosophers;
 
 import java.awt.GridBagConstraints;
 
-import org.objectweb.proactive.*;
+import org.objectweb.proactive.ObjectForSynchronousCall;
+import org.objectweb.proactive.ProActive;
 
 
 /**

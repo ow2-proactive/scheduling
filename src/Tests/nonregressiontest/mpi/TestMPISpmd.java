@@ -31,12 +31,13 @@
 package nonregressiontest.mpi;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.mpi.*;
+import org.objectweb.proactive.mpi.MPI;
+import org.objectweb.proactive.mpi.MPIConstants;
+import org.objectweb.proactive.mpi.MPISpmd;
 
 import testsuite.test.FunctionalTest;
 

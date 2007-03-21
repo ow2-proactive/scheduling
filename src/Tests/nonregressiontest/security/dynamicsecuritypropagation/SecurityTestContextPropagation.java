@@ -30,13 +30,13 @@
  */
 package nonregressiontest.security.dynamicsecuritypropagation;
 
+import nonregressiontest.security.A;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-
-import nonregressiontest.security.A;
 
 import testsuite.test.FunctionalTest;
 

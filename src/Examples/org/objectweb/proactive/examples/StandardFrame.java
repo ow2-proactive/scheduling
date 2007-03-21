@@ -30,11 +30,18 @@
  */
 package org.objectweb.proactive.examples;
 
-import java.text.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.text.*;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.Document;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;

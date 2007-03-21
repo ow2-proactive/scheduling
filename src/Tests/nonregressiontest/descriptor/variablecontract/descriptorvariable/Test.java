@@ -34,9 +34,10 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
+
 import testsuite.test.FunctionalTest;
 
 public class Test extends FunctionalTest {

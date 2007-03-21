@@ -31,6 +31,7 @@
 package nonregressiontest.activeobject.request.immediateservice.terminateActiveObject;
 
 import org.objectweb.proactive.ProActive;
+
 import testsuite.test.FunctionalTest;
 
 

@@ -30,6 +30,11 @@
  */
 package nonregressiontest.component.creation.remote.newactive.primitive;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.creation.ComponentA;
+import nonregressiontest.component.creation.ComponentInfo;
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -38,11 +43,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.creation.ComponentA;
-import nonregressiontest.component.creation.ComponentInfo;
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 
 /**

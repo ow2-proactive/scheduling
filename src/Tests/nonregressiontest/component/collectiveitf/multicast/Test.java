@@ -33,11 +33,11 @@ package nonregressiontest.component.collectiveitf.multicast;
 import java.util.HashMap;
 import java.util.Map;
 
+import nonregressiontest.component.ComponentTest;
+
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-
-import nonregressiontest.component.ComponentTest;
 
 
 public class Test extends ComponentTest {

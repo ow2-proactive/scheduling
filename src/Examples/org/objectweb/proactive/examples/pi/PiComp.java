@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-import org.objectweb.proactive.examples.pi.Interval;
-import org.objectweb.proactive.examples.pi.Result;
-
 
 /**
  * This interface has to be implemented by all workers who will perform pi computation

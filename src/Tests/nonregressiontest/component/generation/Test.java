@@ -30,9 +30,9 @@
  */
 package nonregressiontest.component.generation;
 
-import org.objectweb.proactive.core.component.gen.Utils;
-
 import nonregressiontest.component.ComponentTest;
+
+import org.objectweb.proactive.core.component.gen.Utils;
 
 import testsuite.test.Assertions;
 

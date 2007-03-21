@@ -32,6 +32,10 @@ package nonregressiontest.component.creation.local.newactive.primitive;
 
 import java.net.InetAddress;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.creation.ComponentA;
+import nonregressiontest.component.creation.ComponentInfo;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -41,10 +45,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.creation.ComponentA;
-import nonregressiontest.component.creation.ComponentInfo;
 
 
 /**
