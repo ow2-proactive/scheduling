@@ -22,7 +22,7 @@ SET CLASSPATH=%CLASSPATHEXT%
 SET CLASSPATH=.
 )
 
-IF EXIST "%PROACTIVE%\classes" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes
+IF EXIST "%PROACTIVE%\classes" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples;%PROACTIVE%\classes\IC2D-old
 IF EXIST "%PROACTIVE%\ProActive.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
 IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
 IF EXIST "%PROACTIVE%\lib\log4j.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j.jar
