@@ -31,7 +31,11 @@ fi
 
 if [ -d $PROACTIVE/classes ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/classes
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Core
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/IC2D-old
 fi
 if [ -f $PROACTIVE/ProActive.jar ]
 then
