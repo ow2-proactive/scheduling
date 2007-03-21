@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 /**
  * An implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface.
  *
- * @author Matthieu Morel
+ * @author Paul Naoumenko
  */
 public class ProActiveNFSuperControllerImpl extends AbstractProActiveController
     implements Serializable, ProActiveSuperController {

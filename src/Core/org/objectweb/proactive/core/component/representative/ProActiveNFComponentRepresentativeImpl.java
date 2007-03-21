@@ -87,7 +87,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * corresponding interface is directly returned. Then, invocations on this
  * interface are reified and transferred to the actual component. <br>
  *
- * @author Matthieu Morel
+ * @author Paul Naoumenko
  */
 public class ProActiveNFComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, Serializable,

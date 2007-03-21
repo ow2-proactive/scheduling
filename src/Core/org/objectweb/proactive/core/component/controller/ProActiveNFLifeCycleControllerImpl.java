@@ -59,7 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * Implementation of the {@link org.objectweb.fractal.api.control.LifeCycleController} interface.<br>
  *
- * @author Matthieu Morel
+ * @author Paul Naoumenko
  *
  */
 public class ProActiveNFLifeCycleControllerImpl

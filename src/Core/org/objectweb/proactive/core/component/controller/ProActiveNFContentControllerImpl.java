@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * Implementation of {@link org.objectweb.fractal.api.control.ContentController content controller}
  *
- * @author Matthieu Morel
+ * @author Paul Naoumenko
  *
  */
 public class ProActiveNFContentControllerImpl

@@ -73,7 +73,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
  * Implementation of the
  * {@link org.objectweb.fractal.api.control.BindingController BindingController} interface.
  *
- * @author Matthieu Morel
+ * @author Paul Naoumenko
  *
  */
 public class ProActiveNFBindingControllerImpl

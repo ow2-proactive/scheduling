@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * @author Paul Naoumenko
  */
 public class ProActiveNFImplementationBuilderImpl
     implements ProActiveNFImplementationBuilder, BindingController {

@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 
 
 /**
- * @author Matthieu Morel
+ * @author Paul naoumenko
  *
  */
 public interface ProActiveNFImplementationBuilder extends ImplementationBuilder {

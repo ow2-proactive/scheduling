@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * @author Paul Naoumenko
  */
 public class ProActiveNFImplementationCompiler extends ImplementationCompiler {
     private static int counter = 0;
