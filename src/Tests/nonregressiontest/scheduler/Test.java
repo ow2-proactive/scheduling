@@ -36,7 +36,7 @@
  */
 
 
-package nonregressiontest.taskscheduler;
+package nonregressiontest.scheduler;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
