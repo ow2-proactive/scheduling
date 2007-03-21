@@ -64,7 +64,7 @@ public class FIFOPolicy implements GenericPolicy {
     LinkedList<InternalTask> list; //normal queue
     LinkedList<InternalTask> failedList; //used in failed conditions
     GenericResourceManager rm;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.TASK_SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /**
      * this is a function that simulates what a nodepool would do

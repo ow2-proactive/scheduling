@@ -74,8 +74,8 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.skeletons.manager = DEBUG, CONSOLE
 #log4j.logger.proactive.skeletons.application = DEBUG, CONSOLE
 
-#log4j.logger.proactive.taskScheduler = DEBUG, CONSOLE
-#log4j.logger.proactive.resourceManager = DEBUG, CONSOLE
+log4j.logger.proactive.scheduler = DEBUG, CONSOLE
+log4j.logger.proactive.resourceManager = DEBUG, CONSOLE
 
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender

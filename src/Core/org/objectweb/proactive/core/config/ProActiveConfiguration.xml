@@ -51,12 +51,12 @@
 		<prop key="proactive.ft" value="disable"/>
 		<prop key="proactive.ft.ttc" value="30"/>
 		
-		<prop key="proactive.taskscheduler.default_policy_factory" value="getNewPolicy" />
-		<prop key="proactive.taskscheduler.default_policy" value="org.objectweb.proactive.taskscheduler.policy.FIFOPolicy" />
-      	<prop key="proactive.taskscheduler.scheduler_timeout" value="1000" />
-        <prop key="proactive.taskscheduler.time_before_returning_nodes_to_rm" value="3000" />
- 	    <prop key="proactive.taskscheduler.time_before_test_alive" value="3000" />
-	    <prop key="proactive.taskscheduler.percentage_of_resources_to_return" value="0.5" />	
+		<prop key="proactive.scheduler.default_policy_factory" value="getNewPolicy" />
+		<prop key="proactive.scheduler.default_policy" value="org.objectweb.proactive.extra.scheduler.policy.FIFOPolicy" />
+      	<prop key="proactive.scheduler.scheduler_timeout" value="1000" />
+        <prop key="proactive.scheduler.time_before_returning_nodes_to_rm" value="3000" />
+ 	    <prop key="proactive.scheduler.time_before_test_alive" value="3000" />
+	    <prop key="proactive.scheduler.percentage_of_resources_to_return" value="0.5" />	
 		
 		<!-- ***************************************************** -->
 		<!-- P2P PROPERTIES VALUE -->

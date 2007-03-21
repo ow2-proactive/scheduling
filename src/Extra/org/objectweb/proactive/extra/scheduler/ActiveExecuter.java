@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 
 
 /**
- * A genereic executer used by the TaskScheduler  to create active objects on the remote node and execute the task.
+ * A genereic executer used by the Scheduler  to create active objects on the remote node and execute the task.
  *
  * @author walzouab
  *

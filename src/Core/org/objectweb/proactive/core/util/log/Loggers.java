@@ -140,6 +140,6 @@ public interface Loggers {
     static final public String SKELETONS_KERNEL = SKELETONS + ".kernel";
     static final public String SKELETONS_APPLICATION = SKELETONS +
         ".application";
-    static final public String TASK_SCHEDULER = CORE + ".taskScheduler";
+    static final public String SCHEDULER = CORE + ".scheduler";
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
 }

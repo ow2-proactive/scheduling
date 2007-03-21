@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="taskScheduler">
-  <title>Task Scheduler</title>
+<chapter id="Scheduler">
+  <title>Scheduler</title>
 
   <sect1 id="Scheduler Overview">
     <title>Overview</title>

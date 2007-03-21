@@ -56,7 +56,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.GenericResourceMa
  *
  */
 public class Scheduler implements RunActive, RequestFilter {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.TASK_SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private GenericPolicy policy; //holds the policy used 
     private GenericResourceManager resourceManager;
     private Vector<InternalTask> runningTasks;

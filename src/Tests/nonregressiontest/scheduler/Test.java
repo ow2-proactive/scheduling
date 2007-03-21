@@ -52,11 +52,11 @@ public class Test extends FunctionalTest {
 
 	private AdminScheduler adminAPI;
 	private SchedulerUserAPI userAPI;
-	private final String xmlURL = Test.class.getResource("/nonregressiontest/taskscheduler/testDeployment.xml").getPath();
+	private final String xmlURL = Test.class.getResource("/nonregressiontest/scheduler/testDeployment.xml").getPath();
 	private final String SNode="//localhost/SCHEDULER_NODE";
 	private SimpleResourceManager rm;
 	public Test() {
-		super("TaskScheduler","Launches the task scheduler and adds deletes tasks then shutsdown");
+		super("Scheduler","Launches the scheduler and adds deletes tasks then shutsdown");
 	}
 
 

@@ -35,7 +35,7 @@ call "%PROACTIVE%\scripts\windows\init.bat"
 
 rem This program will enable you to launch the scheduler daemon
 
-%JAVA_CMD% org.objectweb.proactive.examples.taskscheduler.HelloWorld2 %TASKS% %SLEEP% %SCHEDULER_URL%
+%JAVA_CMD% org.objectweb.proactive.examples.scheduler.HelloWorld2 %TASKS% %SLEEP% %SCHEDULER_URL%
 ENDLOCAL
 
 :end

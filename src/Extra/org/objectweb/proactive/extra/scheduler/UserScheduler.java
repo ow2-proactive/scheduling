@@ -47,7 +47,7 @@ import org.objectweb.proactive.extra.scheduler.exception.UserException;
 
 public class UserScheduler extends SchedulerUserAPI {
     private static long taskID = 0;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.TASK_SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private boolean stopped;
     Scheduler scheduler;
 

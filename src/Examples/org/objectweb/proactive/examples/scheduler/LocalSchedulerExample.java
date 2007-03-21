@@ -1,3 +1,4 @@
+
 /*
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
@@ -35,6 +36,8 @@
  */
 package org.objectweb.proactive.examples.scheduler;
 
+
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -46,7 +49,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.SimpleResourceMan
 
 public class LocalSchedulerExample {
     //shows how to run the scheduler
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.TASK_SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     public static void main(String[] args) {
         //get the path of the file
@@ -65,7 +68,7 @@ public class LocalSchedulerExample {
                 }
             } else {
                 String xmlURL = SimpleResourceManager.class.getResource(
-                        "/org/objectweb/proactive/examples.scheduler/test.xml")
+                        "/org/objectweb/proactive/examples/scheduler/test.xml")
                                                            .getPath();
                 rm = (SimpleResourceManager) ProActive.newActive(SimpleResourceManager.class.getName(),
                         null);
@@ -87,6 +90,7 @@ public class LocalSchedulerExample {
             adminAPI.start();
         } catch (Exception e) {
             logger.error("error creating Scheduler" + e.toString());
+           e.printStackTrace();
             System.exit(1);
         }
     }

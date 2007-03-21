@@ -49,7 +49,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.GenericResourceMa
  *
  */
 public class AdminScheduler {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.TASK_SCHEDULER);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private Scheduler scheduler;
     private UserScheduler userScheduler;
 
@@ -383,7 +383,8 @@ public class AdminScheduler {
                     new Object[] { scheduler, userScheduler }, schedulerURL);
             logger.info("Scheduler Created on " + schedulerURL);
         } catch (Exception e) {
-            throw new AdminException(e.getMessage());
+          
+        	throw new AdminException(e.getMessage());
         }
 
         return adminScheduler;
