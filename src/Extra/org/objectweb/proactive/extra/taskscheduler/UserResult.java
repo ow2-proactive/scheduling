@@ -28,81 +28,93 @@
  */
 
 /**
- *
+ * 
  *
  * @author walzouab
  *
  */
-package org.objectweb.proactive.extra.taskscheduler;
 
-import org.objectweb.proactive.extra.taskscheduler.exception.UserException;
+package org.objectweb.proactive.taskscheduler;
 
+import org.objectweb.proactive.taskscheduler.exception.UserException;
 
-public class UserResult implements java.io.Serializable {
-    private String taskID;
-    private UserScheduler userScheduler;
-    private boolean resultAvailable;
-    private InternalResult result;
-    private String userName;
+public class UserResult implements java.io.Serializable{
+	private String taskID;
+	private UserScheduler userScheduler;
+	private boolean resultAvailable;
+	private InternalResult result;
+	private String userName;
+	public UserResult(String ID,String user,UserScheduler API)
+	{
+		resultAvailable=false;
+		taskID=ID;
+		userName=user;
+		userScheduler=API;
+		
+	}
+	
+	//warning this function is blocking
+	public Object getResult()throws UserException,Exception
+	{
+		//if the result isnt already available fetch result
+		
+		
+	
+			if(!resultAvailable)
+			{
+				try
+				{
+					result=userScheduler.getResult(taskID,userName);
+				}
+				catch(Exception e)
+				{
+					throw new UserException("Scheduler has been shut down");
+				}
+				
+				resultAvailable=true;
+			}
+		
+			if(!result.getErrorMessage().equals("")) throw new UserException(result.getErrorMessage());	
+			//checks for exceptions if occured throws it, otherwise returns the result		
+			if(result.getExceptionOccured().booleanValue()) throw result.getProActiveTaskException().getObject();
+		else return result.getProActiveTaskExecutionResult().getObject();
+			
+		
+	}
+	//a non blocking function that returns if the task has finished execution
+	public boolean isFinished()throws UserException
+	{
+		if(resultAvailable)return true;
+		else 
+			{
+				try
+				{
+					return userScheduler.isFinished(taskID).booleanValue();
+				}
+				catch(Exception e)
+				{
+					throw new UserException("Scheduler has been shut down");
+				}
+			}
+		
+	}
+	
+	/**
+	 * Returns execution time. It will return zero if get result hasnt bee called yet
+	 * @return execution time on the node 
+	 */
+	public long getExecutionTime()throws UserException
+	{
+		if(!this.isFinished())
+			return 0;
+		
+		
+		if(!result.getErrorMessage().equals("")) throw new UserException(result.getErrorMessage());
+				
+				return result.getExecutionTime().longValue();
+		
+	}
+	
+	
 
-    public UserResult(String ID, String user, UserScheduler API) {
-        resultAvailable = false;
-        taskID = ID;
-        userName = user;
-        userScheduler = API;
-    }
-
-    //warning this function is blocking
-    public Object getResult() throws UserException, Exception {
-        //if the result isnt already available fetch result
-        if (!resultAvailable) {
-            try {
-                result = userScheduler.getResult(taskID, userName);
-            } catch (Exception e) {
-                throw new UserException("Scheduler has been shut down");
-            }
-
-            resultAvailable = true;
-        }
-
-        if (!result.getErrorMessage().equals("")) {
-            throw new UserException(result.getErrorMessage());
-        }
-
-        //checks for exceptions if occured throws it, otherwise returns the result		
-        if (result.getExceptionOccured().booleanValue()) {
-            throw result.getProActiveTaskException().getObject();
-        } else {
-            return result.getProActiveTaskExecutionResult().getObject();
-        }
-    }
-
-    //a non blocking function that returns if the task has finished execution
-    public boolean isFinished() throws UserException {
-        if (resultAvailable) {
-            return true;
-        } else {
-            try {
-                return userScheduler.isFinished(taskID).booleanValue();
-            } catch (Exception e) {
-                throw new UserException("Scheduler has been shut down");
-            }
-        }
-    }
-
-    /**
-     * Returns execution time. It will return zero if get result hasnt bee called yet
-     * @return execution time on the node
-     */
-    public long getExecutionTime() throws UserException {
-        if (!this.isFinished()) {
-            return 0;
-        }
-
-        if (!result.getErrorMessage().equals("")) {
-            throw new UserException(result.getErrorMessage());
-        }
-
-        return result.getExecutionTime().longValue();
-    }
 }

@@ -26,45 +26,48 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.taskscheduler;
 
+
+
+package org.objectweb.proactive.taskscheduler;
 
 /**
- *
+ * 
  * The status of each task submitted by the user
  * @author walzouab
  *
  */
 public enum Status implements java.io.Serializable {
-    /**
-     *
-     * The task doesnt exist or The task was submitted by the user but hasnt been added to the queue yet
-     */
-    NEW,
-    /**
-     * The task is in the scheduler queue
-     */
-    QUEUED,
-    /**
-     * The task is executing
-     */
-    RUNNNING,
-    /**
-     * The task has finished execution
-     */
-    FINISHED,
-    /**
-     *
-     * the task has failed during execution due to an iternal error and will be rescheduled again
-     */
-    FAILED,
-    /**
-     *
-     * the task was killed
-     */
-    KILLED,
-    /**
-     * An Error has occured
-     */
-    ERROR;
+	/**
+	 * 
+	 * The task doesnt exist or The task was submitted by the user but hasnt been added to the queue yet
+	 */
+	NEW,
+	/**
+	 * The task is in the scheduler queue
+	 */
+	QUEUED,
+	/**
+	 * The task is executing
+	 */
+	RUNNNING,
+	/**
+	 * The task has finished execution
+	 */
+	FINISHED,
+	/**
+	 * 
+	 * the task has failed during execution due to an iternal error and will be rescheduled again
+	 */
+	FAILED,
+	/**
+	 * 
+	 * the task was killed
+	 */
+	KILLED,
+	/**
+	 * An Error has occured
+	 */
+	ERROR
+
 }

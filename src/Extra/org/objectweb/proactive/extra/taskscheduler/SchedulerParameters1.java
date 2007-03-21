@@ -26,8 +26,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.taskscheduler;
-
+package org.objectweb.proactive.taskscheduler;
 
 /**
  * This interface contains tunable paramters to be used by the scheudler
@@ -35,36 +34,40 @@ package org.objectweb.proactive.extra.taskscheduler;
  * @author walzouab
  *
  */
-public interface SchedulerParameters1 {
+public interface SchedulerParameters1
+{
+	/**
+	 * The default policy to be used by the scheduler.
+	 * It is recommended to set it to FIFO
+	 */
+	public final String DEFAULT_POLICY="org.objectweb.proactive.taskscheduler.policy.FIFOPolicy";
+	
+	/**
+	 * Time for the scheduler to sleep, or its heart beat
+	 * </br><b>Warning, Must be a positive integer<b> 
+	 */
 
-    /**
-     * The default policy to be used by the scheduler.
-     * It is recommended to set it to FIFO
-     */
-    public final String DEFAULT_POLICY = "org.objectweb.proactive.extra.taskscheduler.policy.FIFOPolicy";
+	public final long SCHEDULER_TIMEOUT=1000;
+	
+	/**
+	 *	A grace period to wait before returning unused nodes fromt the scheduler to the resource manager
+	 * </br><b>WARNING, Must be a positive integer<b>
+	 */
 
-    /**
-     * Time for the scheduler to sleep, or its heart beat
-     * </br><b>Warning, Must be a positive integer<b>
-     */
-    public final long SCHEDULER_TIMEOUT = 1000;
+	public final long TIME_BEFORE_RETURNING_NODES_TO_RM=SCHEDULER_TIMEOUT*3;
+	
+	/**
+	 *	Time before all active objeccts are pinged to make sure they are still alive
+	 *	</br><b>WARNING, Must be a positive integer<b> 
+	 */
 
-    /**
-     *        A grace period to wait before returning unused nodes fromt the scheduler to the resource manager
-     * </br><b>WARNING, Must be a positive integer<b>
-     */
-    public final long TIME_BEFORE_RETURNING_NODES_TO_RM = SCHEDULER_TIMEOUT * 3;
+	public final long TIME_BEFORE_TEST_ALIVE=SCHEDULER_TIMEOUT*3;
+	
+	/**
+	 * Percentage to be returned of resources each time TIME_BEFORE_RETURNING_NODES_TO_RM times out.
+	 * Zero means to never return any nodes acquired, one means to return all nodes acquired
+	 * </br><b>Warning, Must be a double between zero and one<b>
+	 */
 
-    /**
-     *        Time before all active objeccts are pinged to make sure they are still alive
-     *        </br><b>WARNING, Must be a positive integer<b>
-     */
-    public final long TIME_BEFORE_TEST_ALIVE = SCHEDULER_TIMEOUT * 3;
-
-    /**
-     * Percentage to be returned of resources each time TIME_BEFORE_RETURNING_NODES_TO_RM times out.
-     * Zero means to never return any nodes acquired, one means to return all nodes acquired
-     * </br><b>Warning, Must be a double between zero and one<b>
-     */
-    public final double PERCENTAGE_OF_RESOURCES_TO_RETURN = 0.5;
+	public final double PERCENTAGE_OF_RESOURCES_TO_RETURN=0.5;
 }

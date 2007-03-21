@@ -28,12 +28,14 @@
  */
 
 /**
- *
+ * 
  *
  * @author walzouab
  *
  */
-package org.objectweb.proactive.extra.taskscheduler.resourcemanager;
+
+package org.objectweb.proactive.taskscheduler.resourcemanager;
+
 
 import java.util.Vector;
 
@@ -51,105 +53,175 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
+public class SimpleResourceManager implements GenericResourceManager,NodeCreationEventListener,InitActive{
 
-public class SimpleResourceManager implements GenericResourceManager,
-    NodeCreationEventListener, InitActive {
-    //holds the nodes
-    Vector<Node> freeNodes;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.RESOURCE_MANAGER);
-    //holds the virutal nodes, only used to kill the nodes when the active object is closed
-    Vector<VirtualNode> vn;
+	//holds the nodes
+	Vector<Node>freeNodes;
+	private static Logger logger = ProActiveLogger.getLogger(Loggers.RESOURCE_MANAGER);
 
-    public void initActivity(Body body) {
-        freeNodes = new Vector<Node>();
-        vn = new Vector<VirtualNode>();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Resource Manager Initialized");
-        }
-    }
+	//holds the virutal nodes, only used to kill the nodes when the active object is closed
+	Vector<VirtualNode> vn;
+	
+	public void initActivity(Body body) {
+		
+		freeNodes =new Vector<Node>();
+		vn=new Vector<VirtualNode>();
+		if(logger.isDebugEnabled())
+			logger.debug("Resource Manager Initialized");
+			
+			
+			
+		
+	}
+	
+	public void stopRM()
+	{
+		try
+		{
+			
+			
+			for(int i=0;i<vn.size();i++)
+			{
+				
+				((VirtualNodeImpl)vn.get(i)).waitForAllNodesCreation();
+				((VirtualNodeImpl)vn.get(i)).removeNodeCreationEventListener(this);
+				((VirtualNodeImpl)vn.get(i)).killAll(false);
+				
+				
+				
+			}
+			
+		
+			if(logger.isDebugEnabled())
+				logger.debug("finished deactivating nodes, will terminate Resource Manager");
+			ProActive.getBodyOnThis().terminate();
+			
+		}
+		catch(Exception e)
+		{
+			logger.error("Couldnt Terminate the Resource manager"+e.toString());
+		}
+	}
 
-    public void stopRM() {
-        try {
-            for (int i = 0; i < vn.size(); i++) {
-                ((VirtualNodeImpl) vn.get(i)).waitForAllNodesCreation();
-                ((VirtualNodeImpl) vn.get(i)).removeNodeCreationEventListener(this);
-                ((VirtualNodeImpl) vn.get(i)).killAll(false);
-            }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "finished deactivating nodes, will terminate Resource Manager");
-            }
-            ProActive.getBodyOnThis().terminate();
-        } catch (Exception e) {
-            logger.error("Couldnt Terminate the Resource manager" +
-                e.toString());
-        }
-    }
+	
+	
 
-    //adds the virtual nodes and create listeners for the virtual nodes to add nodes whenever created
-    public void addNodes(String xmlURL) {
-        try {
-            ProActiveDescriptor pad = ProActive.getProactiveDescriptor(xmlURL);
-            VirtualNode[] virtualNodes = pad.getVirtualNodes();
-            for (int i = 0; i < virtualNodes.length; i++) {
-                ((VirtualNodeImpl) virtualNodes[i]).addNodeCreationEventListener(this);
-                virtualNodes[i].activate();
-                vn.add(virtualNodes[i]);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Virtual Node " + virtualNodes[i].getName() +
-                        " added to resource manager");
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Couldnt add the specified resources" + e.toString());
-        }
-    }
 
-    public SimpleResourceManager() {
-    } //proactive no arg constructor
 
-    public Vector<Node> getAtMostNNodes(IntWrapper maxNodeNb) {
-        Vector<Node> nodesToSend = new Vector<Node>();
 
-        //exits the loop when there are no more free 
-        while (!freeNodes.isEmpty() &&
-                (nodesToSend.size() < maxNodeNb.intValue())) {
-            nodesToSend.add(freeNodes.remove(0));
-        }
+	//adds the virtual nodes and create listeners for the virtual nodes to add nodes whenever created
+	public void addNodes(String xmlURL)
+	{  
+		
+		try 
+		{
+			
+			
+			ProActiveDescriptor pad = ProActive.getProactiveDescriptor(xmlURL);
+			VirtualNode[] virtualNodes=pad.getVirtualNodes();
+			for (int i=0;i<virtualNodes.length;i++)
+			{
+				
+				
+				((VirtualNodeImpl)virtualNodes[i]).addNodeCreationEventListener(this);
+				virtualNodes[i].activate();
+				vn.add(virtualNodes[i]);
+				if(logger.isDebugEnabled())
+					logger.debug("Virtual Node "+virtualNodes[i].getName()+" added to resource manager");
+				
+				
+			
+				
+			}
+		   
+		    
+			
+			
+			
+		}
+		
+		catch (Exception e) 
+		{
+			logger.error("Couldnt add the specified resources"+e.toString());
+		
+		}
 
-        if (logger.isDebugEnabled() && (nodesToSend.size() > 0)) {
-            logger.debug(nodesToSend.size() + " Nodes Reserved");
-        }
+	 }
 
-        return nodesToSend;
-    }
+	
+	public SimpleResourceManager(){}//proactive no arg constructor
+	
 
-    public void freeNodes(Vector<Node> nodesToFree) {
-        int nodesFreed = 0;
-        while (!nodesToFree.isEmpty()) {
-            try {
-                nodesToFree.get(0).killAllActiveObjects();
-                freeNodes.add(nodesToFree.remove(0));
-                nodesFreed++;
-            } catch (Exception e) {
-                nodesToFree.remove(0);
-                logger.error("Node has died " + e.toString());
-            }
-        }
 
-        if (logger.isDebugEnabled() & (nodesFreed > 0)) {
-            logger.debug(nodesFreed + " nodes Freed.");
-        }
-    }
+	public Vector<Node> getAtMostNNodes(IntWrapper maxNodeNb){
+		
+	
+		Vector<Node> nodesToSend= new Vector<Node>();
+		
+		
+		
+		//exits the loop when there are no more free 
+		while(!freeNodes.isEmpty()&&nodesToSend.size()<maxNodeNb.intValue())
+		{
+			nodesToSend.add(freeNodes.remove(0));
+		}	
+		
+		if(logger.isDebugEnabled()&&nodesToSend.size()>0)
+			logger.debug(nodesToSend.size()+" Nodes Reserved");
+			
+		
+		return nodesToSend;
+	}
 
-    public void nodeCreated(NodeCreationEvent event) {
+	public void freeNodes(Vector<Node> nodesToFree) {
+		int nodesFreed=0;
+		while(!nodesToFree.isEmpty())
+		{
+			
+			try
+			{
+				
+				nodesToFree.get(0).killAllActiveObjects();
+				freeNodes.add(nodesToFree.remove(0));
+				nodesFreed++;
+			}catch(Exception e)
+			{
+				nodesToFree.remove(0);
+				logger.error("Node has died "+e.toString());
+				
+			}
+		}
+		
+		
+		if(logger.isDebugEnabled()&nodesFreed>0)
+			logger.debug(nodesFreed+" nodes Freed.");
+
+	}
+
+	
+	public void nodeCreated(NodeCreationEvent event) {
         // get the node
-        freeNodes.add(event.getNode());
-        if (logger.isDebugEnabled()) {
-            logger.debug("Node at " +
-                event.getNode().getNodeInformation().getURL() +
-                " added to Resource Manager");
-        }
+    
+		
+		freeNodes.add(event.getNode());
+		if(logger.isDebugEnabled())
+			logger.debug("Node at "+event.getNode().getNodeInformation().getURL()+" added to Resource Manager");
+       
+       
+       
     }
+	
+	
+	
+	
+
+
+
+
+
+
+
+
 }
+

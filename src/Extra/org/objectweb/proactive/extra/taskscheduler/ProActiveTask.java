@@ -28,8 +28,9 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.taskscheduler;
 
+
+package org.objectweb.proactive.taskscheduler;
 
 /**
  * Interface to be implemented for task submitted to the scheduler
@@ -38,10 +39,9 @@ package org.objectweb.proactive.extra.taskscheduler;
  *
  */
 public interface ProActiveTask extends java.io.Serializable {
-
-    /**
-     * The entry point and exit point for the task.
-     * @return an object that is the result of the task
-     */
-    public Object run();
+   /**
+    * The entry point and exit point for the task.
+    * @return an object that is the result of the task
+    */
+	public Object run();
 }

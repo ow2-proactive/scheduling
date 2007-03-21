@@ -28,69 +28,83 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.taskscheduler;
+
+
+
+package org.objectweb.proactive.taskscheduler;
+
+
 
 
 /**
- * Internal task object managed by the scheduler. holds times required plus the result and also the executer object and node in addition to
+ * Internal task object managed by the scheduler. holds times required plus the result and also the executer object and node in addition to 
  * @author walzouab
  *
  */
-public class InternalTask implements java.io.Serializable {
-    Status status;
-    private ProActiveTask userTask;
-    private String taskID;
-    private String userName;
-    public NodeNExecuter nodeNExecuter;
-    InternalResult result;
+public class InternalTask implements java.io.Serializable{
+	Status status;
+		private ProActiveTask userTask;
+		private String taskID;
+		private String userName; 
+	
+	 public NodeNExecuter nodeNExecuter;
+	
+	 InternalResult result;
+	
+	 /*
+	  * a negative value indicates invalidity
+	  */
+	 long timeCreated;
+	 long timeInsertedInQueue;
+	 long timeScheduled;
+	 long timeFinished;
+	 
+	
+	 int failures;
+	/**
+	 * The parameters passed are private with only getters and no setters available , so once they are created they cannot be changed.
+	 * @param userTask 
+	 * @param taskID
+	 * @param userName
+	 */
+	public InternalTask( ProActiveTask userTask, String taskID, String userName) {
+		this.status=Status.NEW;
+		this.userTask = userTask;
+		this.taskID = taskID;
+		this.userName = userName;
+		this.timeCreated=System.currentTimeMillis();
+		this.failures=0;
+		
+		 
+		 
+		 timeInsertedInQueue=-1;
+		 timeScheduled=-1;
+		 timeFinished=-1;
+	}
+	public String getTaskID() {
+		return taskID;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public ProActiveTask getUserTask() {
+		return userTask;
+	}
 
-    /*
-     * a negative value indicates invalidity
-     */
-    long timeCreated;
-    long timeInsertedInQueue;
-    long timeScheduled;
-    long timeFinished;
+	public Info getTaskINFO()
+	{
+		String nodeURL;
+		if(nodeNExecuter!=null)
+		nodeURL=nodeNExecuter.node.getNodeInformation().getURL();
+		
+		else nodeURL="unknown";
+		
+		return new Info( status,  taskID,  userName, nodeURL, timeCreated, timeInsertedInQueue,timeScheduled, timeFinished,failures);
+		
+	}
 
-    /**
-     * The parameters passed are private with only getters and no setters available , so once they are created they cannot be changed.
-     * @param userTask
-     * @param taskID
-     * @param userName
-     */
-    public InternalTask(ProActiveTask userTask, String taskID, String userName) {
-        this.status = Status.NEW;
-        this.userTask = userTask;
-        this.taskID = taskID;
-        this.userName = userName;
-        this.timeCreated = System.currentTimeMillis();
 
-        timeInsertedInQueue = -1;
-        timeScheduled = -1;
-        timeFinished = -1;
-    }
+	
 
-    public String getTaskID() {
-        return taskID;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public ProActiveTask getUserTask() {
-        return userTask;
-    }
-
-    public Info getTaskINFO() {
-        String nodeURL;
-        if (nodeNExecuter != null) {
-            nodeURL = nodeNExecuter.node.getNodeInformation().getURL();
-        } else {
-            nodeURL = "unknown";
-        }
-
-        return new Info(status, taskID, userName, nodeURL, timeCreated,
-            timeInsertedInQueue, timeScheduled, timeFinished);
-    }
 }
+

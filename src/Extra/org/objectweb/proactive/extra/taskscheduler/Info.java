@@ -26,8 +26,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.taskscheduler;
 
+
+
+package org.objectweb.proactive.taskscheduler;
 
 /**
  * information about the task to be returned to the user
@@ -35,65 +37,64 @@ package org.objectweb.proactive.extra.taskscheduler;
  * @author walzouab
  *
  */
-public class Info implements java.io.Serializable {
-    public Info(Status status, String taskID, String userName, String nodeURL,
-        long timeCreated, long timeInsertedInQueue, long timeScheduled,
-        long timeFinished) {
-        this.status = status;
-        this.taskID = taskID;
-        this.userName = userName;
-        this.nodeURL = nodeURL;
-        this.timeCreated = timeCreated;
-        this.timeInsertedInQueue = timeInsertedInQueue;
-        this.timeScheduled = timeScheduled;
-        this.timeFinished = timeFinished;
-    }
+public class Info implements java.io.Serializable{
+	
+	public Info(Status status, String taskID, String userName, String nodeURL, long timeCreated, long timeInsertedInQueue, long timeScheduled, long timeFinished,int failures) {
+		this.status = status;
+		this.taskID = taskID;
+		this.userName = userName;
+		this.nodeURL = nodeURL;
+		this.timeCreated = timeCreated;
+		this.timeInsertedInQueue = timeInsertedInQueue;
+		this.timeScheduled = timeScheduled;
+		this.timeFinished = timeFinished;
+		this.failures=failures;
+	}
+	/**
+	 * priactive no arg constuctor
+	 *
+	 */
+	public Info(){}
+private	Status status;
 
-    /**
-     * priactive no arg constuctor
-     *
-     */
-    public Info() {
-    }
+	private String taskID;
+	private String userName; 
 
-    private Status status;
-    private String taskID;
-    private String userName;
-    private String nodeURL;
-    private long timeCreated;
-    private long timeInsertedInQueue;
-    private long timeScheduled;
-    private long timeFinished;
+ private String nodeURL;
 
-    public String getNodeURL() {
-        return nodeURL;
-    }
+ 
 
-    public Status getStatus() {
-        return status;
-    }
+ private long timeCreated;
+ private long timeInsertedInQueue;
+ private long timeScheduled;
+ private long timeFinished;
+ private int failures;
+public String getNodeURL() {
+	return nodeURL;
+}
+public Status getStatus() {
+	return status;
+}
+public String getTaskID() {
+	return taskID;
+}
+public long getTimeCreated() {
+	return timeCreated;
+}
+public long getTimeFinished() {
+	return timeFinished;
+}
+public long getTimeInsertedInQueue() {
+	return timeInsertedInQueue;
+}
+public long getTimeScheduled() {
+	return timeScheduled;
+}
+public String getUserName() {
+	return userName;
+}
+public int getFailures() {
+	return failures;
+}
 
-    public String getTaskID() {
-        return taskID;
-    }
-
-    public long getTimeCreated() {
-        return timeCreated;
-    }
-
-    public long getTimeFinished() {
-        return timeFinished;
-    }
-
-    public long getTimeInsertedInQueue() {
-        return timeInsertedInQueue;
-    }
-
-    public long getTimeScheduled() {
-        return timeScheduled;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
 }

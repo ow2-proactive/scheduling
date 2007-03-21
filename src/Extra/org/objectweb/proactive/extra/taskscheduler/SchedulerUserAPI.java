@@ -28,20 +28,20 @@
  */
 
 /**
- *
+ * 
  *
  * @author walzouab
  *
  */
-package org.objectweb.proactive.extra.taskscheduler;
+
+package org.objectweb.proactive.taskscheduler;
 
 import java.util.Vector;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.taskscheduler.exception.UserException;
-
+import org.objectweb.proactive.taskscheduler.exception.UserException;
 
 /**
  * An API that provides functions needed by the user
@@ -50,85 +50,84 @@ import org.objectweb.proactive.extra.taskscheduler.exception.UserException;
  */
 public abstract class SchedulerUserAPI {
 
-    /**
-     * A non-blocking method that submits a vector of tasks to the scheduler
-     * @param userTasks
-     * @param userName
-     * @return
-     * @throws UserException
-     */
-    public abstract Vector<UserResult> submit(Vector<ProActiveTask> userTasks,
-        String userName) throws UserException;
-
-    /**
-     * A non-blocking method that submits a single task to the scheduler
-     * @param userTask
-     * @param userName
-     * @return
-     * @throws UserException
-     */
-    public abstract UserResult submit(ProActiveTask userTask, String userName)
-        throws UserException;
-
-    /**
-     * A blocking method that gets the user result when it is available
-     * @param taskID
-     * @return
-     * @throws UserException
-     */
-    public abstract InternalResult getResult(String taskID, String userName)
-        throws UserException;
-
-    /**
-     * A method that checks if the task has finsihed and returns immediately
-     * @param taskID
-     * @return
-     * @throws UserException
-     */
-    public abstract BooleanWrapper isFinished(String taskID)
-        throws UserException;
-
-    /**
-     * deletes a certain task
-     * @param tID
-     * @return true if sucessfulll, false if itsnt queued or running anymore
-     * @throws UserException
-     */
-    public abstract BooleanWrapper del(String tID, String userName)
-        throws UserException;
-
-    /**
-     * gets the status of a certain task
-     * @param tID
-     * @return Status--see enum staus for details
-     * @throws UserException
-     */
-    public abstract Status stat(String tID) throws UserException;
-
-    /**
-     *
-     * Connects to an already exisitng scheduler and returns a reference to the user API
-     * @param schedulerURL
-     * @return SchedulerUserAPI
-     * @throws UserException
-     */
-    public static SchedulerUserAPI connectTo(String schedulerURL)
-        throws UserException {
-        Object[] ao;
-        try {
+	/**
+	 * A non-blocking method that submits a vector of tasks to the scheduler
+	 * @param userTasks
+	 * @param userName
+	 * @return
+	 * @throws UserException 
+	 */
+	public abstract Vector<UserResult> submit(Vector<ProActiveTask> userTasks,String userName) throws UserException;
+	
+	/**
+	 * A non-blocking method that submits a single task to the scheduler
+	 * @param userTask
+	 * @param userName
+	 * @return
+	 * @throws UserException 
+	 */
+	public abstract UserResult submit(ProActiveTask userTask,String userName) throws UserException;
+	
+	/**
+	 * A blocking method that gets the user result when it is available
+	 * @param taskID
+	 * @return
+	 * @throws UserException 
+	 */
+	public abstract InternalResult getResult(String taskID,String userName) throws UserException;
+	
+	/**
+	 * A method that checks if the task has finsihed and returns immediately
+	 * @param taskID
+	 * @return
+	 * @throws UserException
+	 */
+	public abstract BooleanWrapper isFinished(String taskID) throws UserException;
+	
+	/**
+	 * deletes a certain task
+	 * @param tID
+	 * @return true if sucessfulll, false if itsnt queued or running anymore
+	 * @throws UserException
+	 */
+	public abstract BooleanWrapper del(String tID,String userName) throws UserException;
+	
+	/**
+	 * gets the status of a certain task
+	 * @param tID
+	 * @return Status--see enum staus for details
+	 * @throws UserException
+	 */
+	public abstract Status stat(String tID)throws UserException;
+	
+	/**
+	 * 
+	 * Connects to an already exisitng scheduler and returns a reference to the user API
+	 * @param schedulerURL
+	 * @return SchedulerUserAPI
+	 * @throws UserException
+	 */
+	public static SchedulerUserAPI connectTo(String schedulerURL) throws UserException 
+	{
+		Object[] ao;
+		try
+		
+		{
             Node node = NodeFactory.getNode(schedulerURL);
 
             //look up must be made on the user scheudler rather than the api because it is the real object that was instansiated
             ao = node.getActiveObjects(UserScheduler.class.getName());
-        } catch (Exception e) {
-            throw new UserException("Couldn't Connect to the scheduler");
-        }
 
-        if (ao.length == 1) {
-            return ((SchedulerUserAPI) ao[0]);
-        }
-
-        throw new UserException(
-            "Scheduler object doesnt Exist please make sure its running");
+           
+		}
+		catch (Exception e)
+		{
+			throw new UserException("Couldn't Connect to the scheduler");
+		}
+		
+		 if (ao.length == 1)        
+             return ((SchedulerUserAPI) ao[0]);
+         
+         throw new UserException("Scheduler object doesnt Exist please make sure its running");
     }
 }

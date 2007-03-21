@@ -28,27 +28,26 @@
  */
 
 /**
- *
+ * 
  *
  * @author walzouab
  *
  */
-package org.objectweb.proactive.extra.taskscheduler;
+
+package org.objectweb.proactive.taskscheduler;
 
 import org.objectweb.proactive.core.node.Node;
-
-
 /**
  * Only used as a container for node-executer combination
  * @author walzouab
  *
  */
 public class NodeNExecuter {
-    ActiveExecuter executer;
-    Node node;
+	ActiveExecuter executer;
+	Node node;
+	public NodeNExecuter(ActiveExecuter executer, Node node) {
+		this.executer = executer;
+		this.node = node;
+	}
 
-    public NodeNExecuter(ActiveExecuter executer, Node node) {
-        this.executer = executer;
-        this.node = node;
-    }
 }

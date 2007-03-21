@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.taskscheduler;
+package org.objectweb.proactive.taskscheduler;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.wrapper.LongWrapper;
  *
  */
 public class ActiveExecuter implements java.io.Serializable {
-    public ActiveExecuter() {
+	public ActiveExecuter() {
     }
 
     /**
@@ -57,10 +57,11 @@ public class ActiveExecuter implements java.io.Serializable {
      * <b>Warning, use with caution, it causes the node to be killed</b>
      *
      */
-    public void kill() {
-        System.exit(0);
+    public void kill()
+    {
+    	System.exit(0);
+    	
     }
-
     /**
      * Runs the requried task, by executing it and catching any user exceptions that result.
      * @param the task to be exuetued
@@ -81,6 +82,8 @@ public class ActiveExecuter implements java.io.Serializable {
 
             //indicate that no user exception has occured
             result.setExceptionOccured(new BooleanWrapper(false));
+          
+           
         } catch (Exception e) {
             //sets the time the user code executed before an exception occured
             result.setExecutionTimeBeforeException(new LongWrapper(System.currentTimeMillis() -

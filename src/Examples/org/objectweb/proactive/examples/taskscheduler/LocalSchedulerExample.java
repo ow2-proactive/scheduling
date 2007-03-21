@@ -37,42 +37,60 @@ package org.objectweb.proactive.examples.taskscheduler;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.taskscheduler.AdminScheduler;
-import org.objectweb.proactive.extra.taskscheduler.resourcemanager.SimpleResourceManager;
+import org.objectweb.proactive.taskscheduler.AdminScheduler;
+import org.objectweb.proactive.taskscheduler.resourcemanager.SimpleResourceManager;
 
 
 public class LocalSchedulerExample {
 
-    /**
-     * @param args
-     */
-
+  
     //shows how to run the scheduler
     private static Logger logger = ProActiveLogger.getLogger(Loggers.TASK_SCHEDULER);
 
-    public static void main(String[] args) throws Exception {
-        // TODO Auto-generated method stub
-
+    public static void main(String[] args) {
         //get the path of the file
-        String xmlURL = SimpleResourceManager.class.getResource(
-                "/org/objectweb/proactive/examples/taskscheduler/test.xml")
-                                                   .getPath();
-        String SNode = args[0];
+        
+        
+        SimpleResourceManager rm;
+        
+        try 
+        {
+            if (args.length == 2) 
+            {
+                try
+                {
+                	rm = (SimpleResourceManager) NodeFactory.getNode(args[1]).getActiveObjects(SimpleResourceManager.class.getName())[0];
+                
+                	logger.info("Connect to ResourceManager on "+args[1]);
+                }
+                catch(Exception e){throw new Exception("ResourceManager doesn't exist on "+args[1]);}
+            }
+            else 
+            {
+            	String xmlURL = SimpleResourceManager.class.getResource("/org/objectweb/proactive/examples/taskscheduler/test.xml").getPath();
+                rm = (SimpleResourceManager) ProActive.newActive(SimpleResourceManager.class.getName(),null);
+                logger.info("ResourceManager created on "+ProActive.getActiveObjectNodeUrl(rm));
+                rm.addNodes(xmlURL);
+            }
+            
+            String SNode;
+            if(args.length>0)
+            	SNode= args[0];
+            else
+            	SNode="//localhost/SCHEDULER_NODE";
+       
+            
+            AdminScheduler adminAPI = AdminScheduler.createLocalScheduler(rm,SNode);
 
-        try {
-            SimpleResourceManager rm = (SimpleResourceManager) ProActive.newActive(SimpleResourceManager.class.getName(),
-                    null);
-
-            AdminScheduler adminAPI = AdminScheduler.createLocalScheduler(rm,
-                    SNode);
-
-            rm.addNodes(xmlURL);
             adminAPI.start();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
+        } 
+        catch (Exception e) {
+            
             logger.error("error creating Scheduler" + e.toString());
+            System.exit(1);
         }
     }
 }
