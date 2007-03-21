@@ -160,13 +160,15 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty("extra.scheduler.default_policy");
+            defaultPolicy = System.getProperty("proactive.scheduler.default_policy");
             defaultFactory = System.getProperty(
-                    "extra.scheduler.default_policy_factory");
+                    "proactive.scheduler.default_policy_factory");
+            if(defaultPolicy==null||defaultFactory==null)
+            	throw new AdminException("default policy or factory not defined");
         } catch (Exception e) {
             logger.error(
                 "Must define the property defaultpolicy and default factory in proactive configuration");
-            throw new AdminException(e.getLocalizedMessage());
+            throw new AdminException(e.getMessage());
         }
 
         return AdminScheduler.createLocalScheduler(RM, nodeName, defaultPolicy,
@@ -188,13 +190,16 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty("extra.scheduler.default_policy");
+            defaultPolicy = System.getProperty("proactive.scheduler.default_policy");
             defaultFactory = System.getProperty(
-                    "extra.scheduler.default_policy_factory");
+                    "proactive.scheduler.default_policy_factory");
+
+            if(defaultPolicy==null||defaultFactory==null)
+            	throw new Exception("default policy or factory not defined");
         } catch (Exception e) {
             logger.error(
                 "Must define the property defaultpolicy and default factory in proactive configuration");
-            throw new AdminException(e.getLocalizedMessage());
+            throw new AdminException(e.getMessage());
         }
 
         return AdminScheduler.createLocalScheduler(RMURL, nodeName,
@@ -216,6 +221,10 @@ public class AdminScheduler {
         String nodeName, String Policy, String policyFactory)
         throws AdminException {
         GenericResourceManager rm;
+        
+        if(Policy==null||policyFactory==null)
+        	throw new AdminException("default policy or factory not defined");
+        
         try {
             rm = (GenericResourceManager) ProActive.lookupActive(GenericResourceManager.class.getName(),
                     RMURL);
@@ -243,6 +252,9 @@ public class AdminScheduler {
         String policyFactory) throws AdminException {
         String localNode;
 
+        if(Policy==null||policyFactory==null)
+        	throw new AdminException("default policy or factory not defined");
+        
         try {
             if (nodeName == null) {
                 localNode = NodeFactory.getDefaultNode().getNodeInformation()
@@ -278,13 +290,15 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty("extra.scheduler.default_policy");
+            defaultPolicy = System.getProperty("proactive.scheduler.default_policy");
             defaultFactory = System.getProperty(
-                    "extra.scheduler.default_policy_factory");
+                    "proactive.scheduler.default_policy_factory");
+            if(defaultPolicy==null||defaultFactory==null)
+            	throw new Exception("default policy or factory not defined");
         } catch (Exception e) {
             logger.error(
                 "Must define the property defaultpolicy and default factory in proactive configuration");
-            throw new AdminException(e.getLocalizedMessage());
+            throw new AdminException(e.getMessage());
         }
 
         return AdminScheduler.createScheduler(RM, schedulerURL, defaultPolicy,
@@ -305,13 +319,15 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty("extra.scheduler.default_policy");
+            defaultPolicy = System.getProperty("proactive.scheduler.default_policy");
             defaultFactory = System.getProperty(
-                    "extra.scheduler.default_policy_factory");
+                    "proactive.scheduler.default_policy_factory");
+            if(defaultPolicy==null||defaultFactory==null)
+            	throw new Exception("default policy or factory not defined");
         } catch (Exception e) {
             logger.error(
                 "Must define the property defaultpolicy and default factory in proactive configuration");
-            throw new AdminException(e.getLocalizedMessage());
+            throw new AdminException(e.getMessage());
         }
         return AdminScheduler.createScheduler(RMURL, schedulerURL,
             defaultPolicy, defaultFactory);
@@ -339,6 +355,9 @@ public class AdminScheduler {
             throw new AdminException(
                 "Resource Manager doesn't exist in the specified URL");
         }
+        if(Policy==null||policyFactory==null)
+        	throw new AdminException("default policy or factory not defined");
+        
 
         return AdminScheduler.createScheduler(rm, schedulerURL, Policy,
             policyFactory);
@@ -360,6 +379,10 @@ public class AdminScheduler {
         if (RM == null) {
             throw new AdminException("The Resource manager is set to null");
         }
+        
+        if(Policy==null||policyFactory==null)
+        	throw new AdminException("default policy or factory not defined");
+        
         try {
             String temp = ProActive.getActiveObjectNodeUrl(RM);
         } catch (ProActiveRuntimeException e) {
@@ -384,6 +407,7 @@ public class AdminScheduler {
             logger.info("Scheduler Created on " + schedulerURL);
         } catch (Exception e) {
           
+        	
         	throw new AdminException(e.getMessage());
         }
 

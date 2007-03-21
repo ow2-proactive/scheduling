@@ -90,7 +90,7 @@ public class LocalSchedulerExample {
             adminAPI.start();
         } catch (Exception e) {
             logger.error("error creating Scheduler" + e.toString());
-           e.printStackTrace();
+       
             System.exit(1);
         }
     }
