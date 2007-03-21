@@ -23,7 +23,8 @@
 			<javadoc  destdir="${docs.dir}/api" verbose="true" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> <!-- -docfilessubdirs -excludedocfilessubdir  -->
 			    <packageset dir="${src.proactive.dir}" />
 				<packageset dir="${src.extensions.dir}" />
-		      		
+				<packageset dir="${src.extra.dir}" />
+	
 				<classpath refid="project.classpath" />
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
