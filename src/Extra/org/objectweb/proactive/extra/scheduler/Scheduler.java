@@ -300,7 +300,7 @@ public class Scheduler implements RunActive, RequestFilter {
                 //notice we will reach here only if it was launched sucessfully
                 runningTasks.add(taskRetrivedFromPolicy);
                 logger.info("Task " + taskRetrivedFromPolicy.getTaskID() +
-                    "started execution.");
+                    "started execution on "+ taskRetrivedFromPolicy.nodeNExecuter.node.getNodeInformation().getURL());
             } catch (Exception e) {
                 try {
                     //try to kill the nodes, there is a high proability this will fail but it doesnt matter since its already troubled and will be returned
