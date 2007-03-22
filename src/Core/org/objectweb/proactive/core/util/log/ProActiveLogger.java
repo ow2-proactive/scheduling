@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.util.log;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 
@@ -65,5 +68,17 @@ public class ProActiveLogger extends Logger {
      */
     public static Logger getLogger(String name) {
         return Logger.getLogger(name, myFactory);
+    }
+
+    /**
+     * Get corresponding stack trace as string
+     * @param e A Throwable
+     * @return The output of printStackTrace is returned as a String
+     */
+    public static String getStackTraceAsString(Throwable e) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        e.printStackTrace(printWriter);
+        return stringWriter.toString();
     }
 }
