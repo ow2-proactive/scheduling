@@ -34,15 +34,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
@@ -51,8 +47,6 @@ import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 
 public class ReplyImpl extends MessageImpl implements Reply,
@@ -79,12 +73,6 @@ public class ReplyImpl extends MessageImpl implements Reply,
      */
     protected long sessionID;
     protected transient ProActiveSecurityManager psm = null;
-
-    /**
-     * Indicates how many times we will try to send the Reply
-     */
-    private static final int MAX_TRIES = 15;
-    transient protected LocationServer server;
 
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
         FutureResult result, ProActiveSecurityManager psm) {
@@ -156,14 +144,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
 
         // end security
         // fault-tolerance returned value
-        int ftres = FTManager.NON_FT;
-        try {
-            ftres = destinationBody.receiveReply(this);
-        } catch (Exception ex) {
-            this.backupSolution(destinationBody);
-        }
-
-        return ftres;
+        return destinationBody.receiveReply(this);
     }
 
     // security issue
@@ -204,48 +185,5 @@ public class ReplyImpl extends MessageImpl implements Reply,
      */
     public boolean isAutomaticContinuation() {
         return this.isAC;
-    }
-
-    /**
-     * Try to send the reply after obtaining a position
-     * from the location server
-     *
-     * @param destinationBody the destination for the reply
-     * @throws java.io.IOException
-     */
-    protected void backupSolution(UniversalBody destinationBody)
-        throws java.io.IOException {
-        int tries = 0;
-
-        // get the new location from the server
-        UniqueID bodyID = destinationBody.getID();
-        while (tries < MAX_TRIES) {
-            UniversalBody remoteBody = null;
-            UniversalBody mobile = queryServer(bodyID);
-
-            // we want to bypass the stub/proxy
-            remoteBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
-
-            try {
-                remoteBody.receiveReply(this);
-
-                return;
-            } catch (Exception e) {
-                tries++;
-
-                if (tries == MAX_TRIES) {
-                    throw new IOException(e.getMessage());
-                }
-            }
-        }
-    }
-
-    protected UniversalBody queryServer(UniqueID bodyID) {
-        if (server == null) {
-            server = LocationServerFactory.getLocationServer();
-        }
-        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
-        ProActive.waitFor(mobile);
-        return mobile;
     }
 }
