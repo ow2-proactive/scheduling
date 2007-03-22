@@ -83,7 +83,6 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
     /**
      * Implements the backup solution
      */
-    @Override
     protected void backupSolution(UniversalBody destinationBody)
         throws java.io.IOException {
         boolean ok = false;
@@ -116,7 +115,6 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
         }
     }
 
-    @Override
     protected UniversalBody queryServer(UniqueID bodyID) {
         if (server == null) {
             server = LocationServerFactory.getLocationServer();
