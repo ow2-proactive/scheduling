@@ -3,6 +3,7 @@ package org.objectweb.proactive.examples.scheduler;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.objectweb.proactive.extra.scheduler.InternalResult;
 import org.objectweb.proactive.extra.scheduler.SchedulerUserAPI;
 
 public class HelloRet {
@@ -26,7 +27,12 @@ public class HelloRet {
 		    while(!(tID=buf.readLine()).equals("stop"))
 		    {
 		    	if(scheduler.isFinished(tID).booleanValue())
-		    		System.out.println(scheduler.getResult(tID, System.getProperty("user.name")).getProActiveTaskExecutionResult().getObject());
+			    {
+		    		InternalResult result=scheduler.getResult(tID, System.getProperty("user.name"));
+			    	if(result.getErrorMessage().equals(""))
+			    		System.out.println(result.getProActiveTaskExecutionResult().getObject());
+			    	else System.out.println("Error: "+result.getErrorMessage());
+		    	}
 		    	else System.out.println("Not finished or doesnt exist");
 		    	
 		    }
@@ -34,7 +40,7 @@ public class HelloRet {
 		}
 		catch(Exception e)
 		{
-			System.out.println("Error:"+e.getMessage()+" will exit");
+			System.out.println("Error: "+e.getMessage()+" will exit");
 			System.exit(1);
 		}
 

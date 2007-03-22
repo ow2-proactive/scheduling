@@ -506,6 +506,7 @@ public class Scheduler implements RunActive, RequestFilter {
                 result = finishedTasks.remove(i).result;
             }
 
+        
         return result;
     }
 
@@ -522,6 +523,7 @@ public class Scheduler implements RunActive, RequestFilter {
 
             //task doesnt exist while shutting down
             if ((task == null) && shutdown) {
+            	
                 createError(taskID, userName,
                     "The Task doesnt exist in the scheduler or hasn't been added to the queue yet or already collected by the user");
                 return true;
@@ -654,7 +656,11 @@ public class Scheduler implements RunActive, RequestFilter {
     }
 
     public void flushqueue() {
-        policy.flush();
+        
+    	Vector<String> queued=this.getQueuedID();
+    	for(int i=0;i<queued.size();i++)
+    		this.del(queued.get(i), "admin");
+    	
         logger.info("Policy has been flushed.");
     }
 
@@ -774,12 +780,15 @@ public class Scheduler implements RunActive, RequestFilter {
 
         //this means it doesnt exist in the scheduler
         if (toBeKilled == null) {
+        	
             return new BooleanWrapper(false);
         }
 
         //if its not (the admin or the correct user decline it
-        if (!(toBeKilled.getUserName().equals(userName) ||
-                toBeKilled.getUserName().equals("admin"))) {
+        if (!(userName.equals(toBeKilled.getUserName()) ||
+                userName.equals("admin"))) {
+        	
+        	
             return new BooleanWrapper(false);
         }
 
@@ -841,6 +850,7 @@ public class Scheduler implements RunActive, RequestFilter {
             }
         }
 
+        
         return new BooleanWrapper(false);
     }
 }
