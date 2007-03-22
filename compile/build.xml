@@ -430,7 +430,8 @@
 	<target name="proActiveJar" depends="dist-mk-dir, compile" description="Create the ProActive jar, to be used for instance on a distant host">
 		<jar jarfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${cl.proactive.dir}" includes="**"/>
-			<fileset dir="${cl.extensions.dir}"    includes="**"/>
+			<fileset dir="${cl.extensions.dir}" includes="**"/>
+			<fileset dir="${cl.extra.dir}" includes="**"/>
 		</jar>
 	</target>
 
