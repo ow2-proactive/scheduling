@@ -60,7 +60,7 @@ public class VariableContract implements Serializable {
     private static final Pattern legalPattern = Pattern.compile(
             "^\\$\\{[\\w\\.]+\\}$");
 
-    private class PropertiesDatas {
+    private class PropertiesDatas implements Serializable {
         public String value;
         public VariableContractType type;
         public String setFrom; //Descriptor, Program

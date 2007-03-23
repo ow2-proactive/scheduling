@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.xml;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
 
 
@@ -39,7 +41,7 @@ import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
  * @author The ProActive Team
  * @since ProActive 3.0 (December 2005)
  */
-public class VariableContractType {
+public class VariableContractType implements Serializable {
     static final public VariableContractType DescriptorVariable = new VariableContractType(0,
             new String[] { "Descriptor", "Program" },
             new String[] { "Descriptor" }, new String[] { "Program" });
