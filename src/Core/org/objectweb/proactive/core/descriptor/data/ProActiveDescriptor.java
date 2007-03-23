@@ -135,13 +135,13 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * Returns the main definitions mapping
      * @return Map
      */
-    public Map getMainDefinitionMapping();
+    public Map<String, MainDefinition> getMainDefinitionMapping();
 
     /**
      * Returns the virtual nodes mapping
      * @return Map
      */
-    public Map getVirtualNodeMapping();
+    public Map<String, VirtualNode> getVirtualNodeMapping();
 
     public void setMainDefinitionMapping(
         HashMap<String, MainDefinition> newMapping);

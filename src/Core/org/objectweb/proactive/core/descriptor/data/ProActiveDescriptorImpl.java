@@ -239,7 +239,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * return the main definitions mapping
      * @return Map
      */
-    public Map getMainDefinitionMapping() {
+    public Map<String, MainDefinition> getMainDefinitionMapping() {
         return mainDefinitionMapping;
     }
 
