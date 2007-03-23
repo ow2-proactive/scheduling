@@ -142,4 +142,17 @@ public interface Loggers {
         ".application";
     static final public String SCHEDULER = CORE + ".scheduler";
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
+
+    // Infrastructure Manager loggers
+    static final public String IM = "IM";
+    static final public String IM_FACTORY = IM + ".FACTORY";
+    static final public String IM_CORE = IM + ".IMCORE";
+    static final public String IM_ADMIN = IM + ".IMADMIN";
+    static final public String IM_MONITORING = IM + ".IMMONITORING";
+    static final public String IM_USER = IM + ".IMUSER";
+    static final public String IM_DEPLOYMENT_FACTORY = IM +
+        ".IMDEPLOYMENTFACTORY";
+    static final public String IM_DEPLOY = IM_DEPLOYMENT_FACTORY + ".IMDEPLOY";
+    static final public String IM_DATARESOURCE = IM + ".IMDATARESOURCE";
+    static final public String IM_TEST = IM + ".IMTEST";
 }
