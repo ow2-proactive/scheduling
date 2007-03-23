@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         id="org.objectweb.proactive.ic2d.infrastructuremanager.perspectives"
+         name="Perspectives"
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.objectweb.proactive.ic2d.infrastructuremanager.perspectives.IMPerspective"
+            icon="icons/monitoring.gif"
+            id="org.objectweb.proactive.ic2d.infrastructuremanager.perspectives.IMPerspective"
+            name="Infrastructure Manager"/>
+   </extension>
+   <extension
+         id="org.objectweb.proactive.ic2d.infrastructuremanager.views"
+         name="Views"
+         point="org.eclipse.ui.views">
+      <category
+            id="org.objectweb.proactive.ic2d.infrastructuremanager.category"
+            name="Infrastructure Manager"/>
+      <view
+            allowMultiple="false"
+            category="org.objectweb.proactive.ic2d.infrastructuremanager.category"
+            class="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewAdministration"
+            icon="icons/monitoring.gif"
+            id="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewAdministration"
+            name="Administration"/>
+     <view
+            allowMultiple="false"
+            category="org.objectweb.proactive.ic2d.infrastructuremanager.category"
+            class="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewLegend"
+            icon="icons/monitoring.gif"
+            id="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewLegend"
+            name="Legend"/>
+      <view
+            allowMultiple="true"
+            category="org.objectweb.proactive.ic2d.infrastructuremanager.category"
+            class="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewInfrastructure"
+            icon="icons/legend.gif"
+            id="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewInfrastructure"
+            name="Infrastructure"/>
+   </extension>
+      <extension
+         id="org.objectweb.proactive.ic2d.infrastructuremanager.perspectiveextensions"
+         name="Infrastructuremanager perspective extensions"
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.objectweb.proactive.ic2d.infrastructuremanager.perspectives.IMPerspective">
+         <perspectiveShortcut id="org.objectweb.proactive.ic2d.infrastructuremanager.perspectives.IMPerspective"/>
+         <viewShortcut id="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewAdministration"/>
+         <viewShortcut id="org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewInfrastructure"/>
+         <viewShortcut id="org.eclipse.ui.console.ConsoleView"/>
+      </perspectiveExtension>
+   </extension>
+   
+   
+
+</plugin>
+
