@@ -91,15 +91,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    private Map fcInterfaceReferences;
-    private Map nfInterfaceReferences;
-    private Proxy proxy;
-    private ComponentType componentType = null; // immutable
-    private StubObject stubOnBaseObject = null;
-    private String hierarchicalType = null;
-    private String currentControllerInterface = null;
-    private boolean useShortcuts;
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    protected Map fcInterfaceReferences;
+    protected Map nfInterfaceReferences;
+    protected Proxy proxy;
+    protected ComponentType componentType = null; // immutable
+    protected StubObject stubOnBaseObject = null;
+    protected String hierarchicalType = null;
+    protected String currentControllerInterface = null;
+    protected boolean useShortcuts;
 
     public ProActiveComponentRepresentativeImpl(ComponentType componentType,
         String hierarchicalType, String controllersConfigFileLocation) {
