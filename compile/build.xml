@@ -10,10 +10,11 @@
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
 
 	<!-- Osgi properties -->
-	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/" />
-	<property name="manifest.example.dir" value="${src.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
+	<property name="manifest.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/Manifest/" />
+	<property name="manifest.example.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
 	<property name="config.dir" value="${classes.dir}/${proactive.core.path}/config/" />
 	<property name="bundle.dir" value="${base.dir}/dist/bundle" />
+	<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
 
 	<!--
 		Create a timestamp for this build 
@@ -428,14 +429,19 @@
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
 	<target name="proActiveJar" depends="dist-mk-dir, compile" description="Create the ProActive jar, to be used for instance on a distant host">
-		<jar jarfile="${PAdist.dir}/ProActive.jar">
+		<jar manifest="${manifest.dir}/Manifest.mf"  jarfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${cl.proactive.dir}" includes="**"/>
 			<fileset dir="${cl.extensions.dir}" includes="**"/>
 			<fileset dir="${cl.extra.dir}" includes="**"/>
-		</jar>
-	</target>
 
-
+			<fileset dir="${config.dir}">
+				<include name="ProActiveConfiguration.xml" />
+			</fileset>
+			<fileset dir="${osgi.res.dir}" >
+			   <include name="metadata.xml" />
+			</fileset>
+		</jar>		
+		</target>
 	<!-- ================================================================ -->
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
@@ -484,7 +490,6 @@
 				<include name="descriptors/**" />
 				<include name="p2p/**" />
 				<include name="ic2d-plugins-src/**" />
-
 				<exclude name="p2p/config/**" />
 				<exclude name="**/.svn" />
 				<exclude name="scripts/unix/grid5000/**" />
@@ -648,6 +653,7 @@
 	</target>
 
 
+	
 	<target name="jdepend"  depends="compile" description="JDepend report">
 		<macrodef name="jdependMacro">
 			<attribute name="outputfile" />
@@ -682,5 +688,22 @@
 		</exec>
 		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${lib.dir}" />
 	</target>
+
+	<!-- ================================================================ -->
+	<!--                    Create OSGi LibraryBundle.jar                 -->
+	<!--  =============================================================== -->
+	<target name="librariesBundle">
+		<mkdir dir="${bundle.dir}" />
+		<jar manifest="${manifest.dir}/ManifestLibraries.mf" jarfile="${bundle.dir}/librariesBundle.jar">			
+			<fileset dir="${lib.dir}/">
+				<include name="javassist.jar" /> 
+				<include name="log4j.jar" />
+				<include name="xercesImpl.jar" />
+				<include name="bouncycastle.jar" />  
+				<include name="components/fractal.jar" />
+			</fileset>
+		</jar> 
+	</target>
+
 
 </project>
