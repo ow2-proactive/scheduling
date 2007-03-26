@@ -67,10 +67,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveContentControllerImpl extends AbstractProActiveController
     implements ProActiveContentController, Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    List<Component> fcSubComponents;
-    Map<Component, IllegalContentException> contentExceptions = new Hashtable<Component, IllegalContentException>();
-    Map<Component, IllegalLifeCycleException> lifeCycleExceptions = new Hashtable<Component, IllegalLifeCycleException>();
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    protected List<Component> fcSubComponents;
+    protected Map<Component, IllegalContentException> contentExceptions = new Hashtable<Component, IllegalContentException>();
+    protected Map<Component, IllegalLifeCycleException> lifeCycleExceptions = new Hashtable<Component, IllegalLifeCycleException>();
 
     /**
      * Constructor for ProActiveContentController.

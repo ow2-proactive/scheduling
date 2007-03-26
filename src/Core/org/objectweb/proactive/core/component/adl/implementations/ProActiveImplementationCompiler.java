@@ -62,12 +62,33 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class ProActiveImplementationCompiler extends ImplementationCompiler {
-    private static int counter = 0;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
+    protected static int counter = 0;
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     @Override
     public void compile(final List path, final ComponentContainer container,
         final TaskMap tasks, final Map context) throws ADLException {
+        ObjectsContainer obj = init(path, container, tasks, context);
+        fControllers(obj.getImplementation(), obj.getController(),
+            obj.getName(), obj);
+        end(tasks, container, context, obj.getName(), obj.getDefinition(),
+            obj.getControllerDesc(), obj.getContentDesc(), obj.getVn(), true);
+    }
+
+    protected static String getControllerPath(String controller, String name) {
+        URL controllerURL = ProActiveImplementationCompiler.class.getResource(controller);
+        if (controllerURL != null) {
+            return controllerURL.getPath();
+        } else {
+            logger.warn("Can't retrieve controller description \"" +
+                controller + "\" for component " + name);
+            return null;
+        }
+    }
+
+    protected ObjectsContainer init(final List path,
+        final ComponentContainer container, final TaskMap tasks,
+        final Map context) {
         counter++;
 
         String implementation = null;
@@ -141,8 +162,36 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
             }
         }
 
-        AbstractInstanceProviderTask createTask;
+        return new ObjectsContainer(implementation, controller, name,
+            definition, n);
+    }
 
+    protected void end(final TaskMap tasks, final ComponentContainer container,
+        final Map context, String name, String definition,
+        ControllerDescription controllerDesc, ContentDescription contentDesc,
+        VirtualNode n, boolean isFunctional) {
+        AbstractInstanceProviderTask createTask = null;
+        if (isFunctional) {
+            createTask = new CreateTask((ProActiveImplementationBuilder) builder,
+                    container, name, definition,
+                    (ControllerDescription) controllerDesc, contentDesc, n,
+                    context);
+        } else {
+            createTask = new ProActiveNFImplementationCompiler.CreateNFTask((ProActiveImplementationBuilder) builder,
+                    container, name, definition,
+                    (ControllerDescription) controllerDesc, contentDesc, n,
+                    context);
+        }
+
+        FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type",
+                container);
+        createTask.setFactoryProviderTask(typeTask);
+
+        tasks.addTask("create", container, createTask);
+    }
+
+    private void fControllers(String implementation, String controller,
+        String name, ObjectsContainer obj) {
         ContentDescription contentDesc = null;
         ControllerDescription controllerDesc = null;
 
@@ -169,26 +218,8 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
             }
         }
 
-        createTask = new CreateTask((ProActiveImplementationBuilder) builder,
-                container, name, definition, controllerDesc, contentDesc, n,
-                context);
-
-        FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type",
-                container);
-        createTask.setFactoryProviderTask(typeTask);
-
-        tasks.addTask("create", container, createTask);
-    }
-
-    private static String getControllerPath(String controller, String name) {
-        URL controllerURL = ProActiveImplementationCompiler.class.getResource(controller);
-        if (controllerURL != null) {
-            return controllerURL.getPath();
-        } else {
-            logger.warn("Can't retrieve controller description \"" +
-                controller + "\" for component " + name);
-            return null;
-        }
+        obj.setContentDesc(contentDesc);
+        obj.setControllerDesc(controllerDesc);
     }
 
     // TODO change visibility of this inner class in ImplementationCompiler 
@@ -233,6 +264,61 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         public String toString() {
             return "T" + System.identityHashCode(this) + "[CreateTask(" + name +
             "," + controllerDesc + "," + contentDesc + ")]";
+        }
+    }
+
+    protected class ObjectsContainer {
+        private String implementation;
+        private String controller;
+        private String name;
+        private String definition;
+        private VirtualNode n;
+        ContentDescription contentDesc = null;
+        ControllerDescription controllerDesc = null;
+
+        public ObjectsContainer(String implementation, String controller,
+            String name, String definition, VirtualNode n) {
+            this.implementation = implementation;
+            this.controller = controller;
+            this.name = name;
+            this.definition = definition;
+            this.n = n;
+        }
+
+        public String getController() {
+            return controller;
+        }
+
+        public String getDefinition() {
+            return definition;
+        }
+
+        public String getImplementation() {
+            return implementation;
+        }
+
+        public VirtualNode getVn() {
+            return n;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ContentDescription getContentDesc() {
+            return contentDesc;
+        }
+
+        public void setContentDesc(ContentDescription contentDesc) {
+            this.contentDesc = contentDesc;
+        }
+
+        public ControllerDescription getControllerDesc() {
+            return controllerDesc;
+        }
+
+        public void setControllerDesc(ControllerDescription controllerDesc) {
+            this.controllerDesc = controllerDesc;
         }
     }
 }

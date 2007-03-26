@@ -78,7 +78,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
  */
 public class ProActiveBindingControllerImpl extends AbstractProActiveController
     implements ProActiveBindingController, Serializable {
-    private Bindings bindings; // key = clientInterfaceName ; value = Binding
+    protected Bindings bindings; // key = clientInterfaceName ; value = Binding
 
     //    private Map<String, Map<ProActiveComponent, List<String>>> bindingsOnServerItfs = new HashMap<String, Map<ProActiveComponent,List<String>>>(0);
 

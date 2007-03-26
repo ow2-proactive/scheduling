@@ -59,7 +59,7 @@ public class ProActiveImplementationBuilderImpl
     implements ProActiveImplementationBuilder, BindingController {
     public final static String REGISTRY_BINDING = "registry";
     public RegistryManager registry;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     // --------------------------------------------------------------------------
     // Implementation of the BindingController interface
@@ -98,6 +98,15 @@ public class ProActiveImplementationBuilderImpl
     public Object createComponent(Object type, String name, String definition,
         ControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Map context) throws Exception {
+        ObjectsContainer obj = commonCreation(type, name, definition,
+                contentDesc, adlVN, context);
+        return createFComponent(type, obj.getDvn(), controllerDesc,
+            contentDesc, adlVN, obj.getBootstrapComponent());
+    }
+
+    protected ObjectsContainer commonCreation(Object type, String name,
+        String definition, ContentDescription contentDesc, VirtualNode adlVN,
+        Map context) throws Exception {
         org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN = null;
         Component bootstrap = null;
         if (context != null) {
@@ -150,6 +159,13 @@ public class ProActiveImplementationBuilderImpl
                 }
             }
         }
+        return new ObjectsContainer(deploymentVN, bootstrap);
+    }
+
+    private Component createFComponent(Object type,
+        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
+        ControllerDescription controllerDesc, ContentDescription contentDesc,
+        VirtualNode adlVN, Component bootstrap) throws Exception {
         Component result;
 
         // FIXME : exhaustively specify the behaviour
@@ -166,5 +182,25 @@ public class ProActiveImplementationBuilderImpl
 
         //        registry.addComponent(result); // the registry can handle groups
         return result;
+    }
+
+    protected class ObjectsContainer {
+        private org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN;
+        private Component bootstrap;
+
+        public ObjectsContainer(
+            org.objectweb.proactive.core.descriptor.data.VirtualNode dVn,
+            Component bstrp) {
+            deploymentVN = dVn;
+            bootstrap = bstrp;
+        }
+
+        public org.objectweb.proactive.core.descriptor.data.VirtualNode getDvn() {
+            return deploymentVN;
+        }
+
+        public Component getBootstrapComponent() {
+            return bootstrap;
+        }
     }
 }

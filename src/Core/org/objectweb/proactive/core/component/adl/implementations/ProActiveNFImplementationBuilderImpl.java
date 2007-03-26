@@ -32,126 +32,38 @@ package org.objectweb.proactive.core.component.adl.implementations;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.NFControllerDescription;
-import org.objectweb.proactive.core.component.adl.RegistryManager;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
-import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
-import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * @author Paul Naoumenko
  */
 public class ProActiveNFImplementationBuilderImpl
-    implements ProActiveNFImplementationBuilder, BindingController {
-    public final static String REGISTRY_BINDING = "registry";
-    public RegistryManager registry;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
-
-    // --------------------------------------------------------------------------
-    // Implementation of the BindingController interface
-    // --------------------------------------------------------------------------
-    public String[] listFc() {
-        return new String[] { REGISTRY_BINDING };
-    }
-
-    public Object lookupFc(final String itf) {
-        if (itf.equals(REGISTRY_BINDING)) {
-            return registry;
-        }
-        return null;
-    }
-
-    public void bindFc(final String itf, final Object value) {
-        if (itf.equals(REGISTRY_BINDING)) {
-            registry = (RegistryManager) value;
-        }
-    }
-
-    public void unbindFc(final String itf) {
-        if (itf.equals(REGISTRY_BINDING)) {
-            registry = null;
-        }
-    }
-
-    //  --------------------------------------------------------------------------
-    // Implementation of the Implementation Builder and ProActiveImplementationBuilder interfaces
-    // --------------------------------------------------------------------------
-    public Object createComponent(Object arg0, String arg1, String arg2,
-        Object arg3, Object arg4, Object arg5) throws Exception {
-        return null;
-    }
-
+    extends ProActiveImplementationBuilderImpl
+    implements ProActiveNFImplementationBuilder {
     public Object createComponent(Object type, String name, String definition,
         NFControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Map context) throws Exception {
-        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN = null;
-        Component bootstrap = null;
-        if (context != null) {
-            bootstrap = (Component) ((Map) context).get("bootstrap");
-        }
-        if (bootstrap == null) {
-            bootstrap = Fractal.getBootstrapComponent();
-        }
+        ObjectsContainer obj = commonCreation(type, name, definition,
+                contentDesc, adlVN, context);
 
-        if (adlVN != null) {
-            // consider exported virtual nodes
-            LinkedVirtualNode exported = ExportedVirtualNodesList.instance()
-                                                                 .getNode(name,
-                    adlVN.getName(), false);
-            if (exported != null) {
-                adlVN.setName(exported.getExportedVirtualNodeNameAfterComposition());
-                adlVN.setCardinality(exported.isMultiple()
-                    ? VirtualNode.MULTIPLE : VirtualNode.SINGLE);
-            } else {
-                // 	TODO add self exported virtual node ?
-                // for the moment, just add a leaf to the linked vns
-                ExportedVirtualNodesList.instance()
-                                        .addLeafVirtualNode(name,
-                    adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
-            }
-            if (context.get("deployment-descriptor") != null) {
-                deploymentVN = ((ProActiveDescriptor) context.get(
-                        "deployment-descriptor")).getVirtualNode(adlVN.getName());
-                if (deploymentVN == null) {
-                    if (adlVN.getName().equals("null")) {
-                        logger.info(name +
-                            " will be instantiated in the current virtual machine (\"null\" was specified as the virtual node name)");
-                    } else {
-                        throw new ADLException("Could not find virtual node  " +
-                            adlVN.getName() + " in the deployment descriptor",
-                            null);
-                    }
-                } else {
-                    if (deploymentVN.isMultiple() &&
-                            (adlVN.getCardinality().equals(VirtualNode.SINGLE))) {
-                        // there will be only one instance of the component, on one node of the virtual node 
-                        contentDesc.forceSingleInstance();
-                    } else if (!(deploymentVN.isMultiple()) &&
-                            (adlVN.getCardinality().equals(VirtualNode.MULTIPLE))) {
-                        throw new ADLException(
-                            "Cannot deploy on a single virtual node when the cardinality of this virtual node named " +
-                            adlVN.getName() + " in the ADL is set to multiple",
-                            null);
-                    }
-                }
-            }
-        }
+        return createNFComponent(type, obj.getDvn(), controllerDesc,
+            contentDesc, adlVN, obj.getBootstrapComponent());
+    }
+
+    private Component createNFComponent(Object type,
+        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
+        NFControllerDescription controllerDesc, ContentDescription contentDesc,
+        VirtualNode adlVN, Component bootstrap) throws Exception {
         Component result;
 
         // FIXME : exhaustively specify the behaviour
