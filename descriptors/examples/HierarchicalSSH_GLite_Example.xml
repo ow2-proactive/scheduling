@@ -37,7 +37,7 @@
             <processDefinition id="ceJVM">
                 <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
                     <classpath>
-                        <absolutePath value="jsch.jar"/>
+                        <absolutePath value="ganymed-ssh2-build210.jar"/>
                         <absolutePath value="ProActive_examples.jar"/>
                         <absolutePath value="ProActive.jar"/>
                         <absolutePath value="log4j.jar"/>
@@ -67,7 +67,7 @@
                         <absolutePath value="${PROACTIVE_HOME}/lib/classes.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/ProActive_examples.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
@@ -120,7 +120,7 @@
                             <absolutePath value="${REMOTE_HOME}/JDL"/> <!--CHANGE ME-->
                         </JDLRemoteFilePath>
                         <inputSandbox>
-							${PROACTIVE_HOME}/lib/jsch.jar
+							${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar
                             ${PROACTIVE_HOME}/lib/classes.jar                  
                             ${PROACTIVE_HOME}/lib/log4j.jar
                             ${PROACTIVE_HOME}/lib/xercesImpl.jar

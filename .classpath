@@ -46,7 +46,6 @@
 	<classpathentry kind="lib" path="lib/jini/jini-core.jar"/>
 	<classpathentry kind="lib" path="lib/jini/jini-ext.jar"/>
 	<classpathentry kind="lib" path="lib/jini/reggie.jar"/>
-	<classpathentry kind="lib" path="lib/jsch.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/osgi/http.jar"/>
 	<classpathentry kind="lib" path="lib/osgi/moduleloader.jar"/>
@@ -85,5 +84,6 @@
 	<classpathentry kind="lib" path="dev/trywithcatch/JFlex.jar"/>
 	<classpathentry kind="lib" path="lib/scilab/javasci.jar"/>
 	<classpathentry kind="lib" path="dev/lib/junit-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

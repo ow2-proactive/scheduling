@@ -31,131 +31,117 @@
 package org.objectweb.proactive.core.ssh;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.util.Random;
+import static org.objectweb.proactive.core.ssh.SSH.logger;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ssh.SshParameters;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import com.jcraft.jsch.*;
+import ch.ethz.ssh2.LocalPortForwarder;
 
 
 /**
  * @author mlacage
  *
- * This class implements a very simple wrapper on top of the jsch
- * library. Most notably, it implements thread-safe and exception-safe
- * creation and destruction of SSH tunnels.
- * Thread-safety is achieved by using a single global lock whenever
- * we need to access the non-thread-safe jsch library for tunnel
- * creation or destruction operations. This global lock is stored in
- * JSchSingleton and is accessed with the acquireLock and releaseLock
- * methods
+ * This class represent a SSH Tunnel.
+ *
+ * It's a wrapper around a LocalPortForwarder and a SSHConnection object.
+ * When creating a tunnel {@link SSHConnectionCache} is used to reuse
+ * already existing SSH-2 connections.
+ *
+ * @see SSHConnection
+ * @see LocalPortForwarder
  */
 public class SshTunnel {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
+    private Random random = new Random();
+    private SSHConnection connection = null;
+    private LocalPortForwarder lpf = null;
+    private int localPort;
+    private int distantPort;
+    private String distantHost;
     private static Random _random = new Random();
-    private int _localPort;
-    private Session _session;
-    private String _username;
-    private String _distantHost;
-    private String _sshPort;
-    private int _distantPort;
+    static private int lastTriedPort = _random.nextInt(65536 - 1024) + 1024;
 
     /**
-     * Authenticate with the ssh server on the distantHost if needed (authenticated
-     * connections are cached). The ssh server is expected to be listening on port
-     * proactive.ssh.port. If this property is not set, the server is assumed to be
-     * listening on distantHost:22. The Authentication is performed with the username
-     * proactive.ssh.username if this property is set. It is performed with the value of
-     * user.name otherwise (this is supposed to be the username of the user running this
-     * JVM). The SSH Authentication is performed with the standard public/private key
-     * authentication. The private key used by this client is either any of the private
-     * keys located in proactive.ssh.key_directory if it is set or any of the private
-     * keys found in user.home/.ssh/.
-     * The public key of the server to which we connect is verified with the file
-     * proactive.ssh.known_hosts if this property is set of user.home/.ssh/known_hosts.
+     * Open a SSH Tunnel between localhost and distantHost.
      *
-     * Once authentication is performed, a tunnel is established from
-     * localhost:randomPort to distantHost:distantPort. The randomPort can be otained from
-     * this Tunnel with the getPort method after this constructor has completed
-     * successfully.
+     * If no SSH Connection to distantHost exists; a new Connection is opened.
+     * Otherwise the connection is reused.
      *
-     * @param distantHost the name of the machine to which a tunnel must be established.
-     * @param distantPort the port number on the distant machine to which a tunnel must
-     *        be established
-     * @throws IOException an exception is thrown if either the authentication or the
-     *         tunnel establishment fails.
+     * @param distantHost
+     *            the name of the machine to which a tunnel must be established.
+     * @param distantPort
+     *            the port number on the distant machine to which a tunnel must
+     *            be established
+     * @throws IOException
+     *             an exception is thrown if either the authentication or the
+     *             tunnel establishment fails.
      */
     public SshTunnel(String distantHost, int distantPort)
         throws IOException {
-        JSchSingleton.acquireLock();
-        try {
-            String username = SshParameters.getSshUsername(distantHost);
-            String sshPort = SshParameters.getSshPort();
-            Session session;
-            try {
-                session = JSchSingleton.getSession(username, distantHost,
-                        sshPort);
-            } catch (IOException e) {
-                throw new IOException("SSH tunnel failed: 127.0.0.1 -->" +
-                    distantHost + ":" + distantPort + "for " + username);
-            }
+        String username = SshParameters.getSshUsername(distantHost);
+        String sshPort = SshParameters.getSshPort();
 
-            /* Since Jsch 0.1.31 TCP port will be assigned dynamically if lport==0 */
-            _localPort = session.setPortForwardingL("127.0.0.1", 0,
-                    distantHost, distantPort);
-            _session = session;
-            _username = username;
-            _distantHost = distantHost;
-            _distantPort = distantPort;
-            _sshPort = sshPort;
-        } catch (JSchException e) {
-            throw new IOException(e.getMessage());
-        } finally {
-            JSchSingleton.releaseLock();
+        this.distantHost = distantHost;
+        this.distantPort = distantPort;
+
+        SSHConnectionCache scc = SSHConnectionCache.getSingleton();
+        try {
+            connection = scc.getConnection(username, distantHost, sshPort);
+        } catch (IOException e) {
+            logger.info("Connection to " + distantHost + ":" + sshPort +
+                "cannot be opened");
+            throw e;
         }
+
+        for (localPort = (lastTriedPort == 65535) ? 1024 : (lastTriedPort + 1);
+                localPort != lastTriedPort;
+                localPort = (localPort == 65535) ? 1024 : (localPort + 1)) {
+            try {
+                lpf = connection.createTunnel(localPort, distantHost,
+                        distantPort);
+                return;
+            } catch (BindException e) {
+                // Try another port
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The port " + localPort + " is not free");
+                }
+            }
+        }
+
+        // Looped all over the port range
+        logger.warn(
+            "No free local port can be found to establish a new SSH-2 tunnel");
+        throw new BindException("No free local port found");
     }
 
     public void realClose() throws Exception {
-        JSchSingleton.acquireLock();
-        try {
-            logger.debug("close Tunnel for port " + _localPort);
-            JSchSingleton.flushMaybe(_username, _distantHost, _sshPort,
-                _localPort);
-            _username = null;
-            _distantHost = null;
-            _distantPort = 0;
-            _sshPort = null;
-            _session = null;
-            _localPort = 0;
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            JSchSingleton.releaseLock();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Closing tunnel from " +
+                InetAddress.getLocalHost().toString() + ":" + localPort +
+                "to " + distantHost + ":" + distantPort);
         }
+        lpf.close();
+        lpf = null;
+        connection.close(true);
     }
 
     /**
-     * This method returns the local port number which can be used
-     * to access this tunnel.
-     * This method cannot fail.
+     * This method returns the local port number which can be used to access
+     * this tunnel. This method cannot fail.
      */
     public int getPort() {
-        return _localPort;
+        return localPort;
     }
 
     public InetAddress getInetAddress() throws java.net.UnknownHostException {
-        return InetAddress.getByName(_distantHost);
+        return InetAddress.getByName(distantHost);
     }
 
     public String getDistantHost() {
-        return _distantHost;
+        return distantHost;
     }
 
     public int getDistantPort() {
-        return _distantPort;
+        return distantPort;
     }
 }

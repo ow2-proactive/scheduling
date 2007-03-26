@@ -70,7 +70,7 @@ $&gt;hostname -i
 
     <itemizedlist>
       <listitem>
-        <para>ProActlive/lib/jsch.jar must be uncluded in the classpath of the
+        <para>ProActlive/lib/ganymed-ssh2-build210.jar must be uncluded in the classpath of the
         concerned machines.</para>
       </listitem>
 

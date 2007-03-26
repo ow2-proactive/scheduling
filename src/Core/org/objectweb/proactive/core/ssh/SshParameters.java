@@ -119,7 +119,7 @@ public class SshParameters {
     static public String getSshKeyDirectory() {
         String keydir = System.getProperty("proactive.ssh.key_directory");
         if (keydir == null) {
-            keydir = System.getProperty("user.home") + "/.ssh/";
+            keydir = SSHKeys.SSH_DIR;
         }
         return keydir;
     }

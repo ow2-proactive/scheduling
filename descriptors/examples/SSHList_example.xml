@@ -41,7 +41,7 @@
 						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/bin/java"/>

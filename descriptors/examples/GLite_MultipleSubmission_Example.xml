@@ -34,7 +34,7 @@
             <processDefinition id="ceJVM">
                 <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
                     <classpath>
-                        <absolutePath value="jsch.jar"/>
+                        <absolutePath value="ganymed-ssh2-build210.jar"/>
                         <absolutePath value="ProActive_examples.jar"/>
                         <absolutePath value="ProActive.jar"/>
                         <absolutePath value="asm.jar"/>
@@ -75,7 +75,7 @@
                             <absolutePath value="/users/dsksi/emathias/JDL"/> <!--CHANGE ME-->
                         </JDLRemoteFilePath>
                         <inputSandbox>
-							${PROACTIVE_HOME}/lib/jsch.jar
+							${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar
                             ${PROACTIVE_HOME}/lib/classes.jar                  
                             ${PROACTIVE_HOME}/lib/log4j.jar
                             ${PROACTIVE_HOME}/lib/xercesImpl.jar

@@ -35,7 +35,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.rmi.server.RMIClientSocketFactory;
-
+import static org.objectweb.proactive.core.ssh.SSH.logger;
 import org.objectweb.proactive.core.util.HostsInfos;
 
 
@@ -57,6 +57,10 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory,
     }
 
     public Socket createSocket(String host, int port) throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating a SSH socket for " + host + ":" + port);
+        }
+
         String realName = HostsInfos.getSecondaryName(host);
         Socket socket = new SshSocket(realName, port);
         return socket;

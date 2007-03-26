@@ -30,120 +30,207 @@
  */
 package org.objectweb.proactive.core.ssh;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
+
+import ch.ethz.ssh2.ChannelCondition;
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.Session;
 
 
 /**
- * @author arnaud contes this class simulates an ssh client in the use case of a
- * remote execution of a command. Useful under a windows system without ssh a
- * process using this client should be written according the following pattern
- * <processDefinition id="ssh_crusoe">
- * <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="host" username="username">
- * <commandPath value="c:\...\proactive\scripts\windows\ssh.bat -p password"/>
- * <processReference refid="localJVM"></processReference>
- * </sshProcess>
- * </processDefinition>
+ * A minimalistic SSH Client
+ *
+ * Args: [-p password] [-l username] [-i identity_file] hostname "cmd"
+ *
+ * Pubkey and Password authentications are supported. By default 'id_dsa', 'id_rsa'
+ * and 'identity' files are tried. If Pubkey authentication fails then password
+ * authentication is used.
+ *
+ *
  */
 public class SSHClient {
+    static final private String OPT_PASSWORD = "p";
+    static final private String OPT_USERNAME = "l";
+    static final private String OPT_IDENTITY = "i";
 
-    /**
-     * @param args
-     */
-    private static String buildCmdLine(String[] args, int index) {
-        String cmd = "";
+    private static String buildCmdLine(List<String> args) {
+        StringBuilder cmd = new StringBuilder();
 
-        for (int i = index; i < args.length; i++) {
-            cmd += (" " + args[i]);
+        for (String s : args) {
+            cmd.append(" ");
+            cmd.append(s);
         }
 
-        return cmd;
+        return cmd.toString();
     }
 
-    public static void main(String[] args) {
-        if (args.length < 2) {
-            System.err.println("not enought arguments\n" + "usage : " +
-                SSHClient.class.getName() +
-                " username@host [-p password] cmdline");
+    public static void main(String[] args) throws ParseException {
+        Options options = new Options();
+        options.addOption(OPT_PASSWORD, true,
+            "Password for password authentication");
+        options.addOption(OPT_USERNAME, true, "Username");
+        options.addOption(OPT_IDENTITY, true, "Identity file");
+
+        CommandLineParser parser = new PosixParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        String username = System.getProperty("user.name");
+        String password = null;
+        File identity = null;
+        String hostname = null;
+
+        if (cmd.hasOption(OPT_USERNAME)) {
+            username = cmd.getOptionValue(OPT_USERNAME);
+        }
+
+        if (cmd.hasOption(OPT_PASSWORD)) {
+            password = cmd.getOptionValue(OPT_PASSWORD);
+        }
+
+        if (cmd.hasOption(OPT_IDENTITY)) {
+            identity = new File(cmd.getOptionValue(OPT_IDENTITY));
+            if (!identity.exists()) {
+                System.err.println("[E] " + identity + " does not exist");
+                System.exit(1);
+            }
+            if (!identity.isFile()) {
+                System.err.println("[E] " + identity + " is not a file");
+                System.exit(1);
+            }
+            if (!identity.canRead()) {
+                System.err.println("[E] " + identity +
+                    " is not does not exist");
+                System.exit(1);
+            }
+        }
+
+        List<String> remArgs = cmd.getArgList();
+        if (remArgs.size() == 0) {
+            System.err.println("[E] You must specify an hostname");
             System.exit(1);
         }
 
-        //        for (int i = 0; i < args.length; i++)
-        //        {
-        //            System.out.println(args[i]);
-        //        }
+        hostname = remArgs.remove(0);
+
         try {
-            String host = "";
-            String password = "";
-            String command = "";
-            String user = "";
-            int index = 0;
+            Connection conn = new Connection(hostname);
+            conn.connect();
 
-            if ("-p".equals(args[index])) {
-                password = args[index + 1];
-                index += 2;
-            }
+            boolean isAuthenticated = false;
 
-            if ("-l".equals(args[index])) {
-                user = args[index + 1];
-                index += 2;
-            }
+            if (identity != null) {
+                isAuthenticated = conn.authenticateWithPublicKey(username,
+                        identity, null);
+            } else {
+                for (String id : SSHKeys.getKeys()) {
+                    File f = new File(id);
+                    if (!(f.exists() && f.isFile() && f.canRead())) {
+                        continue;
+                    }
 
-            host = args[index];
-            index++;
-            command = buildCmdLine(args, index);
-
-            JSch jsch = new JSch();
-
-            Session session = jsch.getSession(user, host, 22);
-            session.setPassword(password);
-
-            java.util.Hashtable<String, String> config = new java.util.Hashtable<String, String>();
-            config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config);
-
-            // System.out.println("---" + command + "---");
-            session.connect(3000); // making connection with timeout.
-
-            Channel channel = session.openChannel("exec");
-            ((ChannelExec) channel).setCommand(command);
-            channel.setXForwarding(true);
-
-            channel.setInputStream(System.in);
-            // channel.setOutputStream(System.out);
-            ((ChannelExec) channel).setErrStream(System.err);
-
-            InputStream in = channel.getInputStream();
-
-            channel.connect();
-
-            byte[] tmp = new byte[1024];
-            while (true) {
-                while (in.available() > 0) {
-                    int i = in.read(tmp, 0, 1024);
-                    if (i < 0) {
+                    isAuthenticated = conn.authenticateWithPublicKey(username,
+                            f, null);
+                    System.out.println("Authentication succeeded with " + f);
+                    if (isAuthenticated) {
                         break;
                     }
-                    System.out.print(new String(tmp, 0, i));
-                }
-                if (channel.isClosed()) {
-                    in.close();
-                    //  System.out.println("JSCH: exit-status: " + channel.getExitStatus());
-                    break;
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception ee) {
                 }
             }
-            channel.disconnect();
-            session.disconnect();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            if (!isAuthenticated) {
+                isAuthenticated = conn.authenticateWithPassword(username,
+                        password);
+            }
+
+            if (!isAuthenticated) {
+                System.err.println("[E] Authentication failed");
+                System.exit(2);
+            }
+
+            conn.setTCPNoDelay(true);
+            Session sess = conn.openSession();
+
+            sess.execCommand(buildCmdLine(remArgs));
+
+            InputStream stdout = sess.getStdout();
+            InputStream stderr = sess.getStderr();
+
+            byte[] buffer = new byte[8192];
+
+            while (true) {
+                if ((stdout.available() == 0) && (stderr.available() == 0)) {
+
+                    /* Even though currently there is no data available, it may be that new data arrives
+                     * and the session's underlying channel is closed before we call waitForCondition().
+                     * This means that EOF and STDOUT_DATA (or STDERR_DATA, or both) may
+                     * be set together.
+                     */
+                    int conditions = sess.waitForCondition(ChannelCondition.STDOUT_DATA |
+                            ChannelCondition.STDERR_DATA |
+                            ChannelCondition.EOF, 2000);
+
+                    /* Wait no longer than 2 seconds (= 2000 milliseconds) */
+                    if ((conditions & ChannelCondition.TIMEOUT) != 0) {
+
+                        /* A timeout occured. */
+                        throw new IOException(
+                            "Timeout while waiting for data from peer.");
+                    }
+
+                    /* Here we do not need to check separately for CLOSED, since CLOSED implies EOF */
+                    if ((conditions & ChannelCondition.EOF) != 0) {
+
+                        /* The remote side won't send us further data... */
+                        if ((conditions &
+                                (ChannelCondition.STDOUT_DATA |
+                                ChannelCondition.STDERR_DATA)) == 0) {
+
+                            /* ... and we have consumed all data in the local arrival window. */
+                            break;
+                        }
+                    }
+
+                    /* OK, either STDOUT_DATA or STDERR_DATA (or both) is set. */
+
+                    // You can be paranoid and check that the library is not going nuts:
+                    // if ((conditions & (ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA)) == 0)
+                    //	throw new IllegalStateException("Unexpected condition result (" + conditions + ")");
+                }
+
+                /* If you below replace "while" with "if", then the way the output appears on the local
+                 * stdout and stder streams is more "balanced". Addtionally reducing the buffer size
+                 * will also improve the interleaving, but performance will slightly suffer.
+                 * OKOK, that all matters only if you get HUGE amounts of stdout and stderr data =)
+                 */
+                while (stdout.available() > 0) {
+                    int len = stdout.read(buffer);
+                    if (len > 0) { // this check is somewhat paranoid
+                        System.out.write(buffer, 0, len);
+                    }
+                }
+
+                while (stderr.available() > 0) {
+                    int len = stderr.read(buffer);
+                    if (len > 0) { // this check is somewhat paranoid
+                        System.err.write(buffer, 0, len);
+                    }
+                }
+            }
+
+            sess.close();
+            conn.close();
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            System.exit(2);
         }
         System.exit(0);
     }

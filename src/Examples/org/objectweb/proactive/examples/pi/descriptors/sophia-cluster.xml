@@ -43,7 +43,7 @@
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal.jar"/>
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal-swing.jar"/>
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/javassist.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jsch.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/ganymed-ssh2-build210.jar"/>
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-asm.jar"/>
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-mixins.jar"/>
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-runtime.jar"/>

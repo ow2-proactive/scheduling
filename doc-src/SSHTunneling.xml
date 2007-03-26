@@ -220,7 +220,7 @@ A    | &lt;----                    ----&gt;  |    B
     rmissh (namely, whenever you set its <emphasis
     role="bold">proactive.communication.protocol to rmissh</emphasis>), you
     need to make sure that an ssh daemon is running on its host. ProActive
-    uses the <emphasis role="bold">jsch</emphasis> client ssh library to
+    uses the <emphasis role="bold">ganymed</emphasis> client ssh library to
     connect to this daemon.</para>
 
     <para>The properties you can set to configure the behavior of the ssh

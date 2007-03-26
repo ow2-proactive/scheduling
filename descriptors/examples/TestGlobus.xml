@@ -79,7 +79,7 @@
 							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
 
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/jsch.jar" />
+							value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
 						<absolutePath
 							value="${PROACTIVE_HOME}/lib/jini-core.jar" />
 						<absolutePath

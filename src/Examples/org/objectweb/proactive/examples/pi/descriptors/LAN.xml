@@ -64,7 +64,7 @@
                         <absolutePath value="${REMOTE_JARS_FOLDER}/fractal.jar"/>
                         <absolutePath value="${REMOTE_JARS_FOLDER}/fractal-swing.jar"/>
                         <absolutePath value="${REMOTE_JARS_FOLDER}/javassist.jar"/>
-                        <absolutePath value="${REMOTE_JARS_FOLDER}/jsch.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/ganymed-ssh2-build210.jar"/>
                         <absolutePath value="${REMOTE_JARS_FOLDER}/julia-asm.jar"/>
                         <absolutePath value="${REMOTE_JARS_FOLDER}/julia-mixins.jar"/>
                         <absolutePath value="${REMOTE_JARS_FOLDER}/julia-runtime.jar"/>

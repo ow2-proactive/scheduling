@@ -375,7 +375,7 @@
 
     <orderedlist>
       <listitem>
-        <para><emphasis role="bold">lib/jsch.jar</emphasis> Used when
+        <para><emphasis role="bold">lib/ganymed-ssh2-build210.jar</emphasis> Used when
         tunneling with rmissh.</para>
       </listitem>
 

@@ -72,9 +72,9 @@ fi
 
 #--------------------------------------------------
 # jar to set when using RMI/SSH
-if [ -f $PROACTIVE/lib/jsch.jar ]
+if [ -f $PROACTIVE/lib/ganymed-ssh2-build210.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ganymed-ssh2-build210.jar
 fi
 
 #--------------------------------------------------

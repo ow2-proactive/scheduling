@@ -30,17 +30,21 @@
  */
 package org.objectweb.proactive.core.ssh.rmissh;
 
-import java.io.*;
-import java.net.*;
-import java.nio.channels.*;
-
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.nio.channels.SocketChannel;
+import static org.objectweb.proactive.core.ssh.SSH.logger;
 import org.objectweb.proactive.core.ssh.SshParameters;
 import org.objectweb.proactive.core.ssh.SshTunnel;
 import org.objectweb.proactive.core.ssh.SshTunnelFactory;
 import org.objectweb.proactive.core.ssh.TryCache;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -50,7 +54,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * to automagically close the SshTunnels whenever the Socket is closed.
  */
 public class SshSocket extends Socket {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private SshTunnel _tunnel;
     private Socket _socket;
     static private TryCache _tryCache = null;
@@ -73,30 +76,43 @@ public class SshSocket extends Socket {
     }
 
     public SshSocket(String host, int port) throws IOException {
-        logger.debug("try socket to " + host + ":" + port);
         if (SshParameters.getTryNormalFirst() &&
                 getTryCache().needToTry(host, port)) {
             try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("try socket to " + host + ":" + port);
+                }
                 InetSocketAddress address = new InetSocketAddress(host, port);
                 _socket = new Socket();
                 _socket.connect(address, SshParameters.getConnectTimeout());
                 getTryCache().recordTrySuccess(host, port);
-                logger.debug("success normal socket to " + host + ":" + port);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("success normal socket to " + host + ":" +
+                        port);
+                }
                 return;
             } catch (Exception e) {
-                logger.debug("failure normal socket to " + host + ":" + port);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("failure normal socket to " + host + ":" +
+                        port);
+                }
                 getTryCache().recordTryFailure(host, port);
                 _socket = null;
             }
         }
-        logger.debug("try ssh socket to " + host + ":" + port);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("try ssh socket to " + host + ":" + port);
+        }
         _tunnel = SshTunnelFactory.createTunnel(host, port);
         InetSocketAddress address = new InetSocketAddress("127.0.0.1",
                 _tunnel.getPort());
         _socket = new Socket();
         _socket.connect(address, SshParameters.getConnectTimeout());
-        logger.debug("Opened TCP connection 127.0.0.1:" + _tunnel.getPort() +
-            " -> " + host + ":" + port);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Opened TCP connection 127.0.0.1:" +
+                _tunnel.getPort() + " -> " + host + ":" + port);
+        }
     }
 
     public void connect() throws IOException {
