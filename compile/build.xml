@@ -12,10 +12,9 @@
 	<!-- Osgi properties -->
 	<property name="manifest.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/Manifest/" />
 	<property name="manifest.example.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
-	<property name="config.dir" value="${classes.dir}/${proactive.core.path}/config/" />
 	<property name="bundle.dir" value="${base.dir}/dist/bundle" />
 	<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
-
+	<property name="manifest.connector.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/connector/Manifest/"/>
 	<!--
 		Create a timestamp for this build 
 		If ${version} is defined its value is used as string version for this build
@@ -434,9 +433,6 @@
 			<fileset dir="${cl.extensions.dir}" includes="**"/>
 			<fileset dir="${cl.extra.dir}" includes="**"/>
 
-			<fileset dir="${config.dir}">
-				<include name="ProActiveConfiguration.xml" />
-			</fileset>
 			<fileset dir="${osgi.res.dir}" >
 			   <include name="metadata.xml" />
 			</fileset>
@@ -705,5 +701,7 @@
 		</jar> 
 	</target>
 
+
+	
 
 </project>
