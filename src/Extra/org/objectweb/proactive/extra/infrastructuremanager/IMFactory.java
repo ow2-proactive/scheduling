@@ -19,13 +19,9 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 
 
 public class IMFactory implements IMConstants {
-    
-	private static final Logger logger = ProActiveLogger
-	.getLogger(Loggers.IM_FACTORY);
-	
-	private static IMCore imcore = null;
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_FACTORY);
+    private static IMCore imcore = null;
 
-    
     /**
      *
      * @throws NodeException
@@ -44,12 +40,12 @@ public class IMFactory implements IMConstants {
             ProActive.register(imcore,
                 "//localhost/" + NAME_ACTIVE_OBJECT_IMCORE);
             if (logger.isInfoEnabled()) {
-    			logger.info("New IM core localy started");
-    		}
+                logger.info("New IM core localy started");
+            }
         } else {
-        	if (logger.isInfoEnabled()) {
-    			logger.info("IM Core already localy running");
-    		}
+            if (logger.isInfoEnabled()) {
+                logger.info("IM Core already localy running");
+            }
         }
     }
 
@@ -83,9 +79,9 @@ public class IMFactory implements IMConstants {
      */
     private static IMCore getIMCore(String urlIM)
         throws ActiveObjectCreationException, IOException {
-    	if (logger.isInfoEnabled()) {
-			logger.info("lookup of IMCore at the IM url node : " + urlIM);
-		}
+        if (logger.isInfoEnabled()) {
+            logger.info("lookup of IMCore at the IM url node : " + urlIM);
+        }
         IMCore imcoreLookUp;
         imcoreLookUp = (IMCore) ProActive.lookupActive(IMCore.class.getName(),
                 urlIM);
@@ -104,14 +100,14 @@ public class IMFactory implements IMConstants {
         throws NodeException, ActiveObjectCreationException,
             AlreadyBoundException, IOException {
         if (imcore != null) {
-        	if (logger.isInfoEnabled()) {
-    			logger.info("We have started the imcore");
-    		}
+            if (logger.isInfoEnabled()) {
+                logger.info("We have started the imcore");
+            }
             return imcore.getAdmin();
         } else {
-        	if (logger.isInfoEnabled()) {
-    			logger.info("We try to look at localhost for IM");
-    		}
+            if (logger.isInfoEnabled()) {
+                logger.info("We try to look at localhost for IM");
+            }
             return getIMCore().getAdmin();
         }
     }

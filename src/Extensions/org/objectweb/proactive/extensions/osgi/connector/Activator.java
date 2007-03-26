@@ -43,7 +43,7 @@ public class Activator implements BundleActivator {
     public void start(BundleContext arg0) throws Exception {
         new ServerConnector();
     }
- 
+
     public void stop(BundleContext arg0) throws Exception {
     }
 }

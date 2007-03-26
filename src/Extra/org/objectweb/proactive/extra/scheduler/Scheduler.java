@@ -300,7 +300,9 @@ public class Scheduler implements RunActive, RequestFilter {
                 //notice we will reach here only if it was launched sucessfully
                 runningTasks.add(taskRetrivedFromPolicy);
                 logger.info("Task " + taskRetrivedFromPolicy.getTaskID() +
-                    "started execution on "+ taskRetrivedFromPolicy.nodeNExecuter.node.getNodeInformation().getURL());
+                    "started execution on " +
+                    taskRetrivedFromPolicy.nodeNExecuter.node.getNodeInformation()
+                                                             .getURL());
             } catch (Exception e) {
                 try {
                     //try to kill the nodes, there is a high proability this will fail but it doesnt matter since its already troubled and will be returned
@@ -506,7 +508,6 @@ public class Scheduler implements RunActive, RequestFilter {
                 result = finishedTasks.remove(i).result;
             }
 
-        
         return result;
     }
 
@@ -523,7 +524,6 @@ public class Scheduler implements RunActive, RequestFilter {
 
             //task doesnt exist while shutting down
             if ((task == null) && shutdown) {
-            	
                 createError(taskID, userName,
                     "The Task doesnt exist in the scheduler or hasn't been added to the queue yet or already collected by the user");
                 return true;
@@ -656,11 +656,10 @@ public class Scheduler implements RunActive, RequestFilter {
     }
 
     public void flushqueue() {
-        
-    	Vector<String> queued=this.getQueuedID();
-    	for(int i=0;i<queued.size();i++)
-    		this.del(queued.get(i), "admin");
-    	
+        Vector<String> queued = this.getQueuedID();
+        for (int i = 0; i < queued.size(); i++)
+            this.del(queued.get(i), "admin");
+
         logger.info("Policy has been flushed.");
     }
 
@@ -780,15 +779,12 @@ public class Scheduler implements RunActive, RequestFilter {
 
         //this means it doesnt exist in the scheduler
         if (toBeKilled == null) {
-        	
             return new BooleanWrapper(false);
         }
 
         //if its not (the admin or the correct user decline it
         if (!(userName.equals(toBeKilled.getUserName()) ||
                 userName.equals("admin"))) {
-        	
-        	
             return new BooleanWrapper(false);
         }
 
@@ -850,7 +846,6 @@ public class Scheduler implements RunActive, RequestFilter {
             }
         }
 
-        
         return new BooleanWrapper(false);
     }
 }

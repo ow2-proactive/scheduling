@@ -32,16 +32,12 @@ public class HelloWorld implements ProActiveTask, java.io.Serializable {
 
             Vector<UserResult> resultVector = scheduler.submit(tasks,
                     System.getProperty("user.name"));
-            for (int i = 0; i < resultVector.size(); i++)
-            {
-	            try
-	            {
-	            	System.out.println(resultVector.get(i).getResult());
-	            }
-	            catch(Exception e)
-	            {
-	            	System.out.println(e.getMessage());
-	            }
+            for (int i = 0; i < resultVector.size(); i++) {
+                try {
+                    System.out.println(resultVector.get(i).getResult());
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
             }
         } catch (Exception e) {
             System.out.println("Error:" + e.getMessage() + " will exit");

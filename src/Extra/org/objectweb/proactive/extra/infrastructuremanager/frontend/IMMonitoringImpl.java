@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
@@ -15,84 +15,72 @@ import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 
 
-
 /**
  * @author Ellendir
  *
  */
 public class IMMonitoringImpl implements IMMonitoring {
-	
-	private static final Logger logger = ProActiveLogger
-	.getLogger(Loggers.IM_USER);
-	
-	// Attributes
-	private IMCore imcore;
-	
-	
-	//----------------------------------------------------------------------//
-	// CONSTRUTORS
-	
-	/** ProActive compulsory no-args constructor */
-	public IMMonitoringImpl() {}
-	
-	public IMMonitoringImpl(IMCore imcore) {
-		System.out.println("[IMMonitoring] constructor");
-		this.imcore = imcore;
-	}
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_USER);
 
-	
-	//=======================================================//
-	public String echo() {
-		return "Je suis le IMMonitoring";	
-	}
-	//=======================================================//
-	
-	
-	
+    // Attributes
+    private IMCore imcore;
 
-	/* 
-	 * OK
-	 */
-	public HashMap<String,ProActiveDescriptor> getListDescriptor() {
-		return imcore.getListPAD();
-	}
+    //----------------------------------------------------------------------//
+    // CONSTRUTORS
 
-	
-	public HashMap<String,ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
-		return imcore.getDeployedVirtualNodeByPad();
-	}
-	
-	
-	// TODO
-	public ArrayList<IMNode> getListAllIMNodes() {
-		return imcore.getListAllNodes();
-	}
+    /** ProActive compulsory no-args constructor */
+    public IMMonitoringImpl() {
+    }
 
-	/* 
-	 *  OK
-	 */
-	public ArrayList<IMNode> getListFreeIMNode() {
-		return imcore.getListFreeIMNode();
-	}
+    public IMMonitoringImpl(IMCore imcore) {
+        System.out.println("[IMMonitoring] constructor");
+        this.imcore = imcore;
+    }
 
-	/*  
-	 *  OK
-	 */
-	public ArrayList<IMNode> getListBusyIMNode() {
-		return imcore.getListBusyIMNode();
-	}
+    //=======================================================//
+    public String echo() {
+        return "Je suis le IMMonitoring";
+    }
 
+    //=======================================================//
 
-	// TODO
-	public int getNumberOfFreeResource() {
-		return imcore.getSizeListFreeIMNode();
-	}
+    /*
+     * OK
+     */
+    public HashMap<String, ProActiveDescriptor> getListDescriptor() {
+        return imcore.getListPAD();
+    }
 
+    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
+        return imcore.getDeployedVirtualNodeByPad();
+    }
 
-	// TODO
-	public int getNumberOfBusyResource() {
-		return imcore.getSizeListBusyIMNode();
-	}
+    // TODO
+    public ArrayList<IMNode> getListAllIMNodes() {
+        return imcore.getListAllNodes();
+    }
 
+    /*
+     *  OK
+     */
+    public ArrayList<IMNode> getListFreeIMNode() {
+        return imcore.getListFreeIMNode();
+    }
 
+    /*
+     *  OK
+     */
+    public ArrayList<IMNode> getListBusyIMNode() {
+        return imcore.getListBusyIMNode();
+    }
+
+    // TODO
+    public int getNumberOfFreeResource() {
+        return imcore.getSizeListFreeIMNode();
+    }
+
+    // TODO
+    public int getNumberOfBusyResource() {
+        return imcore.getSizeListBusyIMNode();
+    }
 }

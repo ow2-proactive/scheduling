@@ -32,284 +32,265 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUserImpl;
 
+
 public class IMCore implements InitActive, IMConstants, Serializable {
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
 
-	private final static Logger logger = ProActiveLogger
-			.getLogger(Loggers.IM_CORE);
+    // Attributes
+    private Node nodeIM;
+    private IMAdmin admin;
+    private IMMonitoring monitoring;
+    private IMUser user;
+    private IMDataResource dataresource;
+    private IMDeploymentFactory fac;
 
-	// Attributes
-	private Node nodeIM;
+    // TODO add ActionStatus for the futur access
+    private ArrayList<IMActionStatus> currentActionStatus;
 
-	private IMAdmin admin;
+    // ----------------------------------------------------------------------//
+    // CONSTRUCTORS
 
-	private IMMonitoring monitoring;
+    /** ProActive compulsory no-args constructor */
+    public IMCore() {
+    }
 
-	private IMUser user;
+    public IMCore(Node nodeIM)
+        throws ActiveObjectCreationException, NodeException {
+        if (logger.isInfoEnabled()) {
+            logger.info("instanciation IMCore");
+        }
+        this.nodeIM = nodeIM;
+        if (logger.isInfoEnabled()) {
+            logger.info("instanciation IMDataResourceImpl");
+        }
+        this.dataresource = new IMDataResourceImpl();
+        if (logger.isInfoEnabled()) {
+            logger.info("instanciation IMDeploymentFactory");
+        }
+    }
 
-	private IMDataResource dataresource;
+    // ----------------------------------------------------------------------//
+    // INIT ACTIVE FRONT-END
+    public void initActivity(Body body) {
+        if (logger.isInfoEnabled()) {
+            logger.info("IMCore start : initActivity");
+        }
+        try {
+            if (logger.isInfoEnabled()) {
+                logger.info("active object IMAdmin");
+            }
+            admin = (IMAdminImpl) ProActive.newActive(IMAdminImpl.class.getName(),
+                    new Object[] { ProActive.getStubOnThis() }, nodeIM);
 
-	private IMDeploymentFactory fac;
+            if (logger.isInfoEnabled()) {
+                logger.info("active object IMMonitoring");
+            }
+            monitoring = (IMMonitoringImpl) ProActive.newActive(IMMonitoringImpl.class.getName(),
+                    new Object[] { ProActive.getStubOnThis() }, nodeIM);
 
-	// TODO add ActionStatus for the futur access
-	private ArrayList<IMActionStatus> currentActionStatus;
+            if (logger.isInfoEnabled()) {
+                logger.info("active object IMUser");
+            }
+            user = (IMUserImpl) ProActive.newActive(IMUserImpl.class.getName(),
+                    new Object[] { ProActive.getStubOnThis() }, nodeIM);
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("IMCore end : initActivity");
+        }
+    }
 
-	// ----------------------------------------------------------------------//
-	// CONSTRUCTORS
+    // ----------------------------------------------------------------------//
+    // TEST
+    public String echo() {
+        return "Je suis le IMCore";
+    }
 
-	/** ProActive compulsory no-args constructor */
-	public IMCore() {
-	}
+    // ----------------------------------------------------------------------//
+    // ACCESSORS
+    public Node getNodeIM() {
+        return this.nodeIM;
+    }
 
-	public IMCore(Node nodeIM) throws ActiveObjectCreationException,
-			NodeException {
-		if (logger.isInfoEnabled()) {
-			logger.info("instanciation IMCore");
-		}
-		this.nodeIM = nodeIM;
-		if (logger.isInfoEnabled()) {
-			logger.info("instanciation IMDataResourceImpl");
-		}
-		this.dataresource = new IMDataResourceImpl();
-		if (logger.isInfoEnabled()) {
-			logger.info("instanciation IMDeploymentFactory");
-		}
-	}
+    public IMAdmin getAdmin() {
+        return this.admin;
+    }
 
-	// ----------------------------------------------------------------------//
-	// INIT ACTIVE FRONT-END
-	public void initActivity(Body body) {
-		if (logger.isInfoEnabled()) {
-			logger.info("IMCore start : initActivity");
-		}
-		try {
-			if (logger.isInfoEnabled()) {
-				logger.info("active object IMAdmin");
-			}
-			admin = (IMAdminImpl) ProActive.newActive(IMAdminImpl.class
-					.getName(), new Object[] { ProActive.getStubOnThis() },
-					nodeIM);
+    public IMMonitoring getMonitoring() {
+        return this.monitoring;
+    }
 
-			if (logger.isInfoEnabled()) {
-				logger.info("active object IMMonitoring");
-			}
-			monitoring = (IMMonitoringImpl) ProActive.newActive(
-					IMMonitoringImpl.class.getName(), new Object[] { ProActive
-							.getStubOnThis() }, nodeIM);
+    public IMUser getUser() {
+        return this.user;
+    }
 
-			if (logger.isInfoEnabled()) {
-				logger.info("active object IMUser");
-			}
-			user = (IMUserImpl) ProActive.newActive(IMUserImpl.class.getName(),
-					new Object[] { ProActive.getStubOnThis() }, nodeIM);
-		} catch (ActiveObjectCreationException e) {
-			e.printStackTrace();
-		} catch (NodeException e) {
-			e.printStackTrace();
-		}
-		if (logger.isInfoEnabled()) {
-			logger.info("IMCore end : initActivity");
-		}
-	}
+    /*
+    public IMDataResource getDataResource() {
+            return this.dataresource;
+    }*/
 
-	// ----------------------------------------------------------------------//
-	// TEST
-	public String echo() {
-		return "Je suis le IMCore";
-	}
+    // ----------------------------------------------------------------------//
+    // ADMIN
+    public void addNode(Node node, String vnName, String padName) {
+        if (logger.isInfoEnabled()) {
+            logger.info("IMCore - addNode : node=" +
+                node.getNodeInformation().getName() + ", vnName=" + vnName +
+                ", padName=" + padName);
+        }
+        this.dataresource.addNewDeployedNode(node, vnName, padName);
+    }
 
-	// ----------------------------------------------------------------------//
-	// ACCESSORS
-	public Node getNodeIM() {
-		return this.nodeIM;
-	}
+    public void addPAD(String padName, ProActiveDescriptor pad) {
+        this.dataresource.putPAD(padName, pad);
+    }
 
-	public IMAdmin getAdmin() {
-		return this.admin;
-	}
+    // ----------------------------------------------------------------------//	
+    // REDEPLOY
+    private void redeployVNode(VirtualNode vnode, String padName,
+        ProActiveDescriptor pad) {
+        if (vnode.isActivated()) { // REDEPLOY
+            vnode.killAll(false);
+            //vnode.activate();
+            this.dataresource.removeNode(padName, vnode.getName());
+            IMDeploymentFactory.deployVirtualNode(this, padName, pad,
+                vnode.getName());
+        } else { // DEPLOY
+            IMDeploymentFactory.deployVirtualNode(this, padName, pad,
+                vnode.getName());
+        }
+    }
 
-	public IMMonitoring getMonitoring() {
-		return this.monitoring;
-	}
+    public void redeploy(String padName) {
+        if (this.dataresource.isDeployedPad(padName)) {
+            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
+            VirtualNode[] vnodes = pad.getVirtualNodes();
+            for (VirtualNode vnode : vnodes) {
+                redeployVNode(vnode, padName, pad);
+            }
+        }
+    }
 
-	public IMUser getUser() {
-		return this.user;
-	}
+    public void redeploy(String padName, String vnName) {
+        if (this.dataresource.isDeployedPad(padName)) {
+            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
+            VirtualNode vnode = pad.getVirtualNode(vnName);
+            redeployVNode(vnode, padName, pad);
+        }
+    }
 
-	/*
-	public IMDataResource getDataResource() {
-		return this.dataresource;
-	}*/
+    public void redeploy(String padName, String[] vnNames) {
+        if (this.dataresource.isDeployedPad(padName)) {
+            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
+            VirtualNode vnode;
+            for (String vnName : vnNames) {
+                vnode = pad.getVirtualNode(vnName);
+                redeployVNode(vnode, padName, pad);
+            }
+        }
+    }
 
-	// ----------------------------------------------------------------------//
-	// ADMIN
+    // ----------------------------------------------------------------------//	
+    // KILL
+    public void killPAD(String padName) throws ProActiveException {
+        if (this.dataresource.isDeployedPad(padName)) {
+            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
+            pad.killall(false);
+            this.dataresource.removeNode(padName);
+            this.dataresource.removePad(padName);
+            // TODO : delete the pad file
+            // find the temp directory but how ????
+            // File tempPAD = new File( tempDir + padName) 
+            // if ( tempPAD.exists() ) tempPAD.delete();
+        }
+    }
 
-	public void addNode(Node node, String vnName, String padName) {
-		if (logger.isInfoEnabled()) {
-			logger.info("IMCore - addNode : node=" + node.getNodeInformation().getName()+
-					", vnName=" + vnName + ", padName="+padName);
-		}
-		this.dataresource.addNewDeployedNode(node, vnName, padName);
-	}
-	
-	public void addPAD(String padName, ProActiveDescriptor pad) {
-		this.dataresource.putPAD(padName, pad);
-	}
-	
+    public void killPAD(String padName, String vnName) {
+        if (this.dataresource.isDeployedPad(padName)) {
+            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
+            VirtualNode vnode = pad.getVirtualNode(vnName);
+            vnode.killAll(false);
+            this.dataresource.removeNode(padName, vnName);
+        }
+    }
 
+    public void killPAD(String padName, String[] vnNames) {
+        if (this.dataresource.isDeployedPad(padName)) {
+            ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
+            VirtualNode[] vnodes = pad.getVirtualNodes();
+            for (VirtualNode vnode : vnodes) {
+                vnode.killAll(false);
+            }
+            this.dataresource.removeNode(padName, vnNames);
+        }
+    }
 
-	// ----------------------------------------------------------------------//	
-	// REDEPLOY
-	
+    public void killAll() throws ProActiveException {
+        for (String padName : this.dataresource.getListPad().keySet()) {
+            killPAD(padName);
+        }
+    }
 
-	private void redeployVNode(VirtualNode vnode, String padName, ProActiveDescriptor pad) {
-		if( vnode.isActivated() ) { // REDEPLOY
-			vnode.killAll(false);
-			//vnode.activate();
-			this.dataresource.removeNode(padName, vnode.getName());
-			IMDeploymentFactory.deployVirtualNode(this, padName, pad, vnode.getName());	
-		}
-		else { // DEPLOY
-			IMDeploymentFactory.deployVirtualNode(this, padName, pad, vnode.getName());
-		}
-	}
+    // ----------------------------------------------------------------------//
+    // MONITORING
+    public int getSizeListFreeIMNode() {
+        return dataresource.getSizeListFreeIMNode();
+    }
 
+    public int getSizeListBusyIMNode() {
+        return dataresource.getSizeListBusyIMNode();
+    }
 
-	public void redeploy(String padName) {
-		if( this.dataresource.isDeployedPad(padName) ) {
-			ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-			VirtualNode[] vnodes = pad.getVirtualNodes();
-			for(VirtualNode vnode : vnodes) {
-				redeployVNode(vnode, padName, pad);
-			}
-		}
-	}
+    public int getSizeListPad() {
+        return dataresource.getSizeListPad();
+    }
 
+    public HashMap<String, ProActiveDescriptor> getListPAD() {
+        return this.dataresource.getListPad();
+    }
 
-	public void redeploy(String padName, String vnName) {
-		if( this.dataresource.isDeployedPad(padName) ) {
-			ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-			VirtualNode vnode = pad.getVirtualNode(vnName);
-			redeployVNode(vnode, padName, pad);
-		}
-	}
+    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
+        return this.dataresource.getDeployedVirtualNodeByPad();
+    }
 
+    public ArrayList<IMNode> getListFreeIMNode() {
+        return this.dataresource.getListFreeIMNode();
+    }
 
-	public void redeploy(String padName, String[] vnNames) {
-		if( this.dataresource.isDeployedPad(padName) ) {
-			ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-			VirtualNode vnode;
-			for(String vnName : vnNames) {
-				vnode = pad.getVirtualNode(vnName);
-				redeployVNode(vnode, padName, pad);
-			}
-		}
-	}
-	
-	
-	
-	// ----------------------------------------------------------------------//	
-	// KILL
-	
-	public void killPAD(String padName) throws ProActiveException {
-		if( this.dataresource.isDeployedPad(padName) ) {
-			ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-			pad.killall(false);
-			this.dataresource.removeNode(padName);
-			this.dataresource.removePad(padName);
-			// TODO : delete the pad file
-			// find the temp directory but how ????
-			// File tempPAD = new File( tempDir + padName) 
-			// if ( tempPAD.exists() ) tempPAD.delete();
-		}
-	}
+    public ArrayList<IMNode> getListBusyIMNode() {
+        return this.dataresource.getListBusyIMNode();
+    }
 
-	
-	public void killPAD(String padName, String vnName) {
-		if( this.dataresource.isDeployedPad(padName) ) {
-			ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-			VirtualNode vnode = pad.getVirtualNode(vnName);
-			vnode.killAll(false);
-			this.dataresource.removeNode(padName, vnName);
-		}
-	}
-	
-	
-	public void killPAD(String padName, String[] vnNames) {
-		if( this.dataresource.isDeployedPad(padName) ) {
-			ProActiveDescriptor pad = this.dataresource.getDeployedPad(padName);
-			VirtualNode[] vnodes = pad.getVirtualNodes();
-			for(VirtualNode vnode : vnodes) {
-				vnode.killAll(false);
-			}
-			this.dataresource.removeNode(padName, vnNames);
-		}
-	}
-	
-	
-	public void killAll() throws ProActiveException {
-		for(String padName : this.dataresource.getListPad().keySet()) {
-			killPAD(padName);
-		}
-	}
-	
-	
-	// ----------------------------------------------------------------------//
-	// MONITORING
+    public ArrayList<IMNode> getListAllNodes() {
+        return this.dataresource.getListAllIMNode();
+    }
 
-	public int getSizeListFreeIMNode() { return dataresource.getSizeListFreeIMNode(); }
-	public int getSizeListBusyIMNode() { return dataresource.getSizeListBusyIMNode(); }
-	public int getSizeListPad()        { return dataresource.getSizeListPad(); }
-	
-	public HashMap<String,ProActiveDescriptor> getListPAD() {
-		return this.dataresource.getListPad();
-	}
-	
-	public HashMap<String,ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
-		return this.dataresource.getDeployedVirtualNodeByPad();
-	}
-	
-	public ArrayList<IMNode> getListFreeIMNode() {
-		return this.dataresource.getListFreeIMNode();
-	}
-	
-	public ArrayList<IMNode> getListBusyIMNode() {
-		return this.dataresource.getListBusyIMNode();
-	}
-	
-	public ArrayList<IMNode> getListAllNodes() {
-		return this.dataresource.getListAllIMNode();
-	}
-	
-	// ----------------------------------------------------------------------//
-	// USER
+    // ----------------------------------------------------------------------//
+    // USER
+    public Node getNode() throws NodeException {
+        return this.dataresource.getNode();
+    }
 
-	public Node getNode() throws NodeException  {
-		return this.dataresource.getNode();
-	}
-	
-	public Node[] getAtLeastNNodes(int nb) throws NodeException  {
-		return this.dataresource.getAtLeastNNodes(nb);
-	}
+    public Node[] getAtLeastNNodes(int nb) throws NodeException {
+        return this.dataresource.getAtLeastNNodes(nb);
+    }
 
-	public void freeNode(Node node) throws NodeException {
-		this.dataresource.freeNode(node);
-	}
-	
-	public void freeNodes(Node[] nodes) throws NodeException {
-		this.dataresource.freeNodes(nodes);
-	}
-	
+    public void freeNode(Node node) throws NodeException {
+        this.dataresource.freeNode(node);
+    }
 
-	// ----------------------------------------------------------------------//
-	// SHUTDOWN
-	
-	public void shutdown() throws ProActiveException {
-		killAll();
-		ProActive.exitSuccess();
-	}
-	
+    public void freeNodes(Node[] nodes) throws NodeException {
+        this.dataresource.freeNodes(nodes);
+    }
 
-	// ----------------------------------------------------------------------//
+    // ----------------------------------------------------------------------//
+    // SHUTDOWN
+    public void shutdown() throws ProActiveException {
+        killAll();
+        ProActive.exitSuccess();
+    }
 
+    // ----------------------------------------------------------------------//
 }
-

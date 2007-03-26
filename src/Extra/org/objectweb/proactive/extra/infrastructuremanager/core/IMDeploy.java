@@ -15,37 +15,34 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class IMDeploy implements NodeCreationEventListener, Runnable {
-	
-	private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_DEPLOY);
-	
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_DEPLOY);
+
     // Attributes
-	private String padName = null;
+    private String padName = null;
     private ProActiveDescriptor pad = null;
     private String[] vnNames = null;
     private IMCore imCore = null;
 
-    
     //----------------------------------------------------------------------//
     // Construtors
-    
     public IMDeploy(IMCore imCore, String padName, ProActiveDescriptor pad) {
         this.imCore = imCore;
         this.padName = padName;
         this.pad = pad;
     }
 
-    public IMDeploy(IMCore imCore, String padName, ProActiveDescriptor pad, String[] vnNames) {
+    public IMDeploy(IMCore imCore, String padName, ProActiveDescriptor pad,
+        String[] vnNames) {
         this.imCore = imCore;
         this.padName = padName;
         this.pad = pad;
         this.vnNames = vnNames;
     }
 
-    
     //----------------------------------------------------------------------//
 
     /**
-     * 
+     *
      */
     public void run() {
         VirtualNode[] vns = null;
@@ -66,24 +63,23 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
             try {
                 ((VirtualNodeImpl) vn).waitForAllNodesCreation();
             } catch (NodeException e) {
-            	logger.warn("NodeException : " + e, e);
+                logger.warn("NodeException : " + e, e);
             }
         }
         this.imCore.addPAD(padName, pad);
     }
 
-    
     /**
-     * 
+     *
      */
     public void nodeCreated(NodeCreationEvent event) {
         Node node = event.getNode();
         ProActiveRuntime par = node.getProActiveRuntime();
         try {
-            String vnName = par.getVNName(node.getNodeInformation().getName()); 
+            String vnName = par.getVNName(node.getNodeInformation().getName());
             this.imCore.addNode(node, vnName, padName);
         } catch (ProActiveException e) {
-        	logger.warn("ProActiveException : " + e, e);
+            logger.warn("ProActiveException : " + e, e);
         }
 
         // FIXME imcore.addFreeNode(,pad, ) line 82 ??? addNode

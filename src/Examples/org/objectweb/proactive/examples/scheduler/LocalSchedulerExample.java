@@ -1,4 +1,3 @@
-
 /*
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
@@ -35,8 +34,6 @@
  *
  */
 package org.objectweb.proactive.examples.scheduler;
-
-
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -90,7 +87,7 @@ public class LocalSchedulerExample {
             adminAPI.start();
         } catch (Exception e) {
             logger.error("error creating Scheduler" + e.toString());
-       
+
             System.exit(1);
         }
     }
