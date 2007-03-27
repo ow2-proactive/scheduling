@@ -103,7 +103,7 @@ public abstract class SchedulerUserAPI {
      * @return Status--see enum staus for details
      * @throws UserException
      */
-    public abstract Status stat(String tID) throws UserException;
+    public abstract Status status(String tID) throws UserException;
 
     /**
      *
