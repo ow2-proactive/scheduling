@@ -793,7 +793,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         try {
             if (!isSecurityOn) {
-                bodyLogger.debug("security is off");
+                ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("security is off");
             } else {
                 try {
                     if (internalBodySecurity.isLocalBody()) {
