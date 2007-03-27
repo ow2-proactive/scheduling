@@ -59,6 +59,7 @@ public class Scheduler implements RunActive, RequestFilter {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private GenericPolicy policy; //holds the policy used 
     private GenericResourceManager resourceManager;
+    //TODO: change running tasks and finished tasks to hash maps for bettter performance
     private Vector<InternalTask> runningTasks;
     private Vector<InternalTask> finishedTasks;
     private long previousRunOfPingAll;
@@ -229,7 +230,7 @@ public class Scheduler implements RunActive, RequestFilter {
             pingAll();
 
             service.serveAll(this);
-
+            //FIXME:must check for the case where more than one terminate was submitted
             onlyTerminateLeft = ((service.getRequestCount() == 1) &&
                 service.hasRequestToServe("terminateScheduler")) ||
                 (service.getRequestCount() == 0);
@@ -287,10 +288,6 @@ public class Scheduler implements RunActive, RequestFilter {
             try {
                 //get executer object
                 AE = taskRetrivedFromPolicy.nodeNExecuter.executer;
-
-                //next we will ping the active executer  to make sure it is alive
-                AE.ping();
-
                 //start the execution
                 taskRetrivedFromPolicy.result = AE.start(taskRetrivedFromPolicy.getUserTask());
 
@@ -496,10 +493,12 @@ public class Scheduler implements RunActive, RequestFilter {
 
     /**
      * This is the function that gets the result.
-     * </br><b>WARNING, very important. This function must be filtered by accept request to make sure the result is available before it is served otherwise the scheduler might crash</b>
+     *
      * @param taskID
      * @return
      */
+    
+    //WARNING, very important. This function must be filtered by accept request to make sure the result is available before it is served otherwise the scheduler might crash
     public InternalResult getResult(String taskID, String userName) {
         InternalResult result = null;
         for (int i = 0; i < finishedTasks.size(); i++)
@@ -554,9 +553,12 @@ public class Scheduler implements RunActive, RequestFilter {
                 return false;
             }
         }
-        //      terminate scheduler isnt allowed to sericed unless its done explicilty
+        //  the terminate scheduler case, if the scheduler is shutting down, it wont be served because it has to be the last function to be served
         else if (request.getMethodName() == "terminateScheduler") {
-            return false;
+            if(this.shutdown==true||ProActive.getBodyOnThis().getRequestQueue().hasRequest("shutdown"))
+        	return false;
+            else 
+            	return true;
         }
         //all other functions are to be served
         else {
@@ -612,10 +614,11 @@ public class Scheduler implements RunActive, RequestFilter {
     }
 
     /**
-     * Asks the scheduler to terminate
-     * <b>Warning must be filtered so that it is called only when needed
-     * @return true if sucessful, false if asked to terminate while not shutdown
+     * Asks the scheduler to terminate, in order to be sucessful and return true, it must be called after callling shutdown, other wise it will not have any effect 
+     * 
+     * @return true if sucessful and schedueler is shutdowne , false if asked to terminate while not shutdown
      */
+    //Warning must be filtered so that it is called as the last function during shutdown
     public BooleanWrapper terminateScheduler() {
         if (shutdown == true) {
             try {
