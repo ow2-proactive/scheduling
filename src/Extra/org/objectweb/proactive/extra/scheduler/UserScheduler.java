@@ -180,39 +180,11 @@ public class UserScheduler extends SchedulerUserAPI {
         return scheduler.del(tID, userName);
     }
 
-    public Status stat(String tID) throws UserException {
+    public Status status(String tID) throws UserException {
         if (stopped) {
             throw new UserException(
                 "Scheduler is stopped. Please contact the administator");
         }
-
-        Vector<String> temp;
-
-        temp = scheduler.getQueuedID();
-        if (temp.contains(tID)) {
-            return Status.QUEUED;
-        }
-        temp = scheduler.getRunningID();
-        if (temp.contains(tID)) {
-            return Status.RUNNNING;
-        }
-
-        temp = scheduler.getFinishedID();
-        if (temp.contains(tID)) {
-            return Status.FINISHED;
-        }
-
-        temp = scheduler.getFailedID();
-        if (temp.contains(tID)) {
-            return Status.FAILED;
-        }
-
-        temp = scheduler.getKilledID();
-        if (temp.contains(tID)) {
-            return Status.KILLED;
-        }
-
-        // doesnt exist
-        return Status.NEW;
+        return scheduler.info(tID).getObject().getStatus();
     }
 }
