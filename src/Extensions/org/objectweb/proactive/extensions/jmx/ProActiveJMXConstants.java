@@ -46,6 +46,6 @@ public class ProActiveJMXConstants {
 
     static {
         PROACTIVE_JMX_ENV.put("jmx.remote.protocol.provider.pkgs",
-            "org.objectweb.proactive.jmx.provider");
+            "org.objectweb.proactive.extensions.jmx.provider");
     }
 }
