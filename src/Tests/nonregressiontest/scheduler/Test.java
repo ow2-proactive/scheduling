@@ -52,7 +52,7 @@ public class Test extends FunctionalTest {
 
 	private AdminScheduler adminAPI;
 	private SchedulerUserAPI userAPI;
-	private final String xmlURL = Test.class.getResource("/nonregressiontest/scheduler/testDeployment.xml").getPath();
+	private final String xmlURL = Test.class.getResource("/nonregressiontest/scheduler/test.xml").getPath();
 	private final String SNode="//localhost/SCHEDULER_NODE";
 	private SimpleResourceManager rm;
 	public Test() {
@@ -65,13 +65,16 @@ public class Test extends FunctionalTest {
 
 	public void action() throws Exception {
 
-		userAPI=SchedulerUserAPI.connectTo(SNode);
+		
 	}
 
 
 	public void endTest() throws Exception {
-		adminAPI.shutdown(new BooleanWrapper(true));
-		rm.stopRM();
+		BooleanWrapper shutDownResult=adminAPI.shutdown(new BooleanWrapper(true));
+		if(shutDownResult.booleanValue()==false) throw new Exception("error shutting down the scheduler");
+		
+		BooleanWrapper rmStopResult=rm.stopRM();
+		if(rmStopResult.booleanValue()==false) throw new Exception("error shutting down the resource manager");
 
 	}
 
@@ -82,21 +85,35 @@ public class Test extends FunctionalTest {
 		rm=(SimpleResourceManager)ProActive.newActive(SimpleResourceManager.class.getName(),null);
 		adminAPI=AdminScheduler.createLocalScheduler(rm,SNode);
         rm.addNodes(xmlURL);
+        userAPI=SchedulerUserAPI.connectTo(SNode);
 		
 	}
-	public boolean preConditions() throws Exception {return adminAPI.start().booleanValue();	}
+	public boolean preConditions() throws Exception 
+	{
+		
+		return adminAPI.start().booleanValue();	
+	}
 	public boolean postConditions() throws Exception {return true;	}	
 	public static void main(String[] args) {
         Test test = new Test();
         
         try
         {
+        	logger.info("initTest");
         	test.initTest();
+        	if(test.preConditions()==false) throw new Exception("preCondition failes");
+        	logger.info("action");
         	test.action();
+        	if(test.postConditions()==false) throw new Exception("postCondition failes");
+        	logger.info("endTest");
         	test.endTest();
+        	System.exit(0);
         }
         catch (Exception e) {
+        	
             e.printStackTrace();
+            System.exit(1);
+            
         }
 	}
 
