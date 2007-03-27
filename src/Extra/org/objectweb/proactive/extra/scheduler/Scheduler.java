@@ -471,7 +471,7 @@ public class Scheduler implements RunActive, RequestFilter {
             }
 
         for (int i = 0; i < finishedTasks.size(); i++)
-            if (finishedTasks.get(i).getTaskID().equals(taskID)) {
+            if (finishedTasks.get(i).getTaskID().equals(taskID)&&finishedTasks.get(i).status!=Status.ERROR) {
                 return finishedTasks.get(i);
             }
 
