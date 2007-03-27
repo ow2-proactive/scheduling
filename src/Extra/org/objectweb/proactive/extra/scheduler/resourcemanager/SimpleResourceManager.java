@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
@@ -68,7 +69,7 @@ public class SimpleResourceManager implements GenericResourceManager,
         }
     }
 
-    public void stopRM() {
+    public BooleanWrapper stopRM() {
         try {
             for (int i = 0; i < vn.size(); i++) {
                 ((VirtualNodeImpl) vn.get(i)).waitForAllNodesCreation();
@@ -81,10 +82,15 @@ public class SimpleResourceManager implements GenericResourceManager,
                     "finished deactivating nodes, will terminate Resource Manager");
             }
             ProActive.getBodyOnThis().terminate();
+            //sucess
+            return new BooleanWrapper(true);
         } catch (Exception e) {
             logger.error("Couldnt Terminate the Resource manager" +
                 e.toString());
+            
+            return new BooleanWrapper(false);
         }
+        
     }
 
     //adds the virtual nodes and create listeners for the virtual nodes to add nodes whenever created

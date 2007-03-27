@@ -157,7 +157,7 @@ public class UserScheduler extends SchedulerUserAPI {
         return scheduler.isFinished(taskID1);
     }
 
-    public void shutdown() {
+    public BooleanWrapper shutdown() {
         try {
             //			FIXME :must make sure that futures have been propagated using automatic continuation
             logger.warn(
@@ -167,7 +167,12 @@ public class UserScheduler extends SchedulerUserAPI {
             ProActive.getBodyOnThis().terminate();
         } catch (Exception e) {
             logger.info("error terminating userscheulder " + e.getMessage());
+            //shut down failed, will return false
+            return new BooleanWrapper(false);
         }
+        
+        //shutdown dint throw an exceptions
+        return new BooleanWrapper(true);
     }
 
     public BooleanWrapper del(String tID, String userName)

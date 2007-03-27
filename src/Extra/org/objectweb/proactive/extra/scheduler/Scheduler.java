@@ -616,7 +616,7 @@ public class Scheduler implements RunActive, RequestFilter {
     /**
      * Asks the scheduler to terminate, in order to be sucessful and return true, it must be called after callling shutdown, other wise it will not have any effect 
      * 
-     * @return true if sucessful and schedueler is shutdowne , false if asked to terminate while not shutdown
+     * @return true if sucessful and schedueler is shutdowne , false if asked to terminate while not shutdown or if an exception was raised during shutdown
      */
     //Warning must be filtered so that it is called as the last function during shutdown
     public BooleanWrapper terminateScheduler() {
@@ -625,7 +625,8 @@ public class Scheduler implements RunActive, RequestFilter {
                 ProActive.getBodyOnThis().terminate();
                 logger.info("Scheduler terminated successfully");
             } catch (Exception e) {
-                logger.info("error terminating scheudler" + e.toString());
+                logger.info("error terminating scheudler, will return false" + e.toString());
+                return new BooleanWrapper(false);
             }
 
             return new BooleanWrapper(true);
@@ -773,6 +774,7 @@ public class Scheduler implements RunActive, RequestFilter {
 
     /**
      * Deletes a specfic task, only if it is either queued or running
+     * If it is finished, it will return false
      * @param taskID
      * @param username
      * @return true if it is deleted else false

@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.exception.AdminException;
+import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.GenericResourceManager;
 
 
@@ -54,7 +55,7 @@ public class AdminScheduler {
     private UserScheduler userScheduler;
 
     /**
-     * rEguar constructor
+     * regular constructor
      * @param scheduler
      * @param userScheduler
      */
@@ -125,14 +126,22 @@ public class AdminScheduler {
     /**
      *  shuts down the scheduler
      * @param true means killing running processes flushing queues and terminating, false means waiting for current processes to finish
-     */
-    public void shutdown(BooleanWrapper immediate) {
-        this.stop();
+     * @return boolean to indicate wether or not shutdown went smoothely
+     */ 
+    public  BooleanWrapper shutdown(BooleanWrapper immediate) {
+        //assume all goes correctly unless something goes wrong
+    	boolean shutDownResult=true;
+    	this.stop();
         scheduler.shutdown(immediate);
 
-        BooleanWrapper schedulerterminated = scheduler.terminateScheduler();
-        ProActive.waitFor(schedulerterminated);
-        userScheduler.shutdown();
+        //shutdown core and check if sucessful
+        BooleanWrapper schedulerShutDownResult = scheduler.terminateScheduler();
+        if(schedulerShutDownResult.booleanValue()==false) shutDownResult=false;
+        
+        //shutdown user api and check if sucessful
+        BooleanWrapper userShutDownResult=userScheduler.shutdown();
+        if(userShutDownResult.booleanValue()==false) shutDownResult=false;
+        
         try {
             //FIXME :must make sure that futures have been propagated using automatic continuation
             logger.warn(
@@ -141,8 +150,12 @@ public class AdminScheduler {
 
             ProActive.getBodyOnThis().terminate();
         } catch (Exception e) {
+        	//boolean vaLUE INDICATES SOMEHTHING WENT WRONG	 
+        	shutDownResult=false;
             logger.info("error terminating adminscheulder" + e.getMessage());
         }
+        
+        return new  BooleanWrapper(shutDownResult);
     }
 
     /**
@@ -416,6 +429,15 @@ public class AdminScheduler {
                     new Object[] { scheduler }, schedulerURL);
             adminScheduler = (AdminScheduler) ProActive.newActive(AdminScheduler.class.getName(),
                     new Object[] { scheduler, userScheduler }, schedulerURL);
+
+            //Adds NFE handlers     
+            
+    		//TODO: please optimize the nfe handler class:An optimal solution would be to handle the exception for eg if it is due to the fac that the user cant be reached from the user api, the result might need to be sent back tot the core or cached in the uaerapi
+            
+            ProActive.addNFEListenerOnAO(userScheduler,new NFEHandler("UserAPI"));
+            ProActive.addNFEListenerOnAO(scheduler,new NFEHandler("Scheduler Core"));
+            ProActive.addNFEListenerOnAO(adminScheduler,new NFEHandler("AdminAPI"));
+            
             logger.info("Scheduler Created on " + schedulerURL);
         } catch (Exception e) {
             throw new AdminException(e.getMessage());
