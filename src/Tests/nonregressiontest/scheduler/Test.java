@@ -191,7 +191,7 @@ public class Test extends FunctionalTest {
 		results.get(1).getResult();
 		
 		
-         submit(5000,5000);
+         submit(5000,1);
          
          
          
@@ -222,7 +222,7 @@ public class Test extends FunctionalTest {
 
 
 	public void endTest() throws Exception {
-		BooleanWrapper shutDownResult=adminAPI.shutdown(new BooleanWrapper(true));
+		BooleanWrapper shutDownResult=adminAPI.shutdown(new BooleanWrapper(false));
 		if(shutDownResult.booleanValue()==false) throw new Exception("error shutting down the scheduler");
 		
 		BooleanWrapper rmStopResult=rm.stopRM();
