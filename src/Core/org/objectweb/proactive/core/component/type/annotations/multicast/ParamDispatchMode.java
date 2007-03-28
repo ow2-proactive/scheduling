@@ -78,7 +78,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
             break;
         case ROUND_ROBIN:
             for (int i = 0; i < inputParameter.size(); i++) {
-                result.add(inputParameter.get(i % nbOutputReceivers));
+                result.add(inputParameter.get(i));
             }
             break;
         default:
