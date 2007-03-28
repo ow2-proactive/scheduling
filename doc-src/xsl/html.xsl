@@ -10,7 +10,8 @@
  <!-- Just use the image size for the html output. Width=... has no effect. -->
  <xsl:param name="ignore.image.scaling">1</xsl:param>
 <!-- Relative position for the htmlized java files -->
- <xsl:param name="html.java.files">../ProActive_src_html/</xsl:param>
+ <xsl:param name="html.java.files">../ProActive_src_html/org/objectweb/proactive/</xsl:param>
+ <xsl:param name="html.java.suffix">.html</xsl:param>
 <!-- Relative position for the example deployment descriptors -->
  <xsl:param name="html.xml.files">../</xsl:param>
 
@@ -241,24 +242,24 @@
 <!--  Treat differently xrefs if @role=javaFileSrc or xmlFileSrc  -->
 <!-- - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <xsl:template match="xref" name="xref">
-	<xsl:choose>
-		<xsl:when test="@role='javaFileSrc'">
-			<xsl:variable name="javaRef" >
-				<xsl:value-of select="concat(translate(substring-before(@linkend,'.java'),'.','/'),'.java')" />
-			</xsl:variable>
-			<a href="{$html.java.files}{$javaRef}"><xsl:value-of select="$javaRef"/></a>
-		</xsl:when>
-		<xsl:when test="@role='xmlFileSrc'">
-			<xsl:variable name="xmlRef" >
-				<xsl:value-of select="concat(translate(substring-before(@linkend,'.xml'),'.','/'),'.xml')" />
-			</xsl:variable>
-			<a href="{$html.xml.files}{$xmlRef}"><xsl:value-of select="$xmlRef"/></a>
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:call-template name="normal.xref"/>
-		</xsl:otherwise>
-	</xsl:choose>
-</xsl:template>
+  <xsl:choose>
+    <xsl:when test="@role='javaFileSrc'">
+      <xsl:variable name="javaRef" >
+       <xsl:value-of select="concat(translate(substring-before(@linkend,'.java'),'.','/'),'.java')" />
+      </xsl:variable>
+      <a href="{$html.java.files}{$javaRef}{$html.java.suffix}"><xsl:value-of select="$javaRef"/></a>
+    </xsl:when>
+    <xsl:when test="@role='xmlFileSrc'">
+      <xsl:variable name="xmlRef" >
+        <xsl:value-of select="concat(translate(substring-before(@linkend,'.xml'),'.','/'),'.xml')" />
+      </xsl:variable>
+      <a href="{$html.xml.files}{$xmlRef}"><xsl:value-of select="$xmlRef"/></a>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="normal.xref"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template> 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <!--  Copied from xref.xsl.  The possible role treatment is done above  -->
