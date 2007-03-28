@@ -5,10 +5,6 @@
 	<import file="common.xml" />
 	<import file="doc.xml" />
 
-	<property name="proactive.path" value="org/objectweb/proactive" />
-	<property name="proactive.core.path" value="${proactive.path}/core" />
-	<property name="proactive.ext.path" value="${proactive.path}/ext" />
-
 	<!-- Osgi properties -->
 	<property name="manifest.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/Manifest/" />
 	<property name="manifest.example.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />

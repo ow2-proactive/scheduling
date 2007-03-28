@@ -7,6 +7,29 @@
 		<!--            Create docs, which is the javadoc + manual            -->
 		<!--  =============================================================== -->
 		<target name="docs" depends="javadoc, manual" description="Construct the javadoc and the manual" />
+	
+		<!-- ================================================================ -->
+		<!--            Make the java files readable on the web               -->
+		<!--  =============================================================== -->
+		<!-- 
+			** Do not support Java 1.5 **
+		<target name="java2html">
+			<echo message="Converting java to html..." />
+			<java jar="${base}/dev/lib/j2h.jar" fork="true">
+				<arg line="-d ${docs.dir}/ProActive_src_html" />
+				<arg line="-js ${src.dir}/${proactive.dir}" />
+				<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api" />
+				<arg line="-t 2 -n '${name} source code'" />
+			</java>
+
+		</target>-->
+
+		<!-- TODO tempory fix for java 1.5, do not generate index.html -->
+		<!-- http://www.java2html.de /dev/lib/j2h.jar -->
+		<target name="java2html">
+			<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base.dir}/dev/lib/j2h.jar" />
+			<j2h srcdir="${src.proactive.dir}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="false" outputFormat="html" />
+		</target>
 
 
 		<!-- ================================================================ -->
@@ -154,22 +177,20 @@
 	<!-- ==================================================================== -->
 	<target name="-docbookBeautify" depends="util">
 		
-
 		<java classname="doc.DocBookize" fork="true">
 			<classpath refid="project.classpath"/>
-			
-			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 			<!-- The xml file to parse -->
-			<arg value="ProActive_src_html/${proactive.path}/" />
+			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 			<!-- The path to find java files in html -->
-			<arg value="${src.dir}/${proactive.path}/" />
-			<arg value="${src.proactive.dir}/org/objectweb/proactive/" />
-			<arg value="${src.examples.dir}/org/objectweb/proactive/" />
-			<arg value="${src.utils.dir}/" />
-
+			<arg value="ProActive_src_html/${proactive.path}/" />
+			
 			<!-- the path for java file inclusion -->
-			<arg value="${base.dir}/descriptors/" />
+			<arg value="${src.proactive.dir}/${proactive.path}/" />
+			<arg value="${src.examples.dir}/${proactive.path}/" />
+			
 			<!-- the path for xml file inclusion -->
+			<arg value="${descriptors.dir}/" />
+			
 		</java>
 
 		<java classname="doc.Validate" fork="true">
@@ -259,7 +280,7 @@
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
 	<!-- ==================================================================== -->
-	<target name="manual" description="Build all the different manual version: html, pdf... " depends="manualSingleHtml,manualHtml,manualPdf">
+	<target name="manual" description="Build all the different manual version: html, pdf... " depends="java2html,manualSingleHtml,manualHtml,manualPdf">
 		<!-- The generation of the files is done by the depends clause -->
 		<!-- Once the doc files have been generated, do some cleaning up -->
 		<delete dir="${docs.tmp.dir}" />

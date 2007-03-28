@@ -8,6 +8,7 @@
 	<property name="lib.dir"            value="${base.dir}/lib" />
 	<property name="src.dir"            value="${base.dir}/src" />
 	<property name="dev.dir"            value="${base.dir}/dev" />
+	<property name="descriptors.dir"    value="${base.dir}/descriptors" />
 	<property name="daemon.dir"         value="${base.dir}/p2p" />
 	<property name="classes.dir"        value="${base.dir}/classes" />
 	<property name="test.classes.dir"   value="${base.dir}/test-classes" />
@@ -25,19 +26,22 @@
 
 	<property name="cl.proactive.dir"   value="${classes.dir}/Core" />
 	<property name="cl.extensions.dir"  value="${classes.dir}/Extensions" />
-	<property name="cl.extra.dir"  value="${classes.dir}/Extra" />
+	<property name="cl.extra.dir"  		value="${classes.dir}/Extra" />
 	<property name="cl.examples.dir"    value="${classes.dir}/Examples" />
 	<property name="cl.ic2d.dir"        value="${classes.dir}/IC2D-old" />
 	<property name="cl.test.dir"        value="${classes.dir}/Tests" />
 	<property name="cl.utils.dir"       value="${classes.dir}/Utils" />
 
-	<property name="extensions.path"    value="org/objectweb/proactive/extensions"/>
-	<property name="extra.path"    value="org/objectweb/proactive/extra"/>
+	<property name="proactive.path" 	value="org/objectweb/proactive" />
+	<property name="proactive.core.path" value="${proactive.path}/core" />
+	<property name="proactive.ext.path" value="${proactive.path}/ext" />
+	<property name="extensions.path"    value="${proactive.path}/extensions"/>
+	<property name="extra.path"    		value="${proactive.path}/extra"/>
 
-	<property name="doc.src"       value="${base.dir}/doc-src" />
-	<property name="docs.dir"      value="${base.dir}/docs" />
-	<property name="docs.tmp.dir"  value="${docs.dir}/tmp" />
-	<property name="docs.mainFile" value="PA_index.xml" />
+	<property name="doc.src"       		value="${base.dir}/doc-src" />
+	<property name="docs.dir"      		value="${base.dir}/docs" />
+	<property name="docs.tmp.dir"  		value="${docs.dir}/tmp" />
+	<property name="docs.mainFile" 		value="PA_index.xml" />
 	
 	<!-- Javac properties -->
 	<property name="debug" value="on" />
