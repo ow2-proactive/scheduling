@@ -317,6 +317,21 @@ public class MulticastControllerImpl extends AbstractProActiveController
                     clientSideEffectiveArguments[i], delegatee.size()));
         }
 
+        int max = dispatchSizes.get(0);
+        for (int i = 1; i < dispatchSizes.size(); i++) {
+            if (dispatchSizes.get(i) > max) {
+                max = dispatchSizes.get(i);
+            }
+        }
+        if (max == -1) {
+            expectedMethodCallsNb = delegatee.size();
+        }
+        for (int i = 1; i < dispatchSizes.size(); i++) {
+            if (dispatchSizes.get(i) == -1) {
+                dispatchSizes.set(i, max);
+            }
+        }
+
         if (dispatchSizes.size() > 0) {
             // ok, found some annotated elements
             expectedMethodCallsNb = dispatchSizes.get(0);
@@ -326,8 +341,10 @@ public class MulticastControllerImpl extends AbstractProActiveController
                     throw new ParameterDispatchException(
                         "cannot generate invocation for multicast interface " +
                         itfType.getFcItfName() +
-                        "because the specified distribution of parameters is incorrect in method " +
-                        matchingMethodInClientInterface.getName());
+                        " because the specified distribution of parameters is incorrect in method " +
+                        matchingMethodInClientInterface.getName() + "(" +
+                        dispatchSizes.get(i).intValue() + " instead of " +
+                        expectedMethodCallsNb + ")");
                 }
             }
         } else {
@@ -338,7 +355,8 @@ public class MulticastControllerImpl extends AbstractProActiveController
         // get distributed parameters
         for (int i = 0; i < clientSideParamTypes.length; i++) {
             List<Object> dispatchedParameter = clientSideParamDispatchModes[i].dispatch(clientSideEffectiveArguments[i],
-                    delegatee.size());
+                    expectedMethodCallsNb);
+            //delegatee.size()); FIXME 
             dispatchedParameters.add(dispatchedParameter);
         }
 

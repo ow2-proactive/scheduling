@@ -144,7 +144,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
             return expectedDispatchSize((List) inputParameter, nbOutputReceivers);
         }
 
-        return nbOutputReceivers;
+        return -1;
     }
 
     /*
