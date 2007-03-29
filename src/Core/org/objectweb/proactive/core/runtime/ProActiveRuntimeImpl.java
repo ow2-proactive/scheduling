@@ -176,7 +176,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 if ((file != null) && new File(file).exists()) {
                     // loading security from a file
                     ProActiveRuntimeImpl.runtimeSecurityManager = new ProActiveSecurityManager(file);
-                    ProActiveLogger.getInstance(Loggers.SECURITY_RUNTIME)
+                    ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
                                    .info("ProActive Security Policy (proactive.runtime.security) using " +
                         file);
 
@@ -190,7 +190,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                         ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }
                 } else {
-                    ProActiveLogger.getInstance(Loggers.SECURITY_RUNTIME)
+                    ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
                                    .debug("ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled ");
                 }
             } catch (InvalidPolicyFile e) {

@@ -55,14 +55,6 @@ public class ProActiveLogger extends Logger {
     }
 
     /**
-       This method overrides {@link Logger#getInstance} by supplying
-       its own factory type as a parameter.
-     */
-    public static Category getInstance(String name) {
-        return Logger.getLogger(name, myFactory);
-    }
-
-    /**
        This method overrides {@link Logger#getLogger} by supplying
        its own factory type as a parameter.
      */
