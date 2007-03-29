@@ -12,7 +12,9 @@ public class HelloWorld2 implements ProActiveTask, java.io.Serializable {
     int number;
 
     //PA noArg contructor
-    public HelloWorld2(){}
+    public HelloWorld2() {
+    }
+
     public static void main(String[] args) {
         SchedulerUserAPI scheduler = null;
         try {

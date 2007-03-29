@@ -170,7 +170,7 @@ public class UserScheduler extends SchedulerUserAPI {
             //shut down failed, will return false
             return new BooleanWrapper(false);
         }
-        
+
         //shutdown dint throw an exceptions
         return new BooleanWrapper(true);
     }

@@ -87,10 +87,9 @@ public class SimpleResourceManager implements GenericResourceManager,
         } catch (Exception e) {
             logger.error("Couldnt Terminate the Resource manager" +
                 e.toString());
-            
+
             return new BooleanWrapper(false);
         }
-        
     }
 
     //adds the virtual nodes and create listeners for the virtual nodes to add nodes whenever created
