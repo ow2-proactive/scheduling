@@ -3,6 +3,11 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd ../DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="/user/fviale/home/eclipse_workspace/ProActive_Latest"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" 
+			value="/user/fviale/home/bin/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="matrixNode" property="multiple" />
@@ -27,13 +32,39 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess
-					class="org.objectweb.proactive.core.process.JVMNodeProcess" />
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="${PROACTIVE_HOME}/classes"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath value="${JAVA_HOME}/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath value="${PROACTIVE_HOME}/scripts/proactive-log4j"/>
+					</log4jpropertiesFile>
+					<!--<jvmParameters>
+						<parameter value="-Dproactive.communication.protocol=rmissh"/>
+					</jvmParameters>-->
+				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rsh_list">
+				<!-- <processListbyHost
+					class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
+					hostlist="amda anaconda apple bebita cheypa crios crusoe duff galpage gaudi hajjoura lo maledie meije naruto noadcoco orchidee petawawa pollux predadab psychoquack schubby sea sidonie tranquility trans08 trinidad nyx pincoya">
+					<processReference refid="localJVM"></processReference>
+				</processListbyHost>-->
 				<processListbyHost
 					class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
-					hostlist="crusoe waha amstel">
+					hostlist="anaconda apple bebita cheypa crios crusoe duff galpage gaudi hajjoura">
 					<processReference refid="localJVM"></processReference>
 				</processListbyHost>
 			</processDefinition>
