@@ -52,14 +52,11 @@ import ch.ethz.ssh2.LocalPortForwarder;
  * @see LocalPortForwarder
  */
 public class SshTunnel {
-    private Random random = new Random();
     private SSHConnection connection = null;
     private LocalPortForwarder lpf = null;
     private int localPort;
     private int distantPort;
     private String distantHost;
-    private static Random _random = new Random();
-    static private int lastTriedPort = _random.nextInt(65536 - 1024) + 1024;
 
     /**
      * Open a SSH Tunnel between localhost and distantHost.
@@ -93,9 +90,13 @@ public class SshTunnel {
             throw e;
         }
 
-        for (localPort = (lastTriedPort == 65535) ? 1024 : (lastTriedPort + 1);
-                localPort != lastTriedPort;
+        int initialPort = new Random().nextInt(65536 - 1024) + 1024;
+
+        for (localPort = (initialPort == 65535) ? 1024 : (initialPort + 1);
+                localPort != initialPort;
                 localPort = (localPort == 65535) ? 1024 : (localPort + 1)) {
+            logger.debug("initialPort:" + initialPort + " localPort:" +
+                localPort);
             try {
                 lpf = connection.createTunnel(localPort, distantHost,
                         distantPort);
@@ -109,7 +110,7 @@ public class SshTunnel {
         }
 
         // Looped all over the port range
-        logger.warn(
+        logger.error(
             "No free local port can be found to establish a new SSH-2 tunnel");
         throw new BindException("No free local port found");
     }
