@@ -37,17 +37,14 @@ package org.objectweb.proactive.extra.scheduler;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import static org.objectweb.proactive.extra.scheduler.Scheduler.logger;
 import org.objectweb.proactive.extra.scheduler.exception.UserException;
 
 
 public class UserScheduler extends SchedulerUserAPI {
     private static long taskID = 0;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private boolean stopped;
     Scheduler scheduler;
 

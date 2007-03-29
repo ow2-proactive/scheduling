@@ -30,14 +30,12 @@ package org.objectweb.proactive.extra.scheduler;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import static org.objectweb.proactive.extra.scheduler.Scheduler.logger;
 import org.objectweb.proactive.extra.scheduler.exception.AdminException;
 import org.objectweb.proactive.extra.scheduler.exception.NFEHandler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.GenericResourceManager;
@@ -50,7 +48,6 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.GenericResourceMa
  *
  */
 public class AdminScheduler {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private Scheduler scheduler;
     private UserScheduler userScheduler;
 

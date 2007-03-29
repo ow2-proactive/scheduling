@@ -1,14 +1,12 @@
 package org.objectweb.proactive.extra.scheduler.exception;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import static org.objectweb.proactive.extra.scheduler.Scheduler.logger;
 
 
 public class NFEHandler implements NFEListener, java.io.Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private String source;
 
     public NFEHandler() {

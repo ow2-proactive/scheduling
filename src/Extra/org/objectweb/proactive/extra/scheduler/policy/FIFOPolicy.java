@@ -38,17 +38,15 @@ package org.objectweb.proactive.extra.scheduler.policy;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.scheduler.ActiveExecuter;
 import org.objectweb.proactive.extra.scheduler.Info;
 import org.objectweb.proactive.extra.scheduler.InternalTask;
 import org.objectweb.proactive.extra.scheduler.NodeNExecuter;
+import static org.objectweb.proactive.extra.scheduler.Scheduler.logger;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.GenericResourceManager;
 
 
@@ -64,7 +62,6 @@ public class FIFOPolicy implements GenericPolicy {
     LinkedList<InternalTask> list; //normal queue
     LinkedList<InternalTask> failedList; //used in failed conditions
     GenericResourceManager rm;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /**
      * this is a function that simulates what a nodepool would do
