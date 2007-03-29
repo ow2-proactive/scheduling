@@ -74,6 +74,7 @@
 		<macrodef name="checkDir">
 			<attribute name="dir" />
 			<attribute name="tmpdir"/>
+			<attribute name="prop"/>
 			<sequential>
 				<delete dir="@{tmpdir}" />
 				<copy todir="@{tmpdir}">
@@ -82,24 +83,34 @@
 
 				<format_m srcDir="@{tmpdir}" />
 
-				<java fork="true" resultproperty="diffReturnVal" classname="diff.DiffJavaDir">
+				<java fork="true" resultproperty="@{prop}" classname="diff.DiffJavaDir">
 					<classpath refid="project.classpath" />
 					<arg value="@{dir}" />
 					<arg value="@{tmpdir}" />
 				</java>
 				<delete dir="@{tmpdir}" />
-				<if name="diffReturnVal" value="1">
-					<fail message="Please use Jalopy" />
-				</if>
 			</sequential>
 		</macrodef>
 		
 		<parallel threadsperprocessor="1">
-			<checkDir dir="${src.proactive.dir}"  tmpdir="${classes.dir}/tmp/ProActive"/>
-			<checkDir dir="${src.extensions.dir}" tmpdir="${classes.dir}/tmp/Extensions" />
-			<checkDir dir="${src.extra.dir}"      tmpdir="${classes.dir}/tmp/Extra" />
-			<checkDir dir="${src.examples.dir}"   tmpdir="${classes.dir}/tmp/Examples" />
+			<checkDir prop="check.proactive"  dir="${src.proactive.dir}"  tmpdir="${classes.dir}/tmp/ProActive"/>
+			<checkDir prop="check.extensions" dir="${src.extensions.dir}" tmpdir="${classes.dir}/tmp/Extensions" />
+			<checkDir prop="check.extra"      dir="${src.extra.dir}"      tmpdir="${classes.dir}/tmp/Extra" />
+			<checkDir prop="check.examples"   dir="${src.examples.dir}"   tmpdir="${classes.dir}/tmp/Examples" />
 		</parallel>
+
+		<condition property="check.failed">
+			<or>
+				<isfailure code="${check.proactive}" />
+				<isfailure code="${check.extensions}" />
+				<isfailure code="${check.extra}" />
+				<isfailure code="${check.examples}" />
+			</or>
+		</condition>
+
+		<if name="check.failed" exists="true">
+			<fail message="Please use Jalopy (,/build format)" />
+		</if>
 	</target>
 
 	<!-- ================================================================ -->
