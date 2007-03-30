@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.infrastructuremanager;
 
 import java.io.IOException;
+import java.net.URI;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
@@ -23,7 +24,7 @@ public class IMFactory implements IMConstants {
     private static IMCore imcore = null;
 
     /**
-     *
+     * Start the infrastructure manager in the local host
      * @throws NodeException
      * @throws ActiveObjectCreationException
      * @throws AlreadyBoundException
@@ -53,7 +54,7 @@ public class IMFactory implements IMConstants {
     // GET IMCORE
 
     /**
-     * Warning : For Invoking this method, call before startLocal() method
+     * Get the actif object IMCORE in the local host
      * @return IMCore
      * @throws IOException
      * @throws AlreadyBoundException
@@ -89,7 +90,24 @@ public class IMFactory implements IMConstants {
     }
 
     /**
-     * Warning : For Invoking this method, call before startLocal() or getIMCore(urlIM)
+     * Call the method getIMCore(String);<BR/>
+     * URL -> String
+     * @param urlIM
+     * @return IMCore
+     * @throws ActiveObjectCreationException
+     * @throws IOException
+     */
+    private static IMCore getIMCore(URI urlIM)
+        throws ActiveObjectCreationException, IOException {
+        String locationIM = urlIM.toString();
+        if (!(locationIM.charAt(locationIM.length() - 1) == '/')) {
+            locationIM += "/";
+        }
+        locationIM += IMConstants.NAME_ACTIVE_OBJECT_IMCORE;
+        return getIMCore(locationIM);
+    }
+
+    /**
      * @return IMAdmin
      * @throws IOException
      * @throws AlreadyBoundException
@@ -113,14 +131,15 @@ public class IMFactory implements IMConstants {
     }
 
     /**
-     * @param urlIM : the location of the actif object IMCORE (For example : "//localhost/IMCORE")
+     * @param urlIM : the location of the actif object IMCORE
+     *                 (For example : "rmi://localhost:1099/")
      * @return IMAdmin
      * @throws IOException
      * @throws ActiveObjectCreationException
      */
-    public static IMAdmin getAdmin(String urlIM)
+    public static IMAdmin getAdmin(URI uriIM)
         throws ActiveObjectCreationException, IOException {
-        IMCore imcoreLookUp = getIMCore(urlIM);
+        IMCore imcoreLookUp = getIMCore(uriIM);
         return imcoreLookUp.getAdmin();
     }
 
@@ -128,7 +147,6 @@ public class IMFactory implements IMConstants {
     // GET MONITORING
 
     /**
-     * Warning : For Invoking this method, call before startLocal() or getIMCore(urlIM)
      * @return IMMonitoring
      * @throws IOException
      * @throws AlreadyBoundException
@@ -146,14 +164,15 @@ public class IMFactory implements IMConstants {
     }
 
     /**
-     * @param urlIM : the location of the actif object IMCORE (For example : "//localhost/IMCORE")
+     * @param urlIM : the location of the actif object IMCORE
+     *                 (For example : "rmi://localhost:1099/")
      * @return IMMonitoring
      * @throws IOException
      * @throws ActiveObjectCreationException
      */
-    public static IMMonitoring getMonitoring(String urlIM)
+    public static IMMonitoring getMonitoring(URI uriIM)
         throws ActiveObjectCreationException, IOException {
-        IMCore imcoreLookUp = getIMCore(urlIM);
+        IMCore imcoreLookUp = getIMCore(uriIM);
         return imcoreLookUp.getMonitoring();
     }
 
@@ -161,7 +180,6 @@ public class IMFactory implements IMConstants {
     // GET USER
 
     /**
-     * Warning : For Invoking this method, call before startLocal() or getIMCore(urlIM)
      * @return IMUser
      * @throws IOException
      * @throws AlreadyBoundException
@@ -179,14 +197,15 @@ public class IMFactory implements IMConstants {
     }
 
     /**
-     * @param urlIM : the location of the actif object IMCORE (For example : "//localhost/IMCORE")
+     * @param urlIM : the location of the actif object IMCORE
+     *                 (For example : "rmi://localhost:1099/")
      * @return IMUser
      * @throws IOException
      * @throws ActiveObjectCreationException
      */
-    public static IMUser getUser(String urlIM)
+    public static IMUser getUser(URI uriIM)
         throws ActiveObjectCreationException, IOException {
-        IMCore imcoreLookUp = getIMCore(urlIM);
+        IMCore imcoreLookUp = getIMCore(uriIM);
         return imcoreLookUp.getUser();
     }
 

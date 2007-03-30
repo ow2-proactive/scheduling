@@ -2,7 +2,9 @@ package org.objectweb.proactive.extra.infrastructuremanager.core;
 
 import java.io.Serializable;
 
-
+/**
+ * @deprecated
+ */
 public class IMActionStatus implements Serializable {
     // Attributes
     private boolean successAction;

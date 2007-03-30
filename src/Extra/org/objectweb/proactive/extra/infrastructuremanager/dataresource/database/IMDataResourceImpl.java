@@ -21,6 +21,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     // Attributes
     private ArrayList<IMNode> listFreeIMNode = new IMArrayListFree();
     private ArrayList<IMNode> listBusyIMNode = new IMArrayListBusy();
+    private ArrayList<IMNode> listDownIMNode = new ArrayList<IMNode>();
     private HashMap<String, ProActiveDescriptor> listPad = new HashMap<String, ProActiveDescriptor>();
 
     //----------------------------------------------------------------------//
@@ -29,8 +30,9 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     }
 
     public void init() {
-        listFreeIMNode = new ArrayList<IMNode>();
-        listBusyIMNode = new ArrayList<IMNode>();
+        listFreeIMNode = new IMArrayListFree();
+        listBusyIMNode = new IMArrayListBusy();
+        listDownIMNode = new ArrayList<IMNode>();
         listPad = new HashMap<String, ProActiveDescriptor>();
     }
 
@@ -50,8 +52,17 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
         return listBusyIMNode.size();
     }
 
+    public int getSizeListDownIMNode() {
+        return listDownIMNode.size();
+    }
+
     public int getSizeListPad() {
         return listPad.size();
+    }
+
+    public int getNbAllIMNode() {
+        return getSizeListFreeIMNode() + getSizeListBusyIMNode() +
+        getSizeListDownIMNode();
     }
 
     public ArrayList<IMNode> getListFreeIMNode() {
@@ -83,9 +94,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                 logger.info("pad name : " + padName);
             }
             ProActiveDescriptor pad = listPad.get(padName);
-            if (logger.isInfoEnabled()) {
-                logger.info("pad url : " + pad.getUrl());
-            }
+
             ArrayList<VirtualNode> deployedVNodes = new ArrayList<VirtualNode>();
             VirtualNode[] vns = pad.getVirtualNodes();
             if (logger.isInfoEnabled()) {
@@ -93,7 +102,8 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             }
             for (VirtualNode vn : vns) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("vn is actif ? " + vn.isActivated());
+                    logger.info("virtualnode " + vn.getName() + " is actif ? " +
+                        vn.isActivated());
                 }
                 if (vn.isActivated()) {
                     deployedVNodes.add(vn);
@@ -133,12 +143,18 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     public void removeNode(String padName) {
         for (IMNode imnode : listBusyIMNode) {
             if (imnode.getPADName().equals(padName)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("remove node : " + imnode.getNodeName());
+                }
                 listBusyIMNode.remove(imnode);
             }
         }
         for (IMNode imnode : listFreeIMNode) {
             if (imnode.getPADName().equals(padName)) {
-                listBusyIMNode.remove(imnode);
+                if (logger.isInfoEnabled()) {
+                    logger.info("remove node : " + imnode.getNodeName());
+                }
+                listFreeIMNode.remove(imnode);
             }
         }
     }
@@ -147,12 +163,18 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
         for (IMNode imnode : listBusyIMNode) {
             if (imnode.getPADName().equals(padName) &
                     imnode.getVNodeName().equals(vnName)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("remove node : " + imnode.getNodeName());
+                }
                 listBusyIMNode.remove(imnode);
             }
         }
-        for (IMNode imnode : listBusyIMNode) {
+        for (IMNode imnode : listFreeIMNode) {
             if (imnode.getPADName().equals(padName) &
                     imnode.getVNodeName().equals(vnName)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("remove node : " + imnode.getNodeName());
+                }
                 listFreeIMNode.remove(imnode);
             }
         }
@@ -220,6 +242,10 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
         } else {
             throw new NodeException("There isn't free node");
         }
+    }
+
+    public void nodeIsDown(IMNode imNode) {
+        imNode.setDown(true);
     }
 
     //----------------------------------------------------------------------//
