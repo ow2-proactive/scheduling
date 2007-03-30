@@ -100,7 +100,6 @@
       <feature id="org.objectweb.proactive.ic2d.base" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.core" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.dgc" version="1.0.0"/>
-      <feature id="org.objectweb.proactive.ic2d.launcher" version="1.0.0"/>
       <feature id="org.objectweb.proactive.ic2d.monitoring" version="1.0.0"/>
    </features>
 
