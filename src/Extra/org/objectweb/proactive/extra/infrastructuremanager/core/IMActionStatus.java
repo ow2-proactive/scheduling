@@ -2,6 +2,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.core;
 
 import java.io.Serializable;
 
+
 /**
  * @deprecated
  */
