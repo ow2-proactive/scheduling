@@ -91,6 +91,11 @@ public class GarbageCollector {
             TTA = 5 * TTB;
         }
 
+        String tta = System.getProperty("proactive.dgc.tta");
+        if (tta != null) {
+            TTA = Integer.parseInt(tta);
+        }
+
         if (dgcIsEnabled()) {
             AsyncLogger.queueLog(Level.INFO,
                 "Starting DGC, TTB:" + TTB + " TTA:" + TTA);
