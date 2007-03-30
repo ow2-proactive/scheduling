@@ -21,25 +21,20 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
-import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
 
-public class IMDialogRedeploy  extends Dialog {
+public class IMDialogKill  extends Dialog {
 
-	private final String TITLE = "Redeploy";
+	private final String TITLE = "Kill";
 	private Shell shell;
-	private Button redeployButton, cancelButton;
-
+	private Button killButton, cancelButton;
 	private Combo combo;
 	private Table table;
 	private Composite labelAndCheckComposite, buttonsComposite;
-
 	private IMAdmin admin;
-
-	//private HashMap<String, ProActiveDescriptor> hashMap;
 	private HashMap<String, ArrayList<VirtualNode>> hashMap;
 
-
-	public IMDialogRedeploy(Shell parent, IMAdmin admin) {
+	
+	public IMDialogKill(Shell parent, IMAdmin admin) {
 		// Pass the default styles here
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
@@ -62,9 +57,7 @@ public class IMDialogRedeploy  extends Dialog {
 
 		// FileChooser Button & Text
 		addCombo();
-		//addLabelAndCheckAll();
-		//addTable();
-		addRedeployCancelButton();
+		addButtonsComposite();
 
 		shell.setSize(500, 150);
 		shell.open();
@@ -88,7 +81,7 @@ public class IMDialogRedeploy  extends Dialog {
 					buttonsComposite.dispose();
 					addLabelAndCheckAll();
 					addTable();
-					addRedeployCancelButton();
+					addButtonsComposite();
 				}
 				addTableItems();
 				shell.setSize(500, 400);
@@ -138,7 +131,7 @@ public class IMDialogRedeploy  extends Dialog {
 	}
 
 
-	public void addRedeployCancelButton() {
+	public void addButtonsComposite() {
 		buttonsComposite = new Composite(shell, SWT.NONE);
 		RowLayout layout = new RowLayout(SWT.HORIZONTAL);
 		layout.spacing = 20;
@@ -154,10 +147,10 @@ public class IMDialogRedeploy  extends Dialog {
 			}
 		});
 
-		redeployButton = new Button(buttonsComposite, SWT.PUSH);
-		redeployButton.setText("Redeploy");
-		redeployButton.setEnabled(false);
-		redeployButton.addSelectionListener(new SelectionAdapter() {
+		killButton = new Button(buttonsComposite, SWT.PUSH);
+		killButton.setText("Kill");
+		killButton.setEnabled(false);
+		killButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				// TODO : IMDialogDeploy Action deployButton ...);
 				ArrayList<String> listOfCheckedItem = new ArrayList<String>();				
@@ -168,20 +161,16 @@ public class IMDialogRedeploy  extends Dialog {
 				}
 				int checkedItemsNumber = listOfCheckedItem.size();
 				if (checkedItemsNumber == 0) {
-					Label warningLabel = new Label(shell, SWT.NONE);
-					warningLabel.setForeground(IMConstants.RED_COLOR);
-					warningLabel.setText("Check at least one ...");
-					warningLabel.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-					shell.setSize(500, 450);
+					shell.close();
 				}
 				else {
 					if (checkedItemsNumber == 1) {
-						admin.redeploy(combo.getText(), listOfCheckedItem.get(0));
+						admin.killPAD(combo.getText(), listOfCheckedItem.get(0));
 					}
 					else {
 						String[] tab = new String[checkedItemsNumber];
 						listOfCheckedItem.toArray(tab);
-						admin.redeploy(combo.getText(), tab);
+						admin.killPAD(combo.getText(), tab);
 					}
 					shell.close();
 				}
@@ -199,7 +188,7 @@ public class IMDialogRedeploy  extends Dialog {
 		table.setVisible(true);
 		table.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		table.redraw();
-		redeployButton.setEnabled(true);
+		killButton.setEnabled(true);
 	}
 
 }

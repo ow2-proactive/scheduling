@@ -9,7 +9,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
 public class IMConstants {
-	
+
 	public static final String STATUS_AVAILABLE = "Available";
 	public static final String STATUS_BUSY = "Busy";
 	public static final String STATUS_DOWN = "Down";
@@ -20,7 +20,9 @@ public class IMConstants {
 	public static final Color AVAILABLE_COLOR;
 	public static final Color BUSY_COLOR;
 	public static final Color DOWN_COLOR;
+	
 	public static final Color WHITE_COLOR;
+	public static final Color RED_COLOR;
 	
 	public static Node nodeTransfert;
 	
@@ -33,7 +35,8 @@ public class IMConstants {
 		BUSY_COLOR = new Color(device, 255, 190, 0);
 		DOWN_COLOR = new Color(device, 255, 0, 0);
 		WHITE_COLOR = new Color(device, 255, 255, 255);
-
+		RED_COLOR = new Color(device, 255, 0, 0);
+		
 		try {
 			nodeTransfert = NodeFactory.createNode("NODE_TRANSFERT");
 		} 

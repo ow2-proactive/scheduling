@@ -1,6 +1,5 @@
 package org.objectweb.proactive.ic2d.infrastructuremanager.views;
 
-
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -16,10 +15,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
-import org.objectweb.proactive.ic2d.infrastructuremanager.figure.IMNodeFigure;
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.ic2d.infrastructuremanager.figure.IMFigureNode;
 import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
 
 
@@ -37,7 +34,6 @@ public class IMViewLegend extends ViewPart {
 		line.horizontalAlignment = GridData.FILL;
 		line.grabExcessHorizontalSpace = true;
 				
-		
 		GridData listSize = new GridData();
 		listSize.horizontalAlignment = GridData.FILL;
 		listSize.verticalAlignment = GridData.FILL;
@@ -47,7 +43,6 @@ public class IMViewLegend extends ViewPart {
 		FormLayout generalLayout = new FormLayout();
 		generalLayout.marginHeight = 5;
 		generalLayout.marginWidth = 5;	
-		
 		
 		p.setLayout(new FillLayout());
 		ScrolledComposite sc = new ScrolledComposite(p, SWT.H_SCROLL | SWT.V_SCROLL);
@@ -89,8 +84,6 @@ public class IMViewLegend extends ViewPart {
 		Label jvm1Text = new Label(jvmDef, 0);
 		jvm1Text.setText("Standard JVM");
 
-			
-		
 		//--------- Nodes ---------//
 		Group nodeDef = new Group(child, 0);
 		GridLayout nodeLayout = new GridLayout();
@@ -105,17 +98,17 @@ public class IMViewLegend extends ViewPart {
 		nodeDef.setLayoutData(nodeDefFormData);
 		// Available Node
 		FigureCanvas node1Container = new FigureCanvas(nodeDef);
-		node1Container.setContents(new IMNodeFigure(IMConstants.STATUS_AVAILABLE));
+		node1Container.setContents(new IMFigureNode(IMConstants.STATUS_AVAILABLE));
 		Label node1Text = new Label(nodeDef, 0);
 		node1Text.setText("Available Node");
 		// Busy Node
 		FigureCanvas node2Container = new FigureCanvas(nodeDef);
-		node2Container.setContents(new IMNodeFigure(IMConstants.STATUS_BUSY));
+		node2Container.setContents(new IMFigureNode(IMConstants.STATUS_BUSY));
 		Label node2Text = new Label(nodeDef, 0);
 		node2Text.setText("Busy Node");
 		// Down Node
 		FigureCanvas node3Container = new FigureCanvas(nodeDef);
-		node3Container.setContents(new IMNodeFigure(IMConstants.STATUS_DOWN));
+		node3Container.setContents(new IMFigureNode(IMConstants.STATUS_DOWN));
 		Label node3Text = new Label(nodeDef, 0);
 		node3Text.setText("Down Node");
 

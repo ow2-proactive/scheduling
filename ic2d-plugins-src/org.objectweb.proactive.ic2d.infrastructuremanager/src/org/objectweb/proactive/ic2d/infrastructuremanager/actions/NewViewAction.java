@@ -9,8 +9,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.ic2d.infrastructuremanager.dialog.IMDialogConnection;
-import org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewAdministration;
 import org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewInfrastructure;
 
 
@@ -26,18 +24,12 @@ public class NewViewAction  extends Action implements IWorkbenchWindowActionDele
 		this.setToolTipText("New Infrastructure View");
 	}
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
-
 	public void dispose() {
 		// TODO Auto-generated method stub
-
 	}
 
 	public void init(IWorkbenchWindow window) {
 		// TODO Auto-generated method stub
-
 	}
 
 	public void run(IAction action) {
@@ -46,7 +38,6 @@ public class NewViewAction  extends Action implements IWorkbenchWindowActionDele
 
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -67,14 +58,3 @@ public class NewViewAction  extends Action implements IWorkbenchWindowActionDele
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-

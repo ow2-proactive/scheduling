@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.extra.infrastructuremanager.core.IMConstants;
 import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 
 public class IMDialogConnection extends Dialog {
@@ -29,8 +28,7 @@ public class IMDialogConnection extends Dialog {
 	private Combo combo;
 	private Button okButton;
 	private Button cancelButton;
-	private Label labelException;
-	
+
 	private String url;
 	private String nameView;
 	private boolean accept = false;
@@ -60,7 +58,7 @@ public class IMDialogConnection extends Dialog {
 
 		/* Init the shell */
 		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
-		shell.setText("Adding host and depth to monitor");
+		shell.setText("Connect to an Infrastructure Manager");
 		FormLayout layout = new FormLayout();
 		layout.marginHeight = 5;
 		layout.marginWidth = 5;
@@ -68,7 +66,7 @@ public class IMDialogConnection extends Dialog {
 
 		////// group "Host to monitor"
 		Group hostGroup = new Group(shell, SWT.NONE);
-		hostGroup.setText("Host to monitor");
+		hostGroup.setText("Infrastructure Manager to manage");
 		FormLayout hostLayout = new FormLayout();
 		hostLayout.marginHeight = 5;
 		hostLayout.marginWidth = 5;
@@ -127,36 +125,27 @@ public class IMDialogConnection extends Dialog {
 		protocolFormData.right = new FormAttachment(100, 0);
 		combo.setLayoutData(protocolFormData);
 
-		// button "OK"
-		this.okButton = new Button(shell, SWT.NONE);
-		okButton.setText("OK");
-		okButton.addSelectionListener(new IMDialogConnectionButtonListener());
-		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(hostGroup, 20);
-		okFormData.left = new FormAttachment(25, 20);
-		okFormData.right = new FormAttachment(50, -10);
-		okButton.setLayoutData(okFormData);
-		shell.setDefaultButton(okButton);
-
 		// button "CANCEL"
 		this.cancelButton = new Button(shell, SWT.NONE);
 		cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new IMDialogConnectionButtonListener());
 		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(hostGroup, 20);
-		cancelFormData.left = new FormAttachment(50, 10);
-		cancelFormData.right = new FormAttachment(75, -20);
+		cancelFormData.top = new FormAttachment(hostGroup, 10);
+		cancelFormData.left = new FormAttachment(25, 20);
+		cancelFormData.right = new FormAttachment(50, -10);
 		cancelButton.setLayoutData(cancelFormData);		
-		
-		// Label Exception
-		labelException = new Label(shell, SWT.NONE);
-		labelException.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_RED));
-		FormData labelFormData = new FormData();
-		labelFormData.top = new FormAttachment(okButton, 20);
-		labelFormData.left = new FormAttachment(25, 10);
-		labelFormData.right = new FormAttachment(75, -20);
-		labelException.setLayoutData(labelFormData);		
-		
+
+		// button "OK"
+		this.okButton = new Button(shell, SWT.NONE);
+		okButton.setText("OK");
+		okButton.addSelectionListener(new IMDialogConnectionButtonListener());
+		FormData okFormData = new FormData();
+		okFormData.top = new FormAttachment(hostGroup, 10);
+		okFormData.left = new FormAttachment(50, 10);
+		okFormData.right = new FormAttachment(75, -20);
+		okButton.setLayoutData(okFormData);
+		shell.setDefaultButton(okButton);
+
 		shell.pack();
 		shell.open();
 
@@ -166,11 +155,11 @@ public class IMDialogConnection extends Dialog {
 		}
 
 	}
-	
+
 	public boolean isAccept() {
 		return accept;
 	}
-	
+
 	public String getUrl() {
 		return url;
 	}
@@ -178,15 +167,12 @@ public class IMDialogConnection extends Dialog {
 	public String getNameView() {
 		return nameView;
 	}
-	
+
 	private class IMDialogConnectionButtonListener extends SelectionAdapter {
 		public void widgetSelected(SelectionEvent e) {
 			if(e.widget == okButton) {
-				
 				nameView = hostText.getText() + ":" + portText.getText();
 				url = combo.getText().toLowerCase() + "://" + nameView; 
-				url += "/" + IMConstants.NAME_ACTIVE_OBJECT_IMCORE;
-				
 				accept = true;
 			}
 			shell.close();

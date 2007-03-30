@@ -1,99 +1,106 @@
 package org.objectweb.proactive.ic2d.infrastructuremanager.data;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Observable;
+import java.util.Collections;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
+import org.objectweb.proactive.extra.infrastructuremanager.test.simple.ComparatorIMNode;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.infrastructuremanager.Activator;
+import org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewInfrastructure;
 
-public class IMData extends Observable {
+public class IMData implements Runnable {
 
-	private String url;
+	private URI uri;
+	private IMViewInfrastructure view;
 	private IMAdmin admin;
 	private IMMonitoring monitoring;
-	
-	private int availableNode, busyNode, downNode;
-	private HashMap<String, HashMap<String, ArrayList<IMNode>>> infrastructure;
 
+	private int freeNode, busyNode, downNode;
+	private ArrayList<IMNode> infrastructure;
 	
+	private Console console;
+	
+	private long ttr = 30;
+
 	public IMData() {
 	}
-	
-	public IMData(String url) {
+
+	public IMData(String urlString, IMViewInfrastructure view) {
 		try {
-			this.url = url;
-			admin = IMFactory.getAdmin(url);
-			monitoring = IMFactory.getMonitoring(url);
-			arrayListToHashMap(monitoring.getListAllIMNodes());
+			uri = new URI(urlString);
+			this.view = view;
+			console = Console.getInstance(Activator.CONSOLE_NAME);
+			admin = IMFactory.getAdmin(uri);
+			monitoring = IMFactory.getMonitoring(uri);
 		}
 		catch (ActiveObjectCreationException ex) {
 			ex.printStackTrace();
 		}
 		catch (IOException ex) {
 			ex.printStackTrace();
+		} catch (URISyntaxException ex) {
+			ex.printStackTrace();
 		}		
 	}
 
-	public String getURL() {
-		return url;
-	}
-	
-	public HashMap<String, HashMap<String,ArrayList<IMNode>>> getInfrastructure() {
+	public ArrayList<IMNode> getInfrastructure() {
 		return infrastructure;
 	}
-	
+
 	public IMAdmin getAdmin() {
 		return admin;
 	}
-	
-	public void arrayListToHashMap(ArrayList<IMNode> list) {
-		infrastructure = new HashMap<String, HashMap<String, ArrayList<IMNode>>>();
-		String descriptorName, vnodeName;
-		for (IMNode node : list) {
-			descriptorName = node.getPADName();
-			vnodeName = node.getVNodeName();
-			// Si le descriptor n'existe pas dans infrastructure
-			if(! infrastructure.containsKey(descriptorName)) {
-				infrastructure.put(descriptorName, new HashMap<String, ArrayList<IMNode>>());				
-			}
-			// Si le vnode n'existe pas dans infrastructure/descriptorName
-			if(! infrastructure.get(descriptorName).containsKey(vnodeName)) {
-				infrastructure.get(descriptorName).put(vnodeName, new ArrayList<IMNode>());
-			}
-			// on ajoute le IMNode dans infrastructure/descriptorName/vnodeName
-			infrastructure.get(descriptorName).get(vnodeName).add(node);
-		}
+
+	public int getFree() {
+		return freeNode;
+	}
+
+	public int getBusy() {
+		return busyNode;
 	}
 	
+
+	public void updateInfrastructure() {
+		infrastructure = monitoring.getListAllIMNodes();
+		freeNode = monitoring.getNumberOfFreeResource();
+		busyNode = monitoring.getNumberOfBusyResource();
+		
+		Collections.sort(infrastructure, new ComparatorIMNode());
+	}
+
+	public void run() {
+		while(view != null) {
+			console.log("Refresh");
+			updateInfrastructure();
+			view.getParent().getDisplay().asyncExec( new Runnable(){
+				public void run(){
+					view.drawInfrastructure();
+				}
+			});
+			try {
+				Thread.sleep(ttr * 1000);
+			} 
+			catch (InterruptedException e) {
+			}
+		}
+	}
+
+	public long getTTR() {
+		return ttr;
+	}
+
+	public void setTTR(long t) {
+		console.log("Set TTR : Time To Refresh = " + t + " seconds");
+		ttr = t;
+		view.threadRefresh.interrupt();
+	}
 	
-	// TODO
-	/*public HashMap<String, HashMap<String,ArrayList<IMNode>>> getInfrastructureTest() {
-		ArrayList<IMNode> list = new ArrayList<IMNode>();
-		
-		list.add(new IMNodeImpl(new NodeImpl(), "Busy", "VNode1", "Descriptor1"));
-		list.add(new IMNodeImpl(new NodeImpl(), "Available", "VNode1", "Descriptor1"));
-		
-		list.add(new IMNodeImpl(new NodeImpl(), "Down", "VNode2", "Descriptor1"));
-		list.add(new IMNodeImpl(new NodeImpl(), "Busy", "VNode2", "Descriptor1"));
-		list.add(new IMNodeImpl(new NodeImpl(), "Available", "VNode2", "Descriptor1"));
-		
-		list.add(new IMNodeImpl(new NodeImpl(), "Available", "VNode3", "Descriptor2"));
-		list.add(new IMNodeImpl(new NodeImpl(), "Available", "VNode3", "Descriptor2"));
-		list.add(new IMNodeImpl(new NodeImpl(), "Available", "VNode3", "Descriptor2"));
-		list.add(new IMNodeImpl(new NodeImpl(), "Busy", "VNode3", "Descriptor2"));
-		
-		list.add(new IMNodeImpl(new NodeImpl(), "Busy", "VNode4", "Descriptor2"));
-		
-		list.add(new IMNodeImpl(new NodeImpl(), "Busy", "VNode5", "Descriptor3"));
-		
-		list.add(new IMNodeImpl(new NodeImpl(), "Busy", "VNode5", "Descriptor3"));
-		
-		arrayListToHashMap(list);
-		return infrastructure;
-	}*/
 }

@@ -6,35 +6,62 @@ import java.util.HashMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ExpandItem;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
-
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
 
 public class IMCompositeDescriptor extends Composite {
 
-	private ExpandItem expandItem;
+	private ExpandItem item;
+	private HashMap<String, IMCompositeVNode> vnodes;
 	
-	public IMCompositeDescriptor(Composite parent, int style, ExpandItem ei, HashMap<String,ArrayList<IMNode>> liste) {
-		super(parent, style);
-		RowLayout rowLayoutVertical = new RowLayout(SWT.VERTICAL);
-		rowLayoutVertical.pack = true;
-		setLayout(rowLayoutVertical);
-		expandItem = ei;
-				
-		// Pour tous les VNodes
-		for (String nameVNode : liste.keySet()) {
-			new IMCompositeVNode(this, SWT.NONE, nameVNode, liste.get(nameVNode));
-		}
-		setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-		expandItem.setHeight(computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
-		expandItem.setControl(this);
+	public IMCompositeDescriptor(Composite parent, ExpandItem ei) {
+		super(parent, SWT.NONE);
+		item = ei;
+		vnodes = new HashMap<String, IMCompositeVNode>();
+		RowLayout layout = new RowLayout(SWT.VERTICAL);
+		layout.wrap = false;
+		setLayout(layout);
+		setBackground(IMConstants.WHITE_COLOR);
+
+		Menu menu = new Menu(parent.getShell(), SWT.POP_UP);
+		MenuItem item = new MenuItem(menu, SWT.PUSH);
+		item.setText ("Item Test");
+		item.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				System.out.println("item selected: Item Test");
+			}
+		});
+		setMenu(menu);
+		
 	}
-	
+
 	public void pack(boolean b) {
 		super.pack(b);
-		expandItem.setHeight(getSize().y);
-		expandItem.getParent().redraw();
+		item.setHeight(computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
+		item.getParent().redraw();
+	}
+
+	public void addVnode(IMCompositeVNode v) {
+		vnodes.put(v.getName(), v);
+	}
+	
+	public HashMap<String, IMCompositeVNode> getVnodes() {
+		return vnodes;
+	}
+	
+	public ArrayList<String> getNamesOfExpandedVNodes() {
+		ArrayList<String> res = new ArrayList<String>();
+		for (IMCompositeVNode vnode : vnodes.values()) {
+			if(! vnode.isCollapsed()) {
+				res.add(vnode.getName());
+			}
+		}
+		return res;
 	}
 	
 }

@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin>
+<plugin
+   id="org.objectweb.proative.ic2d.infrastructuremanager"
+   name="Infrastructure Manager"
+   version="0.5"
+   provider-name="ProActive">
+   <requires>
+      <import plugin="org.objectweb.proactive.ic2d.console"/>
+      <import plugin="org.objectweb.proactive.ic2d.lib"/>
+      <import plugin="org.objectweb.proactive.ic2d.monitoring"/>
+      <import plugin="org.eclipse.gef"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.ui.views"/>
+   </requires>
    <extension
          id="org.objectweb.proactive.ic2d.infrastructuremanager.perspectives"
          name="Perspectives"
