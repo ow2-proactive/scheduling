@@ -155,4 +155,5 @@ public interface Loggers {
     static final public String IM_DEPLOY = IM_DEPLOYMENT_FACTORY + ".IMDEPLOY";
     static final public String IM_DATARESOURCE = IM + ".IMDATARESOURCE";
     static final public String IM_TEST = IM + ".IMTEST";
+    static final public String IM_ACTIVITY_NODES = IM + ".NODES.ALIVE";
 }
