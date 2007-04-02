@@ -65,7 +65,7 @@
 				     <absolutePath value="proactive.home/lib/components/fractal.jar"/>
 					</classpath>
 					<policyFile>
-						  <absolutePath value="proactive.home/src/nonregressiontest/descriptor/extendedjvm/test.policy"/>
+						  <absolutePath value="proactive.home/src/Tests/nonregressiontest/descriptor/extendedjvm/test.policy"/>
 					</policyFile>
 					<jvmParameters >
 						<parameter value="-Dtata=tata"/>

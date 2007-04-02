@@ -76,7 +76,7 @@ public class Test extends FunctionalTest {
 
         // locates the descriptor directory
         // FIXME if ever the classes are compiled to a location other than a direct child of the PROACTIVE_DIR, the descriptor folder won't be found
-        URI descriptorsuri = baseuri.resolve("../../descriptors");
+        URI descriptorsuri = baseuri.resolve("../../../descriptors");
         File descriptorsfolder = new File(descriptorsuri);
         Assertions.assertTrue("\"" + descriptorsuri +
             "\" directory could not be found", descriptorsfolder.exists());
@@ -89,7 +89,7 @@ public class Test extends FunctionalTest {
         checkValidationRecursive(descriptorsfolder);
 
         // locates the examples directory
-        URI examplesuri = baseuri.resolve("../../src/org/objectweb/proactive/examples");
+        URI examplesuri = baseuri.resolve("../../../src/Examples/org/objectweb/proactive/examples");
         File examplesfolder = new File(examplesuri);
         Assertions.assertTrue("\"" + examplesuri +
             "\" directory could not be found", examplesfolder.exists());

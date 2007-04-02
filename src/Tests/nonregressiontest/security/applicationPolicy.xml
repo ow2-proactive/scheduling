@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Policy>
  <ApplicationName>Garden</ApplicationName>
- <PKCS12KeyStore>../src/nonregressiontest/security/application.keystore</PKCS12KeyStore>
+ <PKCS12KeyStore>../src/Tests/nonregressiontest/security/application.keystore</PKCS12KeyStore>
     <CertificationAuthority>
         <Certificate></Certificate>
     </CertificationAuthority>

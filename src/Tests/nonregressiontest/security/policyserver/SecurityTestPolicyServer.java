@@ -89,7 +89,7 @@ public class SecurityTestPolicyServer extends FunctionalTest {
     @Override
 	public void initTest() throws Exception {
         policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(
-                "../src/nonregressiontest/security/applicationPolicy.xml");
+                "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
     }
 
     @Override

@@ -81,7 +81,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.binding.local.collective.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.binding.remote.collective.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.binding.local.Test"/>
-			<unitTest exclude="no" class="nonregressiontest.component.descriptor.fractaladl.Test"/>
+			<unitTest exclude="yes" class="nonregressiontest.component.descriptor.fractaladl.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.descriptor.arguments.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.controller.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.shortcuts.Test"/>

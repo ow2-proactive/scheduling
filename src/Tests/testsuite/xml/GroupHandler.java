@@ -154,7 +154,10 @@ public class GroupHandler {
                 if (index < group.size()) {
                     //group.add(index, group.get(this.indexGlobal));
                     group.add(this.indexGlobal, test);
-                    group.remove(index + 1);
+                    if (index != -1) {
+                    	// remove a group only if it belongs to the group  
+                    	group.remove(index +1);
+                    }
                     //group.remove(this.indexGlobal);
                     this.indexGlobal++;
                 }

@@ -42,7 +42,7 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rshProcess">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="waha.inria.fr">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="localhost">
 					<processReference refid="localJVM"/>
 				</rshProcess>
 			</processDefinition>
