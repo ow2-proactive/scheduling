@@ -98,7 +98,8 @@ public class TestClient implements NotificationListener, Serializable {
 
     private void connect() {
         System.out.println("Connecting to : " + this.url);
-        this.cc = new ClientConnector(this.url);
+        this.cc = new ClientConnector(this.url, "serverName");
+        this.cc.connect();
         this.connection = cc.getConnection();
         this.connector = cc.getConnector();
         /* adds a connector listener */

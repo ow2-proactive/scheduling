@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.jmx.server;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.MalformedURLException;
 
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
@@ -48,6 +49,8 @@ import org.objectweb.proactive.extensions.jmx.ProActiveJMXConstants;
  */
 public class ServerConnector {
     private MBeanServer mbs;
+    private JMXConnectorServer cs;
+    private String serverName;
 
     /**
      * Creates and register a ProActive JMX Connector attached to the platform MBean Server.
@@ -55,28 +58,41 @@ public class ServerConnector {
      */
     public ServerConnector() {
         /*Retrieve the Platform MBean Server */
-        this.mbs = ManagementFactory.getPlatformMBeanServer();
+        this("");
+    }
 
+    public ServerConnector(String serverName) {
+        this.mbs = ManagementFactory.getPlatformMBeanServer();
+        this.serverName = serverName;
+
+        String url = "service:jmx:proactive:///jndi/proactive://localhost/" +
+            ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" +
+            this.serverName;
+        JMXServiceURL jmxUrl;
         try {
-            useProActiveConnector("service:jmx:proactive:///jndi/proactive://localhost/server",
-                this.mbs);
+            jmxUrl = new JMXServiceURL(url);
+
+            cs = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl,
+                    ProActiveJMXConstants.PROACTIVE_JMX_ENV, this.mbs);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /* Starts the connector */
-    private void useProActiveConnector(String url, MBeanServer mbs)
-        throws IOException {
-        JMXServiceURL jmxUrl = new JMXServiceURL(url);
-
+    private void useProActiveConnector(String url) throws IOException {
         //Useful???
         //        Thread.currentThread()
         //              .setContextClassLoader(Activator.class.getClassLoader());
-        JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl,
-                ProActiveJMXConstants.PROACTIVE_JMX_ENV, this.mbs);
+    }
 
-        //starts the JMX Connector
-        cs.start();
+    /**
+     * Starts the JMX Connector
+     * @throws IOException
+     */
+    public void start() throws IOException {
+        this.cs.start();
     }
 }

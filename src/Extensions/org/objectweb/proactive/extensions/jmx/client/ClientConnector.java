@@ -52,6 +52,7 @@ public class ClientConnector implements Serializable {
     private ProActiveConnection connection;
     private JMXConnector connector;
     private String url;
+    private String serverName;
 
     /**
      * Creates a ClientConnector and connect to the remote JMX MBean Server whose at the specified url
@@ -62,14 +63,26 @@ public class ClientConnector implements Serializable {
         connect();
     }
 
+    public ClientConnector(String url, String serverName) {
+        this.url = url;
+        this.serverName = serverName;
+    }
+
     /*
      *  Connect to the ProActive Connector
      */
-    private void connect() {
+    public void connect() {
         try {
+
             /*  build the jmx Url */
-            this.url = "service:jmx:proactive://" + this.url +
-                ProActiveJMXConstants.SERVER_REGISTERED_NAME;
+            if (this.serverName != null) {
+                this.url = "service:jmx:proactive://" + this.url +
+                    ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" +
+                    serverName;
+            } else {
+                this.url = "service:jmx:proactive://" + this.url +
+                    ProActiveJMXConstants.SERVER_REGISTERED_NAME;
+            }
             JMXServiceURL jmxUrl = new JMXServiceURL(url);
             /* connect to the connector server  */
             this.connector = JMXConnectorFactory.connect(jmxUrl,

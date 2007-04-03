@@ -159,7 +159,10 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         //        String url = ClassServer.getUrl();
         //        String url = "";
         //        System.out.println("url = " + url);
-        String url = ProActiveJMXConstants.SERVER_REGISTERED_NAME;
+        //        String url = ProActiveJMXConstants.SERVER_REGISTERED_NAME;
+        String path = this.address.getURLPath();
+        int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
+        String url = path.substring(index);
         ProActive.register(this.paServer, url);
         state = STARTED;
     }

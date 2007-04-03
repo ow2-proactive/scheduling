@@ -119,11 +119,13 @@ public class ProActiveConnector implements JMXConnector, Serializable,
         try {
             String hostname = this.jmxServiceURL.getHost();
             int port = this.jmxServiceURL.getPort();
-
+            String path = this.jmxServiceURL.getURLPath();
+            int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
+            String serverName = path.substring(index);
             String protocol = System.getProperty(
                     "proactive.communication.protocol");
             String lookupUrl = protocol + "://" + hostname + ":" + port +
-                ProActiveJMXConstants.SERVER_REGISTERED_NAME;
+                serverName;
             ProActiveServerImpl paServer = (ProActiveServerImpl) ProActive.lookupActive(ProActiveServerImpl.class.getName(),
                     lookupUrl);
 
