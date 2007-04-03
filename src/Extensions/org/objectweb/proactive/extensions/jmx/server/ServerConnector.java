@@ -81,13 +81,6 @@ public class ServerConnector {
         }
     }
 
-    /* Starts the connector */
-    private void useProActiveConnector(String url) throws IOException {
-        //Useful???
-        //        Thread.currentThread()
-        //              .setContextClassLoader(Activator.class.getClassLoader());
-    }
-
     /**
      * Starts the JMX Connector
      * @throws IOException
