@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedException;
 import org.objectweb.proactive.core.body.http.util.messages.HttpLookupMessage;
 import org.objectweb.proactive.core.rmi.ClassServer;
@@ -54,13 +55,6 @@ import org.objectweb.proactive.core.rmi.ClassServer;
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
 public class HttpBodyAdapter extends BodyAdapterImpl {
-
-    /**
-     * an Hashtable containing all the http  adapters registered. They can be retrieved
-     * thanks to the ProActive.lookupActive method
-     */
-    protected static transient Hashtable<String, HttpBodyAdapter> urnBodys = new Hashtable<String, HttpBodyAdapter>();
-
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -98,11 +92,10 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
         } catch (MalformedURLException e) {
             url = ClassServer.getUrl() + urn;
         }
-        urnBodys.put(urn, this);
+        HTTPRegistry.getInstance().bind(urn, this);
         //        urn = urn.substring(urn.lastIndexOf('/') + 1);
         if (bodyLogger.isInfoEnabled()) {
             bodyLogger.info("register object  at " + url);
-            bodyLogger.info(urnBodys);
         }
     }
 
@@ -112,7 +105,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      */
     @Override
     public void unregister(String urn) throws java.io.IOException {
-        urnBodys.put(urn, null);
+        HTTPRegistry.getInstance().unbind(urn);
     }
 
     /**
@@ -179,7 +172,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @return the body mapping the urn
      */
     public static synchronized UniversalBody getBodyFromUrn(String urn) {
-        return (UniversalBody) urnBodys.get(urn);
+        return HTTPRegistry.getInstance().lookup(urn);
     }
 
     /**
@@ -194,14 +187,6 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      */
     @Override
     public String[] list(String url) throws java.io.IOException {
-        String[] names = null;
-        names = new String[HttpBodyAdapter.urnBodys.size()];
-        Enumeration<String> e = urnBodys.keys();
-        int i = 0;
-        while (e.hasMoreElements()) {
-            names[i++] = e.nextElement();
-        }
-
-        return names;
+        return HTTPRegistry.getInstance().list();
     }
 }
