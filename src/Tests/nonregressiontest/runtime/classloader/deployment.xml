@@ -39,7 +39,7 @@
 				     <absolutePath value="proactive.home/lib/reggie.jar"/>
 				     <absolutePath value="proactive.home/lib/bouncycastle.jar"/>
 				     <absolutePath value="proactive.home/lib/components/fractal.jar"/>
-				     <absolutePath value="proactive.home/test-classes/nonregressiontest/runtime/classloader/"/>
+				     <absolutePath value="proactive.home/classes/Tests/nonregressiontest/runtime/classloader/"/>
 					</classpath>
 				</jvmProcess>
 			</processDefinition>
