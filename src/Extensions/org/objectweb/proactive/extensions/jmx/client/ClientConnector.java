@@ -60,7 +60,6 @@ public class ClientConnector implements Serializable {
      */
     public ClientConnector(String url) {
         this.url = url;
-        connect();
     }
 
     public ClientConnector(String url, String serverName) {
