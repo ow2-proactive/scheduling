@@ -35,7 +35,7 @@ import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 
 /**
- * This class allows us to make drag and drop.
+ * This class allows us to make drag and drop for a migration.
  */
 public class DragAndDrop {
 

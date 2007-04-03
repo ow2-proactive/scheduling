@@ -81,6 +81,7 @@ import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.editparts.MonitoringEditPartFactory;
 import org.objectweb.proactive.ic2d.monitoring.figures.RoundedLine;
+import org.objectweb.proactive.ic2d.monitoring.figures.listeners.DragHost;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 
 
@@ -104,6 +105,8 @@ public class MonitoringView extends ViewPart {
 	private WorldObject world;
 
 	private DragAndDrop dnd = new DragAndDrop();
+	
+	private DragHost dragHost = new DragHost();
 
 	/** The graphical set of virtual nodes */
 	private VirtualNodesGroup virtualNodesGroup;
@@ -341,6 +344,10 @@ public class MonitoringView extends ViewPart {
 
 	public DragAndDrop getDragAndDrop(){
 		return this.dnd;
+	}
+	
+	public DragHost getDragHost(){
+		return this.dragHost;
 	}
 
 	@Override

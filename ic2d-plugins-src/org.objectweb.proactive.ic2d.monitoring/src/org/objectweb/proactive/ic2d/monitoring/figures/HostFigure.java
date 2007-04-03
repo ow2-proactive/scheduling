@@ -38,7 +38,6 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.monitoring.figures.listeners.Dragger;
 
 public class HostFigure extends AbstractRectangleFigure{
 
@@ -60,7 +59,6 @@ public class HostFigure extends AbstractRectangleFigure{
 	//
 	public HostFigure(String text) {
 		super(text);
-		new Dragger(this);
 	}
 
 	/**

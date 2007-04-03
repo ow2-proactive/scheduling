@@ -37,25 +37,29 @@ import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-public class Dragger extends MouseMotionListener.Stub implements MouseListener {
+/**
+ * This class is used to drag a host.
+ * @author ProActive Team
+ */
+public class DragHost extends MouseMotionListener.Stub implements MouseListener {
 	
-	private Figure figure;
+	private IFigure figure;
 	private int deltaX;
 	private int deltaY;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
-	public Dragger(IFigure figure){
-		figure.addMouseMotionListener(this);
-		figure.addMouseListener(this);
-	}
 	
 	//
 	// -- PUBLIC METHODS ---------------------------------------------
 	//
 	
+	/**
+	 * Set the figure to drag.
+	 */
+	public void setFigure(IFigure figure){
+		this.figure = figure;
+	}
+	
 	public void mouseReleased(MouseEvent e){
+		moveFigure(e);
 		this.figure = null;
 	}
 	
@@ -71,9 +75,20 @@ public class Dragger extends MouseMotionListener.Stub implements MouseListener {
 	}
 	
 	public void mouseDragged(MouseEvent e){
+		moveFigure(e);
+	}
+	
+	//
+	// -- PRIVATE METHODS ---------------------------------------------
+	//
+	
+	/**
+	 * Drag a figure.
+	 */
+	private void moveFigure(MouseEvent e){
 		if(this.figure != null){
 			Rectangle rectangle = this.figure.getBounds();
 			this.figure.setBounds(new Rectangle(e.x - deltaX, e.y - deltaY, rectangle.width, rectangle.height));
-		}
+		}		
 	}
 }

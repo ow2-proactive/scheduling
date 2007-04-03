@@ -59,12 +59,14 @@ public class HostListener implements MouseListener, MouseMotionListener {
 	private HostFigure figure;
 
 	private DragAndDrop dnd;
+	private DragHost dragHost;
 	
 	public HostListener(HostObject host, HostFigure figure, MonitoringView monitoringView) {
 		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 		this.host = host;
 		this.figure = figure;
 		this.dnd = monitoringView.getDragAndDrop();
+		this.dragHost = monitoringView.getDragHost();
 	}
 
 	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
@@ -72,6 +74,7 @@ public class HostListener implements MouseListener, MouseMotionListener {
 	public void mousePressed(MouseEvent me) {
 		if(me.button == 1){
 			dnd.reset();
+			dragHost.mousePressed(me);
 		}
 		else if(me.button == 3) {
 			// Monitor a new host
@@ -127,6 +130,7 @@ public class HostListener implements MouseListener, MouseMotionListener {
 
 	public void mouseReleased(MouseEvent me) {
 		dnd.reset();
+		dragHost.mouseReleased(me);
 	}
 	
 	//---- MouseMotionListener 
@@ -141,7 +145,9 @@ public class HostListener implements MouseListener, MouseMotionListener {
 			dnd.refresh(null);
 	}
 
-	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
+	public void mouseDragged(MouseEvent me) {
+		dragHost.mouseDragged(me);
+	}
 	
 	public void mouseHover(MouseEvent me) { /* Do nothing */ }
 

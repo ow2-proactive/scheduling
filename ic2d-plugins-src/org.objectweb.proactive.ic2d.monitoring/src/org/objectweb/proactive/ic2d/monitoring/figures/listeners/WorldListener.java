@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures.listeners;
 
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
@@ -53,10 +52,12 @@ import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 public class WorldListener implements MouseListener, MouseMotionListener {
 
 	private DragAndDrop dnd;
+	private DragHost dragHost;
 	private ActionRegistry registry;
-
+	
 	public WorldListener(MonitoringView monitoringView) {
 		this.dnd = monitoringView.getDragAndDrop();
+		this.dragHost = monitoringView.getDragHost();
 		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
 	}
 
@@ -107,6 +108,7 @@ public class WorldListener implements MouseListener, MouseMotionListener {
 
 	public void mouseReleased(MouseEvent me) {
 		dnd.reset();
+		dragHost.mouseReleased(me);;
 	}
 
 	//---- MouseMotionListener 
@@ -121,7 +123,9 @@ public class WorldListener implements MouseListener, MouseMotionListener {
 			dnd.refresh(null);
 	}
 
-	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
+	public void mouseDragged(MouseEvent me) {
+		dragHost.mouseDragged(me);
+	}
 	
 	public void mouseHover(MouseEvent me) { /* Do nothing */ }
 
