@@ -89,7 +89,7 @@ public class Legend extends ViewPart {
 		// Active by itself
 
 		FigureCanvas ao1Container = new FigureCanvas(aoDef);
-		ao1Container.setContents(new AOFigure(State.ACTIVE, 0));
+		ao1Container.setContents(new AOFigure(State.ACTIVE, 0, false));
 
 		Label ao1Text = new Label(aoDef, 0);
 		ao1Text.setText("Active by itself");
@@ -97,7 +97,7 @@ public class Legend extends ViewPart {
 		// Serving request
 
 		FigureCanvas ao2Container = new FigureCanvas(aoDef);
-		ao2Container.setContents(new AOFigure(State.SERVING_REQUEST, 0));
+		ao2Container.setContents(new AOFigure(State.SERVING_REQUEST, 0,false));
 
 		Label ao2Text = new Label(aoDef, 0);
 		ao2Text.setText("Serving request");
@@ -105,7 +105,7 @@ public class Legend extends ViewPart {
 		// Waiting for request
 
 		FigureCanvas ao3Container = new FigureCanvas(aoDef);
-		ao3Container.setContents(new AOFigure(State.WAITING_FOR_REQUEST, 0));
+		ao3Container.setContents(new AOFigure(State.WAITING_FOR_REQUEST, 0, false));
 
 		Label ao3Text = new Label(aoDef, 0);
 		ao3Text.setText("Waiting for request");
@@ -113,7 +113,7 @@ public class Legend extends ViewPart {
 		// Waiting for result (wait by necessity)
 
 		FigureCanvas ao4Container = new FigureCanvas(aoDef);
-		ao4Container.setContents(new AOFigure(State.WAITING_BY_NECESSITY_WHILE_ACTIVE, 0));
+		ao4Container.setContents(new AOFigure(State.WAITING_BY_NECESSITY_WHILE_ACTIVE, 0, false));
 
 		Label ao4Text = new Label(aoDef, 0);
 		ao4Text.setText("Waiting for result\n(wait by necessity)");
@@ -122,12 +122,17 @@ public class Legend extends ViewPart {
 		// Migrating
 
 		FigureCanvas ao5Container = new FigureCanvas(aoDef);
-		ao5Container.setContents(new AOFigure(State.MIGRATING, 0));
+		ao5Container.setContents(new AOFigure(State.MIGRATING, 0, false));
 
 		Label ao5Text = new Label(aoDef, 0);
 		ao5Text.setText("Migrating");
 
-
+		// Secure
+		ao5Container = new FigureCanvas(aoDef);
+		ao5Container.setContents(new AOFigure(State.ACTIVE, 0, true));
+		ao5Text = new Label(aoDef, 0);
+		ao5Text.setText("Secure and Active");
+		
 		/*--------- Pendings Request ---------*/
 
 		Group requestDef = new Group(child, 0);
@@ -143,7 +148,7 @@ public class Legend extends ViewPart {
 		requestDef.setLayoutData(requestDefFormData);
 		
 		FigureCanvas requestContainer = new FigureCanvas(requestDef);
-		AOFigure pendingRequestFigure = new AOFigure(State.SERVING_REQUEST, 64);
+		AOFigure pendingRequestFigure = new AOFigure(State.SERVING_REQUEST, 64, false);
 		requestContainer.setContents(pendingRequestFigure);
 		
 		Composite requestLabels = new Composite(requestDef, 0);
@@ -314,7 +319,7 @@ public class Legend extends ViewPart {
 		// Active Object
 
 		FigureCanvas aoNoRespondingContainer = new FigureCanvas(noRespondingDef);
-		aoNoRespondingContainer.setContents(new AOFigure(State.NOT_RESPONDING, 0));
+		aoNoRespondingContainer.setContents(new AOFigure(State.NOT_RESPONDING, 0, false));
 
 		Label aoNoRespondingText = new Label(noRespondingDef, 0);
 		aoNoRespondingText.setText("Active Object");

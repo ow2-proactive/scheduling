@@ -44,8 +44,10 @@ import org.eclipse.draw2d.LayoutManager;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
 
@@ -70,10 +72,11 @@ public class AOFigure extends AbstractFigure{
 	public static final Color COLOR_REQUEST_SEVERAL;
 	public static final Color COLOR_REQUEST_MANY;
 	public static final int REQUEST_FIGURE_SIZE = 4;
+	public static final Display device;
 
 	// initialization of the colors
 	static {
-		Display device = Display.getCurrent();
+		device = Display.getCurrent();
 		COLOR_WHEN_WAITING_FOR_REQUEST = new Color(device, 225, 225, 225);
 		COLOR_WHEN_WAITING_BY_NECESSITY = new Color(device, 255, 205, 110);
 		COLOR_WHEN_ACTIVE = new Color(device, 180, 255, 180);// green
@@ -91,6 +94,9 @@ public class AOFigure extends AbstractFigure{
 	/** Request queue length (used to display small square int the active object) */
 	private int requestQueueLength;
 
+	/** if the active object has a security manager or not */
+	private boolean isSecure = false;
+	
 	/** All connections whose target is this and source is the key */
 	private Map<AOFigure, Connection> sourceConnections;
 
@@ -118,10 +124,11 @@ public class AOFigure extends AbstractFigure{
 	 * Used to display the legend.
 	 * @param state
 	 */
-	public AOFigure(State state, int requestQueueLength){
+	public AOFigure(State state, int requestQueueLength, boolean secure){
 		super();
 		this.setState(state);
 		this.requestQueueLength = requestQueueLength;
+		this.isSecure = secure;
 	}
 
 	//
@@ -149,12 +156,16 @@ public class AOFigure extends AbstractFigure{
 			graphics.fillOval(bounds.getTranslated(4, 4));
 		}
 
+	
+		
 		// Drawings
 		graphics.setForegroundColor(this.borderColor);
 		graphics.setBackgroundColor(this.backgroundColor);
 		graphics.fillOval(bounds);
 		graphics.drawOval(bounds);
 
+
+		
 		// Paint request queue information
 		if(requestQueueLength > 0) {
 			int length = requestQueueLength;
@@ -187,6 +198,11 @@ public class AOFigure extends AbstractFigure{
 					graphics.fillRectangle(requestQueueX + (i * 6), requestQueueY, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
 			}
 		}
+
+		if (isSecure) {
+			graphics.setForegroundColor(device.getSystemColor(SWT.COLOR_RED));
+			graphics.drawText("S", 4, bounds.height/4-2);
+		}		
 
 		// Cleanups
 		graphics.restoreState();
@@ -370,5 +386,14 @@ public class AOFigure extends AbstractFigure{
 				return new Dimension(REQUEST_FIGURE_SIZE,REQUEST_FIGURE_SIZE);
 			}
 		}
+	}
+
+
+	public boolean isSecure() {
+		return isSecure;
+	}
+
+	public void setSecure(boolean isSecure) {
+		this.isSecure = isSecure;
 	}
 }

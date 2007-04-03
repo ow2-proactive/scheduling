@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
+import org.objectweb.proactive.core.Constants;
 
 public class IbisHostRTFinder implements HostRTFinder {
 

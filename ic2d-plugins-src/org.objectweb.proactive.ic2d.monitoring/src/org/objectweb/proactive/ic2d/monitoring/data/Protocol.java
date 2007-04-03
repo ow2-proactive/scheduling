@@ -47,15 +47,15 @@ public enum Protocol {
 	 * @return A protocol
 	 */
 	public static Protocol getProtocolFromString(String s) {
-		if((s.compareToIgnoreCase(Constants.RMI_PROTOCOL_IDENTIFIER) == 0)
+		if(s.compareToIgnoreCase(Constants.RMI_PROTOCOL_IDENTIFIER) == 0)
 			return RMI;
-		else if((s.compareToIgnoreCase(Constants.RMISSH_PROTOCOL_IDENTIFIER) == 0)
+		else if (s.compareToIgnoreCase(Constants.RMISSH_PROTOCOL_IDENTIFIER) == 0)
 			return RMISSH;
-		else if((s.compareToIgnoreCase(Constants.IBIS_PROTOCOL_IDENTIFIER) == 0)
+		else if (s.compareToIgnoreCase(Constants.IBIS_PROTOCOL_IDENTIFIER) == 0)
 			return IBIS;
-		else if((s.compareToIgnoreCase(Constants.JINI_PROTOCOL_IDENTIFIER) == 0)
+		else if (s.compareToIgnoreCase(Constants.JINI_PROTOCOL_IDENTIFIER) == 0)
 			return JINI;
-		else if((s.compareToIgnoreCase(Constants.XMLHTTP_PROTOCOL_IDENTIFIER) == 0)
+		else if (s.compareToIgnoreCase(Constants.XMLHTTP_PROTOCOL_IDENTIFIER) == 0)
 			return HTTP;
 		else//Unknown protocol
 			return UNKNOWN;
