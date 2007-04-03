@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 
 import ibis.io.ArrayOutputStream;
@@ -50,7 +51,7 @@ import sun.rmi.server.MarshalOutputStream;
 public class ObjectToByteConverter {
     public static byte[] convert(Object o) throws ProActiveException {
         try {
-            String mode = System.getProperty("proactive.communication.protocol");
+            String mode = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
             //here we check wether or not we are running in ibis
             if ("ibis".equals(mode)) {

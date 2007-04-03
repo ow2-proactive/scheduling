@@ -43,6 +43,7 @@ import java.util.TreeSet;
 
 import javax.swing.DefaultListModel;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.Node;
@@ -265,12 +266,7 @@ public class NodeExploration implements JobMonitorConstants {
             String runtimeUrl = pr.getURL();
             String protocol = UrlBuilder.getProtocol(runtimeUrl);
             String host = null;
-            try {
-                host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
-            } catch (UnknownHostException e1) {
-                log(e1);
-                e1.printStackTrace();
-            }
+            host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
             int port = UrlBuilder.getPortFromUrl(runtimeUrl);
             String nodeUrl = UrlBuilder.buildUrl(host, nodeName, protocol, port);
             Node node = new NodeImpl(pr, nodeUrl,
@@ -419,13 +415,13 @@ public class NodeExploration implements JobMonitorConstants {
      * @return
      */
     private HostRTFinder initiateFinder(String protocol) {
-        if (protocol.equals("rmi:") || protocol.equals("rmissh:")) {
+        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER))  {
             return new RMIHostRTFinder(controller, skippedObjects);
-        } else if (protocol.equals("http:")) {
+        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             return new HttpHostRTFinder(controller, skippedObjects);
-        } else if (protocol.equals("jini:")) {
+        } else if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER)) {
             return new JiniHostRTFinder(controller, skippedObjects);
-        } else if (protocol.equals("ibis:")) {
+        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             return new IbisHostRTFinder(controller, skippedObjects);
         }
         return null;

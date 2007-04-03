@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.mixedlocation;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
@@ -120,7 +121,8 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
 
     @Override
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(System.getProperty(
+                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is ibis");
             }

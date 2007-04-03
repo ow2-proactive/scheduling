@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.runtime.rmi;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
+import java.net.URISyntaxException;
 import java.rmi.AccessException;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -173,7 +173,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
 
             proActiveRuntime.createLocalNode(name, replacePreviousBinding,
                 securityManager, VNname, jobId);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }
 
@@ -200,7 +200,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
             nodeUrl = buildNodeURL(nodeName);
             name = UrlBuilder.getNameFromUrl(nodeUrl);
             unregister(nodeUrl);
-        } catch (UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeUrl, e);
         }
 
@@ -321,7 +321,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
 
             //register it with the url
             register(virtualNodeURL, replacePreviousBinding);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
         }
@@ -339,7 +339,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
             //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualnodeName);
             unregister(virtualNodeURL);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
         }
@@ -482,8 +482,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         return UrlBuilder.buildUrl(host, name, getProtocol(), port);
     }
 
-    private String buildNodeURL(String url)
-        throws java.net.UnknownHostException {
+    private String buildNodeURL(String url) throws URISyntaxException {
         int i = url.indexOf('/');
 
         if (i == -1) {

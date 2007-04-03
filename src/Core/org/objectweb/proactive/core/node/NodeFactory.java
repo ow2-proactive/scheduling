@@ -30,11 +30,13 @@
  */
 package org.objectweb.proactive.core.node;
 
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -82,17 +84,11 @@ public class NodeFactory {
     static {
         ProActiveConfiguration.load();
 
-        String protocol = UrlBuilder.checkProtocol(System.getProperty(
-                    "proactive.communication.protocol"));
-        String port = System.getProperty("proactive.rmi.port");
+        //        String protocol = UrlBuilder.checkProtocol(System.getProperty(
+        //                    "proactive.communication.protocol"));
+        String protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
-        if (port != null) {
-            DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node",
-                    protocol, new Integer(port).intValue());
-        } else {
-            DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node",
-                    protocol);
-        }
+        DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node", protocol);
     }
 
     // test with class loader
@@ -120,8 +116,8 @@ public class NodeFactory {
             }
 
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    UrlBuilder.checkProtocol(System.getProperty(
-                            "proactive.communication.protocol")), jobID);
+                    System.getProperty(
+                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL), jobID);
         }
 
         return defaultNode;
@@ -225,7 +221,7 @@ public class NodeFactory {
             jobID = proActiveRuntime.getJobID(url);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
-        } catch (UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
         }
 
@@ -251,7 +247,7 @@ public class NodeFactory {
             proActiveRuntime.killNode(url);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
-        } catch (UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
         }
     }

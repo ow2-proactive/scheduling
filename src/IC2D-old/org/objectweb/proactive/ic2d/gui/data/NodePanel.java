@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.gui.data;
 
 import java.util.Iterator;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
@@ -68,13 +69,13 @@ public class NodePanel extends AbstractDataObjectPanel
     public NodePanel(AbstractDataObjectPanel parentDataObjectPanel,
         NodeObject targetNodeObject, java.awt.Color c) {
         super(parentDataObjectPanel, targetNodeObject.getURL(), "NodeObject");
-        if (targetNodeObject.getProtocol().equals("jini:")) {
+        if (targetNodeObject.getProtocol().equals(Constants.JINI_PROTOCOL_IDENTIFIER)) {
             c = java.awt.Color.cyan;
         }
-        if (targetNodeObject.getProtocol().equals("http:")) {
+        if (targetNodeObject.getProtocol().equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             c = java.awt.Color.orange;
         }
-        if (targetNodeObject.getProtocol().equals("rmissh:")) {
+        if (targetNodeObject.getProtocol().equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             c = java.awt.Color.white;
         }
         nodeObject = targetNodeObject;

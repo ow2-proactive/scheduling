@@ -30,6 +30,7 @@
  */
 package nonregressiontest.node.nodefactory;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -75,11 +76,11 @@ public class Test extends FunctionalTest {
         String port = System.getProperty("proactive.rmi.port");
         if (port != null) {
             rmiURL = UrlBuilder.buildUrl("localhost",
-                    "RMINode" + System.currentTimeMillis(), "rmi:",
+                    "RMINode" + System.currentTimeMillis(), Constants.RMI_PROTOCOL_IDENTIFIER,
                     new Integer(port).intValue());
         } else {
             rmiURL = UrlBuilder.buildUrl("localhost",
-                    "RMINode" + System.currentTimeMillis(), "rmi:");
+                    "RMINode" + System.currentTimeMillis(), Constants.RMI_PROTOCOL_IDENTIFIER);
         }
     }
 

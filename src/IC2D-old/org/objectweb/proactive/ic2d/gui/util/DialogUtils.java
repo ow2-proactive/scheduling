@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.gui.util;
 
 import java.net.InetAddress;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
@@ -77,7 +78,7 @@ public class DialogUtils {
             return;
         }
 
-        worldPanel.monitoredHostAdded(host, "rmi:");
+        worldPanel.monitoredHostAdded(host,Constants.RMI_PROTOCOL_IDENTIFIER);
         worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("rmi:", host, rmihostdialog.getJTextFielddepth(),worldObject, logger);//.start();
     }
@@ -120,7 +121,7 @@ public class DialogUtils {
         }
 
         //new MonitorThread("http:", host, httphostdialog.getJTextFielddepth(),worldObject, logger);//.start();
-        worldPanel.monitoredHostAdded(host, "http:");
+        worldPanel.monitoredHostAdded(host, Constants.XMLHTTP_PROTOCOL_IDENTIFIER);
         worldPanel.getMonitorThread().updateHosts();
 
         //        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
@@ -176,7 +177,7 @@ public class DialogUtils {
             return;
         }
 
-        worldPanel.monitoredHostAdded(host, "ibis:");
+        worldPanel.monitoredHostAdded(host, Constants.IBIS_PROTOCOL_IDENTIFIER);
         worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("ibis:", host, ibishostdialog.getJTextFielddepth(), worldObject, logger);//.start();
     }
@@ -208,7 +209,7 @@ public class DialogUtils {
             return;
         }
 
-        worldPanel.monitoredHostAdded(host, "jini:");
+        worldPanel.monitoredHostAdded(host, Constants.JINI_PROTOCOL_IDENTIFIER);
         worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("jini:", host, jinihostdialog.getJTextFielddepth(), worldObject, logger);//.start();
     }
@@ -232,7 +233,7 @@ public class DialogUtils {
         //            }
         //            jinihostdialog.setButtonOK(false);
         //            String host = jinihostdialog.getJTextFieldHostIp();
-        worldPanel.monitoredHostAdded(null, "jini:");
+        worldPanel.monitoredHostAdded(null, Constants.JINI_PROTOCOL_IDENTIFIER);
         worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("jini:", null, "3", worldObject, logger);//.start();
     }

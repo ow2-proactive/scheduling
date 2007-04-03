@@ -37,6 +37,7 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -129,7 +130,7 @@ public class StartHierarchical {
 
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
-                        "proactive.communication.protocol") + ":");
+                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
             LocalProActiveRuntime localPart = (LocalProActiveRuntime) ProActiveRuntimeImpl.getProActiveRuntime();

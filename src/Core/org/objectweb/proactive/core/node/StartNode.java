@@ -296,7 +296,7 @@ public class StartNode {
         logger.info(
             "                      already exists, the creation of the new node will fail.");
         logger.info("  for instance: java " + StartNode.class.getName() + " " +
-            Constants.RMI_PROTOCOL_IDENTIFIER + "//" + localhost + "/node1");
+            Constants.RMI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node1");
         logger.info("                java " + StartNode.class.getName() + " " +
             Constants.RMI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node2  " +
             NO_CLASS_SERVER_OPTION_NAME + " " + NO_REBIND_OPTION_NAME);

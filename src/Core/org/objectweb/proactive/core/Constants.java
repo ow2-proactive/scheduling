@@ -72,18 +72,47 @@ public interface Constants {
     public static final Class FUTURE_PROXY_INTERFACE = org.objectweb.proactive.core.body.future.Future.class;
 
     /** rmi protocol identifier */
-    public static final String RMI_PROTOCOL_IDENTIFIER = "rmi:";
+    public static final String RMI_PROTOCOL_IDENTIFIER = "rmi";
 
     /** rmi tunneling over ssh protocol identifier */
-    public static final String RMISSH_PROTOCOL_IDENTIFIER = "rmissh:";
+    public static final String RMISSH_PROTOCOL_IDENTIFIER = "rmissh";
 
     /** jini protocol identifier */
-    public static final String JINI_PROTOCOL_IDENTIFIER = "jini:";
-    public static final String IBIS_PROTOCOL_IDENTIFIER = "ibis:";
+    public static final String JINI_PROTOCOL_IDENTIFIER = "jini";
+    public static final String IBIS_PROTOCOL_IDENTIFIER = "ibis";
 
     /**xml-http protocol identifier */
-    public static final String XMLHTTP_PROTOCOL_IDENTIFIER = "http:";
+    public static final String XMLHTTP_PROTOCOL_IDENTIFIER = "http";
 
     /** default protocol identifier */
     public static final String DEFAULT_PROTOCOL_IDENTIFIER = RMI_PROTOCOL_IDENTIFIER;
+
+    // list of system properties used within proactive 
+
+    /** this property identifies the communication protocol */
+    public static final String PROPERTY_PA_COMMUNICATION_PROTOCOL = "proactive.communication.protocol";
+
+    /** this property allows to override the default java behaviour when retrieving the runtime url */
+    public static final String PROPERTY_PA_RUNTIME_IPADDRESS = "proactive.runtime.ipaddress";
+
+    /** this property allows to set the hostname of a runtime */
+    public static final String PROPERTY_PA_HOSTNAME = "proactive.hostname";
+
+    /** this property indicates to use the ip adress instead of DNS entry for a runtime url */
+    public static final String PROPERTY_PA_USE_IP_ADDRESS = "proactive.useIPaddress";
+
+    /** this property identifies the default port used by the RMI transport layer */
+    public static final String PROPERTY_PA_RMI_PORT = "proactive.rmi.port";
+
+    /** this property identifies the default port used by the RMISSH transport layer */
+    public static final String PROPERTY_PA_RMISSH_PORT = "proactive.ssh.port";
+
+    /** this property identifies the location of the known host file for the RMISSH transport layer */
+    public static final String PROPERTY_PA_RMISSH_KNOWN_HOST = "proactive.ssh.known_hosts";
+
+    /** this property identifies the location of RMISSH key directory */
+    public static final String PROPERTY_PA_RMISSH_KEY_DIR = "proactive.ssh.key_directory";
+
+    /** thos property identifies the default port for the xml-http protocol  */
+    public static final String PROPERTY_PA_XMLHTTP_PORT = "proactive.http.port";
 }

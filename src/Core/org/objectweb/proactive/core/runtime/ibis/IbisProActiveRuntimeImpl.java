@@ -32,12 +32,13 @@ package org.objectweb.proactive.core.runtime.ibis;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
+import java.net.URISyntaxException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -107,20 +108,24 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         String nodeURL = null;
 
         //Node node;
+        System.out.println(
+            "IbisProActiveRuntimeImpl.createLocalNode() node name is " +
+            nodeName);
+        //first we build a well-formed url
         try {
-            //first we build a well-formed url
             nodeURL = buildNodeURL(nodeName);
-
-            //then take the name of the node
-            String name = UrlBuilder.getNameFromUrl(nodeURL);
-
-            //register the url in rmi registry
-            register(nodeURL, replacePreviousBinding);
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding,
-                securityManager, vnname, jobId);
-        } catch (java.net.UnknownHostException e) {
-            throw new RemoteException("Host unknown in " + nodeURL, e);
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+
+        //then take the name of the node
+        String name = UrlBuilder.getNameFromUrl(nodeURL);
+
+        //register the url in rmi registry
+        register(nodeURL, replacePreviousBinding);
+        proActiveRuntime.createLocalNode(name, replacePreviousBinding,
+            securityManager, vnname, jobId);
 
         nodesArray.add(nodeURL);
 
@@ -143,11 +148,12 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
         try {
             nodeUrl = buildNodeURL(nodeName);
-            name = UrlBuilder.getNameFromUrl(nodeUrl);
-            unregister(nodeUrl);
-        } catch (UnknownHostException e) {
-            throw new RemoteException("Host unknown in " + nodeUrl, e);
+        } catch (URISyntaxException e) {
+            // TODO To check if a node name or a an url is given
+            e.printStackTrace();
         }
+        name = UrlBuilder.getNameFromUrl(nodeUrl);
+        unregister(nodeUrl);
 
         proActiveRuntime.killNode(name);
     }
@@ -248,15 +254,16 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         boolean replacePreviousBinding) throws IOException {
         String virtualNodeURL = null;
 
+        //first we build a well-formed url
         try {
-            //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualNodeName);
-
-            //register it with the url
-            register(virtualNodeURL, replacePreviousBinding);
-        } catch (java.net.UnknownHostException e) {
-            throw new RemoteException("Host unknown in " + virtualNodeURL, e);
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+
+        //register it with the url
+        register(virtualNodeURL, replacePreviousBinding);
 
         vnNodesArray.add(virtualNodeURL);
     }
@@ -267,13 +274,13 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
                 virtualnodeName));
 
+        //first we build a well-formed url
         try {
-            //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualnodeName);
-            unregister(virtualNodeURL);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new RemoteException("Host unknown in " + virtualNodeURL, e);
         }
+        unregister(virtualNodeURL);
 
         vnNodesArray.remove(virtualNodeURL);
     }
@@ -423,9 +430,11 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         throws RemoteException {
         try {
             if (replacePreviousBinding) {
-                Naming.rebind(UrlBuilder.removeProtocol(url, "ibis:"), this);
+                Naming.rebind(UrlBuilder.removeProtocol(url,
+                        Constants.IBIS_PROTOCOL_IDENTIFIER), this);
             } else {
-                Naming.bind(UrlBuilder.removeProtocol(url, "ibis:"), this);
+                Naming.bind(UrlBuilder.removeProtocol(url,
+                        Constants.IBIS_PROTOCOL_IDENTIFIER), this);
             }
 
             if (url.indexOf("PA_JVM") < 0) {
@@ -442,7 +451,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
     private void unregister(String url) throws RemoteException {
         try {
-            Naming.unbind(UrlBuilder.removeProtocol(url, "ibis:"));
+            Naming.unbind(UrlBuilder.removeProtocol(url,
+                    Constants.IBIS_PROTOCOL_IDENTIFIER));
 
             if (url.indexOf("PA_JVM") < 0) {
                 runtimeLogger.info(url + " unbound in registry");
@@ -462,11 +472,11 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
                                                      .getInetAddress());
         String name = getVMInformation().getName();
 
-        return UrlBuilder.buildUrl(host, name, "ibis:", port);
+        return UrlBuilder.buildUrl(host, name,
+            Constants.IBIS_PROTOCOL_IDENTIFIER, port);
     }
 
-    private String buildNodeURL(String url)
-        throws java.net.UnknownHostException {
+    private String buildNodeURL(String url) throws URISyntaxException {
         int i = url.indexOf('/');
 
         if (i == -1) {
@@ -476,7 +486,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
             int port = IbisRuntimeFactory.getRegistryHelper()
                                          .getRegistryPortNumber();
 
-            return UrlBuilder.buildUrl(host, url, "ibis:", port);
+            return UrlBuilder.buildUrl(host, url,
+                Constants.IBIS_PROTOCOL_IDENTIFIER, port);
         } else {
             return UrlBuilder.checkUrl(url);
         }

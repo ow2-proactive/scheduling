@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.descriptor.services;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -61,7 +62,9 @@ public class RMIRegistryLookupService implements UniversalService {
      */
     public ProActiveRuntime[] startService() throws ProActiveException {
         ProActiveRuntime part = RuntimeFactory.getRuntime(UrlBuilder.removeProtocol(
-                    url, "rmi:"), "rmi:");
+                    url,
+                    org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER),
+                org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER);
         runtimeArray[0] = part;
         return runtimeArray;
     }

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.http.HttpProActiveRuntime;
@@ -62,12 +63,12 @@ public class HttpHostRTFinder implements HostRTFinder {
         ProActiveRuntimeAdapterImpl adapter;
         try {
             adapter = new ProActiveRuntimeAdapterImpl(new HttpProActiveRuntime(
-                        UrlBuilder.buildUrl(host, "", "http:", port)));
+                        UrlBuilder.buildUrl(host, "", Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port)));
             runtimeArray.add(adapter);
         } catch (ProActiveException e) {
             //        	we build a jvmObject with depth of 0 since this jvm won't be monitored
             MonitoredJVM jvmObject = new MonitoredJVM(UrlBuilder.buildUrl(
-                        host, "", "http:", port), 0);
+                        host, "", Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port), 0);
             if (!skippedObjects.contains(jvmObject)) {
                 logger.log(e.getMessage(), e);
                 skippedObjects.addElement(jvmObject);

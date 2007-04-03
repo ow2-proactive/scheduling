@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import org.objectweb.proactive.core.Constants;
+
 public enum Protocol {
 	
 	RMI, RMISSH, IBIS, JINI, HTTP, UNKNOWN;
@@ -40,20 +42,20 @@ public enum Protocol {
 	
 	/**
 	 * Get a protocol from a string.
-	 * Example: 'rmi' or 'rmi:' return RMI
+	 * Example: 'rmi' return RMI
 	 * @param s The string
 	 * @return A protocol
 	 */
 	public static Protocol getProtocolFromString(String s) {
-		if((s.compareToIgnoreCase("rmi") == 0)||(s.compareToIgnoreCase("rmi:") == 0))
+		if((s.compareToIgnoreCase(Constants.RMI_PROTOCOL_IDENTIFIER) == 0)
 			return RMI;
-		else if((s.compareToIgnoreCase("rmissh") == 0)||(s.compareToIgnoreCase("rmissh:") == 0))
+		else if((s.compareToIgnoreCase(Constants.RMISSH_PROTOCOL_IDENTIFIER) == 0)
 			return RMISSH;
-		else if((s.compareToIgnoreCase("ibis") == 0)||(s.compareToIgnoreCase("ibis:") == 0))
+		else if((s.compareToIgnoreCase(Constants.IBIS_PROTOCOL_IDENTIFIER) == 0)
 			return IBIS;
-		else if((s.compareToIgnoreCase("jini") == 0)||(s.compareToIgnoreCase("jini:") == 0))
+		else if((s.compareToIgnoreCase(Constants.JINI_PROTOCOL_IDENTIFIER) == 0)
 			return JINI;
-		else if((s.compareToIgnoreCase("http") == 0)||(s.compareToIgnoreCase("http:") == 0))
+		else if((s.compareToIgnoreCase(Constants.XMLHTTP_PROTOCOL_IDENTIFIER) == 0)
 			return HTTP;
 		else//Unknown protocol
 			return UNKNOWN;

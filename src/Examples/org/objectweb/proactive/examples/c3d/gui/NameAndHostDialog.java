@@ -48,6 +48,7 @@ import javax.swing.JTextField;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
@@ -240,17 +241,17 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         String localhost = "";
 
         try {
-            String port = "";
-            String protocol = System.getProperty(
-                    "proactive.communication.protocol");
+            int port = -1;
+            String protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
-            if (!protocol.equals("jini") && !protocol.equals("ibis")) {
-                port = ":" +
-                    System.getProperty("proactive." + protocol + ".port");
+            if (!protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) &&
+                    !protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
+                port = Integer.parseInt(System.getProperty("proactive." +
+                            protocol + ".port"));
             }
 
-            localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost()) +
-                port;
+            localhost = UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
+                        InetAddress.getLocalHost()), null, null, port);
         } catch (UnknownHostException e) {
             localhost = "";
         }

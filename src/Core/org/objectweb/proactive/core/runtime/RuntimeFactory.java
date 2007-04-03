@@ -99,7 +99,7 @@ public abstract class RuntimeFactory {
     public static synchronized void setFactory(String protocol,
         String factoryClassName) {
         if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("protocol =  " + protocol + " " +
+            runtimeLogger.debug("protocol2 =  " + protocol + " " +
                 factoryClassName);
         }
         protocolFactoryMapping.put(protocol, factoryClassName);
@@ -139,7 +139,7 @@ public abstract class RuntimeFactory {
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
             defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
-                        "proactive.communication.protocol") + ":");
+                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             if (runtimeLogger.isDebugEnabled()) {
                 runtimeLogger.debug("default runtime = " +
                     defaultRuntime.getURL());
@@ -302,7 +302,10 @@ public abstract class RuntimeFactory {
     private static synchronized RuntimeFactory getFactory(String protocol)
         throws ProActiveException {
         if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("protocol = " + protocol);
+            runtimeLogger.debug("protocol1 = " + protocol);
+            //            
+            //            if (protocol.endsWith(":")) 
+            //            throw new RuntimeException();
         }
 
         RuntimeFactory factory = instanceFactoryMapping.get(protocol);

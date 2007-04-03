@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ext.util;
 
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
@@ -95,7 +96,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
         String temp = null;
         try {
             tmp = UrlBuilder.checkUrl(url);
-        } catch (UnknownHostException e) {
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         return tmp;

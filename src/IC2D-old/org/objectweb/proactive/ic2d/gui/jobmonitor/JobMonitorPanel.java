@@ -62,6 +62,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
@@ -230,7 +231,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     public void addMonitoredHost(String host, int port) {
-        MonitoredHost hostObject = new MonitoredHost(host, port, "rmi:");
+        MonitoredHost hostObject = new MonitoredHost(host, port, Constants.RMI_PROTOCOL_IDENTIFIER);
         skippedObjects.removeElement(hostObject);
         if (!monitoredHosts.contains(hostObject)) {
             monitoredHosts.addElement(hostObject);

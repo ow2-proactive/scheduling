@@ -76,11 +76,7 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
     protected ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException {
         String host;
-        try {
-            host = UrlBuilder.getHostNameFromUrl(s);
-        } catch (java.net.UnknownHostException e) {
-            throw new ProActiveException("Unknown host: " + s, e);
-        }
+        host = UrlBuilder.getHostNameFromUrl(s);
         int port = UrlBuilder.getPortFromUrl(s);
         try {
             Registry registry = LocateRegistry.getRegistry(host, port,

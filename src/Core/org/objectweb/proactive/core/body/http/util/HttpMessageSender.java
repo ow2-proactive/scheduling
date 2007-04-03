@@ -39,6 +39,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
 
 
@@ -82,8 +83,8 @@ public class HttpMessageSender {
         //        }
         try {
             String nodename = null;
-            if (!url.startsWith("http:")) {
-                url = "http:" + url;
+            if (!url.startsWith(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
+                url = Constants.XMLHTTP_PROTOCOL_IDENTIFIER + url;
             }
             int lastslash = url.lastIndexOf('/');
             if (lastslash > 6) {

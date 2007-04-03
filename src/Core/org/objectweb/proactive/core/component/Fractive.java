@@ -790,13 +790,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         String protocol = UrlBuilder.getProtocol(url);
 
         // First step towards Body factory, will be introduced after the release
-        if (protocol.equals("rmi:")) {
+        if (protocol.equals(
+                    org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER)) {
             b = new RmiBodyAdapter().lookup(url);
-        } else if (protocol.equals("rmissh:")) {
+        } else if (protocol.equals(
+                    org.objectweb.proactive.core.Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             b = new SshRmiBodyAdapter().lookup(url);
-        } else if (protocol.equals("http:")) {
+        } else if (protocol.equals(
+                    org.objectweb.proactive.core.Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             b = new HttpBodyAdapter().lookup(url);
-        } else if (protocol.equals("ibis:")) {
+        } else if (protocol.equals(
+                    org.objectweb.proactive.core.Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             b = new IbisBodyAdapter().lookup(url);
         } else {
             throw new IOException("Protocol " + protocol + " not defined");

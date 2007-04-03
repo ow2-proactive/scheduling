@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.migration;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
@@ -192,7 +193,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
 
         try {
             tmp = UrlBuilder.checkUrl(url);
-        } catch (UnknownHostException e) {
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         return tmp;

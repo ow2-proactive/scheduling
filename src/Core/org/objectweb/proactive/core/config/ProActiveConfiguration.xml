@@ -4,7 +4,7 @@
 		<prop key="RemoteHostname" value="owenii"/>
 		<!--<prop key="ibis.property.file" value="/home1/fabrice/workIbis/Ibis/src/ibis/properties"/> -->
 		<prop key="proactive.locationserver" value="org.objectweb.proactive.ext.locationserver.LocationServer"/>
-		<prop key="proactive.locationserver.rmi" value="//localhost/LocationServer"/>
+		<prop key="proactive.locationserver.rmi" value="//localhost/LocationServer"/> 
 		<prop key="proactive.securitymanager" value="true"/>
 		
 		<prop key="proactive.mixedlocation.ttl" value="-1"/>
@@ -24,7 +24,7 @@
 		<prop key="proactive.communication.protocol" value="rmi"/> 
 		<prop key="byteCodeManipulator" value="javassist"/>
 		<prop key="proactive.rmi.port" value="1099"/>
-		<!--<prop key="proactive.http.port" value="2026"/> -->
+		<prop key="proactive.http.port" value="2026"/> 
 		<!--<prop key="proactive.java.policy" value="../../../../../../scripts/unix/proactive.java.policy"/>-->
 		<prop key="ibis.serialization" value="sun"/>
 		<prop key="ibis.name_server.host" value="localhost"/>

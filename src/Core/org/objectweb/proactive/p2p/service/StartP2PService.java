@@ -40,6 +40,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -465,7 +466,7 @@ public class StartP2PService implements P2PConstants {
         // Keep previous port value
         String bckPortValue = null;
 
-        if (!acquisitionMethod.equals("ibis")) {
+        if (!acquisitionMethod.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             bckPortValue = System.getProperty("proactive." + acquisitionMethod +
                     ".port");
             System.setProperty("proactive." + acquisitionMethod + ".port",
@@ -476,12 +477,11 @@ public class StartP2PService implements P2PConstants {
         }
 
         // ProActiveRuntime creation
-        ProActiveRuntime paRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod +
-                ":");
+        ProActiveRuntime paRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
 
         // Set property port with previous value
         if (bckPortValue != null) {
-            if (!acquisitionMethod.equals("ibis")) {
+            if (!acquisitionMethod.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
                 System.setProperty("proactive." + acquisitionMethod + ".port",
                     bckPortValue);
             } else {

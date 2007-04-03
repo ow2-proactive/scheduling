@@ -41,6 +41,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -360,23 +361,26 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         java.io.Serializable {
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
-                if ("ibis".equals(System.getProperty(
-                                "proactive.communication.protocol"))) {
+                if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
+                            System.getProperty(
+                                Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
                             "Using ibis factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
-                } else if ("http".equals(System.getProperty(
-                                "proactive.communication.protocol"))) {
+                } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
+                            System.getProperty(
+                                Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
                             "Using http factory for creating remote body");
                     }
 
                     return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
-                } else if ("rmissh".equals(System.getProperty(
-                                "proactive.communication.protocol"))) {
+                } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
+                            System.getProperty(
+                                Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
                             "Using rmissh factory for creating remote body");

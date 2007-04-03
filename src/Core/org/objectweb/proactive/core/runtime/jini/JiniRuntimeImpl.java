@@ -31,12 +31,14 @@
 package org.objectweb.proactive.core.runtime.jini;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.security.SecureRandom;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -154,7 +156,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
             //create the node with the name 
             proActiveRuntime.createLocalNode(name, replacePreviousBinding,
                 securityManager, vnname, jobId);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }
 
@@ -182,7 +184,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
             nodeUrl = buildNodeURL(nodeName);
             name = UrlBuilder.getNameFromUrl(nodeUrl);
             unregisterService(nodeUrl, jiniNodeMap);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeUrl, e);
         }
         proActiveRuntime.killNode(name);
@@ -209,7 +211,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         //first we build a well-formed url
         try {
             virtualNodeURL = buildNodeURL(virtualNodeName);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
         }
@@ -238,7 +240,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         try {
             virtualNodeURL = buildNodeURL(virtualNodeName);
             unregisterService(virtualNodeURL, jiniVirtualNodeMap);
-        } catch (java.net.UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
         }
@@ -376,17 +378,18 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl implements java.io.
         String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                      .getInetAddress());
         String name = getVMInformation().getName();
-        return UrlBuilder.buildUrl(host, name, "jini:");
+        return UrlBuilder.buildUrl(host, name,
+            Constants.JINI_PROTOCOL_IDENTIFIER);
     }
 
-    private String buildNodeURL(String url)
-        throws java.net.UnknownHostException {
+    private String buildNodeURL(String url) throws URISyntaxException {
         int i = url.indexOf('/');
         if (i == -1) {
             //it is an url given by a descriptor
             String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                          .getInetAddress());
-            return UrlBuilder.buildUrl(host, url, "jini:");
+            return UrlBuilder.buildUrl(host, url,
+                Constants.JINI_PROTOCOL_IDENTIFIER);
         } else {
             return UrlBuilder.checkUrl(url);
         }

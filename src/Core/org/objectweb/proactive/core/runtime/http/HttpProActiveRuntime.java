@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime.http;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
@@ -114,7 +115,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             this.url = UrlBuilder.checkUrl(newurl);
             isLocal = false;
             runtimeLogger.debug("New Remote XML Adapter : " + url);
-        } catch (UnknownHostException e) {
+        } catch (URISyntaxException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -147,8 +148,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws NodeException, HTTPRemoteException, AlreadyBoundException {
         String nodeURL = null;
         try {
+            System.out.println("HttpProActiveRuntime.createLocalNode() " +
+                nodeName);
             nodeURL = buildNodeURL(nodeName);
-        } catch (UnknownHostException e1) {
+        } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
 
@@ -434,7 +437,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
 
         try {
             vn_url = buildNodeURL(virtualNodeName);
-        } catch (UnknownHostException e) {
+        } catch (URISyntaxException e) {
             throw new ProActiveException(e);
         }
 
@@ -711,8 +714,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         req.send();
     }
 
-    protected String buildNodeURL(String url)
-        throws java.net.UnknownHostException {
+    protected String buildNodeURL(String url) throws URISyntaxException {
         int i = url.indexOf('/');
 
         if (i != -1) {

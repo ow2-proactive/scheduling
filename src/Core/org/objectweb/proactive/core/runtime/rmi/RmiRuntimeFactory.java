@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime.rmi;
 
 import java.rmi.RemoteException;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
@@ -117,7 +118,8 @@ public class RmiRuntimeFactory extends RuntimeFactory {
         //if (s == null) return null;
         try {
             RemoteProActiveRuntime remoteProActiveRuntime;
-            String URL = UrlBuilder.removeProtocol(s, "rmi:");
+            String URL = UrlBuilder.removeProtocol(s,
+                    Constants.RMI_PROTOCOL_IDENTIFIER);
             remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(URL);
             //System.out.println(remoteProActiveRuntime.getClass().getName());
             return createRuntimeAdapter(remoteProActiveRuntime);

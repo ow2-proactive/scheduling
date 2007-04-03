@@ -36,6 +36,7 @@ import java.net.UnknownHostException;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.AbstractUniversalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
@@ -396,7 +397,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
                     rshProcess.setHostname(hostname);
                     rshProcess.setUsername(username);
                     process.setParameters("ic2d " + localRuntimeUrl +
-                        " rmi: 1 rsh-jvm");
+                        " " + Constants.RMI_PROTOCOL_IDENTIFIER + "  1 rsh-jvm");
                     return new JVMProcessWrapper(rshProcess, messagePanel,
                         javaPath, policyFile, classpath, classname, parameters,
                         hostname, username);

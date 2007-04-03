@@ -31,6 +31,7 @@
 package nonregressiontest.descriptor.defaultnodes;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -56,7 +57,7 @@ public class TestNodes extends FunctionalTest {
         if (value != null) {
             XML_LOCATION = TestNodes.class.getResource(value).getPath();
         } else {  
-      	  if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+      	  if ("ibis".equals(System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
       		XML_LOCATION = TestNodes.class.getResource(
             "/nonregressiontest/descriptor/defaultnodes/NodesIbis.xml")
                                   .getPath();

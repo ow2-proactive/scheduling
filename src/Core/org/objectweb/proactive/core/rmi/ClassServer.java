@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.rmi;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -173,12 +174,14 @@ public class ClassServer implements Runnable {
                 return ClassServerServlet.getUrl();
             } else {
                 return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
-                        java.net.InetAddress.getLocalHost()), "", "http:", port);
+                        java.net.InetAddress.getLocalHost()), "",
+                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port);
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        return UrlBuilder.buildUrl("localhost", "", "http:", port);
+        return UrlBuilder.buildUrl("localhost", "",
+            Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port);
     }
 
     /**

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.body.ibis;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -110,7 +111,8 @@ public class IbisBodyAdapter extends BodyAdapterImpl {
 
         // Try if URL is the address of a IbisRemoteBody
         try {
-            o = ibis.rmi.Naming.lookup(UrlBuilder.removeProtocol(url, "ibis:"));
+            o = ibis.rmi.Naming.lookup(UrlBuilder.removeProtocol(url,
+                        Constants.IBIS_PROTOCOL_IDENTIFIER));
         } catch (ibis.rmi.NotBoundException e) {
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");

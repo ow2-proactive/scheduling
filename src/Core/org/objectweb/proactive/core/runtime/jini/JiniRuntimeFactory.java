@@ -104,14 +104,8 @@ public class JiniRuntimeFactory extends RuntimeFactory {
         LookupLocator lookup = null;
         ServiceRegistrar registrar = null;
 
-        try {
-            host = UrlBuilder.getHostNameFromUrl(s);
-            runtimeLogger.info("Try to find the service lookup on host: " +
-                host);
-        } catch (java.net.UnknownHostException e) {
-            runtimeLogger.fatal("Unable to locate host");
-            e.printStackTrace();
-        }
+        host = UrlBuilder.getHostNameFromUrl(s);
+        runtimeLogger.info("Try to find the service lookup on host: " + host);
 
         //ServiceDiscoveryManager clientMgr = null;
         if (host != null) {

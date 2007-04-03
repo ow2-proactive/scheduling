@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
@@ -109,7 +110,8 @@ public class ClassServerServlet extends HttpServlet {
             //            int port = Integer.parseInt(System.getProperty(
             //                        "proactive.http.port"));
             String url = UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
-                        java.net.InetAddress.getLocalHost()), "", "http:", port); /*+
+                        java.net.InetAddress.getLocalHost()), "",
+                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+
             "/" + SERVLET_NAME ;*/
 
             if (url.charAt(url.length() - 1) == '/') {

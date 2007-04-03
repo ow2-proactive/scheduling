@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -108,12 +109,10 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             String protocol = attributes.getValue("protocol");
 
             if (!checkNonEmpty(protocol)) {
-                protocol = System.getProperty(
-                        "proactive.communication.protocol");
+                protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
             }
 
-            protocol = UrlBuilder.checkProtocol(protocol);
-
+            //            protocol = UrlBuilder.checkProtocol(protocol);
             VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(vn,
                     false);
 
@@ -151,7 +150,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                     "within a lookup tag attribute host must be defined for rmi protocol");
             }
 
-            protocol = UrlBuilder.checkProtocol(protocol);
+            //            protocol = UrlBuilder.checkProtocol(protocol);
 
             // String url = UrlBuilder.buildUrl(host, vnLookup, protocol);
             VirtualNodeLookup vn = (VirtualNodeLookup) proActiveDescriptor.createVirtualNode(vnLookup,
@@ -162,7 +161,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
 
             //System.out.println(port);
             if (checkNonEmpty(port)) {
-                if (protocol.equals("jini:")) {
+                if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER)) {
                     throw new org.xml.sax.SAXException(
                         "For a jini lookup, no port number should be specified");
                 }
@@ -245,8 +244,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
                     if (!checkNonEmpty(protocol)) {
-                        protocol = System.getProperty(
-                                "proactive.communication.protocol");
+                        protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
                     }
 
                     vn.createNodeOnCurrentJvm(protocol);

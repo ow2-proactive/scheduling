@@ -45,6 +45,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
@@ -955,7 +956,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void createNodeOnCurrentJvm(String protocol) {
         if (protocol == null) {
-            protocol = System.getProperty("proactive.communication.protocol");
+            protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         }
 
         localVirtualMachines.add(protocol);
@@ -1245,8 +1246,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             increaseNumberOfNodes(1);
 
             // get the Runtime for the given protocol
-            ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
-                        protocol));
+            ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
 
             //create the node
             ProActiveSecurityManager siblingPSM = null;
@@ -1574,18 +1574,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
-    private String checkProtocol(String protocol) {
-        if (protocol.indexOf(":") == -1) {
-            return protocol.concat(":");
-        }
-
-        return protocol;
-    }
-
     private synchronized void performOperations(ProActiveRuntime part,
         String url, String protocol, String vmName) {
-        Node node = new NodeImpl(part, url, checkProtocol(protocol),
-                this.jobID, vmName);
+        Node node = new NodeImpl(part, url, protocol, this.jobID, vmName);
         synchronized (createdNodes) {
             createdNodes.add(node);
         }

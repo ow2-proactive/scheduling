@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueRuntimeID;
 import org.objectweb.proactive.core.body.BodyAdapterForwarder;
@@ -104,25 +105,30 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         bodyForwarder = new BodyForwarderImpl();
 
         // Create the BodyForwarder, protocol specific
-        if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(System.getProperty(
+                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Factory is ibis");
+                logger.debug("Factory is " +
+                    Constants.IBIS_PROTOCOL_IDENTIFIER);
             }
 
             logger.info("Ibis forwarding not yet implemented");
 
             // TODO support Ibis forwarding
-        } else if ("http".equals(System.getProperty(
-                        "proactive.communication.protocol"))) {
+        } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
+                    System.getProperty(
+                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Factory is http");
+                logger.debug("Factory is " +
+                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER);
             }
 
             logger.info("Http forwarding not yet implemented");
 
             // TODO support Http forwarding
-        } else if ("rmissh".equals(System.getProperty(
-                        "proactive.communication.protocol"))) {
+        } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
+                    System.getProperty(
+                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is rmissh");
             }
@@ -136,7 +142,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             }
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug("Factory is rmi");
+                logger.debug("Factory is " + Constants.RMI_PROTOCOL_IDENTIFIER);
             }
 
             try {

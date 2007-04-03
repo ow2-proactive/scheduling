@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.ssh;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.util.HostsInfos;
 
 
@@ -87,9 +88,9 @@ public class SshParameters {
     }
 
     static public boolean getSshTunneling() {
-        String tunneling = System.getProperty(
-                "proactive.communication.protocol");
-        if ((tunneling != null) && tunneling.equals("rmissh")) {
+        String tunneling = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        if ((tunneling != null) &&
+                tunneling.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             return true;
         } else {
             return false;
@@ -101,7 +102,7 @@ public class SshParameters {
     }
 
     static public String getSshPort() {
-        String sshPort = System.getProperty("proactive.ssh.port");
+        String sshPort = System.getProperty(Constants.PROPERTY_PA_RMISSH_PORT);
         if (sshPort == null) {
             sshPort = "22";
         }
@@ -109,7 +110,7 @@ public class SshParameters {
     }
 
     static public String getSshKnownHostsFile() {
-        String hostfile = System.getProperty("proactive.ssh.known_hosts");
+        String hostfile = System.getProperty(Constants.PROPERTY_PA_RMISSH_KNOWN_HOST);
         if (hostfile == null) {
             hostfile = System.getProperty("user.home") + "/.ssh/known_hosts";
         }
@@ -117,7 +118,7 @@ public class SshParameters {
     }
 
     static public String getSshKeyDirectory() {
-        String keydir = System.getProperty("proactive.ssh.key_directory");
+        String keydir = System.getProperty(Constants.PROPERTY_PA_RMISSH_KEY_DIR);
         if (keydir == null) {
             keydir = SSHKeys.SSH_DIR;
         }

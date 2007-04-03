@@ -30,9 +30,13 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.ConnectException;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -80,13 +84,11 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
         try {
             java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
         } catch (ConnectException e) {
-            //failed to unbind at port 1099 
-            // try at proactive.rmi.port
-            String url2 = UrlBuilder.getProtocol(url) + "//" +
-                UrlBuilder.getHostNameFromUrl(url) + ":" +
-                System.getProperty("proactive.rmi.port") + "/" +
-                UrlBuilder.getNameFromUrl(url);
-
+            //failed to unbind, maybe no port was specified in the url 
+            // try at 	Constants.PROPERTY_PA_RMI_PORT	
+            String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
+                    UrlBuilder.getNameFromUrl(url),
+                    System.getProperty(Constants.PROPERTY_PA_RMI_PORT));
             java.rmi.Naming.rebind(url2, (RmiRemoteBody) proxiedRemoteBody);
         }
     }
@@ -104,12 +106,8 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
             } catch (ConnectException e) {
                 //failed to unbind at port 1099 
                 // try at proactive.rmi.port
-                String url2 = UrlBuilder.getProtocol(url) + "//" +
-                    UrlBuilder.getHostNameFromUrl(url) + ":" +
-                    System.getProperty("proactive.rmi.port") + "/" +
-                    UrlBuilder.getNameFromUrl(url);
-
-                java.rmi.Naming.unbind(url2);
+                URI uri = URI.create(url);
+                java.rmi.Naming.unbind(uri.toString());
             }
         } catch (java.rmi.NotBoundException e) {
             throw new java.io.IOException(
@@ -136,11 +134,9 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
                 o = java.rmi.Naming.lookup(url);
             } catch (ConnectException e) {
                 // connection failed, try to find a rmiregistry at proactive.rmi.port port
-                String url2 = UrlBuilder.getProtocol(url) + "//" +
-                    UrlBuilder.getHostNameFromUrl(url) + ":" +
-                    System.getProperty("proactive.rmi.port") + "/" +
-                    UrlBuilder.getNameFromUrl(url);
-
+                String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(
+                            url), UrlBuilder.getNameFromUrl(url),
+                        System.getProperty("proactive.rmi.port"));
                 o = java.rmi.Naming.lookup(url2);
             }
         } catch (java.rmi.NotBoundException e) { // there are one rmiregistry on target computer but node isn t bound
@@ -181,9 +177,9 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
             // connection failed, try to find a rmiregistry at proactive.rmi.port port
             // ie change the port specified in url. 
             // Is this needed ? 
-            String url2 = UrlBuilder.getProtocol(url) + "//" +
-                UrlBuilder.getHostNameFromUrl(url) + ":" +
-                System.getProperty("proactive.rmi.port") + "/";
+            String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
+                    UrlBuilder.getNameFromUrl(url),
+                    System.getProperty("proactive.rmi.port"));
 
             names = java.rmi.Naming.list(url2);
         } catch (ConnectException e) {

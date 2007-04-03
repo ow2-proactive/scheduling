@@ -79,8 +79,8 @@ public class Flower {
         ProActiveConfiguration.load();
         try {
             // It's springtime ! Let's create flowers everywhere !
-            String nodeName1 = "///vm1";
-            String nodeName2 = "///vm2";
+            String nodeName1 = "vm1";
+            String nodeName2 = "vm2";
             if (args.length >= 1) {
                 nodeName1 = args[0];
             }

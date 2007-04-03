@@ -67,12 +67,9 @@ public class SshRmiBodyAdapter extends RmiBodyAdapter {
     @Override
     public UniversalBody lookup(String url) throws java.io.IOException {
         String host;
-        try {
-            host = UrlBuilder.getHostNameFromUrl(url);
-        } catch (java.net.UnknownHostException e) {
-            throw new IOException("Unknown host in: " + url + " " +
-                e.toString());
-        }
+
+        host = UrlBuilder.getHostNameFromUrl(url);
+
         int port = UrlBuilder.getPortFromUrl(url);
         try {
             Registry registry = LocateRegistry.getRegistry(host, port,

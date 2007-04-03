@@ -1327,13 +1327,13 @@ public class ProActive {
 
         // First step towards Body factory, will be introduced after the release
         BodyAdapter ba;
-        if (protocol.equals("rmi:")) {
+        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
             ba = new RmiBodyAdapter();
-        } else if (protocol.equals("rmissh:")) {
+        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             ba = new SshRmiBodyAdapter();
-        } else if (protocol.equals("http:")) {
+        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             ba = new HttpBodyAdapter();
-        } else if (protocol.equals("ibis:")) {
+        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             ba = new IbisBodyAdapter();
         } else {
             throw new IOException("Protocol " + protocol + " not defined");
@@ -1377,13 +1377,13 @@ public class ProActive {
         String protocol = UrlBuilder.getProtocol(url);
 
         // First step towards Body factory, will be introduced after the release
-        if (protocol.equals("rmi:")) {
+        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
             b = new RmiBodyAdapter().lookup(url);
-        } else if (protocol.equals("rmissh:")) {
+        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             b = new SshRmiBodyAdapter().lookup(url);
-        } else if (protocol.equals("http:")) {
+        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             b = new HttpBodyAdapter().lookup(url);
-        } else if (protocol.equals("ibis:")) {
+        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             b = new IbisBodyAdapter().lookup(url);
         } else {
             throw new IOException("Protocol " + protocol + " not defined");
@@ -1418,13 +1418,13 @@ public class ProActive {
         String protocol = UrlBuilder.getProtocol(url);
 
         // First step towards Body factory, will be introduced after the release
-        if (protocol.equals("rmi:")) {
+        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
             activeNames = new RmiBodyAdapter().list(url);
-        } else if (protocol.equals("rmissh:")) {
+        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             activeNames = new SshRmiBodyAdapter().list(url);
-        } else if (protocol.equals("http:")) {
+        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             activeNames = new HttpBodyAdapter().list(url);
-        } else if (protocol.equals("ibis:")) {
+        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             activeNames = new IbisBodyAdapter().list(url);
         } else {
             throw new IOException("Protocol " + protocol + " not defined");
@@ -1688,8 +1688,7 @@ public class ProActive {
                 "Cannot register such virtualNode since it results from a lookup!");
         }
         if (registrationProtocol == null) {
-            registrationProtocol = System.getProperty(
-                    "proactive.communication.protocol");
+            registrationProtocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);

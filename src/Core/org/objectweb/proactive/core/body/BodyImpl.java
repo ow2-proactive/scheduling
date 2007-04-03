@@ -192,29 +192,29 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.gc = new GarbageCollector(this);
 
         // JMX registration 
-        try {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = new ObjectName(
-                    "org.objectweb.proactive:type=oa,class=" + this.getName() +
-                    ",name=" + this.getName() + "-" +
-                    this.getID().toString().replace(':', '-'));
-            mbs.registerMBean(this, name);
-        } catch (MalformedObjectNameException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InstanceAlreadyExistsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (MBeanRegistrationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NotCompliantMBeanException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        //        try {
+        //            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        //            ObjectName name = new ObjectName(
+        //                    "org.objectweb.proactive:type=oa,class=" + this.getName() +
+        //                    ",name=" + this.getName() + "-" +
+        //                    this.getID().toString().replace(':', '-'));
+        //            mbs.registerMBean(this, name);
+        //        } catch (MalformedObjectNameException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        } catch (NullPointerException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        } catch (InstanceAlreadyExistsException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        } catch (MBeanRegistrationException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        } catch (NotCompliantMBeanException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        }
 
         // End JMX registration      
     }

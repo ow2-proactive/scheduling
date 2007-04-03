@@ -31,6 +31,7 @@
 package nonregressiontest.descriptor.services.p2p;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -58,7 +59,7 @@ public class Test extends FunctionalTest {
             "/nonregressiontest/descriptor/services/p2p/TestP2P.xml").getPath();
 
     static {
-        if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+        if ("ibis".equals(System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             P2P_XML_LOCATION_UNIX = Test.class.getResource(
                     "/nonregressiontest/descriptor/services/p2p/TestP2PIbis.xml")
                                               .getPath();
