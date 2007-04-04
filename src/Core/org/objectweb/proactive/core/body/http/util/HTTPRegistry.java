@@ -56,19 +56,9 @@ public class HTTPRegistry {
      * Gets the unique instance of the registry
      * @return the unique instance of the registry
      */
-    public static HTTPRegistry getInstance() {
+    public static synchronized HTTPRegistry getInstance() {
         if (instance == null) {
             instance = new HTTPRegistry();
-            try {
-                instance = (HTTPRegistry) ProActive.turnActive(instance);
-                ProActive.register(instance, HTTPRegistry.REGISTRY_NAME);
-            } catch (ActiveObjectCreationException e) {
-                e.printStackTrace();
-            } catch (NodeException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return instance;
     }
@@ -80,7 +70,6 @@ public class HTTPRegistry {
      */
     public void bind(String name, UniversalBody body) {
         bodyMap.put(name, body);
-        System.out.println(bodyMap.size());
     }
 
     /**

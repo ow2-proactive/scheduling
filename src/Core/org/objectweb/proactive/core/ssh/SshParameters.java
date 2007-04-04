@@ -45,8 +45,7 @@ public class SshParameters {
 
     static public boolean getTryNormalFirst() {
         if (_tryNormalFirst == null) {
-            _tryNormalFirst = System.getProperty(
-            		Constants.PROPERTY_PA_SSH_TUNNELING_TRY_NORMAL_FIRST);
+            _tryNormalFirst = System.getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_TRY_NORMAL_FIRST);
         }
         if ((_tryNormalFirst != null) && _tryNormalFirst.equals("yes")) {
             return true;
@@ -111,9 +110,10 @@ public class SshParameters {
 
     static public String getSshKnownHostsFile() {
         if (System.getProperty(Constants.PROPERTY_PA_RMISSH_KNOWN_HOST) != null) {
-            return  System.getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS);
+            return System.getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS);
         }
-        return System.getProperty("user.home") + System.getProperty(Constants.SSH_TUNNELING_DEFAULT_KNOW_HOSTS);
+        return System.getProperty("user.home") +
+        System.getProperty(Constants.SSH_TUNNELING_DEFAULT_KNOW_HOSTS);
     }
 
     static public String getSshKeyDirectory() {

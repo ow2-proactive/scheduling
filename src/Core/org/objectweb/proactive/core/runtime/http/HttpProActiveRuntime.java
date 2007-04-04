@@ -148,8 +148,6 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws NodeException, HTTPRemoteException, AlreadyBoundException {
         String nodeURL = null;
         try {
-            System.out.println("HttpProActiveRuntime.createLocalNode() " +
-                nodeName);
             nodeURL = buildNodeURL(nodeName);
         } catch (URISyntaxException e1) {
             e1.printStackTrace();

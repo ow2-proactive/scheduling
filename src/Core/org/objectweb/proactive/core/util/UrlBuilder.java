@@ -74,11 +74,31 @@ public class UrlBuilder {
         }
     }
 
+    /**
+     * @param host
+     * @param name
+     * @param protocol
+     * @return
+     */
     public static String buildUrl(String host, String name, String protocol) {
         return buildUrl(host, name, protocol,
             getDefaultPortForProtocol(protocol));
     }
 
+    /**
+     * @param host
+     * @param name
+     * @return
+     */
+    public static String buildUrl(String host, String name) {
+        return buildUrl(host, name, null);
+    }
+
+    /**
+     * returns the default port set for the given protocol
+     * @param protocol the protocol
+     * @return the default port number associated to the protocol
+     */
     public static int getDefaultPortForProtocol(String protocol) {
         if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(protocol)) {
             if (System.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
@@ -108,14 +128,13 @@ public class UrlBuilder {
     */
     public static String buildUrl(String host, String name, String protocol,
         int port) {
-        if (protocol == null) {
-            protocol = Constants.DEFAULT_PROTOCOL_IDENTIFIER;
-        }
-
+        //        if (protocol == null) {
+        //            protocol = Constants.DEFAULT_PROTOCOL_IDENTIFIER;
+        //        }
         try {
             host = fromLocalhostToHostname(host);
 
-            if ((name != null) && (!name.startsWith("/") )) {
+            if ((name != null) && (!name.startsWith("/"))) {
                 /* URI does not require a '/' at the beginning of the name like URLs. As we cannot use
                  * URL directly (because we do not want to register a URL handler), we do this ugly hook.
                  */

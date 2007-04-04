@@ -497,9 +497,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */
     public String getURL() {
-        return "//" +
-        UrlBuilder.getHostNameorIP(vmInformation.getInetAddress()) + "/" +
-        vmInformation.getName();
+        return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
+                vmInformation.getInetAddress()), vmInformation.getName());
     }
 
     public ArrayList<ArrayList<Serializable>> getActiveObjects(String nodeName) {

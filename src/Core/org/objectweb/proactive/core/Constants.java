@@ -115,19 +115,19 @@ public interface Constants {
 
     /** this property identifies the default port for the xml-http protocol  */
     public static final String PROPERTY_PA_XMLHTTP_PORT = "proactive.http.port";
-    
+
     /** this property identifies that when using ssh tunneling, a normal connection should be tried before tunneling */
     public static final String PROPERTY_PA_SSH_TUNNELING_TRY_NORMAL_FIRST = "proactive.tunneling.try_normal_first";
 
     /** this property identifies if the garbage collector should be turned on when using ssh tunneling */
     public static final String PROPERTY_PA_SSH_TUNNELING_USE_GC = "proactive.tunneling.use_gc";
-    
+
     /** this property identifies the garbage collector period when using ssh tunneling */
     public static final String PROPERTY_PA_SSH_TUNNELING_GC_PERIOD = "proactive.tunneling.gc_period";
 
     /** this property identifies the know hosts file location when using ssh tunneling
      *  if undefined, the default value is user.home property concatenated to SSH_TUNNELING_DEFAULT_KNOW_HOSTS
      *  */
-    public static final String PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS =  "proactive.ssh.known_hosts";
+    public static final String PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS = "proactive.ssh.known_hosts";
     public static final String SSH_TUNNELING_DEFAULT_KNOW_HOSTS = "/.ssh/known_hosts";
 }
