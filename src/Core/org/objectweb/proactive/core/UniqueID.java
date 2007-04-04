@@ -124,7 +124,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
     public String shortString() {
         if (this.cachedShortString == null) {
             this.cachedShortString = "" +
-                Math.abs(this.getCanonString().hashCode() % 65536);
+                Math.abs(this.getCanonString().hashCode() % 100000);
         }
 
         return this.cachedShortString;
