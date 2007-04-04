@@ -115,10 +115,10 @@ public class UrlBuilder {
         try {
             host = fromLocalhostToHostname(host);
 
-            if (name != null) {
+            if ((name != null) && (!name.startsWith("/") )) {
                 /* URI does not require a '/' at the beginning of the name like URLs. As we cannot use
-                     * URL directly (because we do not want to register URL handler), we do this ugly hook.
-                     */
+                 * URL directly (because we do not want to register a URL handler), we do this ugly hook.
+                 */
                 name = "/" + name;
             }
 

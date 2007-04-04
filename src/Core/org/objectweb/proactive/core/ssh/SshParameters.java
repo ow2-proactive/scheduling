@@ -46,7 +46,7 @@ public class SshParameters {
     static public boolean getTryNormalFirst() {
         if (_tryNormalFirst == null) {
             _tryNormalFirst = System.getProperty(
-                    "proactive.tunneling.try_normal_first");
+            		Constants.PROPERTY_PA_SSH_TUNNELING_TRY_NORMAL_FIRST);
         }
         if ((_tryNormalFirst != null) && _tryNormalFirst.equals("yes")) {
             return true;
@@ -69,7 +69,7 @@ public class SshParameters {
     }
 
     static public boolean getUseTunnelGC() {
-        String useTunnelGC = System.getProperty("proactive.tunneling.use_gc");
+        String useTunnelGC = System.getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_USE_GC);
         if ((useTunnelGC != null) && useTunnelGC.equals("yes")) {
             return true;
         } else {
@@ -78,7 +78,7 @@ public class SshParameters {
     }
 
     static public int getTunnelGCPeriod() {
-        String gcPeriod = System.getProperty("proactive.tunneling.gc_period");
+        String gcPeriod = System.getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_GC_PERIOD);
         if (gcPeriod != null) {
             return Integer.parseInt(gcPeriod);
         } else {
@@ -110,11 +110,10 @@ public class SshParameters {
     }
 
     static public String getSshKnownHostsFile() {
-        String hostfile = System.getProperty(Constants.PROPERTY_PA_RMISSH_KNOWN_HOST);
-        if (hostfile == null) {
-            hostfile = System.getProperty("user.home") + "/.ssh/known_hosts";
+        if (System.getProperty(Constants.PROPERTY_PA_RMISSH_KNOWN_HOST) != null) {
+            return  System.getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS);
         }
-        return hostfile;
+        return System.getProperty("user.home") + System.getProperty(Constants.SSH_TUNNELING_DEFAULT_KNOW_HOSTS);
     }
 
     static public String getSshKeyDirectory() {
