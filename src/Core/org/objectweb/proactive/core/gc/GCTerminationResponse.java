@@ -37,7 +37,7 @@ package org.objectweb.proactive.core.gc;
  */
 public class GCTerminationResponse extends GCSimpleResponse {
     GCTerminationResponse(Activity lastActivity) {
-        super(lastActivity);
+        super(lastActivity, true);
     }
 
     @Override

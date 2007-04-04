@@ -333,9 +333,13 @@ public class GarbageCollector {
      */
     void newResponse(Referenced ref) {
         if (this.parent == null) {
-            Activity refActivity = ref.getLastResponse().getConsensusActivity();
-            if (this.lastActivity.equals(refActivity) && !isLastActivityMine()) {
-                this.parent = ref;
+            GCSimpleResponse lastResp = ref.getLastResponse();
+            if (lastResp.hasParent()) {
+                Activity refActivity = lastResp.getConsensusActivity();
+                if (this.lastActivity.equals(refActivity) &&
+                        !isLastActivityMine()) {
+                    this.parent = ref;
+                }
             }
         }
     }
@@ -639,7 +643,8 @@ public class GarbageCollector {
             this.setLastActivity(mesg.getLastActivity());
         }
         if (resp == null) {
-            resp = new GCSimpleResponse(this.lastActivity);
+            resp = new GCSimpleResponse(this.lastActivity,
+                    (this.parent != null) || this.isLastActivityMine());
         }
         if (kr == null) {
             /* new known referencer */

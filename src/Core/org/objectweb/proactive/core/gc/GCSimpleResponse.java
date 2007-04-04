@@ -35,9 +35,11 @@ import java.io.Serializable;
 
 public class GCSimpleResponse implements Serializable {
     protected final Activity consensusActivity;
+    private final boolean hasParent;
 
-    GCSimpleResponse(Activity consensusActivity) {
+    GCSimpleResponse(Activity consensusActivity, boolean hasParent) {
         this.consensusActivity = consensusActivity;
+        this.hasParent = hasParent;
     }
 
     @Override
@@ -59,5 +61,9 @@ public class GCSimpleResponse implements Serializable {
             return this.consensusActivity.equals(((GCSimpleResponse) o).consensusActivity);
         }
         return false;
+    }
+
+    boolean hasParent() {
+        return this.hasParent;
     }
 }
