@@ -6,7 +6,7 @@
 	<property name="src.dir" value="${base}" />
 	<property name="proactive.dir" value="${base}/../../../../../.." />
 	<property name="classes.dir" value="${proactive.dir}/classes" />
-	<property name="configfiles.dir" value="${proactive.dir}/classes/org/objectweb/proactive/examples/pi" />
+	<property name="configfiles.dir" value="${proactive.dir}/classes/Examples/org/objectweb/proactive/examples/pi" />
 	<property name="name" value="ProActiveTutorial" />
 	<property name="debug" value="on" />
 	<property name="source" value="1.5" />

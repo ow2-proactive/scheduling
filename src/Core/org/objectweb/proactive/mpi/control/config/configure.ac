@@ -22,7 +22,7 @@ AC_CONFIG_FILES([
 AC_OUTPUT
 echo " "
 echo "************************************************************"
-echo " Enter the src/org/objectweb/proactive/mpi/control/config/ "
+echo " Enter the src/Core/org/objectweb/proactive/mpi/control/config/"
 echo " directory then type 'make mpicode=myCode.c' to compile your"
 echo " mpi code 'myCode.c'. It will generate a binary 'myCode' in bin/"
 echo " directory."

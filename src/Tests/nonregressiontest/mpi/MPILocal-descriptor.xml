@@ -40,7 +40,7 @@
 					<mpiOptions>
 						<processNumber>5</processNumber>
 						<localRelativePath>
-							<relativePath origin="user.home" value="/ProActive/src/org/objectweb/proactive/examples/mpi" />
+							<relativePath origin="user.home" value="/ProActive/src/Examples/org/objectweb/proactive/examples/mpi" />
 						</localRelativePath>
 					</mpiOptions>
 				</mpiProcess>

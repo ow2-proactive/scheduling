@@ -83,7 +83,7 @@ public class MatrixChart implements Chart {
      */
     private static final long serialVersionUID = -9045078395503131290L;
     public static final String logoFile = org.objectweb.proactive.benchmarks.timit.config.ConfigReader.PROJECT_PATH +
-        "/src/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png";
+        "/src/Core/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png";
     private Chart.LegendFormat legendFormatMode;
     private Chart.Scale scaleMode;
 

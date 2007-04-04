@@ -6,7 +6,7 @@
 
 	<variables>
 		<descriptorVariable name="TIMIT_HOME"
-			value="../classes/org/objectweb/proactive/benchmarks/timit" />
+			value="../classes/Core/org/objectweb/proactive/benchmarks/timit" />
 		<descriptorVariable name="PROACTIVE_HOME" value="../" />
 		<descriptorVariable name="RMI_PORT" value="5000" />
 		<descriptorVariable name="COM_PROTO" value="rmi" />
