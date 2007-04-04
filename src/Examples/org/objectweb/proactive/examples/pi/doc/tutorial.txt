@@ -87,7 +87,7 @@ Interval is the input data for PiComputer instances
 Result is the output data for PiComputer instances
 PIBBP is the main class that starts the computation
 
-The sources are in the directory : tutorial/src/org/objectweb/proactive/tutorial/
+The sources are in the directory : tutorial/src/Examples/org/objectweb/proactive/tutorial/
 
 
 We will work only on the PiBBP class, the other classes are already written.
