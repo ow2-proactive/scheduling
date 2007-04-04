@@ -144,16 +144,15 @@ public interface Loggers {
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
 
     // Infrastructure Manager loggers
-    static final public String IM = "IM";
-    static final public String IM_FACTORY = IM + ".FACTORY";
-    static final public String IM_CORE = IM + ".IMCORE";
-    static final public String IM_ADMIN = IM + ".IMADMIN";
-    static final public String IM_MONITORING = IM + ".IMMONITORING";
-    static final public String IM_USER = IM + ".IMUSER";
-    static final public String IM_DEPLOYMENT_FACTORY = IM +
-        ".IMDEPLOYMENTFACTORY";
-    static final public String IM_DEPLOY = IM_DEPLOYMENT_FACTORY + ".IMDEPLOY";
-    static final public String IM_DATARESOURCE = IM + ".IMDATARESOURCE";
-    static final public String IM_TEST = IM + ".IMTEST";
-    static final public String IM_ACTIVITY_NODES = IM + ".NODES.ALIVE";
+    static final public String IM = "proactive.im";
+    static final public String IM_FACTORY = IM + ".factory";
+    static final public String IM_CORE = IM + ".core";
+    static final public String IM_ADMIN = IM + ".admin";
+    static final public String IM_MONITORING = IM + ".monitoring";
+    static final public String IM_USER = IM + ".user";
+    static final public String IM_DEPLOYMENT_FACTORY = IM + ".deployfactory";
+    static final public String IM_DEPLOY = IM_DEPLOYMENT_FACTORY + ".deploy";
+    static final public String IM_DATARESOURCE = IM + ".dataresource";
+    static final public String IM_TEST = IM + ".test";
+    static final public String IM_ACTIVITY_NODES = IM + ".activitynodes";
 }
