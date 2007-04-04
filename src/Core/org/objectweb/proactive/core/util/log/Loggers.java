@@ -39,27 +39,28 @@ package org.objectweb.proactive.core.util.log;
  */
 public interface Loggers {
     static final public String CORE = "proactive";
-    static final public String CLASSLOADING = "proactive.classloading";
-    static final public String EVENTS = "proactive.events";
-    static final public String RUNTIME = "proactive.runtime";
+    static final public String CLASSLOADING = CORE + ".classloading";
+    static final public String EVENTS = CORE + ".events";
+    static final public String RUNTIME = CORE + ".runtime";
     static final public String NODE = RUNTIME + ".node";
-    static final public String BODY = "proactive.body";
-    static final public String MOP = "proactive.mop";
-    public static final String SYNC_CALL = "proactive.sync_call";
-    static final public String GROUPS = "proactive.groups";
-    public static final String NFE = "proactive.nfe";
+    static final public String BODY = CORE + ".body";
+    static final public String MOP = CORE + ".mop";
+    public static final String SYNC_CALL = CORE + ".sync_call";
+    static final public String GROUPS = CORE + ".groups";
+    public static final String NFE = CORE + ".nfe";
     public static final String GC = CORE + ".gc";
-    public static final String HTTP_TRANSPORT = "proactive.communication.transport.http";
-    public static final String MIGRATION = "proactive.migration";
-    public static final String REQUESTS = "proactive.communication.requests";
-    public static final String JINI = "proactive.jini";
-    static final public String UTIL = "proactive.util";
-    static final public String LOG = "proactive.util.log";
-    static final public String XML = "proactive.xml";
-    static final public String STUB_GENERATION = "proactive.mop.stubgeneration";
-    static final public String RMI = "proactive.communication.rmi";
-    static final public String SSH = "proactive.communication.ssh";
-    static final public String COMPONENTS = "proactive.components";
+    public static final String HTTP_TRANSPORT = CORE +
+        ".communication.transport.http";
+    public static final String MIGRATION = CORE + ".migration";
+    public static final String REQUESTS = CORE + ".communication.requests";
+    public static final String JINI = CORE + ".jini";
+    static final public String UTIL = CORE + ".util";
+    static final public String LOG = CORE + ".util.log";
+    static final public String XML = CORE + ".xml";
+    static final public String STUB_GENERATION = CORE + ".mop.stubgeneration";
+    static final public String RMI = CORE + ".communication.rmi";
+    static final public String SSH = CORE + ".communication.ssh";
+    static final public String COMPONENTS = CORE + ".components";
     static final public String COMPONENTS_CONTROLLERS = COMPONENTS +
         ".controllers";
     static final public String COMPONENTS_REQUESTS = COMPONENTS + ".requests";
@@ -74,17 +75,18 @@ public interface Loggers {
         ".multicast";
     static final public String COMPONENTS_GATHERCAST = COMPONENTS +
         ".gathercast";
-    static final public String DEPLOYMENT = "proactive.deployment";
+    static final public String DEPLOYMENT = CORE + ".deployment";
     static final public String DEPLOYMENT_PROCESS = DEPLOYMENT + ".process";
     static final public String DEPLOYMENT_LOG = DEPLOYMENT + ".log";
-    static final public String DEPLOYMENT_FILETRANSFER = "proactive.deployment.filetransfer";
-    static final public String FILETRANSFER = "proactive.filetransfer";
-    public static final String LOAD_BALANCING = "proactive.loadbalancing";
-    public static final String IC2D = "proactive.ic2d";
-    public static final String EXAMPLES = "proactive.examples";
+    static final public String DEPLOYMENT_FILETRANSFER = CORE +
+        ".deployment.filetransfer";
+    static final public String FILETRANSFER = CORE + ".filetransfer";
+    public static final String LOAD_BALANCING = CORE + ".loadbalancing";
+    public static final String IC2D = CORE + ".ic2d";
+    public static final String EXAMPLES = CORE + ".examples";
 
     // P2P loggers
-    public static final String P2P = "proactive.p2p";
+    public static final String P2P = CORE + ".p2p";
     public static final String P2P_STARTSERVICE = P2P + ".startservice";
     public static final String P2P_VN = P2P + ".vn"; //descriptor
     public static final String P2P_DESC_SERV = P2P_VN + ".service"; // threads, nodes lookup
@@ -100,7 +102,7 @@ public interface Loggers {
     public static final String P2P_DAEMON = P2P + ".daemon";
 
     // Security loggers
-    public static final String SECURITY = "proactive.security";
+    public static final String SECURITY = CORE + ".security";
     public static final String SECURITY_NODE = SECURITY + ".node";
     public static final String SECURITY_SESSION = SECURITY + ".session";
     public static final String SECURITY_BODY = SECURITY + ".body";
@@ -115,19 +117,19 @@ public interface Loggers {
     public static final String SECURITY_DESCRIPTOR = SECURITY + ".descriptor";
 
     // Fault-tolerance loggers
-    public static final String FAULT_TOLERANCE = "proactive.ft";
+    public static final String FAULT_TOLERANCE = CORE + ".ft";
     public static final String FAULT_TOLERANCE_CIC = FAULT_TOLERANCE + ".cic";
     public static final String FAULT_TOLERANCE_PML = FAULT_TOLERANCE + ".pml";
 
     // MPI loggers
-    static final public String MPI = "proactive.mpi";
+    static final public String MPI = CORE + ".mpi";
     static final public String MPI_CONTROL = MPI + ".control";
     static final public String MPI_CONTROL_MANAGER = MPI_CONTROL + ".control";
     static final public String MPI_CONTROL_COUPLING = MPI_CONTROL +
         ".coupling";
 
     // Scilab loggers
-    public static final String SCILAB = "proactive.scilab";
+    public static final String SCILAB = CORE + ".scilab";
     public static final String SCILAB_DEPLOY = SCILAB + ".deploy";
     public static final String SCILAB_SERVICE = SCILAB + ".service";
     public static final String SCILAB_WORKER = SCILAB + ".worker";
@@ -144,7 +146,7 @@ public interface Loggers {
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
 
     // Infrastructure Manager loggers
-    static final public String IM = "proactive.im";
+    static final public String IM = CORE + ".im";
     static final public String IM_FACTORY = IM + ".factory";
     static final public String IM_CORE = IM + ".core";
     static final public String IM_ADMIN = IM + ".admin";
