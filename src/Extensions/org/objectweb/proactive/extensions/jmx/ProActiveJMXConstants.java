@@ -41,7 +41,7 @@ import java.util.HashMap;
 public class ProActiveJMXConstants {
     public static final String PROTOCOL = "proactive";
     public static final String VERSION = "ProActive 3.2";
-    public static final String SERVER_REGISTERED_NAME = "/PAJMXServer";
+    public static final String SERVER_REGISTERED_NAME = "PAJMXServer";
     public static final HashMap<String, String> PROACTIVE_JMX_ENV = new HashMap<String, String>();
 
     static {
