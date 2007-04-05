@@ -88,7 +88,7 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
             // try at 	Constants.PROPERTY_PA_RMI_PORT	
             String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
                     UrlBuilder.getNameFromUrl(url),
-                    System.getProperty(Constants.PROPERTY_PA_RMI_PORT));
+                    Constants.RMI_PROTOCOL_IDENTIFIER);
             java.rmi.Naming.rebind(url2, (RmiRemoteBody) proxiedRemoteBody);
         }
     }
@@ -131,12 +131,13 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
         // Try if URL is the address of a RmiRemoteBody
         try {
             try {
+                System.out.println("RmiBodyAdapter.lookup()" + url);
                 o = java.rmi.Naming.lookup(url);
             } catch (ConnectException e) {
                 // connection failed, try to find a rmiregistry at proactive.rmi.port port
                 String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(
                             url), UrlBuilder.getNameFromUrl(url),
-                        System.getProperty("proactive.rmi.port"));
+                        Constants.RMI_PROTOCOL_IDENTIFIER);
                 o = java.rmi.Naming.lookup(url2);
             }
         } catch (java.rmi.NotBoundException e) { // there are one rmiregistry on target computer but node isn t bound
@@ -172,6 +173,7 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
 
         // Try if URL is the address of a RmiRemoteBody
         try {
+            System.out.println("RmiBodyAdapter.list() " + url);
             names = java.rmi.Naming.list(url);
         } catch (MalformedURLException e) {
             // connection failed, try to find a rmiregistry at proactive.rmi.port port
@@ -179,7 +181,7 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
             // Is this needed ? 
             String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
                     UrlBuilder.getNameFromUrl(url),
-                    System.getProperty("proactive.rmi.port"));
+                    Constants.RMI_PROTOCOL_IDENTIFIER);
 
             names = java.rmi.Naming.list(url2);
         } catch (ConnectException e) {

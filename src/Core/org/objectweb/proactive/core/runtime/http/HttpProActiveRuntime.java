@@ -42,6 +42,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -723,8 +724,8 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 port = u_.getPort();
                 if ((port == 0) || (port == -1)) {
                     port = ClassServer.getServerSocketPort();
-                    url = u_.getProtocol() + "://" + u_.getHost() + ":" + port +
-                        u_.getPath();
+                    url = UrlBuilder.buildUrl(u_.getHost(), u_.getPath(),
+                            u_.getProtocol(), port);
                 }
             } catch (MalformedURLException e) {
             }
@@ -737,8 +738,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 e.printStackTrace();
             }
             //            int n = host.indexOf(":");
-            url = "http://" + host + ":" + ClassServer.getServerSocketPort() +
-                "/" + url;
+            url = UrlBuilder.buildUrl(host, url,
+                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
+                    ClassServer.getServerSocketPort());
+
             //            if (n == -1) {
             //                int port = Integer.parseInt(System.getProperty(
             //                            "proactive.http.port"));

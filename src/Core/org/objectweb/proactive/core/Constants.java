@@ -130,4 +130,7 @@ public interface Constants {
      *  */
     public static final String PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS = "proactive.ssh.known_hosts";
     public static final String SSH_TUNNELING_DEFAULT_KNOW_HOSTS = "/.ssh/known_hosts";
+
+    /** this property identifies proactive's configuration file */
+    public static final String PROPERTY_PA_CONFIGURATION_FILE = "proactive.configuration";
 }

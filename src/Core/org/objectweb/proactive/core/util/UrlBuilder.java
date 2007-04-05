@@ -81,6 +81,8 @@ public class UrlBuilder {
      * @return
      */
     public static String buildUrl(String host, String name, String protocol) {
+        System.out.println("UrlBuilder.buildUrl()1" + protocol + host + name);
+
         return buildUrl(host, name, protocol,
             getDefaultPortForProtocol(protocol));
     }
@@ -128,9 +130,13 @@ public class UrlBuilder {
     */
     public static String buildUrl(String host, String name, String protocol,
         int port) {
-        //        if (protocol == null) {
-        //            protocol = Constants.DEFAULT_PROTOCOL_IDENTIFIER;
-        //        }
+        //                if (protocol == null) {
+        //                    protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        //                }
+        if (port == 0) {
+            port = -1;
+        }
+
         try {
             host = fromLocalhostToHostname(host);
 
@@ -140,6 +146,12 @@ public class UrlBuilder {
                  */
                 name = "/" + name;
             }
+
+            System.out.println("UrlBuilder.buildUrl() - " + protocol + " " +
+                host + " " + port + " " + name);
+
+            System.out.println("UrlBuilder.buildUrl()--> " +
+                new URI(protocol, null, host, port, name, null, null).toString());
 
             return new URI(protocol, null, host, port, name, null, null).toString();
         } catch (URISyntaxException e) {
@@ -166,7 +178,7 @@ public class UrlBuilder {
             port = System.getProperty(Constants.PROPERTY_PA_RMI_PORT);
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            port = System.getProperty("proactive.http.port");
+            port = System.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         }
         if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) ||
                 (port == null)) {
