@@ -81,8 +81,6 @@ public class UrlBuilder {
      * @return
      */
     public static String buildUrl(String host, String name, String protocol) {
-        System.out.println("UrlBuilder.buildUrl()1" + protocol + host + name);
-
         return buildUrl(host, name, protocol,
             getDefaultPortForProtocol(protocol));
     }
@@ -146,13 +144,6 @@ public class UrlBuilder {
                  */
                 name = "/" + name;
             }
-
-            System.out.println("UrlBuilder.buildUrl() - " + protocol + " " +
-                host + " " + port + " " + name);
-
-            System.out.println("UrlBuilder.buildUrl()--> " +
-                new URI(protocol, null, host, port, name, null, null).toString());
-
             return new URI(protocol, null, host, port, name, null, null).toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();
