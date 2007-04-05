@@ -250,6 +250,7 @@
 			<param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
+		<zip destfile="${docs.dir}/ProActiveManualMultipleHtml.zip" basedir="${docs.dir}/html" excludes="ProActiveManual.html"/>
 	</target>
 
 
@@ -261,6 +262,7 @@
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="pdfOutputFile" value="${docs.dir}/pdf/ProActiveManual.pdf" />
 		</antcall>
+		<zip destfile="${docs.dir}/ProActiveManualPdf.zip" basedir="${docs.dir}/pdf" includes="ProActiveManual.pdf"/>
 	</target>
 
 
@@ -274,6 +276,7 @@
 			<param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
+		<zip destfile="${docs.dir}/ProActiveManualSingleHtml.zip" basedir="${docs.dir}/html" includes="ProActiveManual.html **/*.gif **/*.png **/*.jpg"/>
 	</target>
 
 
