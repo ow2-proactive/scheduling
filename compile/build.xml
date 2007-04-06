@@ -399,12 +399,25 @@
 		<runTestsMacro nodeDescriptor="/nonregressiontest/descriptor/defaultnodes/Nodes.xml" />
 	</target>
 
-
 	<target name="runTestsLocal" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
 		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
+	
+	<target name="runTestsLocalRmi" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
+		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
+	</target>
 
+	<target name="runTestsLocalHttp" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
+			<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml">
+			<jvmargs>
+				<jvmarg value="-Dproactive.communication.protocol=http" />
+				<jvmarg value="-Dproactive.http.port=2026" />
+				<jvmarg value="-Dproactive.locationserver.rmi=http://locahost:2026/LocationServer" />
+			</jvmargs>
+			</runTestsMacro>
+	</target>
 
+	
 	<target name="runTestsLocalIbis" depends="nonregressiontest, proActiveJar">
 		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml">
 			<jvmargs>
