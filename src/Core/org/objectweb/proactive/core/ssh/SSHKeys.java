@@ -10,15 +10,13 @@ import static org.objectweb.proactive.core.ssh.SSH.logger;
  *
  */
 public class SSHKeys {
-    static final private String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     static final public String[] IDENTITY_FILES = new String[] {
             "identity", "id_rsa", "id_dsa"
         };
 
     /** Default directory for public keys */
     static final public String SSH_DIR = System.getProperty("user.home") +
-        FILE_SEPARATOR + ".ssh" + FILE_SEPARATOR;
+        File.separator + ".ssh" + File.separator;
 
     /** Default suffix for public keys */
     private final static String KEY_SUFFIX = ".pub";

@@ -155,8 +155,7 @@ public class BlastParameters {
      * @return Returns the outPutFile.
      */
     public File getOutPutFile() {
-        return new File(workingDirectory +
-            System.getProperty("file.separator") + "/" +
+        return new File(workingDirectory + File.separator + "/" +
             databaseFile.getName() + "-" + queryFile.getName() + ".blast");
     }
 

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -347,12 +348,10 @@ public abstract class Utils extends Object {
 
     public static String getRelativePath(String className) {
         String packageName;
-        String fileSeparator;
         String result;
         int indexOfDot;
         int indexOfLastDot;
 
-        fileSeparator = System.getProperty("file.separator");
         packageName = Utils.getPackageName(className);
 
         indexOfDot = packageName.indexOf((int) '.', 0);
@@ -360,18 +359,18 @@ public abstract class Utils extends Object {
         indexOfLastDot = 0;
 
         while (indexOfDot != -1) {
-            result = result + fileSeparator +
+            result = result + File.separator +
                 packageName.substring(indexOfLastDot, indexOfDot);
             indexOfLastDot = indexOfDot + 1;
             indexOfDot = packageName.indexOf((int) '.', indexOfDot + 1);
             if (indexOfDot == -1) {
-                result = result + fileSeparator +
+                result = result + File.separator +
                     packageName.substring(indexOfLastDot, packageName.length());
             }
         }
 
         if (result.equals("")) {
-            result = fileSeparator + packageName;
+            result = File.separator + packageName;
         }
 
         return result;

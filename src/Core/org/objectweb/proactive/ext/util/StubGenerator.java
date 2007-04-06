@@ -232,7 +232,7 @@ public class StubGenerator {
                 data = null;
             }
 
-            char sep = System.getProperty("file.separator").toCharArray()[0];
+            char sep = File.separatorChar;
             fileName = directoryName + stubClassName.replace('.', sep) +
                 ".class";
 

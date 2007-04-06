@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.branchnbound.core;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -68,10 +69,9 @@ public class Manager implements Serializable, InitActive {
     private static final boolean enableBackup = false; // TODO turn it
     private static final int backupTask = 10; // TODO turn it configurable
     private static final String backupResultFile = System.getProperty(
-            "user.home") + System.getProperty("file.separator") +
-        "framework.results.backup"; // TODO turn it configurable
+            "user.home") + File.separator + "framework.results.backup"; // TODO turn it configurable
     public static final String backupTaskFile = System.getProperty("user.home") +
-        System.getProperty("file.separator") + "framework.tasks.backup"; // TODO turn it configurable 
+        File.separator + "framework.tasks.backup"; // TODO turn it configurable 
     private Task rootTask = null;
     private TaskQueue taskProviderQueue = null;
 

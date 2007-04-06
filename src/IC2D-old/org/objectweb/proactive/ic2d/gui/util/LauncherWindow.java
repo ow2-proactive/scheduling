@@ -305,7 +305,7 @@ public class LauncherWindow extends JFrame {
                 if (path.endsWith("- activated")) {
                     path = path.substring(0, path.indexOf(" - activated"));
                 }
-                String[] tab = path.split(System.getProperty("file.separator"));
+                String[] tab = path.split(File.separator);
                 String name = tab[tab.length - 1];
 
                 //reads the xml descriptor

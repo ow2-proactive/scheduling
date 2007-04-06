@@ -59,12 +59,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 2.3
  */
 public class NGProcess extends AbstractExternalProcessDecorator {
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
-        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
-        FILE_SEPARATOR + "ngStartRuntime.sh ";
+            "user.home") + File.separator + "ProActive" + File.separator +
+        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+        File.separator + "ngStartRuntime.sh ";
     public final static String DEFAULT_NGPATH = "ngsub";
     protected String count = "1";
     protected String stderr = null;

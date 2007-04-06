@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.process.glite;
 
+import java.io.File;
 import java.util.LinkedList;
 
 import javax.naming.directory.InvalidAttributeValueException;
@@ -64,17 +65,15 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * Firsts parameters
      */
     private static final long serialVersionUID = 1L;
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_COMMAND_PATH = "glite-job-submit";
     protected static final String DEFAULT_FILE_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "public" + FILE_SEPARATOR + "JDL";
+            "user.home") + File.separator + "public" + File.separator + "JDL";
     protected static final String DEFAULT_STDOUPUT = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "out.log";
+            "user.home") + File.separator + "out.log";
     protected static final String DEFAULT_CONFIG_FILE = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "public" + FILE_SEPARATOR + "JDL" +
-        FILE_SEPARATOR + "vo.conf";
+            "user.home") + File.separator + "public" + File.separator + "JDL" +
+        File.separator + "vo.conf";
     protected int jobID;
     protected String hostList;
     protected String processor = DEFAULT_PROCESSOR_NUMBER;
@@ -300,12 +299,12 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         }
 
         if (!confFileOption) {
-            return DEFAULT_COMMAND_PATH + " " + path + FILE_SEPARATOR +
+            return DEFAULT_COMMAND_PATH + " " + path + File.separator +
             fileName;
         }
 
         return DEFAULT_COMMAND_PATH + " --config-vo " + configFile + " " +
-        path + FILE_SEPARATOR + fileName;
+        path + File.separator + fileName;
     }
 
     /**

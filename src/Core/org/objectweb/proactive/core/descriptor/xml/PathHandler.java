@@ -59,10 +59,6 @@ public class PathHandler extends BasicUnmarshaller
     private static final String userDir = System.getProperty("user.dir");
     private static final String userHome = System.getProperty("user.home");
     private static final String javaHome = System.getProperty("java.home");
-    private static final String pathSeparator = System.getProperty(
-            "path.separator");
-    private static final String fileSeparator = System.getProperty(
-            "file.separator");
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------

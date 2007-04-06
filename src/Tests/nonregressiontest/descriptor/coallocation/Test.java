@@ -30,6 +30,8 @@
  */
 package nonregressiontest.descriptor.coallocation;
 
+import java.io.File;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -46,7 +48,7 @@ public class Test extends FunctionalTest {
 	 */
 	private static final long serialVersionUID = 1869140219007735164L;
 	ProActiveDescriptor proActiveDescriptor;
-    private static String FS = System.getProperty("file.separator");
+    private static String FS = File.separator;
     private static String AGENT_XML_LOCATION_UNIX = null;  
     static {
     	  if ("ibis".equals(ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {

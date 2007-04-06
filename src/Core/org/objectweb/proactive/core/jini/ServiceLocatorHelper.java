@@ -66,12 +66,10 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     protected static int MAX_RETRY = 8;
     protected static long MAX_WAIT = 10000L;
     private static String DEFAULT_POLICY = System.getProperty("user.dir") +
-        System.getProperty("file.separator") + "proactive.java.policy";
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
+        File.separator + "proactive.java.policy";
     private static String policy;
     private static String DEFAULT_RMID_LOCATION = System.getProperty(
-            "java.home") + FILE_SEPARATOR + "bin" + FILE_SEPARATOR + "rmid";
+            "java.home") + File.separator + "bin" + File.separator + "rmid";
     private static String DEFAULT_RMID_PARAMS = "-J-Djava.security.policy=";
     protected static LookupLocator lookup = null;
     protected static ServiceRegistrar registrar = null;
@@ -105,8 +103,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     private static final String tmpDir = createTempDirectory(host);
     private static java.io.File jiniLockFile = null;
     private static final String jiniLockFileLocation = System.getProperty(
-            "user.dir") + System.getProperty("file.separator") + host +
-        "jiniLockFile";
+            "user.dir") + File.separator + host + "jiniLockFile";
 
     //
     // -- Constructors -----------------------------------------------
@@ -387,8 +384,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
         logger.info(
             "No ServiceLocator founded ...  we launch a ServiceLocator on " +
             host);
-        String reggieTmpDir = tmpDir + System.getProperty("file.separator") +
-            "reggie_log";
+        String reggieTmpDir = tmpDir + File.separator + "reggie_log";
         delDirectory(new java.io.File(tmpDir));
         java.io.File directory = new java.io.File(tmpDir);
         directory.mkdirs();

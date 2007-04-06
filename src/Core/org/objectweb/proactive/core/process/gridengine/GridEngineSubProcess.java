@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.process.gridengine;
 
+import java.io.File;
+
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
@@ -59,13 +61,11 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 2.0.1
  */
 public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     public final static String DEFAULT_QSUBPATH = "/opt/gridengine/bin/glinux/qsub";
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
-        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
-        FILE_SEPARATOR + "gridEngineStartRuntime.sh ";
+            "user.home") + File.separator + "ProActive" + File.separator +
+        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+        File.separator + "gridEngineStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PARALLEL_ENVIRONMENT = null;
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;

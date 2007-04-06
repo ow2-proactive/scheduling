@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.process.oar;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -51,13 +52,11 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 3.0
  */
 public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     public final static String DEFAULT_OARGRIDSUBPATH = "/usr/local/bin/oargridsub";
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
-        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
-        FILE_SEPARATOR + "oarGRIDStartRuntime.sh ";
+            "user.home") + File.separator + "ProActive" + File.separator +
+        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+        File.separator + "oarGRIDStartRuntime.sh ";
     protected static final int DEFAULT_HOSTS_NUMBER = 1;
     protected static final int DEFAULT_WEIGHT = 1;
     protected static final String DEFAULT_WALLTIME = "01:00:00"; //1 hour

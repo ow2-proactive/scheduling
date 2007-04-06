@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.process.oar;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,13 +65,11 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 2.0.1
  */
 public class OARSubProcess extends AbstractExternalProcessDecorator {
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     public final static String DEFAULT_OARSUBPATH = "/usr/local/bin/oarsub";
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
-        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
-        FILE_SEPARATOR + "oarStartRuntime.sh ";
+            "user.home") + File.separator + "ProActive" + File.separator +
+        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+        File.separator + "oarStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;
     protected String weight = "2";

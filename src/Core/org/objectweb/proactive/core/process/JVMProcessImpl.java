@@ -68,8 +68,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class JVMProcessImpl extends AbstractExternalProcess
     implements JVMProcess, Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
 
     //private final static String POLICY_FILE = "proactive.java.policy";
     private final static String POLICY_OPTION = " -Djava.security.policy=";
@@ -79,7 +77,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
     public final static String DEFAULT_CLASSPATH = convertClasspathToAbsolutePath(System.getProperty(
                 "java.class.path"));
     public final static String DEFAULT_JAVAPATH = System.getProperty(
-            "java.home") + FILE_SEPARATOR + "bin" + FILE_SEPARATOR + "java";
+            "java.home") + File.separator + "bin" + File.separator + "java";
     public static String DEFAULT_POLICY_FILE = System.getProperty(
             "java.security.policy");
     public static String DEFAULT_LOG4J_FILE = System.getProperty(

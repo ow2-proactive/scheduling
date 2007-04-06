@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.process.unicore;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -64,7 +65,6 @@ public class UnicoreParameters implements java.io.Serializable {
     private ArrayList<String> deployFiles;
     private ArrayList<String> deployDirs;
     private ArrayList<String> retrieveFiles; //not yet supported
-    private String fileSep;
 
     @Override
     public String toString() {
@@ -361,13 +361,6 @@ public class UnicoreParameters implements java.io.Serializable {
         this.vsiteRuntime = Integer.parseInt(vsiteRuntime);
     }
 
-    /**
-     * @return Returns the local file separator: "/" "\".
-     */
-    public String getFileSep() {
-        return fileSep;
-    }
-
     public void addDeploymentFile(String f) {
 
         /* Expected input syntax ("[]" is optional):
@@ -531,15 +524,14 @@ public class UnicoreParameters implements java.io.Serializable {
     }
 
     public UnicoreParameters() {
-        fileSep = System.getProperty("file.separator");
-
         jobName = "ProActiveDescriptorDeployment";
         keyPassword = "";
         submitJob = true;
         saveJob = false;
 
-        unicoreDir = System.getProperty("user.home") + fileSep + ".unicore";
-        keyFilePath = unicoreDir + fileSep + "keystore";
+        unicoreDir = System.getProperty("user.home") + File.separator +
+            ".unicore";
+        keyFilePath = unicoreDir + File.separator + "keystore";
 
         usiteName = null;
         usiteType = "CLASSIC";

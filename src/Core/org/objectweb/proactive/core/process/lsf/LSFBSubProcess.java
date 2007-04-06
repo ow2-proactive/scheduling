@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.process.lsf;
 
+import java.io.File;
+
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
@@ -60,19 +62,17 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * @since   ProActive 0.9.4
  */
 public class LSFBSubProcess extends AbstractExternalProcessDecorator {
-    protected static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     protected static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
-        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
-        FILE_SEPARATOR + "startRuntime.sh ";
-    public final static String DEFAULT_LSFPATH = FILE_SEPARATOR + "usr" +
-        FILE_SEPARATOR + "local" + FILE_SEPARATOR + "lsf" + FILE_SEPARATOR +
+            "user.home") + File.separator + "ProActive" + File.separator +
+        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+        File.separator + "startRuntime.sh ";
+    public final static String DEFAULT_LSFPATH = File.separator + "usr" +
+        File.separator + "local" + File.separator + "lsf" + File.separator +
         "bin";
     public final static String DEFAULT_BSUBPATH = DEFAULT_LSFPATH +
-        FILE_SEPARATOR + "bsub";
+        File.separator + "bsub";
     public final static String DEFAULT_BJOBPATH = DEFAULT_LSFPATH +
-        FILE_SEPARATOR + "bjobs";
+        File.separator + "bjobs";
     public static final String DEFAULT_QUEUE_NAME = "normal";
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected int jobID;

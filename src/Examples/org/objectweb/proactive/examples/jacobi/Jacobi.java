@@ -78,7 +78,6 @@ public class Jacobi implements Serializable {
      * the filename which will store the results
      */
     public static final String resultsFileName = "resultsJacobi.txt";
-    private static final String fs = System.getProperty("file.separator");
     private ProActiveDescriptor descriptor = null;
     public static Jacobi singleton = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
@@ -124,8 +123,8 @@ public class Jacobi implements Serializable {
             System.exit(1);
         }
 
-        File resultFile = new File(System.getProperty("user.dir") + fs +
-                resultsFileName);
+        File resultFile = new File(System.getProperty("user.dir") +
+                File.separator + resultsFileName);
 
         if (resultFile.exists()) {
             resultFile.delete();

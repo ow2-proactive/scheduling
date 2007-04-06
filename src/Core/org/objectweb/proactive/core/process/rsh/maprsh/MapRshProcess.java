@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.process.rsh.maprsh;
 
+import java.io.File;
+
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
@@ -57,16 +59,14 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 0.9.4
  */
 public class MapRshProcess extends AbstractExternalProcessDecorator {
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
-        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR +
-        "gridexperiment" + FILE_SEPARATOR + "oasis-exp";
+            "user.home") + File.separator + "ProActive" + File.separator +
+        "scripts" + File.separator + "unix" + File.separator +
+        "gridexperiment" + File.separator + "oasis-exp";
     protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
     private String parallelize = null;
 
-    //private String logFile = System.getProperty("user.home")+System.getProperty("file.separator")+"oasisgridlog.txt";
+    //private String logFile = System.getProperty("user.home")+File.separator+"oasisgridlog.txt";
     public MapRshProcess() {
         super();
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
