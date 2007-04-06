@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -331,7 +332,8 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
         // dynamic classloading through runtimes
         // check system classloader when ProActive.jar is used (where by default : "proactive.classloader" == "disable")
-        if ("enable".equals(System.getProperty("proactive.classloader")) ||
+        if ("enable".equals(ProActiveConfiguration.getProperty(
+                        "proactive.classloader")) ||
                 "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(
                     System.getProperty("java.system.class.loader"))) {
             javaCommand.append(

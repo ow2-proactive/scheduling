@@ -40,6 +40,7 @@ import java.rmi.server.RemoteStub;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 import sun.rmi.server.MarshalInputStream;
 
@@ -70,7 +71,8 @@ public class Checkpoint implements java.io.Serializable {
     public Checkpoint(Body bodyToCheckpoint, String additionalCodebase) {
         try {
             this.bodyID = bodyToCheckpoint.getID();
-            String codebase = System.getProperty("java.rmi.server.codebase");
+            String codebase = ProActiveConfiguration.getProperty(
+                    "java.rmi.server.codebase");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             CheckpointingOutputStream objectOutputStream = new CheckpointingOutputStream(byteArrayOutputStream,
                     codebase + " " + additionalCodebase);

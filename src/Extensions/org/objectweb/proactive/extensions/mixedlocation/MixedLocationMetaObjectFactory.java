@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
@@ -121,7 +122,8 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
 
     @Override
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(System.getProperty(
+        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
+                    ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is ibis");

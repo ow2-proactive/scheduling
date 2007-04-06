@@ -138,7 +138,7 @@ public abstract class RuntimeFactory {
         ProActiveRuntime defaultRuntime = null;
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
-            defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
+            defaultRuntime = getProtocolSpecificRuntime(ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             if (runtimeLogger.isDebugEnabled()) {
                 runtimeLogger.debug("default runtime = " +

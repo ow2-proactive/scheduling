@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -88,13 +89,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * Reference to the current Node.
      */
     private Node p2pServiceNode = null;
-    private static final int MSG_MEMORY = Integer.parseInt(System.getProperty(
+    private static final int MSG_MEMORY = Integer.parseInt(ProActiveConfiguration.getProperty(
                 P2PConstants.PROPERTY_MSG_MEMORY));
-    private static final int NOA = Integer.parseInt(System.getProperty(
+    private static final int NOA = Integer.parseInt(ProActiveConfiguration.getProperty(
                 P2PConstants.PROPERTY_NOA));
-    private static final int EXPL_MSG = Integer.parseInt(System.getProperty(
+    private static final int EXPL_MSG = Integer.parseInt(ProActiveConfiguration.getProperty(
                 P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
-    private static final long ACQ_TO = Long.parseLong(System.getProperty(
+    private static final long ACQ_TO = Long.parseLong(ProActiveConfiguration.getProperty(
                 P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
 
     /**

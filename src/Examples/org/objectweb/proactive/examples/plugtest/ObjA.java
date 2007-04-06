@@ -40,6 +40,7 @@ package org.objectweb.proactive.examples.plugtest;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
 public class ObjA implements InitActive, EndActive {
@@ -58,7 +59,8 @@ public class ObjA implements InitActive, EndActive {
     }
 
     public String getInfo() {
-        String property = System.getProperty("proactive.property");
+        String property = ProActiveConfiguration.getProperty(
+                "proactive.property");
         if (property != null) {
             return s + " " + property;
         } else {

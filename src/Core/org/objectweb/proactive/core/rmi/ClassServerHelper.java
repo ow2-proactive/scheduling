@@ -48,7 +48,8 @@ public class ClassServerHelper {
     //
     public ClassServerHelper() {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(System.getProperty("proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getProperty(
+                        "proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
         if (ProActiveConfiguration.osgiServletEnabled()) {

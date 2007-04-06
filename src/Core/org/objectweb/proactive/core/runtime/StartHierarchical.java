@@ -123,13 +123,13 @@ public class StartHierarchical {
     }
 
     private void run() {
-        padURL = System.getProperty("proactive.pad");
+        padURL = ProActiveConfiguration.getProperty("proactive.pad");
 
         ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         impl.getVMInformation().setCreationProtocolID(protocolId);
 
         try {
-            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
+            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 

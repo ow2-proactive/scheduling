@@ -30,6 +30,8 @@
  */
 package nonregressiontest.component;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 import testsuite.test.FunctionalTest;
 
 
@@ -63,7 +65,7 @@ public abstract class ComponentTest extends FunctionalTest {
 
     @Override
 	public boolean preConditions() throws Exception {
-        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
+        if (!"enable".equals(ProActiveConfiguration.getProperty("proactive.future.ac"))) {
             throw new Exception(
                 "The components framework needs the automatic continuations (system property 'proactive.future.ac' set to 'enable') to be operative");
         }

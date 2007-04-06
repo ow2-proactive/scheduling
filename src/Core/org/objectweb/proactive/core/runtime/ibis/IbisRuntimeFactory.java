@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.runtime.ibis;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -61,7 +62,8 @@ public class IbisRuntimeFactory extends RuntimeFactory {
     //
     public IbisRuntimeFactory() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(System.getProperty("proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getProperty(
+                        "proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 

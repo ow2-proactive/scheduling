@@ -47,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
@@ -956,7 +957,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void createNodeOnCurrentJvm(String protocol) {
         if (protocol == null) {
-            protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+            protocol = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         }
 
         localVirtualMachines.add(protocol);

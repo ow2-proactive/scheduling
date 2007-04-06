@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.gui.util;
 import java.net.InetAddress;
 
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
@@ -53,7 +54,7 @@ public class DialogUtils {
         String initialHostValue = "localhost";
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
-                ":" + System.getProperty("proactive.rmi.port");
+                ":" + ProActiveConfiguration.getProperty("proactive.rmi.port");
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
             return;
@@ -90,7 +91,7 @@ public class DialogUtils {
         String initialHostValue = "localhost";
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
-                ":" + System.getProperty("proactive.http.port");
+                ":" + ProActiveConfiguration.getProperty("proactive.http.port");
             ;
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
@@ -151,7 +152,7 @@ public class DialogUtils {
         String initialHostValue = "localhost";
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
-                ":" + System.getProperty("proactive.rmi.port");
+                ":" + ProActiveConfiguration.getProperty("proactive.rmi.port");
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
             return;

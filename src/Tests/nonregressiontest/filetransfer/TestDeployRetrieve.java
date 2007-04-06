@@ -34,6 +34,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -119,7 +120,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         }
         
         // We save the current state of the schema validation and set it to false for this example
-        String validatingProperyOld = System.getProperty("schema.validation");
+        String validatingProperyOld = ProActiveConfiguration.getProperty("schema.validation");
         System.setProperty("schema.validation", "false");
         
         VariableContract vc = new VariableContract();

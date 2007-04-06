@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -174,9 +175,9 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty(
+            defaultPolicy = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy");
-            defaultFactory = System.getProperty(
+            defaultFactory = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy_factory");
             if ((defaultPolicy == null) || (defaultFactory == null)) {
                 throw new AdminException(
@@ -207,9 +208,9 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty(
+            defaultPolicy = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy");
-            defaultFactory = System.getProperty(
+            defaultFactory = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy_factory");
 
             if ((defaultPolicy == null) || (defaultFactory == null)) {
@@ -311,9 +312,9 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty(
+            defaultPolicy = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy");
-            defaultFactory = System.getProperty(
+            defaultFactory = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy_factory");
             if ((defaultPolicy == null) || (defaultFactory == null)) {
                 throw new Exception("default policy or factory not defined");
@@ -342,9 +343,9 @@ public class AdminScheduler {
         String defaultPolicy;
         String defaultFactory;
         try {
-            defaultPolicy = System.getProperty(
+            defaultPolicy = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy");
-            defaultFactory = System.getProperty(
+            defaultFactory = ProActiveConfiguration.getProperty(
                     "proactive.scheduler.default_policy_factory");
             if ((defaultPolicy == null) || (defaultFactory == null)) {
                 throw new Exception("default policy or factory not defined");

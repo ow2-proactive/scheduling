@@ -33,6 +33,7 @@ package nonregressiontest.activeobject.acontinuation;
 import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 import testsuite.test.FunctionalTest;
 
@@ -59,7 +60,7 @@ public class Test extends FunctionalTest {
     @Override
 	public void action() throws Exception {
         //System.out.println( "Property "+System.getProperty("proactive.future.ac"));
-        String initial_ca_setting = System.getProperty("proactive.future.ac");
+        String initial_ca_setting = ProActiveConfiguration.getProperty("proactive.future.ac");
         if (!"enable".equals(initial_ca_setting)) {
             System.setProperty("proactive.future.ac", "enable");
         }

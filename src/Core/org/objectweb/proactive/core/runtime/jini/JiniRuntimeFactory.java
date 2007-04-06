@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime.jini;
 import java.rmi.RemoteException;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.jini.ServiceLocatorHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
@@ -70,7 +71,8 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     public JiniRuntimeFactory() throws java.io.IOException {
         // Obligatoire d'avoir le security manager fixe
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(System.getProperty("proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getProperty(
+                        "proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 

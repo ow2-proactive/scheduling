@@ -1150,8 +1150,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             //                "_" + hostName;
             String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
 
-            if (System.getProperty("proactive.runtime.name") != null) {
-                this.name = System.getProperty("proactive.runtime.name");
+            if (ProActiveConfiguration.getProperty("proactive.runtime.name") != null) {
+                this.name = ProActiveConfiguration.getProperty(
+                        "proactive.runtime.name");
 
                 if (this.name.indexOf("PA_JVM") < 0) {
                     runtimeLogger.warn(
@@ -1162,8 +1163,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 this.name = "PA_JVM" + random + "_" + hostName;
             }
 
-            if (System.getProperty("proactive.jobid") != null) {
-                this.jobId = System.getProperty("proactive.jobid");
+            if (ProActiveConfiguration.getProperty("proactive.jobid") != null) {
+                this.jobId = ProActiveConfiguration.getProperty(
+                        "proactive.jobid");
             } else {
                 //if the property is null, no need to generate another random, take the one in name
                 this.jobId = "JOB-" + random;

@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.FutureEvent;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
@@ -299,7 +300,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
             /* First time, hopefully the configuration file has been read */
             try {
-                futureMaxDelay = Long.parseLong(System.getProperty(
+                futureMaxDelay = Long.parseLong(ProActiveConfiguration.getProperty(
                             "proactive.future.maxdelay"));
             } catch (IllegalArgumentException iea) {
                 /* The property is not set, that's not a problem */

@@ -41,6 +41,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 
@@ -74,7 +75,7 @@ public class JobMonitorFrame extends JFrame {
                     String initialHostValue = "localhost";
                     try {
                         initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
-                            ":" + System.getProperty("proactive.rmi.port");
+                            ":" + ProActiveConfiguration.getProperty("proactive.rmi.port");
                     } catch (java.net.UnknownHostException exc) {
                     }
                     Object result = JOptionPane.showInputDialog(panel, // Component parentComponent,

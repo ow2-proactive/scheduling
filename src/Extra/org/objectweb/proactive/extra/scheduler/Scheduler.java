@@ -38,6 +38,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.proxy.SendRequestCommunicationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -151,10 +152,10 @@ public class Scheduler implements RunActive, RequestFilter {
      */
     public void configureScheduler() throws Exception {
         try {
-            SCHEDULER_TIMEOUT = Long.parseLong(System.getProperty(
+            SCHEDULER_TIMEOUT = Long.parseLong(ProActiveConfiguration.getProperty(
                         "proactive.scheduler.scheduler_timeout"));
 
-            TIME_BEFORE_TEST_ALIVE = Long.parseLong(System.getProperty(
+            TIME_BEFORE_TEST_ALIVE = Long.parseLong(ProActiveConfiguration.getProperty(
                         "proactive.scheduler.time_before_test_alive"));
 
             if (this.SCHEDULER_TIMEOUT < 1) {

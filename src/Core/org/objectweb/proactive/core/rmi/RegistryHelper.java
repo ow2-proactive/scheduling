@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -55,7 +56,7 @@ public class RegistryHelper {
     // -- Constructors -----------------------------------------------
     //
     public RegistryHelper() {
-        String port = System.getProperty(Constants.PROPERTY_PA_RMI_PORT);
+        String port = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_RMI_PORT);
         if (port != null) {
             setRegistryPortNumber(new Integer(port).intValue());
         }

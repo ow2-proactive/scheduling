@@ -95,9 +95,10 @@ public class ProActiveConfiguration {
             filename = null;
 
             /* First we look for the user defined properties */
-            if (System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE) != null) {
+            if (ProActiveConfiguration.getProperty(
+                        Constants.PROPERTY_PA_CONFIGURATION_FILE) != null) {
                 // if specified as a system property
-                filename = System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE);
+                filename = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE);
             } else {
                 // or if the file exists in the user home dir
                 File f = new File(System.getProperty("user.dir") +
@@ -161,8 +162,12 @@ public class ProActiveConfiguration {
         }
     }
 
-    public String getProperty(String property) {
+    public static String getProperty(String property) {
         return System.getProperty(property);
+    }
+
+    public static String getProperty(String property, String defaultValue) {
+        return System.getProperty(property, defaultValue);
     }
 
     //    /**

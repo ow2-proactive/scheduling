@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -304,7 +305,8 @@ public class ServiceLocatorHelper implements DiscoveryListener {
      */
     private void getOrCreateServiceLocator() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(System.getProperty("proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getProperty(
+                        "proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
         if (multicastLocator) {

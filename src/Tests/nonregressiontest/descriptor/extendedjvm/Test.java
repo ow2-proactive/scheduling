@@ -38,6 +38,7 @@ import java.io.FileWriter;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
@@ -82,7 +83,7 @@ public class Test extends FunctionalTest {
 	public void initTest() throws Exception {
         String fileName = null;
 
-        if ("ibis".equals(System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+        if ("ibis".equals(ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             fileName = "JVMExtensionIbis";
         } else {
             fileName = "JVMExtension";

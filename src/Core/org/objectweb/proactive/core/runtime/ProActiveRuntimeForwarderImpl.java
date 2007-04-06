@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.body.RemoteBodyForwarder;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.rmi.RmiRemoteBodyForwarderImpl;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -105,7 +106,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         bodyForwarder = new BodyForwarderImpl();
 
         // Create the BodyForwarder, protocol specific
-        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(System.getProperty(
+        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
+                    ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is " +
@@ -116,7 +118,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
             // TODO support Ibis forwarding
         } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
-                    System.getProperty(
+                    ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is " +
@@ -127,7 +129,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
             // TODO support Http forwarding
         } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
-                    System.getProperty(
+                    ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is rmissh");
@@ -171,7 +173,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     }
 
     public boolean isRoot() {
-        String val = System.getProperty("proactive.hierarchicalRuntime");
+        String val = ProActiveConfiguration.getProperty(
+                "proactive.hierarchicalRuntime");
 
         return ((val != null) && val.equals("root"));
     }

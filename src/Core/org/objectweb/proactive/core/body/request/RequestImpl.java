@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
@@ -97,7 +98,8 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = new Boolean(!"false".equals(System.getProperty(
+            enableStackTrace = new Boolean(!"false".equals(
+                        ProActiveConfiguration.getProperty(
                             "proactive.stack_trace")));
         }
         if (enableStackTrace.booleanValue()) {
@@ -116,7 +118,8 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = new Boolean(!"false".equals(System.getProperty(
+            enableStackTrace = new Boolean(!"false".equals(
+                        ProActiveConfiguration.getProperty(
                             "proactive.stack_trace")));
         }
         if (enableStackTrace.booleanValue()) {
@@ -136,7 +139,8 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = new Boolean(!"false".equals(System.getProperty(
+            enableStackTrace = new Boolean(!"false".equals(
+                        ProActiveConfiguration.getProperty(
                             "proactive.stack_trace")));
         }
         if (enableStackTrace.booleanValue()) {

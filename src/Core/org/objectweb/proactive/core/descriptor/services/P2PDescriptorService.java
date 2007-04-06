@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -91,8 +92,9 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      */
     private P2PService getPrecedentService() {
         String url = UrlBuilder.buildUrl("localhost", P2P_NODE_NAME,
-                System.getProperty(PROPERTY_ACQUISITION),
-                Integer.parseInt(System.getProperty(PROPERTY_PORT)));
+                ProActiveConfiguration.getProperty(PROPERTY_ACQUISITION),
+                Integer.parseInt(ProActiveConfiguration.getProperty(
+                        PROPERTY_PORT)));
 
         ;
         try {

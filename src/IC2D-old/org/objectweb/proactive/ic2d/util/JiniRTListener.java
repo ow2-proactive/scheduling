@@ -37,6 +37,7 @@ import javax.swing.DefaultListModel;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
@@ -66,7 +67,7 @@ public class JiniRTListener implements DiscoveryListener {
         this.logger = logger;
         this.skippedObjects = skippedObjects;
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(System.getProperty("proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new RMISecurityManager());
         }
 

@@ -141,14 +141,16 @@ public class HostsInfos {
     final static String REGEXP_KEYVAL = "(([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]{1,3}\\.){3}[0-9]{1,3})";
 
     private void loadProperties() {
-        String userNames = System.getProperty("proactive.ssh.username");
+        String userNames = ProActiveConfiguration.getProperty(
+                "proactive.ssh.username");
 
         if (userNames == null) {
             userNames = System.getProperty("user.name");
         }
         parseUserNames(userNames);
 
-        String secondaryNames = System.getProperty("proactive.secondaryNames");
+        String secondaryNames = ProActiveConfiguration.getProperty(
+                "proactive.secondaryNames");
         if (secondaryNames != null) {
             if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL +
                         ")?")) {

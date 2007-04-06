@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.body.HalfBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
 import org.objectweb.proactive.core.exceptions.manager.TypedNFEListener;
 
@@ -85,13 +86,13 @@ public class GarbageCollector {
     static int TTA = 5 * TTB;
 
     static {
-        String ttb = System.getProperty("proactive.dgc.ttb");
+        String ttb = ProActiveConfiguration.getProperty("proactive.dgc.ttb");
         if (ttb != null) {
             TTB = Integer.parseInt(ttb);
             TTA = 5 * TTB;
         }
 
-        String tta = System.getProperty("proactive.dgc.tta");
+        String tta = ProActiveConfiguration.getProperty("proactive.dgc.tta");
         if (tta != null) {
             TTA = Integer.parseInt(tta);
         }
@@ -665,8 +666,8 @@ public class GarbageCollector {
 
     public static boolean dgcIsEnabled() {
         if (cache == null) {
-            cache = new Boolean("true".equals(System.getProperty(
-                            "proactive.dgc")));
+            cache = new Boolean("true".equals(
+                        ProActiveConfiguration.getProperty("proactive.dgc")));
         }
         return cache.booleanValue();
     }

@@ -37,6 +37,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -101,16 +102,17 @@ public class UrlBuilder {
      */
     public static int getDefaultPortForProtocol(String protocol) {
         if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            if (System.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
-                return Integer.parseInt(System.getProperty(
+            if (ProActiveConfiguration.getProperty(
+                        Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
+                return Integer.parseInt(ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_XMLHTTP_PORT));
             }
         } else if ((Constants.RMI_PROTOCOL_IDENTIFIER.equals(protocol)) ||
                 Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            return Integer.parseInt(System.getProperty(
+            return Integer.parseInt(ProActiveConfiguration.getProperty(
                     Constants.PROPERTY_PA_RMI_PORT));
         } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            return Integer.parseInt(System.getProperty(
+            return Integer.parseInt(ProActiveConfiguration.getProperty(
                     Constants.PROPERTY_PA_RMISSH_PORT));
         }
 
@@ -163,13 +165,13 @@ public class UrlBuilder {
      */
     public static String buildUrlFromProperties(String host, String name) {
         String port = null;
-        String protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        String protocol = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
                 protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = System.getProperty(Constants.PROPERTY_PA_RMI_PORT);
+            port = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_RMI_PORT);
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            port = System.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
+            port = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         }
         if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) ||
                 (port == null)) {
@@ -278,14 +280,15 @@ public class UrlBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
-        if (System.getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS) != null) {
-            return System.getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS);
+        if (ProActiveConfiguration.getProperty(
+                    Constants.PROPERTY_PA_RUNTIME_IPADDRESS) != null) {
+            return ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS);
         }
 
-        if (System.getProperty(Constants.PROPERTY_PA_HOSTNAME) != null) {
-            return System.getProperty(Constants.PROPERTY_PA_HOSTNAME);
+        if (ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_HOSTNAME) != null) {
+            return ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_HOSTNAME);
         }
-        if ("true".equals(System.getProperty(
+        if ("true".equals(ProActiveConfiguration.getProperty(
                         Constants.PROPERTY_PA_USE_IP_ADDRESS))) {
             return address.getHostAddress();
         } else {

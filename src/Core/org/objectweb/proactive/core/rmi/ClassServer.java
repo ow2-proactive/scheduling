@@ -51,11 +51,11 @@ public class ClassServer implements Runnable {
     static {
         String newport;
 
-        if (System.getProperty("proactive.http.port") != null) {
-            newport = System.getProperty("proactive.http.port");
+        if (ProActiveConfiguration.getProperty("proactive.http.port") != null) {
+            newport = ProActiveConfiguration.getProperty("proactive.http.port");
         } else {
             newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            System.setProperty("proactive.http.port", newport);
+            ProActiveConfiguration.getProperty("proactive.http.port", newport);
         }
     }
 
@@ -75,7 +75,8 @@ public class ClassServer implements Runnable {
 
     protected ClassServer(int port_) throws java.io.IOException {
         if (port == 0) {
-            port = boundServerSocket(Integer.parseInt(System.getProperty(
+            port = boundServerSocket(Integer.parseInt(
+                        ProActiveConfiguration.getProperty(
                             "proactive.http.port")), MAX_RETRY);
         } else {
             port = port_;

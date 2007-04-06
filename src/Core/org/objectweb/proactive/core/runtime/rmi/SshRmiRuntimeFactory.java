@@ -34,6 +34,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterForwarderImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
@@ -52,7 +53,8 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
     //    private static ProActiveRuntime defaultRmiRuntime = null;
     public SshRmiRuntimeFactory() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(System.getProperty("proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getProperty(
+                        "proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
     }

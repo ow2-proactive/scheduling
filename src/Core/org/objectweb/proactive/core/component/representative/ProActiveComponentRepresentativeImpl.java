@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -104,7 +105,7 @@ public class ProActiveComponentRepresentativeImpl
     public ProActiveComponentRepresentativeImpl(ComponentType componentType,
         String hierarchicalType, String controllersConfigFileLocation) {
         this.componentType = componentType;
-        useShortcuts = ("true".equals(System.getProperty(
+        useShortcuts = ("true".equals(ProActiveConfiguration.getProperty(
                     "proactive.components.use_shortcuts")));
         this.hierarchicalType = hierarchicalType;
         addControllers(componentType, controllersConfigFileLocation);

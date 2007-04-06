@@ -66,6 +66,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.SynchronousComponentRequestReceiver;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -362,7 +363,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
                 if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
-                            System.getProperty(
+                            ProActiveConfiguration.getProperty(
                                 Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
@@ -370,7 +371,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                     }
                     return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
                 } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
-                            System.getProperty(
+                            ProActiveConfiguration.getProperty(
                                 Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
@@ -379,7 +380,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
 
                     return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
                 } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
-                            System.getProperty(
+                            ProActiveConfiguration.getProperty(
                                 Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(

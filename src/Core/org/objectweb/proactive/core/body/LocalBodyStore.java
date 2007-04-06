@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.BodyEventProducerImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -235,7 +236,8 @@ public class LocalBodyStore {
         localBodyMap.removeBody(body.bodyID);
         bodyEventProducer.fireBodyRemoved(body);
         if ((this.localBodyMap.size() == 0) &&
-                "true".equals(System.getProperty("proactive.exit_on_empty"))) {
+                "true".equals(ProActiveConfiguration.getProperty(
+                        "proactive.exit_on_empty"))) {
             ProActive.exitSuccess();
         }
     }

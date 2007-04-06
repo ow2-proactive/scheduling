@@ -37,6 +37,7 @@ import java.net.URLClassLoader;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -46,9 +47,9 @@ public class MOPClassLoader extends URLClassLoader {
 
     // retreives the optionnal byteCodeManipulator JVM arg
     // javassist is used by default
-    public static String BYTE_CODE_MANIPULATOR = (System.getProperty(
+    public static String BYTE_CODE_MANIPULATOR = (ProActiveConfiguration.getProperty(
             "byteCodeManipulator") != null)
-        ? System.getProperty("byteCodeManipulator") : "javassist";
+        ? ProActiveConfiguration.getProperty("byteCodeManipulator") : "javassist";
     protected static Hashtable<String, byte[]> classDataCache = new Hashtable<String, byte[]>();
     protected static MOPClassLoader mopCl = null;
 
