@@ -40,6 +40,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -82,8 +83,8 @@ public class MatrixChart implements Chart {
      *
      */
     private static final long serialVersionUID = -9045078395503131290L;
-    public static final String logoFile = org.objectweb.proactive.benchmarks.timit.config.ConfigReader.PROJECT_PATH +
-        "/src/Core/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png";
+    public static final URL logoFile = MatrixChart.class.getResource(
+        "/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png");
     private Chart.LegendFormat legendFormatMode;
     private Chart.Scale scaleMode;
 
@@ -275,7 +276,7 @@ public class MatrixChart implements Chart {
                 height / 3);
         BufferedImage info = null;
         try {
-            info = ImageIO.read(new File(MatrixChart.logoFile));
+            info = ImageIO.read(MatrixChart.logoFile);
         } catch (IOException ex) {
         }
 
