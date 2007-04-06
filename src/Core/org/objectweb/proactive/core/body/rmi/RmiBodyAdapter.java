@@ -131,7 +131,6 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
         // Try if URL is the address of a RmiRemoteBody
         try {
             try {
-                System.out.println("RmiBodyAdapter.lookup()" + url);
                 o = java.rmi.Naming.lookup(url);
             } catch (ConnectException e) {
                 // connection failed, try to find a rmiregistry at proactive.rmi.port port
@@ -173,7 +172,6 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
 
         // Try if URL is the address of a RmiRemoteBody
         try {
-            System.out.println("RmiBodyAdapter.list() " + url);
             names = java.rmi.Naming.list(url);
         } catch (MalformedURLException e) {
             // connection failed, try to find a rmiregistry at proactive.rmi.port port

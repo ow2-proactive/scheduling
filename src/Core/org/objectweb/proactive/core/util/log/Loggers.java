@@ -39,6 +39,7 @@ package org.objectweb.proactive.core.util.log;
  */
 public interface Loggers {
     static final public String CORE = "proactive";
+    static final public String CONFIGURATION = CORE + ".configuration";
     static final public String CLASSLOADING = CORE + ".classloading";
     static final public String EVENTS = CORE + ".events";
     static final public String RUNTIME = CORE + ".runtime";

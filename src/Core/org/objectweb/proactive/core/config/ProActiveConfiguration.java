@@ -30,17 +30,21 @@
  */
 package org.objectweb.proactive.core.config;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.File;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.config.xml.MasterFileHandler;
+import org.objectweb.proactive.core.config.xml.PropertyHandler;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -52,16 +56,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class ProActiveConfiguration {
-    protected HashMap<String, String> loadedProperties;
-    protected HashMap addedProperties;
+    protected static Properties properties;
+    protected static final String PROACTIVE_CONFIG_FILENAME = "ProActiveConfiguration.xml";
     protected static ProActiveConfiguration singleton;
     protected static boolean isLoaded = false;
-    protected static boolean defaultConfigAlreadyLoaded = false;
-    protected static List<String> jvmDefinedProperties = new ArrayList<String>();
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
 
     private ProActiveConfiguration() {
-        this.loadedProperties = new HashMap<String, String>();
-        this.addedProperties = new HashMap();
     }
 
     protected static synchronized void createConfiguration() {
@@ -71,45 +72,60 @@ public class ProActiveConfiguration {
     }
 
     /**
-     * Load the default configuration
+     * Load the configuration, first look for user defined configuration files, firstly in
+     * the system property Constants.PROPERTY_PA_CONFIGURATION_FILE, then a file called
+     * .ProActiveConfiguration.xml at the user homedir.
      * The default file is located in the same directory as the ProActiceConfiguration
      * class with the name proacticeConfiguration
      * It is obtained using Class.geressource
      * If the property proactive.configuration is set then its value is used
      * as the configuration file
      */
-    public static void load() {
+    public synchronized static void load() {
         if (!isLoaded) {
-            loadDefaultConfig();
-            isLoaded = true;
-        }
-    }
+            // loading  default values
+            String filename = ProActiveConfiguration.class.getResource(PROACTIVE_CONFIG_FILENAME)
+                                                          .toString();
 
-    private static void loadDefaultConfig() {
-        String filename = null;
-        filename = ProActiveConfiguration.class.getResource(
-                "ProActiveConfiguration.xml").toString();
-        MasterFileHandler.createMasterFileHandler(filename,
-            ProActiveConfiguration.getConfiguration());
-        ProActiveConfiguration.getConfiguration().loadProperties();
-        if (System.getProperty("log4j.configuration") == null) {
-            loadDefaultLogger();
-        }
-        defaultConfigAlreadyLoaded = true;
-    }
+            logger.debug("default configuration file " + filename);
 
-    /**
-     * Load the configuration given in filename
-     * @param filename an XML file name
-     */
-    public static void load(String filename) {
-        if (!isLoaded) {
-            if (!defaultConfigAlreadyLoaded) {
-                loadDefaultConfig();
+            properties = PropertyHandler.createMasterFileHandler(filename,
+                    new Properties());
+
+            filename = null;
+
+            /* First we look for the user defined properties */
+            if (System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE) != null) {
+                // if specified as a system property
+                filename = System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE);
+            } else {
+                // or if the file exists in the user home dir
+                File f = new File(System.getProperty("user.dir") +
+                        File.separator + "." + PROACTIVE_CONFIG_FILENAME);
+                if (f.exists()) {
+                    filename = f.getAbsolutePath();
+                }
             }
-            MasterFileHandler.createMasterFileHandler(filename,
-                ProActiveConfiguration.getConfiguration());
-            ProActiveConfiguration.getConfiguration().loadProperties();
+
+            logger.debug("user configuration file " + filename);
+            if (filename != null) {
+                // override default properties by the ones defined by the user
+                properties = PropertyHandler.createMasterFileHandler(filename,
+                        properties);
+            }
+
+            // set the properties
+            setProperties(properties);
+
+            if (System.getProperty("log4j.configuration") == null) {
+                //if logger is not defined create default logger with level info that logs
+                // on the console
+                Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+                logger.setAdditivity(false);
+                logger.setLevel(Level.INFO);
+                logger.addAppender(new ConsoleAppender(new PatternLayout()));
+            }
+
             isLoaded = true;
         }
     }
@@ -122,38 +138,31 @@ public class ProActiveConfiguration {
     }
 
     /**
-     * Called by the parser when a property has been found
-     * @param name  name of the property
-     * @param value value of the property
-     */
-    public void propertyFound(String name, String value) {
-        this.loadedProperties.put(name, value);
-    }
-
-    /**
      * Add the loaded properties to the system
      */
-    public void loadProperties() {
-        Iterator<String> it = loadedProperties.keySet().iterator();
-        String name = null;
-        String value = null;
+    protected static void setProperties(Properties properties) {
+        // order the properties by name
+        // increase output readability
+        Vector<String> v = new Vector(properties.keySet());
+        Collections.sort(v);
+        Iterator<String> it = v.iterator();
+
         while (it.hasNext()) {
-            name = it.next();
-            value = this.loadedProperties.get(name);
-            if (!defaultConfigAlreadyLoaded) {
-                // JVM parameters cannot be overriden
-                if (System.getProperty(name) == null) {
-                    System.setProperty(name, value);
-                } else {
-                    jvmDefinedProperties.add(name);
-                }
+            String key = (String) it.next();
+            String value = properties.getProperty(key);
+
+            if (System.getProperty(key) == null) {
+                logger.debug("key:" + key + " --> value:" + value);
+                System.setProperty(key, value);
             } else {
-                if (!jvmDefinedProperties.contains(name)) {
-                    // override default properties, except JVM defined properties
-                    System.setProperty(name, value);
-                }
+                logger.debug("do not override " + key + ":" +
+                    System.getProperty(key) + " with value:" + value);
             }
         }
+    }
+
+    public String getProperty(String property) {
+        return System.getProperty(property);
     }
 
     //    /**
@@ -251,37 +260,5 @@ public class ProActiveConfiguration {
     public static String getGroupInformation() {
         return System.getProperty("proactive.groupInformation",
             UniqueID.getCurrentVMID().toString() + "~-1");
-    }
-
-    //To be used for the launcher 
-    //    /**
-    //     * Sets the value of proactive.home if not already set
-    //     */
-    //    private void setDefaultProActiveHome() {
-    //        File file = null;
-    //        if (System.getProperty("proactive.home") == null) {
-    //            String location = ProActiveConfiguration.class.getResource(
-    //                    "ProActiveConfiguration.class").getPath();
-    //            try {
-    //                file = new File(location, "/../../../../../../../../ProActive/").getCanonicalFile();
-    //                String proactivehome = file.getCanonicalPath();
-    //                System.setProperty("proactive.home", proactivehome);
-    //            } catch (IOException e) {
-    //                System.err.println(
-    //                    "WARNING: Unable to set proactive.home property. ProActive dir cannot be found! ");
-    //            }
-    //        }
-    //    }
-
-    /**
-     *
-     */
-    private static void loadDefaultLogger() {
-        //if logger is not defined create default logger with level info that logs
-        // on the console
-        Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
-        logger.setAdditivity(false);
-        logger.setLevel(Level.INFO);
-        logger.addAppender(new ConsoleAppender(new PatternLayout()));
     }
 }
