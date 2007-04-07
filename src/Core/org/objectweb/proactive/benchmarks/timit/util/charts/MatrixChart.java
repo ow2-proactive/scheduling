@@ -84,7 +84,7 @@ public class MatrixChart implements Chart {
      */
     private static final long serialVersionUID = -9045078395503131290L;
     public static final URL logoFile = MatrixChart.class.getResource(
-        "/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png");
+            "/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png");
     private Chart.LegendFormat legendFormatMode;
     private Chart.Scale scaleMode;
 
