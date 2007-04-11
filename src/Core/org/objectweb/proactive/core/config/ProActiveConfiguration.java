@@ -108,7 +108,7 @@ public class ProActiveConfiguration {
                 }
             }
 
-            logger.debug("user configuration file " + filename);
+            logger.debug("user configuration file is " + filename);
             if (filename != null) {
                 // override default properties by the ones defined by the user
                 properties = PropertyHandler.createMasterFileHandler(filename,
@@ -170,32 +170,6 @@ public class ProActiveConfiguration {
         return System.getProperty(property, defaultValue);
     }
 
-    //    /**
-    //     * Dump loaded properties, i.e properties found in the configuration file
-    //     */
-    //    public void dumpLoadedProperties() {
-    //        Iterator it = loadedProperties.keySet().iterator();
-    //        while (it.hasNext()) {
-    //            String name = (String) it.next();
-    //
-    //            //            System.out.println("Name = " + name);
-    //            //            System.out.println("Value = " + this.loadedProperties.get(name));
-    //        }
-    //    }
-    //
-    //    /**
-    //     * Dump properties added to the system, i.e loaded properties
-    //     * which were not already in the system
-    //     */
-    //    public void dumpAddedProperties() {
-    //        Iterator it = addedProperties.keySet().iterator();
-    //        while (it.hasNext()) {
-    //            String name = (String) it.next();
-    //
-    //            //            System.out.println("Name = " + name);
-    //            //            System.out.println("Value = " + this.addedProperties.get(name));
-    //        }
-    //    }
     public static String getLocationServerClass() {
         return System.getProperty("proactive.locationserver");
     }
@@ -265,5 +239,16 @@ public class ProActiveConfiguration {
     public static String getGroupInformation() {
         return System.getProperty("proactive.groupInformation",
             UniqueID.getCurrentVMID().toString() + "~-1");
+    }
+
+    /**
+     * set the value 'value' for the property key 'key'.
+     * <i>override any previous value</i>
+     * @param key the of the property
+     * @param value the value of the property
+     */
+    public static void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+        System.setProperty(key, value);
     }
 }

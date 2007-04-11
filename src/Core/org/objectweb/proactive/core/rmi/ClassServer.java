@@ -51,11 +51,13 @@ public class ClassServer implements Runnable {
     static {
         String newport;
 
-        if (ProActiveConfiguration.getProperty("proactive.http.port") != null) {
-            newport = ProActiveConfiguration.getProperty("proactive.http.port");
+        if (ProActiveConfiguration.getProperty(
+                    Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
+            newport = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         } else {
             newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            ProActiveConfiguration.getProperty("proactive.http.port", newport);
+            ProActiveConfiguration.setProperty(Constants.PROPERTY_PA_XMLHTTP_PORT,
+                newport);
         }
     }
 
