@@ -198,6 +198,8 @@
 				<and>
 					<os family="Unix"/>
 					<available file="mpicc" filepath="/bin:/usr/bin:/usr/local/bin"/>
+					<!-- Bug #3128: Disable MPI anyway -->
+					<available file="mpiIsBrokenIDontWantIt" filepath="/bin"/>
 				</and>
 			</bool>
 				
