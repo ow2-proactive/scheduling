@@ -541,6 +541,9 @@ public class GarbageCollector {
      */
     public synchronized void addProxy(AbstractBody body,
         UniversalBodyProxy proxy) {
+        if (proxy.getBody() == null) {
+            return;
+        }
         if (body != this.body) {
             this.log(Level.FATAL, "Wrong body");
         }

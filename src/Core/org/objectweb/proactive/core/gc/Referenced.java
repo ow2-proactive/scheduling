@@ -179,7 +179,7 @@ public class Referenced implements Comparable {
 
     @Override
     public String toString() {
-        return this.body.getID().shortString();
+        return this.getBodyID().shortString();
     }
 
     boolean isReferenced() {
@@ -201,7 +201,7 @@ public class Referenced implements Comparable {
     }
 
     public int compareTo(Object o) {
-        return this.body.getID().compareTo(((Referenced) o).body.getID());
+        return this.getBodyID().compareTo(((Referenced) o).getBodyID());
     }
 
     UniqueID getBodyID() {

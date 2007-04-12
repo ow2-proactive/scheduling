@@ -137,6 +137,9 @@ public class HalfBodies extends GarbageCollector {
         if (this.isFinished()) {
             return;
         }
+        if (proxy.getBody() == null) {
+            return;
+        }
         ConcurrentLinkedQueue<Referenced> refs = this.references.get(body);
         if (refs == null) {
             refs = new ConcurrentLinkedQueue<Referenced>();
