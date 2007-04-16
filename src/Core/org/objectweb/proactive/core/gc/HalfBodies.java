@@ -38,10 +38,10 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Level;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.HalfBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 
 
@@ -72,7 +72,8 @@ public class HalfBodies extends GarbageCollector {
      * Build the singleton with a dummy half body
      */
     private HalfBodies() {
-        super((HalfBody) ProActive.getBodyOnThis());
+        super(HalfBody.getHalfBody(LocalBodyStore.getInstance()
+                                                 .getHalfBodyMetaObjectFactory()));
     }
 
     /**
