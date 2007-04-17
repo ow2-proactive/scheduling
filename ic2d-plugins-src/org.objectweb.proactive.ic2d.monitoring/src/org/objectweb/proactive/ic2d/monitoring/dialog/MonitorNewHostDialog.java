@@ -67,7 +67,6 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsException;
 
@@ -395,7 +394,7 @@ public class MonitorNewHostDialog extends Dialog {
 				new Thread() {
 					public void run() {
 						try {
-							new HostObject(hostname, port, Protocol.getProtocolFromString(protocol), world);
+							new HostObject(hostname, port, protocol, world);
 						} catch (HostAlreadyExistsException e) {
 							displayMessage(e.getMessage());
 						}

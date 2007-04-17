@@ -226,11 +226,14 @@ public class VMObject extends AbstractDataObject {
 	 */
 	private void handleNode(String nodeName){
 		HostObject parent = getTypedParent();
-		String nodeUrl = UrlBuilder.buildUrl(parent.getHostName(), nodeName,
-				parent.getProtocol().toString (), parent.getPort());
+		String hostName = parent.getHostName();
+		String protocol = parent.getProtocol();
+		int port = parent.getPort();
+		
+		String nodeUrl = UrlBuilder.buildUrl(hostName, nodeName, protocol, port);
 		Node node = null;
 		try {
-			node = new NodeImpl(runtime, nodeUrl,UrlBuilder.getProtocol(nodeUrl), runtime.getJobID(nodeUrl));
+			node = new NodeImpl(runtime, nodeUrl, protocol, runtime.getJobID(nodeUrl));
 		} catch (ProActiveException e) {
 			notResponding();
 			Console.getInstance(Activator.CONSOLE_NAME).debug(e);

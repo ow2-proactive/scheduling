@@ -39,23 +39,27 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.core.Constants;
 
 public class NodeFigure extends AbstractRectangleFigure{
-		
+
 	protected final static int DEFAULT_WIDTH = 17;
-	
+
 	private IFigure contentPane;
-	
+
 	public static final Color RMI_COLOR;
 	public static final Color RMISSH_COLOR;
-	
+	public static final Color JINI_COLOR;
+	public static final Color HTTP_COLOR;
+
 	public static final Color DEFAULT_BORDER_COLOR;
-	
+
 	static {
 		Display device = Display.getCurrent();
 		RMI_COLOR = new Color(device, 208, 208, 224);
 		RMISSH_COLOR = new Color(device, 248, 255, 224);
+		JINI_COLOR = ColorConstants.cyan;
+		HTTP_COLOR = ColorConstants.orange;
 		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
 	}
 
@@ -68,56 +72,39 @@ public class NodeFigure extends AbstractRectangleFigure{
 	 * @param text The text to display
 	 * @param protocol The protocol used
 	 */
-	public NodeFigure(String text, Protocol protocol) {
+	public NodeFigure(String text, String protocol) {
 		super(text);
 		setProtocol(protocol);
 	}
-	
-	
+
+
 	/**
 	 * Creates a new node figure (used to display the legend)
 	 * @param protocol The protocol used
 	 */
-	public NodeFigure(Protocol protocol) {
+	public NodeFigure(String protocol) {
 		super();
 		setProtocol(protocol);
 	}
-	
-	/**
-	 * Used to display the legend
-	 * @param protocol The protocol used
-	 */
-	/*public NodeFigure(Protocol protocol){
-		super("Node", null);
-		setProtocol(protocol);
-	}*/
-	//
+
 	// -- PUBLIC METHOD --------------------------------------------
 	//
-	
+
 	public IFigure getContentPane() {
 		return contentPane;
 	}
-	
-	public void setProtocol(Protocol protocol){
-		switch(protocol) {
-		case IBIS:
-			// TODO
-		case RMI:
+
+	public void setProtocol(String protocol){
+		if(protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER))
 			backgroundColor = RMI_COLOR;
-			break;
-		case RMISSH:
-			backgroundColor = RMISSH_COLOR;//ColorConstants.white;
-			break;
-		case JINI:
-			backgroundColor = ColorConstants.cyan;
-			break;
-		case HTTP:
-			backgroundColor = ColorConstants.orange;
-			break;
-		default:
-			// TODO
-		}
+		else if(protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER))
+			backgroundColor = RMISSH_COLOR;
+		else if(protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER))
+			backgroundColor = HTTP_COLOR;
+		else if(protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER))
+			backgroundColor = RMI_COLOR;//TODO
+		else if(protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER))
+			backgroundColor = JINI_COLOR;
 	}
 
 	//
@@ -143,7 +130,7 @@ public class NodeFigure extends AbstractRectangleFigure{
 		contentPane.setLayoutManager(contentPaneLayout);
 		add(contentPane, BorderLayout.CENTER);
 	}
-	
+
 	@Override
 	protected int getDefaultWidth() {
 		return DEFAULT_WIDTH;
@@ -174,10 +161,10 @@ public class NodeFigure extends AbstractRectangleFigure{
 			super(false);
 		}
 
-		
+
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 			return super.calculatePreferredSize(container, wHint, hHint).expand(0,15);
 		}
-		
+
 	}
 }

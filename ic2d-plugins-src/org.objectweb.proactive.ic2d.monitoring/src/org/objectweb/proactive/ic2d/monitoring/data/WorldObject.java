@@ -286,7 +286,7 @@ public class WorldObject extends AbstractDataObject {
 	public boolean isP2PHidden(){
 		return this.hideP2P;
 	}
-	
+		
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//

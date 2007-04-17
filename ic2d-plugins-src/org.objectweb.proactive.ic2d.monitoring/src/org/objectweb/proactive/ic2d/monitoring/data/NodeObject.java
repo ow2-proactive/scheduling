@@ -152,11 +152,10 @@ public class NodeObject extends AbstractDataObject{
 	 * Returns the protocol used by the virtual machine containing this node.
 	 * @return The protocol
 	 */
-	public Protocol getParentProtocol() {
+	public String getParentProtocol() {
 		VMObject vm = (VMObject)getParent();
 		String url = vm.getProActiveRuntime().getURL();
-		String protocol = UrlBuilder.getProtocol(url);
-		return Protocol.getProtocolFromString(protocol);
+		return UrlBuilder.getProtocol(url);
 	}
 
 	@Override

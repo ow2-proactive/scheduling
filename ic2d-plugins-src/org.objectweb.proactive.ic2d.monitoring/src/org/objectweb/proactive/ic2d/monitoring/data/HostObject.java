@@ -62,8 +62,11 @@ public class HostObject extends AbstractDataObject {
 	private String os;
 
 	/** Host's protocol */
-	private Protocol protocol;
+	private String protocol;
 
+	/** Host's url */
+	private String url;
+	
 	public static String OS_PROPERTY = "os.name";
 
 	//
@@ -78,13 +81,15 @@ public class HostObject extends AbstractDataObject {
 	 * @param world The World
 	 * @throws HostAlreadyExistsException 
 	 */
-	public HostObject(String hostname, int port, Protocol protocol, WorldObject world) throws HostAlreadyExistsException{
+	public HostObject(String hostname, int port, String protocol, WorldObject world) throws HostAlreadyExistsException{
 		super(world);
 
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
 
+		this.url = UrlBuilder.buildUrl(hostname, "", protocol, port);
+		
 		HostObject hostAlreadyExists = (HostObject) this.parent.monitoredChildren.get(this.getKey());
 		if(hostAlreadyExists != null)
 			throw new HostAlreadyExistsException(hostAlreadyExists);
@@ -187,8 +192,16 @@ public class HostObject extends AbstractDataObject {
 	 * Returns the host's protocol
 	 * @return The host's protocol
 	 */
-	public Protocol getProtocol(){
+	public String getProtocol(){
 		return this.protocol;
+	}
+	
+	/**
+	 * Returns the host's url
+	 * @return The host's url
+	 */
+	public String getUrl(){
+		return this.url;
 	}
 
 	/**
@@ -261,8 +274,7 @@ public class HostObject extends AbstractDataObject {
 				String hostname = infos.getHostName();
 				String url = pr.getURL();
 				int port = UrlBuilder.getPortFromUrl(url);
-				String pro = UrlBuilder.getProtocol(url);
-				Protocol protocol = Protocol.getProtocolFromString(pro.substring(0, pro.length()-1).toUpperCase());
+				String protocol = UrlBuilder.getProtocol(url);
 				HostObject host;
 				try {
 					host = new HostObject(hostname, port, protocol, getWorld());

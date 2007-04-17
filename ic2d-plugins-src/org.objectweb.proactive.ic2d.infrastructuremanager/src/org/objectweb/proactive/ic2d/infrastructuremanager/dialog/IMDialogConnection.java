@@ -16,9 +16,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 
 public class IMDialogConnection extends Dialog {
 
@@ -114,11 +114,11 @@ public class IMDialogConnection extends Dialog {
 
 		// combo protocols
 		combo = new Combo(hostGroup,SWT.DROP_DOWN);
-		combo.add(Protocol.RMI.toString().toUpperCase());
-		combo.add(Protocol.HTTP.toString().toUpperCase());
-		combo.add(Protocol.IBIS.toString().toUpperCase());
-		combo.add(Protocol.JINI.toString().toUpperCase());
-		combo.setText("RMI");
+		combo.add(Constants.RMI_PROTOCOL_IDENTIFIER);
+		combo.add(Constants.XMLHTTP_PROTOCOL_IDENTIFIER);
+		combo.add(Constants.IBIS_PROTOCOL_IDENTIFIER);
+		combo.add(Constants.JINI_PROTOCOL_IDENTIFIER);
+		combo.setText(Constants.RMI_PROTOCOL_IDENTIFIER);
 		FormData protocolFormData = new FormData();
 		protocolFormData.top = new FormAttachment(0, -1);
 		protocolFormData.left = new FormAttachment(protocolLabel, 5);

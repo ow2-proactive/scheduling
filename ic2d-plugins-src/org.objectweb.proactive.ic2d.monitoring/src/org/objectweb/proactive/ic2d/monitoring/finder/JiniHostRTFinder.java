@@ -18,7 +18,6 @@ import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 
 public class JiniHostRTFinder implements HostRTFinder {
 
@@ -33,9 +32,8 @@ public class JiniHostRTFinder implements HostRTFinder {
 		
 		LookupLocator lookup = null;
 		try {
-			lookup = new LookupLocator(Protocol.JINI.toString()+"://" + host.getHostName());
+			lookup = new LookupLocator(host.getUrl());
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			console.err("Lookup failed:");
 			console.logException(e);
 			e.printStackTrace();
@@ -44,12 +42,10 @@ public class JiniHostRTFinder implements HostRTFinder {
 		try {
 			registrar = lookup.getRegistrar();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			console.err("Registrar search failed:");
 			console.logException(e);
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			console.err("Class Not Found:");
 			console.logException(e);
 			e.printStackTrace();
@@ -60,7 +56,6 @@ public class JiniHostRTFinder implements HostRTFinder {
 		try {
 			matches = registrar.lookup(template, Integer.MAX_VALUE);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			console.logException(e);
 			e.printStackTrace();
 		}
@@ -83,7 +78,6 @@ public class JiniHostRTFinder implements HostRTFinder {
 						try {
 							part = new ProActiveRuntimeAdapterImpl(runtime);
 						} catch (ProActiveException e) {
-							// TODO Auto-generated catch block
 							console.logException(e);
 							e.printStackTrace();
 						}

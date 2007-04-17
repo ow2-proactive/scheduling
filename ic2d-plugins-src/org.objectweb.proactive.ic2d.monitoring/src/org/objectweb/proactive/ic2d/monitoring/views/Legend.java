@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
@@ -220,7 +220,7 @@ public class Legend extends ViewPart {
 		// RMI Node
 
 		FigureCanvas node1Container = new FigureCanvas(nodeDef);
-		node1Container.setContents(new NodeFigure(Protocol.RMI));
+		node1Container.setContents(new NodeFigure(Constants.RMI_PROTOCOL_IDENTIFIER));
 
 		Label node1Text = new Label(nodeDef, 0);
 		node1Text.setText("RMI Node");
@@ -228,7 +228,7 @@ public class Legend extends ViewPart {
 		// HTTP Node
 
 		FigureCanvas node2Container = new FigureCanvas(nodeDef);
-		node2Container.setContents(new NodeFigure(Protocol.HTTP));
+		node2Container.setContents(new NodeFigure(Constants.XMLHTTP_PROTOCOL_IDENTIFIER));
 
 		Label node2Text = new Label(nodeDef, 0);
 		node2Text.setText("HTTP Node");
@@ -236,7 +236,7 @@ public class Legend extends ViewPart {
 		// RMI/SSH Node
 
 		FigureCanvas node3Container = new FigureCanvas(nodeDef);
-		node3Container.setContents(new NodeFigure(Protocol.RMISSH));
+		node3Container.setContents(new NodeFigure(Constants.RMISSH_PROTOCOL_IDENTIFIER));
 
 		Label node3Text = new Label(nodeDef, 0);
 		node3Text.setText("RMI/SSH Node");
@@ -244,7 +244,7 @@ public class Legend extends ViewPart {
 		// JINI Node
 
 		FigureCanvas node4Container = new FigureCanvas(nodeDef);
-		node4Container.setContents(new NodeFigure(Protocol.JINI));
+		node4Container.setContents(new NodeFigure(Constants.JINI_PROTOCOL_IDENTIFIER));
 
 		Label node4Text = new Label(nodeDef, 0);
 		node4Text.setText("JINI Node");

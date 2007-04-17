@@ -30,35 +30,34 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.finder;
 
-import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
+import org.objectweb.proactive.core.Constants;
 
 /**
  * Factory design pattern.
  */
 public class HostRTFinderFactory {
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
+
 	/**
 	 * Create a HostRTFinder corresponding to the protocol
 	 * @param protocol The protocol to use
 	 * @return A HostRTFinder
 	 */
-	public static HostRTFinder createHostRTFinder(Protocol protocol) {
-		switch (protocol) {
-		case RMI:
-		case RMISSH:
+	public static HostRTFinder createHostRTFinder(String protocol) {
+		if(protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER))
 			return new RMIHostRTFinder();
-		case HTTP:
+		else if(protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER))
+			return new RMIHostRTFinder();
+		else if(protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER))
 			return new HttpHostRTFinder();
-		case IBIS:
+		else if(protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER))
 			return new IbisHostRTFinder();
-		case JINI:
+		else if(protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER))
 			return new JiniHostRTFinder();
-		default:
+		else
 			return null;
-		}	
 	}
 }
