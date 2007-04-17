@@ -36,6 +36,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -49,7 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team 06/06 (mleyton)
  *
  */
-public class FileTransferEngine {
+public class FileTransferEngine implements ProActiveInternalObject {
     //Not serializable on purpose: This is a service AO that cannot migrate!!
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     static FileTransferEngine singletonFTE = getFileTransferEngine();

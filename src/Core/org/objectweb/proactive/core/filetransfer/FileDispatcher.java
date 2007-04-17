@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.filetransfer;
 import java.io.File;
 import java.io.IOException;
 
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 
 
@@ -44,7 +45,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * @author The ProActive Team 06/06 (mleyton)
  *
  */
-public class FileDispatcher {
+public class FileDispatcher implements ProActiveInternalObject {
     public FileDispatcher() {
     }
 
