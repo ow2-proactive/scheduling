@@ -30,11 +30,26 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.dialog;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -47,6 +62,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
@@ -55,21 +71,29 @@ import org.objectweb.proactive.ic2d.monitoring.data.Protocol;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.exceptions.HostAlreadyExistsException;
 
-
 public class MonitorNewHostDialog extends Dialog {
 
 	private Shell shell = null;
-	private Shell parent =null;
-
-	private Text hostText;
+	private Shell parent = null;
+	
+	private Combo hostCombo;
 	private Text portText;
-	private Combo combo;
+	private Combo protocolCombo;
 	private Text depthText;
 	private Button okButton;
 	private Button cancelButton;
 	
 	/** The World */
 	private WorldObject world;
+
+	/** Host name */
+	String initialHostValue = "localhost";
+	
+	// Name of the file
+	String file = ".urls";
+
+	// <hostName,url>
+	Map<String,String> urls = new HashMap<String,String>();
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -82,7 +106,6 @@ public class MonitorNewHostDialog extends Dialog {
 		this.parent = parent;
 		this.world = world;
 		
-		String initialHostValue = "localhost";
 		String port = "";
 
 		/* Get the machine's name */
@@ -126,13 +149,36 @@ public class MonitorNewHostDialog extends Dialog {
 		hostLabel.setText("Name or IP :");
 		
 		// text hostname or IP
-		this.hostText = new Text(hostGroup, SWT.BORDER);
-		hostText.setText(initialHostValue);
+		hostCombo = new Combo(hostGroup, SWT.BORDER);
 		FormData hostFormData = new FormData();
 		hostFormData.top = new FormAttachment(0, -1);
 		hostFormData.left = new FormAttachment(hostLabel, 5);
 		hostFormData.right = new FormAttachment(50, -5);
-		hostText.setLayoutData(hostFormData);
+		hostCombo.setLayoutData(hostFormData);
+		hostCombo.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				String hostName = hostCombo.getText();
+				String url = (String) urls.get(hostName);
+				Integer port = UrlBuilder.getPortFromUrl(url);
+				String protocol = UrlBuilder.getProtocol(url);
+				portText.setText(port.toString());
+				protocolCombo.setText(protocol);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				String text = hostCombo.getText();
+				if (hostCombo.indexOf(text) < 0) { // Not in the list yet.
+					hostCombo.add(text);
+
+					// Re-sort
+					String[] items = hostCombo.getItems();
+					Arrays.sort(items);
+					hostCombo.setItems(items);
+					hostCombo.setText(text);
+				}
+			}
+		});
+
 
 		// label "Port"
 		Label portLabel = new Label(hostGroup, SWT.NONE);
@@ -143,7 +189,8 @@ public class MonitorNewHostDialog extends Dialog {
 
 		// text port
 		this.portText = new Text(hostGroup, SWT.BORDER);
-		if(port != null) portText.setText(port);
+		if (port != null)
+			portText.setText(port);
 		FormData portFormData2 = new FormData();
 		portFormData2.top = new FormAttachment(0, -1);
 		portFormData2.left = new FormAttachment(portLabel, 5);
@@ -158,18 +205,21 @@ public class MonitorNewHostDialog extends Dialog {
 		protocolLabel.setLayoutData(protocolFormData1);
 		
 		// combo protocols
-		combo = new Combo(hostGroup,SWT.DROP_DOWN);
-		combo.add(Protocol.RMI.toString().toUpperCase());
-		combo.add(Protocol.HTTP.toString().toUpperCase());
-		combo.add(Protocol.IBIS.toString().toUpperCase());
-		combo.add(Protocol.JINI.toString().toUpperCase());
-		combo.setText("RMI");
+		protocolCombo = new Combo(hostGroup, SWT.DROP_DOWN);
+		protocolCombo.add(Constants.RMI_PROTOCOL_IDENTIFIER);
+		protocolCombo.add(Constants.XMLHTTP_PROTOCOL_IDENTIFIER);
+		protocolCombo.add(Constants.IBIS_PROTOCOL_IDENTIFIER);
+		protocolCombo.add(Constants.JINI_PROTOCOL_IDENTIFIER);
+		protocolCombo.setText(Constants.RMI_PROTOCOL_IDENTIFIER);
 		FormData protocolFormData = new FormData();
 		protocolFormData.top = new FormAttachment(0, -1);
 		protocolFormData.left = new FormAttachment(protocolLabel, 5);
 		protocolFormData.right = new FormAttachment(100, 0);
-		combo.setLayoutData(protocolFormData);
+		protocolCombo.setLayoutData(protocolFormData);
 
+		// Load Urls
+		loadUrls();
+		
 		// label depth
 		Label depthLabel = new Label(shell, SWT.NONE);
 		depthLabel.setText("Hosts will be recursively searched up to a depth of :");
@@ -180,7 +230,7 @@ public class MonitorNewHostDialog extends Dialog {
 
 		// text depth
 		this.depthText = new Text(shell, SWT.BORDER);
-		depthText.setText(world.getMonitorThread().getDepth()+"");
+		depthText.setText(world.getMonitorThread().getDepth() + "");
 		FormData depthFormData2 = new FormData();
 		depthFormData2.top = new FormAttachment(hostGroup, 17);
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
@@ -220,15 +270,13 @@ public class MonitorNewHostDialog extends Dialog {
 		shell.pack();
 		shell.open();
 
-
-		while(!shell.isDisposed()) {
-			if(!display.readAndDispatch())
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
 				display.sleep();
 		}
 
 		//display.dispose(); TODO ???
 	}
-
 
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
@@ -247,8 +295,83 @@ public class MonitorNewHostDialog extends Dialog {
 				MessageBox mb = new MessageBox(parent);
 				mb.setMessage(message);
 				mb.open();
-			}});
+			}
+		});
 
+	}
+
+	/**
+	 * Load Urls
+	 */
+	@SuppressWarnings("unchecked")
+	private void loadUrls(){
+		try{
+			BufferedReader reader = null;
+			String url = null;
+			reader = new BufferedReader(new FileReader(file));
+			try {
+				Set<String> hostNames = new TreeSet<String>();
+				String lastNameUsed = null;
+				Integer lastPortUsed = null;
+				String lastProtocolUsed = null;
+
+				while ((url = reader.readLine()) != null){
+					lastNameUsed = UrlBuilder.getHostNameFromUrl(url);
+					lastPortUsed = UrlBuilder.getPortFromUrl(url);
+					lastProtocolUsed = UrlBuilder.getProtocol(url);
+					hostNames.add(lastNameUsed);
+					urls.put(lastNameUsed, url);
+				}
+
+				String[] t = {""};
+				String[] hosts = (new ArrayList<String>(hostNames)).toArray(t);
+				Arrays.sort(hosts);
+				hostCombo.setItems(hosts);
+				hostCombo.setText(lastNameUsed);
+				portText.setText(lastPortUsed.toString());
+				protocolCombo.setText(lastProtocolUsed);
+			} catch (IOException e) { /* Do-nothing */	}
+			finally{
+				try {
+					reader.close();
+				} catch (IOException e) { /* Do-Nothing */	}
+			}
+		} catch (FileNotFoundException e) {
+			hostCombo.add(initialHostValue);
+			hostCombo.setText(initialHostValue);
+			String defaultURL = UrlBuilder.buildUrlFromProperties(initialHostValue, "");
+			urls.put(initialHostValue, defaultURL);
+			recordUrl(defaultURL);
+		}
+	}
+
+	/**
+	 * Record an url
+	 * @param url
+	 */
+	private void recordUrl(String url) {
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(file, false));
+			PrintWriter pw =new PrintWriter(bw,true);
+			String host = UrlBuilder.getHostNameFromUrl(url);
+			if(urls.size()>1)
+				urls.remove(host);
+			// Record urls
+			Iterator it = urls.values().iterator();
+			while(it.hasNext()){
+				pw.println(it.next());		
+			}
+			// Record the last URL used at the end of the file
+			// in order to find it easily for the next time
+			pw.println(url);
+		}
+		catch(IOException e) {/* Do-Nothing */}
+		finally{
+			try {
+				bw.close();
+			} catch(IOException e){/* Do-Nothing */}
+		}
 	}
 
 	//
@@ -257,19 +380,22 @@ public class MonitorNewHostDialog extends Dialog {
 
 	private class MonitorNewHostListener extends SelectionAdapter {
 		String hostname;
-		int port ;
-		Protocol protocol;
+		int port;
+		String protocol;
 
 		public void widgetSelected(SelectionEvent e) {
-			if(e.widget == okButton) {
-				hostname = hostText.getText();
+			if (e.widget == okButton) {
+				hostname = hostCombo.getText();
 				port = Integer.parseInt(portText.getText());
-				protocol = Protocol.getProtocolFromString((combo.getText()));
-				world.getMonitorThread().setDepth(Integer.parseInt(depthText.getText()));
-				new Thread(){
-					public void run(){
+				protocol = protocolCombo.getText();
+				String url = UrlBuilder.buildUrl(hostname, "", protocol, port);
+				recordUrl(url);
+				world.getMonitorThread().setDepth(
+						Integer.parseInt(depthText.getText()));
+				new Thread() {
+					public void run() {
 						try {
-							new HostObject(hostname, port, protocol, world);
+							new HostObject(hostname, port, Protocol.getProtocolFromString(protocol), world);
 						} catch (HostAlreadyExistsException e) {
 							displayMessage(e.getMessage());
 						}
