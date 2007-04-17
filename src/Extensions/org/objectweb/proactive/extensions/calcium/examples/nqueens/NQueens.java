@@ -50,6 +50,7 @@ import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
 import org.objectweb.proactive.extensions.calcium.skeletons.Fork;
 import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
+import org.objectweb.proactive.extensions.calcium.statistics.StatsImpl;
 
 
 public class NQueens implements Serializable {

@@ -32,14 +32,16 @@ package org.objectweb.proactive.extensions.calcium.statistics;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 
-import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
+import org.objectweb.proactive.extensions.calcium.muscle.*;
 
 
 public class Workout implements Serializable {
-    private HashMap<Class, Exercise> muscleWorkout;
+    public HashMap<Class, Exercise> muscleWorkout;
 
-    Workout(int initHashSize) {
+    public Workout(int initHashSize) {
         muscleWorkout = new HashMap<Class, Exercise>(initHashSize);
     }
 
@@ -59,7 +61,7 @@ public class Workout implements Serializable {
     //TODO this method should not be public
     public void track(Muscle muscle, Timer timer) {
         if (!muscleWorkout.containsKey(muscle.getClass())) {
-            muscleWorkout.put(muscle.getClass(), new Exercise());
+            muscleWorkout.put(muscle.getClass(), new Exercise(muscle.getClass()));
         }
 
         Exercise workout = muscleWorkout.get(muscle.getClass());
@@ -71,14 +73,52 @@ public class Workout implements Serializable {
         while (it.hasNext()) {
             Class muscle = it.next();
             if (!this.muscleWorkout.containsKey(muscle)) {
-                this.muscleWorkout.put(muscle, new Exercise());
+                this.muscleWorkout.put(muscle, new Exercise(muscle.getClass()));
             }
             Exercise exercise = this.muscleWorkout.get(muscle);
             exercise.incrementComputationTime(workout.muscleWorkout.get(muscle));
         }
     }
 
-    public Exercise getWorkout(Muscle muscle) {
+    public Exercise getExercise(Muscle muscle) {
         return muscleWorkout.get(muscle.getClass());
+    }
+
+    /**
+     * Looks inside the workout for classes that implement the requested interface.
+     * @param search The interface used as pattern.
+     * @return The Exercise found for the Classes that implement the interface.
+     */
+    private List<Exercise> getExercises(Class search) {
+        Vector<Exercise> v = new Vector<Exercise>();
+
+        java.util.Iterator<Class> it = muscleWorkout.keySet().iterator();
+        while (it.hasNext()) {
+            Class muscle = it.next();
+            Class[] interfaces = muscle.getInterfaces();
+            for (Class c : interfaces) {
+                if (c.equals(search)) {
+                    v.add(muscleWorkout.get(muscle));
+                }
+            }
+        }
+
+        return v;
+    }
+
+    public List<Exercise> getConditionExercises() {
+        return getExercises(Condition.class);
+    }
+
+    public List<Exercise> getDivideExercises() {
+        return getExercises(Divide.class);
+    }
+
+    public List<Exercise> getConquerExercise() {
+        return getExercises(Conquer.class);
+    }
+
+    public List<Exercise> getExecuteExercise() {
+        return getExercises(Execute.class);
     }
 }

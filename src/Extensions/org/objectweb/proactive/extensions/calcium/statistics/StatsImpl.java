@@ -43,10 +43,11 @@ public class StatsImpl implements Stats {
     private long finitTime;
     private long currentStateStart;
     private Workout workout;
+    private int maxResources;
 
     //sub task related stats
-    private int subTreeSize;
-    private int numberLeafs;
+    public int subTreeSize;
+    public int numberLeafs;
 
     public StatsImpl() {
         computationTime = 0;
@@ -54,6 +55,7 @@ public class StatsImpl implements Stats {
         initTime = System.currentTimeMillis();
         finitTime = 0;
         currentStateStart = initTime;
+        maxResources = 1;
 
         subTreeSize = numberLeafs = 0;
         workout = new Workout(8);
@@ -116,7 +118,8 @@ public class StatsImpl implements Stats {
         this.subTreeSize += stats.getTreeSize();
         this.numberLeafs += ((stats.getNumberLeafs() == 0) ? 1
                                                            : stats.getNumberLeafs());
-
+        this.maxResources = Math.max(maxResources,
+                stats.getMaxAvailableResources());
         this.workout.track(stats.workout);
     }
 
@@ -126,6 +129,10 @@ public class StatsImpl implements Stats {
 
     private int getNumberInnerNodes() {
         return getTreeSize() - getNumberLeafs();
+    }
+
+    public void setMaxAvailableResources(int numResources) {
+        this.maxResources = Math.max(this.maxResources, numResources);
     }
 
     // **************   INTERFACE METHODS   *****************
@@ -174,6 +181,10 @@ public class StatsImpl implements Stats {
     }
 
     public Exercise getExcercise(Muscle muscle) {
-        return workout.getWorkout(muscle);
+        return workout.getExercise(muscle);
+    }
+
+    public int getMaxAvailableResources() {
+        return this.maxResources;
     }
 }

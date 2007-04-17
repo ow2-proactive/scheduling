@@ -167,6 +167,11 @@ public class Skernel implements Serializable {
 
     public synchronized void putProcessedTask(Task<?> task) {
         Task<?> processingTask = processing.remove(task);
+
+        //get a snapshot of the current used resources
+        task.getStats()
+            .setMaxAvailableResources(stats.getProccessingQueueLength());
+
         if (processingTask == null) {
             logger.error(
                 "Dropping Task, since it was not being processed taskId=" +

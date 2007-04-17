@@ -31,19 +31,33 @@
 package org.objectweb.proactive.extensions.calcium.statistics;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 
 public class Exercise implements Serializable {
+    public final static Comparator<Exercise> compareByComputationTime = new CompareByComputationTime();
+    public final static Comparator<Exercise> compareByInvokedTimes = new CompareByInvokedTimes();
+    private Class c;
     private long computationTime;
     private int numberExecutedTimes;
 
-    Exercise() {
+    public Exercise(Class c) {
+        this.c = c;
         computationTime = 0;
+        numberExecutedTimes = 0;
     }
 
-    Exercise(Timer timer) {
-        this.computationTime = timer.getTime();
-        this.computationTime = 1;
+    public Exercise(Class c, int computationTime, int numberExecutedTimes) {
+        this.c = c;
+        this.computationTime = computationTime;
+        this.numberExecutedTimes = numberExecutedTimes;
+    }
+
+    /**
+     * @return The Class of the muscle code that corresponds to this exercise.
+     */
+    public Class getMuscleClass() {
+        return c;
     }
 
     /**
@@ -76,5 +90,19 @@ public class Exercise implements Serializable {
     @Override
     public String toString() {
         return computationTime + "/" + numberExecutedTimes;
+    }
+
+    static class CompareByComputationTime implements Comparator<Exercise> {
+        public int compare(Exercise o1, Exercise o2) {
+            return (new Long(o1.computationTime)).compareTo(new Long(
+                    o2.computationTime));
+        }
+    }
+
+    static class CompareByInvokedTimes implements Comparator<Exercise> {
+        public int compare(Exercise o1, Exercise o2) {
+            return (new Long(o1.numberExecutedTimes)).compareTo(new Long(
+                    o2.numberExecutedTimes));
+        }
     }
 }

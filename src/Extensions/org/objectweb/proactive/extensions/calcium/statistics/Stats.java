@@ -111,4 +111,10 @@ public interface Stats extends Serializable {
      * statistics are available for this muscle.
      */
     public Exercise getExcercise(Muscle muscle);
+
+    /**
+     * @return The theoretical optimistic maximum number of available resources during the execution.
+     * of this task. This doesn't mean that the task was actually executed on as many resources.
+     */
+    public int getMaxAvailableResources();
 }

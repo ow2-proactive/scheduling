@@ -130,7 +130,7 @@ public class Fork<P, R> implements Skeleton<P, R>, Instruction<P, P> {
      * It simply deep copies the parameters N times.
      * @author The ProActive Team (mleyton)
      */
-    static class ForkDefaultDivide<T> implements Divide<T, T> {
+    static public class ForkDefaultDivide<T> implements Divide<T, T> {
         int number;
 
         public ForkDefaultDivide(int number) {
