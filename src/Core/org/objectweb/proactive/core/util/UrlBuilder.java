@@ -108,12 +108,10 @@ public class UrlBuilder {
                         Constants.PROPERTY_PA_XMLHTTP_PORT));
             }
         } else if ((Constants.RMI_PROTOCOL_IDENTIFIER.equals(protocol)) ||
-                Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol)) {
+                Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol) ||
+                Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
             return Integer.parseInt(ProActiveConfiguration.getProperty(
                     Constants.PROPERTY_PA_RMI_PORT));
-        } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            return Integer.parseInt(ProActiveConfiguration.getProperty(
-                    Constants.PROPERTY_PA_RMISSH_PORT));
         }
 
         // default would be to return the RMI default port

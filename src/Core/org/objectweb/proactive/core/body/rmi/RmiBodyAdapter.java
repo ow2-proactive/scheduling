@@ -83,7 +83,7 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
     public void register(String url) throws java.io.IOException {
         try {
             java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
-        } catch (ConnectException e) {
+        } catch (IOException e) {
             //failed to unbind, maybe no port was specified in the url 
             // try at 	Constants.PROPERTY_PA_RMI_PORT	
             String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
@@ -103,7 +103,7 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
         try {
             try {
                 java.rmi.Naming.unbind(url);
-            } catch (ConnectException e) {
+            } catch (IOException e) {
                 //failed to unbind at port 1099 
                 // try at proactive.rmi.port
                 URI uri = URI.create(url);
@@ -132,7 +132,7 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
         try {
             try {
                 o = java.rmi.Naming.lookup(url);
-            } catch (ConnectException e) {
+            } catch (IOException e) {
                 // connection failed, try to find a rmiregistry at proactive.rmi.port port
                 String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(
                             url), UrlBuilder.getNameFromUrl(url),
@@ -144,7 +144,6 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
                 " is not bound to any known object");
         }
 
-        //catch (java.rmi.ConnectException e)
         if (o instanceof RmiRemoteBody) {
             try {
                 construct((RmiRemoteBody) o);
