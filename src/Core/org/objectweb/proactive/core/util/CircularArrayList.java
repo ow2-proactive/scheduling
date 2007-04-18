@@ -363,28 +363,4 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
                 size);
         }
     }
-
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
-        s.writeInt(size);
-        for (int i = 0; i != size; i++) {
-            s.writeObject(array[convert(i)]);
-        }
-    }
-
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        // Read in size of list and allocate array
-        head = 0;
-        size = tail = s.readInt();
-        if (tail < DEFAULT_SIZE) {
-            array = new Object[DEFAULT_SIZE];
-        } else {
-            array = new Object[tail];
-        }
-
-        // Read in all elements in the proper order.
-        for (int i = 0; i < tail; i++)
-            array[i] = s.readObject();
-    }
 }
