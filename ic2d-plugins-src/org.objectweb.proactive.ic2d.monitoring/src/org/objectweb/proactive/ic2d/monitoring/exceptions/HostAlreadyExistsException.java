@@ -44,7 +44,7 @@ public class HostAlreadyExistsException extends Exception{
 	 * @param host The already existing host.
 	 */
 	public HostAlreadyExistsException(HostObject host){
-		super("Host ("+ host.getFullName() + ")  already exists");
+		super("Host ("+ host.getUrl() + ")  already exists");
 		this.host = host;
 	}
 	

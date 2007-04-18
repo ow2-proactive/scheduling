@@ -123,8 +123,10 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 	public void mouseReleased(MouseEvent me) {
 		if(me.button == 1){
 			final AOObject source = dnd.getSource();
+			NodeObject sourceNode = dnd.getSourceNode();
 			if(source != null){
-				if(node.getChild(source.getKey()) != null){
+				if((sourceNode.getParent().equals(node.getParent()))||
+						(node.getChild(source.getKey()) != null)){
 					Console.getInstance(Activator.CONSOLE_NAME).warn("The active object originates from the same VM you're trying to migrate it to !");
 					figure.setHighlight(null);
 					dnd.reset();
@@ -161,7 +163,7 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 	}
 
 	public void mouseDragged(MouseEvent me) { /* Do nothing */ }
-	
+
 	public void mouseHover(MouseEvent me) { /* Do nothing */ }
 
 	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.monitoring.dnd;
 
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
+import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 
@@ -41,17 +42,20 @@ public class DragAndDrop {
 
 	/** The source object */
 	private AOObject source;
-	
+
+	/** The source node */
+	private NodeObject sourceNode;
+
 	/** The source figure */
 	private AOFigure sourceFigure;
-	
+
 	/** The current nodeFigure */
 	private NodeFigure nodeFigure;
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
-	
+
 	/**
 	 * Returns the source of the migration
 	 * @return the source of the migration
@@ -59,15 +63,23 @@ public class DragAndDrop {
 	public AOObject getSource(){
 		return this.source;
 	}
-	
+
+	public NodeObject getSourceNode(){
+		return this.sourceNode;
+	}
+
 	/**
 	 * Sets the source of the migration
 	 * @param source The new source
 	 */
 	public void setSource(AOObject source){
 		this.source = source;
+		if(source==null)
+			this.sourceNode=null;
+		else
+			this.sourceNode = (NodeObject)source.getParent();
 	}
-	
+
 	/**
 	 * Returns the figure of the source of the migration
 	 * @return the figure of the source of the migration
@@ -75,7 +87,7 @@ public class DragAndDrop {
 	public AOFigure getSourceFigure(){
 		return this.sourceFigure;
 	}
-	
+
 	/**
 	 * Sets the figure of the source of the mirgation
 	 * @param figure The new figure
@@ -83,7 +95,7 @@ public class DragAndDrop {
 	public void setSourceFigure(AOFigure figure){
 		this.sourceFigure = figure;
 	}
-	
+
 	/**
 	 * Highlights the new nodeFigure, and cleans the previous nodeFigure.
 	 * @param nodeFigure
@@ -93,7 +105,7 @@ public class DragAndDrop {
 			this.nodeFigure.setHighlight(null);
 		this.nodeFigure = nodeFigure;
 	}
-	
+
 	/**
 	 * Resets all recorded data in order to allow a new migration.
 	 */

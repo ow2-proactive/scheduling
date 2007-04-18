@@ -122,7 +122,7 @@ public class HostObject extends AbstractDataObject {
 			keysOfMonitoringObjects.remove(key);
 		}
 		if(monitoredChildren.size() == 0) { //we didn't find any child
-			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+getKey());
+			Console.getInstance(Activator.CONSOLE_NAME).warn("No ProActiveRuntimes were found on host "+this.url);
 		}
 		if(keysOfMonitoringObjects.size()!=0){
 			Iterator<String> it = keysOfMonitoringObjects.iterator();
