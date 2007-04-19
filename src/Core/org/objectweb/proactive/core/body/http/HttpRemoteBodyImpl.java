@@ -488,7 +488,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
      */
     @SuppressWarnings("unchecked")
-	public ArrayList<Entity> getEntities()
+    public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         if (isLocal) {
             return body.getEntities();
