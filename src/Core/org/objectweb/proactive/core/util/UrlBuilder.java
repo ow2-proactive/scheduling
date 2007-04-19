@@ -149,9 +149,9 @@ public class UrlBuilder {
      */
     public static String buildUrl(String host, String name, String protocol,
         int port, boolean replaceHost) {
-        if (protocol == null) {
-            protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
-        }
+        //        if (protocol == null) {
+        //            protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        //        }
         if (port == 0) {
             port = -1;
         }
