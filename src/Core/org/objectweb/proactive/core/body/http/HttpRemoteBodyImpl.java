@@ -487,7 +487,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
      */
-    public ArrayList<Entity> getEntities()
+    @SuppressWarnings("unchecked")
+	public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         if (isLocal) {
             return body.getEntities();
@@ -525,7 +526,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.receiveGCMessage(msg);
         } else {
-            ArrayList paramList = new ArrayList();
+            ArrayList<Object> paramList = new ArrayList<Object>();
             paramList.add(msg);
 
             BodyRequest br = new BodyRequest("receiveGCMessage", paramList,
@@ -544,7 +545,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.setRegistered(registered);
         } else {
-            ArrayList paramList = new ArrayList();
+            ArrayList<Object> paramList = new ArrayList<Object>();
             paramList.add(new Boolean(registered));
 
             BodyRequest br = new BodyRequest("setRegistered", paramList,
