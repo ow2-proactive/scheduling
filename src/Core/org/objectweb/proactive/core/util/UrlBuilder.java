@@ -58,7 +58,7 @@ public class UrlBuilder {
     /**
      * Checks if the given url is well-formed
      * @param url the url to check
-     * @return String the url if well-formed
+     * @return The url if well-formed
      * @throws URISyntaxException if the url is not well-formed
      */
     public static String checkUrl(String url) throws URISyntaxException {
@@ -76,10 +76,12 @@ public class UrlBuilder {
     }
 
     /**
-     * @param host
-     * @param name
-     * @param protocol
-     * @return
+     * Returns an url compliant with RFC 2396 [protocol:][//host][[/]path]
+     * loopback address is replaced by a non-loopback address localhost -> [DNS/IP] Address
+     * @param host Url's hostname
+     * @param name Url's Path
+     * @param protocol Url's protocol
+     * @returnan url under the form [protocol:][//host][[/]name]
      */
     public static String buildUrl(String host, String name, String protocol) {
         return buildUrl(host, name, protocol,
@@ -87,9 +89,11 @@ public class UrlBuilder {
     }
 
     /**
-     * @param host
-     * @param name
-     * @return
+     * Returns an url compliant with RFC 2396[//host][[/]path]
+     * loopback address is replaced by a non-loopback address localhost -> [DNS/IP] Address
+     * @param host Url's hostname
+     * @param name Url's Path
+     * @returnan url under the form [//host][[/]name]
      */
     public static String buildUrl(String host, String name) {
         return buildUrl(host, name, null);
@@ -119,24 +123,43 @@ public class UrlBuilder {
     }
 
     /**
-    * Returns an url under the form protocol://host:port/name
-    * @param host
-    * @param name
-    * @param protocol
-    * @param port
-    * @return an url under the form protocol://host:port/name
-    */
+     * Returns an url compliant with RFC 2396 [protocol:][//host[:port]][[/]path]
+     * loopback address is replaced by a non-loopback address localhost -> [DNS/IP] Address
+     * @param host Url's hostname
+     * @param name Url's Path
+     * @param protocol Url's protocol
+     * @param port Url's port
+     * @returnan url under the form [protocol:][//host[:port]][[/]name]
+     */
     public static String buildUrl(String host, String name, String protocol,
         int port) {
-        //                if (protocol == null) {
-        //                    protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
-        //                }
+        return buildUrl(host, name, protocol, port, true);
+    }
+
+    /**
+     * Returns an url compliant with RFC 2396 [protocol:][//host[:port]][[/]name]
+     * @param host Url's hostname
+     * @param name Url's Path
+     * @param protocol Url's protocol
+     * @param port Url's port
+     * @param replaceHost indicate if internal hooks regarding how to resolve the hostname have to be used
+     * @see #fromLocalhostToHostname(String localName)
+     * @see #getHostNameorIP(InetAddress address)
+     * @returnan url under the form [protocol:][//host[:port]][[/]name]
+     */
+    public static String buildUrl(String host, String name, String protocol,
+        int port, boolean replaceHost) {
+        if (protocol == null) {
+            protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        }
         if (port == 0) {
             port = -1;
         }
 
         try {
-            host = fromLocalhostToHostname(host);
+            if (replaceHost) {
+                host = fromLocalhostToHostname(host);
+            }
 
             if ((name != null) && (!name.startsWith("/"))) {
                 /* URI does not require a '/' at the beginning of the name like URLs. As we cannot use
@@ -179,6 +202,12 @@ public class UrlBuilder {
         }
     }
 
+    /**
+     * build a virtual node url from a given url
+     * @param url
+     * @return
+     * @throws java.net.UnknownHostException if no network interface was found
+     */
     public static String buildVirtualNodeUrl(String url)
         throws java.net.UnknownHostException {
         String vnName = getNameFromUrl(url);
@@ -194,7 +223,6 @@ public class UrlBuilder {
     }
 
     public static String removeVnSuffix(String url) {
-        //		System.out.println("########vn url "+url);
         int index = url.lastIndexOf("_VN");
         if (index == -1) {
             return url;
@@ -208,9 +236,13 @@ public class UrlBuilder {
      * @return the name included in the url
      */
     public static String getNameFromUrl(String url) {
-        int n = url.lastIndexOf("/");
-        String name = url.substring(n + 1);
-        return name;
+        URI u = URI.create(url);
+        String path = u.getPath();
+        if (path != null) {
+            // remove the intial '/'
+            return path.substring(1);
+        }
+        return null;
     }
 
     /**
@@ -270,9 +302,9 @@ public class UrlBuilder {
     }
 
     /**
-     * this method returns the hostname or the IP address associate to the InetAddress address parameter.
-     * It is possible to set "proactive.runtime.ipaddress" or
-     * "proactive.hostname" or the "proactive.useIPaddress" property (evaluated in that order) to override the default java behaviour
+     * this method returns the hostname or the IP address associated to the InetAddress address parameter.
+     * It is possible to set {@code "proactive.runtime.ipaddress"}  or
+     *  {@code "proactive.hostname"} or the  {@code "proactive.useIPaddress"} property (evaluated in that order) to override the default java behaviour
      * of resolving InetAddress
      * @param address any InetAddress
      * @return a String matching the corresponding InetAddress
@@ -309,6 +341,13 @@ public class UrlBuilder {
         return url;
     }
 
+    /**
+     * evaluate if localName is a loopback entry, if yes calls {@link getHostNameorIP(InetAddress address)}
+     * @param localName
+     * @return a remotely accessible host name if exists
+     * @throws UnknownHostException if no network interface was found
+     * @see getHostNameorIP(InetAddress address)
+     */
     public static String fromLocalhostToHostname(String localName)
         throws UnknownHostException {
         java.net.InetAddress hostInetAddress = java.net.InetAddress.getLocalHost();
