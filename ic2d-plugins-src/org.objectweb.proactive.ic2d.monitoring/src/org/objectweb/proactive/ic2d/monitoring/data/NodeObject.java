@@ -332,7 +332,7 @@ public class NodeObject extends AbstractDataObject{
 				ProActiveRuntime pr = getTypedParent().getRuntime();
 				String jobID = null;
 				try {
-					jobID = pr.getJobID(pr.getURL() + "/" + getKey());
+					jobID = pr.getJobID(this.getURL());
 				} catch (ProActiveException e) {
 					// TODO
 					Console.getInstance(Activator.CONSOLE_NAME).logException(e);
