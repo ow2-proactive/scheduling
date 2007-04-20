@@ -32,10 +32,8 @@ package org.objectweb.proactive.core.config;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.ConsoleAppender;
@@ -101,18 +99,20 @@ public class ProActiveConfiguration {
                 filename = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE);
             } else {
                 // or if the file exists in the user home dir
-                File f = new File(System.getProperty("user.dir") +
+                File f = new File(System.getProperty("user.home") +
                         File.separator + "." + PROACTIVE_CONFIG_FILENAME);
                 if (f.exists()) {
                     filename = f.getAbsolutePath();
                 }
             }
 
-            logger.debug("user configuration file is " + filename);
             if (filename != null) {
                 // override default properties by the ones defined by the user
+                logger.debug("using user configuration file : " + filename);
                 properties = PropertyHandler.createMasterFileHandler(filename,
                         properties);
+            } else {
+                logger.debug("no user configuration file");
             }
 
             // set the properties
