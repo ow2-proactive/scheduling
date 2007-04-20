@@ -62,10 +62,8 @@ public class StartNodeCommand implements Command {
         try {
             NodeFactory.createNode(nodeName, false, null, null);
         } catch (NodeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (AlreadyBoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

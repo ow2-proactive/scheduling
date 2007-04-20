@@ -161,7 +161,6 @@ public class ProActiveServicesImpl implements ProActiveService {
             HttpContext myContext = new HttpContext() {
                     public boolean handleSecurity(HttpServletRequest arg0,
                         HttpServletResponse arg1) throws IOException {
-                        // TODO Auto-generated method stub
                         return false;
                     }
 
@@ -169,14 +168,12 @@ public class ProActiveServicesImpl implements ProActiveService {
                         try {
                             return new URL(aliasServlet + "?" + arg0);
                         } catch (MalformedURLException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                         return null;
                     }
 
                     public String getMimeType(String arg0) {
-                        // TODO Auto-generated method stub
                         return null;
                     }
                 };
