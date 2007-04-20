@@ -214,7 +214,9 @@ public class ClassServer implements Runnable {
     }
 
     private void newListener() {
-        (new Thread(this, "ClassServer-" + hostname + ":" + port)).start();
+        Thread t = new Thread(this, "ClassServer-" + hostname + ":" + port);
+        t.setDaemon(true);
+        t.start();
     }
 
     private int boundServerSocket(int basePortNumber, int numberOfTry)
