@@ -61,6 +61,7 @@ public class SSHClient {
     static final private String OPT_PASSWORD = "p";
     static final private String OPT_USERNAME = "l";
     static final private String OPT_IDENTITY = "i";
+    static final private String OPT_HELP = "h";
 
     private static String buildCmdLine(List<String> args) {
         StringBuilder cmd = new StringBuilder();
@@ -73,12 +74,25 @@ public class SSHClient {
         return cmd.toString();
     }
 
+    public static void printHelp(boolean exit) {
+        System.out.println("Options:");
+        System.out.println("\t-" + OPT_USERNAME + "\tusername");
+        System.out.println("\t-" + OPT_IDENTITY + "\tprivate key");
+        System.out.println("\t-" + OPT_PASSWORD +
+            "\tpassword to decrypt the private key");
+
+        if (exit) {
+            System.exit(2);
+        }
+    }
+
     public static void main(String[] args) throws ParseException {
         Options options = new Options();
         options.addOption(OPT_PASSWORD, true,
             "Password for password authentication");
         options.addOption(OPT_USERNAME, true, "Username");
         options.addOption(OPT_IDENTITY, true, "Identity file");
+        options.addOption(OPT_HELP, false, "Help");
 
         CommandLineParser parser = new PosixParser();
         CommandLine cmd = parser.parse(options, args);
@@ -87,6 +101,10 @@ public class SSHClient {
         String password = null;
         File identity = null;
         String hostname = null;
+
+        if (cmd.hasOption(OPT_HELP)) {
+            printHelp(true);
+        }
 
         if (cmd.hasOption(OPT_USERNAME)) {
             username = cmd.getOptionValue(OPT_USERNAME);
@@ -100,23 +118,23 @@ public class SSHClient {
             identity = new File(cmd.getOptionValue(OPT_IDENTITY));
             if (!identity.exists()) {
                 System.err.println("[E] " + identity + " does not exist");
-                System.exit(1);
+                printHelp(true);
             }
             if (!identity.isFile()) {
                 System.err.println("[E] " + identity + " is not a file");
-                System.exit(1);
+                printHelp(true);
             }
             if (!identity.canRead()) {
                 System.err.println("[E] " + identity +
                     " is not does not exist");
-                System.exit(1);
+                printHelp(true);
             }
         }
 
         List<String> remArgs = cmd.getArgList();
         if (remArgs.size() == 0) {
             System.err.println("[E] You must specify an hostname");
-            System.exit(1);
+            printHelp(true);
         }
 
         hostname = remArgs.remove(0);
