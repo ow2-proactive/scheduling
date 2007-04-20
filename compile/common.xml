@@ -20,7 +20,6 @@
 	<property name="src.extensions.dir" value="${src.dir}/Extensions" />
 	<property name="src.extra.dir"      value="${src.dir}/Extra" />
 	<property name="src.examples.dir"   value="${src.dir}/Examples" />
-	<property name="src.ic2d.dir"       value="${src.dir}/IC2D-old" />
 	<property name="src.test.dir"       value="${src.dir}/Tests" />
 	<property name="src.utils.dir"      value="${src.dir}/Utils" />
 
@@ -28,7 +27,6 @@
 	<property name="cl.extensions.dir"  value="${classes.dir}/Extensions" />
 	<property name="cl.extra.dir"  		value="${classes.dir}/Extra" />
 	<property name="cl.examples.dir"    value="${classes.dir}/Examples" />
-	<property name="cl.ic2d.dir"        value="${classes.dir}/IC2D-old" />
 	<property name="cl.test.dir"        value="${classes.dir}/Tests" />
 	<property name="cl.utils.dir"       value="${classes.dir}/Utils" />
 

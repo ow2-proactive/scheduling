@@ -52,7 +52,7 @@
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
 
-	<target name="compile" depends="core, extensions, extra, util, ic2d, examples" description="build the class files" />
+	<target name="compile" depends="core, extensions, extra, util, examples" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -121,7 +121,6 @@
 		<!-- Create the build directory structure used by compile -->
 		<mkdir dir="${classes.dir}" />
 		<mkdir dir="${cl.examples.dir}"/>
-		<mkdir dir="${cl.ic2d.dir}"/>
 		<mkdir dir="${cl.extra.dir}"/>
 		<mkdir dir="${cl.extensions.dir}"/>
 		<mkdir dir="${cl.proactive.dir}"/>
@@ -279,30 +278,6 @@
 		<mkdir dir="${daemon.dir}/build" />
 		<move file="${daemon.dir}/src/common/proactivep2p" todir="${daemon.dir}/build" />
 		<move file="${daemon.dir}/src/common/p2pctl" todir="${daemon.dir}/build" />
-	</target>
-
-
-	<!-- ================================================================ -->
-	<!--                          Compile ic2d                            -->
-	<!--  =============================================================== -->
-
-	<target name="ic2d" depends="core" description="Compile the IC2D Tool">
-		<javac srcdir="${src.ic2d.dir}" destdir="${cl.ic2d.dir}" includes="**/*.java" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-		</javac>
-		<copy todir="${cl.ic2d.dir}/${proactive.path}/ic2d/gui/images" includeEmptyDirs="no">
-			<fileset dir="${src.ic2d.dir}/${proactive.path}/ic2d/gui/images" />
-		</copy>
-		<!-- JobMonitor images -->
-		<copy todir="${cl.ic2d.dir}/${proactive.path}/ic2d/gui/jobmonitor/images" includeEmptyDirs="no">
-			<fileset dir="${src.ic2d.dir}/${proactive.path}/ic2d/gui/jobmonitor/images" />
-	</copy>
-  	 <copy todir="${cl.ic2d.dir}/${proactive.path}/ic2d/gui/components" includeEmptyDirs="no">
-			 <fileset dir="${src.ic2d.dir}/${proactive.path}/ic2d/gui/components/">
-					 <include name="*.fractal" />
-			 </fileset>
-	</copy>
-
 	</target>
 
 
@@ -465,7 +440,6 @@
     <copy file="${user.home}/clover.license" todir="${base.dir}/dev/lib"/>
     <clover-setup initString="coverage.db">
     <files>
-    <exclude name="org/objectweb/proactive/ic2d/**/*.java"/>
     <exclude name="org/objectweb/proactive/examples/**/*.java"/>
     <exclude name="org/objectweb/proactive/ext/**/*.java"/>
     <exclude name="nonregressiontest/**/*.java"/>
@@ -590,20 +564,17 @@
 	</target>
 
 
-	<target name="dist-examples_ic2d-jar" 
+	<target name="dist-examples-jar" 
 		depends="dist-mk-dir, compile">
 		<!-- Build the examples Jar -->
 		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" 
 			basedir="${cl.examples.dir}" 
 			includes="**" />
-		<!-- Build ic2d (NOT ECLIPSE version) Jar -->
-		<jar jarfile="${PAdist.dir}/ic2d.jar" basedir="${cl.ic2d.dir}"
-			includes="**" />
 	</target>
 
 
 	<target name="dist-bin"
-		depends="dist-examples_ic2d-jar, proActiveJar, dist-cp-files"
+		depends="dist-examples-jar, proActiveJar, dist-cp-files"
 		description="Create zip with only jars">
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
 		<zip zipfile="${dist.dir}/ProActive-bin_${version_}.zip">
@@ -634,14 +605,13 @@
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" >
 				<exclude name="docs/**"/>
 				<exclude name="ProActive_examples.jar" />
-				<exclude name="ic2d.jar" />
 				<exclude name="ProActive.jar" />
 			</zipfileset>
 		</zip>
 	</target>
 
 
-	<target name="dist-bundle" depends="dist-cp-files, proActiveJar, dist-examples_ic2d-jar"
+	<target name="dist-bundle" depends="dist-cp-files, proActiveJar, dist-examples-jar"
 		description="Create a zip with everythings">
 		<zip zipfile="${dist.dir}/ProActive-bundle_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">

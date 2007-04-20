@@ -42,7 +42,6 @@
 				<fileset dir="${src.proactive.dir}" includes="**/*.jpg"/>
 				<fileset dir="${src.extensions.dir}"   includes="**/*.jpg"/>
 			</copy>
-			<mkdir dir="${docs.dir}/ic2d-api" />
 			<javadoc  destdir="${docs.dir}/api" verbose="true" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> <!-- -docfilessubdirs -excludedocfilessubdir  -->
 			    <packageset dir="${src.proactive.dir}" />
 				<packageset dir="${src.extensions.dir}" />
@@ -68,17 +67,6 @@
 				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
 				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
 			</javadoc>
-			<javadoc packagenames="org.objectweb.proactive.ic2d.*" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API"  breakiterator="yes">
-				<sourcepath>
-					<pathelement path="${src.ic2d.dir}"/>
-					<pathelement path="${src.proactive.dir}"/>
-				</sourcepath>
-				<classpath refid="project.classpath" />
-				<doctitle><![CDATA[ProActive ${version} - IC2D]]></doctitle>
-				<bottom><![CDATA[<i>Copyright $$%%CopyrightYears%%$$ INRIA All Rights Reserved.</i>]]></bottom>
-				<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*" />
-			</javadoc>
-
 		</target>
 
 	<!-- ==================================================================== -->
