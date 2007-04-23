@@ -267,7 +267,13 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         return target != null;
     }
 
-    public FutureResult getFutureResult() {
+    /**
+     * Returns a FutureResult containing the awaited result, or the exception that occured if any.
+     * The method blocks until the future is available
+     * @return the result of this future object once available.
+     */
+    public synchronized FutureResult getFutureResult() {
+        waitFor();
         return target;
     }
 
@@ -278,10 +284,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     public synchronized Object getResult() {
         waitFor();
         return target.getResult();
-    }
-
-    public synchronized void setResult(Object o) {
-        target = new FutureResult(o, null, null);
     }
 
     /**
