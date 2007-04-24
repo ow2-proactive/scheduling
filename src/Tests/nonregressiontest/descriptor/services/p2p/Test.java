@@ -132,7 +132,7 @@ public class Test extends FunctionalTest {
             p2pNode.killAllActiveObjects();
             ProActiveRuntime part = p2pNode.getProActiveRuntime();
             part.killNode(p2pNode.getNodeInformation().getURL());
-        } catch (ProActiveRuntimeException e) {
+        } catch (Exception e) {
             // Problem with killing local node
             logger.debug("Impossible to clean local P2P node");
         }
