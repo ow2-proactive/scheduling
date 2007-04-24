@@ -112,10 +112,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
     @Override
     public String toString() {
         if (logger.isDebugEnabled()) {
-            return "<" +
-            vmID.toString()
-                .substring(vmID.toString().length() - 9,
-                vmID.toString().length() - 6) + ">";
+            return shortString();
         } else {
             return getCanonString();
         }
