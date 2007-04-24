@@ -274,7 +274,8 @@ public class GarbageCollector {
                 (isMyActivity || (parent != null))) {
             consensus = true;
             if (p.equals(parent)) {
-                for (Referencer kr : this.referencers.values()) {
+                for (Map.Entry<UniqueID, Referencer> entry : this.referencers.entrySet()) {
+                    Referencer kr = entry.getValue();
                     boolean krConsensus = kr.getConsensus(this.lastActivity);
                     consensus = consensus && krConsensus;
                     if (!consensus) {
@@ -521,17 +522,21 @@ public class GarbageCollector {
      * Run by the broadcasting thread
      */
     protected synchronized Collection<GCSimpleMessage> iteration() {
-        if (!this.isFinished() && this.body.isAlive()) {
-            String goodbye = this.checkConsensus();
-            this.iterations++;
-            if (goodbye != null) {
-                this.log(Level.INFO,
-                    "Goodbye because: " + goodbye + " after " + iterations +
-                    " iterations");
+        try {
+            if (!this.isFinished() && this.body.isAlive()) {
+                String goodbye = this.checkConsensus();
+                this.iterations++;
+                if (goodbye != null) {
+                    this.log(Level.INFO,
+                        "Goodbye because: " + goodbye + " after " + iterations +
+                        " iterations");
+                }
+                if ((this.cycleTimestamp == 0) && !this.isFinished()) {
+                    return this.broadcast();
+                }
             }
-            if ((this.cycleTimestamp == 0) && !this.isFinished()) {
-                return this.broadcast();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -625,22 +630,27 @@ public class GarbageCollector {
         UniqueID senderID = mesg.getSender();
         Referencer kr = this.referencers.get(senderID);
         GCSimpleResponse resp = null;
-        if (this.cycleTimestamp > 0) {
-            this.log(Level.DEBUG, "cycle to " + mesg.getSender().shortString());
-            if (kr == null) {
-                this.log(Level.FATAL, "Cycle notification to a newcomer");
+        try {
+            if (this.cycleTimestamp > 0) {
+                this.log(Level.DEBUG,
+                    "cycle to " + mesg.getSender().shortString());
+                if (kr == null) {
+                    this.log(Level.FATAL, "Cycle notification to a newcomer");
+                }
+                kr.setNotifiedCycle();
+                if (allReferencersNotifiedCycle()) {
+                    this.log(Level.INFO,
+                        "####### notified cycle to every known referencer => PAF");
+                    this.setFinishedState(FinishedState.CYCLIC);
+                    this.terminateBody();
+                }
+                resp = new GCTerminationResponse(this.lastActivity);
+            } else if (this.finished == FinishedState.ACYCLIC) {
+                throw new IllegalStateException(this.body.getID().shortString() +
+                    " thought it was alone but received " + mesg);
             }
-            kr.setNotifiedCycle();
-            if (allReferencersNotifiedCycle()) {
-                this.log(Level.INFO,
-                    "####### notified cycle to every known referencer => PAF");
-                this.setFinishedState(FinishedState.CYCLIC);
-                this.terminateBody();
-            }
-            resp = new GCTerminationResponse(this.lastActivity);
-        } else if (this.finished == FinishedState.ACYCLIC) {
-            throw new IllegalStateException(this.body.getID().shortString() +
-                " thought it was alone but received " + mesg);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (mesg.getLastActivity().strictlyMoreRecentThan(this.lastActivity)) {
