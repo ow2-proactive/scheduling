@@ -180,8 +180,23 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException;
 
+    /**
+     * The DGC broadcasting method, called every GarbageCollector.TTB between
+     * referenced active objects. The GC{Message,Response} may actually be
+     * composed of many GCSimple{Message,Response}.
+     *
+     * @param toSend the message
+     * @return its associated response
+     * @throws IOException if a pb occurs during this method call
+     */
     public GCResponse receiveGCMessage(GCMessage toSend)
         throws IOException;
 
+    /**
+     * Inform the DGC that an active object is pinned somewhere so cannot
+     * be garbage collected until being unregistered.
+     * @param registered true for a registration, false for an unregistration
+     * @throws IOException if a pb occurs during this method call
+     */
     public void setRegistered(boolean registered) throws IOException;
 }
