@@ -330,8 +330,8 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
         // dynamic classloading through runtimes
         // check system classloader when ProActive.jar is used (where by default : "proactive.classloader" == "disable")
-        if ("enable".equals(ProActiveConfiguration.getProperty(
-                        "proactive.classloader")) ||
+        if ("enable".equals(ProActiveConfiguration.getInstance()
+                                                      .getProperty("proactive.classloader")) ||
                 "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(
                     System.getProperty("java.system.class.loader"))) {
             javaCommand.append(

@@ -47,9 +47,10 @@ public class MOPClassLoader extends URLClassLoader {
 
     // retreives the optionnal byteCodeManipulator JVM arg
     // javassist is used by default
-    public static String BYTE_CODE_MANIPULATOR = (ProActiveConfiguration.getProperty(
-            "byteCodeManipulator") != null)
-        ? ProActiveConfiguration.getProperty("byteCodeManipulator") : "javassist";
+    public static String BYTE_CODE_MANIPULATOR = (ProActiveConfiguration.getInstance()
+                                                                        .getProperty("byteCodeManipulator") != null)
+        ? ProActiveConfiguration.getInstance().getProperty("byteCodeManipulator")
+        : "javassist";
     protected static Hashtable<String, byte[]> classDataCache = new Hashtable<String, byte[]>();
     protected static MOPClassLoader mopCl = null;
 

@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
      */
     @Override
     public void action() throws Exception {
-        String serverUrl = ProActiveConfiguration.getLocationServerRmi();
+        String serverUrl = ProActiveConfiguration.getInstance().getLocationServerRmi();
         server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);

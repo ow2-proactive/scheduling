@@ -119,7 +119,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntime proActiveRuntime;
 
     static {
-        if (ProActiveConfiguration.isForwarder()) {
+        if (ProActiveConfiguration.getInstance().isForwarder()) {
             proActiveRuntime = new ProActiveRuntimeForwarderImpl();
         } else {
             proActiveRuntime = new ProActiveRuntimeImpl();
@@ -1156,9 +1156,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             //                "_" + hostName;
             String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
 
-            if (ProActiveConfiguration.getProperty("proactive.runtime.name") != null) {
-                this.name = ProActiveConfiguration.getProperty(
-                        "proactive.runtime.name");
+            if (ProActiveConfiguration.getInstance()
+                                          .getProperty("proactive.runtime.name") != null) {
+                this.name = ProActiveConfiguration.getInstance()
+                                                  .getProperty("proactive.runtime.name");
 
                 if (this.name.indexOf("PA_JVM") < 0) {
                     runtimeLogger.warn(
@@ -1169,9 +1170,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 this.name = "PA_JVM" + random + "_" + hostName;
             }
 
-            if (ProActiveConfiguration.getProperty("proactive.jobid") != null) {
-                this.jobId = ProActiveConfiguration.getProperty(
-                        "proactive.jobid");
+            if (ProActiveConfiguration.getInstance()
+                                          .getProperty("proactive.jobid") != null) {
+                this.jobId = ProActiveConfiguration.getInstance()
+                                                   .getProperty("proactive.jobid");
             } else {
                 //if the property is null, no need to generate another random, take the one in name
                 this.jobId = "JOB-" + random;

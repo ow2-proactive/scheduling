@@ -60,7 +60,7 @@ public class Test extends FunctionalTest {
     @Override
 	public void action() throws Exception {
         //System.out.println( "Property "+System.getProperty("proactive.future.ac"));
-        String initial_ca_setting = ProActiveConfiguration.getProperty("proactive.future.ac");
+        String initial_ca_setting = ProActiveConfiguration.getInstance().getProperty("proactive.future.ac");
         if (!"enable".equals(initial_ca_setting)) {
             System.setProperty("proactive.future.ac", "enable");
         }

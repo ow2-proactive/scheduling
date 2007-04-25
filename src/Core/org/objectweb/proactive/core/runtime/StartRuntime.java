@@ -161,13 +161,14 @@ public class StartRuntime {
      */
     private void register(ProActiveRuntime PART) {
         try {
-            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
+                                                                                               .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
 
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
                 creatorID,
-                ProActiveConfiguration.getProperty(
-                    Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL), vmName);
+                ProActiveConfiguration.getInstance()
+                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
+                vmName);
         } catch (ProActiveException e) {
             e.printStackTrace();
 

@@ -104,7 +104,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     }
 
     protected Object readResolve() throws ObjectStreamException {
-        if (ProActiveConfiguration.isForwarder()) {
+        if (ProActiveConfiguration.getInstance().isForwarder()) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             if (!partf.registeredRuntimes.containsKey(urid)) {

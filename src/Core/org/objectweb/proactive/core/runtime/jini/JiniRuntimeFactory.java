@@ -71,8 +71,8 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     public JiniRuntimeFactory() throws java.io.IOException {
         // Obligatoire d'avoir le security manager fixe
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(ProActiveConfiguration.getProperty(
-                        "proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getInstance()
+                                                           .getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 

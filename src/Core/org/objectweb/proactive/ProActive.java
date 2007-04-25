@@ -778,9 +778,9 @@ public class ProActive {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(
-                    ProActiveConfiguration.getProperty(
-                        "components.creation.timeout")), TimeUnit.SECONDS);
+            threadPool.awaitTermination(new Integer(ProActiveConfiguration.getInstance()
+                                                                          .getProperty("components.creation.timeout")),
+                TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -831,9 +831,9 @@ public class ProActive {
         }
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(
-                    ProActiveConfiguration.getProperty(
-                        "components.creation.timeout")), TimeUnit.SECONDS);
+            threadPool.awaitTermination(new Integer(ProActiveConfiguration.getInstance()
+                                                                          .getProperty("components.creation.timeout")),
+                TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -1526,7 +1526,8 @@ public class ProActive {
      */
     public static ProActiveDescriptor getProactiveDescriptor()
         throws ProActiveException, IOException {
-        String padURL = ProActiveConfiguration.getProperty("proactive.pad");
+        String padURL = ProActiveConfiguration.getInstance()
+                                              .getProperty("proactive.pad");
 
         //System.out.println("pad propertie : " + padURL) ;
         if (padURL == null) {
@@ -1690,7 +1691,8 @@ public class ProActive {
                 "Cannot register such virtualNode since it results from a lookup!");
         }
         if (registrationProtocol == null) {
-            registrationProtocol = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+            registrationProtocol = ProActiveConfiguration.getInstance()
+                                                         .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);

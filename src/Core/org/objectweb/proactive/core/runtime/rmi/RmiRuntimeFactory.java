@@ -59,8 +59,8 @@ public class RmiRuntimeFactory extends RuntimeFactory {
     //
     public RmiRuntimeFactory() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(ProActiveConfiguration.getProperty(
-                        "proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getInstance()
+                                                           .getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 
@@ -103,7 +103,7 @@ public class RmiRuntimeFactory extends RuntimeFactory {
                 e.printStackTrace();
             }
 
-            if (ProActiveConfiguration.isForwarder()) {
+            if (ProActiveConfiguration.getInstance().isForwarder()) {
                 defaultRmiRuntime = createRuntimeAdapterForwarder();
             } else {
                 defaultRmiRuntime = createRuntimeAdapter();

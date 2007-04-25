@@ -157,7 +157,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
 
         // FAULT TOLERANCE
-        String ftstate = ProActiveConfiguration.getFTState();
+        String ftstate = ProActiveConfiguration.getInstance().getFTState();
         if ("enable".equals(ftstate)) {
             // if the object is a ProActive internal object, FT is disabled
             if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
@@ -165,7 +165,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
                     try {
                         // create the fault tolerance manager
-                        int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getFTProtocol());
+                        int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getInstance()
+                                                                                                .getFTProtocol());
                         this.ftmanager = factory.newFTManagerFactory()
                                                 .newFTManager(protocolSelector);
                         this.ftmanager.init(this);

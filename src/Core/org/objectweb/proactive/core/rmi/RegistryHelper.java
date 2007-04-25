@@ -56,7 +56,8 @@ public class RegistryHelper {
     // -- Constructors -----------------------------------------------
     //
     public RegistryHelper() {
-        String port = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_RMI_PORT);
+        String port = ProActiveConfiguration.getInstance()
+                                            .getProperty(Constants.PROPERTY_PA_RMI_PORT);
         if (port != null) {
             setRegistryPortNumber(new Integer(port).intValue());
         }

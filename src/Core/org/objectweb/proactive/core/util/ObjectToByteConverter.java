@@ -52,7 +52,8 @@ import sun.rmi.server.MarshalOutputStream;
 public class ObjectToByteConverter {
     public static byte[] convert(Object o) throws ProActiveException {
         try {
-            String mode = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+            String mode = ProActiveConfiguration.getInstance()
+                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
             //here we check wether or not we are running in ibis
             if ("ibis".equals(mode)) {

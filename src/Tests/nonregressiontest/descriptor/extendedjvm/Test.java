@@ -83,7 +83,7 @@ public class Test extends FunctionalTest {
 	public void initTest() throws Exception {
         String fileName = null;
 
-        if ("ibis".equals(ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+        if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             fileName = "JVMExtensionIbis";
         } else {
             fileName = "JVMExtension";

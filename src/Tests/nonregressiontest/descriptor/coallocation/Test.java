@@ -51,7 +51,7 @@ public class Test extends FunctionalTest {
     private static String FS = File.separator;
     private static String AGENT_XML_LOCATION_UNIX = null;  
     static {
-    	  if ("ibis".equals(ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+    	  if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
     		  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
               "/nonregressiontest/descriptor/coallocation/coallocationIbis.xml")
                                                                 .getPath();

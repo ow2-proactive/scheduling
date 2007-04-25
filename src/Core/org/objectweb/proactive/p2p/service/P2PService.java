@@ -89,14 +89,15 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * Reference to the current Node.
      */
     private Node p2pServiceNode = null;
-    private static final int MSG_MEMORY = Integer.parseInt(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_MSG_MEMORY));
-    private static final int NOA = Integer.parseInt(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_NOA));
-    private static final int EXPL_MSG = Integer.parseInt(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
-    private static final long ACQ_TO = Long.parseLong(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+    private static final int MSG_MEMORY = Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                                                 .getProperty(P2PConstants.PROPERTY_MSG_MEMORY));
+    private static final int NOA = Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                                          .getProperty(P2PConstants.PROPERTY_NOA));
+    private static final int EXPL_MSG = Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                                               .getProperty(P2PConstants.PROPERTY_EXPLORING_MSG)) -
+        1;
+    private static final long ACQ_TO = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                            .getProperty(P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
 
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.

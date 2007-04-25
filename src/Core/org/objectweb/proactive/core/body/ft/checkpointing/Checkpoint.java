@@ -73,8 +73,8 @@ public class Checkpoint implements java.io.Serializable {
             // put futures in copy mode
             bodyToCheckpoint.getFuturePool().setCopyMode();
             this.bodyID = bodyToCheckpoint.getID();
-            String codebase = ProActiveConfiguration.getProperty(
-                    "java.rmi.server.codebase");
+            String codebase = ProActiveConfiguration.getInstance()
+                                                    .getProperty("java.rmi.server.codebase");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             CheckpointingOutputStream objectOutputStream = new CheckpointingOutputStream(byteArrayOutputStream,
                     codebase + " " + additionalCodebase);

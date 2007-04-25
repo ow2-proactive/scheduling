@@ -48,11 +48,11 @@ public class ClassServerHelper {
     //
     public ClassServerHelper() {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(ProActiveConfiguration.getProperty(
-                        "proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getInstance()
+                                                           .getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
-        if (ProActiveConfiguration.osgiServletEnabled()) {
+        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
             this.shouldCreateClassServer = false;
         }
     }
@@ -85,7 +85,7 @@ public class ClassServerHelper {
 
     public synchronized String initializeClassServer()
         throws java.io.IOException {
-        if (ProActiveConfiguration.osgiServletEnabled()) {
+        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
             return this.getCodebase();
         }
 
@@ -114,7 +114,7 @@ public class ClassServerHelper {
         if (SshParameters.getSshTunneling()) {
             codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
                 ClassServer.getServerSocketPort() + "/";
-        } else if (ProActiveConfiguration.osgiServletEnabled()) {
+        } else if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
             codebase = ClassServerServlet.getUrl() + "doc";
         } else {
             codebase = "http://" + currentClassServer.getHostname() + ":" +

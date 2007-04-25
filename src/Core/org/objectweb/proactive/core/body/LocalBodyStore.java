@@ -236,8 +236,8 @@ public class LocalBodyStore {
         localBodyMap.removeBody(body.bodyID);
         bodyEventProducer.fireBodyRemoved(body);
         if ((this.localBodyMap.size() == 0) &&
-                "true".equals(ProActiveConfiguration.getProperty(
-                        "proactive.exit_on_empty"))) {
+                "true".equals(ProActiveConfiguration.getInstance()
+                                                        .getProperty("proactive.exit_on_empty"))) {
             ProActive.exitSuccess();
         }
     }

@@ -134,7 +134,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
          *  All calls doing on the adapter will be send to the forwarder which
          *  will forward the call.
          */
-        if (ProActiveConfiguration.isForwarder()) {
+        if (ProActiveConfiguration.getInstance().isForwarder()) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             try {

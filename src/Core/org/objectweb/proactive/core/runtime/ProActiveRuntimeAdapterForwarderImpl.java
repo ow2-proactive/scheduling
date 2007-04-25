@@ -117,7 +117,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
 
-        if (ProActiveConfiguration.isForwarder()) {
+        if (ProActiveConfiguration.getInstance().isForwarder()) {
             // on a forwarder and during the deserialization of a ProActiveAdapterForwarderImpl.
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 

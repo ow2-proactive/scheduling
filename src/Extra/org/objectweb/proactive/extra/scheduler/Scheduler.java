@@ -152,11 +152,11 @@ public class Scheduler implements RunActive, RequestFilter {
      */
     public void configureScheduler() throws Exception {
         try {
-            SCHEDULER_TIMEOUT = Long.parseLong(ProActiveConfiguration.getProperty(
-                        "proactive.scheduler.scheduler_timeout"));
+            SCHEDULER_TIMEOUT = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                     .getProperty("proactive.scheduler.scheduler_timeout"));
 
-            TIME_BEFORE_TEST_ALIVE = Long.parseLong(ProActiveConfiguration.getProperty(
-                        "proactive.scheduler.time_before_test_alive"));
+            TIME_BEFORE_TEST_ALIVE = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                          .getProperty("proactive.scheduler.time_before_test_alive"));
 
             if (this.SCHEDULER_TIMEOUT < 1) {
                 throw new Exception(

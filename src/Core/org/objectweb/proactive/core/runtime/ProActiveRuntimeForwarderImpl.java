@@ -107,8 +107,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
         // Create the BodyForwarder, protocol specific
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
-                    ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                    ProActiveConfiguration.getInstance()
+                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is " +
                     Constants.IBIS_PROTOCOL_IDENTIFIER);
@@ -118,8 +118,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
             // TODO support Ibis forwarding
         } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
-                    ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                    ProActiveConfiguration.getInstance()
+                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is " +
                     Constants.XMLHTTP_PROTOCOL_IDENTIFIER);
@@ -129,8 +129,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
             // TODO support Http forwarding
         } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
-                    ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                    ProActiveConfiguration.getInstance()
+                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is rmissh");
             }
@@ -173,8 +173,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     }
 
     public boolean isRoot() {
-        String val = ProActiveConfiguration.getProperty(
-                "proactive.hierarchicalRuntime");
+        String val = ProActiveConfiguration.getInstance()
+                                           .getProperty("proactive.hierarchicalRuntime");
 
         return ((val != null) && val.equals("root"));
     }

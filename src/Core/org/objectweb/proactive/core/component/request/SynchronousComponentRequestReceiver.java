@@ -67,8 +67,8 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
         throws IOException {
         if (r instanceof ComponentRequest) {
             if (!((ComponentRequest) r).isControllerRequest()) {
-                if ("true".equals(ProActiveConfiguration.getProperty(
-                                "proactive.components.use_shortcuts"))) {
+                if ("true".equals(ProActiveConfiguration.getInstance()
+                                                            .getProperty("proactive.components.use_shortcuts"))) {
                     if (!((ComponentBody) bodyReceiver).getProActiveComponentImpl()
                               .getInputInterceptors().isEmpty() ||
                             !((ComponentBody) bodyReceiver).getProActiveComponentImpl()

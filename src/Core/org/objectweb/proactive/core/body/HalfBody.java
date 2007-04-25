@@ -98,11 +98,12 @@ public class HalfBody extends AbstractBody {
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
 
         // FAULT TOLERANCE
-        String ftstate = ProActiveConfiguration.getFTState();
+        String ftstate = ProActiveConfiguration.getInstance().getFTState();
         if ("enable".equals(ftstate)) {
             try {
                 // create the fault-tolerance manager
-                int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getFTProtocol());
+                int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getInstance()
+                                                                                        .getFTProtocol());
                 this.ftmanager = factory.newFTManagerFactory()
                                         .newHalfFTManager(protocolSelector);
                 this.ftmanager.init(this);

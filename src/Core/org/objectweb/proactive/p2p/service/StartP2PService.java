@@ -375,9 +375,11 @@ public class StartP2PService implements P2PConstants {
             logger.debug("****              with bootclasspath " +
                 System.getProperty("sun.boot.class.path"));
             logger.debug("Acquisition method: " +
-                ProActiveConfiguration.getProperty("proactive.p2p.acq"));
+                ProActiveConfiguration.getInstance()
+                                      .getProperty("proactive.p2p.acq"));
             logger.debug("Port number: " +
-                ProActiveConfiguration.getProperty("proactive.p2p.port"));
+                ProActiveConfiguration.getInstance()
+                                      .getProperty("proactive.p2p.port"));
 
             if (parsed.peerListFile != null) {
                 logger.debug("Peer list file: " + parsed.peerListFile);
@@ -436,13 +438,15 @@ public class StartP2PService implements P2PConstants {
             String url = (String) peerList.get(i);
 
             if (url.indexOf("//") < 0) {
-                url = ProActiveConfiguration.getProperty(P2PConstants.PROPERTY_ACQUISITION) +
+                url = ProActiveConfiguration.getInstance()
+                                            .getProperty(P2PConstants.PROPERTY_ACQUISITION) +
                     "://" + url;
             }
 
             if (!url.matches(".*:[0-9]+.*")) {
                 url += (":" +
-                ProActiveConfiguration.getProperty(P2PConstants.PROPERTY_PORT));
+                ProActiveConfiguration.getInstance()
+                                      .getProperty(P2PConstants.PROPERTY_PORT));
             }
 
             newPeerList.add(url);
@@ -461,20 +465,23 @@ public class StartP2PService implements P2PConstants {
         this.peers = StartP2PService.checkingPeersUrl(this.peers);
 
         // Starting new Active P2P Service
-        String acquisitionMethod = ProActiveConfiguration.getProperty(P2PConstants.PROPERTY_ACQUISITION);
-        String portNumber = ProActiveConfiguration.getProperty(P2PConstants.PROPERTY_PORT);
+        String acquisitionMethod = ProActiveConfiguration.getInstance()
+                                                         .getProperty(P2PConstants.PROPERTY_ACQUISITION);
+        String portNumber = ProActiveConfiguration.getInstance()
+                                                  .getProperty(P2PConstants.PROPERTY_PORT);
 
         // Keep previous port value
         String bckPortValue = null;
 
         if (!acquisitionMethod.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            bckPortValue = ProActiveConfiguration.getProperty("proactive." +
+            bckPortValue = ProActiveConfiguration.getInstance()
+                                                 .getProperty("proactive." +
                     acquisitionMethod + ".port");
             System.setProperty("proactive." + acquisitionMethod + ".port",
                 portNumber);
         } else {
-            bckPortValue = ProActiveConfiguration.getProperty(
-                    "proactive.rmi.port");
+            bckPortValue = ProActiveConfiguration.getInstance()
+                                                 .getProperty("proactive.rmi.port");
             System.setProperty("proactive.rmi.port", portNumber);
         }
 
@@ -532,19 +539,31 @@ public class StartP2PService implements P2PConstants {
     }
 
     private static class Args {
-        private String acquisitionMethod = ProActiveConfiguration.getProperty(PROPERTY_ACQUISITION);
-        private String portNumber = ProActiveConfiguration.getProperty(PROPERTY_PORT);
-        private String noa = ProActiveConfiguration.getProperty(PROPERTY_NOA);
-        private String ttu = ProActiveConfiguration.getProperty(PROPERTY_TTU);
-        private String ttl = ProActiveConfiguration.getProperty(PROPERTY_TTL);
-        private String msg_capacity = ProActiveConfiguration.getProperty(PROPERTY_MSG_MEMORY);
-        private String expl_msg = ProActiveConfiguration.getProperty(PROPERTY_EXPLORING_MSG);
-        private String nodes_acq_to = ProActiveConfiguration.getProperty(PROPERTY_NODES_ACQUISITION_T0);
-        private String lookup_freq = ProActiveConfiguration.getProperty(PROPERTY_LOOKUP_FREQ);
-        private String multi_proc_nodes = ProActiveConfiguration.getProperty(PROPERTY_MULTI_PROC_NODES);
-        private String xml_path = ProActiveConfiguration.getProperty(PROPERPY_XML_PATH);
+        private String acquisitionMethod = ProActiveConfiguration.getInstance()
+                                                                 .getProperty(PROPERTY_ACQUISITION);
+        private String portNumber = ProActiveConfiguration.getInstance()
+                                                          .getProperty(PROPERTY_PORT);
+        private String noa = ProActiveConfiguration.getInstance()
+                                                   .getProperty(PROPERTY_NOA);
+        private String ttu = ProActiveConfiguration.getInstance()
+                                                   .getProperty(PROPERTY_TTU);
+        private String ttl = ProActiveConfiguration.getInstance()
+                                                   .getProperty(PROPERTY_TTL);
+        private String msg_capacity = ProActiveConfiguration.getInstance()
+                                                            .getProperty(PROPERTY_MSG_MEMORY);
+        private String expl_msg = ProActiveConfiguration.getInstance()
+                                                        .getProperty(PROPERTY_EXPLORING_MSG);
+        private String nodes_acq_to = ProActiveConfiguration.getInstance()
+                                                            .getProperty(PROPERTY_NODES_ACQUISITION_T0);
+        private String lookup_freq = ProActiveConfiguration.getInstance()
+                                                           .getProperty(PROPERTY_LOOKUP_FREQ);
+        private String multi_proc_nodes = ProActiveConfiguration.getInstance()
+                                                                .getProperty(PROPERTY_MULTI_PROC_NODES);
+        private String xml_path = ProActiveConfiguration.getInstance()
+                                                        .getProperty(PROPERPY_XML_PATH);
         private String peerListFile = null;
         private Vector peers = new Vector();
-        private String no_sharing = ProActiveConfiguration.getProperty(PROPERTY_NO_SHARING);
+        private String no_sharing = ProActiveConfiguration.getInstance()
+                                                          .getProperty(PROPERTY_NO_SHARING);
     }
 }

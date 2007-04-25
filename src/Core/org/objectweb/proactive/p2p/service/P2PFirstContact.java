@@ -95,8 +95,8 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
                 connectingPeer();
             }
             try {
-                Thread.sleep(Long.parseLong(ProActiveConfiguration.getProperty(
-                            PROPERTY_TTU)));
+                Thread.sleep(Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                  .getProperty(PROPERTY_TTU)));
             } catch (Exception e) {
             }
         }

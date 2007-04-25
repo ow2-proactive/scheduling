@@ -243,12 +243,14 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         try {
             int port = -1;
-            String protocol = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+            String protocol = ProActiveConfiguration.getInstance()
+                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
             if (!protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) &&
                     !protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-                port = Integer.parseInt(ProActiveConfiguration.getProperty(
-                            "proactive." + protocol + ".port"));
+                port = Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                              .getProperty("proactive." +
+                            protocol + ".port"));
             }
 
             localhost = UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(

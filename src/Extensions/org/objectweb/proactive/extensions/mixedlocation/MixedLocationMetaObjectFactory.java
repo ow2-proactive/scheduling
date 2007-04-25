@@ -123,8 +123,8 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
     @Override
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
-                    ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                    ProActiveConfiguration.getInstance()
+                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is ibis");
             }

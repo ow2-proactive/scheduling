@@ -78,8 +78,8 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
         /* Depending on the system property UnicoreProActiveClient
          * can be forked or called directly.
          */
-        String forkclient = ProActiveConfiguration.getProperty(
-                "proactive.unicore.forkclient");
+        String forkclient = ProActiveConfiguration.getInstance()
+                                                  .getProperty("proactive.unicore.forkclient");
 
         if (forkclient.equalsIgnoreCase("false")) {
             logger.debug("Not Forking UnicoreProActiveClient");

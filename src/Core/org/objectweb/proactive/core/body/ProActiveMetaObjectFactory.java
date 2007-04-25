@@ -363,16 +363,16 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
                 if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
-                            ProActiveConfiguration.getProperty(
-                                Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                            ProActiveConfiguration.getInstance()
+                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
                             "Using ibis factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
                 } else if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(
-                            ProActiveConfiguration.getProperty(
-                                Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                            ProActiveConfiguration.getInstance()
+                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
                             "Using http factory for creating remote body");
@@ -380,8 +380,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
 
                     return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
                 } else if (Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(
-                            ProActiveConfiguration.getProperty(
-                                Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                            ProActiveConfiguration.getInstance()
+                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
                             "Using rmissh factory for creating remote body");

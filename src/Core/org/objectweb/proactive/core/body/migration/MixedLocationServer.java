@@ -213,7 +213,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
 
     public static void main(String[] args) {
         ProActiveConfiguration.load();
-        String name = ProActiveConfiguration.getLocationServerRmi();
+        String name = ProActiveConfiguration.getInstance().getLocationServerRmi();
 
         Object[] arg = new Object[1];
         arg[0] = name;

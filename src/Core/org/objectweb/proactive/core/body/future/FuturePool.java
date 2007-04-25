@@ -82,7 +82,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures = new FutureMap();
         valuesForFutures = new java.util.HashMap<String, FutureResult>();
         this.newState = false;
-        if ("enable".equals(ProActiveConfiguration.getACState())) {
+        if ("enable".equals(ProActiveConfiguration.getInstance().getACState())) {
             this.acEnabled = true;
         } else {
             this.acEnabled = false;

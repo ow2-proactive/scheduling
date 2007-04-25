@@ -105,8 +105,8 @@ public class ProActiveComponentRepresentativeImpl
     public ProActiveComponentRepresentativeImpl(ComponentType componentType,
         String hierarchicalType, String controllersConfigFileLocation) {
         this.componentType = componentType;
-        useShortcuts = ("true".equals(ProActiveConfiguration.getProperty(
-                    "proactive.components.use_shortcuts")));
+        useShortcuts = ("true".equals(ProActiveConfiguration.getInstance()
+                                                            .getProperty("proactive.components.use_shortcuts")));
         this.hierarchicalType = hierarchicalType;
         addControllers(componentType, controllersConfigFileLocation);
 

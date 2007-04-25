@@ -56,18 +56,28 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveConfiguration {
     protected static Properties properties;
     protected static final String PROACTIVE_CONFIG_FILENAME = "ProActiveConfiguration.xml";
+    protected static final String PROACTIVE_USER_CONFIG_FILENAME = "." +
+        PROACTIVE_CONFIG_FILENAME;
     protected static ProActiveConfiguration singleton;
     protected static boolean isLoaded = false;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
+
+    // Cached value since isForwarder is frequently called
+    private static boolean isForwarder;
+
+    static {
+        singleton = new ProActiveConfiguration();
+        String prop = System.getProperty("proactive.hierarchicalRuntime");
+        isForwarder = ((prop != null) &&
+            (prop.equals("true") || prop.equals("root")));
+    }
 
     private ProActiveConfiguration() {
         load();
     }
 
-    protected static synchronized void createConfiguration() {
-        if (ProActiveConfiguration.singleton == null) {
-            ProActiveConfiguration.singleton = new ProActiveConfiguration();
-        }
+    public static ProActiveConfiguration getInstance() {
+        return singleton;
     }
 
     /**
@@ -94,14 +104,13 @@ public class ProActiveConfiguration {
             filename = null;
 
             /* First we look for the user defined properties */
-            if (ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_CONFIGURATION_FILE) != null) {
+            if (System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE) != null) {
                 // if specified as a system property
-                filename = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE);
+                filename = System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE);
             } else {
                 // or if the file exists in the user home dir
                 File f = new File(System.getProperty("user.home") +
-                        File.separator + "." + PROACTIVE_CONFIG_FILENAME);
+                        File.separator + PROACTIVE_USER_CONFIG_FILENAME);
                 if (f.exists()) {
                     filename = f.getAbsolutePath();
                 }
@@ -132,13 +141,6 @@ public class ProActiveConfiguration {
         }
     }
 
-    public synchronized static ProActiveConfiguration getConfiguration() {
-        if (ProActiveConfiguration.singleton == null) {
-            ProActiveConfiguration.createConfiguration();
-        }
-        return singleton;
-    }
-
     /**
      * Add the loaded properties to the system
      */
@@ -163,84 +165,84 @@ public class ProActiveConfiguration {
         }
     }
 
-    public static String getProperty(String property) {
+    /**
+     * returns the value of a property or null
+     * @param property the property
+     * @return the value of the property
+     */
+    public String getProperty(String property) {
         return System.getProperty(property);
     }
 
-    public static String getProperty(String property, String defaultValue) {
+    /**
+     * returns the value of a property or the default value
+     * @param property the property
+     * @return the value of the property or the default value if the property does not exist
+     */
+    public String getProperty(String property, String defaultValue) {
         return System.getProperty(property, defaultValue);
     }
 
-    public static String getLocationServerClass() {
+    public String getLocationServerClass() {
         return System.getProperty("proactive.locationserver");
     }
 
-    public static String getLocationServerRmi() {
+    public String getLocationServerRmi() {
         return System.getProperties().getProperty("proactive.locationserver.rmi");
     }
 
-    public static String getACState() {
+    public String getACState() {
         return System.getProperty("proactive.future.ac");
     }
 
-    public static String getSchemaValidationState() {
+    public String getSchemaValidationState() {
         return System.getProperty("schema.validation");
     }
 
     // FAULT TOLERANCE
-    public static String getFTState() {
+    public String getFTState() {
         return System.getProperty("proactive.ft");
     }
 
-    public static String getCheckpointServer() {
+    public String getCheckpointServer() {
         return System.getProperty("proactive.ft.server.checkpoint");
     }
 
-    public static String getLocationServer() {
+    public String getLocationServer() {
         return System.getProperty("proactive.ft.server.location");
     }
 
-    public static String getRecoveryServer() {
+    public String getRecoveryServer() {
         return System.getProperty("proactive.ft.server.recovery");
     }
 
-    public static String getGlobalFTServer() {
+    public String getGlobalFTServer() {
         return System.getProperty("proactive.ft.server.global");
     }
 
-    public static String getTTCValue() {
+    public String getTTCValue() {
         return System.getProperty("proactive.ft.ttc");
     }
 
-    public static String getAttachedResourceServer() {
+    public String getAttachedResourceServer() {
         return System.getProperty("proactive.ft.server.resource");
     }
 
-    public static String getFTProtocol() {
+    public String getFTProtocol() {
         return System.getProperty("proactive.ft.protocol");
     }
 
-    public static boolean osgiServletEnabled() {
+    public boolean osgiServletEnabled() {
         return "enabled".equals(System.getProperty("proactive.http.servlet"));
-    }
-
-    // Cached value since isForwarder is frequently called
-    private static boolean isForwarder;
-
-    static {
-        ProActiveConfiguration.createConfiguration();
-        String prop = System.getProperty("proactive.hierarchicalRuntime");
-        isForwarder = ((prop != null) &&
-            (prop.equals("true") || prop.equals("root")));
-    }
-
-    public static boolean isForwarder() {
-        return isForwarder;
     }
 
     public static String getGroupInformation() {
         return System.getProperty("proactive.groupInformation",
             UniqueID.getCurrentVMID().toString() + "~-1");
+    }
+
+    public boolean isForwarder() {
+        return isForwarder;
     }
 
     /**
@@ -249,7 +251,7 @@ public class ProActiveConfiguration {
      * @param key the of the property
      * @param value the value of the property
      */
-    public static void setProperty(String key, String value) {
+    public void setProperty(String key, String value) {
         properties.setProperty(key, value);
         System.setProperty(key, value);
     }

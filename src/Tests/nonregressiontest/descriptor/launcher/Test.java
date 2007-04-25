@@ -55,7 +55,7 @@ public class Test extends FunctionalTest {
 	private static String XML_LOCATION;
 
     static {
-    	  if ("ibis".equals(ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+    	  if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
     		  XML_LOCATION = Test.class.getResource(
               "/nonregressiontest/descriptor/launcher/TestLauncherIbis.xml").getPath();
           } else {

@@ -69,12 +69,12 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     private P2PService acquaintances = null;
     private P2PService acquaintancesActived = null;
     private Group<P2PService> groupOfAcquaintances = null;
-    private static final long TTU = Long.parseLong(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_TTU));
-    private static final int NOA = Integer.parseInt(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_NOA));
-    private static final int TTL = Integer.parseInt(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_TTL));
+    private static final long TTU = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                         .getProperty(P2PConstants.PROPERTY_TTU));
+    private static final int NOA = Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                                          .getProperty(P2PConstants.PROPERTY_NOA));
+    private static final int TTL = Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                                          .getProperty(P2PConstants.PROPERTY_TTL));
 
     /**
      * The empty constructor for activating.

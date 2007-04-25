@@ -59,8 +59,8 @@ public class ObjA implements InitActive, EndActive {
     }
 
     public String getInfo() {
-        String property = ProActiveConfiguration.getProperty(
-                "proactive.property");
+        String property = ProActiveConfiguration.getInstance()
+                                                .getProperty("proactive.property");
         if (property != null) {
             return s + " " + property;
         } else {

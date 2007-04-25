@@ -74,11 +74,13 @@ public class HalfFTManagerCIC extends FTManager {
         //super.init(owner);
         // a half body need only a location server...
         try {
-            String urlGlobal = ProActiveConfiguration.getGlobalFTServer();
+            String urlGlobal = ProActiveConfiguration.getInstance()
+                                                     .getGlobalFTServer();
             if (urlGlobal != null) {
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
             } else {
-                String urlLocation = ProActiveConfiguration.getLocationServer();
+                String urlLocation = ProActiveConfiguration.getInstance()
+                                                           .getLocationServer();
                 if (urlLocation != null) {
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                 } else {

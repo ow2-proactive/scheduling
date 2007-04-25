@@ -80,33 +80,37 @@ public class MigrationManagerImpl extends AbstractEventProducer
     public MigrationManagerImpl() {
         super(true);
 
-        if (ProActiveConfiguration.getProperty("proactive.mixedlocation.ttl") != null) {
-            this.ttl = Integer.valueOf(ProActiveConfiguration.getProperty(
-                        "proactive.mixedlocation.ttl")).intValue();
+        if (ProActiveConfiguration.getInstance()
+                                      .getProperty("proactive.mixedlocation.ttl") != null) {
+            this.ttl = Integer.valueOf(ProActiveConfiguration.getInstance()
+                                                             .getProperty("proactive.mixedlocation.ttl"))
+                              .intValue();
         } else {
             this.ttl = INFINITE_TTL;
         }
 
-        if (ProActiveConfiguration.getProperty(
-                    "proactive.mixedlocation.updatingForwarder") != null) {
-            this.updatingForwarder = Boolean.parseBoolean(ProActiveConfiguration.getProperty(
-                        "proactive.mixedlocation.updatingForwarder"));
+        if (ProActiveConfiguration.getInstance()
+                                      .getProperty("proactive.mixedlocation.updatingForwarder") != null) {
+            this.updatingForwarder = Boolean.parseBoolean(ProActiveConfiguration.getInstance()
+                                                                                .getProperty("proactive.mixedlocation.updatingForwarder"));
         } else {
             this.updatingForwarder = false;
         }
 
-        if (ProActiveConfiguration.getProperty(
-                    "proactive.mixedlocation.maxMigrationNb") != null) {
-            this.maxMigrationNb = Integer.valueOf(ProActiveConfiguration.getProperty(
-                        "proactive.mixedlocation.maxMigrationNb")).intValue();
+        if (ProActiveConfiguration.getInstance()
+                                      .getProperty("proactive.mixedlocation.maxMigrationNb") != null) {
+            this.maxMigrationNb = Integer.valueOf(ProActiveConfiguration.getInstance()
+                                                                        .getProperty("proactive.mixedlocation.maxMigrationNb"))
+                                         .intValue();
         } else {
             this.maxMigrationNb = INFINITE_MAX_MIGRATION_NB;
         }
 
-        if (ProActiveConfiguration.getProperty(
-                    "proactive.mixedlocation.maxTimeOnSite") != null) {
-            this.maxTimeOnSite = Integer.valueOf(ProActiveConfiguration.getProperty(
-                        "proactive.mixedlocation.maxTimeOnSite")).intValue();
+        if (ProActiveConfiguration.getInstance()
+                                      .getProperty("proactive.mixedlocation.maxTimeOnSite") != null) {
+            this.maxTimeOnSite = Integer.valueOf(ProActiveConfiguration.getInstance()
+                                                                       .getProperty("proactive.mixedlocation.maxTimeOnSite"))
+                                        .intValue();
         } else {
             this.maxTimeOnSite = INFINITE_MAX_TIME_ON_SITE;
         }

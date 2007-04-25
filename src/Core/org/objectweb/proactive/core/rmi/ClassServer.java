@@ -51,12 +51,14 @@ public class ClassServer implements Runnable {
     static {
         String newport;
 
-        if (ProActiveConfiguration.getProperty(
-                    Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
-            newport = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
+        if (ProActiveConfiguration.getInstance()
+                                      .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
+            newport = ProActiveConfiguration.getInstance()
+                                            .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         } else {
             newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            ProActiveConfiguration.setProperty(Constants.PROPERTY_PA_XMLHTTP_PORT,
+            ProActiveConfiguration.getInstance()
+                                  .setProperty(Constants.PROPERTY_PA_XMLHTTP_PORT,
                 newport);
         }
     }
@@ -78,8 +80,9 @@ public class ClassServer implements Runnable {
     protected ClassServer(int port_) throws java.io.IOException {
         if (port == 0) {
             port = boundServerSocket(Integer.parseInt(
-                        ProActiveConfiguration.getProperty(
-                            "proactive.http.port")), MAX_RETRY);
+                        ProActiveConfiguration.getInstance()
+                                              .getProperty("proactive.http.port")),
+                    MAX_RETRY);
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
@@ -161,7 +164,7 @@ public class ClassServer implements Runnable {
     }
 
     public static int getServerSocketPort() {
-        if (ProActiveConfiguration.osgiServletEnabled()) {
+        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
             return ClassServerServlet.getPort();
         }
         return port;
@@ -173,7 +176,7 @@ public class ClassServer implements Runnable {
 
     public static String getUrl() {
         try {
-            if (ProActiveConfiguration.osgiServletEnabled()) {
+            if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
                 return ClassServerServlet.getUrl();
             } else {
                 return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(

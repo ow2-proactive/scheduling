@@ -173,7 +173,7 @@ public class HTTPRequestHandler extends Thread {
                 bytes = new byte[0];
             }
 
-            if (!ProActiveConfiguration.osgiServletEnabled()) {
+            if (!ProActiveConfiguration.getInstance().osgiServletEnabled()) {
                 dOut.writeBytes(statusLine + "\r\n");
                 dOut.writeBytes("Content-Length: " + bytes.length + "\r\n");
                 dOut.writeBytes("Content-Type: " + contentType + "\r\n");

@@ -66,12 +66,12 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     private Vector<Node> waitingNodesList;
     private Vector<String> nodesToKillList;
     private long expirationTime;
-    private static final long TIMEOUT = Long.parseLong(ProActiveConfiguration.getProperty(
-                PROPERTY_NODES_ACQUISITION_T0));
-    private static final long LOOKUP_FREQ = Long.parseLong(ProActiveConfiguration.getProperty(
-                PROPERTY_LOOKUP_FREQ));
-    private static final int TTL = Integer.parseInt(ProActiveConfiguration.getProperty(
-                PROPERTY_TTL));
+    private static final long TIMEOUT = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                             .getProperty(PROPERTY_NODES_ACQUISITION_T0));
+    private static final long LOOKUP_FREQ = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                                 .getProperty(PROPERTY_LOOKUP_FREQ));
+    private static final int TTL = Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                                          .getProperty(PROPERTY_TTL));
     private int numberOfAskedNodes;
     private int acquiredNodes = 0;
     private P2PService localP2pService;
@@ -154,7 +154,8 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             // Unregister the remote runtime
             this.paRuntime.unregister(remoteRuntime, remoteRuntime.getURL(),
                 "p2p",
-                ProActiveConfiguration.getProperty(PROPERTY_ACQUISITION) + ":",
+                ProActiveConfiguration.getInstance()
+                                      .getProperty(PROPERTY_ACQUISITION) + ":",
                 remoteRuntime.getVMInformation().getName());
         } catch (Exception e) {
             logger.info("Node @" + node + " already down");
@@ -207,7 +208,8 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 remoteRt.addAcquaintance(this.parUrl);
                 this.paRuntime.addAcquaintance(remoteRt.getURL());
                 this.paRuntime.register(remoteRt, remoteRt.getURL(), "p2p",
-                    ProActiveConfiguration.getProperty(PROPERTY_ACQUISITION) +
+                    ProActiveConfiguration.getInstance()
+                                          .getProperty(PROPERTY_ACQUISITION) +
                     ":", remoteRt.getVMInformation().getName());
             } catch (ProActiveException e) {
                 logger.warn("Couldn't recgister the remote runtime", e);
@@ -233,7 +235,8 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 remoteRt.addAcquaintance(this.parUrl);
                 this.paRuntime.addAcquaintance(remoteRt.getURL());
                 this.paRuntime.register(remoteRt, remoteRt.getURL(), "p2p",
-                    ProActiveConfiguration.getProperty(PROPERTY_ACQUISITION) +
+                    ProActiveConfiguration.getInstance()
+                                          .getProperty(PROPERTY_ACQUISITION) +
                     ":", remoteRt.getVMInformation().getName());
             } catch (ProActiveException e) {
                 logger.warn("Couldn't recgister the remote runtime", e);

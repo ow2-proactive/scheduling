@@ -74,7 +74,7 @@ public class Test extends FunctionalTest {
      */
     @Override
 	public void initTest() throws Exception {
-        String port = ProActiveConfiguration.getProperty("proactive.rmi.port");
+        String port = ProActiveConfiguration.getInstance().getProperty("proactive.rmi.port");
         if (port != null) {
             rmiURL = UrlBuilder.buildUrl("localhost",
                     "RMINode" + System.currentTimeMillis(), Constants.RMI_PROTOCOL_IDENTIFIER,

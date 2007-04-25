@@ -95,7 +95,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         isLocal = true;
         this.localruntime = ProActiveRuntimeImpl.getProActiveRuntime();
 
-        if (ProActiveConfiguration.osgiServletEnabled()) {
+        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
             this.url = ClassServerServlet.getUrl();
         } else {
             this.url = ClassServer.getUrl();

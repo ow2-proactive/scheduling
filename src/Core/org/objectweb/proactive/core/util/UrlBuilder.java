@@ -106,16 +106,16 @@ public class UrlBuilder {
      */
     public static int getDefaultPortForProtocol(String protocol) {
         if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            if (ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
-                return Integer.parseInt(ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_XMLHTTP_PORT));
+            if (ProActiveConfiguration.getInstance()
+                                          .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
+                return Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                              .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT));
             }
         } else if ((Constants.RMI_PROTOCOL_IDENTIFIER.equals(protocol)) ||
                 Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol) ||
                 Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            return Integer.parseInt(ProActiveConfiguration.getProperty(
-                    Constants.PROPERTY_PA_RMI_PORT));
+            return Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                          .getProperty(Constants.PROPERTY_PA_RMI_PORT));
         }
 
         // default would be to return the RMI default port
@@ -186,13 +186,16 @@ public class UrlBuilder {
      */
     public static String buildUrlFromProperties(String host, String name) {
         String port = null;
-        String protocol = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        String protocol = ProActiveConfiguration.getInstance()
+                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
                 protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_RMI_PORT);
+            port = ProActiveConfiguration.getInstance()
+                                         .getProperty(Constants.PROPERTY_PA_RMI_PORT);
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            port = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
+            port = ProActiveConfiguration.getInstance()
+                                         .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         }
         if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) ||
                 (port == null)) {
@@ -310,16 +313,19 @@ public class UrlBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
-        if (ProActiveConfiguration.getProperty(
-                    Constants.PROPERTY_PA_RUNTIME_IPADDRESS) != null) {
-            return ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS);
+        if (ProActiveConfiguration.getInstance()
+                                      .getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS) != null) {
+            return ProActiveConfiguration.getInstance()
+                                         .getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS);
         }
 
-        if (ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_HOSTNAME) != null) {
-            return ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_HOSTNAME);
+        if (ProActiveConfiguration.getInstance()
+                                      .getProperty(Constants.PROPERTY_PA_HOSTNAME) != null) {
+            return ProActiveConfiguration.getInstance()
+                                         .getProperty(Constants.PROPERTY_PA_HOSTNAME);
         }
-        if ("true".equals(ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_USE_IP_ADDRESS))) {
+        if ("true".equals(ProActiveConfiguration.getInstance()
+                                                    .getProperty(Constants.PROPERTY_PA_USE_IP_ADDRESS))) {
             return address.getHostAddress();
         } else {
             return address.getCanonicalHostName();

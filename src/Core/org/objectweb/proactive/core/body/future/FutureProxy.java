@@ -296,8 +296,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
             /* First time, hopefully the configuration file has been read */
             try {
-                futureMaxDelay = Long.parseLong(ProActiveConfiguration.getProperty(
-                            "proactive.future.maxdelay"));
+                futureMaxDelay = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                      .getProperty("proactive.future.maxdelay"));
             } catch (IllegalArgumentException iea) {
                 /* The property is not set, that's not a problem */
                 futureMaxDelay = 0;

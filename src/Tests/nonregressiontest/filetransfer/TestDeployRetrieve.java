@@ -120,7 +120,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         }
         
         // We save the current state of the schema validation and set it to false for this example
-        String validatingProperyOld = ProActiveConfiguration.getProperty("schema.validation");
+        String validatingProperyOld = ProActiveConfiguration.getInstance().getProperty("schema.validation");
         System.setProperty("schema.validation", "false");
         
         VariableContract vc = new VariableContract();

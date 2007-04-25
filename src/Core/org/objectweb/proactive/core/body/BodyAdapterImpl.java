@@ -457,7 +457,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
     }
 
     protected Object readResolve() throws ObjectStreamException {
-        if (ProActiveConfiguration.isForwarder()) {
+        if (ProActiveConfiguration.getInstance().isForwarder()) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             try {

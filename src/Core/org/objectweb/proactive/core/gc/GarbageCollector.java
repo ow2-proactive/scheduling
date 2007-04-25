@@ -86,13 +86,15 @@ public class GarbageCollector {
     static int TTA = 5 * TTB;
 
     static {
-        String ttb = ProActiveConfiguration.getProperty("proactive.dgc.ttb");
+        String ttb = ProActiveConfiguration.getInstance()
+                                           .getProperty("proactive.dgc.ttb");
         if (ttb != null) {
             TTB = Integer.parseInt(ttb);
             TTA = 5 * TTB;
         }
 
-        String tta = ProActiveConfiguration.getProperty("proactive.dgc.tta");
+        String tta = ProActiveConfiguration.getInstance()
+                                           .getProperty("proactive.dgc.tta");
         if (tta != null) {
             TTA = Integer.parseInt(tta);
         }
@@ -679,8 +681,8 @@ public class GarbageCollector {
 
     public static boolean dgcIsEnabled() {
         if (cache == null) {
-            cache = new Boolean("true".equals(
-                        ProActiveConfiguration.getProperty("proactive.dgc")));
+            cache = new Boolean("true".equals(ProActiveConfiguration.getInstance()
+                                                                    .getProperty("proactive.dgc")));
         }
         return cache.booleanValue();
     }

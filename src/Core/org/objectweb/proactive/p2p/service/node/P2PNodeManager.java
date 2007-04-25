@@ -71,7 +71,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private Vector<Object> bookedNodes = new Vector<Object>();
     private Vector usingNodes = new Vector();
     private int nodeCounter = 0;
-    private final String descriptorPath = ProActiveConfiguration.getProperty(PROPERPY_XML_PATH);
+    private final String descriptorPath = ProActiveConfiguration.getInstance()
+                                                                .getProperty(PROPERPY_XML_PATH);
     private ProActiveDescriptor pad = null;
 
     //--------------------------------------------------------------------------
@@ -299,13 +300,14 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         assert PROC > 0 : "Processor count = 0";
         logger.debug("Number of available processors for this JVM: " + PROC);
         int nodes = PROC;
-        if (!new Boolean(ProActiveConfiguration.getProperty(
-                        PROPERTY_MULTI_PROC_NODES)).booleanValue()) {
+        if (!new Boolean(ProActiveConfiguration.getInstance()
+                                                   .getProperty(PROPERTY_MULTI_PROC_NODES)).booleanValue()) {
             nodes = 1;
         }
 
         // No sharing enable
-        if (new Boolean(ProActiveConfiguration.getProperty(PROPERTY_NO_SHARING)).booleanValue()) {
+        if (new Boolean(ProActiveConfiguration.getInstance()
+                                                  .getProperty(PROPERTY_NO_SHARING)).booleanValue()) {
             nodes = 0;
         }
 

@@ -62,8 +62,8 @@ public class IbisRuntimeFactory extends RuntimeFactory {
     //
     public IbisRuntimeFactory() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(ProActiveConfiguration.getProperty(
-                        "proactive.securitymanager")))) {
+                !("false".equals(ProActiveConfiguration.getInstance()
+                                                           .getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 

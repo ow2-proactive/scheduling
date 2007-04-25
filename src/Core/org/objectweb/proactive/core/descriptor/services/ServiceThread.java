@@ -59,8 +59,8 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @since   ProActive 2.0.1
  */
 public class ServiceThread extends Thread {
-    private static final long LOOK_UP_FREQ = new Long(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_LOOKUP_FREQ)).longValue();
+    private static final long LOOK_UP_FREQ = new Long(ProActiveConfiguration.getInstance()
+                                                                            .getProperty(P2PConstants.PROPERTY_LOOKUP_FREQ)).longValue();
     private static final int MAX_NODE = P2PConstants.MAX_NODE;
     private VirtualNode vn;
     private UniversalService service;
@@ -70,8 +70,8 @@ public class ServiceThread extends Thread {
     long timeout = 0;
     int nodeRequested;
     public static Logger loggerDeployment = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
-    private static final long TIMEOUT = Long.parseLong(ProActiveConfiguration.getProperty(
-                P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+    private static final long TIMEOUT = Long.parseLong(ProActiveConfiguration.getInstance()
+                                                                             .getProperty(P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
     private long expirationTime;
 
     public ServiceThread(VirtualNode vn, VirtualMachine vm) {

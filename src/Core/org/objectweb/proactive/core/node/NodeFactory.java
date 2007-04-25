@@ -86,7 +86,8 @@ public class NodeFactory {
 
         //        String protocol = UrlBuilder.checkProtocol(System.getProperty(
         //                    "proactive.communication.protocol"));
-        String protocol = ProActiveConfiguration.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        String protocol = ProActiveConfiguration.getInstance()
+                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
         DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node", protocol);
     }
@@ -116,8 +117,9 @@ public class NodeFactory {
             }
 
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    ProActiveConfiguration.getProperty(
-                        Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL), jobID);
+                    ProActiveConfiguration.getInstance()
+                                          .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
+                    jobID);
         }
 
         return defaultNode;

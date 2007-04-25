@@ -75,11 +75,13 @@ public class HalfFTManagerPMLRB extends FTManager {
     public int init(AbstractBody owner) throws ProActiveException {
         //super.init(owner);        
         try {
-            String urlGlobal = ProActiveConfiguration.getGlobalFTServer();
+            String urlGlobal = ProActiveConfiguration.getInstance()
+                                                     .getGlobalFTServer();
             if (urlGlobal != null) {
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
             } else {
-                String urlLocation = ProActiveConfiguration.getLocationServer();
+                String urlLocation = ProActiveConfiguration.getInstance()
+                                                           .getLocationServer();
                 if (urlLocation != null) {
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                 } else {

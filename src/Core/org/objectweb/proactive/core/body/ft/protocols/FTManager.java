@@ -126,21 +126,25 @@ public abstract class FTManager implements java.io.Serializable {
         this.owner = owner;
         this.ownerID = owner.getID();
         try {
-            String ttcValue = ProActiveConfiguration.getTTCValue();
+            String ttcValue = ProActiveConfiguration.getInstance().getTTCValue();
             if (ttcValue != null) {
                 this.ttc = Integer.parseInt(ttcValue) * 1000;
             } else {
                 this.ttc = FTManager.DEFAULT_TTC_VALUE;
             }
-            String urlGlobal = ProActiveConfiguration.getGlobalFTServer();
+            String urlGlobal = ProActiveConfiguration.getInstance()
+                                                     .getGlobalFTServer();
             if (urlGlobal != null) {
                 this.storage = (CheckpointServer) (Naming.lookup(urlGlobal));
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
                 this.recovery = (RecoveryProcess) (Naming.lookup(urlGlobal));
             } else {
-                String urlCheckpoint = ProActiveConfiguration.getCheckpointServer();
-                String urlRecovery = ProActiveConfiguration.getRecoveryServer();
-                String urlLocation = ProActiveConfiguration.getLocationServer();
+                String urlCheckpoint = ProActiveConfiguration.getInstance()
+                                                             .getCheckpointServer();
+                String urlRecovery = ProActiveConfiguration.getInstance()
+                                                           .getRecoveryServer();
+                String urlLocation = ProActiveConfiguration.getInstance()
+                                                           .getLocationServer();
                 if ((urlCheckpoint != null) && (urlRecovery != null) &&
                         (urlLocation != null)) {
                     this.storage = (CheckpointServer) (Naming.lookup(urlCheckpoint));
