@@ -200,21 +200,11 @@ public class Start implements Serializable {
         Displayer displayer = null;
         if (display) {
             try {
-                if (!ddd) {
-                    displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
-                            new Object[] {
-                                new Integer(totalNbBodies),
-                                new Boolean(displayft), this,
-                                new BooleanWrapper(false)
-                            }));
-                } else {
-                    displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
-                            new Object[] {
-                                new Integer(totalNbBodies),
-                                new Boolean(displayft), this,
-                                new BooleanWrapper(true)
-                            }));
-                }
+                displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
+                        new Object[] {
+                            new Integer(totalNbBodies), new Boolean(displayft),
+                            this, new BooleanWrapper(ddd)
+                        }));
             } catch (ActiveObjectCreationException e) {
                 abort(e);
             } catch (NodeException e) {
