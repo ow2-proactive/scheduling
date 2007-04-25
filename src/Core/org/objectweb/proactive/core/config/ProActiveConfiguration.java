@@ -61,6 +61,7 @@ public class ProActiveConfiguration {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
 
     private ProActiveConfiguration() {
+    	load();
     }
 
     protected static synchronized void createConfiguration() {
@@ -227,6 +228,7 @@ public class ProActiveConfiguration {
     private static boolean isForwarder;
 
     static {
+    	ProActiveConfiguration.createConfiguration();
         String prop = System.getProperty("proactive.hierarchicalRuntime");
         isForwarder = ((prop != null) &&
             (prop.equals("true") || prop.equals("root")));
