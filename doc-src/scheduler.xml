@@ -3,7 +3,7 @@
 <chapter id="Scheduler">
   <title>Scheduler</title>
 
-  <sect1 id="Scheduler Overview">
+  <sect1 id="Scheduler_Overview">
     <title>Overview</title>
 
     <para>The scheduler allows the usage of a grid with minimal knowledge of
@@ -15,7 +15,7 @@
     doesnt.Archite</para>
   </sect1>
 
-  <sect1 id="Scheduler Architecture">
+  <sect1 id="Scheduler_Architecture">
     <title>Architecture</title>
 
     <para><figure>
