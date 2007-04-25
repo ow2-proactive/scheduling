@@ -4,7 +4,6 @@
 	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" path="src/Examples"/>
 	<classpathentry kind="src" path="src/Extensions"/>
 	<classpathentry kind="src" path="src/Extra"/>
-	<classpathentry kind="src" path="src/IC2D-old"/>
 	<classpathentry kind="src" path="src/Tests"/>
 	<classpathentry kind="src" path="src/Utils"/>
 	<classpathentry kind="lib" path="compile/lib/ant-javah.jar"/>
