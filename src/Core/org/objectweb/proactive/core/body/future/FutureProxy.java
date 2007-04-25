@@ -97,16 +97,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     protected FutureResult target;
 
     /**
-     * To mark the Proxy before migration
-     * Usually, the Proxy cannot be serialized if the result is not available (no automatic continuation)
-     * but if we migrate, we don't want to wait for the result
+     * True if this proxy has to be copied for migration or local copie.
+     * If true, the serialization of this future does not register an automatic continuation.
      */
-    protected boolean migration;
-
-    /**
-     * To mark the proxy before sending this future by parameter or by result
-     */
-    protected boolean continuation;
+    protected transient boolean copyMode;
 
     /**
      * UniqueID of the body which create this future
@@ -451,20 +445,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         returnFutureProxy(this);
     }
 
-    protected void setMigrationTag() {
-        migration = true;
+    protected void setCopyMode() {
+        copyMode = true;
     }
 
-    protected void unsetMigrationTag() {
-        migration = false;
-    }
-
-    public synchronized void setContinuationTag() {
-        continuation = true;
-    }
-
-    public synchronized void unsetContinuationTag() {
-        continuation = false;
+    protected void unsetCopyMode() {
+        copyMode = false;
     }
 
     //
@@ -473,22 +459,15 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private synchronized void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         if (!FuturePool.isInsideABodyForwarder()) {
-            // If we are on a forwarder we want to forward the call, not wait the 
-            // futur result or whatever
-            //if continuation is already set, we are in a forwarder
-            //else if a destination is available in destTable, set the continuation tag
-            if (!continuation) {
-                continuation = (FuturePool.getBodyDestination() != null);
-            }
+            // if copy mode, no need for registering AC
+            if (this.isAwaited() && !this.copyMode) {
+                boolean continuation = (FuturePool.getBodyDestination() != null);
 
-            // We wait until the result is available
-            if ((!migration) && (!continuation)) {
-                waitFor();
-            }
+                // if continuation=false, no destination is registred:
+                // - either ac are disabled,
+                // - or this future is serialized in a migration forwarder.
 
-            // Registration in case of continuation
-            if (continuation && isAwaited()) {
-                // get the sender body
+                // identify the sender for regsitering continuation and determine if we are in a migration formwarder
                 Body sender = LocalBodyStore.getInstance().getLocalBody(senderID);
 
                 // it's a halfbody...
@@ -496,15 +475,16 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                     sender = LocalBodyStore.getInstance()
                                            .getLocalHalfBody(senderID);
                 }
-                if (sender != null) {
-                    UniversalBody dest = FuturePool.getBodyDestination();
-                    if (dest != null) {
+                if (sender != null) { // else we are in a migration forwarder
+                    if (continuation) {
                         sender.getFuturePool()
-                              .addAutomaticContinuation(ID, creatorID, dest);
+                              .addAutomaticContinuation(ID, creatorID,
+                            FuturePool.getBodyDestination());
+                    } else {
+                        // its not a copy and not a continuation: wait for the result
+                        this.waitFor();
                     }
                 }
-
-                // if sender is still null, it's a forwarder !!
             }
         } else {
             // Maybe this FutureProxy has been added into FuturePool by readObject
@@ -515,43 +495,29 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                     FutureProxy fp = (FutureProxy) futures.get(i);
                     if (fp.creatorID.equals(creatorID) && (fp.ID == ID)) {
                         FuturePool.removeIncomingFutures();
-                        continuation = true;
                     }
                 }
             }
         }
-
         // Pass the result
         out.writeObject(target);
-        // Pass the continuation flag
-        out.writeBoolean(continuation);
         // Pass the id
         out.writeLong(ID);
         //Pass the creatorID
         out.writeObject(creatorID);
-
-        //unset the current continuation tag
-        this.continuation = false;
     }
 
     private synchronized void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         target = (FutureResult) in.readObject();
-        continuation = (boolean) in.readBoolean();
         ID = (long) in.readLong();
         creatorID = (UniqueID) in.readObject();
 
-        // THIS MUST BE DONE WHEN THE SERVER SEND LOGS !!
-        if (continuation && isAwaited()) {
-            // If we are on a BodyForwarder we DO NOT want to perform the 
-            // following operations but can't avoid them.
-            // There is a hack in writeObject to restore the continuation state        	
-            continuation = false;
+        // register all incoming futures, even for migration or checkpoiting
+        if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);
         }
-
-        //now we restore migration to its normal value
-        migration = false;
+        copyMode = false;
     }
 
     //

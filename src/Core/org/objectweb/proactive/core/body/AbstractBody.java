@@ -356,13 +356,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
                 FuturePool.removeIncomingFutures();
             } else {
-                // we are in a forwarder
-                // some futures have to set their continuation tag
-                java.util.Iterator it = incomingFutures.iterator();
-                while (it.hasNext()) {
-                    FutureProxy current = (FutureProxy) (it.next());
-                    current.setContinuationTag();
-                }
+                // we are in a migration forwarder,just remove registred futures                
                 FuturePool.removeIncomingFutures();
             }
         }

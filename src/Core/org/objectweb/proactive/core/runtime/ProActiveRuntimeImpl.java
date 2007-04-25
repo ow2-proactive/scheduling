@@ -665,6 +665,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         registerBody(nodeName, body);
 
+        // register futures that have been deserialized in the body
+        ((AbstractBody) body).registerIncomingFutures();
+
         return body.getRemoteAdapter();
     }
 
@@ -692,6 +695,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         // register the body
         this.registerBody(nodeName, ret);
+
+        // register futures that have been deserialized in the body
+        ((AbstractBody) ret).registerIncomingFutures();
 
         // restart actvity
         if (runtimeLogger.isDebugEnabled()) {

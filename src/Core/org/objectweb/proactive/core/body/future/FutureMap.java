@@ -190,7 +190,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * Unset the migration tag in all futures of the map.
      * @see FutureProxy
      */
-    public synchronized void unsetMigrationTag() {
+    public synchronized void unsetCopyMode() {
         java.util.Collection<HashMap<Long, ArrayList[]>> c1 = indexedByBodyID.values();
         java.util.Iterator<HashMap<Long, ArrayList[]>> it1 = c1.iterator();
 
@@ -203,7 +203,7 @@ public class FutureMap extends Object implements java.io.Serializable {
                 java.util.Iterator itFutures = futures.iterator();
                 while (itFutures.hasNext()) {
                     FutureProxy p = (FutureProxy) itFutures.next();
-                    p.unsetMigrationTag();
+                    p.unsetCopyMode();
                 }
             }
         }
@@ -213,7 +213,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * Set the migration tag in all futures of the map.
      * @see FutureProxy
      */
-    public synchronized void setMigrationTag() {
+    public synchronized void setCopyMode() {
         java.util.Collection<HashMap<Long, ArrayList[]>> c1 = indexedByBodyID.values();
         java.util.Iterator<HashMap<Long, ArrayList[]>> it1 = c1.iterator();
 
@@ -226,7 +226,7 @@ public class FutureMap extends Object implements java.io.Serializable {
                 java.util.Iterator itFutures = futures.iterator();
                 while (itFutures.hasNext()) {
                     FutureProxy p = (FutureProxy) itFutures.next();
-                    p.setMigrationTag();
+                    p.setCopyMode();
                 }
             }
         }

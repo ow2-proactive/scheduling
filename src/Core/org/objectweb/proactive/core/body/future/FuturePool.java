@@ -59,7 +59,8 @@ public class FuturePool extends Object implements java.io.Serializable {
     protected boolean newState;
 
     // table of future and ACs
-    private FutureMap futures;
+    // this map is rebuilt on deserailisation of the object
+    public transient FutureMap futures;
 
     // ID of the body corresponding to this futurePool
     private UniqueID ownerBody;
@@ -91,28 +92,13 @@ public class FuturePool extends Object implements java.io.Serializable {
     //
     // -- STATIC ------------------------------------------------------
     //
+
+    // Automatic continuation
+
     // this table is used to register destination before sending.
     // So, a future could retreive its destination during serialization
     // this table indexed by the thread which perform the registration.
     static private java.util.Hashtable<Thread, UniversalBody> bodyDestination;
-
-    // map of threads that are running a body forwarder 
-    static private Map<Thread, Object> forwarderThreads;
-
-    // Add the current thread as a body forwarder
-    static public void addMeAsBodyForwarder() {
-        forwarderThreads.put(Thread.currentThread(), null);
-    }
-
-    // Remove the current thread from the list of body forwarders
-    static public void removeMeFromBodyForwarders() {
-        forwarderThreads.remove(Thread.currentThread());
-    }
-
-    // Return true if the current thread is executing a body forwarder 
-    static public boolean isInsideABodyForwarder() {
-        return forwarderThreads.containsKey(Thread.currentThread());
-    }
 
     // to register in the table
     static public void registerBodyDestination(UniversalBody dest) {
@@ -133,7 +119,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     // So, futures to add in the local futurePool could be retreived
     static private java.util.Hashtable<Thread, ArrayList<Future>> incomingFutures;
 
-    // to register an incoming future in the table  	
+    // to register an incoming future in the table      
     public static void registerIncomingFuture(Future f) {
         java.util.ArrayList<Future> listOfFutures = incomingFutures.get(Thread.currentThread());
         if (listOfFutures != null) {
@@ -153,6 +139,26 @@ public class FuturePool extends Object implements java.io.Serializable {
     // to get a list of incomingFutures
     static public java.util.ArrayList getIncomingFutures() {
         return (incomingFutures.get(Thread.currentThread()));
+    }
+
+    // body forwarders
+
+    // map of threads that are running a body forwarder 
+    static private Map<Thread, Object> forwarderThreads;
+
+    // Add the current thread as a body forwarder
+    static public void addMeAsBodyForwarder() {
+        forwarderThreads.put(Thread.currentThread(), null);
+    }
+
+    // Remove the current thread from the list of body forwarders
+    static public void removeMeFromBodyForwarders() {
+        forwarderThreads.remove(Thread.currentThread());
+    }
+
+    // Return true if the current thread is executing a body forwarder 
+    static public boolean isInsideABodyForwarder() {
+        return forwarderThreads.containsKey(Thread.currentThread());
     }
 
     static {
@@ -233,13 +239,23 @@ public class FuturePool extends Object implements java.io.Serializable {
             // without continuation side-effects)
             int numOfFuturesToUpdate = futuresToUpdate.size();
             if (numOfFuturesToUpdate > 1) {
-                setMigrationTag();
+                setCopyMode();
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (Future) (futuresToUpdate.get(i));
                     otherFuture.receiveReply((FutureResult) Utils.makeDeepCopy(
                             result));
                 }
-                unsetMigrationTag();
+                unsetCopyMode();
+                // register futures potentially generated during the copy of result
+                AbstractBody localBody = ((AbstractBody) (LocalBodyStore.getInstance()
+                                                                        .getLocalBody(this.ownerBody)));
+
+                // halfbody ?
+                if (localBody == null) {
+                    localBody = ((AbstractBody) (LocalBodyStore.getInstance()
+                                                               .getLocalHalfBody(this.ownerBody)));
+                }
+                localBody.registerIncomingFutures();
             }
             stateChange();
 
@@ -344,12 +360,12 @@ public class FuturePool extends Object implements java.io.Serializable {
         }
     }
 
-    public void setMigrationTag() {
-        futures.setMigrationTag();
+    public void setCopyMode() {
+        futures.setCopyMode();
     }
 
-    public void unsetMigrationTag() {
-        futures.unsetMigrationTag();
+    public void unsetCopyMode() {
+        futures.unsetCopyMode();
     }
 
     //
@@ -365,7 +381,6 @@ public class FuturePool extends Object implements java.io.Serializable {
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        setMigrationTag();
         out.defaultWriteObject();
         if (acEnabled) {
             // queue could not be created because of lazy creation
@@ -394,7 +409,9 @@ public class FuturePool extends Object implements java.io.Serializable {
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        unsetMigrationTag();
+        // futuremap is empty
+        // futures are registred in FutureProxy.read()
+        this.futures = new FutureMap();
         if (acEnabled) {
             // if queueExists is true, ACqueue has been created
             boolean queueExists = in.readBoolean();
@@ -578,7 +595,6 @@ public class FuturePool extends Object implements java.io.Serializable {
                         if (ftm != null) {
                             ftm.sendReply(reply, dest);
                         } else {
-                            //System.out.println("ACService.doAutomaticContinuation() : sending reply");
                             reply.send(dest);
                         }
                     } catch (IOException ioe) {

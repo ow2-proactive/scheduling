@@ -246,6 +246,10 @@ public class MigratableBody extends BodyImpl implements Migratable,
                 openedSessions = securityManager.getOpenedConnexion();
             }
 
+            // Set copyMode tag in all futures
+            // those futures are going to be serialized for migration (i.e. no AC registration)
+            this.getFuturePool().setCopyMode();
+
             // try to migrate
             migratedBody = migrationManager.migrateTo(node, this);
             if (isSecurityOn) {
@@ -262,7 +266,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
             openedSessions = null;
             nodeURL = saveNodeURL;
             bodyID = savedID;
-            localBodyStrategy.getFuturePool().unsetMigrationTag();
+            localBodyStrategy.getFuturePool().unsetCopyMode();
             if (this.isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(null);
             }
