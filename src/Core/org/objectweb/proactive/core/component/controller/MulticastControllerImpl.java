@@ -324,9 +324,9 @@ public class MulticastControllerImpl extends AbstractProActiveController
             }
         }
         if (max == -1) {
-            expectedMethodCallsNb = delegatee.size();
+            max = delegatee.size();
         }
-        for (int i = 1; i < dispatchSizes.size(); i++) {
+        for (int i = 0; i < dispatchSizes.size(); i++) {
             if (dispatchSizes.get(i) == -1) {
                 dispatchSizes.set(i, max);
             }
