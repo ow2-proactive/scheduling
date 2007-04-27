@@ -89,7 +89,8 @@ public class Test extends FunctionalTest {
      */
     @Override
 	public void endTest() throws Exception {
-        pad.killall(false);
+    	pad.killall(false);
+    	pad1.killall(false);
     }
 
     @Override

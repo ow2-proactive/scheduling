@@ -30,11 +30,11 @@
  */
 package nonregressiontest.activeobject.creation.parallel;
 
-import nonregressiontest.activeobject.creation.A;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+
+import nonregressiontest.activeobject.creation.A;
 
 import testsuite.test.FunctionalTest;
 
@@ -45,15 +45,17 @@ import testsuite.test.FunctionalTest;
  * Created on Nov 8, 2005
  */
 public class TestVnActivated extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4947991801620598508L;
-	private static final String XML_PATH = TestVnActivated.class.getResource(
+         *
+         */
+    private static final long serialVersionUID = 4947991801620598508L;
+    private static final String XML_PATH = TestVnActivated.class.getResource(
             "/nonregressiontest/activeobject/creation/parallel/4_local.xml")
                                                                 .getPath();
     private A[] aos;
     private VirtualNode vn;
+    private ProActiveDescriptor padForActiving;
 
     public TestVnActivated() {
         super("newActiveInParallel (VN activated)",
@@ -65,13 +67,13 @@ public class TestVnActivated extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                 new Object[] { "toto" }, vn);
     }
 
     @Override
-	public boolean preConditions() throws Exception {
+    public boolean preConditions() throws Exception {
         return this.vn.isActivated();
     }
 
@@ -79,8 +81,8 @@ public class TestVnActivated extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
-        ProActiveDescriptor padForActiving = ProActive.getProactiveDescriptor(XML_PATH);
+    public void initTest() throws Exception {
+        padForActiving = ProActive.getProactiveDescriptor(XML_PATH);
         this.vn = padForActiving.getVirtualNode("Workers01");
         this.vn.activate();
     }
@@ -89,11 +91,14 @@ public class TestVnActivated extends FunctionalTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
+        if (padForActiving != null) {
+            padForActiving.killall(false);
+        }
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         if ((this.aos == null) || (this.aos.length != 4)) {
             this.vn.killAll(false);
             return false;

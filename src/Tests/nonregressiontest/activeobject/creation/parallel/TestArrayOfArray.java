@@ -30,11 +30,11 @@
  */
 package nonregressiontest.activeobject.creation.parallel;
 
-import nonregressiontest.activeobject.creation.A;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+
+import nonregressiontest.activeobject.creation.A;
 
 import testsuite.test.FunctionalTest;
 
@@ -45,15 +45,17 @@ import testsuite.test.FunctionalTest;
  * Created on Nov 8, 2005
  */
 public class TestArrayOfArray extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1371427361062549957L;
-	private static final String XML_PATH = TestVnNotActivated.class.getResource(
+         *
+         */
+    private static final long serialVersionUID = -1371427361062549957L;
+    private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/nonregressiontest/activeobject/creation/parallel/4_local.xml")
                                                                    .getPath();
     private A[] aos;
     private VirtualNode vn;
+    private ProActiveDescriptor padForActiving;
 
     public TestArrayOfArray() {
         super("newActiveInParallel with an array of params",
@@ -65,7 +67,7 @@ public class TestArrayOfArray extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         try {
             this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                     new Object[][] {
@@ -91,14 +93,14 @@ public class TestArrayOfArray extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
-        ProActiveDescriptor padForActiving = ProActive.getProactiveDescriptor(XML_PATH);
+    public void initTest() throws Exception {
+        padForActiving = ProActive.getProactiveDescriptor(XML_PATH);
         this.vn = padForActiving.getVirtualNode("Workers03");
         this.vn.activate();
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         if ((this.aos == null) || (this.aos.length != 4)) {
             this.vn.killAll(false);
             return false;
@@ -108,6 +110,9 @@ public class TestArrayOfArray extends FunctionalTest {
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
+        if (padForActiving != null) {
+            padForActiving.killall(false);
+        }
     }
 }

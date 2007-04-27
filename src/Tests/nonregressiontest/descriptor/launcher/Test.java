@@ -107,6 +107,7 @@ public class Test extends FunctionalTest {
         part.getVirtualNode("lVN1").killAll(true);
         part.getVirtualNode("lVN2").killAll(true);
         vnMain.killAll(true);
+        pad.killall(false);
     }
 
     @Override
