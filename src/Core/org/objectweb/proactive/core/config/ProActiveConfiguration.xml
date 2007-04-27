@@ -89,6 +89,11 @@
 		<!-- Enable load balance -->
 		<prop key="proactive.p2p.loadbalancing" value="false" />
 		<!-- ***************************************************** -->
+		
+		<!-- ***************************************************** -->
+		<!-- MASTER/SLAVE PROPERTIES VALUE -->
+		<!-- Period of the slave pinging (in ms) -->
+		<prop key="proactive.masterslave.pingperiod" value="10000" />
 
 		<!-- Workaround to fix rmissh/unicore conflict -->
 		<prop key="proactive.unicore.forkclient" value="true" />

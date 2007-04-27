@@ -159,4 +159,10 @@ public interface Loggers {
     static final public String IM_DATARESOURCE = IM + ".dataresource";
     static final public String IM_TEST = IM + ".test";
     static final public String IM_ACTIVITY_NODES = IM + ".activitynodes";
+    
+    //  Master Slave loggers
+    static final public String MASTERSLAVE = CORE + ".masterslave";
+    static final public String MASTERSLAVE_SLAVEMANAGER = MASTERSLAVE + ".slavemanager";
+    static final public String MASTERSLAVE_PINGER = MASTERSLAVE + ".pinger";
+    static final public String MASTERSLAVE_SLAVES = MASTERSLAVE + ".slaves";
 }
