@@ -33,8 +33,11 @@ package org.objectweb.proactive.core.descriptor.xml;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
@@ -44,6 +47,7 @@ import org.xml.sax.SAXException;
 
 public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     protected ProActiveDescriptor proActiveDescriptor;
 
     public TechnicalServicesHandler(ProActiveDescriptor proActiveDescriptor) {
@@ -61,6 +65,9 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
         UnmarshallerHandler activeHandler) throws SAXException {
         try {
             proActiveDescriptor.addTechnicalService((TechnicalServiceXmlType) activeHandler.getResultObject());
+        } catch (NullPointerException e) {
+            // Technical service not used by any virtual node
+            logger.warn("Technical service  not attached to virtual node");
         } catch (Exception e) {
             throw new SAXException("Technical service class not instanciable", e);
         }
