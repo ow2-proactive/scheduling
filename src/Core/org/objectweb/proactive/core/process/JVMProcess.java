@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.process;
 
+import org.objectweb.proactive.core.util.OperatingSystem;
+
 
 /**
  * <p>
@@ -174,4 +176,29 @@ public interface JVMProcess extends ExternalProcess {
      * Each time a makeDeepCopy is performed on a JVMProcess this method must be called.
      */
     public int getNewGroupId();
+
+    public void setPriority(PriorityLevel priority);
+
+    public void setOperatingSystem(OperatingSystem os);
+
+    public OperatingSystem getOperatingSystem();
+    public enum PriorityLevel {low(19, "low"),
+        normal(0, "normal"),
+        high(-10, "high");
+        private int unixValue;
+        private String windowsValue;
+
+        PriorityLevel(int unixValue, String windowsValue) {
+            this.unixValue = unixValue;
+            this.windowsValue = windowsValue;
+        }
+
+        public String unixCmd() {
+            return "nice -n " + unixValue + " ";
+        }
+
+        public String windowsCmd() {
+            return "start /" + windowsValue + " ";
+        }
+    }
 }

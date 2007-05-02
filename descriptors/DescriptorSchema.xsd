@@ -931,7 +931,29 @@
 			fixed="org.objectweb.proactive.core.process.JVMNodeProcess" />
 		<xs:attribute name="closeStream" type="CloseStreamType"
 			use="optional" />
+		<xs:attribute name="priority" type="PriorityType" use="optional"/>
+		<xs:attribute name="os" type="OSType" use="optional"/>
 	</xs:complexType>
+	<xs:simpleType name="PriorityType">
+		<xs:union memberTypes="variableRefType">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="low"/>
+					<xs:enumeration value="normal"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="OSType">
+		<xs:union memberTypes="variableRefType">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="unix"/>
+					<xs:enumeration value="windows"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
 	<xs:complexType name="ExtendedJVMType">
 		<xs:complexContent>
 			<xs:extension base="ProcessReferenceType">

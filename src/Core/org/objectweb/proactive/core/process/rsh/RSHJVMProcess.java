@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.process.rsh;
 
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
@@ -252,6 +253,17 @@ public class RSHJVMProcess extends RSHProcess implements JVMProcess {
         return jvmProcess.getNewGroupId();
     }
 
+    public void setPriority(PriorityLevel priority) {
+        jvmProcess.setPriority(priority);
+    }
+
+    public void setOperatingSystem(OperatingSystem os) {
+        jvmProcess.setOperatingSystem(os);
+    }
+
+    public OperatingSystem getOperatingSystem() {
+        return jvmProcess.getOperatingSystem();
+    }
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //

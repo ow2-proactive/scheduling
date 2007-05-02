@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.process.ssh;
 
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
@@ -250,6 +251,18 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
 
     public int getNewGroupId() {
         return jvmProcess.getNewGroupId();
+    }
+
+    public void setPriority(PriorityLevel priority) {
+        jvmProcess.setPriority(priority);
+    }
+
+    public void setOperatingSystem(OperatingSystem os) {
+        jvmProcess.setOperatingSystem(os);
+    }
+
+    public OperatingSystem getOperatingSystem() {
+        return jvmProcess.getOperatingSystem();
     }
 
     //

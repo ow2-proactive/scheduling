@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.IndependentListProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.JVMProcess.PriorityLevel;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
@@ -55,6 +56,7 @@ import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
 import org.objectweb.proactive.core.util.HostsInfos;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshallerDecorator;
@@ -205,6 +207,20 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
             if (checkNonEmpty(username)) {
                 targetProcess.setUsername(username);
+            }
+
+            String priority = attributes.getValue("priority");
+
+            if (checkNonEmpty(priority)) {
+                ((JVMProcess) targetProcess).setPriority(PriorityLevel.valueOf(
+                        priority));
+            }
+
+            String os = attributes.getValue("os");
+
+            if (checkNonEmpty(os)) {
+                ((JVMProcess) targetProcess).setOperatingSystem(OperatingSystem.valueOf(
+                        os));
             }
         }
 
@@ -923,7 +939,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
                 if (paths.length > 0) {
                     StringBuffer sb = new StringBuffer();
-                    String pathSeparator = System.getProperty("path.separator");
+                    char pathSeparator = jvmProcess.getOperatingSystem()
+                                                   .pathSeparator();
                     sb.append(paths[0].trim());
 
                     //we call trim method to avoid whitespace at the beginning

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -119,6 +120,8 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
     // How many paths leading to a JVMProcessImpl have been encountered
     static private int groupID = 0;
+    protected PriorityLevel priority = PriorityLevel.normal;
+    protected OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -292,6 +295,17 @@ public class JVMProcessImpl extends AbstractExternalProcess
     protected String buildJavaCommand() {
         StringBuffer javaCommand = new StringBuffer();
 
+        if (!priority.equals(PriorityLevel.normal)) {
+            switch (os) {
+            case unix:
+                javaCommand.append(priority.unixCmd());
+                break;
+            case windows:
+                javaCommand.append(priority.windowsCmd());
+                break;
+            }
+        }
+
         // append java command
         if (javaPath == null) {
             javaCommand.append("java");
@@ -439,5 +453,17 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
     public int getNewGroupId() {
         return groupID++;
+    }
+
+    public void setPriority(PriorityLevel priority) {
+        this.priority = priority;
+    }
+
+    public void setOperatingSystem(OperatingSystem os) {
+        this.os = os;
+    }
+
+    public OperatingSystem getOperatingSystem() {
+        return os;
     }
 }
