@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 
 /**
- * A task to be executed <br/>
+ * Definition of a Task (to be executed by the framework) <br/>
  * @author fviale
  *
  * @param <R> the result type of this task

@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.masterslave.core.AOMaster;
 import org.objectweb.proactive.extra.masterslave.core.TaskAlreadySubmittedException;
-import org.objectweb.proactive.extra.masterslave.core.TaskException;
 import org.objectweb.proactive.extra.masterslave.core.TaskWrapperImpl;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
@@ -53,6 +52,19 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultInter
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
+/**
+ * Entry point of the Master/Slave API.<br/>
+ * Here is how the Master/Slave API is used :
+ * <ol>
+ * <li>Create a ProActiveMaster object through the different constructors</li>
+ * <li>Submit tasks through the use of the <b><i>solve</i></b> methods</li>
+ * <li>Collect results through the <b><i>wait</i></b> methods</li>
+ * </ol>
+ * @author fviale
+ *
+ * @param <T> Task of result R
+ * @param <R> Result Object
+ */
 public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     implements Master<T, R>, Serializable {
     protected AOMaster aomaster = null;

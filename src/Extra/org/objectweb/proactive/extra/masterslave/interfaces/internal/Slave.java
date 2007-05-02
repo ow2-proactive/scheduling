@@ -33,6 +33,12 @@ package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
+/**
+ * The interface of the slave objects <br/>
+ * A slave is connected to a TaskProvider (i.e. Master) which will provide tasks to execute <br/>
+ * @author fviale
+ *
+ */
 public interface Slave {
 
     /**
@@ -53,10 +59,10 @@ public interface Slave {
     public void setProvider(TaskProvider provider);
 
     /**
-         * terminates this slave
-         * @param freeResources tells the slave what to do with its resources
-         * @return
-         */
+     * terminates this slave
+     * @param freeResources tells the slave what to do with its resources
+     * @return
+     */
     public BooleanWrapper terminate(boolean freeResources);
 
     /**

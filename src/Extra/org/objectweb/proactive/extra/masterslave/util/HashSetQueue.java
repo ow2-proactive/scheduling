@@ -40,7 +40,7 @@ import java.util.Queue;
  * This collection provides both Set and Queue functionnalities <br/>
  * @author fviale
  *
- * @param <T>
+ * @param <T> type of the elements contained in the Queue
  */
 public class HashSetQueue<T> extends LinkedHashSet<T> implements Queue<T> {
 

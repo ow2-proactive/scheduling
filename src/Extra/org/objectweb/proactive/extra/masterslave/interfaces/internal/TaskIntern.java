@@ -36,9 +36,9 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
 /**
- * Internal view of a task in the Master/Slave API
- * Adds the possibility to set the result for a task
- * Adds the notion of a task id
+ * Internal view of a task in the Master/Slave API<br/>
+ * Adds the possibility to set the result for a task<br/>
+ * Adds the notion of a "Task ID"<br/>
  * @author fviale
  *
  * @param <R>

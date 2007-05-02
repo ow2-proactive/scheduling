@@ -36,7 +36,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.masterslave.core.TaskException;
+import org.objectweb.proactive.extra.masterslave.TaskException;
 
 
 /**

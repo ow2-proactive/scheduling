@@ -61,6 +61,17 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManage
 import org.objectweb.proactive.extra.masterslave.util.ConsumerQueue;
 
 
+/**
+ * The Slave Manager Active Object is responsible for the deployment of Slaves :<br/>
+ * <ul>
+ * <li> Through a ProActive deployment descriptor</li>
+ * <li> Using an existing VirtualNode objectcollection of Nodes</li>
+ * <li> Using a collection of Nodes</li>
+ * </ul>
+ *
+ * @author fviale
+ *
+ */
 public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     NodeCreationEventListener, InitActive, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVEMANAGER);

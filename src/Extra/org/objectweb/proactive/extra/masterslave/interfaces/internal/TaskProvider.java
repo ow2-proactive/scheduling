@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 
 /**
- * A Task Provider provides tasks to be executed and excepts results of these tasks
+ * A Task Provider provides tasks to be executed and excepts results of these tasks (i.e. the Master from the slave point of view)
  * @author fviale
  *
  * @param <T> TaskWrapper of Result R

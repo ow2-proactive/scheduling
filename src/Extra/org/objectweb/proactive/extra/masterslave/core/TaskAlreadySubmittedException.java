@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.masterslave.core;
 
 
 /**
- * AN Exception thrown when a task has already been submitted
+ * An Exception thrown when a task has already been submitted
  * @author fviale
  *
  */

@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 
 
 /**
- * Generic interface for a consumer of slaves (an object which needs slaves)
+ * Generic interface for a consumer of slaves (an object which needs slaves) <br/>
  * @author fviale
  *
  */

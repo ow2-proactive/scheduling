@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
- * Admin interface of the Slave Manager in the Master/Slave API (allows to extend or reduce the pool)
+ * Admin interface of the Slave Manager in the Master/Slave API (allows to extend the pool of slaves, or terminate the manager)<br/>
  * @author fviale
  *
  */
