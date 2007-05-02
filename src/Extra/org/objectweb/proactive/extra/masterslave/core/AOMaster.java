@@ -58,8 +58,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.masterslave.interfaces.Master;
-import org.objectweb.proactive.extra.masterslave.interfaces.Task;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.MasterIntern;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveDeadListener;
@@ -77,7 +77,7 @@ import org.objectweb.proactive.extra.masterslave.util.HashSetQueue;
  * @author fviale
  */
 public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
-    InitActive, RunActive, Master, SlaveDeadListener {
+    InitActive, RunActive, MasterIntern, SlaveDeadListener {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
 
     // stub on this active object
@@ -107,11 +107,6 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
 
     // tasks that are completed
     protected HashSetQueue<TaskIntern> completedTasks;
-
-    // IDs management : we keep an internal version of the tasks with an ID internally generated
-    protected HashMap<Task, TaskIntern> wrappedTasks;
-    protected HashMap<TaskIntern, Task> wrappedTasksRev;
-    protected long taskCounter;
 
     public AOMaster() {
     }
@@ -220,29 +215,9 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
      * @return true if all the results are available
      * @throws NoSuchElementException
      */
-    private boolean areResultsAvailable(List<Task> tasks)
+    private boolean areResultsAvailable(List<TaskIntern> tasks)
         throws NoSuchElementException {
-        List<TaskIntern> wrappers = getWrapping(tasks);
-        return completedTasks.containsAll(wrappers);
-    }
-
-    /**
-     * Creates an internal version of the given task
-     * This version will identify the task internally in a unique way
-     * @param task task to be wrapped
-     * @return wrapped version
-     * @throws IllegalArgumentException if the same task has already been wrapped
-     */
-    private TaskIntern createWrapping(Task task)
-        throws IllegalArgumentException {
-        if (wrappedTasks.containsKey(task)) {
-            throw new IllegalArgumentException(new TaskAlreadySubmittedException());
-        }
-
-        TaskIntern wrapper = new TaskWrapperImpl(taskCounter++, task);
-        wrappedTasks.put(task, wrapper);
-        wrappedTasksRev.put(wrapper, task);
-        return wrapper;
+        return completedTasks.containsAll(tasks);
     }
 
     /**
@@ -273,39 +248,19 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
         }
     }
 
-    /**
-     * Returns a list of internal tasks associated with these tasks
-     * @param tasks
-     * @return list of internal tasks
-     * @throws NoSuchElementException
-     */
-    private List<TaskIntern> getWrapping(List<Task> tasks)
-        throws NoSuchElementException {
-        List<TaskIntern> answer = new ArrayList<TaskIntern>();
-        for (Task task : tasks) {
-            if (!wrappedTasks.containsKey(task)) {
-                throw new NoSuchElementException();
-            }
-            answer.add(wrappedTasks.get(task));
-        }
-        return answer;
-    }
-
     /* (non-Javadoc)
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
         stubOnThis = ProActive.getStubOnThis();
         // General initializations
-        taskCounter = 0;
         resourceReserved = 0;
         terminated = false;
-        // Queues and dictionnaries
+        // Queues 
         pendingTasks = new HashSetQueue<TaskIntern>();
         launchedTasks = new HashSetQueue<TaskIntern>();
         completedTasks = new HashSetQueue<TaskIntern>();
-        wrappedTasks = new HashMap<Task, TaskIntern>();
-        wrappedTasksRev = new HashMap<TaskIntern, Task>();
+        ;
 
         // Slaves
         try {
@@ -371,12 +326,9 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isResultAvailable()
      */
-    public boolean isResultAvailable(Task task) throws IllegalArgumentException {
-        TaskIntern wrapper = wrappedTasks.get(task);
-        if (wrapper == null) {
-            throw new IllegalArgumentException("Bad wrapping of task");
-        }
-        return completedTasks.contains(wrapper);
+    public boolean isResultAvailable(TaskIntern task)
+        throws IllegalArgumentException {
+        return completedTasks.contains(task);
     }
 
     /* (non-Javadoc)
@@ -401,20 +353,6 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
         }
         // One of the previously reserved resource is now available
         resourceReserved--;
-    }
-
-    /**
-     * Removes the internal wrapping associated with this task
-     * @param task
-     * @throws IllegalArgumentException
-     */
-    private void removeWrapping(Task task) throws IllegalArgumentException {
-        if (!wrappedTasks.containsKey(task)) {
-            throw new IllegalArgumentException("Non existent wrapping.");
-        }
-
-        TaskIntern wrapper = wrappedTasks.remove(task);
-        wrappedTasksRev.remove(wrapper);
     }
 
     /* (non-Javadoc)
@@ -462,23 +400,22 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solve(org.objectweb.proactive.extra.masterslave.interfaces.Task)
      */
-    public void solve(Task task) throws IllegalArgumentException {
-        TaskIntern wrapper = createWrapping(task);
-
+    public void solve(TaskIntern task) throws IllegalArgumentException {
         if (emptyPending()) {
-            pendingTasks.add(wrapper);
+            pendingTasks.add(task);
             slaveGroupStub.wakeup();
         } else {
-            pendingTasks.add(wrapper);
+            pendingTasks.add(task);
         }
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection)
      */
-    public void solveAll(Collection tasks) throws IllegalArgumentException {
+    public void solveAll(Collection<TaskIntern> tasks)
+        throws IllegalArgumentException {
         logger.debug("Adding " + tasks.size() + " tasks...");
-        for (Task task : (Collection<Task>) tasks) {
+        for (TaskIntern task : tasks) {
             solve(task);
         }
     }
@@ -530,10 +467,10 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitAllResults()
      */
-    public Collection waitAllResults()
+    public Collection<ResultIntern> waitAllResults()
         throws IllegalStateException, TaskException {
-        logger.debug("polling All Results");
-        List results = new ArrayList();
+        logger.debug("All Results received by the user...");
+        List<ResultIntern> results = new ArrayList<ResultIntern>();
         while (!completedTasks.isEmpty()) {
             results.add(waitOneResult());
         }
@@ -543,46 +480,27 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitOneResult()
      */
-    public Serializable waitOneResult()
+    public ResultIntern waitOneResult()
         throws IllegalStateException, TaskException {
         TaskIntern wrapper = completedTasks.poll();
 
-        //  we remove the mapping between the task and its wrapper
-        Task task = wrappedTasksRev.get(wrapper);
-        removeWrapping(task);
-        if (wrapper.threwException()) {
-            throw new TaskException(wrapper.getException());
-        }
-
         // We return the result
-        return wrapper.getResult();
+        return new ResultInternImpl(wrapper.getResult(), wrapper);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitResultOf(org.objectweb.proactive.extra.masterslave.interfaces.Task)
      */
-    public Serializable waitResultOf(Task task)
+    public ResultIntern waitResultOf(TaskIntern task)
         throws IllegalArgumentException, TaskException {
-        TaskIntern wrapper = wrappedTasks.get(task);
-        if (wrapper == null) {
-            throw new NoSuchElementException();
-        }
-        logger.debug("Result of task " + wrapper.getId() +
+        logger.debug("Result of task " + task.getId() +
             " retrieved by the user");
         Iterator<TaskIntern> it = completedTasks.iterator();
         while (it.hasNext()) {
             TaskIntern candidate = it.next();
-            if (candidate.equals(wrapper)) {
-                // remove the wrapping for this task
-                removeWrapping(task);
-                // remove the task from the completed list
+            if (candidate.equals(task)) {
                 it.remove();
-
-                if (candidate.threwException()) {
-                    throw new TaskException(candidate.getException());
-                }
-
-                return (Serializable) candidate.getResult();
+                return new ResultInternImpl(candidate.getResult(), candidate);
             }
         }
         return null;
@@ -591,11 +509,11 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitResultsOf(java.util.List)
      */
-    public List waitResultsOf(List tasks)
+    public List<ResultIntern> waitResultsOf(List<TaskIntern> tasks)
         throws IllegalArgumentException, TaskException {
-        ArrayList results = new ArrayList();
-        for (Task task : (List<Task>) tasks) {
-            Object res = waitResultOf(task);
+        ArrayList<ResultIntern> results = new ArrayList<ResultIntern>();
+        for (TaskIntern task : tasks) {
+            ResultIntern res = waitResultOf(task);
             results.add(res);
         }
         return results;
@@ -621,14 +539,15 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
                 return areAllResultsAvailable();
             } else if (request.getMethodName().equals("waitResultOf")) {
                 try {
-                    return isResultAvailable((Task) request.getParameter(0));
+                    return isResultAvailable((TaskIntern) request.getParameter(
+                            0));
                 } catch (NoSuchElementException e) {
                     return true;
                 }
             } else if (request.getMethodName().equals("waitResultsOf")) {
                 // TODO Might be unscalable if the number of tasks gets too high
                 try {
-                    return areResultsAvailable((List<Task>) request.getParameter(
+                    return areResultsAvailable((List<TaskIntern>) request.getParameter(
                             0));
                 } catch (NoSuchElementException e) {
                     return true;

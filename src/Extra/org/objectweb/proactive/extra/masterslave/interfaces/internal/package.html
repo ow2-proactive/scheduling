@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+</head>
+<body bgcolor="white">
+<p>
+internal Interfaces of the Master/Slave API. The package includes : <br>
+<ul>
+<li> MasterIntern : an internal version of the Master interface </li>
+<li> ResultIntern : an oject containing a task and its result </li>
+<li> Slave : the slave interface </li>
+<li> SlaveConsumer : from the SlaveManager point of view, the entity that will be notified of new slaves deployment</li>
+<li> SlaveDeadListener : in relation with the SlaveWatcher(Pinger), the enity that will be notified of slave failure </li>
+<li> SlaveManager : the interface of the SlaveManager which allows to get slaves from the Slave pool </li>
+<li> SlaveManagerAdmin : the admin interface of the SlaveManager which allows to increase the slave pool </li>
+<li> SlaveWatcher : the entity which takes care that slaves are alive (Pinger) </li>
+<li> TaskIntern : the internal version of the Task </li>
+<li> TaskProvider : from the slave point of view the entity which provides task and expects results (i.e. the master) </li>
+</ul>
+</p>
+
+<!-- Put @see and @since tags down here. -->
+  @author  fviale <br/>
+  @version 1.0,  2007/04/27 <br/>
+  @since   ProActive 3.2 <br/>
+
+</body>
+</html>
