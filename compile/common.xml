@@ -75,6 +75,7 @@
 		<pathelement location="${cl.extensions.dir}" />
 		<pathelement location="${cl.extra.dir}" />
 		<pathelement location="${cl.utils.dir}" />
+		<pathelement location="${cl.test.dir}"/>
 		<path refid="project.libs"/>
 	</path>
 	

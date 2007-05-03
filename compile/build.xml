@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ProActive" default="compile" basedir=".">
+<project name="ProActive JUNIT" default="compile" basedir=".">
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
 
 	<import file="common.xml" />
@@ -417,6 +417,28 @@
 		</runTestsMacro>
 	</target>
 
+
+	<target name="unitTests" depends="compile">
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<target name="junit" depends="unitTests">
+	
+		<delete dir="${base.dir}/testReports"/>
+		<mkdir dir="${base.dir}/testReports"/>
+	
+		<junit printsummary="yes">
+			<classpath refid="project.classpath"/>
+			<formatter type="xml"/>
+			<batchtest fork="yes" todir="${base.dir}/testReports">
+				<fileset dir="${cl.test.dir}">
+   					<include name="unitTests/**/*Test*.class"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 
 	<!-- ================================================================ -->
 	<!--   Tests coverage : need clover license in user.home directory    -->
