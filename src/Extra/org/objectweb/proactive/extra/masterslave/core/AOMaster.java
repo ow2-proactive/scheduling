@@ -399,6 +399,13 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     }
 
     /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.MasterIntern#slavepoolSize()
+     */
+    public int slavepoolSize() {
+        return slaveGroup.size();
+    }
+
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solve(org.objectweb.proactive.extra.masterslave.interfaces.Task)
      */
     public void solve(TaskIntern task) throws IllegalArgumentException {

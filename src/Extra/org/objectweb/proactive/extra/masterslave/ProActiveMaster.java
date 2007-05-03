@@ -256,6 +256,13 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#slavepoolSize()
+     */
+    public int slavepoolSize() {
+        return aomaster.slavepoolSize();
+    }
+
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solve(org.objectweb.proactive.extra.masterslave.interfaces.Task)
      */
     public void solve(T task) {

@@ -68,6 +68,12 @@ public interface MasterIntern {
     public void addResources(VirtualNode virtualnode);
 
     /**
+     * This method returns the number of slaves currently in the slave pool
+     * @return
+     */
+    public int slavepoolSize();
+
+    /**
      * Terminates the slave manager and (eventually free every resources) <br/>
      * @param freeNodeResources tells if the Slave Manager should as well free the node resources
      * @return success
