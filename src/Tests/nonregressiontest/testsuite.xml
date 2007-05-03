@@ -10,8 +10,6 @@
 		dir="../classes/Tests" 
 		packageName="nonregressiontest" >
 			<unitTest exclude="no" class="nonregressiontest.runtime.defaultruntime.Test" />
-			<unitTest exclude="no" class="nonregressiontest.runtime.interfaceconsistency.Test" />
-			<unitTest exclude="no" class="nonregressiontest.forwarder.interfaceconsistency.Test" />
 			<unitTest exclude="no" class="nonregressiontest.node.nodefactory.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
 			<unitTest exclude="no" class="nonregressiontest.node.localnode.Test" />
@@ -95,7 +93,6 @@
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.loadbalancing.Test" />
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
-			<unitTest exclude="no" class="nonregressiontest.forwarder.interfaceconsistency.Test" />
 		    <unitTest exclude="yes" class="nonregressiontest.security.SecurityTests"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
