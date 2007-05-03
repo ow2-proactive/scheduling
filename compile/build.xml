@@ -434,7 +434,7 @@
 			<formatter type="xml"/>
 			<batchtest fork="yes" todir="${base.dir}/testReports">
 				<fileset dir="${cl.test.dir}">
-   					<include name="unitTests/**/*Test*.class"/>
+   					<include name="unitTests/**/*.class"/>
 				</fileset>
 			</batchtest>
 		</junit>
