@@ -255,14 +255,14 @@
 	<!--  =============================================================== -->
 
 	<target name="extensions" depends="core" description="Compile the ProActive extensions classes" >
-		<subant target="-compile" inheritall="yes" >
+		<subant target="-compile" inheritall="yes" failonerror="true">
 			<fileset dir="${src.extensions.dir}" includes="**/build.xml"/>
 		</subant>
 	</target>
 
 	
 	<target name="extra" depends="core" description="Compile the ProActive extensions classes" >
-		<subant target="-compile" inheritall="yes" >
+		<subant target="-compile" inheritall="yes" failonerror="true" >
 			<fileset dir="${src.extra.dir}" includes="**/build.xml"/>
 		</subant>
 	</target>
