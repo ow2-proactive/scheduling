@@ -82,7 +82,7 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
     }
 
     public CircularArrayList(java.util.Collection c) {
-    	size = c.size();
+        size = c.size();
         tail = c.size();
         array = new Object[c.size()];
         c.toArray(array);
