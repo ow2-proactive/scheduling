@@ -56,12 +56,15 @@ public class NQueensExample {
                 vn_name);
 
         // Generating the queries for the NQueens
-        Vector<Query> queries = QueryGenerator.generateQueries(nqueen_board_size, nqueen_algorithm_depth);
-        System.out.println("Launching NQUEENS solutions finder for n = " + nqueen_board_size+" with a depth of "+nqueen_algorithm_depth);
+        Vector<Query> queries = QueryGenerator.generateQueries(nqueen_board_size,
+                nqueen_algorithm_depth);
+        System.out.println("Launching NQUEENS solutions finder for n = " +
+            nqueen_board_size + " with a depth of " + nqueen_algorithm_depth);
         master.solveAll(queries);
         try {
             long sumResults = 0;
             long begin = System.currentTimeMillis();
+
             // Waiting for the results
             Collection<Long> results = master.waitAllResults();
             for (long res : results) {
@@ -70,8 +73,8 @@ public class NQueensExample {
             long end = System.currentTimeMillis();
 
             System.out.println("Total number of configurations found in " +
-                String.format("%1$tT", end - begin) + " for n = "+nqueen_board_size+" : " +
-                sumResults);
+                String.format("%1$tT", end - begin) + " for n = " +
+                nqueen_board_size + " : " + sumResults);
         } catch (TaskException e) {
             // Exception in the algorithm
             e.printStackTrace();
