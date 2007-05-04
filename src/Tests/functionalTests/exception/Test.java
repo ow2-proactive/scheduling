@@ -28,8 +28,9 @@
  *
  * ################################################################
  */
-package nonregressiontest.exception;
+package functionalTests.exception;
 
+import static junit.framework.Assert.assertTrue;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
@@ -38,30 +39,19 @@ import testsuite.test.FunctionalTest;
 
 
 /**
+ * Test exceptions
  * @author ProActiveTeam
  * @version 1.0, 25 mars 2005
  * @since ProActive 2.2
  *
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4146928628360380282L;
+public class Test {
+   
+	public Test() {
+		
+	}
+	
 	int counter = 0;
-
-    public Test() {
-        super("Exception", "Test exceptions");
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        if (counter == 14) {
-            return true;
-        }
-        System.out.println("counter == " + counter);
-        return false;
-    }
 
     void good() {
         counter++;
@@ -174,9 +164,11 @@ public class Test extends FunctionalTest {
         } finally {
             ProActive.removeTryWithCatch();
         }
+        
+        assertTrue(counter == 14);
     }
 
-    @Override
+    @org.junit.Test
 	public void action() throws Exception {
 
         /* Server */
@@ -235,21 +227,11 @@ public class Test extends FunctionalTest {
         testMechanism(r);
     }
 
-    @Override
-	public void initTest() throws Exception {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-	public void endTest() throws Exception {
-        // TODO Auto-generated method stub
-    }
 
     public static void main(String[] args) {
         Test test = new Test();
         try {
             test.action();
-            System.out.println(test.postConditions());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

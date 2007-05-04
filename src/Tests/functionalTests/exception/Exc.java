@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.exception;
+package functionalTests.exception;
 
 
 /**

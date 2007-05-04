@@ -34,7 +34,6 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.loopmixedlocation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.acontinuation.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.activeobject.wrapper.Test" /> 
-			<unitTest exclude="no" class="nonregressiontest.exception.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.validateall.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.coallocation.Test" />
@@ -89,7 +88,6 @@
 			<unitTest exclude="no" class="nonregressiontest.component.migration.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.cic.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
-			<unitTest exclude="no" class="nonregressiontest.loadbalancing.Test" />
 		    <unitTest exclude="yes" class="nonregressiontest.security.SecurityTests"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
