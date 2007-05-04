@@ -28,8 +28,10 @@
  *
  * ################################################################
  */
-package nonregressiontest.loadbalancing;
+package functionalTests.loadbalancing;
 
+import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -37,35 +39,35 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.loadbalancing.LoadBalancing;
 import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTimeMillisMetricFactory;
 
-import testsuite.test.Assertions;
-import testsuite.test.FunctionalTest;
+import functionalTests.Helper;
 
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6456202200419791534L;
-	private static String XML_LOCATION = Test.class.getResource(
-            "/nonregressiontest/loadbalancing/LoadBalancing.xml").getPath();
+import testsuite.test.Assertions;
+
+import static junit.framework.Assert.assertTrue;
+
+/**
+ * Test load balancing
+ */
+public class Test {
+   
+	private String XML_LOCATION = Test.class.getResource(
+            "/functionalTests/loadbalancing/LoadBalancing.xml").getPath();
     private ProActiveDescriptor pad;
     private VirtualNode vn1;
     A a;
     Node nodeOne;
     Node nodeTwo;
 
-    public Test() {
-        super("load balancing", "Test load balancing");
-    }
-
-    @Override
+   
+    @org.junit.Test
 	public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), null, nodeOne);
-
         Thread.sleep(1000);
+        assertTrue(a.getNodeUrl().equals(nodeTwo.getNodeInformation().getURL()));
     }
 
-    @Override
-	public void initTest() throws Exception {
+    @Before
+    public void initTest() throws Exception {
         this.pad = ProActive.getProactiveDescriptor(XML_LOCATION);
         this.pad.activateMappings();
         this.vn1 = this.pad.getVirtualNode("VN");
@@ -77,13 +79,10 @@ public class Test extends FunctionalTest {
             new CurrentTimeMillisMetricFactory());
     }
 
-    @Override
-	public void endTest() throws Exception {
-        this.pad.killall(false);
+    @After
+	public void endTest() {
+    	Helper.killJVMs();
     }
 
-    @Override
-	public boolean postConditions() throws Exception {
-        return a.getNodeUrl().equals(nodeTwo.getNodeInformation().getURL());
-    }
+   
 }

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.loadbalancing;
+package functionalTests.loadbalancing;
 
 import java.io.Serializable;
 
