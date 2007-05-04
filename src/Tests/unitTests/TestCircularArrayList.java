@@ -5,7 +5,6 @@ import static junit.framework.Assert.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
