@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ProActive JUNIT" default="compile" basedir=".">
+<project name="ProActive" default="compile" basedir=".">
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
 
 	<import file="common.xml" />
@@ -452,6 +452,7 @@
 				<fileset dir="${cl.test.dir}">
    					<include name="unitTests/**/*.class"/>			
 					<include name="functionalTests/**/*Test*.class"/>
+					<exclude name="**/*$*.class"/>
 				</fileset>
 			</batchtest>
 		</junit>
