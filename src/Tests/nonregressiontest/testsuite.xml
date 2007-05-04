@@ -10,30 +10,11 @@
 		dir="../classes/Tests" 
 		packageName="nonregressiontest" >
 			<unitTest exclude="no" class="nonregressiontest.node.nodefactory.Test" /> 
-			<unitTest exclude="no" class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
 			<unitTest exclude="no" class="nonregressiontest.node.localnode.Test" />
 			<unitTest exclude="no" class="nonregressiontest.node.deployertag.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.stubgeneration.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.stubinterface.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.abstractclass.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.local.newactive.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.local.turnactive.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.remote.newactive.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.remote.turnactive.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.generics.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.request.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.request.immediateservice.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.request.terminate.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.lookupactive.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.node.getactiveobject.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.simplemigration.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.multiplemigration.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.loopmigration.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.strategy.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.locationserver.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.loopmixedlocation.Test" />
-			<unitTest exclude="no" class="nonregressiontest.activeobject.acontinuation.Test" /> 
-			<unitTest exclude="no" class="nonregressiontest.activeobject.wrapper.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.validateall.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.coallocation.Test" />
