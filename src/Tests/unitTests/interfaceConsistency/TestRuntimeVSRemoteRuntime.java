@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
  * @author cmathieu
  *
  */
-public class RuntimeVSRemoteRuntime {
+public class TestRuntimeVSRemoteRuntime {
 	
 	
 	    @Test
