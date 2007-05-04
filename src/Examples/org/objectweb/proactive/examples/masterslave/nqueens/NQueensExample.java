@@ -72,12 +72,18 @@ public class NQueensExample {
             }
             long end = System.currentTimeMillis();
 
+            long hours = (end - begin) / 3600000;
+            System.out.println("" + hours +
+                String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
+
             System.out.println("Total number of configurations found in " +
-                String.format("%1$tT", end - begin) + " for n = " +
-                nqueen_board_size + " : " + sumResults);
+                hours + String.format("h %1$tMm %1$tSs %1$tLms", end - begin) +
+                " for n = " + nqueen_board_size + " : " + sumResults);
         } catch (TaskException e) {
             // Exception in the algorithm
             e.printStackTrace();
         }
+        master.terminate(true);
+        System.exit(0);
     }
 }

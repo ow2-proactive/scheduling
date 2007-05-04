@@ -98,7 +98,6 @@ public class TestBasic implements Task<Integer> {
 
         // Post processing, calculates the statistics
         long sum = 0;
-        long max = 0;
 
         for (Integer result : results) {
             sum += result;

@@ -309,14 +309,6 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
         }
     }
 
-    /**
-     * Tells if the master has some activity
-     * @return master activity
-     */
-    private boolean isIdle() {
-        return pendingTasks.isEmpty() && launchedTasks.isEmpty();
-    }
-
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isOneResultAvailable()
      */
@@ -385,17 +377,6 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
             // This slave is now idle
             slavesActivity.put(originatorName, new TaskWrapperImpl());
         }
-    }
-
-    /* (non-Javadoc)
-     * DEBUG : show completed tasks
-     */
-    private void showCompletedTasks() {
-        String strCompleted = "CompletedTasks : ";
-        for (TaskIntern task : completedTasks) {
-            strCompleted += (" " + task.getId());
-        }
-        logger.debug(strCompleted);
     }
 
     /* (non-Javadoc)

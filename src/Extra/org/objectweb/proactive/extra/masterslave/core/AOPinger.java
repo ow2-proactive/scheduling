@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
