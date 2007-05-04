@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.runtime.classloader;
+package functionalTests.runtime.classloader;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -36,12 +36,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-
+import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
-import testsuite.test.FunctionalTest;
+import functionalTests.Helper;
 
 
 /**
@@ -58,36 +58,15 @@ import testsuite.test.FunctionalTest;
  *
  * @author Matthieu Morel
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1636051750940227685L;
+public class Test {
+ 
 	ProActiveDescriptor descriptor;
 
-    public Test() {
-        super("remote classloading with custom classloader",
-            "remote classloading with custom classloader");
-    }
-
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
-	public void action() throws Exception {
-        A a = (A) ProActive.newActive("nonregressiontest.runtime.classloader.A",
-                new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
-        a.createActiveObjectB();
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
+	@Before
 	public void initTest() throws Exception {
         System.setProperty("proactive.classloader", "enable");
         String oldFilePath = getClass()
-                                 .getResource("/nonregressiontest/runtime/classloader/deployment.xml")
+                                 .getResource("/functionalTests/runtime/classloader/deployment.xml")
                                  .getPath();
         String newFilePath = oldFilePath.replaceFirst("deployment.xml",
                 "deployment-tmp.xml");
@@ -103,61 +82,45 @@ public class Test extends FunctionalTest {
         searchAndReplace(oldFilePath, newFilePath, "proactive.home",
             proactiveDir);
         descriptor = ProActive.getProactiveDescriptor(getClass()
-                                                          .getResource("/nonregressiontest/runtime/classloader/deployment-tmp.xml")
+                                                          .getResource("/functionalTests/runtime/classloader/deployment-tmp.xml")
                                                           .getPath());
         descriptor.activateMappings();
     }
 
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    @Override
-	public void endTest() throws Exception {
-        descriptor.killall(false);
-        System.setProperty("proactive.classloader", "disable");
+	
+	
+	@org.junit.Test
+	public void action() throws Exception {
+        A a = (A) ProActive.newActive("functionalTests.runtime.classloader.A",
+                new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
+        a.createActiveObjectB();
     }
 
-    @Override
-	public boolean postConditions() throws Exception {
-        return true;
+   @After
+   public void endTest() throws Exception {
+	   Helper.killJVMs();
     }
-
-    private void searchAndReplace(String oldFilePath, String newFilePath,
-        String oldString, String newString) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(
-                        oldFilePath));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(
-                        newFilePath));
-            while (true) {
-                String oldLine = reader.readLine();
-                if (oldLine == null) {
-                    break;
-                }
-                String newLine = oldLine.replace(oldString, newString);
-                writer.write(newLine);
-                writer.newLine();
-            }
-            reader.close();
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static void main(String[] args) {
-        try {
-        	System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
-        	TestNodes tn = new TestNodes();
-        	tn.action();
-        Test test = new Test();
-        test.initTest();
-        test.action();
-        test.endTest();
-        boolean success = test.postConditions();
-        System.out.println(success?"SUCCESS":"FAILURE");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+   
+   private void searchAndReplace(String oldFilePath, String newFilePath,
+	        String oldString, String newString) {
+	        try {
+	            BufferedReader reader = new BufferedReader(new FileReader(
+	                        oldFilePath));
+	            BufferedWriter writer = new BufferedWriter(new FileWriter(
+	                        newFilePath));
+	            while (true) {
+	                String oldLine = reader.readLine();
+	                if (oldLine == null) {
+	                    break;
+	                }
+	                String newLine = oldLine.replace(oldString, newString);
+	                writer.write(newLine);
+	                writer.newLine();
+	            }
+	            reader.close();
+	            writer.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
 }

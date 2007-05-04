@@ -28,21 +28,20 @@
  *
  * ################################################################
  */
-package nonregressiontest.runtime.classloader;
+package functionalTests.runtime.defaultruntime;
 
-import org.objectweb.proactive.ProActive;
-
-
+import org.junit.Test;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import static junit.framework.Assert.*;
 /**
- * @author Matthieu Morel
- *
+ * Test default runtime creation
  */
-public class A {
-    public A() {
-    }
-
-    public void createActiveObjectB() throws Exception {
-        Object ao = ProActive.newActive("nonregressiontest.runtime.classloader.B",
-                new Object[] { "dummy" });
+public class TestDefaultRuntime {
+	
+    @Test
+	public void action() throws Exception {
+    	ProActiveRuntime part = RuntimeFactory.getDefaultRuntime();
+    	assertTrue(part != null);
     }
 }

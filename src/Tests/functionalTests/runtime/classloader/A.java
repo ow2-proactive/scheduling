@@ -28,48 +28,21 @@
  *
  * ################################################################
  */
-package nonregressiontest.runtime.defaultruntime;
+package functionalTests.runtime.classloader;
 
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.ProActive;
 
-import testsuite.test.FunctionalTest;
 
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4773910513232125220L;
-	ProActiveRuntime part;
-
-    public Test() {
-        super("defaultruntimecreation", "Test default runtime creation");
+/**
+ * @author Matthieu Morel
+ *
+ */
+public class A {
+    public A() {
     }
 
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
-	public void action() throws Exception {
-        part = RuntimeFactory.getDefaultRuntime();
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
-	public void initTest() throws Exception {
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    @Override
-	public void endTest() throws Exception {
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        return (part != null);
+    public void createActiveObjectB() throws Exception {
+        Object ao = ProActive.newActive("functionalTests.runtime.classloader.B",
+                new Object[] { "dummy" });
     }
 }
