@@ -28,65 +28,29 @@
  *
  * ################################################################
  */
-package nonregressiontest.node.localnode;
+package functionalTests.node.localnode;
+
+import java.io.Serializable;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 
-import testsuite.test.FunctionalTest;
-
-
-/**
- * @author Alexandre di Costanzo
- *
- */
-public class Test extends FunctionalTest {
+public class A implements Serializable {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1626919410261919710L;
-	private A ao;
+	private static final long serialVersionUID = -3486687166076491272L;
+	String name;
 
-    /**
-    * Constructor for Test.
-    */
-    public Test() {
-        super("Local node access",
-            "Test the access to an active object local node");
+    public A() {
     }
 
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
-	public void initTest() throws Exception {
-        this.ao = (A) ProActive.newActive(A.class.getName(),
-                new Object[] { "Alex" });
+    public A(String name) {
+        this.name = name;
     }
 
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
-	public void action() throws Exception {
-        Node aoNode = this.ao.getMyNode();
-        aoNode.setProperty("test", "alex");
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    @Override
-	public void endTest() throws Exception {
-    	ProActive.terminateActiveObject(this.ao, false);
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        Node aoNode = this.ao.getMyNode();
-        if (aoNode.getProperty("test").compareTo("alex") != 0) {
-            return false;
-        }
-        return true;
+    public Node getMyNode() throws NodeException {
+        return ProActive.getNode();
     }
 }

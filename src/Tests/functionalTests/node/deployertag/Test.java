@@ -28,33 +28,34 @@
  *
  * ################################################################
  */
-package nonregressiontest.node.deployertag;
+package functionalTests.node.deployertag;
 
+import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.DeployerTag;
 
-import testsuite.test.FunctionalTest;
+import functionalTests.Helper;
 
 
 // TODO: Test deployment from multiple VMs
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1955857833355837127L;
+/**
+ * Test that DeployerTag are correctly assigned.
+ */
+public class Test {
+
 	private static String XML_LOCATION;
 
     static {
         String value = System.getProperty(
-                "nonregressiontest.node.deployertag.file");
+                "functionalTests.node.deployertag.file");
         if (value != null) {
             XML_LOCATION = Test.class.getResource(value).getPath();
         } else {
             XML_LOCATION = Test.class.getResource(
-                    "/nonregressiontest/node/deployertag/groupinformation.xml")
+                    "/functionalTests/node/deployertag/groupinformation.xml")
                                      .getPath();
         }
     }
@@ -62,15 +63,9 @@ public class Test extends FunctionalTest {
     private static ProActiveDescriptor proActiveDescriptor = null;
     private static VirtualNode[] virtualNodes = null;
 
-    public Test() {
-        super("DeployerTag", "Test that DeployerTag are correctly assigned.");
-    }
-
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
-	public void action() throws Exception {
+    
+    @org.junit.Test
+    public void action() throws Exception {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
                 XML_LOCATION);
         proActiveDescriptor.activateMappings();
@@ -101,22 +96,9 @@ public class Test extends FunctionalTest {
         }
     }
 
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
-	public void initTest() throws Exception {
-        // nothing to do
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    @Override
-	public void endTest() throws Exception {
-        if (proActiveDescriptor != null) {
-            proActiveDescriptor.killall(false);
-            proActiveDescriptor = null;
-        }
+    
+    @After
+	public void endTest() {
+       Helper.killJVMs();
     }
 }

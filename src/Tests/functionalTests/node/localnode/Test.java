@@ -28,29 +28,43 @@
  *
  * ################################################################
  */
-package nonregressiontest.node.localnode;
+package functionalTests.node.localnode;
 
-import java.io.Serializable;
+import static junit.framework.Assert.assertTrue;
 
+import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-
-public class A implements Serializable {
+/**
+ * @author Alexandre di Costanzo
+ *
+ */
+public class Test {
     /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3486687166076491272L;
-	String name;
+	private static final long serialVersionUID = -1626919410261919710L;
+	private A ao;
 
-    public A() {
+   
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    @Before
+	public void initTest() throws Exception {
+        this.ao = (A) ProActive.newActive(A.class.getName(),
+                new Object[] { "bernard Lavilliers" });
+        
+       
     }
 
-    public A(String name) {
-        this.name = name;
-    }
+   @org.junit.Test
+	public void action() throws Exception {
+        Node aoNode = this.ao.getMyNode();
+        aoNode.setProperty("test", "bernard Lavilliers");
+        
+        assertTrue(aoNode.getProperty("test").compareTo("bernard Lavilliers") == 0);
 
-    public Node getMyNode() throws NodeException {
-        return ProActive.getNode();
+        ProActive.terminateActiveObject(this.ao, false);
     }
 }

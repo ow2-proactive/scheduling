@@ -28,17 +28,23 @@
  *
  * ################################################################
  */
-package nonregressiontest.node.nodefactory;
+package functionalTests.node.nodefactory;
 
+import static junit.framework.Assert.assertTrue;
+
+import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
-import testsuite.test.FunctionalTest;
-
-public class Test extends FunctionalTest {
+import functionalTests.Helper;
+/**
+ * Test the creation of rmi, jini, ibis node whith the factory
+ */
+public class Test {
     /**
 	 * 
 	 */
@@ -49,30 +55,21 @@ public class Test extends FunctionalTest {
     private String jiniURL = "jini://localhost/JININode" +
         System.currentTimeMillis();
 
-    //Node ibisNode;
 
-    /**
-     * Constructor for Test.
-     */
-    public Test() {
-        super("NodeFactory",
-            "Test the creation of rmi, jini, ibis node whith the factory");
-    }
-
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
+    @org.junit.Test
 	public void action() throws Exception {
         NodeFactory.createNode(rmiURL);
         NodeFactory.createNode(jiniURL);
         //        NodeFactory.createNode("ibis://localhost/IBISNode");
+        
+        rmiNode = NodeFactory.getNode(rmiURL);
+        jiniNode = NodeFactory.getNode(jiniURL);
+        //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
+        assertTrue((rmiNode != null) && (jiniNode != null) &&
+        NodeFactory.isNodeLocal(rmiNode));
     }
 
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
+    @Before
 	public void initTest() throws Exception {
         String port = ProActiveConfiguration.getInstance().getProperty("proactive.rmi.port");
         if (port != null) {
@@ -85,23 +82,11 @@ public class Test extends FunctionalTest {
         }
     }
 
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    @Override
+  
+    @After
 	public void endTest() throws Exception {
         NodeFactory.killNode(rmiURL);
         NodeFactory.killNode(jiniURL);
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        rmiNode = NodeFactory.getNode(rmiURL);
-        jiniNode = NodeFactory.getNode(jiniURL);
-        //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
-        return ((rmiNode != null) && (jiniNode != null) &&
-        NodeFactory.isNodeLocal(rmiNode));
-        //        return ((rmiNode != null) &&
-        //        		NodeFactory.isNodeLocal(rmiNode));
+        Helper.killJVMs();
     }
 }
