@@ -461,7 +461,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if (!FuturePool.isInsideABodyForwarder()) {
             // if copy mode, no need for registering AC
             if (this.isAwaited() && !this.copyMode) {
-                boolean continuation = (FuturePool.getBodyDestination() != null);
+                boolean continuation = (FuturePool.getBodiesDestination() != null);
 
                 // if continuation=false, no destination is registred:
                 // - either ac are disabled,
@@ -477,9 +477,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 }
                 if (sender != null) { // else we are in a migration forwarder
                     if (continuation) {
-                        sender.getFuturePool()
-                              .addAutomaticContinuation(ID, creatorID,
-                            FuturePool.getBodyDestination());
+                        for (UniversalBody dest : FuturePool.getBodiesDestination()) {
+                            sender.getFuturePool()
+                                  .addAutomaticContinuation(ID, creatorID, dest);
+                        }
                     } else {
                         // its not a copy and not a continuation: wait for the result
                         this.waitFor();
@@ -499,6 +500,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 }
             }
         }
+
+        // for future that are deepcopied then not registred in any futurepool
+        out.writeObject(senderID);
         // Pass the result
         out.writeObject(target);
         // Pass the id
@@ -509,10 +513,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     private synchronized void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
+        senderID = (UniqueID) in.readObject();
         target = (FutureResult) in.readObject();
         ID = (long) in.readLong();
         creatorID = (UniqueID) in.readObject();
-
         // register all incoming futures, even for migration or checkpoiting
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);

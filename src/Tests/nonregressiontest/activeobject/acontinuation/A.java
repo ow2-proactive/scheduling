@@ -34,11 +34,12 @@ import org.objectweb.proactive.ProActive;
 
 
 public class A implements java.io.Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5362621066324170354L;
-	boolean isFuture = true;
+     *
+     */
+    private static final long serialVersionUID = 5362621066324170354L;
+    boolean isFuture = true;
     private A deleguate;
     Id id;
     Id idSent;
@@ -94,8 +95,11 @@ public class A implements java.io.Serializable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         return a;
+    }
+
+    public A delegatedGetA(A a) {
+        return this.deleguate.getA(a);
     }
 
     public void forwardID(Id id) {

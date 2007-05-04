@@ -32,14 +32,7 @@ package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
+import java.util.ArrayList;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
@@ -72,8 +65,6 @@ import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
-import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
 /**
@@ -425,7 +416,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                             MessageEvent.REPLY_SENT, destinationBodyId,
                             getRequestQueue().size());
                     }
-                    this.getFuturePool().registerDestination(request.getSender());
+                    ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
+                    destinations.add(request.getSender());
+                    this.getFuturePool().registerDestinations(destinations);
 
                     // FAULT-TOLERANCE
                     if (BodyImpl.this.ftmanager != null) {
@@ -435,7 +428,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         replyAlternate.send(request.getSender());
                     }
 
-                    this.getFuturePool().removeDestination();
+                    this.getFuturePool().removeDestinations();
                     return;
                 }
 
@@ -457,7 +450,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         MessageEvent.REPLY_SENT, destinationBodyId,
                         getRequestQueue().size());
                 }
-                this.getFuturePool().registerDestination(request.getSender());
+                ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
+                destinations.add(request.getSender());
+                this.getFuturePool().registerDestinations(destinations);
 
                 // FAULT-TOLERANCE
                 if (BodyImpl.this.ftmanager != null) {
@@ -466,7 +461,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     reply.send(request.getSender());
                 }
 
-                this.getFuturePool().removeDestination();
+                this.getFuturePool().removeDestinations();
             } catch (java.io.IOException e) {
                 // Create a non functional exception encapsulating the network exception
                 BodyNonFunctionalException nfe = new SendReplyCommunicationException(

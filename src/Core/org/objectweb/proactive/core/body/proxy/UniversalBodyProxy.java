@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.proxy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -285,7 +286,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             universalBody = newBody;
             isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
         }
-        sourceBody.getFuturePool().registerDestination(universalBody);
+        ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
+        destinations.add(universalBody);
+        sourceBody.getFuturePool().registerDestinations(destinations);
         if (isLocal) {
             // Replaces the effective arguments with a deep copy
             // Only do this if the body is local
@@ -293,7 +296,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             methodCall.makeDeepCopyOfArguments();
         }
         sendRequestInternal(methodCall, future, sourceBody);
-        sourceBody.getFuturePool().removeDestination();
+        sourceBody.getFuturePool().removeDestinations();
     }
 
     protected void sendRequestInternal(MethodCall methodCall, Future future,

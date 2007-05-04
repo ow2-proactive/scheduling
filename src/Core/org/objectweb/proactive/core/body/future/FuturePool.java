@@ -98,21 +98,21 @@ public class FuturePool extends Object implements java.io.Serializable {
     // this table is used to register destination before sending.
     // So, a future could retreive its destination during serialization
     // this table indexed by the thread which perform the registration.
-    static private java.util.Hashtable<Thread, UniversalBody> bodyDestination;
+    static private java.util.Hashtable<Thread, ArrayList<UniversalBody>> bodiesDestination;
 
     // to register in the table
-    static public void registerBodyDestination(UniversalBody dest) {
-        bodyDestination.put(Thread.currentThread(), dest);
+    static public void registerBodiesDestination(ArrayList<UniversalBody> dests) {
+        bodiesDestination.put(Thread.currentThread(), dests);
     }
 
     // to clear an entry in the table
-    static public void removeBodyDestination() {
-        bodyDestination.remove(Thread.currentThread());
+    static public void removeBodiesDestination() {
+        bodiesDestination.remove(Thread.currentThread());
     }
 
     // to get a destination
-    static public UniversalBody getBodyDestination() {
-        return (bodyDestination.get(Thread.currentThread()));
+    static public ArrayList<UniversalBody> getBodiesDestination() {
+        return (bodiesDestination.get(Thread.currentThread()));
     }
 
     // this table is used to register deserialized futures after receive
@@ -162,7 +162,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     }
 
     static {
-        bodyDestination = new java.util.Hashtable<Thread, UniversalBody>();
+        bodiesDestination = new java.util.Hashtable<Thread, ArrayList<UniversalBody>>();
         incomingFutures = new java.util.Hashtable<Thread, ArrayList<Future>>();
         // A HashTable cannot contain null as value so we use a syncrhonized HashMap
         forwarderThreads = Collections.synchronizedMap(new HashMap<Thread, Object>());
@@ -272,15 +272,31 @@ public class FuturePool extends Object implements java.io.Serializable {
                         this.queueAC = new ActiveACQueue();
                         this.queueAC.start();
                     }
-                    //the added reply is a deep copy with the isAC tag set to true
+                    // the added reply is a deep copy (concurrent modification of result)
+                    // ACs are registred during this deep copy (no copy mode)
+                    // Warn : this copy does not avoid the copy for local communications !
+                    this.registerDestinations(bodiesToContinue);
+                    FutureResult newResult = (FutureResult) Utils.makeDeepCopy(result);
+
+                    // the created futures should be set in copyMode to avoid AC registration
+                    // during the effective sending by the AC thread
+                    ArrayList incFutures = FuturePool.getIncomingFutures();
+                    if (incFutures != null) {
+                        for (Object f : incFutures) {
+                            ((FutureProxy) f).setCopyMode();
+                        }
+                        FuturePool.removeIncomingFutures();
+                    }
+                    this.removeDestinations();
+
+                    // add the deepcopied AC
                     queueAC.addACRequest(new ACService(bodiesToContinue,
-                            new ReplyImpl(creatorID, id, null, result, psm, true)));
+                            new ReplyImpl(creatorID, id, null, newResult, psm,
+                                true)));
                 }
             }
-
             // 3) Remove futures from the futureMap
             futures.removeFutures(id, creatorID);
-
             return ftres;
         } else {
             // we have to store the result received by AC until future arrive
@@ -345,18 +361,18 @@ public class FuturePool extends Object implements java.io.Serializable {
      * To register a destination before sending a reques or a reply
      * Registration key is the calling thread.
      */
-    public void registerDestination(UniversalBody dest) {
+    public void registerDestinations(ArrayList<UniversalBody> dests) {
         if (acEnabled) {
-            FuturePool.registerBodyDestination(dest);
+            FuturePool.registerBodiesDestination(dests);
         }
     }
 
     /**
      * To clear registred destination for the calling thread.
      */
-    public void removeDestination() {
+    public void removeDestinations() {
         if (acEnabled) {
-            FuturePool.removeBodyDestination();
+            FuturePool.removeBodiesDestination();
         }
     }
 
@@ -507,7 +523,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 }
                 while (owner == null) {
                     owner = LocalBodyStore.getInstance().getLocalBody(ownerBody);
-                    // Associating the thred with the body
+                    // Associating the thread with the body
                     LocalBodyStore.getInstance().setCurrentThreadBody(owner);
                     // it's a halfbody...
                     if (owner == null) {
@@ -561,7 +577,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      */
     private class ACService implements java.io.Serializable {
         // bodies that have to be updated	
-        private java.util.ArrayList dests;
+        private java.util.ArrayList<UniversalBody> dests;
 
         // reply to send
         private Reply reply;
@@ -569,7 +585,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         //
         // -- CONSTRUCTORS -----------------------------------------------
         //
-        public ACService(java.util.ArrayList dests, Reply reply) {
+        public ACService(java.util.ArrayList<UniversalBody> dests, Reply reply) {
             this.dests = dests;
             this.reply = reply;
         }
@@ -579,9 +595,18 @@ public class FuturePool extends Object implements java.io.Serializable {
         //
         public void doAutomaticContinuation() throws java.io.IOException {
             if (dests != null) {
+                // for several *local* destinations, the deepcopy of the result in the reply object
+                // would unset copymode for the future contained inside this result. A new reply is 
+                // created to avoid the alteration of the original result.
+                int remainingSends = dests.size();
+                Reply toSend = null;
+                ProActiveSecurityManager psm = (remainingSends > 1)
+                    ? (((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager())
+                    : null;
+
                 for (int i = 0; i < dests.size(); i++) {
                     UniversalBody dest = (UniversalBody) (dests.get(i));
-                    registerDestination(dest);
+
                     // FAULT-TOLERANCE
                     AbstractBody ownerBody = (AbstractBody) (LocalBodyStore.getInstance()
                                                                            .getLocalBody(FuturePool.this.ownerBody));
@@ -591,19 +616,30 @@ public class FuturePool extends Object implements java.io.Serializable {
                                                                   .getLocalHalfBody(FuturePool.this.ownerBody));
                     }
                     FTManager ftm = ownerBody.getFTManager();
+
+                    if (remainingSends > 1) {
+                        // create a new reply to keep the original copy unchanged for next sending ...
+                        toSend = new ReplyImpl(reply.getSourceBodyID(),
+                                reply.getSequenceNumber(), null,
+                                reply.getResult(), psm, true);
+                    } else {
+                        // last sending : the orignal can ben sent
+                        toSend = reply;
+                    }
+
+                    // send the reply
                     try {
                         if (ftm != null) {
-                            ftm.sendReply(reply, dest);
+                            ftm.sendReply(toSend, dest);
                         } else {
-                            reply.send(dest);
+                            toSend.send(dest);
                         }
                     } catch (IOException ioe) {
                         BodyNonFunctionalException nfe = new SendReplyCommunicationException("Exception occured in while sending reply in AC",
                                 ioe, ownerBody, dest.getID());
-
                         NFEManager.fireNFE(nfe, ownerBody);
                     }
-                    removeDestination();
+                    remainingSends--;
                 }
             }
         }

@@ -186,8 +186,8 @@ public class FutureMap extends Object implements java.io.Serializable {
         }
     }
 
-    /*
-     * Unset the migration tag in all futures of the map.
+    /**
+     * Unset the copy tag in all futures of the map.
      * @see FutureProxy
      */
     public synchronized void unsetCopyMode() {
@@ -210,7 +210,7 @@ public class FutureMap extends Object implements java.io.Serializable {
     }
 
     /**
-     * Set the migration tag in all futures of the map.
+     * Set the copy tag in all futures of the map.
      * @see FutureProxy
      */
     public synchronized void setCopyMode() {

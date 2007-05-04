@@ -37,13 +37,17 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 import testsuite.test.FunctionalTest;
 
+
 public class Test extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8272627897015121569L;
-	A a;
+     *
+     */
+    private static final long serialVersionUID = -8272627897015121569L;
+    A a;
     A b;
+    A t1;
+    A t2;
     A lastA;
     Id idPrincipal;
     Id idDeleguate;
@@ -58,9 +62,9 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
-        //System.out.println( "Property "+System.getProperty("proactive.future.ac"));
-        String initial_ca_setting = ProActiveConfiguration.getInstance().getProperty("proactive.future.ac");
+    public void action() throws Exception {
+        String initial_ca_setting = ProActiveConfiguration.getInstance()
+                                                          .getProperty("proactive.future.ac");
         if (!"enable".equals(initial_ca_setting)) {
             System.setProperty("proactive.future.ac", "enable");
         }
@@ -74,25 +78,26 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return (futureByResult && a.isSuccessful() &&
-        a.getFinalResult().equals("dummy") && lastA.getIdName().equals("e"));
+        a.getFinalResult().equals("dummy") && lastA.getIdName().equals("e") &&
+        (t1.getIdName().equals("d")) && (t2.getIdName().equals("d")));
     }
 
     private class ACThread extends Thread {
         @Override
-		public void run() {
+        public void run() {
             try {
                 a = (A) ProActive.newActive(A.class.getName(),
                         new Object[] { "principal" });
@@ -125,6 +130,14 @@ public class Test extends FunctionalTest {
                 A de = d.getA(e);
                 A cde = c.getA(de);
                 lastA = e.getA(cde);
+
+                //test multiple wrapped futures with multiples AC destinations
+                A f = (A) ProActive.newActive(A.class.getName(),
+                        new Object[] { "f" });
+                c.initSecondDeleguate();
+                A t = c.delegatedGetA(d);
+                t1 = e.getA(t);
+                t2 = f.getA(t);
             } catch (Exception e) {
                 e.printStackTrace();
             }
