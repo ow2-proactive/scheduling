@@ -934,10 +934,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         LocalBodyStore.getInstance().unregisterBody(this);
     }
 
-    //protected void activityStopped2(){
-    //	LocalBodyStore.getInstance().unregisterBody(this);
-    //}
-
     /**
      * Signals that the activity of this body, managed by the active thread has just started.
      */

@@ -186,7 +186,10 @@ public class Service {
      * @param timeout the timeout in ms
      */
     public void blockingServeOldest(RequestFilter requestFilter, long timeout) {
-        body.serve(requestQueue.blockingRemoveOldest(requestFilter, timeout));
+        Request r = requestQueue.blockingRemoveOldest(requestFilter, timeout);
+        if (r != null) {
+            body.serve(r);
+        }
     }
 
     /**

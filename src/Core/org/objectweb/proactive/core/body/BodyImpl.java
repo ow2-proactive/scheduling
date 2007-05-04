@@ -260,17 +260,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      */
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
-        //System.out.print("Body receives Reply -> ");
         if (messageEventProducer != null) {
             messageEventProducer.notifyListeners(reply,
                 MessageEvent.REPLY_RECEIVED, bodyID);
         }
-
-        /*if (reply.getResult() != null) {
-           System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
-           } else {
-                   System.out.println("Reply is : " + reply);
-           }*/
         return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
@@ -281,13 +274,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected void activityStopped() {
         super.activityStopped();
         messageEventProducer = null;
+        this.localBodyStrategy.getRequestQueue().destroy();
         setLocalBodyImpl(new InactiveLocalBodyStrategy());
     }
 
-    //protected void activityStopped2() {
-    //	super.activityStopped2();
-    //	
-    //}
     public void setImmediateService(String methodName)
         throws java.io.IOException {
         this.requestReceiver.setImmediateService(methodName);
