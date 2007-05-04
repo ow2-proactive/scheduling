@@ -71,7 +71,6 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnActivated" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnNotActivated" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestArrayOfArray" />
-			<unitTest exclude="no" class="nonregressiontest.component.generation.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.conform.TestConformWrapper"/>
 			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.composite.Test"/>
@@ -123,7 +122,7 @@
 			</link>
 			<link id="3">
 				<parent id="2" />
-			</link>-->
+			</link>
 			<!-- remote tests - composite-->
 			<link id="5">
 				<parent id="4" />
