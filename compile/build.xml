@@ -444,7 +444,7 @@
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 			<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
-			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=@{nodeDescriptor}" />
+			<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=NodesLocal.xml" />
 
 		
 			<formatter type="xml"/>
