@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/Core"/>
-	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" path="src/Examples"/>
-	<classpathentry kind="src" path="src/Extensions"/>
-	<classpathentry kind="src" path="src/Extra"/>
-	<classpathentry kind="src" path="src/Tests"/>
-	<classpathentry kind="src" path="src/Utils"/>
+	<classpathentry kind="src" output="classes/Core" path="src/Core"/>
+	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" output="classes/Examples" path="src/Examples"/>
+	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
+	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
+	<classpathentry kind="src" output="classes/Tests" path="src/Tests"/>
+	<classpathentry kind="src" output="classes/Utils" path="src/Utils"/>
 	<classpathentry kind="lib" path="compile/lib/ant-javah.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant-jdepend.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant-launcher.jar"/>
