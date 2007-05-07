@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -51,6 +52,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastBindingChecker;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
@@ -209,14 +211,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
 
         try {
             ProActiveInterface multicastItf = (ProActiveInterface) owner.getFcInterface(itfType.getFcItfName());
-
-            if (itfType.isFcMulticastItf()) {
-                multicastItfs.put(itfType.getFcItfName(), multicastItf);
-            } else {
-                //                logger.error("the interface named " + itfType.getFcItfName() +
-                //                    " cannot be managed by this collective interfaces controller");
-                return false;
-            }
+            multicastItfs.put(itfType.getFcItfName(), multicastItf);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
             return false;
@@ -230,21 +225,17 @@ public class MulticastControllerImpl extends AbstractProActiveController
      */
     public void bindFcMulticast(String clientItfName,
         ProActiveInterface serverItf) {
-        init();
-        if (logger.isDebugEnabled()) {
-            try {
-                if (!ProActiveGroup.isGroup(serverItf.getFcItfOwner())) {
-                    logger.debug("multicast binding : " + clientItfName +
-                        " to : " +
-                        Fractal.getNameController(serverItf.getFcItfOwner())
-                               .getFcName() + "." + serverItf.getFcItfName());
-                }
-            } catch (NoSuchInterfaceException e) {
-                e.printStackTrace();
-            }
-        }
-        if (multicastItfs.containsKey(clientItfName)) {
-            bindFc(clientItfName, serverItf);
+        try {
+        	// bindFcMulticast is just a renaming of the bindFc method in the BindingController
+        	// this avoid to rewrite similar code
+        	// the specific part is in the bindFc method in this class
+            Fractive.getBindingController(owner).bindFc(clientItfName, serverItf);
+        } catch (NoSuchInterfaceException e) {
+        	logger.warn("No such interface: " + clientItfName, e);
+        } catch (IllegalBindingException e) {
+        	logger.warn("Illegal binding between " + clientItfName + " and " + serverItf.getFcItfName(),e);
+        } catch (IllegalLifeCycleException e) {
+        	logger.warn("Illegal life cycle component for binding "  + clientItfName + " and " + serverItf.getFcItfName(),e);
         }
     }
 
@@ -402,24 +393,37 @@ public class MulticastControllerImpl extends AbstractProActiveController
         return result;
     }
 
-    private void bindFc(String clientItfName, ProActiveInterface serverItf) {
-        try {
-            ProxyForComponentInterfaceGroup clientSideProxy = (ProxyForComponentInterfaceGroup) clientSideProxies.get(clientItfName);
-
-            if (clientSideProxy.getDelegatee() == null) {
-                ProActiveInterface groupItf = ProActiveComponentGroup.newComponentInterfaceGroup((ProActiveInterfaceType) serverItf.getFcItfType(),
-                        owner);
-                ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) groupItf).getProxy();
-                clientSideProxy.setDelegatee(proxy);
+    protected void bindFc(String clientItfName, ProActiveInterface serverItf) {
+        init();
+        if (logger.isDebugEnabled()) {
+            try {
+                if (!ProActiveGroup.isGroup(serverItf.getFcItfOwner())) {
+                    logger.debug("multicast binding : " + clientItfName +
+                        " to : " +
+                        Fractal.getNameController(serverItf.getFcItfOwner())
+                               .getFcName() + "." + serverItf.getFcItfName());
+                }
+            } catch (NoSuchInterfaceException e) {
+                e.printStackTrace();
             }
+        }
+        if (multicastItfs.containsKey(clientItfName)) {
+            try {
+                ProxyForComponentInterfaceGroup clientSideProxy = (ProxyForComponentInterfaceGroup) clientSideProxies.get(clientItfName);
 
-            ((Group) clientSideProxy.getDelegatee()).add(serverItf);
-        } catch (ClassNotReifiableException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+                if (clientSideProxy.getDelegatee() == null) {
+                    ProActiveInterface groupItf = ProActiveComponentGroup.newComponentInterfaceGroup((ProActiveInterfaceType) serverItf.getFcItfType(),
+                            owner);
+                    ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) groupItf).getProxy();
+                    clientSideProxy.setDelegatee(proxy);
+                }
+
+                ((Group) clientSideProxy.getDelegatee()).add(serverItf);
+            } catch (ClassNotReifiableException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
