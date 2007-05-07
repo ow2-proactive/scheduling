@@ -28,11 +28,14 @@
  *
  * ################################################################
  */
-package nonregressiontest.filetransfer;
+package functionalTests.filetransfer;
 
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -43,16 +46,18 @@ import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.filetransfer.FileVector;
 
-import testsuite.test.Assertions;
-import testsuite.test.FunctionalTest;
+import functionalTests.Helper;
 
-
-public class TestDeployRetrieve extends FunctionalTest {
+import static junit.framework.Assert.assertTrue;
+/**
+ * Tests that both schems work using the ProActive FileTransfer API
+ */
+public class TestDeployRetrieve {
     static final long serialVersionUID = 1;
     private static Logger logger = ProActiveLogger.getLogger(
-            "nonregressiontest");
+            "functionalTests");
     private static String XML_LOCATION = TestAPI.class.getResource(
-            "/nonregressiontest/filetransfer/TestDeployRetrieve.xml").getPath();
+            "/functionalTests/filetransfer/TestDeployRetrieve.xml").getPath();
     ProActiveDescriptor pad;
     File fileTest = new File("/tmp/ProActiveTestFile.dat");
     File fileRetrieved = new File("/tmp/ProActiveTestFileRetrieved.dat");
@@ -67,19 +72,8 @@ public class TestDeployRetrieve extends FunctionalTest {
     //Descriptor variables
     String jvmProcess = "localJVM";
     String hostName = "localhost";
-    
-    public TestDeployRetrieve() {
-        super("File Transfer at Deployment and Retrieval Time",
-            "Tests that both schems work using the ProActive FileTransfer API");
-    }
 
-    @Override
-	public boolean postConditions() throws Exception {
-    	//depricated when using the assertions patter
-        return true;
-    }
-
-    @Override
+    @Before
 	public void initTest() throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -97,7 +91,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         
     }
 
-    @Override
+    @After
 	public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
@@ -108,9 +102,10 @@ public class TestDeployRetrieve extends FunctionalTest {
         cleanIfNecessary(this.fileDeployed2);
         cleanIfNecessary(this.fileRetrieved2);
         cleanIfNecessary(this.fileRetrieved);
+        Helper.killJVMs();
     }
 
-    @Override
+    @Test
 	public void action() throws Exception {
     	
     	long fileTestSum = TestAPI.checkSum(fileTest);
@@ -143,7 +138,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         Node node[]=testVNode.getNodes();
         long finitDeployment=System.currentTimeMillis();
         
-        Assertions.assertTrue(node.length > 0);
+        assertTrue(node.length > 0);
         if(logger.isDebugEnabled()){
         	logger.debug("Deployed "+node.length+" node from VirtualNode "+testVNode.getName()+" in "+(finitDeployment-initDeployment)+"[ms]");
         }
@@ -154,7 +149,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         	logger.debug("Checking the integrity of the test file transfer at deployment time.");
         }
         long fileDeployedSum = TestAPI.checkSum(fileDeployed);
-        Assertions.assertTrue(fileTestSum == fileDeployedSum);
+        assertTrue(fileTestSum == fileDeployedSum);
         
         //Checking correct FileTransferRetrieve
 		if(logger.isDebugEnabled()){
@@ -169,7 +164,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         	logger.debug("Retrieved "+fileVector.size()+" files from VirtualNode "+testVNode.getName()+" in "+(finitRetrieve-initRetrieve)+"[ms]");
         }
         
-        Assertions.assertTrue(fileVector.size()==2);
+        assertTrue(fileVector.size()==2);
         
         fileRetrieved = new File(fileRetrieved.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());
         fileRetrieved2 = new File(fileRetrieved2.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());
@@ -182,7 +177,7 @@ public class TestDeployRetrieve extends FunctionalTest {
             logger.debug("CheckSum Deploy=" + fileDeployedSum);
         }
 
-        Assertions.assertTrue(fileTestSum == fileRetrievedSum);
+        assertTrue(fileTestSum == fileRetrievedSum);
     }
 
     /**
@@ -221,8 +216,6 @@ public class TestDeployRetrieve extends FunctionalTest {
             test.initTest();
             System.out.println("Action");
             test.action();
-            System.out.println("postConditions");
-            System.out.println("Result=" + test.postConditions());
             System.out.println("endTest");
             test.endTest();
             System.out.println("The end");

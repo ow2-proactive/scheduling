@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.filetransfer;
+package functionalTests.filetransfer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +39,9 @@ import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -47,15 +50,18 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
-import testsuite.test.Assertions;
-import testsuite.test.FunctionalTest;
+import functionalTests.Helper;
+import static junit.framework.Assert.assertTrue;
 
-public class TestAPI extends FunctionalTest {
+/**
+ * Tests the two main methods of the File Transfer API
+ */
+public class TestAPI {
     static final long serialVersionUID = 1;
     private static Logger logger = ProActiveLogger.getLogger(
-            "nonregressiontest");
-    private static String XML_LOCATION = TestAPI.class.getResource("/nonregressiontest/filetransfer/TestAPI.xml").getPath();
-    //private static String XML_LOCATION = TestAPI.class.getResource("/nonregressiontest/filetransfer/TestAPINotLocal.xml").getPath();
+            "functionalTests");
+    private static String XML_LOCATION = TestAPI.class.getResource("/functionalTests/filetransfer/TestAPI.xml").getPath();
+    //private static String XML_LOCATION = TestAPI.class.getResource("/functionalTests/filetransfer/TestAPINotLocal.xml").getPath();
     private static int FILE_SIZE = 16; //MB
     
     ProActiveDescriptor pad;
@@ -65,32 +71,10 @@ public class TestAPI extends FunctionalTest {
     File fileFuturePushed = new File("/tmp/ProActiveTestFuturePushed.dat");
     FileVector filePulledWrapper; 
 
-    public TestAPI() {
-        super("File Transfer API: File Push and File Pull",
-            "Tests the two main methods of the File Transfer API.");
-    }
+   
 
-    @Override
-	public boolean postConditions() throws Exception {
-        
-    	long fileTestSum = checkSum(fileTest);
-        long filePulledSum = checkSum(filePulled);
-        long filePushedSum = checkSum(filePushed);
-        long fileFuturePushedSum = checkSum(fileFuturePushed);
-        
-        if (logger.isDebugEnabled()) {
-            logger.debug("CheckSum TestFile              =" + fileTestSum);
-            logger.debug("CheckSum PushedFile            =" + filePushedSum);
-            logger.debug("CheckSum PulledFile            =" + filePulledSum);
-            logger.debug("CheckSum PushedFileWhilePulling=" + fileFuturePushedSum);
-        }
 
-        return (fileTestSum == filePushedSum) &&
-        (fileTestSum == filePulledSum) &&(fileTestSum == fileFuturePushedSum);
-       
-    }
-
-    @Override
+    @Before
 	public void initTest() throws Exception {
         cleanIfNecessary();
 
@@ -102,16 +86,17 @@ public class TestAPI extends FunctionalTest {
         createRandomContentFile(fileTest.getAbsolutePath(), FILE_SIZE);
     }
 
-    @Override
+    @After
 	public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
 
         cleanIfNecessary();
+        Helper.killJVMs();
     }
 
-    @Override
+    @Test
 	public void action() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
@@ -130,7 +115,7 @@ public class TestAPI extends FunctionalTest {
         
         FileVector fw = FileTransfer.pushFile(testnode[0],
             fileTest, filePushed);
-        Assertions.assertTrue(fw.getFile(0).equals(filePushed)); //wait-by-necessity
+        assertTrue(fw.getFile(0).equals(filePushed)); //wait-by-necessity
         
         filePulledWrapper = FileTransfer.pullFile(testnode[0],filePushed, filePulled);
         
@@ -139,11 +124,27 @@ public class TestAPI extends FunctionalTest {
         //System.out.println("Finished wiating");
         FileVector pushedWhilePulling = FileTransfer.pushFile(testnodePush[0], filePulledWrapper, fileFuturePushed);
 
-        Assertions.assertTrue(filePulledWrapper.size()==1);
-        Assertions.assertTrue(filePulledWrapper.getFile(0).equals(filePulled)); //wait-by-necessity
+        assertTrue(filePulledWrapper.size()==1);
+        assertTrue(filePulledWrapper.getFile(0).equals(filePulled)); //wait-by-necessity
         
-        Assertions.assertTrue(pushedWhilePulling.size()==1);
-        Assertions.assertTrue(pushedWhilePulling.getFile(0).equals(fileFuturePushed)); //wait-by-necessity
+        assertTrue(pushedWhilePulling.size()==1);
+        assertTrue(pushedWhilePulling.getFile(0).equals(fileFuturePushed)); //wait-by-necessity
+    
+        long fileTestSum = checkSum(fileTest);
+        long filePulledSum = checkSum(filePulled);
+        long filePushedSum = checkSum(filePushed);
+        long fileFuturePushedSum = checkSum(fileFuturePushed);
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug("CheckSum TestFile              =" + fileTestSum);
+            logger.debug("CheckSum PushedFile            =" + filePushedSum);
+            logger.debug("CheckSum PulledFile            =" + filePulledSum);
+            logger.debug("CheckSum PushedFileWhilePulling=" + fileFuturePushedSum);
+        }
+
+        assertTrue(fileTestSum == filePushedSum);
+        assertTrue(fileTestSum == filePulledSum);
+        assertTrue(fileTestSum == fileFuturePushedSum);
     }
 
     /**
@@ -217,7 +218,6 @@ public class TestAPI extends FunctionalTest {
             System.out.println("Action");
             test.action();
             System.out.println("postConditions");
-            System.out.println("Result=" + test.postConditions());
             System.out.println("endTest");
             test.endTest();
             System.out.println("The end");
