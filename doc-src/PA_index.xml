@@ -51,7 +51,6 @@
 <!ENTITY conclusion SYSTEM "guided_tour/conclusion.xml">
 <!ENTITY writeDoc SYSTEM "writeProActiveDocumentation.xml">
 <!ENTITY developingConventions SYSTEM "developingConventions.xml">
-<!ENTITY testSuiteAPI SYSTEM "testSuiteAPI.xml">
 <!ENTITY DescriptorProcess SYSTEM "development/DescriptorProcess.xml">
 <!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
@@ -150,7 +149,6 @@
     &writeDoc;
     &extendingIC2D;
     &developingConventions;
-    &testSuiteAPI;
     &DescriptorProcess;
     &devFileTransfer;
     &devFaultTolerance;
