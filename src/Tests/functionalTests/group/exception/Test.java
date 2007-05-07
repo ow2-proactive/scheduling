@@ -28,10 +28,10 @@
  *
  * ################################################################
  */
-package nonregressiontest.group.exception;
+package functionalTests.group.exception;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
@@ -40,24 +40,20 @@ import org.objectweb.proactive.core.node.Node;
 
 import testsuite.test.FunctionalTest;
 
-
+import static junit.framework.Assert.assertTrue;
 /**
+ * do an (a)synchronous call that rise exception
+ * 
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
+public class Test {
+    
 	private static final long serialVersionUID = -4420144742633751760L;
 	private A typedGroup = null;
     private A resultTypedGroup = null;
 
-    public Test() {
-        super("Exception returned in a method call on group",
-            "do an (a)synchronous call that rise exception");
-    }
 
-    @Override
+    @org.junit.Test
 	public void action() throws Exception {
         Object[][] params = {
                 { "Agent0" },
@@ -72,65 +68,43 @@ public class Test extends FunctionalTest {
                 params, nodes);
 
         this.resultTypedGroup = this.typedGroup.asynchronousCallException();
-    }
-
-    @Override
-	public void endTest() throws Exception {
-        // nothing to do
-    }
-
-    @Override
-	public void initTest() throws Exception {
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
+    
         // was the result group created ?
-        if (this.resultTypedGroup == null) {
-            System.err.println(
-                "the result group containing exception is not build");
-            return false;
-        }
-
+        assertTrue(resultTypedGroup != null);
+        // System.err.println(
+        //        "the result group containing exception is not build");
+      
         Group group = ProActiveGroup.getGroup(this.typedGroup);
         Group groupOfResult = ProActiveGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
-        if (groupOfResult.size() != group.size()) {
-            System.err.println(
-                "the result group containing exception has the correct size");
-            return false;
-        }
-
+        assertTrue(groupOfResult.size() == group.size());
+        //    System.err.println(
+        //        "the result group containing exception has the correct size");
+          
         boolean exceptionInResultGroup = true;
         for (int i = 0; i < groupOfResult.size(); i++) {
             exceptionInResultGroup &= (groupOfResult.get(i) instanceof Throwable);
         }
 
         // is the result group containing exceptions ?
-        if (!exceptionInResultGroup) {
-            System.err.println(
-                "the result group doesn't contain (exclusively) exception");
-            return false;
-        }
+        assertTrue(exceptionInResultGroup);
+//        System.err.println(
+//                "the result group doesn't contain (exclusively) exception");
 
         // has the ExceptionListException the correct size ?
         ExceptionListException el = groupOfResult.getExceptionList();
-        if (el.size() != groupOfResult.size()) {
-            System.err.println(
-                "the ExceptionListException hasn't the right size");
-            return false;
-        }
+        assertTrue((el.size() == groupOfResult.size()));
+//        System.err.println(
+//                "the ExceptionListException hasn't the right size");
 
         A resultOfResultGroup = (A) this.resultTypedGroup.asynchronousCall();
         Group groupOfResultResult = ProActiveGroup.getGroup(resultOfResultGroup);
 
         // has the result-result group the correct size ?
-        if (groupOfResultResult.size() != groupOfResult.size()) {
-            System.err.println(
-                "the result of a call on a group containing exception hasn't the correct size");
-            return false;
-        }
+        assertTrue (groupOfResultResult.size() == groupOfResult.size());
+//            System.err.println(
+//                "the result of a call on a group containing exception hasn't the correct size");
 
         boolean nullInResultResultGroup = true;
         for (int i = 0; i < groupOfResultResult.size(); i++) {
@@ -138,28 +112,22 @@ public class Test extends FunctionalTest {
         }
 
         // is the result group containing null ?
-        if (!nullInResultResultGroup) {
-            System.err.println(
-                "the result group of a group containing exception doesn't contain null");
-            return false;
-        }
+        assertTrue (nullInResultResultGroup);
+//            System.err.println(
+//                "the result group of a group containing exception doesn't contain null");
+         
 
         // are the exceptions deleted ?
         groupOfResult.purgeExceptionAndNull();
-        if (groupOfResult.size() != 0) {
-            System.err.println(
-                "the exceptions in a group are not correctly (totaly) purged");
-            return false;
-        }
+        assertTrue(groupOfResult.size() == 0);
+//            System.err.println(
+//                "the exceptions in a group are not correctly (totaly) purged");
+         
 
         // are the null deleted ?
         groupOfResultResult.purgeExceptionAndNull();
-        if (groupOfResultResult.size() != 0) {
-            System.err.println(
-                "the null in a group are not correctly (totaly) purged");
-            return false;
-        }
-
-        return true;
+        assertTrue (groupOfResultResult.size() == 0);
+//            System.err.println(
+//                "the null in a group are not correctly (totaly) purged");
     }
 }

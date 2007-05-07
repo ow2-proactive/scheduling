@@ -28,66 +28,59 @@
  *
  * ################################################################
  */
-package nonregressiontest.group.oneserialization;
+package functionalTests.group.javaobject;
 
-import java.util.Iterator;
+import static junit.framework.Assert.assertTrue;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
-
+import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.FunctionalTest;
-
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 
 /**
+ * create a group with active nd non-ctive object then launch method calls
+ * 
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8599180613841630776L;
+public class Test {
+ 	private static final long serialVersionUID = -1946538215241283938L;
 	private A typedGroup = null;
+    private A resultTypedGroup = null;
 
-    public Test() {
-        super("one serialization of the methodcall object in a group communication",
-            "do only serialization of the MethodCall object (in broadcast call only)");
-    }
-
-    @Override
+    
+    @org.junit.Test
 	public void action() throws Exception {
-        ProActiveGroup.setUniqueSerialization(this.typedGroup);
-        this.typedGroup.onewayCall();
-        ProActiveGroup.unsetUniqueSerialization(this.typedGroup);
-    }
+        this.resultTypedGroup = this.typedGroup.asynchronousCall();
+        this.resultTypedGroup.asynchronousCall();
+        
+        // was the result group created ?
+        assertTrue(this.resultTypedGroup != null);
 
-    @Override
-	public void endTest() throws Exception {
-        // nothing to do
-    }
-
-    @Override
-	public void initTest() throws Exception {
-        // nothing to do : ProActive methods can be used here
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        boolean allOnewayCallDone = true;
         Group group = ProActiveGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
-        while (it.hasNext()) {
-            allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
+        Group groupOfResult = ProActiveGroup.getGroup(this.resultTypedGroup);
+
+        // has the result group the same size as the caller group ?
+        assertTrue(groupOfResult.size() == group.size());
+
+        boolean rightRankingOfResults = true;
+        for (int i = 0; i < group.size(); i++) {
+            rightRankingOfResults &= ((A) groupOfResult.get(i)).getName()
+                                      .equals((((A) group.get(i)).asynchronousCall()).getName());
         }
-        return allOnewayCallDone;
+
+        // is the result of the n-th group member at the n-th position in the result group ?
+        assertTrue(rightRankingOfResults);
+
     }
 
-    @Override
-	public boolean preConditions() throws Exception {
-        Object[][] params = {
+    @Before
+	public void preConditions() throws Exception {
+    	new TestNodes().action();
+    	
+    	Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
                 { "Agent2" }
@@ -98,14 +91,16 @@ public class Test extends FunctionalTest {
             };
         this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
                 params, nodes);
-        ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
-        boolean NoOnewayCallDone = true;
-        Group group = ProActiveGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
-        while (it.hasNext()) {
-            NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
-        }
-        return NoOnewayCallDone;
+        Group g = ProActiveGroup.getGroup(this.typedGroup);
+
+        g.add(new A("Agent3"));
+        g.add(new A("Agent4"));
+        g.add(new A("Agent5"));
+
+        g.setRatioMemberToThread(1);
+
+        assertTrue(this.typedGroup != null);
     }
+
 }

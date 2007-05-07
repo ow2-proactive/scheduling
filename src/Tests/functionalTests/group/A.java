@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.group;
+package functionalTests.group;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;

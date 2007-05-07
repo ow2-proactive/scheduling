@@ -28,57 +28,46 @@
  *
  * ################################################################
  */
-package nonregressiontest.group.dynamicthreadpool;
+package functionalTests.group.onewaycall;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
+import static junit.framework.Assert.assertTrue;
 
+import java.util.Iterator;
+
+import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.FunctionalTest;
-
-
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 /**
+ * do a oneway call on a previously created group
+ * 
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8294278613480913623L;
+public class Test {
+ 	private static final long serialVersionUID = -881236704381741691L;
 	private A typedGroup = null;
 
-    /**
-     *
-     */
-    public Test() {
-        super("dynamic threadpool",
-            "add and remove member in a group to see the threadpool vary");
-    }
-
-    @Override
+   
+    @org.junit.Test
 	public void action() throws Exception {
-        Group g = ProActiveGroup.getGroup(this.typedGroup);
-
         this.typedGroup.onewayCall();
-
-        for (int i = 0; i < 100; i++) {
-            g.add(g.get(i % 3));
+  
+        boolean allOnewayCallDone = true;
+        Group group = ProActiveGroup.getGroup(this.typedGroup);
+        Iterator it = group.iterator();
+        while (it.hasNext()) {
+            allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
         }
-
-        this.typedGroup.onewayCall();
-
-        int i = 3;
-        while (i < g.size()) {
-            g.remove(g.size() - 1);
-        }
-        this.typedGroup.onewayCall();
+        assertTrue(allOnewayCallDone);
     }
 
-    @Override
-	public boolean preConditions() throws Exception {
+    @Before
+	public void preConditions() throws Exception {
+    	new TestNodes().action();
+    	
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -90,17 +79,14 @@ public class Test extends FunctionalTest {
             };
         this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
                 params, nodes);
+        ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
-        return (this.typedGroup != null);
-    }
-
-    @Override
-	public void endTest() throws Exception {
-        // nothing to do
-    }
-
-    @Override
-	public void initTest() throws Exception {
-        // nothing to do : ProActive methods can not be used here
+        boolean NoOnewayCallDone = true;
+        Group group = ProActiveGroup.getGroup(this.typedGroup);
+        Iterator it = group.iterator();
+        while (it.hasNext()) {
+            NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
+        }
+        assertTrue(NoOnewayCallDone);
     }
 }

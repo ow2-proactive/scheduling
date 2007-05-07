@@ -28,63 +28,33 @@
  *
  * ################################################################
  */
-package nonregressiontest.group.onewaycall;
+package functionalTests.group.barrier;
+
+import static junit.framework.Assert.assertTrue;
 
 import java.util.Iterator;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
-
-import org.objectweb.proactive.core.group.Group;
+import org.junit.Before;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.FunctionalTest;
-
+import functionalTests.descriptor.defaultnodes.TestNodes;
 
 /**
+ * perform a barrier call on an SPMD group
+ * 
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -881236704381741691L;
-	private A typedGroup = null;
+public class Test {
+	private static final long serialVersionUID = 6929428940280564107L;
+	private A spmdgroup = null;
 
-    public Test() {
-        super("oneway call on group",
-            "do a oneway call on a previously created group");
-    }
 
-    @Override
-	public void action() throws Exception {
-        this.typedGroup.onewayCall();
-    }
-
-    @Override
-	public void endTest() throws Exception {
-        // nothing to do
-    }
-
-    @Override
-	public void initTest() throws Exception {
-        // nothing to do : ProActive methods can not be used here
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        boolean allOnewayCallDone = true;
-        Group group = ProActiveGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
-        while (it.hasNext()) {
-            allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
-        }
-        return allOnewayCallDone;
-    }
-
-    @Override
-	public boolean preConditions() throws Exception {
+    @Before
+	public void preConditions() throws Exception {
+    	new TestNodes().action();
+    	
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -94,16 +64,23 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
-                params, nodes);
-        ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
+        this.spmdgroup = (A) ProSPMD.newSPMDGroup(A.class.getName(), params,
+                nodes);
 
-        boolean NoOnewayCallDone = true;
-        Group group = ProActiveGroup.getGroup(this.typedGroup);
-        Iterator it = group.iterator();
+        assertTrue(spmdgroup != null);
+        assertTrue(ProActiveGroup.size(spmdgroup) == 3);
+    }
+
+    @org.junit.Test
+	public void action() throws Exception {
+        this.spmdgroup.start();
+ 
+        String errors = "";
+        Iterator it = ProActiveGroup.getGroup(this.spmdgroup).iterator();
         while (it.hasNext()) {
-            NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
+            errors += ((A) it.next()).getErrors();
         }
-        return NoOnewayCallDone;
+        System.err.print(errors);
+        assertTrue("".equals(errors));
     }
 }

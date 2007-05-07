@@ -28,10 +28,10 @@
  *
  * ################################################################
  */
-package nonregressiontest.group.scatter;
+package functionalTests.group.scatter;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -39,27 +39,24 @@ import org.objectweb.proactive.core.node.Node;
 
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
-
+import static junit.framework.Assert.assertTrue;
 
 /**
+ * distributes the parameters of a method call to member
+ * 
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3983994850028585746L;
+public class Test  {
+ 	private static final long serialVersionUID = 3983994850028585746L;
 	private A typedGroup = null;
     private A parameterGroup = null;
     private A resultTypedGroup = null;
 
-    public Test() {
-        super("scatter parameters",
-            "distributes the parameters of a method call to member");
-    }
-
-    @Override
+ 
+    @org.junit.Test
 	public void action() throws Exception {
+    	new TestNodes().action();
+    	
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -86,32 +83,16 @@ public class Test extends FunctionalTest {
         ProActiveGroup.setScatterGroup(this.parameterGroup);
         this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
         ProActiveGroup.unsetScatterGroup(this.parameterGroup);
-    }
-
-    @Override
-	public void endTest() throws Exception {
-        // nothing to do
-    }
-
-    @Override
-	public void initTest() throws Exception {
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
+   
         // was the result group created ?
-        if (this.resultTypedGroup == null) {
-            return false;
-        }
+        assertTrue (this.resultTypedGroup != null);
 
         Group group = ProActiveGroup.getGroup(this.typedGroup);
         Group groupResult = ProActiveGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
-        if (groupResult.size() != group.size()) {
-            return false;
-        }
-
+        assertTrue (groupResult.size() == group.size());
+  
         Group groupParameter = ProActiveGroup.getGroup(this.parameterGroup);
         boolean rightRankingAndCorrectnessOfResults = true;
         for (int i = 0; i < group.size(); i++) {
@@ -121,7 +102,6 @@ public class Test extends FunctionalTest {
         }
 
         // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
-        return true;
     }
 
     public static void main(String[] args) {
@@ -136,17 +116,10 @@ public class Test extends FunctionalTest {
             System.setProperty("log4j.configuration",
                 "file:" + System.getProperty("user.dir") +
                 "/compile/proactive-log4j");
-            System.setProperty("nonregressiontest.descriptor.defaultnodes.file",
-                "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
+            System.setProperty("functionalTests.descriptor.defaultnodes.file",
+                "/functionalTests/descriptor/defaultnodes/NodesLocal.xml");
             Test test = new Test();
-            test.initTest();
             test.action();
-            boolean success = test.postConditions();
-            if (success) {
-                System.out.println("[SUCCESS] " + test.getName());
-            } else {
-                System.out.println("[FAILED] " + test.getName());
-            }
             System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();

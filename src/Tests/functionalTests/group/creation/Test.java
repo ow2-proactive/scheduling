@@ -28,33 +28,30 @@
  *
  * ################################################################
  */
-package nonregressiontest.group.creation;
+package functionalTests.group.creation;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
 import testsuite.test.FunctionalTest;
-
+import static junit.framework.Assert.assertTrue;
 
 /**
+ * create a group with 3 active objects
+ * 
  * @author Laurent Baduel
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1483216038924949402L;
+public class Test  {
+ private static final long serialVersionUID = -1483216038924949402L;
 	private A typedGroup = null;
 
-    public Test() {
-        super("group creation", "create a group with 3 active objects");
-    }
-
     private A createGroup() throws Exception {
+    	new TestNodes().action();
+    	
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -70,37 +67,17 @@ public class Test extends FunctionalTest {
         return this.typedGroup;
     }
 
-    @Override
+    @org.junit.Test
 	public void action() throws Exception {
         this.createGroup();
-    }
-
-    public A action(Object o) throws Exception {
-        return this.createGroup();
-    }
-
-    @Override
-	public void initTest() throws Exception {
-        // nothing to do
-    }
-
-    @Override
-	public void endTest() throws Exception {
-        // nothing to do
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
+  
+        
         // was the group created ?
-        if (this.typedGroup == null) {
-            return false;
-        }
+        assertTrue(typedGroup != null);
         Group agentGroup = ProActiveGroup.getGroup(this.typedGroup);
 
         // has the group the right size ?
-        if (agentGroup.size() != 3) {
-            return false;
-        }
+        assertTrue(agentGroup.size() == 3);
 
         A agent0 = (A) agentGroup.get(0);
         A agent1 = (A) agentGroup.get(1);
@@ -122,22 +99,7 @@ public class Test extends FunctionalTest {
             (agent2.getName().equals("Agent2"));
 
         // are the agents at the correct location with the correct names ?
-        return (rightLocations && rightNames);
-    }
-    
-    
- public static void main(String[] args) {
-        
-        Test test = new Test();
-        try {
-            test.action();
-            if (test.postConditions()) {
-                System.out.println("TEST SUCCEEDED");
-            } else {
-                System.out.println("TEST FAILED");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        assertTrue(rightLocations);
+        assertTrue(rightNames);
     }
 }

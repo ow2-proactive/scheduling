@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.group.barrier;
+package functionalTests.group.barrier;
 
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
