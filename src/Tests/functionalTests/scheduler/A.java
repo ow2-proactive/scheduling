@@ -36,7 +36,7 @@
  */
 
 
-package nonregressiontest.scheduler;
+package functionalTests.scheduler;
 
 import org.objectweb.proactive.extra.scheduler.ProActiveTask;
 

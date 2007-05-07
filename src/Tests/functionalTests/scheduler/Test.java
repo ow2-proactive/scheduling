@@ -36,14 +36,16 @@
  */
 
 
-package nonregressiontest.scheduler;
+package functionalTests.scheduler;
+
+import static junit.framework.Assert.assertTrue;
 
 import java.util.Vector;
 
+import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-
-
 import org.objectweb.proactive.extra.scheduler.AdminScheduler;
 import org.objectweb.proactive.extra.scheduler.Info;
 import org.objectweb.proactive.extra.scheduler.ProActiveTask;
@@ -53,29 +55,23 @@ import org.objectweb.proactive.extra.scheduler.UserResult;
 import org.objectweb.proactive.extra.scheduler.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.SimpleResourceManager;
 
-
-import testsuite.test.FunctionalTest;
-
+import functionalTests.Helper;
 
 
-
-
-public class Test extends FunctionalTest {
+/**
+ * Launches the scheduler and adds deletes tasks then shutsdown
+ */
+public class Test {
 
 	private AdminScheduler adminAPI;
 	private SchedulerUserAPI userAPI;
-	private final String xmlURL =Test.class.getResource("/nonregressiontest/scheduler/test.xml").getPath();
+	private final String xmlURL =Test.class.getResource("/functionalTests/scheduler/test.xml").getPath();
 	private final String SNode="//localhost/SCHEDULER_NODE";
 	private String userName;
 	private SimpleResourceManager rm;
-	public Test() {
-		super("Scheduler","Launches the scheduler and adds deletes tasks then shutsdown");
-	}
+	
 
-
-
-
-
+	@org.junit.Test
 	public void action() throws Exception {
 		boolean sucessfulTryCatch=true;
 		Vector<UserResult>results=null;
@@ -192,44 +188,25 @@ public class Test extends FunctionalTest {
 		
 		
          submit(5000,1);
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
         
-     
-     
-         
-         
-
+         assertTrue(adminAPI.info_all().size()==5000);	
+     	
 	}
 
 
+	@After
 	public void endTest() throws Exception {
 		BooleanWrapper shutDownResult=adminAPI.shutdown(new BooleanWrapper(false));
 		if(shutDownResult.booleanValue()==false) throw new Exception("error shutting down the scheduler");
 		
 		BooleanWrapper rmStopResult=rm.stopRM();
 		if(rmStopResult.booleanValue()==false) throw new Exception("error shutting down the resource manager");
+	
+		Helper.killJVMs();
 	}
 
 
+	@Before
 	public void initTest() throws Exception {
 		//get the path of the file
 		
@@ -239,40 +216,9 @@ public class Test extends FunctionalTest {
         userAPI=SchedulerUserAPI.connectTo(SNode);
         userName=System.getProperty("user.name");
 		
+		assertTrue(adminAPI.start().booleanValue());	
 	}
-	public boolean preConditions() throws Exception 
-	{
-		
-		return adminAPI.start().booleanValue();	
-	}
-	public boolean postConditions() throws Exception 
-	{
-		return adminAPI.info_all().size()==5000;	
-		
-	}
-	public static void main(String[] args) {
-        Test test = new Test();
-        
-        try
-        {
-        	logger.info("initTest");
-        	test.initTest();
-        	if(test.preConditions()==false) throw new Exception("preCondition failes");
-        	logger.info("action");
-        	test.action();
-        	if(test.postConditions()==false) throw new Exception("postCondition failes");
-        	logger.info("endTest");
-        	test.endTest();
-        	System.exit(0);
-        }
-        catch (Exception e) {
-        	
-            e.printStackTrace();
-            System.exit(1);
-            
-        }
-	}
-
+	
 	Vector<UserResult> submit(int no, int sleepTime) throws Exception
 	{
 	Vector<ProActiveTask> tasks = new Vector<ProActiveTask>();
