@@ -30,17 +30,18 @@
  */
 package functionalTests.group.exception;
 
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
+import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.FunctionalTest;
-
-import static junit.framework.Assert.assertTrue;
+import functionalTests.Helper;
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 /**
  * do an (a)synchronous call that rise exception
  * 
@@ -53,6 +54,11 @@ public class Test {
     private A resultTypedGroup = null;
 
 
+    @Before
+    public void before() throws Exception {
+    	new TestNodes().action();
+    }
+    
     @org.junit.Test
 	public void action() throws Exception {
         Object[][] params = {
@@ -129,5 +135,10 @@ public class Test {
         assertTrue (groupOfResultResult.size() == 0);
 //            System.err.println(
 //                "the null in a group are not correctly (totaly) purged");
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 }

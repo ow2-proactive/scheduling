@@ -30,9 +30,12 @@
  */
 package functionalTests.group.creation;
 
+import functionalTests.Helper;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 
+import org.junit.After;
+import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
@@ -49,8 +52,12 @@ public class Test  {
  private static final long serialVersionUID = -1483216038924949402L;
 	private A typedGroup = null;
 
+	@Before
+	public void before() throws Exception {
+		new TestNodes().action();	
+	}
+	
     private A createGroup() throws Exception {
-    	new TestNodes().action();
     	
         Object[][] params = {
                 { "Agent0" },
@@ -101,5 +108,10 @@ public class Test  {
         // are the agents at the correct location with the correct names ?
         assertTrue(rightLocations);
         assertTrue(rightNames);
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 }

@@ -34,11 +34,13 @@ import static junit.framework.Assert.assertTrue;
 
 import java.util.Iterator;
 
+import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
+import functionalTests.Helper;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 
@@ -69,6 +71,8 @@ public class Test {
 
     @Before
 	public void preConditions() throws Exception {
+    	new TestNodes().action();
+    	
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -89,5 +93,10 @@ public class Test {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }
         assertTrue(NoOnewayCallDone);
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 }

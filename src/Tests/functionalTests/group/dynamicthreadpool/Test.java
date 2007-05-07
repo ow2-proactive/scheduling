@@ -32,11 +32,13 @@ package functionalTests.group.dynamicthreadpool;
 
 import static junit.framework.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
+import functionalTests.Helper;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 
@@ -71,6 +73,8 @@ public class Test {
 
     @Before
 	public void preConditions() throws Exception {
+    	new TestNodes().action();
+    	
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -84,5 +88,10 @@ public class Test {
                 params, nodes);
 
         assertTrue(this.typedGroup != null);
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 }

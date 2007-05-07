@@ -32,11 +32,13 @@ package functionalTests.group.javaobject;
 
 import static junit.framework.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
+import functionalTests.Helper;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 
@@ -101,6 +103,11 @@ public class Test {
         g.setRatioMemberToThread(1);
 
         assertTrue(this.typedGroup != null);
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 
 }

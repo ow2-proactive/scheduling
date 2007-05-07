@@ -32,9 +32,11 @@ package functionalTests.group.result;
 
 import java.util.Iterator;
 
+import functionalTests.Helper;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 
+import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -106,5 +108,10 @@ public class Test {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }
         assertTrue(NoOnewayCallDone && (this.resultResultTypedGroup == null));
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 }

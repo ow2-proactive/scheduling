@@ -30,9 +30,11 @@
  */
 package functionalTests.group.scatter;
 
+import functionalTests.Helper;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 
+import org.junit.After;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
@@ -102,6 +104,11 @@ public class Test  {
         }
 
         // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 
     public static void main(String[] args) {

@@ -34,11 +34,13 @@ import static junit.framework.Assert.assertTrue;
 
 import java.util.Iterator;
 
+import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
 
+import functionalTests.Helper;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 
 /**
@@ -83,4 +85,10 @@ public class Test {
         System.err.print(errors);
         assertTrue("".equals(errors));
     }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
+    }
 }
+

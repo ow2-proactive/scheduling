@@ -32,9 +32,11 @@ package functionalTests.group.accessbyname;
 
 import static junit.framework.Assert.assertTrue;
 
+import org.junit.After;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
+import functionalTests.Helper;
 import functionalTests.group.A;
 
 /**
@@ -85,5 +87,10 @@ public class Test {
         assertTrue(group.size() == 2);
         assertTrue(group.get(0) == agent1_indexed);
         assertTrue(!group.containsKey("number0"));
+    }
+    
+    @After
+    public void after() {
+    	Helper.killJVMs();
     }
 }
