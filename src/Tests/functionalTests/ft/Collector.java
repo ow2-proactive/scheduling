@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.ft;
+package functionalTests.ft;
 
 import java.io.Serializable;
 
