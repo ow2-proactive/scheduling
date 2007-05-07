@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubgeneration;
+package functionalTests.stub.stubgeneration;
 
 public class A {
     String name;

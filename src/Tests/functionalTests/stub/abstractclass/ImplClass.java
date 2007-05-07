@@ -28,12 +28,18 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubgeneration;
+package functionalTests.stub.abstractclass;
 
 
-/**
- * @author cdalmass
- *
- */
-public class My_PFirst_PType {
+public class ImplClass extends AbstractClass {
+
+	
+	public void foo() {
+//		System.out.println("GreenWidget : foo");
+	}
+	
+	@Override
+	public void gee() {
+//		System.out.println("GreenWidget : gee");
+	}
 }

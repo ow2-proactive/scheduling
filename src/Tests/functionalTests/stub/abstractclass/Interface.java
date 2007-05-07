@@ -28,19 +28,10 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubinterface;
+package functionalTests.stub.abstractclass;
 
-public class StringInterfaceImpl implements StringInterface {
-    String mystring;
+public interface Interface {
+	
+	public void foo();
 
-    public StringInterfaceImpl() {
-    }
-
-    public StringInterfaceImpl(String mystring) {
-        this.mystring = mystring;
-    }
-
-    public String getMyString() {
-        return mystring;
-    }
 }

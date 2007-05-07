@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubinterface;
+package functionalTests.stub.stubinterface;
 
 import java.lang.reflect.InvocationTargetException;
 

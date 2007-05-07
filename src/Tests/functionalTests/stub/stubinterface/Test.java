@@ -28,28 +28,23 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubinterface;
+package functionalTests.stub.stubinterface;
 
 import org.objectweb.proactive.core.mop.MOP;
 
 import testsuite.test.FunctionalTest;
-
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7137686002811784615L;
+import static junit.framework.Assert.assertTrue;
+/**
+ * Test stub generation for interface
+ */
+public class Test  {
+ 	private static final long serialVersionUID = 7137686002811784615L;
 	String result1;
     String result2;
 
-    public Test() {
-        super("StubInterface generation", "Test stub generation for interface");
-    }
-
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
+ 
+    
+    @org.junit.Test
 	public void action() throws Exception {
         StringInterface i1 = (StringInterface) MOP.newInstance("nonregressiontest.stub.stubinterface.StringInterface",
                 "nonregressiontest.stub.stubinterface.StringInterfaceImpl",
@@ -60,25 +55,9 @@ public class Test extends FunctionalTest {
         StringInterfaceImpl i2 = (StringInterfaceImpl) MOP.newInstance("nonregressiontest.stub.stubinterface.StringInterfaceImpl",
                 null, new Object[] { "titi" }, "nonregressiontest.stub.stubinterface.ProxyOne", new Object[0]);
         result2 = i2.getMyString();
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
-	public void initTest() throws Exception {
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    @Override
-	public void endTest() throws Exception {
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        return (result1.equals("toto") && result2.equals("titi"));
+     
+        assertTrue(result1.equals("toto"));
+        assertTrue(result2.equals("titi"));
     }
     
     
@@ -87,11 +66,6 @@ public static void main(String[] args) {
         Test test = new Test();
         try {
             test.action();
-            if (test.postConditions()) {
-                System.out.println("TEST SUCCEEDED");
-            } else {
-                System.out.println("TEST FAILED");
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

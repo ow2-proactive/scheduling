@@ -28,8 +28,44 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubinterface;
+package functionalTests.stub.abstractclass;
 
-public interface StringInterface {
-    public String getMyString();
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.UrlBuilder;
+
+
+/**
+ * Stub generation on abstract classes
+ */
+public class Test {
+  	private static final long serialVersionUID = 69064608102818965L;
+	String stubClassName;
+    byte[] data;
+
+   
+
+    @org.junit.Test
+	public void action() throws Exception {
+    	
+    	Factory f = (Factory) ProActive.newActive(Factory.class.getName(), new Object[]{});
+		ProActive.register(f, UrlBuilder.buildUrlFromProperties("localhost", "myFactory"));
+		
+	     Factory factory = (Factory) ProActive.lookupActive(Factory.class.getName(), UrlBuilder.buildUrlFromProperties("localhost", "myFactory"));
+	     AbstractClass abstractClass = factory.getWidget(NodeFactory.getDefaultNode());
+	     abstractClass.foo();
+	     abstractClass.bar();
+	     abstractClass.gee();
+    }
+
+  
+    
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            test.action();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

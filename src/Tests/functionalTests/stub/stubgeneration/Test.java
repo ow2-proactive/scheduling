@@ -28,89 +28,82 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubgeneration;
+package functionalTests.stub.stubgeneration;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 import java.util.Arrays;
 
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.Utils;
 
-import testsuite.test.Assertions;
-import testsuite.test.FunctionalTest;
-
 
 /**
+ * Testing on-the-fly generation of stub classes in bytecode form
  * @author rquilici
  */
-public class Test extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2856204140856147300L;
+public class Test {
+ 	private static final long serialVersionUID = 2856204140856147300L;
 	String stubClassName;
     byte[] data;
 
-    public Test() {
-        super("Stub Generation",
-            "Testing on-the-fly generation of stub classes in bytecode form");
-    }
+ 
 
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
-	public void action() throws Exception {
+    @org.junit.Test
+ 	public void action() throws Exception {
         //empty String
-        Assertions.assertEquals(Utils.convertClassNameToStubClassName("", null),
+        assertEquals(Utils.convertClassNameToStubClassName("", null),
             "");
 
         //not a stub
-        String notAStubClassName = "nonregressiontest.stub.stubgeneration.A";
-        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+        String notAStubClassName = "functionalTests.stub.stubgeneration.A";
+        assertEquals(Utils.convertStubClassNameToClassName(
                 notAStubClassName), notAStubClassName);
 
         // Class not in a package 
-        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+        assertEquals(Utils.convertStubClassNameToClassName(
                 "pa.stub._StubA"), "A");
 
         //tests with a simple name
-        String baseclassName = "nonregressiontest.stub.stubgeneration.A";
+        String baseclassName = "functionalTests.stub.stubgeneration.A";
         data = JavassistByteCodeStubBuilder.create(baseclassName, null);
-        Assertions.assertNotNull(data);
-        Class stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.nonregressiontest.stub.stubgeneration._StubA",
+        assertNotNull(data);
+        Class stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.functionalTests.stub.stubgeneration._StubA",
                 data);
-        Assertions.assertTrue("A isn't parent of its Stub!",
+        assertTrue("A isn't parent of its Stub!",
             A.class.isAssignableFrom(stubClass));
         stubClassName = Utils.convertClassNameToStubClassName(baseclassName,
                 null);
-        Assertions.assertEquals(stubClassName +
-            " not equals pa.stub.nonregressiontest.stub.stubgeneration._StubA",
+        assertEquals(stubClassName +
+            " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
             stubClassName,
-            "pa.stub.nonregressiontest.stub.stubgeneration._StubA");
-        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+            "pa.stub.functionalTests.stub.stubgeneration._StubA");
+        assertEquals(Utils.convertStubClassNameToClassName(
                 stubClassName), baseclassName);
-        Assertions.assertTrue(Arrays.equals(
+        assertTrue(Arrays.equals(
                 Utils.getNamesOfParameterizingTypesFromStubClassName(
                     stubClassName), new String[0]));
 
         //tests with a more complicated name, test char escaping
-        baseclassName = "nonregressiontest.stub.stubgeneration._StubA_PTy_Dpe_Generics";
+        baseclassName = "functionalTests.stub.stubgeneration._StubA_PTy_Dpe_Generics";
         data = JavassistByteCodeStubBuilder.create(baseclassName,
                 new Class[] { My_PFirst_PType.class, My_DSecond_PType.class });
-        Assertions.assertNotNull(data);
-        stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.parameterized.nonregressiontest.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_Genericsnonregressiontest_Pstub_Pstubgeneration_PMy__PFirst__PType_Dnonregressiontest_Pstub_Pstubgeneration_PMy__DSecond__PType",
+        assertNotNull(data);
+        stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.parameterized.functionalTests.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_GenericsfunctionalTests_Pstub_Pstubgeneration_PMy__PFirst__PType_DfunctionalTests_Pstub_Pstubgeneration_PMy__DSecond__PType",
                 data);
-        Assertions.assertTrue("_StubA_PTy_Dpe_Generics isn't parent of its Stub!",
+        assertTrue("_StubA_PTy_Dpe_Generics isn't parent of its Stub!",
             _StubA_PTy_Dpe_Generics.class.isAssignableFrom(stubClass));
         stubClassName = Utils.convertClassNameToStubClassName(baseclassName,
                 new Class[] { My_PFirst_PType.class, My_DSecond_PType.class });
-        Assertions.assertEquals(stubClassName +
-            " not equals pa.stub.nonregressiontest.stub.stubgeneration._StubA",
+        assertEquals(stubClassName +
+            " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
             stubClassName,
-            "pa.stub.parameterized.nonregressiontest.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_Genericsnonregressiontest_Pstub_Pstubgeneration_PMy__PFirst__PType_Dnonregressiontest_Pstub_Pstubgeneration_PMy__DSecond__PType");
-        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+            "pa.stub.parameterized.functionalTests.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_GenericsfunctionalTests_Pstub_Pstubgeneration_PMy__PFirst__PType_DfunctionalTests_Pstub_Pstubgeneration_PMy__DSecond__PType");
+        assertEquals(Utils.convertStubClassNameToClassName(
                 stubClassName), baseclassName);
-        Assertions.assertTrue(Arrays.equals(
+        assertTrue(Arrays.equals(
                 Utils.getNamesOfParameterizingTypesFromStubClassName(
                     stubClassName),
                 new String[] {
@@ -131,42 +124,20 @@ public class Test extends FunctionalTest {
         //        }
         //        System.out.println("convertStubClassNameToClassName " +
         //            (System.currentTimeMillis() - begin));
+        
+        assertTrue(data != null);
     }
 
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
-	public void initTest() throws Exception {
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    @Override
-	public void endTest() throws Exception {
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        return (data != null);
-    }
+ 
 
     public static void main(String[] args) {
         Test test = new Test();
         try {
-            test.initTest();
             test.action();
-            if (test.postConditions()) {
-                System.out.println("TEST SUCCEEDED");
-            } else {
-                System.out.println("TEST FAILED");
-            }
-        } catch (Exception e) {
+         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                test.endTest();
                 System.exit(0);
             } catch (Exception e1) {
                 e1.printStackTrace();

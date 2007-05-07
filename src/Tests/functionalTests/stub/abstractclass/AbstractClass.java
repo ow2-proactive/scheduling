@@ -28,18 +28,15 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.abstractclass;
+package functionalTests.stub.abstractclass;
 
 
-public class ImplClass extends AbstractClass {
+public abstract class AbstractClass implements Interface {
 
+	public void bar() {}
 	
-	public void foo() {
-//		System.out.println("GreenWidget : foo");
-	}
+	public abstract void gee();
 	
-	@Override
-	public void gee() {
-//		System.out.println("GreenWidget : gee");
-	}
+	
+	
 }

@@ -28,12 +28,19 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.stubgeneration;
+package functionalTests.stub.stubinterface;
 
+public class StringInterfaceImpl implements StringInterface {
+    String mystring;
 
-/**
- * @author cdalmass
- *
- */
-public class My_DSecond_PType {
+    public StringInterfaceImpl() {
+    }
+
+    public StringInterfaceImpl(String mystring) {
+        this.mystring = mystring;
+    }
+
+    public String getMyString() {
+        return mystring;
+    }
 }

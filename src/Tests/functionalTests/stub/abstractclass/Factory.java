@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.abstractclass;
+package functionalTests.stub.abstractclass;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;

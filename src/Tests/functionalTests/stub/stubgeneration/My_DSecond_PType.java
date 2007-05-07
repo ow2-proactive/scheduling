@@ -28,15 +28,12 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.abstractclass;
+package functionalTests.stub.stubgeneration;
 
 
-public abstract class AbstractClass implements Interface {
-
-	public void bar() {}
-	
-	public abstract void gee();
-	
-	
-	
+/**
+ * @author cdalmass
+ *
+ */
+public class My_DSecond_PType {
 }

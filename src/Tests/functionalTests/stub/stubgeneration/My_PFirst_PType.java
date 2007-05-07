@@ -28,10 +28,12 @@
  *
  * ################################################################
  */
-package nonregressiontest.stub.abstractclass;
+package functionalTests.stub.stubgeneration;
 
-public interface Interface {
-	
-	public void foo();
 
+/**
+ * @author cdalmass
+ *
+ */
+public class My_PFirst_PType {
 }
