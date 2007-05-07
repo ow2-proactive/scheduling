@@ -15,7 +15,7 @@ public class Helper {
 			try {
 				switch (OperatingSystem.getOperatingSystem()) {
 				case unix:
-					Runtime.getRuntime().exec(cmd.getAbsolutePath().replaceAll(" ", "\\ "), null, dir);
+					Runtime.getRuntime().exec(new String[]{cmd.getAbsolutePath()}, null, dir);
 					break;
 
 				default:
