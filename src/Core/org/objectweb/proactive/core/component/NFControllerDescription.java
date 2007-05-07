@@ -30,10 +30,6 @@
  */
 package org.objectweb.proactive.core.component;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
 
