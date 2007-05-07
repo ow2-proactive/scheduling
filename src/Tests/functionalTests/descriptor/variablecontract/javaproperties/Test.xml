@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor schemaVersion="3.3" xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd">
+	<variables>
+		<javaPropertyVariable name="user.name" />
+	</variables>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="test"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="test">
+				<jvmSet>
+					<vmName value="JvmNode"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="JvmNode">
+				<creation>
+					<processReference refid="localJVM"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+      					<absolutePath value="${user.name}/plop" />
+      				</classpath>
+      				<jvmParameters>
+						<parameter value="-Dproactive.test=true"/>
+					</jvmParameters>
+      			</jvmProcess>	
+			</processDefinition>	
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
