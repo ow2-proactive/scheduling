@@ -1663,7 +1663,7 @@ public class ProActive {
                 xmlDescriptorUrl + "\".");
             throw new ProActiveException(
                 "A problem occured when getting the proActiveDescriptor at location \"" +
-                xmlDescriptorUrl + "\"." + e);
+                xmlDescriptorUrl + "\".", e);
         } catch (java.io.IOException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
