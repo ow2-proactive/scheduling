@@ -226,16 +226,18 @@ public class MulticastControllerImpl extends AbstractProActiveController
     public void bindFcMulticast(String clientItfName,
         ProActiveInterface serverItf) {
         try {
-        	// bindFcMulticast is just a renaming of the bindFc method in the BindingController
-        	// this avoid to rewrite similar code
-        	// the specific part is in the bindFc method in this class
+            // bindFcMulticast is just a renaming of the bindFc method in the BindingController
+            // this avoid to rewrite similar code
+            // the specific part is in the bindFc method in this class
             Fractive.getBindingController(owner).bindFc(clientItfName, serverItf);
         } catch (NoSuchInterfaceException e) {
-        	logger.warn("No such interface: " + clientItfName, e);
+            logger.warn("No such interface: " + clientItfName, e);
         } catch (IllegalBindingException e) {
-        	logger.warn("Illegal binding between " + clientItfName + " and " + serverItf.getFcItfName(),e);
+            logger.warn("Illegal binding between " + clientItfName + " and " +
+                serverItf.getFcItfName(), e);
         } catch (IllegalLifeCycleException e) {
-        	logger.warn("Illegal life cycle component for binding "  + clientItfName + " and " + serverItf.getFcItfName(),e);
+            logger.warn("Illegal life cycle component for binding " +
+                clientItfName + " and " + serverItf.getFcItfName(), e);
         }
     }
 
