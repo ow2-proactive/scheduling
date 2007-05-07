@@ -28,9 +28,13 @@
  *
  * ################################################################
  */
-package nonregressiontest.mpi;
+package functionalTests.mpi;
+
+import static junit.framework.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Test;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -39,41 +43,29 @@ import org.objectweb.proactive.mpi.MPI;
 import org.objectweb.proactive.mpi.MPIConstants;
 import org.objectweb.proactive.mpi.MPISpmd;
 
-import testsuite.test.FunctionalTest;
-
-
-public class TestMPISpmd extends FunctionalTest {
+import functionalTests.Helper;
+/**
+ * Tests if dependency is well ensured between processes. That is MPISpmd object is created from a Virtual Node.
+ */
+public class TestMPISpmd {
     static final long serialVersionUID = 1;
     private static Logger logger = ProActiveLogger.getLogger(
-            "nonregressiontest");
+            "functionalTests");
     private static String XML_FILE = TestMPISpmd.class.getResource(
-            "/nonregressiontest/mpi/MPILocal-descriptor.xml").getPath();
+            "/functionalTests/mpi/MPILocal-descriptor.xml").getPath();
     ProActiveDescriptor pad;
     MPISpmd mpi_spmd;
 
-    public TestMPISpmd() {
-        super("MPI: Resources booking - MPISpmd object creation",
-            "Tests if dependency is well ensured between processes. That is MPISpmd object is created from a Virtual Node.");
-    }
-
-    @Override
-	public boolean postConditions() throws Exception {
-        String status = mpi_spmd.getStatus();
-        return (status.equals(MPIConstants.MPI_DEFAULT_STATUS));
-    }
-
-    @Override
-	public void initTest() throws Exception {
-    }
-
-    @Override
-	public void endTest() throws Exception {
+  
+       @After 
+       public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
+        Helper.killJVMs();
     }
 
-    @Override
+    @Test
 	public void action() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_FILE);
@@ -83,6 +75,10 @@ public class TestMPISpmd extends FunctionalTest {
 
         VirtualNode testNode = pad.getVirtualNode("CPI");
         this.mpi_spmd = MPI.newMPISpmd(testNode);
+        
+
+        String status = mpi_spmd.getStatus();
+      assertTrue(status.equals(MPIConstants.MPI_DEFAULT_STATUS));
     }
 
     /**
@@ -94,7 +90,6 @@ public class TestMPISpmd extends FunctionalTest {
             System.out.println("Action");
             test.action();
             System.out.println("postConditions");
-            System.out.println("Result=" + test.postConditions());
             System.out.println("endTest");
             test.endTest();
             System.out.println("The end");
