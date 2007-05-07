@@ -40,6 +40,7 @@ import nonregressiontest.component.PrimitiveComponentB;
 import nonregressiontest.component.PrimitiveComponentD;
 import nonregressiontest.component.PrimitiveComponentE;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -52,8 +53,6 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-
-import testsuite.test.Assertions;
 
 
 /**

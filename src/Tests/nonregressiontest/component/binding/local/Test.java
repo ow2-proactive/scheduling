@@ -36,6 +36,7 @@ import java.util.List;
 import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.Setup;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -43,8 +44,6 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Binding;
 import org.objectweb.proactive.core.component.Bindings;
-
-import testsuite.test.Assertions;
 
 
 /**

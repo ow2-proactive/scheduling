@@ -33,12 +33,11 @@ package nonregressiontest.component.collectiveitf.multicast;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-
-import testsuite.test.Assertions;
 
 public class TesterImpl implements Tester, BindingController
 		 {

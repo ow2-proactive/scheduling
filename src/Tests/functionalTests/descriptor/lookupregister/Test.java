@@ -30,6 +30,8 @@
  */
 package functionalTests.descriptor.lookupregister;
 
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
@@ -37,7 +39,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import static junit.framework.Assert.assertTrue;
+
 import functionalTests.Helper;
 
 /**

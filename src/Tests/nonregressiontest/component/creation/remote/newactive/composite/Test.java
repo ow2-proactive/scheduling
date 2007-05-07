@@ -36,7 +36,6 @@ import nonregressiontest.component.I2;
 import nonregressiontest.component.Message;
 import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -48,6 +47,8 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
+
+import functionalTests.descriptor.defaultnodes.TestNodes;
 
 
 /**

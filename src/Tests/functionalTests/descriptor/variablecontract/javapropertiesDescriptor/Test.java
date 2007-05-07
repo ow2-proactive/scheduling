@@ -30,6 +30,8 @@
  */
 package functionalTests.descriptor.variablecontract.javapropertiesDescriptor;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.util.HashMap;
 
 import org.junit.After;
@@ -41,7 +43,6 @@ import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
 import functionalTests.Helper;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Tests conditions for variables of type JavaPropertiesDescriptor

@@ -30,11 +30,9 @@
  */
 package functionalTests.group.result;
 
-import java.util.Iterator;
+import static junit.framework.Assert.assertTrue;
 
-import functionalTests.Helper;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import functionalTests.group.A;
+import java.util.Iterator;
 
 import org.junit.After;
 import org.junit.Before;
@@ -42,8 +40,9 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.Helper;
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 
 /**
  * do a oneway call and an (a)synchronous call on a result group

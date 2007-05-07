@@ -43,8 +43,6 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import testsuite.test.Assertions;
 /**
  * A stripped-down Active Object example. The object has only one public method,
  * sayHello() The object does nothing but reflect the host its on.
@@ -64,11 +62,11 @@ public class Test {
         // FIXME if ever the classes are compiled to a location other than a direct child of the PROACTIVE_DIR, the descriptor folder won't be found
         URI descriptorsuri = baseuri.resolve("../../../descriptors");
         File descriptorsfolder = new File(descriptorsuri);
-        Assertions.assertTrue("\"" + descriptorsuri +
+        assertTrue("\"" + descriptorsuri +
             "\" directory could not be found", descriptorsfolder.exists());
-        Assertions.assertTrue("\"" + descriptorsuri + "\" is not a directory",
+        assertTrue("\"" + descriptorsuri + "\" is not a directory",
             descriptorsfolder.isDirectory());
-        Assertions.assertTrue("\"" + descriptorsuri + "\" is read-protected",
+        assertTrue("\"" + descriptorsuri + "\" is read-protected",
             descriptorsfolder.canRead());
 
         // recurse into directory tree to locate xml files
@@ -77,11 +75,11 @@ public class Test {
         // locates the examples directory
         URI examplesuri = baseuri.resolve("../../../src/Examples/org/objectweb/proactive/examples");
         File examplesfolder = new File(examplesuri);
-        Assertions.assertTrue("\"" + examplesuri +
+        assertTrue("\"" + examplesuri +
             "\" directory could not be found", examplesfolder.exists());
-        Assertions.assertTrue("\"" + examplesuri + "\" is not a directory",
+        assertTrue("\"" + examplesuri + "\" is not a directory",
             examplesfolder.isDirectory());
-        Assertions.assertTrue("\"" + examplesuri + "\" is read-protected",
+        assertTrue("\"" + examplesuri + "\" is read-protected",
             examplesfolder.canRead());
 
         // recurse into directory tree to locate xml files

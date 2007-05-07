@@ -38,12 +38,11 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
-import testsuite.test.FunctionalTest;
 import functionalTests.Helper;
 /**
  * Deployment descriptor technical services.
  */
-public class Test extends FunctionalTest {
+public class Test {
  	private static final long serialVersionUID = 6092398365628948219L;
 	private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/services/technicalservice/TechnicalService.xml")

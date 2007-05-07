@@ -33,9 +33,8 @@ package nonregressiontest.component.collectiveitf.gathercast;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
-
-import testsuite.test.Assertions;
 
 public class GatherServer implements GatherDummyItf {
 

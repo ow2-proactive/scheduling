@@ -30,10 +30,6 @@
  */
 package functionalTests.ft.cic;
 
-import functionalTests.Helper;
-import functionalTests.ft.Agent;
-import functionalTests.ft.Collector;
-import functionalTests.ft.ReInt;
 import static junit.framework.Assert.assertTrue;
 
 import org.junit.After;
@@ -46,7 +42,10 @@ import org.objectweb.proactive.core.exceptions.manager.TypedNFEListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 
-import testsuite.test.FunctionalTest;
+import functionalTests.Helper;
+import functionalTests.ft.Agent;
+import functionalTests.ft.Collector;
+import functionalTests.ft.ReInt;
 
 /**
  * AO fails during the computation, and is restarted.

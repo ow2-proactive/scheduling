@@ -31,11 +31,10 @@
 package functionalTests.exception;
 
 import static junit.framework.Assert.assertTrue;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-
-import testsuite.test.FunctionalTest;
 
 
 /**

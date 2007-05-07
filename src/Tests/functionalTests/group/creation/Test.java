@@ -30,9 +30,7 @@
  */
 package functionalTests.group.creation;
 
-import functionalTests.Helper;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,8 +38,9 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.Helper;
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 
 /**
  * create a group with 3 active objects

@@ -33,6 +33,7 @@ package nonregressiontest.component.lookup;
 import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -44,8 +45,6 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import testsuite.test.Assertions;
 
 
 public class Test extends ComponentTest {

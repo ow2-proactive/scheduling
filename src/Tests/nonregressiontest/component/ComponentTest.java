@@ -32,8 +32,6 @@ package nonregressiontest.component;
 
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
-import testsuite.test.FunctionalTest;
-
 
 /**
  * @author Matthieu Morel

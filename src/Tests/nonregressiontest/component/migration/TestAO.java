@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.NameController;
@@ -42,8 +43,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-
-import testsuite.test.Assertions;
 
 
 // we need this active object to perform the test, because futures updates are involved (managed by future pool)

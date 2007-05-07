@@ -30,6 +30,8 @@
  */
 package functionalTests.filetransfer;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
 
 import org.apache.log4j.Logger;
@@ -47,8 +49,6 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.filetransfer.FileVector;
 
 import functionalTests.Helper;
-
-import static junit.framework.Assert.assertTrue;
 /**
  * Tests that both schems work using the ProActive FileTransfer API
  */

@@ -30,6 +30,8 @@
  */
 package functionalTests.loadbalancing;
 
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
@@ -40,10 +42,6 @@ import org.objectweb.proactive.loadbalancing.LoadBalancing;
 import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTimeMillisMetricFactory;
 
 import functionalTests.Helper;
-
-import testsuite.test.Assertions;
-
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Test load balancing
@@ -71,7 +69,7 @@ public class Test {
         this.pad = ProActive.getProactiveDescriptor(XML_LOCATION);
         this.pad.activateMappings();
         this.vn1 = this.pad.getVirtualNode("VN");
-        Assertions.assertTrue(this.vn1.getMinNumberOfNodes() <= this.vn1.getNumberOfCreatedNodesAfterDeployment());
+        assertTrue(this.vn1.getMinNumberOfNodes() <= this.vn1.getNumberOfCreatedNodesAfterDeployment());
         this.nodeOne = this.vn1.getNode();
         this.nodeTwo = this.vn1.getNode();
 

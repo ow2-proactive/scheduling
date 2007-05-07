@@ -37,6 +37,7 @@ import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
 import nonregressiontest.component.Setup;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -44,8 +45,6 @@ import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ProActive;
-
-import testsuite.test.Assertions;
 
 
 /**

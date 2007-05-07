@@ -35,12 +35,11 @@ import java.util.Map;
 
 import nonregressiontest.component.ComponentTest;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-
-import testsuite.test.Assertions;
 
 
 public class Test extends ComponentTest {

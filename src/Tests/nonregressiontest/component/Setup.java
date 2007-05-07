@@ -33,8 +33,6 @@ package nonregressiontest.component;
 import java.util.HashMap;
 import java.util.Map;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -48,6 +46,8 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+
+import functionalTests.descriptor.defaultnodes.TestNodes;
 
 
 /**

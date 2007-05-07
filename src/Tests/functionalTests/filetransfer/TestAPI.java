@@ -30,6 +30,8 @@
  */
 package functionalTests.filetransfer;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -51,7 +53,6 @@ import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
 import functionalTests.Helper;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Tests the two main methods of the File Transfer API

@@ -30,12 +30,13 @@
  */
 package functionalTests.activeobject.request;
 
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
 import functionalTests.Helper;
-import static junit.framework.Assert.assertTrue;
 /**
  * Test blocking request, and calling void, int returned type and object returned type method
  */

@@ -31,6 +31,7 @@
 package functionalTests.activeobject.lookupactive;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 import org.junit.After;
@@ -38,8 +39,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 import functionalTests.Helper;
-
-import testsuite.test.Assertions;
 /**
  * Test register and lookup AOs
  */
@@ -61,7 +60,7 @@ public class Test {
         // check listActive contains the previous lookup
         String host = UrlBuilder.buildUrlFromProperties("localhost", "");
         String[] registered = ProActive.listActive(host);
-        Assertions.assertNotNull(registered);
+        assertNotNull(registered);
 
         for (int i = 0; i < registered.length; i++) {
             if (registered[i].substring(registered[i].lastIndexOf('/'))

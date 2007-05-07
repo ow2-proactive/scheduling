@@ -30,10 +30,11 @@
  */
 package functionalTests.runtime.defaultruntime;
 
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.Test;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import static junit.framework.Assert.*;
 /**
  * Test default runtime creation
  */

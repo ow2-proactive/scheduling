@@ -30,6 +30,8 @@
  */
 package functionalTests.activeobject.creation.parallel;
 
+import static junit.framework.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,9 +41,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 import functionalTests.Helper;
 import functionalTests.activeobject.creation.A;
-
-import testsuite.test.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Test newActiveInParallel method with the virtual node has NOT been activated

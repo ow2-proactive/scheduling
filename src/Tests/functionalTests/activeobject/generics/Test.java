@@ -30,6 +30,9 @@
  */
 package functionalTests.activeobject.generics;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 import java.util.Arrays;
 
 import org.junit.After;
@@ -41,7 +44,6 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.Helper;
-import static junit.framework.Assert.*;
 
 /**
  * Checks that ProActive correctly handles generics.

@@ -30,18 +30,17 @@
  */
 package functionalTests.group.scatter;
 
-import functionalTests.Helper;
-import functionalTests.descriptor.defaultnodes.TestNodes;
-import functionalTests.group.A;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 import org.junit.After;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.Assertions;
-import testsuite.test.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
+import functionalTests.Helper;
+import functionalTests.descriptor.defaultnodes.TestNodes;
+import functionalTests.group.A;
 
 /**
  * distributes the parameters of a method call to member
@@ -99,7 +98,7 @@ public class Test  {
         boolean rightRankingAndCorrectnessOfResults = true;
         for (int i = 0; i < group.size(); i++) {
             // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
-            Assertions.assertEquals(((A) groupResult.get(i)).getName(),
+            assertEquals(((A) groupResult.get(i)).getName(),
                 (((A) group.get(i)).asynchronousCall((A) groupParameter.get(i))).getName());
         }
 

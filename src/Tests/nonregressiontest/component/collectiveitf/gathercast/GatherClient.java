@@ -30,6 +30,7 @@
  */
 package nonregressiontest.component.collectiveitf.gathercast;
 
+import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -38,8 +39,6 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.exceptions.GathercastTimeoutException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
-
-import testsuite.test.Assertions;
 
 
 public class GatherClient implements GatherClientAttributes, TestItf, BindingController {
