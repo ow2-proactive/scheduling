@@ -310,51 +310,8 @@
 	</target>
 
 
-	<!-- ================================================================ -->
-	<!--                      Compile Test Suite                         -->
-	<!--  =============================================================== -->
 
-	<target name="testsuite" depends="core">
-		<!-- XXX Depends on core because of ProActiveLogger -->
-		<copy toDir="${cl.test.dir}/testsuite">
-			<fileset dir="${src.test.dir}/testsuite">
-				<include name="**/*.properties" />
-				<include name="**/*.css" />
-				<include name="**/*.xml" />
-				<include name="**/*.xsl" />
-				<include name="**/*.xsd" />
-			</fileset>
-		</copy>
-		<mkdir dir="${test.classes.dir}"/>
-		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="testsuite/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-		</javac>
-	</target>
-
-
-	<!-- ================================================================ -->
-	<!--            Compile non regression test                            -->
-	<!-- ================================================================ -->
-
-	<target name="nonregressiontest" depends="testsuite, compile">
-		<copy toDir="${cl.test.dir}">
-			<fileset dir="${src.test.dir}">
-				<include name="nonregressiontest/**/*.xml" />
-				<include name="nonregressiontest/**/*.fractal" />
-				<include name="nonregressiontest/**/*.properties" />
-				<include name="nonregressiontest/**/*.xsd" />
-			</fileset>
-		</copy>
-		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="nonregressiontest/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-		</javac>
-	</target>
-
-
-	<!-- ================================================================ -->
-	<!--       Run non regression test with TestSuite API                  -->
-	<!-- ================================================================ -->
-
+<!--
 	<macrodef name="runTestsMacro">
 		<attribute name="nodeDescriptor" />
 		<element name="jvmargs" optional="yes" />
@@ -416,7 +373,7 @@
 			</jvmargs>
 		</runTestsMacro>
 	</target>
-
+-->
 	
 	<target name="junit" depends="proActiveJar">
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
