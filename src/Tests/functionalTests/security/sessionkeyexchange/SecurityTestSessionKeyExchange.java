@@ -28,14 +28,10 @@
  *
  * ################################################################
  */
-package nonregressiontest.security.securitymanager;
+package functionalTests.security.sessionkeyexchange;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -44,66 +40,34 @@ import functionalTests.FunctionalTest;
 
 
 /**
+ * Test if the session exchange works.
+ *
  * @author arnaud
  *
  */
-public class SecurityTestSecurityManager extends FunctionalTest {
+public class SecurityTestSessionKeyExchange extends FunctionalTest {
 
     /**
          *
          */
-    private static final long serialVersionUID = -3414159361865609323L;
+    private static final long serialVersionUID = 7116369482051444133L;
     private ProActiveSecurityManager psm = null;
-    private ProActiveSecurityManager psm2 = null;
 
-    /**
-     *
-     */
-    public SecurityTestSecurityManager() {
-        super("security setup - security manager ",
-            "Test if the security manager is operational :  to be serialized and unserialized, ...");
-    }
-
-    /* (non-Javadoc)
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
+    @Test
     public void action() throws Exception {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutput out = new ObjectOutputStream(bout);
+        ProActiveSecurityManager psm1 = psm.generateSiblingCertificate("caller");
+        TestSecurityEntity entity1 = new TestSecurityEntity(psm1);
 
-        out.writeObject(psm);
-        out.close();
+        ProActiveSecurityManager psm2 = psm.generateSiblingCertificate("Callee");
+        TestSecurityEntity entity2 = new TestSecurityEntity(psm2);
 
-        // Get the bytes of the serialized object
-        byte[] buf = bout.toByteArray();
-
-        // retrieve policyserver
-        ByteArrayInputStream bis = new ByteArrayInputStream(buf);
-        ObjectInputStream is = new ObjectInputStream(bis);
-
-        psm2 = (ProActiveSecurityManager) is.readObject();
+        entity1.initiateSession(1, entity2);
     }
 
-    /* (non-Javadoc)
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
+    @Before
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(
-                "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
+                "../src/Tests/functionalTests/security/applicationPolicy.xml");
         psm = new ProActiveSecurityManager(ps);
-    }
-
-    @Override
-    public boolean postConditions() throws Exception {
-        if (psm2 != null) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void endTest() throws Exception {
     }
 }

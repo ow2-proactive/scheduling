@@ -28,8 +28,10 @@
  *
  * ################################################################
  */
-package nonregressiontest.security.dynamicsecuritypropagation;
+package functionalTests.security.dynamicsecuritypropagation;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.security.PolicyServer;
@@ -37,11 +39,12 @@ import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import functionalTests.FunctionalTest;
-
-import nonregressiontest.security.A;
+import functionalTests.security.A;
 
 
 /**
+ * Test the dynamic propagation of an application context
+ *
  * @author arnaud
  *
  */
@@ -52,47 +55,22 @@ public class SecurityTestContextPropagation extends FunctionalTest {
          */
     private static final long serialVersionUID = 5300342458704469429L;
     private ProActiveSecurityManager psm = null;
-    private boolean isTestValide = false;
 
-    /**
-     *
-     */
-    public SecurityTestContextPropagation() {
-        super("security setup - security context propagation ",
-            "Test the dynamic propagation of an application context");
-    }
-
-    /* (non-Javadoc)
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
+    @Test
     public void action() throws Exception {
-        A a = (A) ProActive.newActive("nonregressiontest.security.A",
+        A a = (A) ProActive.newActive("functionalTests.security.A",
                 new Object[] {  });
 
         System.out.println(a.hello("arnaud"));
-        isTestValide = true;
     }
 
-    /* (non-Javadoc)
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
+    @Before
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(
-                "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
+                "../src/Tests/functionalTests/security/applicationPolicy.xml");
         psm = new ProActiveSecurityManager(ps);
 
         // set the default security manager
         ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);
-    }
-
-    @Override
-    public boolean postConditions() throws Exception {
-        return isTestValide;
-    }
-
-    @Override
-    public void endTest() throws Exception {
     }
 }

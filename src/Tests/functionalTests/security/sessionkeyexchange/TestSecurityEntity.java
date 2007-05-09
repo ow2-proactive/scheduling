@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.security.sessionkeyexchange;
+package functionalTests.security.sessionkeyexchange;
 
 import java.io.IOException;
 import java.security.PublicKey;

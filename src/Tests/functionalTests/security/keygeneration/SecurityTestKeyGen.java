@@ -28,18 +28,26 @@
  *
  * ################################################################
  */
-package nonregressiontest.security;
+package functionalTests.security.keygeneration;
+
+import org.junit.Test;
+import org.objectweb.proactive.core.security.KeyTools;
+import org.objectweb.proactive.core.security.ProActiveSecurity;
+
+import functionalTests.FunctionalTest;
 
 
 /**
- * @author acontes
+ * Test if the the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files is available
+ * @author arnaud
  *
  */
-public class A {
-    public A() {
-    }
-    ;
-    public String hello(String name) {
-        return "hello " + name + " !";
+public class SecurityTestKeyGen extends FunctionalTest {
+    private static final long serialVersionUID = 6453945881218909030L;
+
+    @Test
+    public void action() throws Exception {
+        ProActiveSecurity.loadProvider();
+        KeyTools.genKeys(1024);
     }
 }

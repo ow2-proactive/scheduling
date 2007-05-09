@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.security.policyserver;
+package functionalTests.security.policyserver;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,37 +36,26 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 
 import functionalTests.FunctionalTest;
-
+import static junit.framework.Assert.*;
 
 /**
+ * Test if the policy server is able to load a policy file, to be serialized and unserialized
+ *
  * @author arnaud
  *
  */
 public class SecurityTestPolicyServer extends FunctionalTest {
-
-    /**
-         *
-         */
     private static final long serialVersionUID = -8689457521948634564L;
     private PolicyServer policyServer = null;
     private PolicyServer ps = null;
 
-    /**
-     *
-     */
-    public SecurityTestPolicyServer() {
-        super("security setup - policy server ",
-            "Test if the policy server is able to load a policy file, to be serialized and unserialized");
-    }
-
-    /* (non-Javadoc)
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
+    @Test
     public void action() throws Exception {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ObjectOutput out = new ObjectOutputStream(bout);
@@ -82,26 +71,12 @@ public class SecurityTestPolicyServer extends FunctionalTest {
         ObjectInputStream is = new ObjectInputStream(bis);
 
         ps = (PolicyServer) is.readObject();
+        assertNotNull(ps);
     }
 
-    /* (non-Javadoc)
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
+    @Before
     public void initTest() throws Exception {
         policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(
-                "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
-    }
-
-    @Override
-    public boolean postConditions() throws Exception {
-        if (ps != null) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void endTest() throws Exception {
+                "../src/Tests/functionalTests/security/applicationPolicy.xml");
     }
 }

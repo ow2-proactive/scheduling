@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.security.applicationlifecycle;
+package functionalTests.security.applicationlifecycle;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,38 +36,26 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import functionalTests.FunctionalTest;
-
+import static junit.framework.Assert.*;
 
 /**
+ * Test the generation of entity certificate from an application one
  * @author arnaud
  *
  */
 public class SecurityTestApplicationLifeCycle extends FunctionalTest {
-
-    /**
-         *
-         */
     private static final long serialVersionUID = 1312765218867401690L;
     private ProActiveSecurityManager psm = null;
     private ProActiveSecurityManager psm2 = null;
 
-    /**
-     *
-     */
-    public SecurityTestApplicationLifeCycle() {
-        super("security  - test generation of entity certificate ",
-            "Test the generation of entity certificate from an application one");
-    }
-
-    /* (non-Javadoc)
-     * @see testsuite.test.FunctionalTest#action()
-     */
-    @Override
+    @Test
     public void action() throws Exception {
         psm = psm.generateSiblingCertificate("subcert");
 
@@ -85,27 +73,14 @@ public class SecurityTestApplicationLifeCycle extends FunctionalTest {
         ObjectInputStream is = new ObjectInputStream(bis);
 
         psm2 = (ProActiveSecurityManager) is.readObject();
+
+        assertNotNull(psm2);
     }
 
-    /* (non-Javadoc)
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    @Override
+    @Before
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(
-                "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
+                "../src/Tests/functionalTests/security/applicationPolicy.xml");
         psm = new ProActiveSecurityManager(ps);
-    }
-
-    @Override
-    public boolean postConditions() throws Exception {
-        if (psm2 != null) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void endTest() throws Exception {
     }
 }
