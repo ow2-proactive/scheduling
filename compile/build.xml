@@ -67,6 +67,8 @@
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
 		<delete file="descriptors/examples/DescriptorExamples.xsd"/>
+		<delete dir="${junit.dir}" />
+		<delete dir="${emma.dir}" />
 	</target>
 
 
@@ -106,7 +108,7 @@
 				<isfailure code="${check.extensions}" />
 				<isfailure code="${check.extra}" />
 				<isfailure code="${check.examples}" />
-				<isfailure code="${check.tests}" />
+				<isfailure code="${check.test}" />
 			</or>
 		</condition>
 
@@ -377,7 +379,7 @@
 	</target>
 -->
 	
-	<target name="junit" depends="proActiveJar">
+	<target name="junit" depends="proActiveJar" description="Run all tests">
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
@@ -407,7 +409,7 @@
 
 		
 			<formatter type="xml"/>
-			<batchtest fork="yes" todir="${base.dir}/testReports">
+			<batchtest fork="yes" todir="${junit.dir}">
 				<fileset dir="${cl.test.dir}">
    					<include name="unitTests/**/*.class"/>			
 					<include name="functionalTests/*/**/*Test*.class"/>
