@@ -136,7 +136,7 @@ public class FileTransfer {
         } catch (Exception e) {
             e.printStackTrace();
             throw new ProActiveException(
-                "Unable to connect or use ProActive Node: " + node);
+                "Unable to connect or use ProActive Node: " + node, e);
         }
     }
 
@@ -219,7 +219,7 @@ public class FileTransfer {
         } catch (Exception e) {
             e.printStackTrace();
             throw new ProActiveException(
-                "Unable to connect or use ProActive Node: " + node);
+                "Unable to connect or use ProActive Node: " + node, e);
         }
     }
 
