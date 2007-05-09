@@ -40,12 +40,12 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
@@ -75,6 +75,9 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.profiling.TimerProvidable;
+import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 /**
@@ -131,6 +134,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // FAULT TOLERANCE
     protected FTManager ftmanager;
 
+    // TIMING
+    /** A container for timers not migratable for the moment */
+    protected transient TimerProvidable timersContainer;
+
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -167,6 +174,21 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     public AbstractBody(Object reifiedObject, String nodeURL,
         MetaObjectFactory factory, String jobId) {
         super(nodeURL, factory.newRemoteBodyFactory(), jobId);
+
+        // TIMING
+        if (!(this instanceof HalfBody) &&
+                !CoreTimersContainer.checkReifiedObject(reifiedObject)) {
+            final String timitActivationPropertyValue = CoreTimersContainer.checkNodeProperty(nodeURL);
+            this.timersContainer = CoreTimersContainer.contructOnDemand(this.bodyID,
+                    factory, timitActivationPropertyValue,
+                    reifiedObject.toString());
+            if (this.timersContainer != null) {
+                TimerWarehouse.enableTimers();
+                // START TOTAL TIMER
+                TimerWarehouse.startTimer(this.bodyID, TimerWarehouse.TOTAL);
+            }
+        }
+
         this.threadStore = factory.newThreadStoreFactory().newThreadStore();
 
         // GROUP
@@ -670,6 +692,18 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     public void terminate() {
         if (isDead) {
             return;
+        }
+        if (Profiling.TIMERS_COMPILED) {
+            // THE VARIABLE TIMERS_COMPILED SHOULD BE EVALUATED ALONE
+            if (this.timersContainer != null) {
+                // Stops wfr, serve and total
+                this.timersContainer.stopAll();
+                // We need to finalize statistics of the timers container
+                // for this body                		        		
+                this.timersContainer.sendResults(this.getName(),
+                    this.bodyID.shortString());
+                this.timersContainer = null;
+            }
         }
         isDead = true;
         activityStopped();

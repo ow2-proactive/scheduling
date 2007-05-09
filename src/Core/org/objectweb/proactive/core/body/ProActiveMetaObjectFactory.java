@@ -142,6 +142,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected ProActiveComponentFactory componentFactoryInstance;
     protected ProActiveSecurityManager proActiveSecurityManager;
     protected FTManagerFactory ftmanagerFactoryInstance;
+    protected Object timItReductor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -499,5 +500,13 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         }
 
         return clone;
+    }
+    
+    public void setTimItReductor(Object timItReductor){
+        this.timItReductor = timItReductor;
+    }
+       
+    public Object getTimItReductor(){
+        return this.timItReductor;
     }
 }

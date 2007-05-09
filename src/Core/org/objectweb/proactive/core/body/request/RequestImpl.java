@@ -55,6 +55,8 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 import sun.rmi.server.MarshalInputStream;
 
@@ -382,12 +384,26 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     //
-    // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
+    // -- PRIVATE METHODS FOR SERIALIZATION
+    // -----------------------------------------------
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
+        if (Profiling.TIMERS_COMPILED) {
+            TimerWarehouse.stopTimer(this.sourceID,
+                TimerWarehouse.BEFORE_SERIALIZATION);
+            TimerWarehouse.startTimer(this.sourceID,
+                TimerWarehouse.SERIALIZATION);
+        }
+
         out.defaultWriteObject();
         out.writeObject(sender.getRemoteAdapter());
+
+        if (Profiling.TIMERS_COMPILED) {
+            TimerWarehouse.stopTimer(this.sourceID, TimerWarehouse.SERIALIZATION);
+            TimerWarehouse.startTimer(this.sourceID,
+                TimerWarehouse.AFTER_SERIALIZATION);
+        }
     }
 
     private void readObject(java.io.ObjectInputStream in)

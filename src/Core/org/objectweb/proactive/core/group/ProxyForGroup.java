@@ -65,6 +65,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
@@ -180,6 +181,14 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     public synchronized Object reify(MethodCall mc)
         throws InvocationTargetException {
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
+    	if ( Profiling.TIMERS_COMPILED ){    		
+    		TimerWarehouse.startXAndSkipSendRequest(    				
+    				ProActive.getBodyOnThis().getID(),
+    						( mc.isOneWayCall() || mc.getReifiedMethod().getReturnType() == Void.TYPE ?
+    								TimerWarehouse.GROUP_ONE_WAY_CALL :
+    									TimerWarehouse.GROUP_ASYNC_CALL ) );
+    	}
+    	
         ExceptionListException exceptionList = null;
 
         /* if the method called is toString, apply it to the proxy, not to the members */
@@ -222,6 +231,14 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
         /* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
         this.threadpool.complete();
+        
+    	if ( Profiling.TIMERS_COMPILED ){    		
+    		TimerWarehouse.stopXAndUnskipSendRequest(    				
+    				ProActive.getBodyOnThis().getID(),
+    						( mc.isOneWayCall() || mc.getReifiedMethod().getReturnType() == Void.TYPE ?
+    								TimerWarehouse.GROUP_ONE_WAY_CALL :
+    									TimerWarehouse.GROUP_ASYNC_CALL ) );
+    	}
 
         /* Throws the exceptionList if one or more exceptions occur in the oneWayCall */
         if ((exceptionList != null) && (exceptionList.size() != 0)) {

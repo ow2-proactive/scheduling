@@ -57,6 +57,8 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 /**
@@ -324,6 +326,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if (isAvailable()) {
             return;
         }
+        
+    	if ( Profiling.TIMERS_COMPILED ){
+    		TimerWarehouse.startTimer(ProActive.getBodyOnThis().getID(), TimerWarehouse.WAIT_BY_NECESSITY);
+    	}
 
         UniqueID id = null;
 
@@ -359,6 +365,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             futureEventProducer.notifyListeners(id, getCreatorID(),
                 FutureEvent.RECEIVED_FUTURE_RESULT);
         }
+        
+    	if ( Profiling.TIMERS_COMPILED ){
+    		TimerWarehouse.stopTimer(ProActive.getBodyOnThis().getID(), TimerWarehouse.WAIT_BY_NECESSITY);
+    	}
     }
 
     public long getID() {

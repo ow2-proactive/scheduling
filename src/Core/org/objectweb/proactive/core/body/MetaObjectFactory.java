@@ -149,4 +149,18 @@ public interface MetaObjectFactory {
      * @return the fault-tolerance manager.
      */
     public FTManagerFactory newFTManagerFactory();
+    
+    // TIMING
+    
+    /**
+     * A setter for the reductor.
+     * @param timitReductor
+     */
+    public void setTimItReductor(Object timItReductor);
+    
+    /**
+     * A getter for the reductor stub.
+     * @return The stub on the reductor
+     */
+    public Object getTimItReductor();
 }

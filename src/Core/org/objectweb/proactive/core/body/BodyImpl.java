@@ -65,14 +65,9 @@ import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
-
-/**
- * @author fhuet
- *
- *
- *
- */
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
@@ -355,8 +350,21 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         /** Serves the request. The request should be removed from the request queue
          * before serving, which is correctly done by all methods of the Service class.
-         * However, this condition is not ensured for custom calls on serve. */
+         * However, this condition is not ensured for custom calls on serve.
+         */
         public void serve(Request request) {
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.startTimer(bodyID, TimerWarehouse.SERVE);
+                // TimerWarehouse.startTimerWithInfos(bodyID, TimerWarehouse.SERVE, request.getMethodName());        	
+            }
+            serveInternal(request);
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.stopTimer(bodyID, TimerWarehouse.SERVE);
+                //TimerWarehouse.stopTimerWithInfos(bodyID, TimerWarehouse.SERVE, request.getMethodName());        		
+            }
+        }
+
+        private void serveInternal(Request request) {
             if (request == null) {
                 return;
             }
@@ -399,6 +407,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                             getRequestQueue().size());
                         return;
                     }
+
+                    if (Profiling.TIMERS_COMPILED) {
+                        TimerWarehouse.startTimer(bodyID,
+                            TimerWarehouse.SEND_REPLY);
+                    }
+
                     UniqueID destinationBodyId = request.getSourceBodyID();
                     if ((destinationBodyId != null) &&
                             (messageEventProducer != null)) {
@@ -418,6 +432,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         replyAlternate.send(request.getSender());
                     }
 
+                    if (Profiling.TIMERS_COMPILED) {
+                        TimerWarehouse.stopTimer(bodyID,
+                            TimerWarehouse.SEND_REPLY);
+                    }
+
                     this.getFuturePool().removeDestinations();
                     return;
                 }
@@ -433,6 +452,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     }
                     return;
                 }
+
+                if (Profiling.TIMERS_COMPILED) {
+                    TimerWarehouse.startTimer(bodyID, TimerWarehouse.SEND_REPLY);
+                }
+
                 UniqueID destinationBodyId = request.getSourceBodyID();
                 if ((destinationBodyId != null) &&
                         (messageEventProducer != null)) {
@@ -449,6 +473,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
                 } else {
                     reply.send(request.getSender());
+                }
+                if (Profiling.TIMERS_COMPILED) {
+                    TimerWarehouse.stopTimer(bodyID, TimerWarehouse.SEND_REPLY);
                 }
 
                 this.getFuturePool().removeDestinations();

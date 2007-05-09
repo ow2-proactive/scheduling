@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -30,15 +30,29 @@
  */
 package org.objectweb.proactive.core.util.profiling;
 
+import org.objectweb.proactive.core.UniqueID;
+
 
 /**
- * @author fabrice
- *
+ * An instance of a class that implements this interface can
+ * provide the minimal operations on timers.
+ * @see TimerWarehouse
+ * @author vbodnart
  */
-public class Profiling {
-    public static final boolean STARTNODE = false;
-    public static final boolean GROUP = false;
-    public static final boolean SERVICE = false;
-    public static final boolean SECURITY = false;
-    public static boolean TIMERS_COMPILED = false;
+public interface TimerProvidable {
+    public void startTimer(byte timerId, String infos);
+
+    public void stopTimer(byte timerId, String infos);
+
+    public void setTimerValue(byte timerId, long value);
+
+    public UniqueID getTimerProvidableID();
+
+    public void sendResults(String className, String shortUniqueID);
+
+    public void startXAndSkipSendRequest(byte timerId);
+
+    public void stopXAndUnskipSendRequest(byte timerId);
+
+    public void stopAll();
 }

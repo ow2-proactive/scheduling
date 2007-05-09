@@ -41,6 +41,8 @@ import org.objectweb.proactive.core.group.spmd.MethodBarrier;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrierWithMethodName;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.io.Serializable,
@@ -179,6 +181,10 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     public synchronized void waitForRequest(long timeout) {
+        if (Profiling.TIMERS_COMPILED) {
+            TimerWarehouse.startTimer(this.ownerID,
+                TimerWarehouse.WAIT_FOR_REQUEST);
+        }
         if (hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.WAIT_FOR_REQUEST));
@@ -190,6 +196,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
             e.printStackTrace();
         } finally {
             this.waitingForRequest = false;
+            // THIS CODE IS NEVER EXECUTED IF THE ACTIVE OBJECT IS TERMINATED
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.stopTimer(this.ownerID,
+                    TimerWarehouse.WAIT_FOR_REQUEST);
+            }
         }
     }
 
