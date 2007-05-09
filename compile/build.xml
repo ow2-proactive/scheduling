@@ -315,46 +315,63 @@
 
 
 
-<!--
-	<macrodef name="runTestsMacro">
+	<macrodef name="junitMacro">
 		<attribute name="nodeDescriptor" />
 		<element name="jvmargs" optional="yes" />
 		<sequential>
-			<delete dir="${base.dir}/compile/log" />
-			<java classname="nonregressiontest.MainManager" fork="true">
+			<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
+				<classpath refid="project.classpath" />
+			</javac>
+			<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
+				<classpath refid="test.classpath" />
+			</javac>
+			<copy toDir="${cl.test.dir}">
+				<fileset dir="${src.test.dir}">
+					<include name="functionalTests/**/*.xml" />
+					<include name="functionalTests/**/*.fractal" />
+					<include name="functionalTests/**/*.properties" />
+					<include name="functionalTests/**/*.xsd" />
+				</fileset>
+			</copy>
+
+			<delete dir="${junit.dir}"/>
+			<mkdir dir="${junit.dir}"/>
+		
+			<junit printsummary="yes" forkmode="perTest" showoutput="yes">
+				<sysproperty key="PROACTIVE_TEST" value="1"/>
+				<jvmarg value="-Dproactive.dir=${base.dir}"/>
+	
 				<classpath refid="test.classpath"/>
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
-				<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=@{nodeDescriptor}" />
+				<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=@{nodeDescriptor}" />
 				<jvmargs/>
-			</java>
+
+		
+				<formatter type="xml"/>
+				<batchtest fork="yes" todir="${junit.dir}">
+					<fileset dir="${cl.test.dir}">
+   						<include name="unitTests/**/*.class"/>			
+						<include name="functionalTests/*/**/*Test*.class"/>
+						<exclude name="**/*$*.class"/>
+					</fileset>
+				</batchtest>
+			</junit>
 		</sequential>
 	</macrodef>
 
 
-	<target name="runTests" depends="nonregressiontest, proActiveJar" description="Run all non regression tests">
-		<runTestsMacro nodeDescriptor="/nonregressiontest/descriptor/defaultnodes/Nodes.xml" />
+	<target name="junitDistributed" depends="proActiveJar" description="Run all non regression tests">
+		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
 	</target>
 
-	<target name="runTestsLocal" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
-		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
+	<target name="junit" depends="proActiveJar" description="Run all non regression tests on the current host only">
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
 	
-	<target name="runTestsLocalDebug" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only, debug enabled">
-		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml">
-			<jvmargs>
-				<jvmarg value="-Xdebug" />
-				<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
-			</jvmargs>
-		</runTestsMacro>
-	</target>
-
-	<target name="runTestsLocalRmi" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
-		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
-	</target>
-
+<!--	
 	<target name="runTestsLocalHttp" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
-			<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml">
+			<junitMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml">
 			<jvmargs>
 				<jvmarg value="-Dproactive.communication.protocol=http" />
 				<jvmarg value="-Dproactive.http.port=2026" />
@@ -362,10 +379,10 @@
 			</jvmargs>
 			</runTestsMacro>
 	</target>
-
+-->
 	
-	<target name="runTestsLocalIbis" depends="nonregressiontest, proActiveJar">
-		<runTestsMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml">
+	<target name="junitIbis" depends="proActiveJar">
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocalIbis.xml">
 			<jvmargs>
 				<jvmarg value="-Dproactive.rmi=ibis" />
 				<jvmarg value="-Dibis.serialization=sun" />
@@ -375,97 +392,8 @@
 				<jvmarg value="-Dibis.name_server.key=12" />
 				<jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties" />
 			</jvmargs>
-		</runTestsMacro>
+		</junitMacro>
 	</target>
--->
-	
-	<target name="junit" depends="proActiveJar" description="Run all tests">
-		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-		</javac>
-		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="test.classpath" />
-		</javac>
-		<copy toDir="${cl.test.dir}">
-			<fileset dir="${src.test.dir}">
-				<include name="functionalTests/**/*.xml" />
-				<include name="functionalTests/**/*.fractal" />
-				<include name="functionalTests/**/*.properties" />
-				<include name="functionalTests/**/*.xsd" />
-			</fileset>
-		</copy>
-
-		<delete dir="${base.dir}/testReports"/>
-		<mkdir dir="${base.dir}/testReports"/>
-		
-		<junit printsummary="yes" forkmode="perTest" showoutput="yes">
-			<sysproperty key="PROACTIVE_TEST" value="1"/>
-			<jvmarg value="-Dproactive.dir=${base.dir}"/>
-	
-			<classpath refid="test.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
-			<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=NodesLocal.xml" />
-
-		
-			<formatter type="xml"/>
-			<batchtest fork="yes" todir="${junit.dir}">
-				<fileset dir="${cl.test.dir}">
-   					<include name="unitTests/**/*.class"/>			
-					<include name="functionalTests/*/**/*Test*.class"/>
-					<exclude name="**/*$*.class"/>
-				</fileset>
-			</batchtest>
-		</junit>
-	</target>
-
-	<!-- ================================================================ -->
-	<!--   Tests coverage : need clover license in user.home directory    -->
-	<!-- ================================================================ -->
-
-	<!-- Commented for the release
-    <property name="coverage.dir" value="${base.dir}/compile/coverage"/>
-    
-    <path id="coverage.classpath">
-    <path refid="test.classpath"/>
-    <pathelement location="${base.dir}/dev/lib/clover.jar"/>
-    <pathelement location="${base.dir}/dev/lib/cenquatasks.jar"/>
-    </path>
-    
-    <taskdef resource="com/cenqua/ant/antlib.xml" classpath="${base.dir}/dev/lib/cenquatasks.jar"/>
-    <extendclasspath path="${base.dir}/dev/lib/clover.jar"/>
-    <taskdef resource="clovertasks" classpath="${base.dir}/dev/lib/clover.jar"/>
-    
-    <target name="coverage-init">
-    <delete file="coverage*.*"/>
-    <copy file="${user.home}/clover.license" todir="${base.dir}/dev/lib"/>
-    <clover-setup initString="coverage.db">
-    <files>
-    <exclude name="org/objectweb/proactive/examples/**/*.java"/>
-    <exclude name="org/objectweb/proactive/ext/**/*.java"/>
-    <exclude name="nonregressiontest/**/*.java"/>
-    <exclude name="testsuite/**/*.java"/>
-    </files>
-    </clover-setup>
-    </target>
-    
-    <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
-    <delete file="${base.dir}/compile/tests.log"/> -->
-	<!-- classloader test needs clover tasks as specified in deployment-coverage.xml file -->
-	<!-- 
-    <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
-    <java classname="nonregressiontest.MainManager" fork="true">
-    <classpath refid="coverage.classpath"/>
-    <jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy"/>
-    <jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j"/>
-    <jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
-    </java>
-    <clover-report>
-    <current outfile="clover_html">
-    <format type="html"/>
-    </current>
-    </clover-report>
-    </target> -->
 
 
 	<!-- ================================================================ -->
