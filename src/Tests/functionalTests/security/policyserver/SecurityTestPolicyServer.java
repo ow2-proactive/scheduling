@@ -76,7 +76,7 @@ public class SecurityTestPolicyServer extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(
-                "../src/Tests/functionalTests/security/applicationPolicy.xml");
+        policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestPolicyServer.class.getResource(
+                    "/functionalTests/security/applicationPolicy.xml").getPath());
     }
 }

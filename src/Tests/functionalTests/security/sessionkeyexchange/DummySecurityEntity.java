@@ -47,10 +47,10 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-public class TestSecurityEntity implements SecurityEntity {
+public class DummySecurityEntity implements SecurityEntity {
     private ProActiveSecurityManager securityManager;
 
-    public TestSecurityEntity(ProActiveSecurityManager securityManager) {
+    public DummySecurityEntity(ProActiveSecurityManager securityManager) {
         this.securityManager = securityManager;
     }
 

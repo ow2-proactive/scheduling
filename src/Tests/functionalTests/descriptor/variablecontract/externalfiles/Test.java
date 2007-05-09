@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractType;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -67,6 +68,10 @@ public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         VariableContract variableContract = new VariableContract();
+        variableContract.setVariableFromProgram("RPATH",
+            Test.class.getResource(
+                "/functionalTests/descriptor/variablecontract/externalfiles/")
+                      .getPath(), VariableContractType.ProgramVariable);
 
         /*
         //Setting from Program

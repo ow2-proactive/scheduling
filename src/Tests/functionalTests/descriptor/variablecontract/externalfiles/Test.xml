@@ -2,8 +2,8 @@
 <ProActiveDescriptor schemaVersion="3.3" xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd">
 	<variables>
 		<descriptorDefaultVariable name="test_var0" value="value0"/>
-	 	<includeXMLFile location="../classes/Tests/functionalTests/descriptor/variablecontract/externalfiles/Test2.xml"/>
-	 	<includePropertyFile location="../classes/Tests/functionalTests/descriptor/variablecontract/externalfiles/Test.properties"/>
+	 	<includeXMLFile location="${RPATH}/Test2.xml"/>
+	 	<includePropertyFile location="${RPATH}/Test.properties"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
