@@ -9,7 +9,8 @@ if "%1" == "" goto projecthelp
 SETLOCAL
 set CLASSPATH=lib\ant-launcher.jar;%CLASSPATH%
 echo %CLASSPATH%
-"%JAVA_HOME%\bin\java" "-Dant.home=." "-Dant.library.dir=./lib"  -Xmx256000000 org.apache.tools.ant.launch.Launcher -buildfile build.xml %1 %2 %3 %4 %5 %WHEN_NO_ARGS%
+cd ..
+"%JAVA_HOME%\bin\java" "-Dant.home=compile" "-Dant.library.dir=compile/lib"  -Xmx256000000 org.apache.tools.ant.launch.Launcher -buildfile compile/build.xml %1 %2 %3 %4 %5 %WHEN_NO_ARGS%
 ENDLOCAL
 goto end
 

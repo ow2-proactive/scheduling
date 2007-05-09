@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir=".">
+<project basedir="compile">
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
 
 	<property environment="env" />

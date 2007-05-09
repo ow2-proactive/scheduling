@@ -1,10 +1,12 @@
 #!/bin/bash
 #build file for Unix system
-currentDir=`dirname $0`
+compileDir=$(readlink -e `dirname $0`)
 if [ $# -lt 1 ]
 then
   args="-projecthelp"
 else
   args=$@
 fi
-ANT_HOME=$currentDir $JAVA_HOME/bin/java  -Dant.home=\"$currentDir\" -Dant.library.dir=\"$currentDir/lib\" -Xmx256000000 -classpath $currentDir/lib/ant-launcher.jar org.apache.tools.ant.launch.Launcher -buildfile  $currentDir/build.xml $args
+# Go inside the ProActive directory
+cd $compileDir/..
+ANT_HOME=$compileDir $JAVA_HOME/bin/java  -Dant.home=\"$compileDir\" -Dant.library.dir=\"$compileDir/lib\" -Xmx256000000 -classpath $compileDir/lib/ant-launcher.jar org.apache.tools.ant.launch.Launcher -buildfile  $compileDir/build.xml $args

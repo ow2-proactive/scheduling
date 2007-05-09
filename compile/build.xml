@@ -313,8 +313,6 @@
 		</if>
 	</target>
 
-
-
 	<macrodef name="junitMacro">
 		<attribute name="nodeDescriptor" />
 		<element name="jvmargs" optional="yes" />
