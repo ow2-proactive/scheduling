@@ -30,9 +30,6 @@
  */
 package nonregressiontest.component.interceptor;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -41,6 +38,9 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.controller.DummyController;
 
 
 /**
@@ -55,11 +55,12 @@ import org.objectweb.proactive.core.component.ControllerDescription;
  *
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -644817728440189096L;
-	Component componentA;
+         *
+         */
+    private static final long serialVersionUID = -644817728440189096L;
+    Component componentA;
     Component componentB;
     String name;
     String nodeUrl;
@@ -75,7 +76,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
@@ -103,7 +104,8 @@ public class Test extends ComponentTest {
                     }), new ControllerDescription("B", Constants.PRIMITIVE),
                 new ContentDescription(B.class.getName(), new Object[] {  }));
 
-        Fractal.getBindingController(componentA).bindFc(FooItf.CLIENT_ITF_NAME,
+        Fractal.getBindingController(componentA)
+               .bindFc(FooItf.CLIENT_ITF_NAME,
             componentB.getFcInterface(FooItf.SERVER_ITF_NAME));
 
         //logger.debug("OK, instantiated the component");
@@ -122,18 +124,18 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         String expectedResult = DUMMY_VALUE +
             InputInterceptor1.BEFORE_INTERCEPTION +
             InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION +
@@ -148,13 +150,13 @@ public class Test extends ComponentTest {
         ;
         return expectedResult.equals(result);
     }
-    
+
     public static void main(String[] args) {
         try {
-        Test test = new Test();
-        test.action();
-        boolean success = test.postConditions();
-        System.out.println(success?"SUCCESS":"FAILURE");
+            Test test = new Test();
+            test.action();
+            boolean success = test.postConditions();
+            System.out.println(success ? "SUCCESS" : "FAILURE");
         } catch (Exception e) {
             e.printStackTrace();
         }

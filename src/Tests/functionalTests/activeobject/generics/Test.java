@@ -30,12 +30,8 @@
  */
 package functionalTests.activeobject.generics;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Arrays;
 
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -43,7 +39,9 @@ import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Checks that ProActive correctly handles generics.
@@ -54,7 +52,7 @@ import functionalTests.Helper;
  *
  * @author Matthieu Morel
  */
-public class Test {
+public class Test extends FunctionalTest {
     private static final long serialVersionUID = -3311965940327392139L;
 
     @org.junit.Test
@@ -154,10 +152,5 @@ public class Test {
                 "org.objectweb.proactive.core.util.wrapper.IntWrapper"
             };
         assertTrue(Arrays.equals(unescape, result));
-    }
-
-    @After
-    public void endTest() {
-		Helper.killJVMs();
     }
 }

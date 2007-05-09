@@ -30,33 +30,31 @@
  */
 package functionalTests.group.onewaycall;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Iterator;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * do a oneway call on a previously created group
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test {
- 	private static final long serialVersionUID = -881236704381741691L;
-	private A typedGroup = null;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -881236704381741691L;
+    private A typedGroup = null;
 
-   
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         this.typedGroup.onewayCall();
-  
+
         boolean allOnewayCallDone = true;
         Group group = ProActiveGroup.getGroup(this.typedGroup);
         Iterator it = group.iterator();
@@ -67,9 +65,9 @@ public class Test {
     }
 
     @Before
-	public void preConditions() throws Exception {
-    	new TestNodes().action();
-    	
+    public void preConditions() throws Exception {
+        new TestNodes().action();
+
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -90,10 +88,5 @@ public class Test {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }
         assertTrue(NoOnewayCallDone);
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 }

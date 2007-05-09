@@ -32,14 +32,6 @@ package nonregressiontest.component.binding.local.collective;
 
 import java.util.Arrays;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.I2;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentB;
-import nonregressiontest.component.PrimitiveComponentD;
-import nonregressiontest.component.PrimitiveComponentE;
-
 import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -54,6 +46,14 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.I2;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentB;
+import nonregressiontest.component.PrimitiveComponentD;
+import nonregressiontest.component.PrimitiveComponentE;
+
 
 /**
  * @author Matthieu Morel
@@ -61,11 +61,12 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
  * a test for bindings on client collective interfaces between remote components
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 8307154807769118654L;
-	public static String MESSAGE = "-->Main";
+         *
+         */
+    private static final long serialVersionUID = 8307154807769118654L;
+    public static String MESSAGE = "-->Main";
     Component pD1;
     Component pB1;
     Component pB2;
@@ -80,7 +81,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
@@ -97,25 +98,24 @@ public class Test extends ComponentTest {
                         TypeFactory.SERVER, TypeFactory.MANDATORY,
                         TypeFactory.SINGLE)
                 });
-        
+
         ComponentType eType = type_factory.createFcType(new InterfaceType[] {
-                type_factory.createFcItfType("i1", I1.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE),
-                type_factory.createFcItfType("i2", I2.class.getName(),
-                            TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            TypeFactory.COLLECTION)});
-    
-        
-        ComponentType fType = type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType("i2-server", I2.class.getName(),
+                    type_factory.createFcItfType("i1", I1.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.COLLECTION),
-        type_factory.createFcItfType("i2-client", I2.class.getName(),
-                                TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                                TypeFactory.COLLECTION)});
-        
-        
+                        TypeFactory.SINGLE),
+                    type_factory.createFcItfType("i2", I2.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                        TypeFactory.COLLECTION)
+                });
+
+        ComponentType fType = type_factory.createFcType(new InterfaceType[] {
+                    type_factory.createFcItfType("i2-server",
+                        I2.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.COLLECTION),
+                    type_factory.createFcItfType("i2-client",
+                        I2.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, TypeFactory.COLLECTION)
+                });
 
         // instantiate the components
         pD1 = cf.newFcInstance(D_Type,
@@ -130,19 +130,21 @@ public class Test extends ComponentTest {
                 new ControllerDescription("pB2", Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentB.class.getName(),
                     new Object[] {  }));
-        
-        
 
         // check that listFc() does not return the name of the collective interface :
         // it should return no client interface
         Assertions.assertTrue(Fractal.getBindingController(pD1).listFc().length == 0);
 
         // bind the components
-        Fractal.getBindingController(pD1).bindFc("i2_01", pB1.getFcInterface("i2"));
-        Fractal.getBindingController(pD1).bindFc("i2_02", pB2.getFcInterface("i2"));
+        Fractal.getBindingController(pD1)
+               .bindFc("i2_01", pB1.getFcInterface("i2"));
+        Fractal.getBindingController(pD1)
+               .bindFc("i2_02", pB2.getFcInterface("i2"));
 
         // check that listFc() does not return the name of the collective interface
-        Assertions.assertTrue(Arrays.equals(Fractal.getBindingController(pD1).listFc(), new String[] {"i2_01", "i2_02"}));
+        Assertions.assertTrue(Arrays.equals(Fractal.getBindingController(pD1)
+                                                   .listFc(),
+                new String[] { "i2_01", "i2_02" }));
 
         // start them
         Fractal.getLifeCycleController(pD1).startFc();
@@ -153,9 +155,8 @@ public class Test extends ComponentTest {
         I1 i1 = (I1) pD1.getFcInterface("i1");
         Message msg1 = i1.processInputMessage(new Message(MESSAGE));
         message = msg1.append(MESSAGE);
-        
-        
-//      test collection itf with composite component
+
+        //      test collection itf with composite component
         Component c1 = cf.newFcInstance(fType,
                 new ControllerDescription("composite1", Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
@@ -183,55 +184,66 @@ public class Test extends ComponentTest {
         Fractal.getContentController(c1).addFcSubComponent(pB3);
         Fractal.getContentController(c1).addFcSubComponent(pB4);
         Fractal.getContentController(c1).addFcSubComponent(pE);
-        Fractal.getBindingController(c1).bindFc("i2-server-01", pB3.getFcInterface("i2"));
-        Fractal.getBindingController(c1).bindFc("i2-server-02", pB4.getFcInterface("i2"));
-        Fractal.getBindingController(pE).bindFc("i2-01", c1.getFcInterface("i2-client-01"));
-        Fractal.getBindingController(pE).bindFc("i2-02", c1.getFcInterface("i2-client-02"));
-        Fractal.getBindingController(c1).bindFc("i2-client-01", pB5.getFcInterface("i2"));
-        Fractal.getBindingController(c1).bindFc("i2-client-02", pB6.getFcInterface("i2"));
-     
+        Fractal.getBindingController(c1)
+               .bindFc("i2-server-01", pB3.getFcInterface("i2"));
+        Fractal.getBindingController(c1)
+               .bindFc("i2-server-02", pB4.getFcInterface("i2"));
+        Fractal.getBindingController(pE)
+               .bindFc("i2-01", c1.getFcInterface("i2-client-01"));
+        Fractal.getBindingController(pE)
+               .bindFc("i2-02", c1.getFcInterface("i2-client-02"));
+        Fractal.getBindingController(c1)
+               .bindFc("i2-client-01", pB5.getFcInterface("i2"));
+        Fractal.getBindingController(c1)
+               .bindFc("i2-client-02", pB6.getFcInterface("i2"));
+
         Fractal.getLifeCycleController(c1).startFc();
         Fractal.getLifeCycleController(pB5).startFc();
         Fractal.getLifeCycleController(pB6).startFc();
-        ((I1)pE.getFcInterface("i1")).processInputMessage(new Message(""));
-        Message expected = new Message("composite-"+PrimitiveComponentB.MESSAGE);
-        Message m1 = ((I2)c1.getFcInterface("i2-server-01")).processOutputMessage(new Message("composite-"));
-        Message m2 = ((I2)c1.getFcInterface("i2-server-02")).processOutputMessage(new Message("composite-"));
-        Assertions.assertEquals(new Message("composite-"+PrimitiveComponentB.MESSAGE).toString(), ProActive.getFutureValue(m1).toString());
-        Assertions.assertEquals(new Message("composite-"+PrimitiveComponentB.MESSAGE).toString(), ProActive.getFutureValue(m2).toString());
+        ((I1) pE.getFcInterface("i1")).processInputMessage(new Message(""));
+        Message expected = new Message("composite-" +
+                PrimitiveComponentB.MESSAGE);
+        Message m1 = ((I2) c1.getFcInterface("i2-server-01")).processOutputMessage(new Message(
+                    "composite-"));
+        Message m2 = ((I2) c1.getFcInterface("i2-server-02")).processOutputMessage(new Message(
+                    "composite-"));
+        Assertions.assertEquals(new Message("composite-" +
+                PrimitiveComponentB.MESSAGE).toString(),
+            ProActive.getFutureValue(m1).toString());
+        Assertions.assertEquals(new Message("composite-" +
+                PrimitiveComponentB.MESSAGE).toString(),
+            ProActive.getFutureValue(m2).toString());
     }
 
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         StringBuffer resulting_msg = new StringBuffer();
         int message_size = ProActiveGroup.size(message);
         for (int i = 0; i < message_size; i++) {
             resulting_msg.append(((Message) ProActiveGroup.get(message, i)).toString());
         }
+
         // this --> primitiveA --> primitiveB --> primitiveA --> this  (message goes through composite components)
         String single_message = Test.MESSAGE + PrimitiveComponentD.MESSAGE +
             PrimitiveComponentB.MESSAGE + PrimitiveComponentD.MESSAGE +
             Test.MESSAGE;
         return resulting_msg.toString().equals(single_message + single_message);
     }
-    
-    
-    
-    
+
     public static void main(String[] args) {
         Test test = new Test();
         try {

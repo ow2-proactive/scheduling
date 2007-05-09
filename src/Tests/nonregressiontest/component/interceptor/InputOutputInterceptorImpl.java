@@ -30,8 +30,6 @@
  */
 package nonregressiontest.component.interceptor;
 
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -40,6 +38,8 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
+
+import nonregressiontest.component.controller.DummyController;
 
 
 /**
@@ -50,32 +50,34 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
     implements InputOutputInterceptor {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4443709217298433485L;
+         *
+         */
+    private static final long serialVersionUID = 4443709217298433485L;
 
-	/**
-     * @param owner
-     */
+    /**
+    * @param owner
+    */
     public InputOutputInterceptorImpl(Component owner) {
         super(owner);
     }
 
     @Override
-	protected void setControllerItfType() {
+    protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(InputOutputInterceptor.INPUT_OUTPUT_INTERCEPTOR_NAME,
+            setItfType(ProActiveTypeFactoryImpl.instance()
+                                               .createFcItfType(InputOutputInterceptor.INPUT_OUTPUT_INTERCEPTOR_NAME,
                     InputOutputInterceptor.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
         }
- 	}
+    }
 
-	public void setDummyValue(String value) {
+    public void setDummyValue(String value) {
         try {
-            ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
+            ((DummyController) getFcItfOwner()
+                                   .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -83,7 +85,8 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
 
     public String getDummyValue() {
         try {
-            return ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
+            return ((DummyController) getFcItfOwner()
+                                          .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
             return null;

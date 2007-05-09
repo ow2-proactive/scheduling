@@ -30,26 +30,24 @@
  */
 package functionalTests.activeobject.request;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test blocking request, and calling void, int returned type and object returned type method
  */
-public class Test {
- 	private static final long serialVersionUID = 5390683714407366750L;
-	A activeA;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 5390683714407366750L;
+    A activeA;
     A javaA;
     int counterActiveA;
     int counterA;
 
- 
     @Before
-	public void action() throws Exception {
+    public void action() throws Exception {
         activeA = (A) ProActive.newActive(A.class.getName(), new Object[0]);
         activeA.method1();
         javaA = activeA.method2();
@@ -57,16 +55,9 @@ public class Test {
         counterActiveA = activeA.method3();
     }
 
-    
-	
     @org.junit.Test
-	public void postConditions() {
-    	assertTrue(counterA == 1);
-    	assertTrue(counterActiveA == 3);
-    }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
+    public void postConditions() {
+        assertTrue(counterA == 1);
+        assertTrue(counterActiveA == 3);
     }
 }

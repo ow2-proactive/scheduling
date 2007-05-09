@@ -30,36 +30,33 @@
  */
 package functionalTests.group.oneserialization;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Iterator;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * do only serialization of the MethodCall object (in broadcast call only)
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test {
- 	private static final long serialVersionUID = -8599180613841630776L;
-	private A typedGroup = null;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -8599180613841630776L;
+    private A typedGroup = null;
 
- 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         ProActiveGroup.setUniqueSerialization(this.typedGroup);
         this.typedGroup.onewayCall();
         ProActiveGroup.unsetUniqueSerialization(this.typedGroup);
-  
+
         boolean allOnewayCallDone = true;
         Group group = ProActiveGroup.getGroup(this.typedGroup);
         Iterator it = group.iterator();
@@ -70,9 +67,9 @@ public class Test {
     }
 
     @Before
-	public void preConditions() throws Exception {
-    	new TestNodes().action();
-    	
+    public void preConditions() throws Exception {
+        new TestNodes().action();
+
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -93,10 +90,5 @@ public class Test {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }
         assertTrue(NoOnewayCallDone);
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 }

@@ -38,12 +38,14 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 
+
 public class A implements Serializable, RunActive {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5115640483342344013L;
-	public static final int MAX_MIG = 20;
+         *
+         */
+    private static final long serialVersionUID = 5115640483342344013L;
+    public static final int MAX_MIG = 20;
     String node1;
     String node2;
     boolean exceptionThrown = false;

@@ -30,8 +30,6 @@
  */
 package nonregressiontest.component.interceptor;
 
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -41,6 +39,8 @@ import org.objectweb.proactive.core.component.controller.AbstractProActiveContro
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 
+import nonregressiontest.component.controller.DummyController;
+
 
 /**
  * @author Matthieu Morel
@@ -48,11 +48,12 @@ import org.objectweb.proactive.core.mop.MethodCall;
  */
 public class InputInterceptor1Impl extends AbstractProActiveController
     implements InputInterceptor1 {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -855162283473328497L;
-	private int beforeInvocationCounter = 0;
+         *
+         */
+    private static final long serialVersionUID = -855162283473328497L;
+    private int beforeInvocationCounter = 0;
     private int afterInvocationCounter = 0;
 
     /**
@@ -63,10 +64,10 @@ public class InputInterceptor1Impl extends AbstractProActiveController
     }
 
     @Override
-	protected void setControllerItfType() {
+    protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance()
-                                           .createFcItfType(InputInterceptor1.INPUT_INTERCEPTOR1_NAME,
+                                               .createFcItfType(InputInterceptor1.INPUT_INTERCEPTOR1_NAME,
                     InputInterceptor1.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {

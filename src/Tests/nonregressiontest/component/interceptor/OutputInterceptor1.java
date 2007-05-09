@@ -30,9 +30,9 @@
  */
 package nonregressiontest.component.interceptor;
 
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
+
+import nonregressiontest.component.controller.DummyController;
 
 
 public interface OutputInterceptor1 extends OutputInterceptor, DummyController {

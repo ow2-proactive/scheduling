@@ -30,11 +30,8 @@
  */
 package functionalTests.descriptor.coallocation;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.io.File;
 
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -43,32 +40,36 @@ import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test coallocation in deployment descriptors
  */
-public class Test  {
-
-	private static final long serialVersionUID = 1869140219007735164L;
-	ProActiveDescriptor proActiveDescriptor;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 1869140219007735164L;
+    ProActiveDescriptor proActiveDescriptor;
     private static String FS = File.separator;
-    private static String AGENT_XML_LOCATION_UNIX = null;  
+    private static String AGENT_XML_LOCATION_UNIX = null;
+
     static {
-    	  if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-    		  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-              "/functionalTests/descriptor/coallocation/coallocationIbis.xml")
-                                                                .getPath();
-    	  } else {
-    		  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-              "/functionalTests/descriptor/coallocation/coallocation.xml")
-                                                                .getPath(); 
-    	  }
-      }
+        if ("ibis".equals(ProActiveConfiguration.getInstance()
+                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+            AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+                    "/functionalTests/descriptor/coallocation/coallocationIbis.xml")
+                                                .getPath();
+        } else {
+            AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+                    "/functionalTests/descriptor/coallocation/coallocation.xml")
+                                                .getPath();
+        }
+    }
+
     Node node1;
     Node node2;
 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         // We activate the mapping in reverse order
@@ -80,16 +81,12 @@ public class Test  {
         VirtualNode vn2 = proActiveDescriptor.getVirtualNode("covn2");
         node1 = vn1.getNode();
         node2 = vn2.getNode();
-   
-    	vn1 = proActiveDescriptor.getVirtualNode("covn1");
-    	VirtualMachine vm = vn1.getVirtualMachine();
-        assertTrue(node1.getProActiveRuntime().getURL().equals(node2.getProActiveRuntime()
-                                                                .getURL()) && vm.getCreatorId().equals("covn2"));
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
+
+        vn1 = proActiveDescriptor.getVirtualNode("covn1");
+        VirtualMachine vm = vn1.getVirtualMachine();
+        assertTrue(node1.getProActiveRuntime().getURL()
+                        .equals(node2.getProActiveRuntime().getURL()) &&
+            vm.getCreatorId().equals("covn2"));
     }
 
     public static void main(String[] args) {

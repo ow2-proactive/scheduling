@@ -30,8 +30,6 @@
  */
 package functionalTests.descriptor.variablecontract.javapropertiesDescriptor;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.util.HashMap;
 
 import org.junit.After;
@@ -42,85 +40,93 @@ import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Tests conditions for variables of type JavaPropertiesDescriptor
  */
-public class Test {
-	static final long serialVersionUID = 1;
+public class Test extends FunctionalTest {
+    static final long serialVersionUID = 1;
+    private static String XML_LOCATION = Test.class.getResource(
+            "/functionalTests/descriptor/variablecontract/javapropertiesDescriptor/Test.xml")
+                                                   .getPath();
+    ProActiveDescriptor pad;
+    boolean bogusFromProgram;
+    boolean bogusFromDescriptor;
 
-	private static String XML_LOCATION = Test.class.getResource(
-			"/functionalTests/descriptor/variablecontract/javapropertiesDescriptor/Test.xml").getPath();
-	ProActiveDescriptor pad;
-	
-	boolean bogusFromProgram, bogusFromDescriptor;
-	
+    @Before
+    public void initTest() throws Exception {
+        bogusFromDescriptor = true;
+        bogusFromProgram = true;
+    }
 
-	@Before
-	public void initTest() throws Exception {
-		bogusFromDescriptor=true;
-		bogusFromProgram=true;
-	}
-	
-	@After
-	public void endTest() throws Exception {
-		
-		if (pad != null) {
-			pad.killall(false);
-		}
-		Helper.killJVMs();
-	}
+    @After
+    public void endTest() throws Exception {
+        if (pad != null) {
+            pad.killall(false);
+        }
+    }
 
-	@org.junit.Test
-	public void action() throws Exception {
-		
-		VariableContract variableContract= new VariableContract();
-		
-		//Setting from Program
-		HashMap map = new HashMap();
-		map.put("user.home", "/home/userprogram");
-		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-		variableContract.setVariableFromProgram("bogus.property", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-		
-		assertTrue( variableContract.getValue("user.home").equals(System.getProperty("user.home")));
-		
-		//Setting from Descriptor
-		variableContract.setDescriptorVariable("user.home", "/home/userdesc", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-		assertTrue( variableContract.getValue("user.home").equals(System.getProperty("user.home")));
-		
-		//Setting bogus from program
-		boolean bogus=false;
-		try{
-			variableContract.setDescriptorVariable("bogus.property", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-			bogus=true;//shouldn't reach this line
-		}catch (Exception e){
-		}
-		assertTrue(!bogus);
+    @org.junit.Test
+    public void action() throws Exception {
+        VariableContract variableContract = new VariableContract();
 
-		pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
-		variableContract = pad.getVariableContract();
-		assertTrue(variableContract.getValue("user.home").equals(System.getProperty("user.home")));
-		
-		assertTrue(variableContract.isClosed());
-	}
+        //Setting from Program
+        HashMap map = new HashMap();
+        map.put("user.home", "/home/userprogram");
+        variableContract.setVariableFromProgram(map,
+            VariableContractType.getType(
+                ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
+        variableContract.setVariableFromProgram("bogus.property", "",
+            VariableContractType.getType(
+                ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Test test = new Test();
-		try {
-			System.out.println("InitTest");
-			test.initTest();
-			System.out.println("Action");
-			test.action();
-			System.out.println("postConditions");
-			System.out.println("endTest");
-			test.endTest();
-			System.out.println("The end");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        assertTrue(variableContract.getValue("user.home")
+                                   .equals(System.getProperty("user.home")));
+
+        //Setting from Descriptor
+        variableContract.setDescriptorVariable("user.home", "/home/userdesc",
+            VariableContractType.getType(
+                ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
+        assertTrue(variableContract.getValue("user.home")
+                                   .equals(System.getProperty("user.home")));
+
+        //Setting bogus from program
+        boolean bogus = false;
+        try {
+            variableContract.setDescriptorVariable("bogus.property", "",
+                VariableContractType.getType(
+                    ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
+            bogus = true; //shouldn't reach this line
+        } catch (Exception e) {
+        }
+        assertTrue(!bogus);
+
+        pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
+        variableContract = pad.getVariableContract();
+        assertTrue(variableContract.getValue("user.home")
+                                   .equals(System.getProperty("user.home")));
+
+        assertTrue(variableContract.isClosed());
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            System.out.println("InitTest");
+            test.initTest();
+            System.out.println("Action");
+            test.action();
+            System.out.println("postConditions");
+            System.out.println("endTest");
+            test.endTest();
+            System.out.println("The end");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

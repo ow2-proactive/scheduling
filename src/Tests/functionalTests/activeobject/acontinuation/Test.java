@@ -30,20 +30,20 @@
  */
 package functionalTests.activeobject.acontinuation;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Vector;
 
 import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
+import functionalTests.FunctionalTest;
 import functionalTests.Helper;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test automatic continuations by results and parameters
  */
-public class Test {
-
+public class Test extends FunctionalTest {
     private static final long serialVersionUID = -8272627897015121569L;
     A a;
     A b;
@@ -53,7 +53,6 @@ public class Test {
     Id idPrincipal;
     Id idDeleguate;
     boolean futureByResult;
-
 
     @org.junit.Test
     public void action() throws Exception {
@@ -66,7 +65,7 @@ public class Test {
         acthread.start();
         acthread.join();
         System.setProperty("proactive.future.ac", initial_ca_setting);
-        
+
         assertTrue(futureByResult && a.isSuccessful());
         assertTrue(a.getFinalResult().equals("dummy"));
         assertTrue(lastA.getIdName().equals("e"));
@@ -74,11 +73,11 @@ public class Test {
         assertTrue(t2.getIdName().equals("d"));
     }
 
-  @After
-  public void after() {
-	  Helper.killJVMs();
-  }
-  
+    @After
+    public void after() {
+        Helper.killJVMs();
+    }
+
     private class ACThread extends Thread {
         @Override
         public void run() {

@@ -97,6 +97,7 @@
 			<checkDir prop="check.extensions" dir="${src.extensions.dir}" tmpdir="${classes.dir}/tmp/Extensions" />
 			<checkDir prop="check.extra"      dir="${src.extra.dir}"      tmpdir="${classes.dir}/tmp/Extra" />
 			<checkDir prop="check.examples"   dir="${src.examples.dir}"   tmpdir="${classes.dir}/tmp/Examples" />
+			<checkDir prop="check.test"       dir="${src.test.dir}"       tmpdir="${classes.dir}/tmp/Tests" />
 		</parallel>
 
 		<condition property="check.failed">
@@ -105,6 +106,7 @@
 				<isfailure code="${check.extensions}" />
 				<isfailure code="${check.extra}" />
 				<isfailure code="${check.examples}" />
+				<isfailure code="${check.tests}" />
 			</or>
 		</condition>
 
@@ -408,7 +410,7 @@
 			<batchtest fork="yes" todir="${base.dir}/testReports">
 				<fileset dir="${cl.test.dir}">
    					<include name="unitTests/**/*.class"/>			
-					<include name="functionalTests/**/*Test*.class"/>
+					<include name="functionalTests/*/**/*Test*.class"/>
 					<exclude name="**/*$*.class"/>
 				</fileset>
 			</batchtest>
@@ -683,6 +685,7 @@
 			<format_m srcdir="${src.extensions.dir}"/>
 			<format_m srcdir="${src.extra.dir}"/>
 			<format_m srcdir="${src.examples.dir}"/>
+			<format_m srcdir="${src.test.dir}"/>
 		</parallel>
 	</target>
 

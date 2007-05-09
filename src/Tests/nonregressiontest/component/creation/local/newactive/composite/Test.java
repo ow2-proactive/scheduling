@@ -30,13 +30,6 @@
  */
 package nonregressiontest.component.creation.local.newactive.composite;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.I2;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentA;
-import nonregressiontest.component.PrimitiveComponentB;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -47,6 +40,13 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.type.Composite;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.I2;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentA;
+import nonregressiontest.component.PrimitiveComponentB;
 
 
 /**
@@ -79,11 +79,12 @@ import org.objectweb.proactive.core.component.type.Composite;
  *
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7002185868293478843L;
-	private static final String P1_NAME = "primitive-component-1";
+         *
+         */
+    private static final long serialVersionUID = 7002185868293478843L;
+    private static final String P1_NAME = "primitive-component-1";
     private static final String P2_NAME = "primitive-component-2";
     private static final String C1_NAME = "composite-component1";
     private static final String C2_NAME = "composite-component2";
@@ -106,7 +107,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         throw new testsuite.exception.NotStandAloneException();
     }
 
@@ -163,18 +164,18 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         String p1_name = Fractal.getNameController(p1).getFcName();
         String p2_name = Fractal.getNameController(p2).getFcName();
         String c1_name = Fractal.getNameController(c1).getFcName();

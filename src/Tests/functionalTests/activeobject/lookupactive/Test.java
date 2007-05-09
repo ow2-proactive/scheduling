@@ -30,30 +30,29 @@
  */
 package functionalTests.activeobject.lookupactive;
 
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.UrlBuilder;
+
+import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
-import org.junit.After;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.UrlBuilder;
-
-import functionalTests.Helper;
 /**
  * Test register and lookup AOs
  */
-public class Test {
-	private static final long serialVersionUID = -6695388796855172951L;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -6695388796855172951L;
 
-	@org.junit.Test
-	public void action() throws Exception {
+    @org.junit.Test
+    public void action() throws Exception {
         A a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
         a.register();
 
         // check lookup works
         String url = UrlBuilder.buildUrlFromProperties("localhost", "A");
         a = (A) ProActive.lookupActive(A.class.getName(), url);
-        
+
         assertTrue(a != null);
         assertEquals(a.getName(), "toto");
 
@@ -69,12 +68,7 @@ public class Test {
             }
         }
 
-        throw new Exception("Could not find registered object in list of objects");
-
+        throw new Exception(
+            "Could not find registered object in list of objects");
     }
-	
-	 @After
-	  public void after() {
-		  Helper.killJVMs();
-	  }
 }

@@ -38,11 +38,12 @@ import java.io.Serializable;
  * @author Matthieu Morel
  */
 public class Message implements Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7172398116571652345L;
-	String message;
+         *
+         */
+    private static final long serialVersionUID = 7172398116571652345L;
+    String message;
     boolean valid = true;
 
     public Message() {
@@ -65,7 +66,7 @@ public class Message implements Serializable {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return message;
     }
 

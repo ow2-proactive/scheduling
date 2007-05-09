@@ -30,23 +30,21 @@
  */
 package functionalTests.group.accessbyname;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * This class tests the access to named elements of a group.
  *
  * @author Matthieu Morel
  */
-public class Test {
-   	private static final long serialVersionUID = 3756826632109245192L;
-	A typedGroup;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 3756826632109245192L;
+    A typedGroup;
 
     private A createGroup() throws Exception {
         typedGroup = (A) ProActiveGroup.newGroup(A.class.getName());
@@ -60,9 +58,9 @@ public class Test {
     }
 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         this.createGroup();
-   
+
         // was the group created ?
         assertTrue(typedGroup != null);
         Group group = ProActiveGroup.getGroup(this.typedGroup);
@@ -87,10 +85,5 @@ public class Test {
         assertTrue(group.size() == 2);
         assertTrue(group.get(0) == agent1_indexed);
         assertTrue(!group.containsKey("number0"));
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 }

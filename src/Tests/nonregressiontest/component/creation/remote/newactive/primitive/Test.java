@@ -30,10 +30,6 @@
  */
 package nonregressiontest.component.creation.remote.newactive.primitive;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.creation.ComponentA;
-import nonregressiontest.component.creation.ComponentInfo;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -45,6 +41,10 @@ import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 
 import functionalTests.descriptor.defaultnodes.TestNodes;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.creation.ComponentA;
+import nonregressiontest.component.creation.ComponentInfo;
+
 
 /**
  * @author Matthieu Morel
@@ -52,11 +52,12 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
  * creates a primitive component on a remote node with ACs
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 9123267571116623375L;
-	Component componentA;
+         *
+         */
+    private static final long serialVersionUID = 9123267571116623375L;
+    Component componentA;
     String name;
     String nodeUrl;
     String remoteHost;
@@ -70,10 +71,10 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        ProActiveGenericFactory cf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
+        ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
 
         componentA = cf.newFcInstance(type_factory.createFcType(
                     new InterfaceType[] {
@@ -97,12 +98,13 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     @Override
-	public boolean preConditions() throws Exception {
-        remoteHost = TestNodes.getRemoteACVMNode().getNodeInformation().getHostName();
+    public boolean preConditions() throws Exception {
+        remoteHost = TestNodes.getRemoteACVMNode().getNodeInformation()
+                              .getHostName();
         return (super.preConditions() && (remoteHost != null));
     }
 
@@ -110,11 +112,11 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return (name.equals("toto") && (nodeUrl.indexOf(remoteHost) != -1));
     }
 }

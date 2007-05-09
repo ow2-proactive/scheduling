@@ -40,18 +40,19 @@ import java.io.Serializable;
  *
  */
 public class My_DType implements Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3354197670802167911L;
-	private String str = null;
+         *
+         */
+    private static final long serialVersionUID = 3354197670802167911L;
+    private String str = null;
 
     public My_DType(String str) {
         this.str = str;
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return str;
     }
 }

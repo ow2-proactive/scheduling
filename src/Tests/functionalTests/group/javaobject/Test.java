@@ -30,34 +30,31 @@
  */
 package functionalTests.group.javaobject;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * create a group with active nd non-ctive object then launch method calls
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test {
- 	private static final long serialVersionUID = -1946538215241283938L;
-	private A typedGroup = null;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -1946538215241283938L;
+    private A typedGroup = null;
     private A resultTypedGroup = null;
 
-    
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         this.resultTypedGroup = this.typedGroup.asynchronousCall();
         this.resultTypedGroup.asynchronousCall();
-        
+
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
 
@@ -75,14 +72,13 @@ public class Test {
 
         // is the result of the n-th group member at the n-th position in the result group ?
         assertTrue(rightRankingOfResults);
-
     }
 
     @Before
-	public void preConditions() throws Exception {
-    	new TestNodes().action();
-    	
-    	Object[][] params = {
+    public void preConditions() throws Exception {
+        new TestNodes().action();
+
+        Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
                 { "Agent2" }
@@ -104,10 +100,4 @@ public class Test {
 
         assertTrue(this.typedGroup != null);
     }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
-    }
-
 }

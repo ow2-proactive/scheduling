@@ -30,33 +30,30 @@
  */
 package functionalTests.group.barrier;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Iterator;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * perform a barrier call on an SPMD group
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test {
-	private static final long serialVersionUID = 6929428940280564107L;
-	private A spmdgroup = null;
-
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 6929428940280564107L;
+    private A spmdgroup = null;
 
     @Before
-	public void preConditions() throws Exception {
-    	new TestNodes().action();
-    	
+    public void preConditions() throws Exception {
+        new TestNodes().action();
+
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -74,9 +71,9 @@ public class Test {
     }
 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         this.spmdgroup.start();
- 
+
         String errors = "";
         Iterator it = ProActiveGroup.getGroup(this.spmdgroup).iterator();
         while (it.hasNext()) {
@@ -85,10 +82,4 @@ public class Test {
         System.err.print(errors);
         assertTrue("".equals(errors));
     }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
-    }
 }
-

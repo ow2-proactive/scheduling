@@ -36,7 +36,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
-public class A  {
+public class A {
     String name;
 
     public A() {
@@ -51,12 +51,12 @@ public class A  {
     }
 
     public int register() {
-  	  try {
+        try {
             ProActive.register((A) ProActive.getStubOnThis(),
                 UrlBuilder.buildUrlFromProperties("localhost", "A"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-  	return 0;
-  }
+        return 0;
+    }
 }

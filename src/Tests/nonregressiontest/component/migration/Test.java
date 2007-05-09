@@ -30,25 +30,26 @@
  */
 package nonregressiontest.component.migration;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.Message;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.Message;
 
 
 /**
  * This test deploys a distributed component system and makes sure migration is effective by
  * invoking methods on migrated components (through singleton, collection, gathercast and multicast interfaces)
- * 
+ *
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 597685496464004752L;
-	public static String MESSAGE = "-->m";
+         *
+         */
+    private static final long serialVersionUID = 597685496464004752L;
+    public static String MESSAGE = "-->m";
 
     //ComponentsCache componentsCache;
     public Test() {
@@ -59,7 +60,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         TestAO testAO = (TestAO) ProActive.newActive(TestAO.class.getName(),
                 new Object[] {  });
         testAO.go();
@@ -69,19 +70,19 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
         //        Launcher.killNodes(false);
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return true;
     }
 

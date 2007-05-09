@@ -30,42 +30,35 @@
  */
 package functionalTests.activeobject.migration.strategy;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test migration strategy, with onDeparture and onArrival method
  * @author cmathieu
  *
  */
-public class Test  {
- 	private static final long serialVersionUID = 6261773679239900038L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 6261773679239900038L;
+    A a;
 
-	 @Before
-	    public void Before() throws Exception {
-	    	new TestNodes().action();
-	    }
-	 
-	@org.junit.Test
-	public void action() throws Exception {
+    @Before
+    public void Before() throws Exception {
+        new TestNodes().action();
+    }
+
+    @org.junit.Test
+    public void action() throws Exception {
         String[] nodesUrl = new String[3];
         nodesUrl[0] = TestNodes.getLocalVMNode().getNodeInformation().getURL();
         nodesUrl[1] = TestNodes.getSameVMNode().getNodeInformation().getURL();
         nodesUrl[2] = TestNodes.getRemoteVMNode().getNodeInformation().getURL();
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { nodesUrl });
 
-        
-      assertTrue(a.getCounter() == 7);
+        assertTrue(a.getCounter() == 7);
     }
-	
-	 @After
-	  public void after() {
-		  Helper.killJVMs();
-	  }
 }

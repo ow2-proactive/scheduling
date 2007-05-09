@@ -34,18 +34,18 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.ProActive;
 
+
 public class A implements Serializable {
-   
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7562698745274296370L;
-	public A() {
+         *
+         */
+    private static final long serialVersionUID = 7562698745274296370L;
+
+    public A() {
     }
+
     public String getNodeUrl() {
         return ProActive.getBodyOnThis().getNodeURL();
     }
-
-
-   
 }

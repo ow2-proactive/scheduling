@@ -30,7 +30,6 @@
  */
 package functionalTests.descriptor.defaultnodes;
 
-import org.junit.After;
 import org.junit.Test;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
@@ -38,7 +37,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 
 
 /**
@@ -46,29 +45,28 @@ import functionalTests.Helper;
  * @author Alexandre di Costanzo
  *
  */
-public class TestNodes  {
-  
-	private static final long serialVersionUID = 7106378819266760591L;
-	private static String XML_LOCATION;
+public class TestNodes extends FunctionalTest {
+    private static final long serialVersionUID = 7106378819266760591L;
+    private static String XML_LOCATION;
 
     static {
         String value = System.getProperty(
                 "functionalTests.descriptor.defaultnodes.file");
         if (value != null) {
             XML_LOCATION = TestNodes.class.getResource(value).getPath();
-        } else {  
-      	  if ("ibis".equals(System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-      		XML_LOCATION = TestNodes.class.getResource(
-            "/functionalTests/descriptor/defaultnodes/NodesIbis.xml")
-                                  .getPath();
-    	  } else {
-    		  XML_LOCATION = TestNodes.class.getResource(
-              "/functionalTests/descriptor/defaultnodes/Nodes.xml")
-                                    .getPath();
-    	  }
-      }
+        } else {
+            if ("ibis".equals(System.getProperty(
+                            Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                XML_LOCATION = TestNodes.class.getResource(
+                        "/functionalTests/descriptor/defaultnodes/NodesIbis.xml")
+                                              .getPath();
+            } else {
+                XML_LOCATION = TestNodes.class.getResource(
+                        "/functionalTests/descriptor/defaultnodes/Nodes.xml")
+                                              .getPath();
+            }
+        }
     }
-           
 
     private static ProActiveDescriptor proActiveDescriptor = null;
     private static VirtualNode[] virtualNodes = null;
@@ -78,9 +76,8 @@ public class TestNodes  {
     private static Node remoteACVMNode = null;
     private static String remoteHostname = "localhost";
 
-   
     @Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
                 XML_LOCATION);
         proActiveDescriptor.activateMappings();
@@ -113,11 +110,6 @@ public class TestNodes  {
     public Object[] action(Object[] parameters) throws Exception {
         action();
         return null;
-    }
-
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 
     /**

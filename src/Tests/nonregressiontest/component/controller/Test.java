@@ -30,10 +30,6 @@
  */
 package nonregressiontest.component.controller;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.creation.ComponentA;
-import nonregressiontest.component.creation.ComponentInfo;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -43,6 +39,10 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.creation.ComponentA;
+import nonregressiontest.component.creation.ComponentInfo;
+
 
 /**
  * @author Matthieu Morel
@@ -50,11 +50,12 @@ import org.objectweb.proactive.core.component.ControllerDescription;
  * creates a new component
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6072679061847402007L;
-	Component componentA;
+         *
+         */
+    private static final long serialVersionUID = 6072679061847402007L;
+    Component componentA;
     String name;
     String nodeUrl;
     String result = null;
@@ -68,7 +69,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
@@ -95,18 +96,18 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return "DUMMY".equals(result);
     }
 }

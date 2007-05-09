@@ -30,13 +30,6 @@
  */
 package nonregressiontest.component.creation.remote.newactive.composite;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.I2;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentA;
-import nonregressiontest.component.PrimitiveComponentB;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -49,6 +42,13 @@ import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 
 import functionalTests.descriptor.defaultnodes.TestNodes;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.I2;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentA;
+import nonregressiontest.component.PrimitiveComponentB;
 
 
 /**
@@ -82,11 +82,12 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
  *
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7565506825129118096L;
-	private static final String P1_NAME = "primitive-component-1";
+         *
+         */
+    private static final long serialVersionUID = 7565506825129118096L;
+    private static final String P1_NAME = "primitive-component-1";
     private static final String P2_NAME = "primitive-component-2";
     private static final String C1_NAME = "composite-component1";
     private static final String C2_NAME = "composite-component2";
@@ -109,7 +110,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         throw new testsuite.exception.NotStandAloneException();
     }
 
@@ -120,7 +121,7 @@ public class Test extends ComponentTest {
     public Component[] action(Object obj) throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        ProActiveGenericFactory cf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
+        ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
                     type_factory.createFcItfType("i1", I1.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -158,18 +159,18 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         String p1_name = Fractal.getNameController(p1).getFcName();
         String p2_name = Fractal.getNameController(p2).getFcName();
         String c1_name = Fractal.getNameController(c1).getFcName();

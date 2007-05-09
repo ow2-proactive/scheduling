@@ -30,8 +30,6 @@
  */
 package functionalTests.descriptor.extendedjvm;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,20 +44,21 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Jvm extension in deployment descriptor
  */
-public class Test {
-    	private static final long serialVersionUID = -6030295227851414810L;
-	ProActiveDescriptor descriptor;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -6030295227851414810L;
+    ProActiveDescriptor descriptor;
     A a1;
     A a2;
     A a3;
 
-
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         VirtualNode vn1 = descriptor.getVirtualNode("evn1");
         VirtualNode vn2 = descriptor.getVirtualNode("evn2");
         VirtualNode vn3 = descriptor.getVirtualNode("evn3");
@@ -69,21 +68,22 @@ public class Test {
                 vn2.getNode());
         a3 = (A) ProActive.newActive(A.class.getName(), new Object[] {  },
                 vn3.getNode());
-        
+
         assertTrue(a2.getTiti() == null);
         assertTrue(a2.getTata() != null);
         assertTrue(a3.getTiti() != null);
         assertTrue(a3.getToto() != null);
-        
+
         assertTrue(a2.getClassPath().contains("ProActive.jar"));
         assertTrue(a2.getPolicy().contains("test"));
     }
 
     @Before
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         String fileName = null;
 
-        if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+        if ("ibis".equals(ProActiveConfiguration.getInstance()
+                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             fileName = "JVMExtensionIbis";
         } else {
             fileName = "JVMExtension";
@@ -110,15 +110,11 @@ public class Test {
         descriptor.activateMappings();
     }
 
-  
     @After
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
         descriptor.killall(false);
-        Helper.killJVMs();
     }
 
-  
-  
     private void searchAndReplace(String oldFilePath, String newFilePath,
         String oldString, String newString) {
         try {

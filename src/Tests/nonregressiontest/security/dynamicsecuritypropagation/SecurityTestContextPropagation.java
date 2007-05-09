@@ -30,13 +30,15 @@
  */
 package nonregressiontest.security.dynamicsecuritypropagation;
 
-import nonregressiontest.security.A;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+
+import functionalTests.FunctionalTest;
+
+import nonregressiontest.security.A;
 
 
 /**
@@ -44,11 +46,12 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
  *
  */
 public class SecurityTestContextPropagation extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5300342458704469429L;
-	private ProActiveSecurityManager psm = null;
+         *
+         */
+    private static final long serialVersionUID = 5300342458704469429L;
+    private ProActiveSecurityManager psm = null;
     private boolean isTestValide = false;
 
     /**
@@ -63,7 +66,7 @@ public class SecurityTestContextPropagation extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         A a = (A) ProActive.newActive("nonregressiontest.security.A",
                 new Object[] {  });
 
@@ -75,7 +78,7 @@ public class SecurityTestContextPropagation extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(
                 "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
         psm = new ProActiveSecurityManager(ps);
@@ -85,11 +88,11 @@ public class SecurityTestContextPropagation extends FunctionalTest {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return isTestValide;
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 }

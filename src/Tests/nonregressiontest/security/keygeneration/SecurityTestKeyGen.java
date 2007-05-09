@@ -33,18 +33,21 @@ package nonregressiontest.security.keygeneration;
 import org.objectweb.proactive.core.security.KeyTools;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 
+import functionalTests.FunctionalTest;
+
 
 /**
  * @author arnaud
  *
  */
 public class SecurityTestKeyGen extends FunctionalTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6453945881218909030L;
 
-	public SecurityTestKeyGen() {
+    /**
+         *
+         */
+    private static final long serialVersionUID = 6453945881218909030L;
+
+    public SecurityTestKeyGen() {
         super("security setup - key generation ",
             "Test if the the Java(TM) Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files is available");
     }
@@ -53,25 +56,25 @@ public class SecurityTestKeyGen extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         try {
             ProActiveSecurity.loadProvider();
             KeyTools.genKeys(1024);

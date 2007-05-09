@@ -30,38 +30,37 @@
  */
 package functionalTests.stub.stubinterface;
 
+import org.objectweb.proactive.core.mop.MOP;
+
+import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
-import org.objectweb.proactive.core.mop.MOP;
 /**
  * Test stub generation for interface
  */
-public class Test  {
- 	private static final long serialVersionUID = 7137686002811784615L;
-	String result1;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 7137686002811784615L;
+    String result1;
     String result2;
 
- 
-    
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         StringInterface i1 = (StringInterface) MOP.newInstance("functionalTests.stub.stubinterface.StringInterface",
-                "functionalTests.stub.stubinterface.StringInterfaceImpl",
-                null,
-                new Object[] { "toto" }, "functionalTests.stub.stubinterface.ProxyOne", new Object[0]);
+                "functionalTests.stub.stubinterface.StringInterfaceImpl", null,
+                new Object[] { "toto" },
+                "functionalTests.stub.stubinterface.ProxyOne", new Object[0]);
         result1 = i1.getMyString();
 
         StringInterfaceImpl i2 = (StringInterfaceImpl) MOP.newInstance("functionalTests.stub.stubinterface.StringInterfaceImpl",
-                null, new Object[] { "titi" }, "functionalTests.stub.stubinterface.ProxyOne", new Object[0]);
+                null, new Object[] { "titi" },
+                "functionalTests.stub.stubinterface.ProxyOne", new Object[0]);
         result2 = i2.getMyString();
-     
+
         assertTrue(result1.equals("toto"));
         assertTrue(result2.equals("titi"));
     }
-    
-    
-public static void main(String[] args) {
-        
+
+    public static void main(String[] args) {
         Test test = new Test();
         try {
             test.action();

@@ -30,34 +30,31 @@
  */
 package functionalTests.group.creation;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * create a group with 3 active objects
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test  {
- private static final long serialVersionUID = -1483216038924949402L;
-	private A typedGroup = null;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -1483216038924949402L;
+    private A typedGroup = null;
 
-	@Before
-	public void before() throws Exception {
-		new TestNodes().action();	
-	}
-	
+    @Before
+    public void before() throws Exception {
+        new TestNodes().action();
+    }
+
     private A createGroup() throws Exception {
-    	
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -74,10 +71,9 @@ public class Test  {
     }
 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         this.createGroup();
-  
-        
+
         // was the group created ?
         assertTrue(typedGroup != null);
         Group agentGroup = ProActiveGroup.getGroup(this.typedGroup);
@@ -89,16 +85,17 @@ public class Test  {
         A agent1 = (A) agentGroup.get(1);
         A agent2 = (A) agentGroup.get(2);
 
-        boolean rightLocations = (agent0.getNodeName().compareTo(TestNodes.getSameVMNode()
-                                                                          .getNodeInformation()
-                                                                          .getURL()
-                                                                          .toUpperCase()) == 0) &&
-            (agent1.getNodeName().compareTo(TestNodes.getLocalVMNode()
-                                                     .getNodeInformation()
-                                                     .getURL().toUpperCase()) == 0) &&
-            (agent2.getNodeName().compareTo(TestNodes.getRemoteVMNode()
-                                                     .getNodeInformation()
-                                                     .getURL().toUpperCase()) == 0);
+        boolean rightLocations = (agent0.getNodeName()
+                                        .compareTo(TestNodes.getSameVMNode()
+                                                            .getNodeInformation()
+                                                            .getURL()
+                                                            .toUpperCase()) == 0) &&
+            (agent1.getNodeName()
+                   .compareTo(TestNodes.getLocalVMNode().getNodeInformation()
+                                       .getURL().toUpperCase()) == 0) &&
+            (agent2.getNodeName()
+                   .compareTo(TestNodes.getRemoteVMNode().getNodeInformation()
+                                       .getURL().toUpperCase()) == 0);
 
         boolean rightNames = (agent0.getName().equals("Agent0")) &&
             (agent1.getName().equals("Agent1")) &&
@@ -107,10 +104,5 @@ public class Test  {
         // are the agents at the correct location with the correct names ?
         assertTrue(rightLocations);
         assertTrue(rightNames);
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 }

@@ -34,17 +34,20 @@ import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
+import functionalTests.FunctionalTest;
+
 
 /**
  * @author arnaud
  *
  */
 public class SecurityTestSessionKeyExchange extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7116369482051444133L;
-	private ProActiveSecurityManager psm = null;
+         *
+         */
+    private static final long serialVersionUID = 7116369482051444133L;
+    private ProActiveSecurityManager psm = null;
     private boolean testSucceed = true;
 
     /**
@@ -59,7 +62,7 @@ public class SecurityTestSessionKeyExchange extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         try {
             ProActiveSecurityManager psm1 = psm.generateSiblingCertificate(
                     "caller");
@@ -81,18 +84,18 @@ public class SecurityTestSessionKeyExchange extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(
                 "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
         psm = new ProActiveSecurityManager(ps);
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return testSucceed;
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 }

@@ -32,22 +32,23 @@ package nonregressiontest.component.collectiveitf.gathercast;
 
 import java.io.Serializable;
 
+
 public class B implements Serializable {
-    
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -478206495332926111L;
-	int value;
-    
-    public B() {}
-    
+         *
+         */
+    private static final long serialVersionUID = -478206495332926111L;
+    int value;
+
+    public B() {
+    }
+
     public B(int value) {
         this.value = value;
     }
-    
+
     public int getValue() {
         return value;
     }
-
 }

@@ -30,9 +30,6 @@
  */
 package nonregressiontest.component.lookup;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-
 import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -46,22 +43,25 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+
 
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7279835028272218055L;
-	private ComponentType typeA;
+         *
+         */
+    private static final long serialVersionUID = -7279835028272218055L;
+    private ComponentType typeA;
     private Component componentA;
 
     public Test() {
-        super("registration and lookup",
-            "registration and lookup");
+        super("registration and lookup", "registration and lookup");
     }
 
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory typeFactory = Fractal.getTypeFactory(boot);
         GenericFactory componentFactory = Fractal.getGenericFactory(boot);
@@ -81,15 +81,15 @@ public class Test extends ComponentTest {
     }
 
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return true;
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 }

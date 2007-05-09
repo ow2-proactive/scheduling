@@ -50,7 +50,8 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive,
     RunActive, EndActive {
     public final static String MESSAGE = "-->a";
     public final static String I2_ITF_NAME = "i2";
-    private static Logger logger = ProActiveLogger.getLogger("nonregressiontest");
+    private static Logger logger = ProActiveLogger.getLogger(
+            "nonregressiontest");
     I2 i2;
 
     /**
@@ -134,7 +135,7 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive,
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
     public void unbindFc(String clientItf)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (clientItf.equals(I2_ITF_NAME)) {
             i2 = null;

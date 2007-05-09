@@ -27,15 +27,14 @@
  *
  * ################################################################
  */
-
 package unitTests.interfaceConsistency;
-import static junit.framework.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Check interface consistency between ProActiveRuntime and RemoteProActiveRuntime
@@ -43,70 +42,65 @@ import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
  *
  */
 public class TestRuntimeVSRemoteRuntime {
-	
-	
-	    @Test
-		public void test() throws Exception {
-	    	boolean testPassed = true;
-	    	
-	        testPassed &= checkConsistency(ProActiveRuntime.class,
-	            RemoteProActiveRuntime.class, true);
-	        
-	        assertTrue(testPassed);
-	    }
+    @Test
+    public void test() throws Exception {
+        boolean testPassed = true;
 
-	  
-	    static public boolean checkConsistency(Class normal, Class remote,
-	         boolean unneededCheck) {
-	       
-	    	boolean testPassed = true;
-	        StringBuffer msg = new StringBuffer();
+        testPassed &= checkConsistency(ProActiveRuntime.class,
+            RemoteProActiveRuntime.class, true);
 
-	        msg.append("Missing methods in " + remote + "\n");
-	        msg.append("--------------------------------\n");
+        assertTrue(testPassed);
+    }
 
-	        // Checks that each method in runtime as an equivalent in forwarderRuntime
-	        Method[] methods = normal.getMethods();
-	        for (int i = 0; i < methods.length; i++) {
-	            Method method = methods[i];
-	            Class[] parameters = method.getParameterTypes();
-	            try {
-	                Method remoteMethod = remote.getMethod(method.getName(),
-	                        parameters);
-	                if (!remoteMethod.getReturnType()
-	                                        .equals(method.getReturnType())) {
-	                    testPassed = false;
-	                    msg.append(remoteMethod + "\n");
-	                    msg.append("     -> Incompatible return type\n");
-	                }
-	            } catch (NoSuchMethodException e) {
-	                if (!(method.getName().equals("getJobID") && parameters.length == 0)) {
-	                	testPassed = false;
-	                	msg.append(method + "\n");
-	                	msg.append("     -> Missing in remote class");
-	                }
-	            }
-	        }
+    static public boolean checkConsistency(Class normal, Class remote,
+        boolean unneededCheck) {
+        boolean testPassed = true;
+        StringBuffer msg = new StringBuffer();
 
-	        if (unneededCheck) {
-	            Method[] remoteMethods = remote.getDeclaredMethods();
-	            for (int i = 0; i < remoteMethods.length; i++) {
-	                Method method = remoteMethods[i];
-	                Class[] rParameters = method.getParameterTypes();
-	                              try {
-	                    normal.getMethod(method.getName(), rParameters);
-	                } catch (NoSuchMethodException e) {
-	                    msg.append(method + "\n");
-	                    msg.append("     -> Probably unneeded");
-	                }
-	            }
-	        }
+        msg.append("Missing methods in " + remote + "\n");
+        msg.append("--------------------------------\n");
 
-	        if (!testPassed) {
-	            System.err.println(msg);
-	        }
+        // Checks that each method in runtime as an equivalent in forwarderRuntime
+        Method[] methods = normal.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            Method method = methods[i];
+            Class[] parameters = method.getParameterTypes();
+            try {
+                Method remoteMethod = remote.getMethod(method.getName(),
+                        parameters);
+                if (!remoteMethod.getReturnType().equals(method.getReturnType())) {
+                    testPassed = false;
+                    msg.append(remoteMethod + "\n");
+                    msg.append("     -> Incompatible return type\n");
+                }
+            } catch (NoSuchMethodException e) {
+                if (!(method.getName().equals("getJobID") &&
+                        (parameters.length == 0))) {
+                    testPassed = false;
+                    msg.append(method + "\n");
+                    msg.append("     -> Missing in remote class");
+                }
+            }
+        }
 
-	        return testPassed;
-	    }
-	}
+        if (unneededCheck) {
+            Method[] remoteMethods = remote.getDeclaredMethods();
+            for (int i = 0; i < remoteMethods.length; i++) {
+                Method method = remoteMethods[i];
+                Class[] rParameters = method.getParameterTypes();
+                try {
+                    normal.getMethod(method.getName(), rParameters);
+                } catch (NoSuchMethodException e) {
+                    msg.append(method + "\n");
+                    msg.append("     -> Probably unneeded");
+                }
+            }
+        }
 
+        if (!testPassed) {
+            System.err.println(msg);
+        }
+
+        return testPassed;
+    }
+}

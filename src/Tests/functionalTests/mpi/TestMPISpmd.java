@@ -30,8 +30,6 @@
  */
 package functionalTests.mpi;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
@@ -43,30 +41,29 @@ import org.objectweb.proactive.mpi.MPI;
 import org.objectweb.proactive.mpi.MPIConstants;
 import org.objectweb.proactive.mpi.MPISpmd;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Tests if dependency is well ensured between processes. That is MPISpmd object is created from a Virtual Node.
  */
-public class TestMPISpmd {
+public class TestMPISpmd extends FunctionalTest {
     static final long serialVersionUID = 1;
-    private static Logger logger = ProActiveLogger.getLogger(
-            "functionalTests");
+    private static Logger logger = ProActiveLogger.getLogger("functionalTests");
     private static String XML_FILE = TestMPISpmd.class.getResource(
             "/functionalTests/mpi/MPILocal-descriptor.xml").getPath();
     ProActiveDescriptor pad;
     MPISpmd mpi_spmd;
 
-  
-       @After 
-       public void endTest() throws Exception {
+    @After
+    public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
-        Helper.killJVMs();
     }
 
     @Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_FILE);
         }
@@ -75,10 +72,9 @@ public class TestMPISpmd {
 
         VirtualNode testNode = pad.getVirtualNode("CPI");
         this.mpi_spmd = MPI.newMPISpmd(testNode);
-        
 
         String status = mpi_spmd.getStatus();
-      assertTrue(status.equals(MPIConstants.MPI_DEFAULT_STATUS));
+        assertTrue(status.equals(MPIConstants.MPI_DEFAULT_STATUS));
     }
 
     /**

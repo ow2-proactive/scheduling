@@ -30,8 +30,6 @@
  */
 package nonregressiontest.component.activity;
 
-import nonregressiontest.component.ComponentTest;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -41,6 +39,8 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 
+import nonregressiontest.component.ComponentTest;
+
 
 /**
  * @author Matthieu Morel
@@ -48,12 +48,13 @@ import org.objectweb.proactive.core.component.ControllerDescription;
  * creates a new component
  */
 public class Test extends ComponentTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4191411789650566643L;
 
-	public Test() {
+    /**
+         *
+         */
+    private static final long serialVersionUID = 4191411789650566643L;
+
+    public Test() {
         super("Encapsulation of functional activity within component activity",
             "Encapsulation of functional activity within component activity");
     }
@@ -62,7 +63,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
@@ -80,18 +81,18 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         String expectedResult = A.INIT_COMPONENT_ACTIVITY +
             A.RUN_COMPONENT_ACTIVITY + A.INIT_FUNCTIONAL_ACTIVITY +
             A.RUN_FUNCTIONAL_ACTIVITY + A.END_FUNCTIONAL_ACTIVITY +
@@ -99,7 +100,7 @@ public class Test extends ComponentTest {
         A.getLock().waitForRelease(); // wait until component activity is finished
         return expectedResult.equals(A.message);
     }
-    
+
     public static void main(String[] args) {
         Test test = new Test();
         try {
@@ -113,5 +114,4 @@ public class Test extends ComponentTest {
             e.printStackTrace();
         }
     }
-
 }

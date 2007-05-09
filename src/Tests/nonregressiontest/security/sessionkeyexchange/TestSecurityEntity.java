@@ -55,8 +55,8 @@ public class TestSecurityEntity implements SecurityEntity {
     }
 
     public void initiateSession(int type, SecurityEntity body)
-        throws IOException, CommunicationForbiddenException, 
-            AuthenticationException, RenegotiateSessionException, 
+        throws IOException, CommunicationForbiddenException,
+            AuthenticationException, RenegotiateSessionException,
             SecurityNotAvailableException {
         securityManager.initiateSession(type, body);
     }
@@ -91,7 +91,7 @@ public class TestSecurityEntity implements SecurityEntity {
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException {
         return securityManager.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);

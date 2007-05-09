@@ -33,12 +33,12 @@ package nonregressiontest.component.collectiveitf.multicast.classbased;
 import java.util.HashMap;
 import java.util.Map;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.collectiveitf.multicast.Tester;
-
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.collectiveitf.multicast.Tester;
 
 
 /**
@@ -48,28 +48,27 @@ import org.objectweb.fractal.util.Fractal;
  * Tests are performed using assertions in related classes
  */
 public class Test extends ComponentTest {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3040607689612678450L;
-	public static final String MESSAGE = "-Main-";
-    public static final int NB_CONNECTED_ITFS = 2;
 
+    /**
+         *
+         */
+    private static final long serialVersionUID = -3040607689612678450L;
+    public static final String MESSAGE = "-Main-";
+    public static final int NB_CONNECTED_ITFS = 2;
 
     /*
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
     public void action() throws Exception {
-
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
-        Component testcase = (Component) f.newComponent("nonregressiontest.component.collectiveitf.multicast.classbased.testcase",context);
-        
+        Component testcase = (Component) f.newComponent("nonregressiontest.component.collectiveitf.multicast.classbased.testcase",
+                context);
+
         Fractal.getLifeCycleController(testcase).startFc();
-        ((Tester)testcase.getFcInterface("runTestItf")).testConnectedServerMulticastItf();
-        ((Tester)testcase.getFcInterface("runTestItf")).testOwnClientMulticastItf();
-        
+        ((Tester) testcase.getFcInterface("runTestItf")).testConnectedServerMulticastItf();
+        ((Tester) testcase.getFcInterface("runTestItf")).testOwnClientMulticastItf();
     }
 
     /*
@@ -77,9 +76,7 @@ public class Test extends ComponentTest {
      */
     @Override
     public void endTest() throws Exception {
-
         // TODO Auto-generated method stub
-        
     }
 
     /*
@@ -87,17 +84,20 @@ public class Test extends ComponentTest {
      */
     @Override
     public void initTest() throws Exception {
-
         // TODO Auto-generated method stub
-        
     }
-    
+
     public static void main(String[] args) {
-        System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
-        System.setProperty("java.security.policy", System.getProperty("user.dir")+"/proactive.java.policy");
-        System.setProperty("log4j.configuration", System.getProperty("user.dir")+"/proactive-log4j");
-        System.setProperty("log4j.configuration", "file:" + System.getProperty("user.dir")+"/proactive-log4j");
-        System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
+        System.setProperty("fractal.provider",
+            "org.objectweb.proactive.core.component.Fractive");
+        System.setProperty("java.security.policy",
+            System.getProperty("user.dir") + "/proactive.java.policy");
+        System.setProperty("log4j.configuration",
+            System.getProperty("user.dir") + "/proactive-log4j");
+        System.setProperty("log4j.configuration",
+            "file:" + System.getProperty("user.dir") + "/proactive-log4j");
+        System.setProperty("nonregressiontest.descriptor.defaultnodes.file",
+            "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
         Test test = new Test();
         try {
             test.action();

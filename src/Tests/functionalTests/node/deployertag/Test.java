@@ -30,23 +30,21 @@
  */
 package functionalTests.node.deployertag;
 
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.DeployerTag;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 
 
 // TODO: Test deployment from multiple VMs
 /**
  * Test that DeployerTag are correctly assigned.
  */
-public class Test {
-
-	private static String XML_LOCATION;
+public class Test extends FunctionalTest {
+    private static String XML_LOCATION;
 
     static {
         String value = System.getProperty(
@@ -63,7 +61,6 @@ public class Test {
     private static ProActiveDescriptor proActiveDescriptor = null;
     private static VirtualNode[] virtualNodes = null;
 
-    
     @org.junit.Test
     public void action() throws Exception {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
@@ -94,11 +91,5 @@ public class Test {
                 }
             }
         }
-    }
-
-    
-    @After
-	public void endTest() {
-       Helper.killJVMs();
     }
 }

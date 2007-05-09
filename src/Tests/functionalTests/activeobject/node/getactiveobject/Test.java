@@ -30,60 +30,48 @@
  */
 package functionalTests.activeobject.node.getactiveobject;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test getActiveObjects method on a node
  */
-public class Test {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -5140404245390698648L;
-	Node node;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -5140404245390698648L;
+    Node node;
     A a;
 
     @Before
     public void Before() throws Exception {
-    	new TestNodes().action();
+        new TestNodes().action();
     }
-  
+
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         node = TestNodes.getLocalVMNode();
         if (node == null) {
             new TestNodes().action();
             node = TestNodes.getLocalVMNode();
         }
         ProActive.newActive(A.class.getName(), new Object[] { "toto" }, node);
-       // Thread.sleep(3000);
+        // Thread.sleep(3000);
         a = (A) node.getActiveObjects(A.class.getName())[0];
-  
+
         assertTrue(a.getName().equals("toto"));
         assertTrue(a.getNodeUrl().equals(node.getNodeInformation().getURL()));
     }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
-    }
-    
+
     public static void main(String[] args) {
-            
-            Test test = new Test();
-            try {
-                test.action();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        Test test = new Test();
+        try {
+            test.action();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    
-    
+    }
 }

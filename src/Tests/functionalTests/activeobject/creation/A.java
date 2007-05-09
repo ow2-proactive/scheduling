@@ -34,12 +34,14 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.ProActive;
 
+
 public class A implements Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6783498564410212488L;
-	String name;
+         *
+         */
+    private static final long serialVersionUID = 6783498564410212488L;
+    String name;
 
     public A() {
     }

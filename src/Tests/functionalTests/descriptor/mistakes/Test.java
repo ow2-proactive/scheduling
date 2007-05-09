@@ -30,20 +30,19 @@
  */
 package functionalTests.descriptor.mistakes;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.xml.VariableContract;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test service: variable support and mistakes in deployment descriptor
  */
-public class Test {
-	private static final long serialVersionUID = 8303982699999215955L;
-	private static String TESTMISTAKES_XML_LOCATION_UNIX = Test.class.getResource(
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 8303982699999215955L;
+    private static String TESTMISTAKES_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/descriptor/mistakes/testMistakes.xml").getPath();
     private static String TESTVARIABLES_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/descriptor/mistakes/testVariables.xml").getPath();
@@ -60,8 +59,8 @@ public class Test {
             testSuccess = false;
         } catch (Exception e) {
             // Mistake found as expected
-//            super.getLogger()
-//                 .debug("Message found as expected\n" + e.getMessage());
+            //            super.getLogger()
+            //                 .debug("Message found as expected\n" + e.getMessage());
         }
 
         if (pad != null) {
@@ -69,7 +68,7 @@ public class Test {
         }
 
         assertTrue(testSuccess);
-        
+
         // We now parse an XML Deployment Descriptor with variables
         // The preceding test resulted in an error during the parsing, if you
         // encounter an endless loop here,
@@ -90,13 +89,7 @@ public class Test {
             pad1.killall(false);
         }
     }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
-    }
 
-  
     public static void main(String[] args) {
         Test test = new Test();
 

@@ -30,30 +30,27 @@
  */
 package functionalTests.group.dynamicthreadpool;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * add and remove member in a group to see the threadpool vary
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test {
- 	private static final long serialVersionUID = -8294278613480913623L;
-	private A typedGroup = null;
-
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -8294278613480913623L;
+    private A typedGroup = null;
 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         Group g = ProActiveGroup.getGroup(this.typedGroup);
 
         this.typedGroup.onewayCall();
@@ -72,9 +69,9 @@ public class Test {
     }
 
     @Before
-	public void preConditions() throws Exception {
-    	new TestNodes().action();
-    	
+    public void preConditions() throws Exception {
+        new TestNodes().action();
+
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -88,10 +85,5 @@ public class Test {
                 params, nodes);
 
         assertTrue(this.typedGroup != null);
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 }

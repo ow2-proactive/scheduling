@@ -34,7 +34,5 @@ import nonregressiontest.component.collectiveitf.multicast.WrappedInteger;
 
 
 public interface OneToOneServerItf {
-    
     public WrappedInteger dispatch(WrappedInteger i);
-
 }

@@ -33,12 +33,12 @@ package nonregressiontest.component.descriptor.arguments;
 import java.util.HashMap;
 import java.util.Map;
 
-import nonregressiontest.component.ComponentTest;
-
 import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
+
+import nonregressiontest.component.ComponentTest;
 
 
 /**
@@ -49,11 +49,12 @@ import org.objectweb.fractal.util.Fractal;
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7744558732415529004L;
-	Component dummy;
+         *
+         */
+    private static final long serialVersionUID = 7744558732415529004L;
+    Component dummy;
 
     public Test() {
         super("Configuration with ADL arguments and AttributeController",
@@ -64,7 +65,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         context.put("message", "hello world");
@@ -77,30 +78,29 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         Assertions.assertEquals("This component is storing the info : hello world",
-                ((Action) dummy.getFcInterface("action")).doSomething());
+            ((Action) dummy.getFcInterface("action")).doSomething());
         return true;
     }
 
     private Component getDummy() {
         return dummy;
     }
-    
-    
+
     public static void main(String[] args) throws Throwable {
-    	Test t = new Test();
-    	t.action();
+        Test t = new Test();
+        t.action();
     }
 }

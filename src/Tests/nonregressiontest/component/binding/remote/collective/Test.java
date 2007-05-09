@@ -30,13 +30,6 @@
  */
 package nonregressiontest.component.binding.remote.collective;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.I2;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentB;
-import nonregressiontest.component.PrimitiveComponentD;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -50,17 +43,25 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import functionalTests.descriptor.defaultnodes.TestNodes;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.I2;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentB;
+import nonregressiontest.component.PrimitiveComponentD;
+
 
 /**
  * @author Matthieu Morel
  * a test for bindings on client collective interfaces between remote components
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2951919520858323164L;
-	public static String MESSAGE = "-->Main";
+         *
+         */
+    private static final long serialVersionUID = -2951919520858323164L;
+    public static String MESSAGE = "-->Main";
     Component pD1;
     Component pB1;
     Component pB2;
@@ -75,10 +76,10 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        ProActiveGenericFactory cf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
+        ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
 
         ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
                     type_factory.createFcItfType("i1", I1.class.getName(),
@@ -127,18 +128,18 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         StringBuffer resulting_msg = new StringBuffer();
         int message_size = ProActiveGroup.size(message);
         for (int i = 0; i < message_size; i++) {

@@ -30,9 +30,6 @@
  */
 package functionalTests.descriptor.launcher;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.After;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -42,30 +39,34 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test launching an application via the launcher and deploys it.
- * 
+ *
  * @author ProActiveTeam
  * @version 1.0 26 aout 2005
  * @since ProActive 2.0.1
  */
-public class Test {
- 	private static final long serialVersionUID = -2153432590156382257L;
-
-	private static String XML_LOCATION;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -2153432590156382257L;
+    private static String XML_LOCATION;
 
     static {
-    	  if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-    		  XML_LOCATION = Test.class.getResource(
-              "/functionalTests/descriptor/launcher/TestLauncherIbis.xml").getPath();
-          } else {
-        	  XML_LOCATION = Test.class.getResource(
-          "/functionalTests/descriptor/launcher/TestLauncher.xml").getPath();
-          }
-    	
+        if ("ibis".equals(ProActiveConfiguration.getInstance()
+                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+            XML_LOCATION = Test.class.getResource(
+                    "/functionalTests/descriptor/launcher/TestLauncherIbis.xml")
+                                     .getPath();
+        } else {
+            XML_LOCATION = Test.class.getResource(
+                    "/functionalTests/descriptor/launcher/TestLauncher.xml")
+                                     .getPath();
+        }
     }
-    
+
     /** node array for VN1 */
     Node[] nodeTab;
 
@@ -77,13 +78,11 @@ public class Test {
     ProActiveRuntime part;
     Node mainNode;
 
-
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         launcher = new Launcher(XML_LOCATION);
         launcher.activate();
-  //      Thread.sleep(5000);
-        
+        //      Thread.sleep(5000);
         pad = launcher.getProActiveDescriptor();
         vnMain = pad.getVirtualNode("lVNmain");
         mainNode = vnMain.getNode();
@@ -93,30 +92,33 @@ public class Test {
         nodeTab2 = part.getVirtualNode("lVN2").getNodes();
 
         // 1) there must be exactly 2 nodes
-        
         assertTrue(nodeTab.length == 1);
         assertTrue(nodeTab2.length == 1);
 
         // 2) test equality between job ids
-        assertTrue(vnMain.getJobID().equals(nodeTab[0].getNodeInformation().getJobID()));
-       assertTrue(vnMain.getJobID().equals(nodeTab2[0].getNodeInformation().getJobID())); 
+        assertTrue(vnMain.getJobID()
+                         .equals(nodeTab[0].getNodeInformation().getJobID()));
+        assertTrue(vnMain.getJobID()
+                         .equals(nodeTab2[0].getNodeInformation().getJobID()));
 
         // 3) all nodes must be in differents VM, and mainNode in current VM
-    	   assertFalse((nodeTab[0].getNodeInformation().getVMID().equals(nodeTab2[0].getNodeInformation().getVMID())));
-           assertFalse(nodeTab[0].getNodeInformation().getVMID().equals(mainNode.getNodeInformation().getVMID()));
-           assertFalse(nodeTab2[0].getNodeInformation().getVMID().equals(mainNode.getNodeInformation().getVMID()));
-           assertTrue(part.getVMInformation().getVMID().equals(mainNode.getNodeInformation().getVMID()));
+        assertFalse((nodeTab[0].getNodeInformation().getVMID()
+                               .equals(nodeTab2[0].getNodeInformation().getVMID())));
+        assertFalse(nodeTab[0].getNodeInformation().getVMID()
+                              .equals(mainNode.getNodeInformation().getVMID()));
+        assertFalse(nodeTab2[0].getNodeInformation().getVMID()
+                               .equals(mainNode.getNodeInformation().getVMID()));
+        assertTrue(part.getVMInformation().getVMID()
+                       .equals(mainNode.getNodeInformation().getVMID()));
     }
 
-   @After
-	public void endTest() throws Exception {
+    @After
+    public void endTest() throws Exception {
         // kill the runtimes where the nodes are deployed.
         part.getVirtualNode("lVN1").killAll(true);
         part.getVirtualNode("lVN2").killAll(true);
         vnMain.killAll(true);
         pad.killall(false);
-        
-        Helper.killJVMs();
     }
 
     public static void main(String[] args) {

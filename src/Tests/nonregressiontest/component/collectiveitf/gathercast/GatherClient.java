@@ -41,12 +41,10 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
-public class GatherClient implements GatherClientAttributes, TestItf, BindingController {
-    
+public class GatherClient implements GatherClientAttributes, TestItf,
+    BindingController {
     DummyItf client2primitive;
-    
     DummyItf client2composite;
-    
     String id;
 
     /*
@@ -54,35 +52,35 @@ public class GatherClient implements GatherClientAttributes, TestItf, BindingCon
      */
     public BooleanWrapper test() {
         client2primitive.foo(new IntMutableWrapper(new Integer(id)));
-        
+
         try {
-        A a = new A(new Integer(id));
-        B b1 = client2primitive.bar(a);
-        B b2 = client2composite.bar(a);
-        Assertions.assertTrue(b1.getValue() == a.getValue());
-        Assertions.assertTrue(b2.getValue() == a.getValue());
+            A a = new A(new Integer(id));
+            B b1 = client2primitive.bar(a);
+            B b2 = client2composite.bar(a);
+            Assertions.assertTrue(b1.getValue() == a.getValue());
+            Assertions.assertTrue(b2.getValue() == a.getValue());
         } catch (Throwable t) {
-        	System.out.println("client side");
-        	t.printStackTrace();
+            System.out.println("client side");
+            t.printStackTrace();
         }
-        
+
         boolean timedout = false;
         try {
-        	B b = client2primitive.timeout();
-        	b.getValue(); // only case where timedout exception is thrown: need to access a result!
+            B b = client2primitive.timeout();
+            b.getValue(); // only case where timedout exception is thrown: need to access a result!
         } catch (GathercastTimeoutException e) {
-        	timedout = true;
-//            System.out.println("timeout worked fine with primitive in client " +id);
+            timedout = true;
+            //            System.out.println("timeout worked fine with primitive in client " +id);
         }
         Assertions.assertTrue(timedout);
 
         timedout = false;
         try {
-        	B b = client2composite.timeout();
-        	b.getValue(); // only case where timedout exception is thrown: need to access a result!
+            B b = client2composite.timeout();
+            b.getValue(); // only case where timedout exception is thrown: need to access a result!
         } catch (GathercastTimeoutException e) {
-        	timedout = true;
-//            System.out.println("timeout worked fine for composite in client " +id);
+            timedout = true;
+            //            System.out.println("timeout worked fine for composite in client " +id);
         }
         Assertions.assertTrue(timedout);
 
@@ -102,40 +100,38 @@ public class GatherClient implements GatherClientAttributes, TestItf, BindingCon
      */
     public void setId(String id) {
         this.id = id;
-        
     }
 
-	public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
-		if ("client2composite".equals(clientItfName)) {
-			client2composite = (DummyItf)serverItf;
-		}
-		else if ("client2primitive".equals(clientItfName)) {
-			client2primitive = (DummyItf)serverItf;
-		} else {
-			throw new NoSuchInterfaceException(clientItfName);
-		}
-	}
+    public void bindFc(String clientItfName, Object serverItf)
+        throws NoSuchInterfaceException, IllegalBindingException,
+            IllegalLifeCycleException {
+        if ("client2composite".equals(clientItfName)) {
+            client2composite = (DummyItf) serverItf;
+        } else if ("client2primitive".equals(clientItfName)) {
+            client2primitive = (DummyItf) serverItf;
+        } else {
+            throw new NoSuchInterfaceException(clientItfName);
+        }
+    }
 
-	public String[] listFc() {
-		return new String[] {"client2composite", "client2primitive"};
-	}
+    public String[] listFc() {
+        return new String[] { "client2composite", "client2primitive" };
+    }
 
-	public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
-		if ("client2composite".equals(clientItfName)) {
-			return client2composite ;
-		}
-		else if ("client2primitive".equals(clientItfName)) {
-			return client2primitive ;
-		} else {
-			throw new NoSuchInterfaceException(clientItfName);
-		}
-	}
+    public Object lookupFc(String clientItfName)
+        throws NoSuchInterfaceException {
+        if ("client2composite".equals(clientItfName)) {
+            return client2composite;
+        } else if ("client2primitive".equals(clientItfName)) {
+            return client2primitive;
+        } else {
+            throw new NoSuchInterfaceException(clientItfName);
+        }
+    }
 
-	public void unbindFc(String arg0) throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
-		throw new ProActiveRuntimeException("not implemented!");
-		
-	}
-
-    
-    
+    public void unbindFc(String arg0)
+        throws NoSuchInterfaceException, IllegalBindingException,
+            IllegalLifeCycleException {
+        throw new ProActiveRuntimeException("not implemented!");
+    }
 }

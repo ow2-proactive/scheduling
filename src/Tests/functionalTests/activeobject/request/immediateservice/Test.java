@@ -30,43 +30,36 @@
  */
 package functionalTests.activeobject.request.immediateservice;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test immediateService method on an AO
  */
-public class Test  {
- 	private static final long serialVersionUID = -3419716072002687705L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -3419716072002687705L;
+    A a;
     DummyObject dum;
     String name;
 
     @Before
-	public void action() throws Exception {
+    public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
         ProActive.setImmediateService(a, "getObject");
         dum = a.getObject();
         ProActive.terminateActiveObject(a, true);
     }
 
-   
     @org.junit.Test
-	public void postConditions() throws Exception {
+    public void postConditions() throws Exception {
         if (!ProActive.isAwaited(dum)) {
             assertTrue(dum.getName().equals("toto"));
             return;
-        } 
-        
+        }
+
         throw new Exception();
-    }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
     }
 }

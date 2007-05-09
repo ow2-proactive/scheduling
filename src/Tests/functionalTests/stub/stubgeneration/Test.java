@@ -30,41 +30,38 @@
  */
 package functionalTests.stub.stubgeneration;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Arrays;
 
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.Utils;
 
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Testing on-the-fly generation of stub classes in bytecode form
  * @author rquilici
  */
-public class Test {
- 	private static final long serialVersionUID = 2856204140856147300L;
-	String stubClassName;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 2856204140856147300L;
+    String stubClassName;
     byte[] data;
 
- 
-
     @org.junit.Test
- 	public void action() throws Exception {
+    public void action() throws Exception {
         //empty String
-        assertEquals(Utils.convertClassNameToStubClassName("", null),
-            "");
+        assertEquals(Utils.convertClassNameToStubClassName("", null), "");
 
         //not a stub
         String notAStubClassName = "functionalTests.stub.stubgeneration.A";
-        assertEquals(Utils.convertStubClassNameToClassName(
-                notAStubClassName), notAStubClassName);
+        assertEquals(Utils.convertStubClassNameToClassName(notAStubClassName),
+            notAStubClassName);
 
         // Class not in a package 
-        assertEquals(Utils.convertStubClassNameToClassName(
-                "pa.stub._StubA"), "A");
+        assertEquals(Utils.convertStubClassNameToClassName("pa.stub._StubA"),
+            "A");
 
         //tests with a simple name
         String baseclassName = "functionalTests.stub.stubgeneration.A";
@@ -78,10 +75,9 @@ public class Test {
                 null);
         assertEquals(stubClassName +
             " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
-            stubClassName,
-            "pa.stub.functionalTests.stub.stubgeneration._StubA");
-        assertEquals(Utils.convertStubClassNameToClassName(
-                stubClassName), baseclassName);
+            stubClassName, "pa.stub.functionalTests.stub.stubgeneration._StubA");
+        assertEquals(Utils.convertStubClassNameToClassName(stubClassName),
+            baseclassName);
         assertTrue(Arrays.equals(
                 Utils.getNamesOfParameterizingTypesFromStubClassName(
                     stubClassName), new String[0]));
@@ -101,8 +97,8 @@ public class Test {
             " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
             stubClassName,
             "pa.stub.parameterized.functionalTests.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_GenericsfunctionalTests_Pstub_Pstubgeneration_PMy__PFirst__PType_DfunctionalTests_Pstub_Pstubgeneration_PMy__DSecond__PType");
-        assertEquals(Utils.convertStubClassNameToClassName(
-                stubClassName), baseclassName);
+        assertEquals(Utils.convertStubClassNameToClassName(stubClassName),
+            baseclassName);
         assertTrue(Arrays.equals(
                 Utils.getNamesOfParameterizingTypesFromStubClassName(
                     stubClassName),
@@ -124,17 +120,14 @@ public class Test {
         //        }
         //        System.out.println("convertStubClassNameToClassName " +
         //            (System.currentTimeMillis() - begin));
-        
         assertTrue(data != null);
     }
-
- 
 
     public static void main(String[] args) {
         Test test = new Test();
         try {
             test.action();
-         } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {

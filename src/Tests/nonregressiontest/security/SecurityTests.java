@@ -30,6 +30,8 @@
  */
 package nonregressiontest.security;
 
+import functionalTests.FunctionalTest;
+
 import nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle;
 import nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation;
 import nonregressiontest.security.keygeneration.SecurityTestKeyGen;
@@ -39,18 +41,19 @@ import nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExcha
 
 
 public class SecurityTests extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 5833323104163731463L;
-	private boolean testSucceed = true;
+         *
+         */
+    private static final long serialVersionUID = 5833323104163731463L;
+    private boolean testSucceed = true;
 
     public SecurityTests() {
         super("Security Tests");
     }
 
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         FunctionalTest test = null;
 
         test = new SecurityTestKeyGen();
@@ -68,15 +71,15 @@ public class SecurityTests extends FunctionalTest {
     }
 
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return testSucceed;
     }
 }

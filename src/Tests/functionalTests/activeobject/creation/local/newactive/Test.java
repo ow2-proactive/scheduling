@@ -30,22 +30,21 @@
  */
 package functionalTests.activeobject.creation.local.newactive;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.net.InetAddress;
 
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test newActive method on the local default node
  */
-public class Test {
-	private static final long serialVersionUID = 8174997414009997078L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 8174997414009997078L;
+    A a;
     String name;
     String nodeUrl;
 
@@ -54,15 +53,9 @@ public class Test {
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
         name = a.getName();
         nodeUrl = a.getNodeUrl();
-        
-        assertTrue(name.equals("toto"));
-        assertTrue(nodeUrl.indexOf(UrlBuilder.getHostNameorIP(InetAddress.getLocalHost())) != -1);
-            
-    }
 
-    @After
-    public void after() {
-  	  Helper.killJVMs();
+        assertTrue(name.equals("toto"));
+        assertTrue(nodeUrl.indexOf(UrlBuilder.getHostNameorIP(
+                    InetAddress.getLocalHost())) != -1);
     }
-    
 }

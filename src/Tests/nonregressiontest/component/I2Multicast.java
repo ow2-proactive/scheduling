@@ -32,8 +32,7 @@ package nonregressiontest.component;
 
 import java.util.List;
 
-public interface I2Multicast {
-	
-    public List<Message> processOutputMessage(Message message);
 
+public interface I2Multicast {
+    public List<Message> processOutputMessage(Message message);
 }

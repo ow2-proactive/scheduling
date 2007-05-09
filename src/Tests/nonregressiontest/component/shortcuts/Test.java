@@ -30,13 +30,6 @@
  */
 package nonregressiontest.component.shortcuts;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentA;
-import nonregressiontest.component.PrimitiveComponentB;
-import nonregressiontest.component.Setup;
-
 import org.apache.tools.ant.types.Assertions;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -46,21 +39,30 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ProActive;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentA;
+import nonregressiontest.component.PrimitiveComponentB;
+import nonregressiontest.component.Setup;
+
 
 /**
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 8211123887252319212L;
-	private static final int NB_WRAPPERS = 5;
+         *
+         */
+    private static final long serialVersionUID = 8211123887252319212L;
+    private static final int NB_WRAPPERS = 5;
     private Message result1;
     private Message result2;
     private Message result3;
     private Message result4;
-    private final String expectedResult = "foo"+PrimitiveComponentA.MESSAGE+PrimitiveComponentB.MESSAGE+PrimitiveComponentA.MESSAGE;
+    private final String expectedResult = "foo" + PrimitiveComponentA.MESSAGE +
+        PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE;
     private Component systemWithWrappingWithShortcuts;
     private Component systemWithWrappingWithoutShortcuts;
     private Component systemWithoutWrapping;
@@ -71,7 +73,7 @@ public class Test extends ComponentTest {
     }
 
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         initializeComponentSystems();
 
         //System.out.println("testing unwrapped system");
@@ -125,8 +127,8 @@ public class Test extends ComponentTest {
         // system without wrapped components
         Component unwrappedA = Setup.createPrimitiveA();
         Component unwrappedB = Setup.createPrimitiveB1();
-        Fractal.getBindingController(unwrappedA).bindFc("i2",
-            unwrappedB.getFcInterface("i2"));
+        Fractal.getBindingController(unwrappedA)
+               .bindFc("i2", unwrappedB.getFcInterface("i2"));
         Fractal.getLifeCycleController(unwrappedA).startFc();
         Fractal.getLifeCycleController(unwrappedB).startFc();
         systemWithoutWrapping = unwrappedA;
@@ -144,8 +146,8 @@ public class Test extends ComponentTest {
                     i, wrappedBWithoutShortcuts);
         }
 
-        Fractal.getBindingController(wrappedAWithoutShortcuts).bindFc("i2",
-            wrappedBWithoutShortcuts.getFcInterface("i2"));
+        Fractal.getBindingController(wrappedAWithoutShortcuts)
+               .bindFc("i2", wrappedBWithoutShortcuts.getFcInterface("i2"));
         Fractal.getLifeCycleController(wrappedAWithoutShortcuts).startFc();
         Fractal.getLifeCycleController(wrappedBWithoutShortcuts).startFc();
 
@@ -164,8 +166,8 @@ public class Test extends ComponentTest {
                     i, wrappedBWithShortcuts);
         }
 
-        Fractal.getBindingController(wrappedAWithShortcuts).bindFc("i2",
-            wrappedBWithShortcuts.getFcInterface("i2"));
+        Fractal.getBindingController(wrappedAWithShortcuts)
+               .bindFc("i2", wrappedBWithShortcuts.getFcInterface("i2"));
         Fractal.getLifeCycleController(wrappedAWithShortcuts).startFc();
         Fractal.getLifeCycleController(wrappedBWithShortcuts).startFc();
 
@@ -173,7 +175,7 @@ public class Test extends ComponentTest {
     }
 
     private void resetComponentSystem()
-        throws IllegalContentException, IllegalLifeCycleException, 
+        throws IllegalContentException, IllegalLifeCycleException,
             NoSuchInterfaceException, IllegalBindingException {
         // TODO_M change the inner wrapped components and check the shortcut is aware of the reconfiguration
     }
@@ -183,8 +185,8 @@ public class Test extends ComponentTest {
         Component wrapper = Setup.createSynchronousCompositeOfTypeB(
                 "sync_composite_b" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper).bindFc("i2",
-            wrappee.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper)
+               .bindFc("i2", wrappee.getFcInterface("i2"));
         return wrapper;
     }
 
@@ -192,8 +194,8 @@ public class Test extends ComponentTest {
         throws Exception {
         Component wrapper = Setup.createCompositeOfTypeB("composite_b" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper).bindFc("i2",
-            wrappee.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper)
+               .bindFc("i2", wrappee.getFcInterface("i2"));
         return wrapper;
     }
 
@@ -202,10 +204,10 @@ public class Test extends ComponentTest {
         Component wrapper = Setup.createSynchronousCompositeOfTypeA(
                 "sync_composite_a" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper).bindFc("i1",
-            wrappee.getFcInterface("i1"));
-        Fractal.getBindingController(wrappee).bindFc("i2",
-            wrapper.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper)
+               .bindFc("i1", wrappee.getFcInterface("i1"));
+        Fractal.getBindingController(wrappee)
+               .bindFc("i2", wrapper.getFcInterface("i2"));
         return wrapper;
     }
 
@@ -213,20 +215,20 @@ public class Test extends ComponentTest {
         throws Exception {
         Component wrapper = Setup.createCompositeOfTypeA("composite_a" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper).bindFc("i1",
-            wrappee.getFcInterface("i1"));
-        Fractal.getBindingController(wrappee).bindFc("i2",
-            wrapper.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper)
+               .bindFc("i1", wrappee.getFcInterface("i1"));
+        Fractal.getBindingController(wrappee)
+               .bindFc("i2", wrapper.getFcInterface("i2"));
         return wrapper;
     }
 
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         System.setProperty("proactive.components.use_shortcuts", "true");
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
         System.setProperty("proactive.components.use_shortcuts", "false");
     }
 
@@ -234,12 +236,15 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#postConditions()
      */
     @Override
-	public boolean postConditions() throws Exception {
-        Assertions.assertEquals(expectedResult, ((Message) ProActive.getFutureValue(result4)).getMessage());
-        Assertions.assertEquals(expectedResult, ((Message) ProActive.getFutureValue(result3)).getMessage());
-        Assertions.assertEquals(expectedResult,((Message) ProActive.getFutureValue(result2)).getMessage());
-        Assertions.assertEquals(expectedResult,((Message) ProActive.getFutureValue(result1)).getMessage());
+    public boolean postConditions() throws Exception {
+        Assertions.assertEquals(expectedResult,
+            ((Message) ProActive.getFutureValue(result4)).getMessage());
+        Assertions.assertEquals(expectedResult,
+            ((Message) ProActive.getFutureValue(result3)).getMessage());
+        Assertions.assertEquals(expectedResult,
+            ((Message) ProActive.getFutureValue(result2)).getMessage());
+        Assertions.assertEquals(expectedResult,
+            ((Message) ProActive.getFutureValue(result1)).getMessage());
         return true;
-        
     }
 }

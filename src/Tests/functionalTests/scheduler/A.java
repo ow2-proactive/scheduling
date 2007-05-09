@@ -27,31 +27,34 @@
  * ################################################################
  */
 
-
 /**
- * 
+ *
  *
  * @author walzouab
  *
  */
-
-
 package functionalTests.scheduler;
 
 import org.objectweb.proactive.extra.scheduler.ProActiveTask;
 
-public class A implements ProActiveTask {
 
-	private int sleepTime=0;
-	private boolean throwException=false;
-	
-	
-	 //PA noArg contructor
-    public A(){}
-	public Object run() {
-        if(throwException) {int a=2;int b=1; b--;a=a/b;}
-        	
-		String message;
+public class A implements ProActiveTask {
+    private int sleepTime = 0;
+    private boolean throwException = false;
+
+    //PA noArg contructor
+    public A() {
+    }
+
+    public Object run() {
+        if (throwException) {
+            int a = 2;
+            int b = 1;
+            b--;
+            a = a / b;
+        }
+
+        String message;
         try {
             message = java.net.InetAddress.getLocalHost().toString();
             Thread.sleep(sleepTime * 1000);
@@ -60,14 +63,15 @@ public class A implements ProActiveTask {
             e.printStackTrace();
         }
 
-        return (" hi from " + message + "\t slept for " +
-        sleepTime + "Seconds");
+        return (" hi from " + message + "\t slept for " + sleepTime +
+        "Seconds");
     }
-	public void setSleepTime(int sleepTime) {
-		this.sleepTime = sleepTime;
-	}
-	public void setThrowException(boolean throwException) {
-		this.throwException = throwException;
-	}
 
+    public void setSleepTime(int sleepTime) {
+        this.sleepTime = sleepTime;
+    }
+
+    public void setThrowException(boolean throwException) {
+        this.throwException = throwException;
+    }
 }

@@ -39,17 +39,20 @@ import java.io.ObjectOutputStream;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 
+import functionalTests.FunctionalTest;
+
 
 /**
  * @author arnaud
  *
  */
 public class SecurityTestPolicyServer extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -8689457521948634564L;
-	private PolicyServer policyServer = null;
+         *
+         */
+    private static final long serialVersionUID = -8689457521948634564L;
+    private PolicyServer policyServer = null;
     private PolicyServer ps = null;
 
     /**
@@ -64,7 +67,7 @@ public class SecurityTestPolicyServer extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ObjectOutput out = new ObjectOutputStream(bout);
 
@@ -85,13 +88,13 @@ public class SecurityTestPolicyServer extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(
                 "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         if (ps != null) {
             return true;
         }
@@ -99,6 +102,6 @@ public class SecurityTestPolicyServer extends FunctionalTest {
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 }

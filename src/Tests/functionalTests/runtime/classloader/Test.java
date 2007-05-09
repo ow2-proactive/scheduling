@@ -36,12 +36,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 
 
 /**
@@ -58,12 +57,11 @@ import functionalTests.Helper;
  *
  * @author Matthieu Morel
  */
-public class Test {
- 
-	ProActiveDescriptor descriptor;
+public class Test extends FunctionalTest {
+    ProActiveDescriptor descriptor;
 
-	@Before
-	public void initTest() throws Exception {
+    @Before
+    public void initTest() throws Exception {
         System.setProperty("proactive.classloader", "enable");
         String oldFilePath = getClass()
                                  .getResource("/functionalTests/runtime/classloader/deployment.xml")
@@ -87,40 +85,33 @@ public class Test {
         descriptor.activateMappings();
     }
 
-	
-	
-	@org.junit.Test
-	public void action() throws Exception {
+    @org.junit.Test
+    public void action() throws Exception {
         A a = (A) ProActive.newActive("functionalTests.runtime.classloader.A",
                 new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
         a.createActiveObjectB();
     }
 
-   @After
-   public void endTest() throws Exception {
-	   Helper.killJVMs();
+    private void searchAndReplace(String oldFilePath, String newFilePath,
+        String oldString, String newString) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(
+                        oldFilePath));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(
+                        newFilePath));
+            while (true) {
+                String oldLine = reader.readLine();
+                if (oldLine == null) {
+                    break;
+                }
+                String newLine = oldLine.replace(oldString, newString);
+                writer.write(newLine);
+                writer.newLine();
+            }
+            reader.close();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-   
-   private void searchAndReplace(String oldFilePath, String newFilePath,
-	        String oldString, String newString) {
-	        try {
-	            BufferedReader reader = new BufferedReader(new FileReader(
-	                        oldFilePath));
-	            BufferedWriter writer = new BufferedWriter(new FileWriter(
-	                        newFilePath));
-	            while (true) {
-	                String oldLine = reader.readLine();
-	                if (oldLine == null) {
-	                    break;
-	                }
-	                String newLine = oldLine.replace(oldString, newString);
-	                writer.write(newLine);
-	                writer.newLine();
-	            }
-	            reader.close();
-	            writer.close();
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    }
 }

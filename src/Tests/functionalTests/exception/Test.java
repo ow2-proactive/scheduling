@@ -30,12 +30,12 @@
  */
 package functionalTests.exception;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test exceptions
@@ -44,13 +44,11 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
  * @since ProActive 2.2
  *
  */
-public class Test {
-   
-	public Test() {
-		
-	}
-	
-	int counter = 0;
+public class Test extends FunctionalTest {
+    public Test() {
+    }
+
+    int counter = 0;
 
     void good() {
         counter++;
@@ -163,12 +161,12 @@ public class Test {
         } finally {
             ProActive.removeTryWithCatch();
         }
-        
+
         assertTrue(counter == 14);
     }
 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
 
         /* Server */
         Exc r = (Exc) org.objectweb.proactive.ProActive.newActive(Exc.class.getName(),
@@ -178,12 +176,13 @@ public class Test {
         /* voidRT() */
         ProActive.addNFEListenerOnAO(r,
             new NFEListener() {
-                /**
-				 * 
-				 */
-				private static final long serialVersionUID = 2860995251769787397L;
 
-				public boolean handleNFE(NonFunctionalException e) {
+                /**
+                                 *
+                                 */
+                private static final long serialVersionUID = 2860995251769787397L;
+
+                public boolean handleNFE(NonFunctionalException e) {
                     good();
                     return true;
                 }
@@ -225,7 +224,6 @@ public class Test {
 
         testMechanism(r);
     }
-
 
     public static void main(String[] args) {
         Test test = new Test();

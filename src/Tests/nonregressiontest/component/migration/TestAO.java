@@ -49,12 +49,13 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 // therefore, future pool must be serialized, which poses a problem if there is a reference on a HalfBody (from main)
 // solution : we run the test from an active object (no HalfBody involved)
 public class TestAO implements Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -382934140742469216L;
 
-	public boolean go() throws Exception {
+    /**
+         *
+         */
+    private static final long serialVersionUID = -382934140742469216L;
+
+    public boolean go() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(Test.class.getResource(

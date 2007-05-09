@@ -30,36 +30,33 @@
  */
 package functionalTests.group.result;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.util.Iterator;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * do a oneway call and an (a)synchronous call on a result group
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test {
- 	private static final long serialVersionUID = -3291469024207693377L;
-	private A resultTypedGroup = null;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -3291469024207693377L;
+    private A resultTypedGroup = null;
     private A resultResultTypedGroup = null;
 
- 
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         this.resultTypedGroup.onewayCall();
         this.resultResultTypedGroup = this.resultTypedGroup.asynchronousCall();
-   
+
         Group group = ProActiveGroup.getGroup(this.resultTypedGroup);
         Group groupResult = ProActiveGroup.getGroup(this.resultResultTypedGroup);
 
@@ -77,16 +74,16 @@ public class Test {
         // is the result of the n-th group member at the n-th position in the result-result group ?
         boolean rightRankingOfResults = true;
         for (int i = 0; i < group.size(); i++) {
-            rightRankingOfResults &= ((A) groupResult.get(i)).getName().equals((((A) group.get(
-                    i)).asynchronousCall()).getName());
+            rightRankingOfResults &= ((A) groupResult.get(i)).getName()
+                                      .equals((((A) group.get(i)).asynchronousCall()).getName());
         }
         assertTrue(rightRankingOfResults);
     }
 
     @Before
-	public void preConditions() throws Exception {
-    	new TestNodes().action();
-    	
+    public void preConditions() throws Exception {
+        new TestNodes().action();
+
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -107,10 +104,5 @@ public class Test {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
         }
         assertTrue(NoOnewayCallDone && (this.resultResultTypedGroup == null));
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 }

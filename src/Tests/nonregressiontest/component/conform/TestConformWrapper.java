@@ -32,11 +32,13 @@ package nonregressiontest.component.conform;
 
 import java.util.List;
 
-import nonregressiontest.component.ComponentTest;
-
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
+
+import functionalTests.FunctionalTest;
+
+import nonregressiontest.component.ComponentTest;
 
 
 /**
@@ -44,11 +46,12 @@ import org.junit.runner.notification.Failure;
  *
  */
 public class TestConformWrapper extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7978027750915442971L;
-	static Result r;
+         *
+         */
+    private static final long serialVersionUID = 7978027750915442971L;
+    static Result r;
     private boolean success = false;
 
     public TestConformWrapper() {
@@ -102,7 +105,7 @@ public class TestConformWrapper extends ComponentTest {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         return success;
     }
 

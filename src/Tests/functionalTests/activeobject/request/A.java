@@ -41,11 +41,12 @@ import org.objectweb.proactive.RunActive;
  * @author rquilici
  */
 public class A implements Serializable, RunActive {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 7313731330586627985L;
-	int counter = 0;
+         *
+         */
+    private static final long serialVersionUID = 7313731330586627985L;
+    int counter = 0;
 
     public A() {
     }

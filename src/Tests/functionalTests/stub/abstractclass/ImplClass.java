@@ -30,16 +30,13 @@
  */
 package functionalTests.stub.abstractclass;
 
-
 public class ImplClass extends AbstractClass {
+    public void foo() {
+        //		System.out.println("GreenWidget : foo");
+    }
 
-	
-	public void foo() {
-//		System.out.println("GreenWidget : foo");
-	}
-	
-	@Override
-	public void gee() {
-//		System.out.println("GreenWidget : gee");
-	}
+    @Override
+    public void gee() {
+        //		System.out.println("GreenWidget : gee");
+    }
 }

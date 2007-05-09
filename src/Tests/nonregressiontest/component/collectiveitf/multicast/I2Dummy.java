@@ -36,6 +36,5 @@ import nonregressiontest.component.Message;
 
 
 public interface I2Dummy {
-
     public List<Message> processOutputMessage(Message message);
 }

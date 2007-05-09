@@ -128,7 +128,7 @@ public class PrimitiveComponentD implements I1, BindingController {
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
     public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (clientItfName.equals(I2_ITF_NAME)) {
             i2Group.clear();

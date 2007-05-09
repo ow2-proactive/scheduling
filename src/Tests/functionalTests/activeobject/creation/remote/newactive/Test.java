@@ -30,45 +30,38 @@
  */
 package functionalTests.activeobject.creation.remote.newactive;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test newActive method on a remote node
  */
-public class Test  {
-	private static final long serialVersionUID = 6283316656144464814L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 6283316656144464814L;
+    A a;
     String name;
     String nodeUrl;
     String remoteHost;
 
-
     @Before
     public void Before() throws Exception {
-    	new TestNodes().action();
+        new TestNodes().action();
     }
 
-   @org.junit.Test
-	public void action() throws Exception {
-	   assertTrue(TestNodes.getRemoteHostname() != null);
-	   
+    @org.junit.Test
+    public void action() throws Exception {
+        assertTrue(TestNodes.getRemoteHostname() != null);
+
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" },
                 TestNodes.getRemoteVMNode());
         name = a.getName();
         nodeUrl = a.getNodeUrl();
-        
+
         assertTrue((name.equals("toto")));
     }
-   
-   @After
-   public void after() {
- 	  Helper.killJVMs();
-   }
 }

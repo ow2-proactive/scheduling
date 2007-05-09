@@ -30,30 +30,29 @@
  */
 package functionalTests.activeobject.migration.simplemigration;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test AO simple migration
  */
-public class Test {
-	private static final long serialVersionUID = -7610928539081956490L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -7610928539081956490L;
+    A a;
     Node sameVmNode;
     Node localVmNode;
 
     @Before
     public void Before() throws Exception {
-    	new TestNodes().action();
+        new TestNodes().action();
     }
-    
-   @org.junit.Test 
+
+    @org.junit.Test
     public void action() throws Exception {
         sameVmNode = TestNodes.getSameVMNode();
         if (sameVmNode == null) {
@@ -67,11 +66,7 @@ public class Test {
         a.moveTo(localVmNode);
 
         assertTrue(a.getName().equals("toto"));
-        assertTrue(a.getNodeUrl().equals(localVmNode.getNodeInformation().getURL()));
+        assertTrue(a.getNodeUrl()
+                    .equals(localVmNode.getNodeInformation().getURL()));
     }
-   
-   @After
-   public void after() {
- 	  Helper.killJVMs();
-   }
 }

@@ -36,12 +36,14 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 
+
 public class A implements Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -9004651207069128L;
-	String name;
+         *
+         */
+    private static final long serialVersionUID = -9004651207069128L;
+    String name;
 
     public A() {
     }

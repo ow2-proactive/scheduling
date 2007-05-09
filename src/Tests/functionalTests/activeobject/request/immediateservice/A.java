@@ -35,12 +35,14 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 
+
 public class A implements Serializable, RunActive {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2006727574867723226L;
-	DummyObject dum;
+         *
+         */
+    private static final long serialVersionUID = -2006727574867723226L;
+    DummyObject dum;
 
     public A() {
     }

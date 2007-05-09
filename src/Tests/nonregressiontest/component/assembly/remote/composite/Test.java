@@ -32,10 +32,10 @@ package nonregressiontest.component.assembly.remote.composite;
 
 import java.util.Arrays;
 
-import nonregressiontest.component.ComponentTest;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
+
+import nonregressiontest.component.ComponentTest;
 
 
 /**
@@ -61,11 +61,12 @@ import org.objectweb.fractal.util.Fractal;
  *
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -7017549219906759724L;
-	public static String MESSAGE = "-->Main";
+         *
+         */
+    private static final long serialVersionUID = -7017549219906759724L;
+    public static String MESSAGE = "-->Main";
     Component p1;
     Component p2;
     Component c1;
@@ -83,7 +84,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         throw new testsuite.exception.NotStandAloneException();
     }
 
@@ -105,18 +106,18 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         Component[] c2_sub_components = { c1 };
         Component[] c1_sub_components = { p1 };
 

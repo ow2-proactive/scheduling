@@ -30,8 +30,6 @@
  */
 package functionalTests.node.nodefactory;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.Constants;
@@ -40,53 +38,51 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test the creation of rmi, jini, ibis node whith the factory
  */
-public class Test {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -303170046021003591L;
-	Node rmiNode;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -303170046021003591L;
+    Node rmiNode;
     Node jiniNode;
     private String rmiURL;
     private String jiniURL = "jini://localhost/JININode" +
         System.currentTimeMillis();
 
-
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         NodeFactory.createNode(rmiURL);
         NodeFactory.createNode(jiniURL);
         //        NodeFactory.createNode("ibis://localhost/IBISNode");
-        
         rmiNode = NodeFactory.getNode(rmiURL);
         jiniNode = NodeFactory.getNode(jiniURL);
         //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
         assertTrue((rmiNode != null) && (jiniNode != null) &&
-        NodeFactory.isNodeLocal(rmiNode));
+            NodeFactory.isNodeLocal(rmiNode));
     }
 
     @Before
-	public void initTest() throws Exception {
-        String port = ProActiveConfiguration.getInstance().getProperty("proactive.rmi.port");
+    public void initTest() throws Exception {
+        String port = ProActiveConfiguration.getInstance()
+                                            .getProperty("proactive.rmi.port");
         if (port != null) {
             rmiURL = UrlBuilder.buildUrl("localhost",
-                    "RMINode" + System.currentTimeMillis(), Constants.RMI_PROTOCOL_IDENTIFIER,
+                    "RMINode" + System.currentTimeMillis(),
+                    Constants.RMI_PROTOCOL_IDENTIFIER,
                     new Integer(port).intValue());
         } else {
             rmiURL = UrlBuilder.buildUrl("localhost",
-                    "RMINode" + System.currentTimeMillis(), Constants.RMI_PROTOCOL_IDENTIFIER);
+                    "RMINode" + System.currentTimeMillis(),
+                    Constants.RMI_PROTOCOL_IDENTIFIER);
         }
     }
 
-  
     @After
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
         NodeFactory.killNode(rmiURL);
         NodeFactory.killNode(jiniURL);
-        Helper.killJVMs();
     }
 }

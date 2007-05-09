@@ -36,11 +36,12 @@ import org.objectweb.proactive.ProActive;
 
 
 public class Collector implements Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -2210392565586275888L;
-	private int result = 0;
+         *
+         */
+    private static final long serialVersionUID = -2210392565586275888L;
+    private int result = 0;
 
     public Collector() {
     }

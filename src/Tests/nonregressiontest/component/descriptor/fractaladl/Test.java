@@ -35,12 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1Multicast;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentA;
-import nonregressiontest.component.PrimitiveComponentB;
-
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
@@ -49,6 +43,12 @@ import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1Multicast;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentA;
+import nonregressiontest.component.PrimitiveComponentB;
 
 
 /**
@@ -61,11 +61,12 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -4791174213677002564L;
-	public static String MESSAGE = "-->m";
+         *
+         */
+    private static final long serialVersionUID = -4791174213677002564L;
+    public static String MESSAGE = "-->m";
     private List<Message> messages;
 
     //ComponentsCache componentsCache;
@@ -80,88 +81,91 @@ public class Test extends ComponentTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
-//        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
-//            throw new Exception("automatic continuations are not set");
-//        }
-//        org.objectweb.proactive.core.component.adl.Launcher.main(new String[] {
-//                "-fractal",
-//                "nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",
-//                "",
-//                Test.class.getResource(
-//                    "/nonregressiontest/component/descriptor/deploymentDescriptor.xml")
-//                          .getPath()
-//            });
-//
-//        Component c = Registry.instance().getComponent("parallel");
-        
+    public void action() throws Exception {
+        //        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
+        //            throw new Exception("automatic continuations are not set");
+        //        }
+        //        org.objectweb.proactive.core.component.adl.Launcher.main(new String[] {
+        //                "-fractal",
+        //                "nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",
+        //                "",
+        //                Test.class.getResource(
+        //                    "/nonregressiontest/component/descriptor/deploymentDescriptor.xml")
+        //                          .getPath()
+        //            });
+        //
+        //        Component c = Registry.instance().getComponent("parallel");
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         deploymentDescriptor = ProActive.getProactiveDescriptor(Test.class.getResource(
-                "/nonregressiontest/component/descriptor/deploymentDescriptor.xml").getPath());
-        context.put("deployment-descriptor",deploymentDescriptor);
-        Component root = (Component) f.newComponent("nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",context);
+                    "/nonregressiontest/component/descriptor/deploymentDescriptor.xml")
+                                                                          .getPath());
+        context.put("deployment-descriptor", deploymentDescriptor);
+        Component root = (Component) f.newComponent("nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",
+                context);
         Fractal.getLifeCycleController(root).startFc();
-        Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
+        Component[] subComponents = Fractal.getContentController(root)
+                                           .getFcSubComponents();
         for (Component component : subComponents) {
-            if ("parallel".equals(Fractal.getNameController(component).getFcName())) {
+            if ("parallel".equals(Fractal.getNameController(component)
+                                             .getFcName())) {
                 // invoke method on composite
-                I1Multicast i1Multicast  = (I1Multicast) component.getFcInterface("i1");
+                I1Multicast i1Multicast = (I1Multicast) component.getFcInterface(
+                        "i1");
                 //I1 i1= (I1)p1.getFcInterface("i1");
-                messages =  i1Multicast.processInputMessage(new Message(MESSAGE));
+                messages = i1Multicast.processInputMessage(new Message(MESSAGE));
 
                 for (Iterator iter = messages.iterator(); iter.hasNext();) {
-					Message element = (Message) iter.next();
-					element.append(MESSAGE);
-				}
+                    Message element = (Message) iter.next();
+                    element.append(MESSAGE);
+                }
                 break;
             }
-            
         }
-
-
     }
 
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
     }
 
     /* (non-Javadoc)
      * @see testsuite.test.AbstractTest#endTest()
      */
     @Override
-	public void endTest() throws Exception {
-//        Launcher.killNodes(false);
+    public void endTest() throws Exception {
+        //        Launcher.killNodes(false);
         Registry.instance().clear();
         deploymentDescriptor.killall(false);
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         //        		System.out.println("\nMESSAGE IS : ");
         //        		System.out.println("-------------------------------------------------");
         //        		message.printToStream(System.out);
         //        		System.out.println("-------------------------------------------------");
         StringBuffer resulting_msg = new StringBuffer();
         Object futureValue = ProActive.getFutureValue(messages);
-        Message m = (Message)((Group)futureValue).getGroupByType();
-//        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
-        int nb_messages = append(resulting_msg, m);
-        
+        Message m = (Message) ((Group) futureValue).getGroupByType();
 
-//        System.out.println("*** received " + nb_messages + "  : " +
-//            resulting_msg.toString());
-//        System.out.println("***" + resulting_msg.toString());
+        //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
+        int nb_messages = append(resulting_msg, m);
+
+        //        System.out.println("*** received " + nb_messages + "  : " +
+        //            resulting_msg.toString());
+        //        System.out.println("***" + resulting_msg.toString());
         // this --> primitiveC --> primitiveA --> primitiveB--> primitiveA --> primitiveC --> this  (message goes through parallel and composite components)
         String single_message = Test.MESSAGE + PrimitiveComponentA.MESSAGE +
             PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE +
             Test.MESSAGE;
 
         // there should be 4 messages with the current configuration
-        return resulting_msg.toString().equals(single_message + single_message + single_message + single_message);
+        return resulting_msg.toString()
+                            .equals(single_message + single_message +
+            single_message + single_message);
     }
 
     private int append(StringBuffer buffer, Message message) {
@@ -179,19 +183,18 @@ public class Test extends ComponentTest {
     }
 
     public static void main(String[] args) {
-        
-//        System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
-//        System.setProperty("java.security.policy", System.getProperty("user.dir")+"/proactive.java.policy");
-//        System.setProperty("log4j.configuration", System.getProperty("user.dir")+"/proactive-log4j");
-//        System.setProperty("log4j.configuration", "file:" + System.getProperty("user.dir")+"/proactive-log4j");
-//        System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
+        //        System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
+        //        System.setProperty("java.security.policy", System.getProperty("user.dir")+"/proactive.java.policy");
+        //        System.setProperty("log4j.configuration", System.getProperty("user.dir")+"/proactive-log4j");
+        //        System.setProperty("log4j.configuration", "file:" + System.getProperty("user.dir")+"/proactive-log4j");
+        //        System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
         Test test = new Test();
         try {
             test.action();
-            if (test.postConditions() ) {
-            	System.out.println("SUCCESS!");
+            if (test.postConditions()) {
+                System.out.println("SUCCESS!");
             } else {
-            	System.out.println("FAILED!");
+                System.out.println("FAILED!");
             }
         } catch (Exception e) {
             System.out.println("FAILED!");

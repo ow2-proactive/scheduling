@@ -30,9 +30,6 @@
  */
 package functionalTests.activeobject.locationserver;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -42,45 +39,43 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test migration with location server
  */
-public class Test {
-   	private static final long serialVersionUID = 7390234087440842136L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 7390234087440842136L;
+    A a;
     MigratableA migratableA;
     SimpleLocationServer server;
     UniqueID idA;
 
     @Before
     public void Before() throws Exception {
-    	new TestNodes().action();
+        new TestNodes().action();
     }
-    
+
     @org.junit.Test
     public void action() throws Exception {
-        String serverUrl = ProActiveConfiguration.getInstance().getLocationServerRmi();
+        String serverUrl = ProActiveConfiguration.getInstance()
+                                                 .getLocationServerRmi();
         server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
         a = (A) ProActive.newActive(A.class.getName(), null,
-                new Object[] { "toto" }, TestNodes.getSameVMNode(),
-                null, LocationServerMetaObjectFactory.newInstance());
+                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                LocationServerMetaObjectFactory.newInstance());
         migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
-                null, new Object[] { "toto" }, TestNodes.getSameVMNode(),
-                null, LocationServerMetaObjectFactory.newInstance());
+                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                LocationServerMetaObjectFactory.newInstance());
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
         migratableA.moveTo(TestNodes.getLocalVMNode());
         Thread.sleep(3000);
-    
+
         assertTrue(server.searchObject(idA) != null);
         assertTrue(a.getName(migratableA).equals("toto"));
-    }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
     }
 }

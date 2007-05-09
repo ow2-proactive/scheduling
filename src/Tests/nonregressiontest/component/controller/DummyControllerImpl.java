@@ -44,34 +44,34 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  */
 public class DummyControllerImpl extends AbstractProActiveController
     implements DummyController {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3802641387106106202L;
-	private String dummyValue = null;
+         *
+         */
+    private static final long serialVersionUID = 3802641387106106202L;
+    private String dummyValue = null;
 
     /**
      * @param owner
      */
     public DummyControllerImpl(Component owner) {
         super(owner);
-  }
-    
-        @Override
-		protected void setControllerItfType() {
-            try {
-                setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(DummyController.DUMMY_CONTROLLER_NAME,
-                        DummyController.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE));
-            } catch (InstantiationException e) {
-                throw new ProActiveRuntimeException("cannot create controller " +
-                    this.getClass().getName());
-            }
-       }
+    }
 
+    @Override
+    protected void setControllerItfType() {
+        try {
+            setItfType(ProActiveTypeFactoryImpl.instance()
+                                               .createFcItfType(DummyController.DUMMY_CONTROLLER_NAME,
+                    DummyController.class.getName(), TypeFactory.SERVER,
+                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+        } catch (InstantiationException e) {
+            throw new ProActiveRuntimeException("cannot create controller " +
+                this.getClass().getName());
+        }
+    }
 
-
-	public void setDummyValue(String value) {
+    public void setDummyValue(String value) {
         dummyValue = value;
     }
 

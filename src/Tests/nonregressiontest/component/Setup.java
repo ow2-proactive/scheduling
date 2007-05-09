@@ -74,11 +74,11 @@ public class Setup {
                 "org.objectweb.proactive.core.component.Fractive");
             Component boot = Fractal.getBootstrapComponent();
             if (tf == null) {
-                tf = (ProActiveTypeFactory)Fractal.getTypeFactory(boot);
+                tf = (ProActiveTypeFactory) Fractal.getTypeFactory(boot);
             }
 
             if (gf == null) {
-                gf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
+                gf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
             }
         }
     }

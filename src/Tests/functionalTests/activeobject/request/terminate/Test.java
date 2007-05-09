@@ -30,35 +30,30 @@
  */
 package functionalTests.activeobject.request.terminate;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.activeobject.request.A;
+
 
 /**
  * Test sending termination method
  */
-public class Test {
-	private static final long serialVersionUID = 9207669520580816164L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 9207669520580816164L;
+    A a;
 
-	@Before
-	public void action() throws Exception {
+    @Before
+    public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), new Object[0]);
         a.method1();
         a.exit();
-      //  Thread.sleep(5000);
+        //  Thread.sleep(5000);
     }
 
-    @org.junit.Test(expected=Exception.class)
-	public void postConditions() throws Exception {
-            a.method1();
-          }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
+    @org.junit.Test(expected = Exception.class)
+    public void postConditions() throws Exception {
+        a.method1();
     }
 }

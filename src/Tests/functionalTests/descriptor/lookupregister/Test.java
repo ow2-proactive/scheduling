@@ -30,9 +30,6 @@
  */
 package functionalTests.descriptor.lookupregister;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -40,26 +37,31 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test lookup and register in deployment descriptors
  */
-public class Test {
-  private static final long serialVersionUID = -6581981842836211604L;
-	// private static String FS = File.separator;
-    private static String AGENT_XML_LOCATION_UNIX ;
-    
-  static {
-	  if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-		  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-	      "/functionalTests/descriptor/lookupregister/AgentIbis.xml").getPath();
-	  } else {
-	  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-      "/functionalTests/descriptor/lookupregister/Agent.xml").getPath();
-	  }
-  }
-    
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -6581981842836211604L;
+
+    // private static String FS = File.separator;
+    private static String AGENT_XML_LOCATION_UNIX;
+
+    static {
+        if ("ibis".equals(ProActiveConfiguration.getInstance()
+                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+            AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+                    "/functionalTests/descriptor/lookupregister/AgentIbis.xml")
+                                                .getPath();
+        } else {
+            AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+                    "/functionalTests/descriptor/lookupregister/Agent.xml")
+                                                .getPath();
+        }
+    }
+
     ProActiveDescriptor proActiveDescriptorAgent;
     A a;
 
@@ -69,19 +71,13 @@ public class Test {
                 AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
-       ProActive.newActive(A.class.getName(),
-                new Object[] { "local" }, vnAgent.getNode());
+        ProActive.newActive(A.class.getName(), new Object[] { "local" },
+            vnAgent.getNode());
         VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties(
                     "localhost", "Agent"));
         a = (A) vnLookup.getUniqueAO();
-        
-        assertTrue((a.getName().equals("local")));
-    }
 
-   
-    @After
-	public void endTest()  {
-    	Helper.killJVMs(); 	
+        assertTrue((a.getName().equals("local")));
     }
 
     public static void main(String[] args) {

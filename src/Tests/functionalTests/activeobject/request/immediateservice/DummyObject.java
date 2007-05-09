@@ -32,12 +32,14 @@ package functionalTests.activeobject.request.immediateservice;
 
 import java.io.Serializable;
 
+
 public class DummyObject implements Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2098320851319030620L;
-	String name;
+         *
+         */
+    private static final long serialVersionUID = 2098320851319030620L;
+    String name;
 
     public DummyObject() {
     }

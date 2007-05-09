@@ -30,8 +30,6 @@
  */
 package functionalTests.activeobject.creation.parallel;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +37,9 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test newActiveInParallel method with the virtual node has been activated
@@ -48,8 +47,7 @@ import functionalTests.activeobject.creation.A;
  *
  * Created on Nov 8, 2005
  */
-public class TestVnActivated{
-
+public class TestVnActivated extends FunctionalTest {
     private static final long serialVersionUID = 4947991801620598508L;
     private static final String XML_PATH = TestVnActivated.class.getResource(
             "/functionalTests/activeobject/creation/parallel/4_local.xml")
@@ -58,23 +56,20 @@ public class TestVnActivated{
     private VirtualNode vn;
     private ProActiveDescriptor padForActiving;
 
-
-  
     @Test
     public void action() throws Exception {
-    	assertTrue(vn.isActivated());
-    	
+        assertTrue(vn.isActivated());
+
         this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                 new Object[] { "toto" }, vn);
-        
+
         assertTrue(aos != null);
         assertTrue(aos.length == 4);
-        
+
         for (int i = 0; i < this.aos.length; i++) {
             aos[i].getNodeUrl();
         }
         this.vn.killAll(false);
-    
     }
 
     @Before
@@ -89,9 +84,5 @@ public class TestVnActivated{
         if (padForActiving != null) {
             padForActiving.killall(false);
         }
-        Helper.killJVMs();
     }
-
-   
-    
 }

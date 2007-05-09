@@ -30,9 +30,6 @@
  */
 package functionalTests.loadbalancing;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -41,14 +38,14 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.loadbalancing.LoadBalancing;
 import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTimeMillisMetricFactory;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test load balancing
  */
-public class Test {
-   
-	private String XML_LOCATION = Test.class.getResource(
+public class Test extends FunctionalTest {
+    private String XML_LOCATION = Test.class.getResource(
             "/functionalTests/loadbalancing/LoadBalancing.xml").getPath();
     private ProActiveDescriptor pad;
     private VirtualNode vn1;
@@ -56,9 +53,8 @@ public class Test {
     Node nodeOne;
     Node nodeTwo;
 
-   
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), null, nodeOne);
         Thread.sleep(1000);
         assertTrue(a.getNodeUrl().equals(nodeTwo.getNodeInformation().getURL()));
@@ -76,11 +72,4 @@ public class Test {
         LoadBalancing.activateOn(new Node[] { nodeOne, nodeTwo },
             new CurrentTimeMillisMetricFactory());
     }
-
-    @After
-	public void endTest() {
-    	Helper.killJVMs();
-    }
-
-   
 }

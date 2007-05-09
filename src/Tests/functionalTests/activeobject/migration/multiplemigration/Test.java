@@ -30,28 +30,27 @@
  */
 package functionalTests.activeobject.migration.multiplemigration;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+
 
 /**
  * Test multiple migration with method call
  */
-public class Test  {
- 
-	private static final long serialVersionUID = -1990961843638689934L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -1990961843638689934L;
+    A a;
 
-	 @Before
-	    public void Before() throws Exception {
-	    	new TestNodes().action();
-	    }
-	 
+    @Before
+    public void Before() throws Exception {
+        new TestNodes().action();
+    }
+
     @org.junit.Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
         a.moveTo(TestNodes.getRemoteVMNode());
         a.getNodeUrl();
@@ -59,10 +58,5 @@ public class Test  {
         a.getNodeUrl();
         a.moveTo(TestNodes.getLocalVMNode());
         a.getNodeUrl();
-    }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
     }
 }

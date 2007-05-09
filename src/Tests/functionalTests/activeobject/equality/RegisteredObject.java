@@ -35,6 +35,7 @@ import java.io.IOException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+
 public class RegisteredObject {
     String name;
 
@@ -49,14 +50,13 @@ public class RegisteredObject {
         return name;
     }
 
-    
     public int register() {
-    	  try {
-              ProActive.register((RegisteredObject) ProActive.getStubOnThis(),
-                  UrlBuilder.buildUrlFromProperties("localhost", "A"));
-          } catch (IOException e) {
-              e.printStackTrace();
-          }
-    	return 0;
+        try {
+            ProActive.register((RegisteredObject) ProActive.getStubOnThis(),
+                UrlBuilder.buildUrlFromProperties("localhost", "A"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

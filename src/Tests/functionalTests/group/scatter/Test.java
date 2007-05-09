@@ -30,34 +30,31 @@
  */
 package functionalTests.group.scatter;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * distributes the parameters of a method call to member
- * 
+ *
  * @author Laurent Baduel
  */
-public class Test  {
- 	private static final long serialVersionUID = 3983994850028585746L;
-	private A typedGroup = null;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 3983994850028585746L;
+    private A typedGroup = null;
     private A parameterGroup = null;
     private A resultTypedGroup = null;
 
- 
     @org.junit.Test
-	public void action() throws Exception {
-    	new TestNodes().action();
-    	
+    public void action() throws Exception {
+        new TestNodes().action();
+
         Object[][] params = {
                 { "Agent0" },
                 { "Agent1" },
@@ -84,16 +81,16 @@ public class Test  {
         ProActiveGroup.setScatterGroup(this.parameterGroup);
         this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
         ProActiveGroup.unsetScatterGroup(this.parameterGroup);
-   
+
         // was the result group created ?
-        assertTrue (this.resultTypedGroup != null);
+        assertTrue(this.resultTypedGroup != null);
 
         Group group = ProActiveGroup.getGroup(this.typedGroup);
         Group groupResult = ProActiveGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
-        assertTrue (groupResult.size() == group.size());
-  
+        assertTrue(groupResult.size() == group.size());
+
         Group groupParameter = ProActiveGroup.getGroup(this.parameterGroup);
         boolean rightRankingAndCorrectnessOfResults = true;
         for (int i = 0; i < group.size(); i++) {
@@ -103,11 +100,6 @@ public class Test  {
         }
 
         // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
-    }
-    
-    @After
-    public void after() {
-    	Helper.killJVMs();
     }
 
     public static void main(String[] args) {

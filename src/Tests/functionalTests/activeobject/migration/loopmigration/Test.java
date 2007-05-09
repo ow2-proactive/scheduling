@@ -30,41 +30,34 @@
  */
 package functionalTests.activeobject.migration.loopmigration;
 
-import static junit.framework.Assert.assertFalse;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertFalse;
+
 /**
  * Test AO loop migration
  */
-public class Test {
- 
-	private static final long serialVersionUID = 38511988116531130L;
-	String node1;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 38511988116531130L;
+    String node1;
     String node2;
     A a;
 
     @Before
     public void Before() throws Exception {
-    	new TestNodes().action();
+        new TestNodes().action();
     }
-    
+
     @org.junit.Test
-   public void action() throws Exception {
+    public void action() throws Exception {
         node1 = TestNodes.getSameVMNode().getNodeInformation().getURL();
         node2 = TestNodes.getLocalVMNode().getNodeInformation().getURL();
         a = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { node1, node2 }, node1);
-        
+
         assertFalse(a.isException());
-    }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
     }
 }

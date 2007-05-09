@@ -30,9 +30,6 @@
  */
 package functionalTests.descriptor.services.p2p;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -40,30 +37,33 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
+import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test service: P2P JVM acquisition in deployment descriptor
- * 
+ *
  * @author ProActiveTeam
  * @version 1.0 6 ao?t 2004
  * @since ProActive 2.0.1
  */
-public class Test {
+public class Test extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3787507831019771599L;
-	private static String P2P_XML_LOCATION_UNIX = Test.class.getResource(
+         *
+         */
+    private static final long serialVersionUID = -3787507831019771599L;
+    private static String P2P_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/descriptor/services/p2p/TestP2P.xml").getPath();
 
     static {
-        if ("ibis".equals(ProActiveConfiguration.getInstance().getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+        if ("ibis".equals(ProActiveConfiguration.getInstance()
+                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             P2P_XML_LOCATION_UNIX = Test.class.getResource(
                     "/functionalTests/descriptor/services/p2p/TestP2PIbis.xml")
                                               .getPath();
@@ -78,8 +78,6 @@ public class Test {
     JVMProcessImpl process;
     Node[] nodeTab;
     ProActiveDescriptor pad;
-
-
 
     @org.junit.Test
     public void action() throws Exception {
@@ -101,7 +99,7 @@ public class Test {
         pad.activateMappings();
         VirtualNode vn = pad.getVirtualNode("p2pvn");
         nodeTab = vn.getNodes();
-  
+
         boolean resultTest = (nodeTab.length == 3);
         try {
             this.process.stopProcess();
@@ -114,16 +112,11 @@ public class Test {
             part.killNode(p2pNode.getNodeInformation().getURL());
         } catch (Exception e) {
             // Problem with killing local node
-//            logger.debug("Impossible to clean local P2P node");
+            //            logger.debug("Impossible to clean local P2P node");
         }
         assertTrue(resultTest);
     }
 
-    @After
-    public void after() {
-    	Helper.killJVMs();
-    }
-    
     public static void main(String[] args) {
         Test test = new Test();
 

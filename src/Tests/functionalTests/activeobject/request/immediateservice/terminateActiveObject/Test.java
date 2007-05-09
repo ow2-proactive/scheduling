@@ -30,31 +30,30 @@
  */
 package functionalTests.activeobject.request.immediateservice.terminateActiveObject;
 
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+
 
 /**
  * Test immediate termination of an active object
  */
-public class Test {
-	private static final long serialVersionUID = -5501538868583034371L;
-	B b;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -5501538868583034371L;
+    B b;
 
-    
-	@Before
-	public void before() throws Exception {
-	    b = (B) ProActive.newActive(B.class.getName(), new Object[] { "blue" });
+    @Before
+    public void before() throws Exception {
+        b = (B) ProActive.newActive(B.class.getName(), new Object[] { "blue" });
         b.changeColor("red");
         ProActive.terminateActiveObject(b, true);
-	}
-	
-	@org.junit.Test(expected=Exception.class)
-	public void action() throws Exception {
-          b.getColor();
-          }
+    }
+
+    @org.junit.Test(expected = Exception.class)
+    public void action() throws Exception {
+        b.getColor();
+    }
 
     public static void main(String[] args) {
         Test test = new Test();
@@ -63,10 +62,5 @@ public class Test {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
     }
 }

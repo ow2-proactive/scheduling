@@ -30,9 +30,6 @@
  */
 package functionalTests.activeobject.loopmixedlocation;
 
-import static junit.framework.Assert.assertTrue;
-
-import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -42,28 +39,31 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 import org.objectweb.proactive.extensions.mixedlocation.MixedLocationMetaObjectFactory;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.activeobject.locationserver.A;
 import functionalTests.activeobject.locationserver.MigratableA;
 import functionalTests.descriptor.defaultnodes.TestNodes;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test migration with location server and forwarder
  */
-public class Test {
- 	private static final long serialVersionUID = -8550542790438719546L;
-	A a;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -8550542790438719546L;
+    A a;
     MigratableA migratableA;
     SimpleLocationServer server;
     UniqueID idA;
 
     @Before
     public void Before() throws Exception {
-    	new TestNodes().action();
+        new TestNodes().action();
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        String serverUrl = ProActiveConfiguration.getInstance().getLocationServerRmi();
+        String serverUrl = ProActiveConfiguration.getInstance()
+                                                 .getLocationServerRmi();
         server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
@@ -76,13 +76,8 @@ public class Test {
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
         migratableA.moveTo(TestNodes.getLocalVMNode());
         Thread.sleep(3000);
-    
+
         assertTrue(server.searchObject(idA) != null);
         assertTrue(a.getName(migratableA).equals("toto"));
-    }
-    
-    @After
-    public void after() {
-  	  Helper.killJVMs();
     }
 }

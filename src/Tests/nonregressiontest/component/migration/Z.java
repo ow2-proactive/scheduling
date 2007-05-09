@@ -34,18 +34,18 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
+
 public class Z implements D, Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7589027827602951941L;
-	int barCounter = 0;
 
-	public StringWrapper bar(StringWrapper s) {
-//		System.out.println("z processing bar method " + barCounter);
-		barCounter++;
-		return s;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7589027827602951941L;
+    int barCounter = 0;
 
+    public StringWrapper bar(StringWrapper s) {
+        //		System.out.println("z processing bar method " + barCounter);
+        barCounter++;
+        return s;
+    }
 }

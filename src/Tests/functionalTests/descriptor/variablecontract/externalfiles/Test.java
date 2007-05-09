@@ -30,113 +30,103 @@
  */
 package functionalTests.descriptor.variablecontract.externalfiles;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.xml.VariableContract;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Tests conditions for external files
  */
-public class Test {
-	static final long serialVersionUID = 1;
+public class Test extends FunctionalTest {
+    static final long serialVersionUID = 1;
+    private static String XML_LOCATION = Test.class.getResource(
+            "/functionalTests/descriptor/variablecontract/externalfiles/Test.xml")
+                                                   .getPath();
+    ProActiveDescriptor pad;
+    boolean bogusFromDescriptor;
+    boolean bogusFromProgram;
 
-	private static String XML_LOCATION = Test.class.getResource(
-			"/functionalTests/descriptor/variablecontract/externalfiles/Test.xml").getPath();
-	ProActiveDescriptor pad;
-	
-	boolean bogusFromDescriptor, bogusFromProgram;
+    @Before
+    public void initTest() throws Exception {
+        bogusFromDescriptor = true;
+        bogusFromProgram = true;
+    }
 
+    @After
+    public void endTest() throws Exception {
+        if (pad != null) {
+            pad.killall(false);
+        }
+    }
 
+    @org.junit.Test
+    public void action() throws Exception {
+        VariableContract variableContract = new VariableContract();
 
-		
+        /*
+        //Setting from Program
+        HashMap map = new HashMap();
+        map.put("test_var1", "value1");
+        variableContract.setVariableFromProgram(map, XMLPropertiesType.getType("ProgramDefaultVariable"));
 
-	@Before
-	public void initTest() throws Exception {
-		bogusFromDescriptor=true;
-		bogusFromProgram=true;
-	}
-	
-	@After
-	public void endTest() throws Exception {
-		
-		if (pad != null) {
-			pad.killall(false);
-		}
-		Helper.killJVMs();
-	}
+        //Setting bogus from Program (this should fail)
+        try{
+                variableContract.setVariableFromProgram("test_empty", "", XMLPropertiesType.getType("ProgramDefaultVariable"));
+        }catch (Exception e){
+                bogusFromProgram=false;
+        }
 
-	@org.junit.Test
-	public void action() throws Exception {
-		
-		VariableContract variableContract= new VariableContract();
-		
-		/*
-		//Setting from Program
-		HashMap map = new HashMap();
-		map.put("test_var1", "value1");
-		variableContract.setVariableFromProgram(map, XMLPropertiesType.getType("ProgramDefaultVariable"));
-				
-		//Setting bogus from Program (this should fail)
-		try{
-			variableContract.setVariableFromProgram("test_empty", "", XMLPropertiesType.getType("ProgramDefaultVariable"));
-		}catch (Exception e){
-			bogusFromProgram=false;
-		}
-		
-		//Setting from Program
-		variableContract.setDescriptorVariable("test_var2", "value2a", XMLPropertiesType.getType("ProgramDefaultVariable"));
-		//The following value should not be set, because Program is default and therefore has lower priority
-		variableContract.setVariableFromProgram("test_var2", "value2b", XMLPropertiesType.getType("ProgramDefaultVariable"));
-				
-		//Setting bogus variable from Descriptor (this should fail)
-		try{
-			variableContract.setDescriptorVariable("bogus_from_descriptor", "", XMLPropertiesType.getType("ProgramDefaultVariable"));
-		}catch (Exception e){
-			bogusFromDescriptor=false;
-		}
-		
-		//test_var3=value3
-		*/
-		
-		pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
-		
- variableContract=pad.getVariableContract();
-		
-		//System.out.println(variableContract);
-		
-		 
-		assertTrue(variableContract.getValue("test_var0").equals("value0"));
-		assertTrue(		variableContract.getValue("test_var1").equals("value1"));
-		assertTrue(		variableContract.getValue("test_var2").equals("value2"));
-		assertTrue(		variableContract.getValue("test_var3").equals("value3"));
-		assertTrue(		variableContract.getValue("test_var4").equals("value4"));
-		assertTrue(		variableContract.getValue("test_var5").equals("value5"));
-		assertTrue(		variableContract.getValue("test_var6").equals("value6"));
-		assertTrue(		variableContract.isClosed());
-		assertTrue(		variableContract.checkContract());
-	}
+        //Setting from Program
+        variableContract.setDescriptorVariable("test_var2", "value2a", XMLPropertiesType.getType("ProgramDefaultVariable"));
+        //The following value should not be set, because Program is default and therefore has lower priority
+        variableContract.setVariableFromProgram("test_var2", "value2b", XMLPropertiesType.getType("ProgramDefaultVariable"));
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Test test = new Test();
-		try {
-			System.out.println("InitTest");
-			test.initTest();
-			System.out.println("Action");
-			test.action();
-			System.out.println("postConditions");
-			System.out.println("endTest");
-			test.endTest();
-			System.out.println("The end");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        //Setting bogus variable from Descriptor (this should fail)
+        try{
+                variableContract.setDescriptorVariable("bogus_from_descriptor", "", XMLPropertiesType.getType("ProgramDefaultVariable"));
+        }catch (Exception e){
+                bogusFromDescriptor=false;
+        }
+
+        //test_var3=value3
+        */
+        pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
+
+        variableContract = pad.getVariableContract();
+
+        //System.out.println(variableContract);
+        assertTrue(variableContract.getValue("test_var0").equals("value0"));
+        assertTrue(variableContract.getValue("test_var1").equals("value1"));
+        assertTrue(variableContract.getValue("test_var2").equals("value2"));
+        assertTrue(variableContract.getValue("test_var3").equals("value3"));
+        assertTrue(variableContract.getValue("test_var4").equals("value4"));
+        assertTrue(variableContract.getValue("test_var5").equals("value5"));
+        assertTrue(variableContract.getValue("test_var6").equals("value6"));
+        assertTrue(variableContract.isClosed());
+        assertTrue(variableContract.checkContract());
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            System.out.println("InitTest");
+            test.initTest();
+            System.out.println("Action");
+            test.action();
+            System.out.println("postConditions");
+            System.out.println("endTest");
+            test.endTest();
+            System.out.println("The end");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

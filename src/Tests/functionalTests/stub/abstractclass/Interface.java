@@ -31,7 +31,5 @@
 package functionalTests.stub.abstractclass;
 
 public interface Interface {
-	
-	public void foo();
-
+    public void foo();
 }

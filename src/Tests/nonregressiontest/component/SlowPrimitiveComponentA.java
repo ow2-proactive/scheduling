@@ -45,7 +45,7 @@ public class SlowPrimitiveComponentA extends PrimitiveComponentA {
      * @see nonregressiontest.component.I1#processInputMessage(nonregressiontest.component.Message)
      */
     @Override
-	public Message processInputMessage(Message message) {
+    public Message processInputMessage(Message message) {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {

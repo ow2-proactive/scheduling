@@ -27,10 +27,7 @@
  *
  * ################################################################
  */
-
 package unitTests.interfaceConsistency;
-
-import static junit.framework.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 
@@ -45,101 +42,102 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarder;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntimeForwarder;
+import static junit.framework.Assert.assertTrue;
 public class TestRuntimeAndBodyForwarder {
+    @Test
+    public void proActiveRuntimeForwarder() {
+        boolean ret = checkConsistency(ProActiveRuntime.class,
+                ProActiveRuntimeForwarder.class, UniqueRuntimeID.class, true);
 
-	   @Test
-	   public void proActiveRuntimeForwarder() {
-		   boolean ret = checkConsistency(ProActiveRuntime.class,
-		            ProActiveRuntimeForwarder.class, UniqueRuntimeID.class, true);
-		   
-		   assertTrue(ret);
-	   }
-	   
-	   @Test
-	   public void remoteProActiveRuntimeForwarder() {
-		   boolean ret = checkConsistency(RemoteProActiveRuntime.class,
-		            RemoteProActiveRuntimeForwarder.class, UniqueRuntimeID.class, true);
-		   
-		   assertTrue(ret);
-	   }
-	   
-	   @Test
-	   public void universalBodyForwarder() {
-		   boolean ret = checkConsistency(UniversalBody.class,
-		            UniversalBodyForwarder.class, UniqueID.class, false);
-		   
-		   assertTrue(ret);
-	   }
-	   
-	   @Test
-	   public void remoteBodyForwarder() {
-		   boolean ret = checkConsistency(RemoteBody.class,
-		            RemoteBodyForwarder.class, UniqueID.class, false);
-		   
-		   assertTrue(ret);
-	   }
-		
-	    static public boolean checkConsistency(Class normal, Class forwarder,
-	        Class prefix, boolean unneededCheck) {
-	        boolean testPassed = true;
-	        StringBuffer msg = new StringBuffer();
+        assertTrue(ret);
+    }
 
-	        msg.append("Missing methods in " + forwarder + "\n");
-	        msg.append("--------------------------------\n");
+    @Test
+    public void remoteProActiveRuntimeForwarder() {
+        boolean ret = checkConsistency(RemoteProActiveRuntime.class,
+                RemoteProActiveRuntimeForwarder.class, UniqueRuntimeID.class,
+                true);
 
-	        // Checks that each method in runtime as an equivalent in forwarderRuntime
-	        Method[] methods = normal.getMethods();
-	        for (int i = 0; i < methods.length; i++) {
-	            Method method = methods[i];
-	            Class[] parameters = method.getParameterTypes();
-	            Class[] fParameters = new Class[parameters.length + 1];
-	            fParameters[0] = prefix;
-	            for (int j = 0; j < parameters.length; j++) {
-	                fParameters[j + 1] = parameters[j];
-	            }
-	            try {
-	                Method forwarderMethod = forwarder.getMethod(method.getName(),
-	                        fParameters);
-	                if (!forwarderMethod.getReturnType()
-	                                        .equals(method.getReturnType())) {
-	                    testPassed = false;
-	                    msg.append(forwarderMethod + "\n");
-	                    msg.append("     -> Incompatible return type\n");
-	                }
-	            } catch (NoSuchMethodException e) {
-	                testPassed = false;
-	                msg.append(method + "\n");
-	                msg.append("     -> Missing forwarder equivalent");
-	            }
-	        }
+        assertTrue(ret);
+    }
 
-	        if (unneededCheck) {
-	            Method[] forwarderMethods = forwarder.getDeclaredMethods();
-	            for (int i = 0; i < forwarderMethods.length; i++) {
-	                Method method = forwarderMethods[i];
-	                Class[] fParameters = method.getParameterTypes();
-	                Class[] parameters = new Class[fParameters.length - 1];
-	                if ((fParameters.length == 0) ||
-	                        !fParameters[0].equals(prefix)) {
-	                    // Probably not a forwarded method, skipping it
-	                    continue;
-	                }
-	                for (int j = 1; j < fParameters.length; j++) {
-	                    parameters[j - 1] = fParameters[j];
-	                }
-	                try {
-	                    normal.getMethod(method.getName(), parameters);
-	                } catch (NoSuchMethodException e) {
-	                    msg.append(method + "\n");
-	                    msg.append("     -> Probably unneeded");
-	                }
-	            }
-	        }
+    @Test
+    public void universalBodyForwarder() {
+        boolean ret = checkConsistency(UniversalBody.class,
+                UniversalBodyForwarder.class, UniqueID.class, false);
 
-	        if (!testPassed) {
-	            System.err.println(msg);
-	        }
+        assertTrue(ret);
+    }
 
-	        return testPassed;
-	    }
+    @Test
+    public void remoteBodyForwarder() {
+        boolean ret = checkConsistency(RemoteBody.class,
+                RemoteBodyForwarder.class, UniqueID.class, false);
+
+        assertTrue(ret);
+    }
+
+    static public boolean checkConsistency(Class normal, Class forwarder,
+        Class prefix, boolean unneededCheck) {
+        boolean testPassed = true;
+        StringBuffer msg = new StringBuffer();
+
+        msg.append("Missing methods in " + forwarder + "\n");
+        msg.append("--------------------------------\n");
+
+        // Checks that each method in runtime as an equivalent in forwarderRuntime
+        Method[] methods = normal.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            Method method = methods[i];
+            Class[] parameters = method.getParameterTypes();
+            Class[] fParameters = new Class[parameters.length + 1];
+            fParameters[0] = prefix;
+            for (int j = 0; j < parameters.length; j++) {
+                fParameters[j + 1] = parameters[j];
+            }
+            try {
+                Method forwarderMethod = forwarder.getMethod(method.getName(),
+                        fParameters);
+                if (!forwarderMethod.getReturnType()
+                                        .equals(method.getReturnType())) {
+                    testPassed = false;
+                    msg.append(forwarderMethod + "\n");
+                    msg.append("     -> Incompatible return type\n");
+                }
+            } catch (NoSuchMethodException e) {
+                testPassed = false;
+                msg.append(method + "\n");
+                msg.append("     -> Missing forwarder equivalent");
+            }
+        }
+
+        if (unneededCheck) {
+            Method[] forwarderMethods = forwarder.getDeclaredMethods();
+            for (int i = 0; i < forwarderMethods.length; i++) {
+                Method method = forwarderMethods[i];
+                Class[] fParameters = method.getParameterTypes();
+                Class[] parameters = new Class[fParameters.length - 1];
+                if ((fParameters.length == 0) ||
+                        !fParameters[0].equals(prefix)) {
+                    // Probably not a forwarded method, skipping it
+                    continue;
+                }
+                for (int j = 1; j < fParameters.length; j++) {
+                    parameters[j - 1] = fParameters[j];
+                }
+                try {
+                    normal.getMethod(method.getName(), parameters);
+                } catch (NoSuchMethodException e) {
+                    msg.append(method + "\n");
+                    msg.append("     -> Probably unneeded");
+                }
+            }
+        }
+
+        if (!testPassed) {
+            System.err.println(msg);
+        }
+
+        return testPassed;
+    }
 }

@@ -40,17 +40,20 @@ import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
+import functionalTests.FunctionalTest;
+
 
 /**
  * @author arnaud
  *
  */
 public class SecurityTestSecurityManager extends FunctionalTest {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = -3414159361865609323L;
-	private ProActiveSecurityManager psm = null;
+         *
+         */
+    private static final long serialVersionUID = -3414159361865609323L;
+    private ProActiveSecurityManager psm = null;
     private ProActiveSecurityManager psm2 = null;
 
     /**
@@ -65,7 +68,7 @@ public class SecurityTestSecurityManager extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     @Override
-	public void action() throws Exception {
+    public void action() throws Exception {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ObjectOutput out = new ObjectOutputStream(bout);
 
@@ -86,14 +89,14 @@ public class SecurityTestSecurityManager extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Override
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(
                 "../src/Tests/nonregressiontest/security/applicationPolicy.xml");
         psm = new ProActiveSecurityManager(ps);
     }
 
     @Override
-	public boolean postConditions() throws Exception {
+    public boolean postConditions() throws Exception {
         if (psm2 != null) {
             return true;
         }
@@ -101,6 +104,6 @@ public class SecurityTestSecurityManager extends FunctionalTest {
     }
 
     @Override
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
     }
 }

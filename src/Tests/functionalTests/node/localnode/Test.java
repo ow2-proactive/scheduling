@@ -30,39 +30,35 @@
  */
 package functionalTests.node.localnode;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
+
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * @author Alexandre di Costanzo
  *
  */
-public class Test {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1626919410261919710L;
-	private A ao;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -1626919410261919710L;
+    private A ao;
 
-   
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
     @Before
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         this.ao = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { "bernard Lavilliers" });
-        
-       
     }
 
-   @org.junit.Test
-	public void action() throws Exception {
+    @org.junit.Test
+    public void action() throws Exception {
         Node aoNode = this.ao.getMyNode();
         aoNode.setProperty("test", "bernard Lavilliers");
-        
+
         assertTrue(aoNode.getProperty("test").compareTo("bernard Lavilliers") == 0);
 
         ProActive.terminateActiveObject(this.ao, false);

@@ -46,7 +46,7 @@ public class PrimitiveComponentE implements I1, BindingController {
     I2List multicastServerItf = null;
 
     public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if ("i2Multicast".equals(clientItfName) &&
                 (serverItf instanceof I2List)) {
@@ -71,7 +71,7 @@ public class PrimitiveComponentE implements I1, BindingController {
     }
 
     public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if ("i2Multicast".equals(clientItfName)) {
             multicastServerItf = null;

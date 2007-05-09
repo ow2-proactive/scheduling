@@ -30,8 +30,6 @@
  */
 package functionalTests.activeobject.wrapper;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
@@ -48,7 +46,9 @@ import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test if a futre is created for primitive wrappers
  * Test primitive wrapper for asynchronous call.
@@ -56,9 +56,9 @@ import functionalTests.Helper;
  *
  * Created on Jul 28, 2005
  */
-public class Test {
-	private static final long serialVersionUID = -659037699635472597L;
-	private A ao;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = -659037699635472597L;
+    private A ao;
     private BooleanMutableWrapper boolMutable;
     private DoubleMutableWrapper dbleMutable;
     private IntMutableWrapper integerMutable;
@@ -72,16 +72,15 @@ public class Test {
     private StringWrapper string;
     private FloatWrapper flt;
 
-  
     @Before
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         this.ao = (A) ProActive.newActive(A.class.getName(), null);
     }
 
     @org.junit.Test
-	public void action() throws Exception {
-    	assertTrue(ao != null);
-    	
+    public void action() throws Exception {
+        assertTrue(ao != null);
+
         this.boolMutable = this.ao.testBooleanMutableWrapper();
         this.dbleMutable = this.ao.testDoubleMutableWrapper();
         this.integerMutable = this.ao.testIntMutableWrapper();
@@ -95,26 +94,24 @@ public class Test {
         this.longNumber = this.ao.testLongWrapper();
         this.string = this.ao.testStringWrapper();
         this.flt = this.ao.testFloatWrapper();
-   
+
         assertTrue(ProActive.isAwaited(this.boolMutable));
-        		assertTrue(ProActive.isAwaited(this.dbleMutable));
-        				assertTrue(ProActive.isAwaited(this.integerMutable));
-        						assertTrue(ProActive.isAwaited(this.longNumberMutable));
-        								assertTrue(ProActive.isAwaited(this.stringMutable));
-        										assertTrue(ProActive.isAwaited(this.fltMutable));
-        										assertTrue(ProActive.isAwaited(this.bool));
-        												assertTrue(ProActive.isAwaited(this.dble));
-        												assertTrue(ProActive.isAwaited(this.integer));
-        														assertTrue( ProActive.isAwaited(this.longNumber)); 
-        																assertTrue(ProActive.isAwaited(this.string));
-        																assertTrue(ProActive.isAwaited(this.flt));
+        assertTrue(ProActive.isAwaited(this.dbleMutable));
+        assertTrue(ProActive.isAwaited(this.integerMutable));
+        assertTrue(ProActive.isAwaited(this.longNumberMutable));
+        assertTrue(ProActive.isAwaited(this.stringMutable));
+        assertTrue(ProActive.isAwaited(this.fltMutable));
+        assertTrue(ProActive.isAwaited(this.bool));
+        assertTrue(ProActive.isAwaited(this.dble));
+        assertTrue(ProActive.isAwaited(this.integer));
+        assertTrue(ProActive.isAwaited(this.longNumber));
+        assertTrue(ProActive.isAwaited(this.string));
+        assertTrue(ProActive.isAwaited(this.flt));
     }
 
     @After
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
         this.ao.terminate();
-        this.ao = null;       
-      	  Helper.killJVMs();
-
+        this.ao = null;
     }
 }

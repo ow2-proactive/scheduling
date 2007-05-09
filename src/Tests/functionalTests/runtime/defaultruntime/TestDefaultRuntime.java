@@ -30,19 +30,20 @@
  */
 package functionalTests.runtime.defaultruntime;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.Test;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Test default runtime creation
  */
-public class TestDefaultRuntime {
-	
+public class TestDefaultRuntime extends FunctionalTest {
     @Test
-	public void action() throws Exception {
-    	ProActiveRuntime part = RuntimeFactory.getDefaultRuntime();
-    	assertTrue(part != null);
+    public void action() throws Exception {
+        ProActiveRuntime part = RuntimeFactory.getDefaultRuntime();
+        assertTrue(part != null);
     }
 }

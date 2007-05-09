@@ -34,8 +34,9 @@ package nonregressiontest.component.collectiveitf.multicast;
 /**
  * @author Matthieu Morel
  */
-public interface TestItf {}
-    // public void
+public interface TestItf {
+}
+// public void
 // processOutputMessage(@ParamDispatchMetadata(mode=ParamDispatchMode.ONE_TO_ONE)
 // List<Message> message);
 //    List<WrappedInteger> testBroadcast_Param(

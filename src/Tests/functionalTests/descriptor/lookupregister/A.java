@@ -31,11 +31,12 @@
 package functionalTests.descriptor.lookupregister;
 
 public class A implements java.io.Serializable {
+
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 700190191973621109L;
-	private String name;
+         *
+         */
+    private static final long serialVersionUID = 700190191973621109L;
+    private String name;
 
     public A() {
     }

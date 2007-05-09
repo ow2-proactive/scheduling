@@ -34,17 +34,17 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
+
 public class X implements E, Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2820583785217633252L;
-	int i = 0;
 
-	public StringWrapper gee(StringWrapper s) {
-//		System.out.println("x processing gee method from node : " + ProActiveRuntimeImpl.getProActiveRuntime().getURL());
-		return s;
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2820583785217633252L;
+    int i = 0;
 
+    public StringWrapper gee(StringWrapper s) {
+        //		System.out.println("x processing gee method from node : " + ProActiveRuntimeImpl.getProActiveRuntime().getURL());
+        return s;
+    }
 }

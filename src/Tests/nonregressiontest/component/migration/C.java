@@ -37,10 +37,9 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
-public interface C {
-	
-	@MethodDispatchMetadata(mode = @ParamDispatchMetadata(mode =ParamDispatchMode.ONE_TO_ONE))
-	public List<StringWrapper> bar(List<StringWrapper> l );
-	
 
+public interface C {
+    @MethodDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE)
+    )
+    public List<StringWrapper> bar(List<StringWrapper> l);
 }

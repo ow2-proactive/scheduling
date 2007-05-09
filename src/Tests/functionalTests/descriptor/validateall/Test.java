@@ -30,8 +30,6 @@
  */
 package functionalTests.descriptor.validateall;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -43,13 +41,17 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * A stripped-down Active Object example. The object has only one public method,
  * sayHello() The object does nothing but reflect the host its on.
  */
-public class Test {
-	private static final long serialVersionUID = 6795575088681405778L;
-	ProActiveDescriptor pad;
+public class Test extends FunctionalTest {
+    private static final long serialVersionUID = 6795575088681405778L;
+    ProActiveDescriptor pad;
     transient SAXParser parser = null;
     transient Validator handler = null;
 
@@ -62,8 +64,8 @@ public class Test {
         // FIXME if ever the classes are compiled to a location other than a direct child of the PROACTIVE_DIR, the descriptor folder won't be found
         URI descriptorsuri = baseuri.resolve("../../../descriptors");
         File descriptorsfolder = new File(descriptorsuri);
-        assertTrue("\"" + descriptorsuri +
-            "\" directory could not be found", descriptorsfolder.exists());
+        assertTrue("\"" + descriptorsuri + "\" directory could not be found",
+            descriptorsfolder.exists());
         assertTrue("\"" + descriptorsuri + "\" is not a directory",
             descriptorsfolder.isDirectory());
         assertTrue("\"" + descriptorsuri + "\" is read-protected",
@@ -73,10 +75,11 @@ public class Test {
         checkValidationRecursive(descriptorsfolder);
 
         // locates the examples directory
-        URI examplesuri = baseuri.resolve("../../../src/Examples/org/objectweb/proactive/examples");
+        URI examplesuri = baseuri.resolve(
+                "../../../src/Examples/org/objectweb/proactive/examples");
         File examplesfolder = new File(examplesuri);
-        assertTrue("\"" + examplesuri +
-            "\" directory could not be found", examplesfolder.exists());
+        assertTrue("\"" + examplesuri + "\" directory could not be found",
+            examplesfolder.exists());
         assertTrue("\"" + examplesuri + "\" is not a directory",
             examplesfolder.isDirectory());
         assertTrue("\"" + examplesuri + "\" is read-protected",
@@ -84,12 +87,10 @@ public class Test {
 
         // recurse into directory tree to locate xml files
         checkValidationRecursive(examplesfolder);
-    
-        assertTrue(!handler.validationError);
 
+        assertTrue(!handler.validationError);
     }
 
-    
     private void checkValidationRecursive(File basedirectory)
         throws SAXException, IOException {
         for (File file : basedirectory.listFiles()) {
@@ -136,7 +137,8 @@ public class Test {
         parser = new SAXParser();
 
         //Set the validation feature to true to report validation errors. If the validation feature is set to true, the XML document should specify a XML schema or a DTD.
-        parser.setFeature("http://apache.org/xml/features/validation/dynamic", true);
+        parser.setFeature("http://apache.org/xml/features/validation/dynamic",
+            true);
 
         //Set the validation/schema feature to true to report validation errors against a schema.
         parser.setFeature("http://apache.org/xml/features/validation/schema",
@@ -172,21 +174,21 @@ public class Test {
         public SAXParseException saxParseException = null;
 
         @Override
-		public void error(SAXParseException exception)
+        public void error(SAXParseException exception)
             throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
         @Override
-		public void fatalError(SAXParseException exception)
+        public void fatalError(SAXParseException exception)
             throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
         @Override
-		public void warning(SAXParseException exception)
+        public void warning(SAXParseException exception)
             throws SAXException {
         }
     }

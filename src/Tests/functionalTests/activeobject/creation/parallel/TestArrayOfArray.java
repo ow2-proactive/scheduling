@@ -30,8 +30,6 @@
  */
 package functionalTests.activeobject.creation.parallel;
 
-import static junit.framework.Assert.assertTrue;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +37,9 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test newActiveInParallel method with an array for constructor parameters
@@ -49,7 +48,7 @@ import functionalTests.activeobject.creation.A;
  *
  * Created on Nov 8, 2005
  */
-public class TestArrayOfArray {
+public class TestArrayOfArray extends FunctionalTest {
     private static final long serialVersionUID = -1371427361062549957L;
     private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/functionalTests/activeobject/creation/parallel/4_local.xml")
@@ -94,6 +93,5 @@ public class TestArrayOfArray {
         if (padForActiving != null) {
             padForActiving.killall(false);
         }
-        Helper.killJVMs();
     }
 }

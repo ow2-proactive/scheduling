@@ -30,8 +30,6 @@
  */
 package functionalTests.filetransfer;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -52,35 +50,34 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Tests the two main methods of the File Transfer API
  */
-public class TestAPI {
+public class TestAPI extends FunctionalTest {
     static final long serialVersionUID = 1;
-    private static Logger logger = ProActiveLogger.getLogger(
-            "functionalTests");
-    private static String XML_LOCATION = TestAPI.class.getResource("/functionalTests/filetransfer/TestAPI.xml").getPath();
+    private static Logger logger = ProActiveLogger.getLogger("functionalTests");
+    private static String XML_LOCATION = TestAPI.class.getResource(
+            "/functionalTests/filetransfer/TestAPI.xml").getPath();
+
     //private static String XML_LOCATION = TestAPI.class.getResource("/functionalTests/filetransfer/TestAPINotLocal.xml").getPath();
     private static int FILE_SIZE = 16; //MB
-    
     ProActiveDescriptor pad;
     File fileTest = new File("/tmp/ProActiveTestFile.dat");
     File filePushed = new File("/tmp/ProActiveTestPushed.dat");
     File filePulled = new File("/tmp/ProActiveTestPulled.dat");
     File fileFuturePushed = new File("/tmp/ProActiveTestFuturePushed.dat");
-    FileVector filePulledWrapper; 
-
-   
-
+    FileVector filePulledWrapper;
 
     @Before
-	public void initTest() throws Exception {
+    public void initTest() throws Exception {
         cleanIfNecessary();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Creating "+FILE_SIZE+"MB random test file in /tmp");
+            logger.debug("Creating " + FILE_SIZE +
+                "MB random test file in /tmp");
         }
 
         //creates a new 10MB test file
@@ -88,17 +85,16 @@ public class TestAPI {
     }
 
     @After
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
 
         cleanIfNecessary();
-        Helper.killJVMs();
     }
 
     @Test
-	public void action() throws Exception {
+    public void action() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }
@@ -107,40 +103,42 @@ public class TestAPI {
 
         VirtualNode testVNode = pad.getVirtualNode("test");
         VirtualNode testVNodePush = pad.getVirtualNode("testPush");
-        
+
         testVNode.activate();
         testVNodePush.activate();
-        
+
         Node[] testnode = testVNode.getNodes();
         Node[] testnodePush = testVNodePush.getNodes();
-        
-        FileVector fw = FileTransfer.pushFile(testnode[0],
-            fileTest, filePushed);
+
+        FileVector fw = FileTransfer.pushFile(testnode[0], fileTest, filePushed);
         assertTrue(fw.getFile(0).equals(filePushed)); //wait-by-necessity
-        
-        filePulledWrapper = FileTransfer.pullFile(testnode[0],filePushed, filePulled);
-        
+
+        filePulledWrapper = FileTransfer.pullFile(testnode[0], filePushed,
+                filePulled);
+
         //Thread.sleep(1000);
         //filePulledWrapper.waitForAll(); //sync line
         //System.out.println("Finished wiating");
-        FileVector pushedWhilePulling = FileTransfer.pushFile(testnodePush[0], filePulledWrapper, fileFuturePushed);
+        FileVector pushedWhilePulling = FileTransfer.pushFile(testnodePush[0],
+                filePulledWrapper, fileFuturePushed);
 
-        assertTrue(filePulledWrapper.size()==1);
+        assertTrue(filePulledWrapper.size() == 1);
         assertTrue(filePulledWrapper.getFile(0).equals(filePulled)); //wait-by-necessity
-        
-        assertTrue(pushedWhilePulling.size()==1);
+
+        assertTrue(pushedWhilePulling.size() == 1);
         assertTrue(pushedWhilePulling.getFile(0).equals(fileFuturePushed)); //wait-by-necessity
-    
+
         long fileTestSum = checkSum(fileTest);
         long filePulledSum = checkSum(filePulled);
         long filePushedSum = checkSum(filePushed);
         long fileFuturePushedSum = checkSum(fileFuturePushed);
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug("CheckSum TestFile              =" + fileTestSum);
             logger.debug("CheckSum PushedFile            =" + filePushedSum);
             logger.debug("CheckSum PulledFile            =" + filePulledSum);
-            logger.debug("CheckSum PushedFileWhilePulling=" + fileFuturePushedSum);
+            logger.debug("CheckSum PushedFileWhilePulling=" +
+                fileFuturePushedSum);
         }
 
         assertTrue(fileTestSum == filePushedSum);
@@ -198,14 +196,14 @@ public class TestAPI {
         if (filePulled.exists()) {
             filePulled.delete();
         }
-        
+
         if (fileFuturePushed.exists()) {
             fileFuturePushed.delete();
         }
 
         if (fileTest.exists()) {
             fileTest.delete();
-        }     
+        }
     }
 
     /**

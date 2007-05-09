@@ -48,9 +48,7 @@ public class UncompatibleComponentB implements I2Dummy {
     }
 
     public List<Message> processOutputMessage(Message message) {
-
         // TODO Auto-generated method stub
         return null;
     }
-
 }

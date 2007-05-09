@@ -30,8 +30,6 @@
  */
 package functionalTests.filetransfer;
 
-import static junit.framework.Assert.assertTrue;
-
 import java.io.File;
 
 import org.apache.log4j.Logger;
@@ -48,14 +46,15 @@ import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.filetransfer.FileVector;
 
-import functionalTests.Helper;
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Tests that both schems work using the ProActive FileTransfer API
  */
-public class TestDeployRetrieve {
+public class TestDeployRetrieve extends FunctionalTest {
     static final long serialVersionUID = 1;
-    private static Logger logger = ProActiveLogger.getLogger(
-            "functionalTests");
+    private static Logger logger = ProActiveLogger.getLogger("functionalTests");
     private static String XML_LOCATION = TestAPI.class.getResource(
             "/functionalTests/filetransfer/TestDeployRetrieve.xml").getPath();
     ProActiveDescriptor pad;
@@ -64,35 +63,33 @@ public class TestDeployRetrieve {
     File fileDeployed = new File("/tmp/ProActiveTestFileDeployed.dat");
     File fileRetrieved2 = new File("/tmp/ProActiveTestFileRetrieved2.dat");
     File fileDeployed2 = new File("/tmp/ProActiveTestFileDeployed2.dat");
-    static int testblocksize= org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
-    static int testflyingblocks=org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
-    static int filesize=2;
-    
-    
+    static int testblocksize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
+    static int testflyingblocks = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
+    static int filesize = 2;
+
     //Descriptor variables
     String jvmProcess = "localJVM";
     String hostName = "localhost";
 
     @Before
-	public void initTest() throws Exception {
-
+    public void initTest() throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("Creating "+filesize+"Mb random test file in /tmp");
+            logger.debug("Creating " + filesize +
+                "Mb random test file in /tmp");
         }
 
         //creates a new 2MB test file
         TestAPI.createRandomContentFile(fileTest.getAbsolutePath(), filesize);
-        
+
         try {
-        	hostName= java.net.InetAddress.getLocalHost().getHostName();
+            hostName = java.net.InetAddress.getLocalHost().getHostName();
         } catch (Exception e) {
-            hostName= "localhost";
+            hostName = "localhost";
         }
-        
     }
 
     @After
-	public void endTest() throws Exception {
+    public void endTest() throws Exception {
         if (pad != null) {
             pad.killall(false);
         }
@@ -102,73 +99,80 @@ public class TestDeployRetrieve {
         cleanIfNecessary(this.fileDeployed2);
         cleanIfNecessary(this.fileRetrieved2);
         cleanIfNecessary(this.fileRetrieved);
-        Helper.killJVMs();
     }
 
     @Test
-	public void action() throws Exception {
-    	
-    	long fileTestSum = TestAPI.checkSum(fileTest);
-    	
+    public void action() throws Exception {
+        long fileTestSum = TestAPI.checkSum(fileTest);
+
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }
-        
+
         // We save the current state of the schema validation and set it to false for this example
-        String validatingProperyOld = ProActiveConfiguration.getInstance().getProperty("schema.validation");
+        String validatingProperyOld = ProActiveConfiguration.getInstance()
+                                                            .getProperty("schema.validation");
         System.setProperty("schema.validation", "false");
-        
+
         VariableContract vc = new VariableContract();
-        vc.setVariableFromProgram("JVM_PROCESS", jvmProcess ,VariableContractType.DescriptorDefaultVariable);
-        vc.setVariableFromProgram("HOST_NAME", hostName ,VariableContractType.DescriptorDefaultVariable);
-    
+        vc.setVariableFromProgram("JVM_PROCESS", jvmProcess,
+            VariableContractType.DescriptorDefaultVariable);
+        vc.setVariableFromProgram("HOST_NAME", hostName,
+            VariableContractType.DescriptorDefaultVariable);
+
         pad = ProActive.getProactiveDescriptor(XML_LOCATION, vc);
-        
+
         // we restore the old state of the schema validation
         System.setProperty("schema.validation", validatingProperyOld);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
-        testVNode.setFileTransferParams(testblocksize,testflyingblocks);
-        long initDeployment=System.currentTimeMillis();
+        testVNode.setFileTransferParams(testblocksize, testflyingblocks);
+        long initDeployment = System.currentTimeMillis();
         testVNode.activate();
-        if(logger.isDebugEnabled()){
-        	logger.debug("Getting the Node.");
-        }
-        
-        Node node[]=testVNode.getNodes();
-        long finitDeployment=System.currentTimeMillis();
-        
-        assertTrue(node.length > 0);
-        if(logger.isDebugEnabled()){
-        	logger.debug("Deployed "+node.length+" node from VirtualNode "+testVNode.getName()+" in "+(finitDeployment-initDeployment)+"[ms]");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Getting the Node.");
         }
 
+        Node[] node = testVNode.getNodes();
+        long finitDeployment = System.currentTimeMillis();
+
+        assertTrue(node.length > 0);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Deployed " + node.length + " node from VirtualNode " +
+                testVNode.getName() + " in " +
+                (finitDeployment - initDeployment) + "[ms]");
+        }
 
         //Checking correc FileTransferDeploy
-        if(logger.isDebugEnabled()){
-        	logger.debug("Checking the integrity of the test file transfer at deployment time.");
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "Checking the integrity of the test file transfer at deployment time.");
         }
         long fileDeployedSum = TestAPI.checkSum(fileDeployed);
         assertTrue(fileTestSum == fileDeployedSum);
-        
+
         //Checking correct FileTransferRetrieve
-		if(logger.isDebugEnabled()){
-        	logger.debug("Retrieving test files");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Retrieving test files");
         }
-		long initRetrieve=System.currentTimeMillis();
+        long initRetrieve = System.currentTimeMillis();
         FileVector fileVector = testVNode.fileTransferRetrieve(); //async
         fileVector.waitForAll(); //sync here
-        long finitRetrieve=System.currentTimeMillis();
-        
-        if(logger.isDebugEnabled()){
-        	logger.debug("Retrieved "+fileVector.size()+" files from VirtualNode "+testVNode.getName()+" in "+(finitRetrieve-initRetrieve)+"[ms]");
+        long finitRetrieve = System.currentTimeMillis();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Retrieved " + fileVector.size() +
+                " files from VirtualNode " + testVNode.getName() + " in " +
+                (finitRetrieve - initRetrieve) + "[ms]");
         }
-        
-        assertTrue(fileVector.size()==2);
-        
-        fileRetrieved = new File(fileRetrieved.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());
-        fileRetrieved2 = new File(fileRetrieved2.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());
-        
+
+        assertTrue(fileVector.size() == 2);
+
+        fileRetrieved = new File(fileRetrieved.getAbsoluteFile() + "-" +
+                node[0].getNodeInformation().getName());
+        fileRetrieved2 = new File(fileRetrieved2.getAbsoluteFile() + "-" +
+                node[0].getNodeInformation().getName());
+
         long fileRetrievedSum = TestAPI.checkSum(fileRetrieved);
 
         if (logger.isDebugEnabled()) {
@@ -184,33 +188,32 @@ public class TestDeployRetrieve {
      * Cleans test files
      */
     private void cleanIfNecessary(File f) {
-    	if (f.exists()) {
-	        if (logger.isDebugEnabled()) {
-	            logger.debug("Deleting old randomly generated file:" +
-	            		f.getName());
-	        }
-	        f.delete();
-    	}
+        if (f.exists()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Deleting old randomly generated file:" +
+                    f.getName());
+            }
+            f.delete();
+        }
     }
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-    	
-      	if(args.length==4){
-    		filesize=Integer.parseInt(args[0]);
-    		testblocksize=Integer.parseInt(args[1]);
-    		testflyingblocks=Integer.parseInt(args[2]);
-    		XML_LOCATION=args[3];
-    	}
-    	else if(args.length !=0){
-    		System.out.println("Use with arguments: filesize[mb] fileblocksize[bytes] maxflyingblocks xmldescriptorpath");
-    	}
-      	
+        if (args.length == 4) {
+            filesize = Integer.parseInt(args[0]);
+            testblocksize = Integer.parseInt(args[1]);
+            testflyingblocks = Integer.parseInt(args[2]);
+            XML_LOCATION = args[3];
+        } else if (args.length != 0) {
+            System.out.println(
+                "Use with arguments: filesize[mb] fileblocksize[bytes] maxflyingblocks xmldescriptorpath");
+        }
+
         TestDeployRetrieve test = new TestDeployRetrieve();
-        test.jvmProcess="remoteJVM";
-        
+        test.jvmProcess = "remoteJVM";
+
         try {
             System.out.println("InitTest");
             test.initTest();

@@ -42,7 +42,8 @@ public class ParameterizedPrimitiveComponentA extends PrimitiveComponentA
     implements AttributeController {
     public String message;
     public final static String I2_ITF_NAME = "i2";
-    private static Logger logger = ProActiveLogger.getLogger("nonregressiontest");
+    private static Logger logger = ProActiveLogger.getLogger(
+            "nonregressiontest");
     I2 i2;
 
     /**
@@ -57,7 +58,7 @@ public class ParameterizedPrimitiveComponentA extends PrimitiveComponentA
     }
 
     @Override
-	public Message processInputMessage(Message message) {
+    public Message processInputMessage(Message message) {
         //      /logger.info("transferring message :" + message.toString());
         if (i2 != null) {
             return (i2.processOutputMessage(message.append(message))).append(message);

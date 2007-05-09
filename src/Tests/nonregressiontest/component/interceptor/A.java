@@ -47,7 +47,7 @@ public class A implements FooItf, BindingController {
     }
 
     public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (clientItfName.equals(FooItf.CLIENT_ITF_NAME)) {
             b = (FooItf) serverItf;
@@ -64,12 +64,14 @@ public class A implements FooItf, BindingController {
 
     public Object lookupFc(String clientItfName)
         throws NoSuchInterfaceException {
-        if ("foo-client".equals(clientItfName)) return b;
+        if ("foo-client".equals(clientItfName)) {
+            return b;
+        }
         throw new NoSuchInterfaceException(clientItfName);
     }
 
     public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException, 
+        throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
     }
 }
