@@ -14,7 +14,7 @@
 
    <launcherArgs>
       <vmArgs>-Dcom.sun.management.jmxremote -Xmx512M -Xms512M
--Djava.security.policy=${env_var:HOME}/proactive.java.policy</vmArgs>
+-Djava.security.policy=${env_var:HOME}/.ic2d.java.policy</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.objectweb.proactive.ic2d/icons/alt_window_16.gif" i32="/org.objectweb.proactive.ic2d/icons/alt_window_32.gif"/>
