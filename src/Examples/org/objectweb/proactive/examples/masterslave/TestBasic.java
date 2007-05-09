@@ -1,5 +1,6 @@
 package org.objectweb.proactive.examples.masterslave;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,12 +24,10 @@ public class TestBasic implements Task<Integer> {
     public static final int DEFAULT_NUMBER_OF_TASKS = 50;
     public static final int DEFAULT_TASK_FIXED_WAIT_TIME = 15000;
     public static final int DEFAULT_TASK_RANDOM_WAIT_TIME = 5000;
-    public static final String DEFAULT_DESCRIPTOR = "./RSHListbyHost_Example.xml";
-    public static final String DEFAULT_VN_NAME = "matrixNode";
     public static int number_of_tasks;
     public static int fixed_wait_time;
     public static int random_wait_time;
-    public static String descriptor_path;
+    public static URL descriptor_url;
     public static String vn_name;
 
     /* (non-Javadoc)
@@ -48,23 +47,24 @@ public class TestBasic implements Task<Integer> {
     /**
      * Initializing the example with command line arguments
      * @param args
+     * @throws MalformedURLException
      */
-    public static void init(String[] args) {
-        if (args.length == 0) {
-            descriptor_path = DEFAULT_DESCRIPTOR;
-            vn_name = DEFAULT_VN_NAME;
+    public static void init(String[] args) throws MalformedURLException {
+        if (args.length == 2) {
+            descriptor_url = (new File(args[0])).toURL();
+            vn_name = args[1];
             number_of_tasks = DEFAULT_NUMBER_OF_TASKS;
             fixed_wait_time = DEFAULT_TASK_FIXED_WAIT_TIME;
             random_wait_time = DEFAULT_TASK_RANDOM_WAIT_TIME;
         } else if (args.length == 5) {
-            descriptor_path = args[0];
+            descriptor_url = (new File(args[0])).toURL();
             vn_name = args[1];
             number_of_tasks = Integer.parseInt(args[2]);
             fixed_wait_time = Integer.parseInt(args[3]);
             random_wait_time = Integer.parseInt(args[4]);
         } else {
             System.out.println(
-                "Usage: <java_command> [descriptor_path virtual_node_name number_of_tasks fixed_wait_time random_wait_time]");
+                "Usage: <java_command> descriptor_path virtual_node_name [number_of_tasks fixed_wait_time random_wait_time]");
         }
     }
 
@@ -79,8 +79,7 @@ public class TestBasic implements Task<Integer> {
         init(args);
 
         //      Creating the Master
-        ProActiveMaster master = new ProActiveMaster(new URL(descriptor_path),
-                vn_name);
+        ProActiveMaster master = new ProActiveMaster(descriptor_url, vn_name);
 
         // Creating the tasks to be solved
         List<TestBasic> tasks = new ArrayList<TestBasic>();

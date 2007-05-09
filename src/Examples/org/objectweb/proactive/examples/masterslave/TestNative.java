@@ -1,5 +1,6 @@
 package org.objectweb.proactive.examples.masterslave;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,9 +19,7 @@ import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
  *
  */
 public class TestNative extends NativeTask {
-    public static final String DEFAULT_DESCRIPTOR = "./RSHListbyHost_Example.xml";
-    public static final String DEFAULT_VN_NAME = "matrixNode";
-    public static String descriptor_path;
+    public static URL descriptor_url;
     public static String vn_name;
 
     /**
@@ -34,17 +33,18 @@ public class TestNative extends NativeTask {
     /**
      * Initializing the example with command line arguments
      * @param args
+     * @throws MalformedURLException
      */
-    public static void init(String[] args) {
+    public static void init(String[] args) throws MalformedURLException {
         if (args.length == 0) {
-            descriptor_path = DEFAULT_DESCRIPTOR;
-            vn_name = DEFAULT_VN_NAME;
+            descriptor_url = (new File(args[0])).toURL();
+            vn_name = args[1];
         } else if (args.length == 2) {
-            descriptor_path = args[0];
+            descriptor_url = (new File(args[0])).toURL();
             vn_name = args[1];
         } else {
             System.out.println(
-                "Usage: <java_command> [descriptor_path virtual_node_name]");
+                "Usage: <java_command> descriptor_path virtual_node_name");
         }
     }
 
@@ -56,8 +56,7 @@ public class TestNative extends NativeTask {
         init(args);
 
         // Creating the Master
-        ProActiveMaster master = new ProActiveMaster(new URL(descriptor_path),
-                vn_name);
+        ProActiveMaster master = new ProActiveMaster(descriptor_url, vn_name);
 
         // Creating the tasks to be solved
         List<TestNative> tasks = new ArrayList<TestNative>();
