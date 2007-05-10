@@ -269,7 +269,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected void activityStopped() {
         super.activityStopped();
         messageEventProducer = null;
-        this.localBodyStrategy.getRequestQueue().destroy();
+        try {
+            this.localBodyStrategy.getRequestQueue().destroy();
+        } catch (ProActiveRuntimeException e) {
+            bodyLogger.warn("Terminating already terminated body " +
+                this.getID(), e);
+        }
         setLocalBodyImpl(new InactiveLocalBodyStrategy());
     }
 
