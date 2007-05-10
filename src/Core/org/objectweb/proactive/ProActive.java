@@ -703,29 +703,28 @@ public class ProActive {
         }
 
         MetaObjectFactory clonedFactory = factory;
-        
+
         // TIMING
-		// First we must create the timit manager then provide the timit
-		// reductor to the MetaObjectFactory, this reductor will be used
+        // First we must create the timit manager then provide the timit
+        // reductor to the MetaObjectFactory, this reductor will be used
         // in BodyImpl for the timing of a body.
-		if (Profiling.TIMERS_COMPILED) {
-			try {
-				if (TimItBasicManager.checkNodeProperties(node) &&
-						// Because we don't want to time the TimItReductor
-						// active object and avoid StackOverflow
-						// we need to check the current activated object
-						// classname
-						!TimItBasicManager.getReductorClassName().equals(
-								classname)) {
-					// The timit reductor will be passed to the factory
-					// and used when a body is created
-					clonedFactory.setTimItReductor(TimItBasicManager
-							.getInstance().createReductor());
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+        if (Profiling.TIMERS_COMPILED) {
+            try {
+                if (TimItBasicManager.checkNodeProperties(node) &&
+                        // Because we don't want to time the TimItReductor
+                    // active object and avoid StackOverflow
+                    // we need to check the current activated object
+                    // classname
+                    !TimItBasicManager.getReductorClassName().equals(classname)) {
+                    // The timit reductor will be passed to the factory
+                    // and used when a body is created
+                    clonedFactory.setTimItReductor(TimItBasicManager.getInstance()
+                                                                    .createReductor());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         ProActiveSecurityManager factorySM = factory.getProActiveSecurityManager();
         if (factorySM != null) {

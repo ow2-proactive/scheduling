@@ -326,10 +326,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if (isAvailable()) {
             return;
         }
-        
-    	if ( Profiling.TIMERS_COMPILED ){
-    		TimerWarehouse.startTimer(ProActive.getBodyOnThis().getID(), TimerWarehouse.WAIT_BY_NECESSITY);
-    	}
+
+        if (Profiling.TIMERS_COMPILED) {
+            TimerWarehouse.startTimer(ProActive.getBodyOnThis().getID(),
+                TimerWarehouse.WAIT_BY_NECESSITY);
+        }
 
         UniqueID id = null;
 
@@ -365,10 +366,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             futureEventProducer.notifyListeners(id, getCreatorID(),
                 FutureEvent.RECEIVED_FUTURE_RESULT);
         }
-        
-    	if ( Profiling.TIMERS_COMPILED ){
-    		TimerWarehouse.stopTimer(ProActive.getBodyOnThis().getID(), TimerWarehouse.WAIT_BY_NECESSITY);
-    	}
+
+        if (Profiling.TIMERS_COMPILED) {
+            TimerWarehouse.stopTimer(ProActive.getBodyOnThis().getID(),
+                TimerWarehouse.WAIT_BY_NECESSITY);
+        }
     }
 
     public long getID() {

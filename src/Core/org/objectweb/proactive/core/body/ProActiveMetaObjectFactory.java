@@ -501,12 +501,12 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
 
         return clone;
     }
-    
-    public void setTimItReductor(Object timItReductor){
+
+    public void setTimItReductor(Object timItReductor) {
         this.timItReductor = timItReductor;
     }
-       
-    public Object getTimItReductor(){
+
+    public Object getTimItReductor() {
         return this.timItReductor;
     }
 }
