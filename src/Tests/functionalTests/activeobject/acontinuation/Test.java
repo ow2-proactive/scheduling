@@ -32,12 +32,10 @@ package functionalTests.activeobject.acontinuation;
 
 import java.util.Vector;
 
-import org.junit.After;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 import functionalTests.FunctionalTest;
-import functionalTests.Helper;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -71,11 +69,6 @@ public class Test extends FunctionalTest {
         assertTrue(lastA.getIdName().equals("e"));
         assertTrue(t1.getIdName().equals("d"));
         assertTrue(t2.getIdName().equals("d"));
-    }
-
-    @After
-    public void after() {
-        Helper.killJVMs();
     }
 
     private class ACThread extends Thread {

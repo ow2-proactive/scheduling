@@ -30,9 +30,13 @@
  */
 package functionalTests;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.objectweb.proactive.core.util.OperatingSystem;
 
 
 public class FunctionalTest {
@@ -44,6 +48,36 @@ public class FunctionalTest {
     @BeforeClass
     @AfterClass
     public static void killProActive() {
-        Helper.killJVMs();
+        File dir = new File(System.getProperty("proactive.dir"));
+        File cmd = new File(dir + "/dev/scripts/killTests");
+        if (cmd.exists()) {
+            try {
+                Process p = null;
+
+                switch (OperatingSystem.getOperatingSystem()) {
+                case unix:
+                    p = Runtime.getRuntime()
+                               .exec(new String[] { cmd.getAbsolutePath() },
+                            null, dir);
+                    try {
+                        p.waitFor();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    System.err.println("TODO: Kill JVMs on Windows also !");
+                    break;
+                }
+
+                p.waitFor();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println(cmd + "does not exist");
+        }
     }
 }
