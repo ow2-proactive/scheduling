@@ -211,9 +211,11 @@ public class GarbageCollector {
         this.cycleTimestamp = 0;
         this.body = body;
         this.previouslyBusy = true;
-        body.addNFEListener(new TypedNFEListener(
-                SendReplyCommunicationException.class,
-                SendReplyCommunicationExceptionHandler.instance));
+        if (dgcIsEnabled()) {
+            body.addNFEListener(new TypedNFEListener(
+                    SendReplyCommunicationException.class,
+                    SendReplyCommunicationExceptionHandler.instance));
+        }
     }
 
     /**
