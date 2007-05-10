@@ -48,7 +48,9 @@ public class SendReplyCommunicationExceptionHandler implements NFEListener {
         SendReplyCommunicationException srce = (SendReplyCommunicationException) e;
         GarbageCollector gc = ((AbstractBody) srce.getSender()).getGarbageCollector();
         gc.log(Level.INFO,
-            "Failure to send a reply to " + srce.getReceiverID().shortString());
+            "Failure to send a reply to " + srce.getReceiverID().shortString() +
+            " caused by ");
+        e.printStackTrace();
         return true;
     }
 }
