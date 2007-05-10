@@ -178,7 +178,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                     uriSchema = classURLcandidate.toURI();
                     // we navigate to the descriptor schema
                     URI outsideSchema = new URI(
-                            "../../../../../../../descriptors/" + schema);
+                            "../../../../../../../../descriptors/" + schema);
 
                     uriSchema = uriSchema.resolve(outsideSchema);
 
@@ -190,20 +190,19 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                     if (test.isFile() && test.getName().equals(schema)) {
                         schemaURLcandidate = uriSchema.toURL();
                     } else {
-                        logger.error(
-                            "The Proactive.jar file doesn't contain the " +
-                            schema + " Schema.");
+                        logger.error("The schema " + schema +
+                        " could not be located in your environment. Consider compiling ProActive using ant");
                         schemaURLcandidate = null;
                     }
                 } else {
                     logger.error("The schema " + schema +
-                        " could not be located in your environment.");
+                    " could not be located in your environment. Consider compiling ProActive using ant");
                     schemaURLcandidate = null;
                 }
             } catch (Exception e) {
                 logger.debug(e.getMessage());
                 logger.error("The schema " + schema +
-                    " could not be located in your environment.");
+                " could not be located in your environment. Consider compiling ProActive using ant");
                 schemaURLcandidate = null;
             }
         }
