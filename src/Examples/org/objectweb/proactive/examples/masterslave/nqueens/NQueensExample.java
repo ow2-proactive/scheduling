@@ -32,13 +32,13 @@ public class NQueensExample {
      */
     public static void init(String[] args) throws MalformedURLException {
         if (args.length == 2) {
-            descriptor_url = (new File(args[0])).toURL();
+            descriptor_url = (new File(args[0])).toURI().toURL();
             ;
             vn_name = args[1];
             nqueen_board_size = DEFAULT_NQUEEN_BOARD;
             nqueen_algorithm_depth = DEFAULT_NQUEEN_ALG_DEPTH;
         } else if (args.length == 4) {
-            descriptor_url = (new File(args[0])).toURL();
+            descriptor_url = (new File(args[0])).toURI().toURL();
             vn_name = args[1];
             nqueen_board_size = Integer.parseInt(args[2]);
             nqueen_algorithm_depth = Integer.parseInt(args[3]);

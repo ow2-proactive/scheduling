@@ -51,13 +51,13 @@ public class TestBasic implements Task<Integer> {
      */
     public static void init(String[] args) throws MalformedURLException {
         if (args.length == 2) {
-            descriptor_url = (new File(args[0])).toURL();
+            descriptor_url = (new File(args[0])).toURI().toURL();
             vn_name = args[1];
             number_of_tasks = DEFAULT_NUMBER_OF_TASKS;
             fixed_wait_time = DEFAULT_TASK_FIXED_WAIT_TIME;
             random_wait_time = DEFAULT_TASK_RANDOM_WAIT_TIME;
         } else if (args.length == 5) {
-            descriptor_url = (new File(args[0])).toURL();
+            descriptor_url = (new File(args[0])).toURI().toURL();
             vn_name = args[1];
             number_of_tasks = Integer.parseInt(args[2]);
             fixed_wait_time = Integer.parseInt(args[3]);

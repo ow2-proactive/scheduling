@@ -37,10 +37,10 @@ public class TestNative extends NativeTask {
      */
     public static void init(String[] args) throws MalformedURLException {
         if (args.length == 0) {
-            descriptor_url = (new File(args[0])).toURL();
+            descriptor_url = (new File(args[0])).toURI().toURL();
             vn_name = args[1];
         } else if (args.length == 2) {
-            descriptor_url = (new File(args[0])).toURL();
+            descriptor_url = (new File(args[0])).toURI().toURL();
             vn_name = args[1];
         } else {
             System.out.println(
