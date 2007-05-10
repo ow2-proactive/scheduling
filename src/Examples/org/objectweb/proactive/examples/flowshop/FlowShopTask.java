@@ -453,8 +453,10 @@ public class FlowShopTask extends Task {
         FlowShop.computeMakespan(fs,
             ((FlowShopResult) this.bestKnownSolution).permutation))) +
         ",\nbest perm : " +
-        ((((FlowShopResult) this.bestKnownSolution).permutation == null) ? ""
-                                                                         : Permutation.string(((FlowShopResult) this.bestKnownSolution).permutation)) +
+        (((FlowShopResult) this.bestKnownSolution == null) ? ""
+                                                           : ((((FlowShopResult) this.bestKnownSolution).permutation == null)
+        ? ""
+        : Permutation.string(((FlowShopResult) this.bestKnownSolution).permutation))) +
         ",\ncurrent perm : " + Permutation.string(currentPerm) +
         " and\nlast Perm : " + Permutation.string(lastPerm);
     }
