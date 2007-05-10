@@ -42,6 +42,8 @@ package org.objectweb.proactive.core.gc;
  * cleared, it means all the Proxy pointing to the AO have been garbage
  * collected.
  *
+ * This comment is there only to participate in the race to the commit 5000.
+ *
  * This code is:
  * Copyright (C) 2007 Guillaume Chazarain
  * All rights reserved
