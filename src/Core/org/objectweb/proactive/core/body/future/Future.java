@@ -96,4 +96,11 @@ public interface Future extends LocalFuture {
      * in case of automatic continuation.
      */
     public void setSenderID(UniqueID i);
+
+    /**
+     * Set the copyMode for this future. If copyMode is true, the serialisation of this future
+     * will not trigger wait-by-necessity nor AC registration.
+     * @param mode true is the copyMode is set
+     */
+    public void setCopyMode(boolean mode);
 }

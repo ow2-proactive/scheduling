@@ -417,17 +417,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     public Object reify(MethodCall c) throws InvocationTargetException {
         Object result = null;
-
-        //stem.out.println("FutureProxy: c.getName() = " +c.getName());
-        //		if ((c.getName()).equals("equals") || (c.getName()).equals("hashCode")) {
-        //			//System.out.println("FutureProxy: now executing " + c.getName());
-        //			try {
-        //				result = c.execute(this);
-        //			} catch (MethodCallExecutionFailedException e) {
-        //				throw new ProActiveRuntimeException("FutureProxy: Illegal arguments in call " + c.getName());
-        //			}
-        //			return result;
-        //		}
         waitFor();
 
         // Now that the object is available, execute the call
@@ -457,12 +446,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         returnFutureProxy(this);
     }
 
-    protected void setCopyMode() {
-        copyMode = true;
-    }
-
-    protected void unsetCopyMode() {
-        copyMode = false;
+    public void setCopyMode(boolean mode) {
+        copyMode = mode;
     }
 
     //
@@ -502,11 +487,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         } else {
             // Maybe this FutureProxy has been added into FuturePool by readObject
             // Remove it and restore continuation
-            ArrayList futures = FuturePool.getIncomingFutures();
+            ArrayList<Future> futures = FuturePool.getIncomingFutures();
             if (futures != null) {
                 for (int i = 0; i < futures.size(); i++) {
-                    FutureProxy fp = (FutureProxy) futures.get(i);
-                    if (fp.creatorID.equals(creatorID) && (fp.ID == ID)) {
+                    Future fp = futures.get(i);
+                    if (fp.getCreatorID().equals(creatorID) &&
+                            (fp.getID() == ID)) {
                         FuturePool.removeIncomingFutures();
                     }
                 }

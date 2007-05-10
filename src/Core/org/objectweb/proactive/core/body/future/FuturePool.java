@@ -121,11 +121,11 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     // to register an incoming future in the table      
     public static void registerIncomingFuture(Future f) {
-        java.util.ArrayList<Future> listOfFutures = incomingFutures.get(Thread.currentThread());
+        ArrayList<Future> listOfFutures = incomingFutures.get(Thread.currentThread());
         if (listOfFutures != null) {
             listOfFutures.add(f);
         } else {
-            java.util.ArrayList<Future> newListOfFutures = new java.util.ArrayList<Future>();
+            ArrayList<Future> newListOfFutures = new ArrayList<Future>();
             newListOfFutures.add(f);
             incomingFutures.put(Thread.currentThread(), newListOfFutures);
         }
@@ -137,7 +137,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     }
 
     // to get a list of incomingFutures
-    static public java.util.ArrayList getIncomingFutures() {
+    static public ArrayList<Future> getIncomingFutures() {
         return (incomingFutures.get(Thread.currentThread()));
     }
 
@@ -218,7 +218,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     public synchronized int receiveFutureValue(long id, UniqueID creatorID,
         FutureResult result, Reply reply) throws java.io.IOException {
         // get all aiwated futures
-        java.util.ArrayList futuresToUpdate = futures.getFuturesToUpdate(id,
+        ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id,
                 creatorID);
 
         if (futuresToUpdate != null) {
@@ -239,13 +239,13 @@ public class FuturePool extends Object implements java.io.Serializable {
             // without continuation side-effects)
             int numOfFuturesToUpdate = futuresToUpdate.size();
             if (numOfFuturesToUpdate > 1) {
-                setCopyMode();
+                setCopyMode(true);
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (Future) (futuresToUpdate.get(i));
                     otherFuture.receiveReply((FutureResult) Utils.makeDeepCopy(
                             result));
                 }
-                unsetCopyMode();
+                setCopyMode(false);
                 // register futures potentially generated during the copy of result
                 AbstractBody localBody = ((AbstractBody) (LocalBodyStore.getInstance()
                                                                         .getLocalBody(this.ownerBody)));
@@ -261,7 +261,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             // 2) create and put ACservices
             if (acEnabled) {
-                java.util.ArrayList bodiesToContinue = futures.getAutomaticContinuation(id,
+                ArrayList<UniversalBody> bodiesToContinue = futures.getAutomaticContinuation(id,
                         creatorID);
                 if ((bodiesToContinue != null) &&
                         (bodiesToContinue.size() != 0)) {
@@ -280,10 +280,10 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                     // the created futures should be set in copyMode to avoid AC registration
                     // during the effective sending by the AC thread
-                    ArrayList incFutures = FuturePool.getIncomingFutures();
+                    ArrayList<Future> incFutures = FuturePool.getIncomingFutures();
                     if (incFutures != null) {
-                        for (Object f : incFutures) {
-                            ((FutureProxy) f).setCopyMode();
+                        for (Future f : incFutures) {
+                            f.setCopyMode(true);
                         }
                         FuturePool.removeIncomingFutures();
                     }
@@ -376,12 +376,8 @@ public class FuturePool extends Object implements java.io.Serializable {
         }
     }
 
-    public void setCopyMode() {
-        futures.setCopyMode();
-    }
-
-    public void unsetCopyMode() {
-        futures.unsetCopyMode();
+    public void setCopyMode(boolean mode) {
+        futures.setCopyMode(mode);
     }
 
     //
@@ -433,7 +429,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             boolean queueExists = in.readBoolean();
             if (queueExists) {
                 // create a new ActiveACQueue
-                java.util.ArrayList<ACService> queue = (java.util.ArrayList<ACService>) (in.readObject());
+                ArrayList<ACService> queue = (ArrayList<ACService>) (in.readObject());
                 queueAC = new ActiveACQueue(queue);
                 queueAC.start();
             }
@@ -450,7 +446,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @see ACservice
      */
     private class ActiveACQueue extends Thread {
-        private java.util.ArrayList<ACService> queue;
+        private ArrayList<ACService> queue;
         private int counter;
         private boolean kill;
 
@@ -458,13 +454,13 @@ public class FuturePool extends Object implements java.io.Serializable {
         // -- CONSTRUCTORS -----------------------------------------------
         //
         public ActiveACQueue() {
-            queue = new java.util.ArrayList<ACService>();
+            queue = new ArrayList<ACService>();
             counter = 0;
             kill = false;
             this.setName("Thread for AC");
         }
 
-        public ActiveACQueue(java.util.ArrayList<ACService> queue) {
+        public ActiveACQueue(ArrayList<ACService> queue) {
             this.queue = queue;
             counter = queue.size();
             kill = false;
@@ -478,7 +474,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         /**
          * return the current queue of ACServices to perform
          */
-        public java.util.ArrayList<ACService> getQueue() {
+        public ArrayList<ACService> getQueue() {
             return queue;
         }
 
@@ -577,7 +573,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      */
     private class ACService implements java.io.Serializable {
         // bodies that have to be updated	
-        private java.util.ArrayList<UniversalBody> dests;
+        private ArrayList<UniversalBody> dests;
 
         // reply to send
         private Reply reply;
@@ -585,7 +581,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         //
         // -- CONSTRUCTORS -----------------------------------------------
         //
-        public ACService(java.util.ArrayList<UniversalBody> dests, Reply reply) {
+        public ACService(ArrayList<UniversalBody> dests, Reply reply) {
             this.dests = dests;
             this.reply = reply;
         }

@@ -31,7 +31,10 @@
 package org.objectweb.proactive.core.body.future;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -41,23 +44,23 @@ import org.objectweb.proactive.core.body.UniversalBody;
 /**
  * Data structure which stores futures and corresponding automatic continuation to do.
  * This map is like :
- * [creatorID --> [sequenceID --> {list of futures to update, list of bodies for AC}]]
+ * [creatorID --> [sequenceID --> FuturesAndACs]]
  * @see FuturePool
  * @see FutureProxy
  */
 public class FutureMap extends Object implements java.io.Serializable {
     // main map
-    private java.util.HashMap<UniqueID, HashMap<Long, ArrayList[]>> indexedByBodyID;
+    private Map<UniqueID, HashMap<Long, FuturesAndACs>> indexedByBodyID;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public FutureMap() {
-        indexedByBodyID = new java.util.HashMap<UniqueID, HashMap<Long, ArrayList[]>>();
+        indexedByBodyID = new java.util.HashMap<UniqueID, HashMap<Long, FuturesAndACs>>();
     }
 
     /**
-     * Add an AC to do for bodyDest when the futurPool will receive the value of the future
+     * Add an AC to do for bodyDest when the futurePool will receive the value of the future
      * indexed by (id, creatorID)
      * @param id sequence id of the future
      * @param creatorID UniqueID of the creator body of the future
@@ -65,17 +68,16 @@ public class FutureMap extends Object implements java.io.Serializable {
      */
     public synchronized void addAutomaticContinuation(long id,
         UniqueID creatorID, UniversalBody bodyDest) {
-        java.util.HashMap indexedByID = (indexedByBodyID.get(creatorID));
+        java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID == null) {
             throw new ProActiveRuntimeException(
                 "There is no map for creatorID " + creatorID);
         }
-        java.util.ArrayList[] listes = (java.util.ArrayList[]) (indexedByID.get(new Long(
-                    id)));
+        FuturesAndACs listes = indexedByID.get(new Long(id));
 
         // add bodyDest to the list of dest for future (id, bodyID)
         if (listes != null) {
-            listes[1].add(bodyDest);
+            listes.addDestinationsAC(bodyDest);
         } else {
             throw new ProActiveRuntimeException("There is no list for future " +
                 id);
@@ -84,47 +86,34 @@ public class FutureMap extends Object implements java.io.Serializable {
 
     /**
      * Add a future (id, creatorID) in the map. The entry for this key could already
-     * exists, because a body can have copies of a future.
+     * exists, because a body can have multiple copies of the same future.
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
-        java.util.HashMap<Long, ArrayList[]> indexedByID = (indexedByBodyID.get(creatorID));
+        java.util.HashMap<Long, FuturesAndACs> indexedByID = indexedByBodyID.get(creatorID);
 
         // entry does not exist
         if (indexedByID == null) {
             //sub-map
-            java.util.HashMap<Long, ArrayList[]> newIndexedByID = new java.util.HashMap<Long, ArrayList[]>();
+            java.util.HashMap<Long, FuturesAndACs> newIndexedByID = new java.util.HashMap<Long, FuturesAndACs>();
 
-            //list of futures
-            java.util.ArrayList<Future> futures = new java.util.ArrayList<Future>();
-            futures.add(futureObject);
-            //list of ACs (ie bodies destination)
-            java.util.ArrayList<Future> dests = new java.util.ArrayList<Future>();
-
-            java.util.ArrayList[] listes = new java.util.ArrayList[2];
-            listes[0] = futures;
-            listes[1] = dests;
-            newIndexedByID.put(new Long(id), listes);
+            FuturesAndACs newf = new FuturesAndACs();
+            newf.addFuture(futureObject);
+            newIndexedByID.put(new Long(id), newf);
             indexedByBodyID.put(creatorID, newIndexedByID);
         }
         // entry for creatorID exists, but there is no sub-entry for id
         else if (indexedByID.get(new Long(id)) == null) {
             //list of futures
-            java.util.ArrayList<Future> futures = new java.util.ArrayList<Future>();
-            futures.add(futureObject);
-            //list of ACs
-            java.util.ArrayList<Future> dests = new java.util.ArrayList<Future>();
-
-            java.util.ArrayList[] listes = new java.util.ArrayList[2];
-            listes[0] = futures;
-            listes[1] = dests;
-            indexedByID.put(new Long(id), listes);
+            FuturesAndACs newf = new FuturesAndACs();
+            newf.addFuture(futureObject);
+            indexedByID.put(new Long(id), newf);
         }
         // one copy of an existing future
         else {
-            ((indexedByID.get(new Long(id)))[0]).add(futureObject);
+            ((indexedByID.get(new Long(id)))).addFuture(futureObject);
         }
     }
 
@@ -133,25 +122,18 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param id sequence id of the future
      * @param creatorID UniqueID of the creator body of the future
      */
-    public synchronized java.util.ArrayList getFuturesToUpdate(long id,
+    public synchronized ArrayList<Future> getFuturesToUpdate(long id,
         UniqueID creatorID) {
-        java.util.HashMap indexedByID = (indexedByBodyID.get(creatorID));
-        java.util.ArrayList resultat = null;
+        java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
+        ArrayList<Future> result = null;
 
         if (indexedByID != null) {
-            java.util.ArrayList[] listes = (java.util.ArrayList[]) (indexedByID.get(new Long(
-                        id)));
-
+            FuturesAndACs listes = indexedByID.get(new Long(id));
             if (listes != null) {
-                java.util.ArrayList futures = listes[0];
-                resultat = futures;
+                result = listes.getFutures();
             }
         }
-
-        // one of these two lists could be null : it's not an error ! Futures could have been already
-        // updated. We must not throw exception in this case. 
-        // Could be optimized...
-        return resultat;
+        return result;
     }
 
     /**
@@ -159,18 +141,17 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param id sequence id of the future
      * @param bodyID UniqueID of the creator body of the future
      */
-    public synchronized java.util.ArrayList getAutomaticContinuation(long id,
-        UniqueID bodyID) {
-        java.util.ArrayList resultat = null;
-        java.util.HashMap indexedByID = (indexedByBodyID.get(bodyID));
+    public synchronized ArrayList<UniversalBody> getAutomaticContinuation(
+        long id, UniqueID bodyID) {
+        java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(bodyID));
+        ArrayList<UniversalBody> result = null;
         if (indexedByID != null) {
-            java.util.ArrayList[] listes = (java.util.ArrayList[]) (indexedByID.get(new Long(
-                        id)));
+            FuturesAndACs listes = indexedByID.get(new Long(id));
             if (listes != null) {
-                resultat = listes[1];
+                result = listes.getDestinationsAC();
             }
         }
-        return resultat;
+        return result;
     }
 
     /**
@@ -179,33 +160,9 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the creator body of the future
      */
     public synchronized void removeFutures(long id, UniqueID creatorID) {
-        java.util.HashMap indexedByID = (indexedByBodyID.get(creatorID));
+        java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID != null) {
-            java.util.ArrayList[] listes = (java.util.ArrayList[]) (indexedByID.remove(new Long(
-                        id)));
-        }
-    }
-
-    /**
-     * Unset the copy tag in all futures of the map.
-     * @see FutureProxy
-     */
-    public synchronized void unsetCopyMode() {
-        java.util.Collection<HashMap<Long, ArrayList[]>> c1 = indexedByBodyID.values();
-        java.util.Iterator<HashMap<Long, ArrayList[]>> it1 = c1.iterator();
-
-        while (it1.hasNext()) {
-            java.util.Collection c2 = (it1.next()).values();
-            java.util.Iterator it2 = c2.iterator();
-            while (it2.hasNext()) {
-                java.util.ArrayList[] listes = (java.util.ArrayList[]) (it2.next());
-                java.util.ArrayList futures = listes[0];
-                java.util.Iterator itFutures = futures.iterator();
-                while (itFutures.hasNext()) {
-                    FutureProxy p = (FutureProxy) itFutures.next();
-                    p.unsetCopyMode();
-                }
-            }
+            indexedByID.remove(new Long(id));
         }
     }
 
@@ -213,22 +170,83 @@ public class FutureMap extends Object implements java.io.Serializable {
      * Set the copy tag in all futures of the map.
      * @see FutureProxy
      */
-    public synchronized void setCopyMode() {
-        java.util.Collection<HashMap<Long, ArrayList[]>> c1 = indexedByBodyID.values();
-        java.util.Iterator<HashMap<Long, ArrayList[]>> it1 = c1.iterator();
+    public synchronized void setCopyMode(boolean mode) {
+        Collection<HashMap<Long, FuturesAndACs>> c1 = indexedByBodyID.values();
+        Iterator<HashMap<Long, FuturesAndACs>> it1 = c1.iterator();
 
         while (it1.hasNext()) {
-            java.util.Collection c2 = (it1.next()).values();
-            java.util.Iterator it2 = c2.iterator();
+            Collection<FuturesAndACs> c2 = (it1.next()).values();
+            Iterator<FuturesAndACs> it2 = c2.iterator();
             while (it2.hasNext()) {
-                java.util.ArrayList[] listes = (java.util.ArrayList[]) (it2.next());
-                java.util.ArrayList futures = listes[0];
-                java.util.Iterator itFutures = futures.iterator();
+                FuturesAndACs listes = it2.next();
+                Iterator<Future> itFutures = listes.getFutures().iterator();
                 while (itFutures.hasNext()) {
-                    FutureProxy p = (FutureProxy) itFutures.next();
-                    p.setCopyMode();
+                    Future f = itFutures.next();
+                    f.setCopyMode(mode);
                 }
             }
+        }
+    }
+
+    /**
+     * Simple container for futures and automatic continuations (i.e. destination bodies)
+     * for a given future's unique id (i.e. [CreatorID,SequenceID])
+     * @author cdelbe
+     * @since 3.2
+     */
+    private class FuturesAndACs {
+        // futures
+        private ArrayList<Future> futures;
+
+        // destinations of ACs if any
+        private ArrayList<UniversalBody> destinationsAC;
+
+        /**
+         * Create a FuturesAndACs
+         * @param isACEnabled true if AC are enabled
+         */
+        public FuturesAndACs(boolean isACEnabled) {
+            futures = new ArrayList<Future>();
+            destinationsAC = isACEnabled ? new ArrayList<UniversalBody>() : null;
+        }
+
+        /**
+         * Create a FuturesAndACs
+         */
+        public FuturesAndACs() {
+            this(true);
+        }
+
+        /**
+         * Return the list of registred futures
+         * @return the list of registred futures
+         */
+        public ArrayList<Future> getFutures() {
+            return futures;
+        }
+
+        /**
+         * Register a future
+         * @param f the registred future
+         */
+        public void addFuture(Future f) {
+            this.futures.add(f);
+        }
+
+        /**
+         * Return the list of registred ACs, i.e. target bodies
+         * @return the list of registred ACs, i.e. target bodies
+         */
+        public ArrayList<UniversalBody> getDestinationsAC() {
+            return destinationsAC;
+        }
+
+        /**
+         * Register an AC
+         * @param f the target body for the registred AC
+         */
+        public void addDestinationsAC(UniversalBody d) {
+            this.destinationsAC.add(d);
         }
     }
 }
