@@ -191,18 +191,18 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                         schemaURLcandidate = uriSchema.toURL();
                     } else {
                         logger.error("The schema " + schema +
-                        " could not be located in your environment. Consider compiling ProActive using ant");
+                            " could not be located in your environment. Consider compiling ProActive using ant");
                         schemaURLcandidate = null;
                     }
                 } else {
                     logger.error("The schema " + schema +
-                    " could not be located in your environment. Consider compiling ProActive using ant");
+                        " could not be located in your environment. Consider compiling ProActive using ant");
                     schemaURLcandidate = null;
                 }
             } catch (Exception e) {
                 logger.debug(e.getMessage());
                 logger.error("The schema " + schema +
-                " could not be located in your environment. Consider compiling ProActive using ant");
+                    " could not be located in your environment. Consider compiling ProActive using ant");
                 schemaURLcandidate = null;
             }
         }
