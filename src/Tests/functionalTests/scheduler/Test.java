@@ -39,6 +39,7 @@ import java.util.Vector;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.AdminScheduler;
@@ -56,6 +57,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Launches the scheduler and adds deletes tasks then shutsdown
  */
+@Ignore("See bug #3276")
 public class Test extends FunctionalTest {
     private AdminScheduler adminAPI;
     private SchedulerUserAPI userAPI;
