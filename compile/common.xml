@@ -69,7 +69,7 @@
 			<include name="timit/*.jar" />
 		</fileset>
 		<!-- XXX ${dev.dir} is not included in the source release ! -->
-		<pathelement location="${dev.dir}/lib/junit-4.1.jar"/> 
+		<pathelement location="${dev.dir}/lib/junit-4.3.jar"/> 
 	</path>
 		
 	<path id="project.classpath">
