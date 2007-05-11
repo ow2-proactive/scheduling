@@ -29,6 +29,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
+import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -536,6 +537,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new NGProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(CLUSTERFORK_PROCESS_TAG)) {
                 new ClusterForkProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(PROCESS_LIST_TAG) ||
+                    processType.equals(PROCESS_LIST_BYHOST_TAG)) {
+                new ProcessListExtractor(node, infrastructureContext);
             }
         }
     }
@@ -1545,6 +1549,60 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         public ClusterForkProcessExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
+        }
+    }
+
+    protected class ProcessListExtractor extends ProcessExtractor {
+        public ProcessListExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+
+            String closeStream = getNodeExpandedValue(node.getAttributes()
+                                                          .getNamedItem("closeStream"));
+
+            String fixedName = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("fixedName"));
+            String list = getNodeExpandedValue(node.getAttributes()
+                                                   .getNamedItem("list"));
+            String domain = getNodeExpandedValue(node.getAttributes()
+                                                     .getNamedItem("domain"));
+            String spadding = getNodeExpandedValue(node.getAttributes()
+                                                       .getNamedItem("padding"));
+            String hostlist = getNodeExpandedValue(node.getAttributes()
+                                                       .getNamedItem("hostlist"));
+            String srepeat = getNodeExpandedValue(node.getAttributes()
+                                                      .getNamedItem("repeat"));
+
+            int padding = 0;
+            int repeat = 1;
+            if (spadding != null) {
+                padding = Integer.parseInt(spadding);
+            }
+
+            if (srepeat != null) {
+                repeat = Integer.parseInt(srepeat);
+            }
+
+            AbstractListProcessDecorator listProcessDecorator = ((AbstractListProcessDecorator) targetProcess);
+            if ((fixedName != null) && (list != null)) {
+                listProcessDecorator.setHostConfig(fixedName, list, domain,
+                    padding, repeat);
+            }
+
+            if (hostlist != null) {
+                listProcessDecorator.setHostList(hostlist, domain);
+            }
+
+            if ((closeStream != null) && closeStream.equals("yes")) {
+                targetProcess.closeStream();
+            }
+
+            String username = getNodeExpandedValue(node.getAttributes()
+                                                       .getNamedItem("username"));
+
+            if (username != null) {
+                targetProcess.setUsername(username);
+            }
         }
     }
 
