@@ -29,14 +29,19 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
+import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
+import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.mpi.MPIProcess;
+import org.objectweb.proactive.core.process.nordugrid.NGProcess;
 import org.objectweb.proactive.core.process.oar.OARGRIDSubProcess;
 import org.objectweb.proactive.core.process.oar.OARSubProcess;
 import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
@@ -518,8 +523,19 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new OARGridProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(HIERARCHICAL_PROCESS_TAG)) {
                 new HierarchicalProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(MPI_PROCESS_TAG)) {
+                new MPIProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(DEPENDENT_PROCESS_SEQUENCE_TAG)) {
+                new DependentProcessSequenceExtractor(node,
+                    infrastructureContext);
+            } else if (processType.equals(SEQUENTIAL_PROCESS_TAG)) {
+                new SequentialProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(UNICORE_PROCESS_TAG)) {
                 new UnicoreProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(NG_PROCESS_TAG)) {
+                new NGProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(CLUSTERFORK_PROCESS_TAG)) {
+                new ClusterForkProcessExtractor(node, infrastructureContext);
             }
         }
     }
@@ -1378,16 +1394,161 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 HostsInfos.setSecondaryName(hostName, internalIP);
             }
 
-            NodeList subProcesses = (NodeList) xpath.evaluate("pa:" +
-                    HIERARCHICIAL_REFERENCE_TAG, node, XPathConstants.NODESET);
-            for (int i = 0; i < subProcesses.getLength(); ++i) {
-                Node processNode = subProcesses.item(i);
-                new ProcessExtractor(processNode, node);
+            NodeList subProcessesRefIds = (NodeList) xpath.evaluate("pa:" +
+                    HIERARCHICIAL_REFERENCE_TAG + "/@refid", node,
+                    XPathConstants.NODESET);
+            for (int i = 0; i < subProcessesRefIds.getLength(); ++i) {
+                Node refIdNode = subProcessesRefIds.item(i);
+                proActiveDescriptor.registerHierarchicalProcess((HierarchicalProcess) targetProcess,
+                    getNodeExpandedValue(refIdNode));
             }
         }
     }
 
-    // //////////////////////////////
+    protected class MPIProcessExtractor extends ProcessExtractor {
+        public MPIProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            String mpiFileName = getNodeExpandedValue(node.getAttributes()
+                                                          .getNamedItem("mpiFileName"));
+            MPIProcess mpiProcess = ((MPIProcess) targetProcess);
+            if (mpiFileName != null) {
+                mpiProcess.setMpiFileName(mpiFileName);
+            }
+            String hostsFileName = getNodeExpandedValue(node.getAttributes()
+                                                            .getNamedItem("hostsFileName"));
+            if (hostsFileName != null) {
+                mpiProcess.setHostsFileName(hostsFileName);
+            }
+            String mpiCommandOptions = getNodeExpandedValue(node.getAttributes()
+                                                                .getNamedItem("mpiCommandOptions"));
+            if (mpiCommandOptions != null) {
+                mpiProcess.setMpiCommandOptions(mpiCommandOptions);
+            }
+
+            Node optionNode = (Node) xpath.evaluate("pa:" +
+                    MPI_PROCESS_OPTIONS_TAG, node, XPathConstants.NODE);
+            new MPIOptionsExtractor(mpiProcess, optionNode);
+        }
+
+        protected class MPIOptionsExtractor {
+            public MPIOptionsExtractor(MPIProcess mpiProcess, Node node)
+                throws SAXException {
+                NodeList childNodes = node.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    Node childNode = childNodes.item(i);
+                    String nodeName = childNode.getNodeName();
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+
+                    if (nodeName.equals(MPI_LOCAL_PATH_TAG)) {
+                        String path = getPath(childNode);
+                        mpiProcess.setLocalPath(path);
+                    } else if (nodeName.equals(MPI_REMOTE_PATH_TAG)) {
+                        String path = getPath(childNode);
+                        mpiProcess.setRemotePath(path);
+                    } else if (nodeName.equals(PROCESS_NUMBER_TAG)) {
+                        mpiProcess.setHostsNumber(nodeExpandedValue);
+                    }
+                }
+            }
+        }
+    }
+
+    protected class DependentProcessSequenceExtractor extends ProcessExtractor {
+        public DependentProcessSequenceExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+
+            NodeList processRefs = (NodeList) xpath.evaluate("pa:" +
+                    PROCESS_REFERENCE_TAG + "/@refid", node,
+                    XPathConstants.NODESET);
+            for (int i = 0; i < processRefs.getLength(); ++i) {
+                Node item = processRefs.item(i);
+                proActiveDescriptor.addProcessToSequenceList((DependentListProcess) targetProcess,
+                    getNodeExpandedValue(item));
+            }
+
+            NodeList serviceRefs = (NodeList) xpath.evaluate("pa:" +
+                    SERVICE_REFERENCE_TAG + "/@refid", node,
+                    XPathConstants.NODESET);
+            for (int i = 0; i < processRefs.getLength(); ++i) {
+                Node item = serviceRefs.item(i);
+                proActiveDescriptor.addServiceToSequenceList((DependentListProcess) targetProcess,
+                    getNodeExpandedValue(item));
+            }
+        }
+    }
+
+    protected class SequentialProcessExtractor extends ProcessExtractor {
+        public SequentialProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            NodeList processRefs = (NodeList) xpath.evaluate("pa:" +
+                    PROCESS_REFERENCE_TAG + "/@refid", node,
+                    XPathConstants.NODESET);
+            for (int i = 0; i < processRefs.getLength(); ++i) {
+                Node item = processRefs.item(i);
+                proActiveDescriptor.addProcessToSequenceList((DependentListProcess) targetProcess,
+                    getNodeExpandedValue(item));
+            }
+        }
+    }
+
+    protected class NGProcessExtractor extends ProcessExtractor {
+        public NGProcessExtractor(Node node, Node infrastructureContext)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, infrastructureContext);
+
+            String jobname = getNodeExpandedValue(node.getAttributes()
+                                                      .getNamedItem("jobname"));
+            NGProcess ngProcess = ((NGProcess) targetProcess);
+            if (jobname != null) {
+                ngProcess.setJobname(jobname);
+            }
+
+            String queueName = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("queue"));
+            if (queueName != null) {
+                ngProcess.setQueue(queueName);
+            }
+
+            Node optionNode = (Node) xpath.evaluate("pa:" + NG_OPTIONS_TAG,
+                    node, XPathConstants.NODE);
+            new NGOptionsExtractor(ngProcess, optionNode);
+        }
+
+        protected class NGOptionsExtractor {
+            public NGOptionsExtractor(NGProcess ngProcess, Node node)
+                throws SAXException {
+                NodeList childNodes = node.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    Node childNode = childNodes.item(i);
+                    String nodeName = childNode.getNodeName();
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+
+                    if (nodeName.equals(COUNT_TAG)) {
+                        ngProcess.setCount(nodeExpandedValue);
+                    } else if (nodeName.equals(OUTPUT_FILE)) {
+                        ngProcess.setStdout(nodeExpandedValue);
+                    } else if (nodeName.equals(ERROR_FILE)) {
+                        ngProcess.setStderr(nodeExpandedValue);
+                    } else if (nodeName.equals(EXECUTABLE_TAG)) {
+                        String path = getPath(childNode);
+                        ngProcess.setExecutable(path);
+                    }
+                }
+            }
+        }
+    }
+
+    protected class ClusterForkProcessExtractor extends ProcessExtractor {
+        public ClusterForkProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
     // utility methods
     // //////////////////////////////
     private String getParameters(Node classpathNode) throws SAXException {
