@@ -349,8 +349,9 @@
 				<formatter type="xml"/>
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset dir="${cl.test.dir}">
-   						<include name="unitTests/**/*.class"/>			
-						<include name="functionalTests/*/**/*Test*.class"/>
+						<include name="unitTests/**/*.class"/>		
+						<include name="functionalTests/**/*Test*.class"/>
+						<exclude name="functionTests/security/*/*.class"/>
 						<exclude name="**/*$*.class"/>
 					</fileset>
 				</batchtest>
