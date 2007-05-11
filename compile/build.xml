@@ -351,8 +351,9 @@
 					<fileset dir="${cl.test.dir}">
 						<include name="unitTests/**/*.class"/>		
 						<include name="functionalTests/**/*Test*.class"/>
-						<exclude name="functionTests/security/*/*.class"/>
+						<exclude name="functionalTests/security/*/*.class"/>
 						<exclude name="**/*$*.class"/>
+						<exclude name="functionalTests/*.class"/>
 					</fileset>
 				</batchtest>
 			</junit>
