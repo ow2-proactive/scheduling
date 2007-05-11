@@ -48,6 +48,7 @@ import java.security.SignatureException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
 import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXCertPathValidatorResult;
@@ -110,7 +111,8 @@ public class ProActiveSecurity {
     public static Object[] genCert(String dn, long validity, String policyId,
         PrivateKey privKey, PublicKey pubKey, boolean isCA, String caDn,
         PrivateKey caPrivateKey, PublicKey acPubKey)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
+            CertificateEncodingException, IllegalStateException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();
@@ -181,7 +183,7 @@ public class ProActiveSecurity {
                 false, seq);
         }
 
-        X509Certificate selfcert = certgen.generateX509Certificate(caPrivateKey);
+        X509Certificate selfcert = certgen.generate(caPrivateKey);
 
         return new Object[] { selfcert, privKey };
     } //genselfCert
@@ -212,6 +214,12 @@ public class ProActiveSecurity {
             // TODOSECURITY Auto-generated catch block
             e.printStackTrace();
         } catch (SignatureException e) {
+            // TODOSECURITY Auto-generated catch block
+            e.printStackTrace();
+        } catch (CertificateEncodingException e) {
+            // TODOSECURITY Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
             // TODOSECURITY Auto-generated catch block
             e.printStackTrace();
         }

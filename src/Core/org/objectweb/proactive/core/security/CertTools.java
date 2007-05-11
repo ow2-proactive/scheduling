@@ -597,10 +597,13 @@ public class CertTools {
      * @throws NoSuchAlgorithmException DOCUMENT ME!
      * @throws SignatureException DOCUMENT ME!
      * @throws InvalidKeyException DOCUMENT ME!
+     * @throws IllegalStateException
+     * @throws CertificateEncodingException
      */
     public static X509Certificate genSelfCert(String dn, long validity,
         String policyId, PrivateKey privKey, PublicKey pubKey, boolean isCA)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
+            CertificateEncodingException, IllegalStateException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();
@@ -669,7 +672,7 @@ public class CertTools {
                 false, seq);
         }
 
-        X509Certificate selfcert = certgen.generateX509Certificate(privKey);
+        X509Certificate selfcert = certgen.generate(privKey);
 
         return selfcert;
     } //genselfCert
@@ -677,7 +680,8 @@ public class CertTools {
     public static X509Certificate genCert(String dn, long validity,
         String policyId, PrivateKey privKey, PublicKey pubKey, boolean isCA,
         String caDn, PrivateKey caPrivateKey, PublicKey acPubKey)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
+            CertificateEncodingException, IllegalStateException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();
@@ -748,7 +752,7 @@ public class CertTools {
                 false, seq);
         }
 
-        X509Certificate selfcert = certgen.generateX509Certificate(caPrivateKey);
+        X509Certificate selfcert = certgen.generate(caPrivateKey);
 
         return selfcert;
     } //genselfCert
