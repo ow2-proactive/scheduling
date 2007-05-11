@@ -39,7 +39,6 @@ import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import functionalTests.FunctionalTest;
-import functionalTests.SecurityTest;
 import functionalTests.security.A;
 
 
@@ -49,7 +48,7 @@ import functionalTests.security.A;
  * @author arnaud
  *
  */
-public class SecurityTestContextPropagation extends SecurityTest {
+public class SecurityTestContextPropagation extends FunctionalTest {
 
     /**
          *

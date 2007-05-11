@@ -43,8 +43,8 @@ import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import functionalTests.FunctionalTest;
-import functionalTests.SecurityTest;
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
+
 
 /**
  * Test if the security manager is operational :  to be serialized and unserialized, ...
@@ -52,7 +52,7 @@ import static junit.framework.Assert.*;
  * @author arnaud
  *
  */
-public class SecurityTestSecurityManager extends SecurityTest {
+public class SecurityTestSecurityManager extends FunctionalTest {
     private static final long serialVersionUID = -3414159361865609323L;
     private ProActiveSecurityManager psm = null;
     private ProActiveSecurityManager psm2 = null;

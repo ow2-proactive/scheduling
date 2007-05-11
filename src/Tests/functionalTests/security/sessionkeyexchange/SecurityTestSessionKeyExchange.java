@@ -37,7 +37,6 @@ import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import functionalTests.FunctionalTest;
-import functionalTests.SecurityTest;
 
 
 /**
@@ -46,7 +45,7 @@ import functionalTests.SecurityTest;
  * @author arnaud
  *
  */
-public class SecurityTestSessionKeyExchange extends SecurityTest {
+public class SecurityTestSessionKeyExchange extends FunctionalTest {
 
     /**
          *

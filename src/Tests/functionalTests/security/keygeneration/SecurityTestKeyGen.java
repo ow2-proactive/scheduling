@@ -35,7 +35,6 @@ import org.objectweb.proactive.core.security.KeyTools;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 
 import functionalTests.FunctionalTest;
-import functionalTests.SecurityTest;
 
 
 /**
@@ -43,7 +42,7 @@ import functionalTests.SecurityTest;
  * @author arnaud
  *
  */
-public class SecurityTestKeyGen extends SecurityTest {
+public class SecurityTestKeyGen extends FunctionalTest {
     private static final long serialVersionUID = 6453945881218909030L;
 
     @Test

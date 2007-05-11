@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import functionalTests.FunctionalTest;
-import functionalTests.SecurityTest;
 import static junit.framework.Assert.*;
 
 /**
@@ -51,7 +50,7 @@ import static junit.framework.Assert.*;
  * @author arnaud
  *
  */
-public class SecurityTestApplicationLifeCycle extends SecurityTest {
+public class SecurityTestApplicationLifeCycle extends FunctionalTest {
     private static final long serialVersionUID = 1312765218867401690L;
     private ProActiveSecurityManager psm = null;
     private ProActiveSecurityManager psm2 = null;

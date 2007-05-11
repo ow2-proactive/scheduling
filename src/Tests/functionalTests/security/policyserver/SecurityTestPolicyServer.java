@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 
 import functionalTests.FunctionalTest;
-import functionalTests.SecurityTest;
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
+
 
 /**
  * Test if the policy server is able to load a policy file, to be serialized and unserialized
@@ -51,7 +51,7 @@ import static junit.framework.Assert.*;
  * @author arnaud
  *
  */
-public class SecurityTestPolicyServer extends SecurityTest {
+public class SecurityTestPolicyServer extends FunctionalTest {
     private static final long serialVersionUID = -8689457521948634564L;
     private PolicyServer policyServer = null;
     private PolicyServer ps = null;
