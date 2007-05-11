@@ -44,7 +44,6 @@ import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
 
-
 /**
  * Test if the policy server is able to load a policy file, to be serialized and unserialized
  *

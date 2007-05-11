@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
 
-
 /**
  * Test if the security manager is operational :  to be serialized and unserialized, ...
  *

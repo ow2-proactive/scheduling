@@ -20,8 +20,6 @@ import functionalTests.security.policyserver.SecurityTestPolicyServer;
 import functionalTests.security.securitymanager.SecurityTestSecurityManager;
 import functionalTests.security.sessionkeyexchange.SecurityTestSessionKeyExchange;
 import static junit.framework.Assert.assertTrue;
-
-
 @RunWith(Suite.class)
 @SuiteClasses({SecurityTestKeyGen.class,
     SecurityTestPolicyServer.class,
