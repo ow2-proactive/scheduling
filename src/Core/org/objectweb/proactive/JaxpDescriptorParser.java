@@ -35,12 +35,17 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
+import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.oar.OARGRIDSubProcess;
+import org.objectweb.proactive.core.process.oar.OARSubProcess;
+import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
+import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
+import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -483,93 +488,55 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
 
-            // get parent id
-            String id = getNodeExpandedValue(node.getParentNode().getAttributes()
-                                                 .getNamedItem("id"));
-
             String processType = node.getNodeName();
-            String processClassName = getNodeExpandedValue(node.getAttributes()
-                                                               .getNamedItem("class"));
-            ExternalProcess targetProcess = proActiveDescriptor.createProcess(id,
-                    processClassName);
 
             if (processType.equals(JVM_PROCESS_TAG)) {
-                JVMProcess jvmProcess = ((JVMProcess) targetProcess);
-
-                NodeList childNodes = node.getChildNodes();
-                for (int j = 0; j < childNodes.getLength(); ++j) {
-                    Node child = childNodes.item(j);
-                    if (child.getNodeName().equals(CLASSPATH_TAG)) {
-                        String classpath = getPath(child);
-                        jvmProcess.setClasspath(classpath);
-                    } else if (child.getNodeName().equals(BOOT_CLASSPATH_TAG)) {
-                        String classpath = getPath(child);
-                        jvmProcess.setBootClasspath(classpath);
-                    } else if (child.getNodeName().equals(JAVA_PATH_TAG)) {
-                        String path = getPath(child);
-                        jvmProcess.setJavaPath(path);
-                    } else if (child.getNodeName().equals(POLICY_FILE_TAG)) {
-                        String path = getPath(child);
-                        jvmProcess.setPolicyFile(path);
-                    } else if (child.getNodeName().equals(LOG4J_FILE_TAG)) {
-                        String path = getPath(child);
-                        jvmProcess.setLog4jFile(path);
-                    } else if (child.getNodeName()
-                                        .equals(PROACTIVE_PROPS_FILE_TAG)) {
-                        String path = getPath(child);
-                        jvmProcess.setJvmOptions("-Dproactive.configuration=" +
-                            path);
-                    } else if (child.getNodeName().equals(JVMPARAMETERS_TAG)) {
-                        String params = getParameters(child);
-                        jvmProcess.setJvmOptions(params);
-                    } else if (child.getNodeName().equals(EXTENDED_JVM_TAG)) {
-                        Node overwriteParamsArg = child.getAttributes()
-                                                       .getNamedItem("overwriteParameters");
-                        if ((overwriteParamsArg != null) &&
-                                "yes".equals(getNodeExpandedValue(
-                                        overwriteParamsArg))) {
-                            jvmProcess.setOverwrite(true);
-                        }
-                        try {
-                            proActiveDescriptor.mapToExtendedJVM((JVMProcess) targetProcess,
-                                getNodeExpandedValue(child.getAttributes()
-                                                          .getNamedItem("refid")));
-                        } catch (ProActiveException e) {
-                            throw new SAXException(e);
-                        }
-                    }
-                }
+                new JVMProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(RSH_PROCESS_TAG)) {
-                new RshProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new RshProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(MAPRSH_PROCESS_TAG)) {
-                new MapRshProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new MapRshProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(SSH_PROCESS_TAG)) {
-                new SshProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new SshProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(RLOGIN_PROCESS_TAG)) {
-                new RloginProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new RloginProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(BSUB_PROCESS_TAG)) {
-                new BSubProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new BSubProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(GLOBUS_PROCESS_TAG)) {
-                new GlobusProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new GlobusProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(PRUN_PROCESS_TAG)) {
+                new PrunProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(PBS_PROCESS_TAG)) {
+                new PbsProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(GRID_ENGINE_PROCESS_TAG)) {
+                new GridEngineProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(OAR_PROCESS_TAG)) {
+                new OARProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(GLITE_PROCESS_TAG)) {
-                new GliteProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new GliteProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(OARGRID_PROCESS_TAG)) {
+                new OARGridProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(HIERARCHICAL_PROCESS_TAG)) {
+                new HierarchicalProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(UNICORE_PROCESS_TAG)) {
-                new UnicoreProcessExtractor(targetProcess, node,
-                    infrastructureContext);
+                new UnicoreProcessExtractor(node, infrastructureContext);
             }
         }
     }
 
     protected class ProcessExtractor {
-        public ProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
+        protected ExternalProcess targetProcess;
+
+        public ProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            // get parent id
+            String id = getNodeExpandedValue(node.getParentNode().getAttributes()
+                                                 .getNamedItem("id"));
+
+            String processClassName = getNodeExpandedValue(node.getAttributes()
+                                                               .getNamedItem("class"));
+            targetProcess = proActiveDescriptor.createProcess(id,
+                    processClassName);
             Node namedItem = node.getAttributes().getNamedItem("closeStream");
             String t = getNodeExpandedValue(namedItem);
             if ((t != null) && t.equals("yes")) {
@@ -698,17 +665,68 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
+    protected class JVMProcessExtractor extends ProcessExtractor {
+        public JVMProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            JVMProcess jvmProcess = ((JVMProcess) targetProcess);
+
+            NodeList childNodes = node.getChildNodes();
+            for (int j = 0; j < childNodes.getLength(); ++j) {
+                Node child = childNodes.item(j);
+                if (child.getNodeName().equals(CLASSPATH_TAG)) {
+                    String classpath = getPath(child);
+                    jvmProcess.setClasspath(classpath);
+                } else if (child.getNodeName().equals(BOOT_CLASSPATH_TAG)) {
+                    String classpath = getPath(child);
+                    jvmProcess.setBootClasspath(classpath);
+                } else if (child.getNodeName().equals(JAVA_PATH_TAG)) {
+                    String path = getPath(child);
+                    jvmProcess.setJavaPath(path);
+                } else if (child.getNodeName().equals(POLICY_FILE_TAG)) {
+                    String path = getPath(child);
+                    jvmProcess.setPolicyFile(path);
+                } else if (child.getNodeName().equals(LOG4J_FILE_TAG)) {
+                    String path = getPath(child);
+                    jvmProcess.setLog4jFile(path);
+                } else if (child.getNodeName().equals(PROACTIVE_PROPS_FILE_TAG)) {
+                    String path = getPath(child);
+                    jvmProcess.setJvmOptions("-Dproactive.configuration=" +
+                        path);
+                } else if (child.getNodeName().equals(JVMPARAMETERS_TAG)) {
+                    String params = getParameters(child);
+                    jvmProcess.setJvmOptions(params);
+                } else if (child.getNodeName().equals(EXTENDED_JVM_TAG)) {
+                    Node overwriteParamsArg = child.getAttributes()
+                                                   .getNamedItem("overwriteParameters");
+                    if ((overwriteParamsArg != null) &&
+                            "yes".equals(getNodeExpandedValue(
+                                    overwriteParamsArg))) {
+                        jvmProcess.setOverwrite(true);
+                    }
+                    try {
+                        proActiveDescriptor.mapToExtendedJVM((JVMProcess) targetProcess,
+                            getNodeExpandedValue(child.getAttributes()
+                                                      .getNamedItem("refid")));
+                    } catch (ProActiveException e) {
+                        throw new SAXException(e);
+                    }
+                }
+            }
+        }
+    }
+
     protected class RshProcessExtractor extends ProcessExtractor {
-        public RshProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
+        public RshProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
         }
     }
 
     protected class MapRshProcessExtractor extends RshProcessExtractor {
-        public MapRshProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
+        public MapRshProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
 
             Node namedItem = node.getAttributes().getNamedItem("parallelize");
             String t = getNodeExpandedValue(namedItem);
@@ -730,23 +748,23 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class SshProcessExtractor extends ProcessExtractor {
-        public SshProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
+        public SshProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
         }
     }
 
     protected class RloginProcessExtractor extends ProcessExtractor {
-        public RloginProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
+        public RloginProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
         }
     }
 
     protected class BSubProcessExtractor extends ProcessExtractor {
-        public BSubProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
+        public BSubProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
 
             Node namedItem = node.getAttributes().getNamedItem("interactive");
             String t = getNodeExpandedValue(namedItem);
@@ -766,13 +784,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 ((LSFBSubProcess) targetProcess).setJobname(t);
             }
 
-            NodeList childNodes = node.getChildNodes();
-            for (int j = 0; j < childNodes.getLength(); ++j) {
-                Node child = childNodes.item(j);
-
-                if (child.getNodeName().equals(BSUB_OPTIONS_TAG)) {
-                    new BSubOptionsExtractor(targetProcess, child);
-                }
+            Node optionNode = (Node) xpath.evaluate("pa:" + BSUB_OPTIONS_TAG,
+                    node, XPathConstants.NODE);
+            if (optionNode != null) {
+                new BSubOptionsExtractor(targetProcess, optionNode);
             }
         }
 
@@ -802,16 +817,13 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class GlobusProcessExtractor extends ProcessExtractor {
-        public GlobusProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
-            NodeList childNodes = node.getChildNodes();
-            for (int j = 0; j < childNodes.getLength(); ++j) {
-                Node child = childNodes.item(j);
-                if (child.getNodeName().equals(BSUB_OPTIONS_TAG)) {
-                    new GlobusOptionsExtractor(targetProcess, child);
-                }
-            }
+        public GlobusProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+
+            Node optionNode = (Node) xpath.evaluate("pa:" + BSUB_OPTIONS_TAG,
+                    node, XPathConstants.NODE);
+            new GlobusOptionsExtractor(targetProcess, optionNode);
         }
 
         protected class GlobusOptionsExtractor {
@@ -822,13 +834,14 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 for (int j = 0; j < childNodes.getLength(); ++j) {
                     Node child = childNodes.item(j);
                     String nodeValue = getNodeExpandedValue(child);
-                    if (child.getNodeName().equals(COUNT_TAG)) {
+                    String nodeName = child.getNodeName();
+                    if (nodeName.equals(COUNT_TAG)) {
                         globusProcess.setCount(nodeValue);
-                    } else if (child.getNodeName().equals(GLOBUS_MAXTIME_TAG)) {
+                    } else if (nodeName.equals(GLOBUS_MAXTIME_TAG)) {
                         globusProcess.setMaxTime(nodeValue);
-                    } else if (child.getNodeName().equals(OUTPUT_FILE)) {
+                    } else if (nodeName.equals(OUTPUT_FILE)) {
                         globusProcess.setStdout(nodeValue);
-                    } else if (child.getNodeName().equals(ERROR_FILE)) {
+                    } else if (nodeName.equals(ERROR_FILE)) {
                         globusProcess.setStderr(nodeValue);
                     }
                 }
@@ -837,9 +850,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class GliteProcessExtractor extends ProcessExtractor {
-        public GliteProcessExtractor(ExternalProcess targetProcess, Node node,
-            Node context) throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
+        public GliteProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
 
             GLiteProcess gliteProcess = ((GLiteProcess) targetProcess);
 
@@ -913,21 +926,21 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
-                if (child.getNodeName().equals(GLITE_CONFIG_TAG)) {
+                String nodeName = child.getNodeName();
+                if (nodeName.equals(GLITE_CONFIG_TAG)) {
                     String path = getPath(child);
                     gliteProcess.setJobEnvironment(path);
                 } else {
                     String nodeValue = getNodeExpandedValue(child);
-                    if (child.getNodeName().equals(GLITE_ENVIRONMENT_TAG)) {
+                    if (nodeName.equals(GLITE_ENVIRONMENT_TAG)) {
                         gliteProcess.setJobEnvironment(nodeValue);
-                    } else if (child.getNodeName().equals(GLITE_REQUIREMENTS_TAG)) {
+                    } else if (nodeName.equals(GLITE_REQUIREMENTS_TAG)) {
                         gliteProcess.setJobRequirements(nodeValue);
-                    } else if (child.getNodeName().equals(GLITE_RANK_TAG)) {
+                    } else if (nodeName.equals(GLITE_RANK_TAG)) {
                         gliteProcess.setJobRank(nodeValue);
-                    } else if (child.getNodeName().equals(GLITE_INPUTDATA_TAG)) {
+                    } else if (nodeName.equals(GLITE_INPUTDATA_TAG)) {
                         new GliteInputExtractor(gliteProcess, child);
-                    } else if (child.getNodeName()
-                                        .equals(GLITE_PROCESS_OPTIONS_TAG)) {
+                    } else if (nodeName.equals(GLITE_PROCESS_OPTIONS_TAG)) {
                         new GliteOptionsExtractor(gliteProcess, child);
                     }
                 }
@@ -957,36 +970,33 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeName().equals(GLITE_PATH_TAG)) {
+                    String nodeName = childNode.getNodeName();
+                    if (nodeName.equals(GLITE_PATH_TAG)) {
                         String path = getPath(childNode);
                         gliteProcess.setFilePath(path);
-                    } else if (childNode.getNodeName()
-                                            .equals(GLITE_REMOTE_PATH_TAG)) {
+                    } else if (nodeName.equals(GLITE_REMOTE_PATH_TAG)) {
                         String path = getPath(childNode);
                         gliteProcess.setRemoteFilePath(path);
                         gliteProcess.setJdlRemote(true);
-                    } else if (childNode.getNodeName().equals(GLITE_CONFIG_TAG)) {
+                    } else if (nodeName.equals(GLITE_CONFIG_TAG)) {
                         String path = getPath(childNode);
                         gliteProcess.setConfigFile(path);
                         gliteProcess.setConfigFileOption(true);
                     } else {
                         String nodeValue = getNodeExpandedValue(childNode);
-                        if (childNode.getNodeName()
-                                         .equals(GLITE_INPUTSANDBOX_TAG)) {
+                        if (nodeName.equals(GLITE_INPUTSANDBOX_TAG)) {
                             String sandbox = nodeValue;
                             StringTokenizer st = new StringTokenizer(sandbox);
                             while (st.hasMoreTokens()) {
                                 gliteProcess.addInputSBEntry(st.nextToken());
                             }
-                        } else if (childNode.getNodeName()
-                                                .equals(GLITE_OUTPUTSANDBOX_TAG)) {
+                        } else if (nodeName.equals(GLITE_OUTPUTSANDBOX_TAG)) {
                             String sandbox = nodeValue;
                             StringTokenizer st = new StringTokenizer(sandbox);
                             while (st.hasMoreTokens()) {
                                 gliteProcess.addOutputSBEntry(st.nextToken());
                             }
-                        } else if (childNode.getNodeName()
-                                                .equals(GLITE_ARGUMENTS_TAG)) {
+                        } else if (nodeName.equals(GLITE_ARGUMENTS_TAG)) {
                             gliteProcess.setJobArgument(nodeValue);
                         }
                     }
@@ -996,10 +1006,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class UnicoreProcessExtractor extends ProcessExtractor {
-        public UnicoreProcessExtractor(ExternalProcess targetProcess,
-            Node node, Node context)
-            throws XPathExpressionException, SAXException {
-            super(targetProcess, node, context);
+        public UnicoreProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
             UnicoreProcess unicoreProcess = ((UnicoreProcess) targetProcess);
 
             Node namedItem = node.getAttributes().getNamedItem("jobname");
@@ -1120,6 +1129,260 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 if (t != null) {
                     unicoreProcess.uParam.setVsitePriority(t);
                 }
+            }
+        }
+    }
+
+    protected class PrunProcessExtractor extends ProcessExtractor {
+        public PrunProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+
+            String queueName = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("value"));
+            if (queueName != null) {
+                ((PrunSubProcess) targetProcess).setQueueName(queueName);
+            }
+
+            Node optionNode = (Node) xpath.evaluate("pa:" + PRUN_OPTIONS_TAG,
+                    node, XPathConstants.NODE);
+            new PrunOptionsExtractor((PrunSubProcess) targetProcess, optionNode);
+        }
+
+        protected class PrunOptionsExtractor {
+            public PrunOptionsExtractor(PrunSubProcess prunSubProcess, Node node)
+                throws SAXException {
+                NodeList childNodes = node.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    Node childNode = childNodes.item(i);
+                    String nodeName = childNode.getNodeName();
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+                    if (nodeName.equals(HOST_LIST_TAG)) {
+                        prunSubProcess.setHostList(nodeExpandedValue);
+                    } else if (nodeName.equals(HOSTS_NUMBER_TAG)) {
+                        prunSubProcess.setHostsNumber(nodeExpandedValue);
+                    } else if (nodeName.equals(PROCESSOR_PER_NODE_TAG)) {
+                        prunSubProcess.setProcessorPerNodeNumber(nodeExpandedValue);
+                    } else if (nodeName.equals(BOOKING_DURATION_TAG)) {
+                        prunSubProcess.setBookingDuration(nodeExpandedValue);
+                    } else if (nodeName.equals(OUTPUT_FILE)) {
+                        prunSubProcess.setOutputFile(nodeExpandedValue);
+                    }
+                }
+            }
+        }
+    }
+
+    protected class PbsProcessExtractor extends ProcessExtractor {
+        public PbsProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            PBSSubProcess pbsSubProcess = (PBSSubProcess) targetProcess;
+
+            String interactive = getNodeExpandedValue(node.getAttributes()
+                                                          .getNamedItem("interactive"));
+            if (interactive != null) {
+                pbsSubProcess.setInteractive(interactive);
+            }
+
+            String queueName = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("queueName"));
+            if (queueName != null) {
+                pbsSubProcess.setQueueName(queueName);
+            }
+
+            Node optionNode = (Node) xpath.evaluate("pa:" + PBS_OPTIONS_TAG,
+                    node, XPathConstants.NODE);
+            new PbsOptionsExtractor(pbsSubProcess, optionNode);
+        }
+
+        protected class PbsOptionsExtractor {
+            public PbsOptionsExtractor(PBSSubProcess pbsSubProcess, Node node)
+                throws SAXException {
+                NodeList childNodes = node.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    Node childNode = childNodes.item(i);
+                    String nodeName = childNode.getNodeName();
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+                    if (nodeName.equals(HOST_LIST_TAG)) {
+                        pbsSubProcess.setHostList(nodeExpandedValue);
+                    } else if (nodeName.equals(HOSTS_NUMBER_TAG)) {
+                        pbsSubProcess.setHostsNumber(nodeExpandedValue);
+                    } else if (nodeName.equals(PROCESSOR_PER_NODE_TAG)) {
+                        pbsSubProcess.setProcessorPerNodeNumber(nodeExpandedValue);
+                    } else if (nodeName.equals(BOOKING_DURATION_TAG)) {
+                        pbsSubProcess.setBookingDuration(nodeExpandedValue);
+                    } else if (nodeName.equals(OUTPUT_FILE)) {
+                        pbsSubProcess.setOutputFile(nodeExpandedValue);
+                    } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
+                        String path = getPath(childNode);
+                        pbsSubProcess.setScriptLocation(path);
+                    }
+                }
+            }
+        }
+    }
+
+    protected class GridEngineProcessExtractor extends ProcessExtractor {
+        public GridEngineProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            GridEngineSubProcess gridEngineSubProcess = (GridEngineSubProcess) targetProcess;
+            String queueName = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("queue"));
+            if (queueName != null) {
+                gridEngineSubProcess.setQueueName(queueName);
+            }
+
+            Node optionNode = (Node) xpath.evaluate("pa:" +
+                    GRID_ENGINE_OPTIONS_TAG, node, XPathConstants.NODE);
+            new GridEngineOptionsExtractor(gridEngineSubProcess, optionNode);
+        }
+
+        protected class GridEngineOptionsExtractor {
+            public GridEngineOptionsExtractor(
+                GridEngineSubProcess gridEngineSubProcess, Node node)
+                throws SAXException {
+                NodeList childNodes = node.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    Node childNode = childNodes.item(i);
+                    String nodeName = childNode.getNodeName();
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+                    if (nodeName.equals(HOST_LIST_TAG)) {
+                        gridEngineSubProcess.setHostList(nodeExpandedValue);
+                    } else if (nodeName.equals(HOSTS_NUMBER_TAG)) {
+                        gridEngineSubProcess.setHostsNumber(nodeExpandedValue);
+                    } else if (nodeName.equals(PARALLEL_ENVIRONMENT_TAG)) {
+                        gridEngineSubProcess.setParallelEnvironment(nodeExpandedValue);
+                    } else if (nodeName.equals(BOOKING_DURATION_TAG)) {
+                        gridEngineSubProcess.setBookingDuration(nodeExpandedValue);
+                        //                    } else if (nodeName.equals(OUTPUT_FILE)) {
+                        //                        gridEngineSubProcess.setOutputFile(nodeExpandedValue);
+                    } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
+                        String path = getPath(childNode);
+                        gridEngineSubProcess.setScriptLocation(path);
+                    }
+                }
+            }
+        }
+    }
+
+    protected class OARProcessExtractor extends ProcessExtractor {
+        public OARProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+
+            String interactive = getNodeExpandedValue(node.getAttributes()
+                                                          .getNamedItem("interactive"));
+
+            OARSubProcess oarSubProcess = ((OARSubProcess) targetProcess);
+            if (interactive != null) {
+                oarSubProcess.setInteractive(interactive);
+            }
+
+            String queueName = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("queue"));
+
+            if (queueName != null) {
+                oarSubProcess.setQueueName(queueName);
+            }
+
+            String accessProtocol = getNodeExpandedValue(node.getAttributes()
+                                                             .getNamedItem("bookedNodesAccess"));
+
+            if (accessProtocol != null) {
+                oarSubProcess.setAccessProtocol(accessProtocol);
+            }
+
+            Node optionNode = (Node) xpath.evaluate("pa:" + OAR_OPTIONS_TAG,
+                    node, XPathConstants.NODE);
+            new OAROptionsExtractor(oarSubProcess, optionNode);
+        }
+
+        protected class OAROptionsExtractor {
+            public OAROptionsExtractor(OARSubProcess oarSubProcess, Node node)
+                throws SAXException {
+                NodeList childNodes = node.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    Node childNode = childNodes.item(i);
+                    String nodeName = childNode.getNodeName();
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+                    if (nodeName.equals(OAR_RESOURCE_TAG)) {
+                        oarSubProcess.setResources(nodeExpandedValue);
+                    } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
+                        String path = getPath(childNode);
+                        oarSubProcess.setScriptLocation(path);
+                    }
+                }
+            }
+        }
+    }
+
+    protected class OARGridProcessExtractor extends ProcessExtractor {
+        public OARGridProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            String queueName = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("queue"));
+
+            OARGRIDSubProcess oarGridSubProcess = ((OARGRIDSubProcess) targetProcess);
+
+            if (queueName != null) {
+                oarGridSubProcess.setQueueName(queueName);
+            }
+
+            String accessProtocol = getNodeExpandedValue(node.getAttributes()
+                                                             .getNamedItem("bookedNodesAccess"));
+
+            if (accessProtocol != null) {
+                oarGridSubProcess.setAccessProtocol(accessProtocol);
+            }
+
+            Node optionNode = (Node) xpath.evaluate("pa:" +
+                    OARGRID_OPTIONS_TAG, node, XPathConstants.NODE);
+            new OARGridOptionsExtractor(oarGridSubProcess, optionNode);
+        }
+
+        protected class OARGridOptionsExtractor {
+            public OARGridOptionsExtractor(
+                OARGRIDSubProcess oarGridSubProcess, Node node)
+                throws SAXException {
+                NodeList childNodes = node.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    Node childNode = childNodes.item(i);
+                    String nodeName = childNode.getNodeName();
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+                    if (nodeName.equals(OAR_RESOURCE_TAG)) {
+                        oarGridSubProcess.setResources(nodeExpandedValue);
+                    } else if (nodeName.equals(OARGRID_WALLTIME_TAG)) {
+                        oarGridSubProcess.setScriptLocation(nodeExpandedValue);
+                    } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
+                        String path = getPath(childNode);
+                        oarGridSubProcess.setScriptLocation(path);
+                    }
+                }
+            }
+        }
+    }
+
+    protected class HierarchicalProcessExtractor extends ProcessExtractor {
+        public HierarchicalProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            String hostName = getNodeExpandedValue(node.getAttributes()
+                                                       .getNamedItem("hostname"));
+            String internalIP = getNodeExpandedValue(node.getAttributes()
+                                                         .getNamedItem("internal_ip"));
+
+            if ((hostName != null) && (internalIP != null)) {
+                HostsInfos.setSecondaryName(hostName, internalIP);
+            }
+
+            NodeList subProcesses = (NodeList) xpath.evaluate("pa:" +
+                    HIERARCHICIAL_REFERENCE_TAG, node, XPathConstants.NODESET);
+            for (int i = 0; i < subProcesses.getLength(); ++i) {
+                Node processNode = subProcesses.item(i);
+                new ProcessExtractor(processNode, node);
             }
         }
     }
