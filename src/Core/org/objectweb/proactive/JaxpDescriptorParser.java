@@ -544,11 +544,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    protected class ProcessExtractor {
+    protected class BasicProcessExtractor {
         protected ExternalProcess targetProcess;
-
-        public ProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public BasicProcessExtractor(Node node, Node context)
+        throws XPathExpressionException, SAXException, ProActiveException {
             // get parent id
             String id = getNodeExpandedValue(node.getParentNode().getAttributes()
                                                  .getNamedItem("id"));
@@ -556,7 +555,16 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             String processClassName = getNodeExpandedValue(node.getAttributes()
                                                                .getNamedItem("class"));
             targetProcess = proActiveDescriptor.createProcess(id,
-                    processClassName);
+                    processClassName);            
+        }
+    }
+    
+    protected class ProcessExtractor extends BasicProcessExtractor {
+
+        public ProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+            
             Node namedItem = node.getAttributes().getNamedItem("closeStream");
             String t = getNodeExpandedValue(namedItem);
             if ((t != null) && t.equals("yes")) {
@@ -594,10 +602,12 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 }
             }
 
-            String[] env = new String[envVars.size()];
-            envVars.toArray(env);
-            targetProcess.setEnvironment(env);
-
+            if (envVars.size() > 0) {
+                String[] env = new String[envVars.size()];
+                envVars.toArray(env);
+                targetProcess.setEnvironment(env);
+            }
+            
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
@@ -1458,7 +1468,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    protected class DependentProcessSequenceExtractor extends ProcessExtractor {
+    protected class DependentProcessSequenceExtractor extends BasicProcessExtractor {
         public DependentProcessSequenceExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
@@ -1483,7 +1493,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    protected class SequentialProcessExtractor extends ProcessExtractor {
+    protected class SequentialProcessExtractor extends BasicProcessExtractor {
         public SequentialProcessExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
