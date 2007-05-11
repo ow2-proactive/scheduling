@@ -82,7 +82,7 @@
 	<classpathentry kind="lib" path="dev/trywithcatch/java-cup-v11a.jar"/>
 	<classpathentry kind="lib" path="dev/trywithcatch/JFlex.jar"/>
 	<classpathentry kind="lib" path="lib/scilab/javasci.jar"/>
-	<classpathentry kind="lib" path="dev/lib/junit-4.1.jar"/>
+	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
