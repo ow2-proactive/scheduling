@@ -58,7 +58,7 @@ public abstract class ComponentTest extends FunctionalTest {
     }
 
     @BeforeClass
-    public static void preConditions() throws Exception {
+    public static void componentPreConditions() throws Exception {
         if (!"enable".equals(ProActiveConfiguration.getInstance()
                                                        .getProperty("proactive.future.ac"))) {
             throw new Exception(
