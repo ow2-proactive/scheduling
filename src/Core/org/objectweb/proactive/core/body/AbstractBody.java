@@ -1026,6 +1026,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.gc.receiveGCMessage(msg);
     }
 
+    /**
+     * Returns true iff an immediate service request is being served now.
+     */
     public abstract boolean isInImmediateService() throws IOException;
 
     //
