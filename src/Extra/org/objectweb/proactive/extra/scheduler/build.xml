@@ -6,5 +6,10 @@
 	
 	<target name="-compile">
 		<compile_extra module="scheduler" />
+		<java classname="${stubgenerator.class}" fork="true">
+			<classpath refid="project.classpath" />
+			<arg line="-srcDir ${cl.extra.dir} -pkg org.objectweb.proactive.extra.scheduler" />
+		</java>
+
 	</target>
 </project>
