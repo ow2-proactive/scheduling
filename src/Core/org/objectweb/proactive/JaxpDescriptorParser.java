@@ -546,8 +546,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
     protected class BasicProcessExtractor {
         protected ExternalProcess targetProcess;
+
         public BasicProcessExtractor(Node node, Node context)
-        throws XPathExpressionException, SAXException, ProActiveException {
+            throws XPathExpressionException, SAXException, ProActiveException {
             // get parent id
             String id = getNodeExpandedValue(node.getParentNode().getAttributes()
                                                  .getNamedItem("id"));
@@ -555,16 +556,15 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             String processClassName = getNodeExpandedValue(node.getAttributes()
                                                                .getNamedItem("class"));
             targetProcess = proActiveDescriptor.createProcess(id,
-                    processClassName);            
+                    processClassName);
         }
     }
-    
-    protected class ProcessExtractor extends BasicProcessExtractor {
 
+    protected class ProcessExtractor extends BasicProcessExtractor {
         public ProcessExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
-            
+
             Node namedItem = node.getAttributes().getNamedItem("closeStream");
             String t = getNodeExpandedValue(namedItem);
             if ((t != null) && t.equals("yes")) {
@@ -607,7 +607,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 envVars.toArray(env);
                 targetProcess.setEnvironment(env);
             }
-            
+
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
@@ -1468,7 +1468,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    protected class DependentProcessSequenceExtractor extends BasicProcessExtractor {
+    protected class DependentProcessSequenceExtractor
+        extends BasicProcessExtractor {
         public DependentProcessSequenceExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
