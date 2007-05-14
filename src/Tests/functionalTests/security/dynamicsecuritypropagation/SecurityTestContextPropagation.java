@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 import functionalTests.FunctionalTest;
 import functionalTests.security.A;
-
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test the dynamic propagation of an application context
@@ -61,7 +61,7 @@ public class SecurityTestContextPropagation extends FunctionalTest {
         A a = (A) ProActive.newActive("functionalTests.security.A",
                 new Object[] {  });
 
-        System.out.println(a.hello("arnaud"));
+        assertTrue("hello".equals(a.hello("hello")));
     }
 
     @Before

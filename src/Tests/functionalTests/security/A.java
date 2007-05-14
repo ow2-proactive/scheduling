@@ -38,8 +38,8 @@ package functionalTests.security;
 public class A {
     public A() {
     }
-    ;
+
     public String hello(String name) {
-        return "hello " + name + " !";
+        return name;
     }
 }
