@@ -30,7 +30,6 @@
  */
 package functionalTests;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
@@ -58,7 +57,7 @@ public abstract class ComponentTest extends FunctionalTest {
         //  super("Components : " + name, description);
     }
 
-    @Before
+    @BeforeClass
     public void preConditions() throws Exception {
         if (!"enable".equals(ProActiveConfiguration.getInstance()
                                                        .getProperty("proactive.future.ac"))) {

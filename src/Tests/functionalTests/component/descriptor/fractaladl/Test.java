@@ -84,7 +84,6 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        System.err.println("TOTOTaction");
         //        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
         //            throw new Exception("automatic continuations are not set");
         //        }
@@ -109,11 +108,9 @@ public class Test extends ComponentTest {
         Fractal.getLifeCycleController(root).startFc();
         Component[] subComponents = Fractal.getContentController(root)
                                            .getFcSubComponents();
-        System.err.println("Comp started");
         for (Component component : subComponents) {
             if ("parallel".equals(Fractal.getNameController(component)
                                              .getFcName())) {
-                System.err.println("Comp started" + component);
                 // invoke method on composite
                 I1Multicast i1Multicast = (I1Multicast) component.getFcInterface(
                         "i1");
