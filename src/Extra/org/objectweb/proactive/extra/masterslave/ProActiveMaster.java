@@ -90,7 +90,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         this();
         try {
             aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
-                    new Object[] { nodes });
+                    new Object[] {  });
+
+            aomaster.addResources(nodes);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -107,7 +109,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         this();
         try {
             aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
-                    new Object[] { descriptorURL, virtualNodeName });
+                    new Object[] {  });
+            aomaster.addResources(descriptorURL, virtualNodeName);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -122,7 +125,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     public ProActiveMaster(VirtualNode virtualNode) {
         try {
             aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
-                    new Object[] { virtualNode });
+                    new Object[] {  });
+            aomaster.addResources(virtualNode);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -348,5 +352,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         }
         removeWrappings(tasks);
         return results;
+    }
+
+    public boolean isAnyResultPending() {
+        return aomaster.isAnyResultPending();
     }
 }

@@ -10,12 +10,12 @@ public class FirstOutQuery extends Query {
         super(n, 0, 0, ~((1 << n) - 1), 0);
     }
 
-    public Long run(SlaveMemory memory) {
+    public long run() {
         Vector v = split(new Vector());
         int n = v.size();
         long r = 0;
         for (int i = 0; i < n; i++) {
-            r += ((Query) v.get(i)).run(memory);
+            r += ((Query) v.get(i)).run();
         }
         return (r);
     }

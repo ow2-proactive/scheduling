@@ -15,8 +15,8 @@ public class DiagQuery extends Query {
         this.scale = s;
     }
 
-    public Long run(SlaveMemory memory) {
-        return new Long(Diag.run(this) * scale);
+    public long run() {
+        return Diag.run(this) * scale;
     }
 
     private DiagQuery next(int q) {

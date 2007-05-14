@@ -17,12 +17,12 @@ public class QueryGenerator {
         long r = 0;
         int n = all.size();
         for (int i = 0; i < n; i++) {
-            r += ((Query) all.get(i)).run(null);
+            r += ((Query) all.get(i)).run();
         }
         System.out.println("" + r);
     }
 
-    public static Vector generateQueries(String[] args) {
+    public static Vector<Query> generateQueries(String[] args) {
         Vector<Query> v = new Vector<Query>();
         v.add(parseArgs(args));
 

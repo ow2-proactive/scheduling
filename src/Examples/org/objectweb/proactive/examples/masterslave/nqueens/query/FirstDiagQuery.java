@@ -14,12 +14,12 @@ public class FirstDiagQuery extends Query {
         scale = s;
     }
 
-    public Long run(SlaveMemory memory) {
+    public long run() {
         Vector v = split(new Vector());
         int n = v.size();
         long r = 0;
         for (int i = 0; i < n; i++) {
-            r += ((Query) v.get(i)).run(memory);
+            r += ((Query) v.get(i)).run();
         }
         return (r);
     }

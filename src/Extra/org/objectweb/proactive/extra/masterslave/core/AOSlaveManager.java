@@ -34,7 +34,6 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,10 +54,9 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin;
-import org.objectweb.proactive.extra.masterslave.util.ConsumerQueue;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider;
 
 
 /**
@@ -78,19 +76,25 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
 
     //	stub on this active object
     protected Object stubOnThis;
-    //	holds the free slaves
-    HashSet<Slave> slaveSet;
     protected long slaveCounter;
     //	holds the virtual nodes, only used to kill the nodes when the active object is closed
     Vector<VirtualNode> vnlist;
 
     // a thread pool used for slave creation
     private ExecutorService threadPool;
-    private ConsumerQueue consumerQueue;
     private boolean isTerminated;
+    private TaskProvider provider;
 
     public AOSlaveManager() {
     } //proactive no arg constructor
+
+    /**
+     *
+     * @param provider
+     */
+    public AOSlaveManager(TaskProvider provider) {
+        this.provider = provider;
+    }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#addResources(java.util.Collection)
@@ -112,7 +116,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                 ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
                 addResources(pad.getVirtualNode(virtualNodeName));
             } catch (Exception e) {
-                logger.error("Couldnt add the specified resources" +
+                logger.error("Couldnt add the specified resources " +
                     e.toString());
             }
         }
@@ -136,8 +140,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                 }
             }
             vnlist.add(virtualnode);
-            logger.debug("Virtual Node " + virtualnode.getName() +
-                " added to slave manager");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Virtual Node " + virtualnode.getName() +
+                    " added to slave manager");
+            }
         }
     }
 
@@ -147,30 +153,18 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      */
     private void createSlave(Node node) {
         try {
-            logger.debug("Creating slave on " +
-                node.getNodeInformation().getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Creating slave on " +
+                    node.getNodeInformation().getName());
+            }
             String slavename = "Slave" + slaveCounter++;
 
-            AOSlave slave = (AOSlave) ProActive.newActive(AOSlave.class.getName(),
-                    new Object[] { slavename }, node);
-
-            logger.debug("Slave " + slavename + " created on " +
-                node.getNodeInformation().getName());
-
-            // we get the next consumer from the queue
-            SlaveConsumer consumer = null;
-            synchronized (consumerQueue) {
-                if (consumerQueue.hasConsumers()) {
-                    consumer = consumerQueue.getNext();
-                }
-            }
-
-            // If there is one consumer we will give him the slave 
-            if (consumer != null) {
-                consumer.receiveSlave(slave);
-            } else {
-                // otherwise, we keep the slave in our pool
-                slaveSet.add(slave);
+            // Creates the slave which will automatically connect to the master
+            ProActive.newActive(AOSlave.class.getName(),
+                new Object[] { slavename, provider }, node);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Slave " + slavename + " created on " +
+                    node.getNodeInformation().getName());
             }
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace(); // bad node
@@ -184,9 +178,11 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      */
     public BooleanWrapper freeSlave(Slave slave) {
         if (!isTerminated) {
-            logger.debug(slave.getName() + " freed.");
-            // we ask the slave to sleep for a while
-            slaveSet.add(slave);
+            if (logger.isDebugEnabled()) {
+                logger.debug(slave.getName() + " freed.");
+            }
+            BooleanWrapper term = slave.terminate();
+            ProActive.waitFor(term);
             return new BooleanWrapper(true);
         }
         return new BooleanWrapper(false);
@@ -200,7 +196,9 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
             for (Slave slave : slavesToFree) {
                 freeSlave(slave);
             }
-            logger.debug(slavesToFree.size() + " slaves Freed.");
+            if (logger.isDebugEnabled()) {
+                logger.debug(slavesToFree.size() + " slaves Freed.");
+            }
             return new BooleanWrapper(true);
         }
         return new BooleanWrapper(false);
@@ -212,8 +210,6 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     public void initActivity(Body body) {
         stubOnThis = ProActive.getStubOnThis();
         slaveCounter = 0;
-        consumerQueue = new ConsumerQueue();
-        slaveSet = new HashSet<Slave>();
         vnlist = new Vector<VirtualNode>();
         isTerminated = false;
         if (logger.isDebugEnabled()) {
@@ -232,27 +228,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager#reserveAllSlaves(org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#setConsumer(org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer)
      */
-    public BooleanWrapper reserveAllSlaves(SlaveConsumer consumer) {
-        if (!isTerminated) {
-            logger.debug("Reserving all slaves.");
-            consumerQueue.addConsumer(consumer, Integer.MAX_VALUE);
-            return new BooleanWrapper(true);
-        }
-        return new BooleanWrapper(false);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager#reserveSlaves(org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer, int)
-     */
-    public BooleanWrapper reserveSlaves(SlaveConsumer consumer, int nbToReserve) {
-        if (!isTerminated) {
-            logger.debug("Reserving " + nbToReserve + " slaves.");
-            consumerQueue.addConsumer(consumer, nbToReserve);
-            return new BooleanWrapper(true);
-        }
-        return new BooleanWrapper(false);
+    public void setTaskProvider(TaskProvider provider) {
+        this.provider = provider;
     }
 
     /* (non-Javadoc)
@@ -260,12 +239,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      */
     public BooleanWrapper terminate(boolean freeResources) {
         isTerminated = true;
-        logger.debug("Terminating SlaveManager...");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Terminating SlaveManager...");
+        }
         try {
-            for (Slave slave : slaveSet) {
-                BooleanWrapper term = slave.terminate(freeResources);
-                ProActive.waitFor(term);
-            }
             for (int i = 0; i < vnlist.size(); i++) {
                 // ((VirtualNodeImpl) vnlist.get(i)).waitForAllNodesCreation();
                 ((VirtualNodeImpl) vnlist.get(i)).removeNodeCreationEventListener(this);
@@ -280,7 +257,9 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
             }
             ProActive.getBodyOnThis().terminate();
             //sucess
-            logger.debug("SlaveManager terminated...");
+            if (logger.isDebugEnabled()) {
+                logger.debug("SlaveManager terminated...");
+            }
             return new BooleanWrapper(true);
         } catch (Exception e) {
             logger.error("Couldnt Terminate the Resource manager" +

@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,7 +53,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -62,7 +60,6 @@ import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.MasterIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveDeadListener;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin;
@@ -77,8 +74,8 @@ import org.objectweb.proactive.extra.masterslave.util.HashSetQueue;
  * Literally : the entity to which an user can submit tasks to be solved
  * @author fviale
  */
-public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
-    InitActive, RunActive, MasterIntern, SlaveDeadListener {
+public class AOMaster implements Serializable, TaskProvider, InitActive,
+    RunActive, MasterIntern, SlaveDeadListener {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
 
     // stub on this active object
@@ -92,9 +89,12 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     protected SlaveWatcher pinger;
 
     // Slaves : effective resources
-    protected int resourceReserved;
     Slave slaveGroupStub;
     Group slaveGroup;
+
+    // Sleeping slaves (we might want to wake them up)
+    Slave sleepingGroupStub;
+    Group sleepingGroup;
     HashMap<String, Slave> slavesByName;
     HashMap<Slave, String> slavesByNameRev;
     HashMap<String, TaskIntern> slavesActivity;
@@ -110,25 +110,7 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     protected HashSetQueue<TaskIntern> completedTasks;
 
     public AOMaster() {
-    }
-
-    /**
-     * Creates a master with a collection of nodes
-     * @param nodes
-     * @throws IllegalArgumentException
-     */
-    public AOMaster(Node[] nodes) throws IllegalArgumentException {
-        try {
-            smanager = (AOSlaveManager) ProActive.newActive(AOSlaveManager.class.getName(),
-                    new Object[] {  });
-            List<Node> nodeList = Arrays.asList(nodes);
-
-            ((SlaveManagerAdmin) smanager).addResources(nodeList);
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
+        // proactive emty no arg constructor
     }
 
     /**
@@ -141,44 +123,6 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
             throw new IllegalArgumentException(new NullPointerException());
         }
         this.smanager = rmanager;
-    }
-
-    /**
-     * Creates a master with a descriptor and some virtual node names
-     * @param descriptorURL
-     * @param virtualNodeNames
-     * @throws IllegalArgumentException
-     */
-    public AOMaster(URL descriptorURL, String virtualNodeName)
-        throws IllegalArgumentException {
-        try {
-            smanager = (AOSlaveManager) ProActive.newActive(AOSlaveManager.class.getName(),
-                    new Object[] {  });
-            ((SlaveManagerAdmin) smanager).addResources(descriptorURL,
-                virtualNodeName);
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Creates a master with a virtual node
-     * @param virtualnode
-     * @throws IllegalArgumentException
-     */
-    public AOMaster(VirtualNode virtualnode) throws IllegalArgumentException {
-        try {
-            smanager = (AOSlaveManager) ProActive.newActive(AOSlaveManager.class.getName(),
-                    new Object[] {  });
-
-            ((SlaveManagerAdmin) smanager).addResources(virtualnode);
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
     }
 
     /* (non-Javadoc)
@@ -230,20 +174,30 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider#getTask(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider#getTask(java.lang.String)
      */
-    public TaskIntern getTask(String originatorName) {
+    public TaskIntern getTask(Slave slave, String slaveName) {
+        // if we don't know him, we record the slave in our system
+        if (!slavesByName.containsKey(slaveName)) {
+            recordSlave(slave, slaveName);
+        }
+
         if (emptyPending()) {
+            slavesActivity.put(slaveName, new TaskWrapperImpl());
+            sleepingGroup.add(slave);
             // we return the null task, this will cause the slave to sleep for a while
             return new TaskWrapperImpl();
         } else {
+            if (sleepingGroup.contains(slave)) {
+                sleepingGroup.remove(slave);
+            }
             Iterator<TaskIntern> it = pendingTasks.iterator();
             TaskIntern wrapper = it.next();
             // We remove the task from the pending list
             it.remove();
             // We add the task inside the launched list
             launchedTasks.add(wrapper);
-            slavesActivity.put(originatorName, wrapper);
+            slavesActivity.put(slaveName, wrapper);
 
             return wrapper;
         }
@@ -255,7 +209,6 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     public void initActivity(Body body) {
         stubOnThis = ProActive.getStubOnThis();
         // General initializations
-        resourceReserved = 0;
         terminated = false;
         // Queues 
         pendingTasks = new HashSetQueue<TaskIntern>();
@@ -267,6 +220,8 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
         try {
             slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
             slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
+            sleepingGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
+            sleepingGroup = ProActiveGroup.getGroup(sleepingGroupStub);
             slavesActivity = new HashMap<String, TaskIntern>();
             slavesByName = new HashMap<String, Slave>();
             slavesByNameRev = new HashMap<Slave, String>();
@@ -276,8 +231,12 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
             e.printStackTrace();
         }
 
-        // The slave pinger
         try {
+            // The resource manager
+            smanager = (AOSlaveManager) ProActive.newActive(AOSlaveManager.class.getName(),
+                    new Object[] { stubOnThis });
+
+            // The slave pinger
             pinger = (SlaveWatcher) ProActive.newActive(AOPinger.class.getName(),
                     new Object[] { stubOnThis });
         } catch (ActiveObjectCreationException e1) {
@@ -285,10 +244,11 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
         } catch (NodeException e1) {
             e1.printStackTrace();
         }
+    }
 
-        // Our resource utilisation strategy is currently brute-force : we reserve as many ressources as available
-        // TODO make a better Resource usage policy
-        smanager.reserveAllSlaves((SlaveConsumer) stubOnThis);
+    public boolean isAnyResultPending() {
+        return !(pendingTasks.isEmpty() && launchedTasks.isEmpty() &&
+        completedTasks.isEmpty());
     }
 
     /* (non-Javadoc)
@@ -296,13 +256,18 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
      */
     public void isDead(Slave slave) {
         String slaveName = slavesByNameRev.get(slave);
-        logger.debug(slaveName + " reported missing... removing it");
+        if (logger.isDebugEnabled()) {
+            logger.debug(slaveName + " reported missing... removing it");
+        }
         if (slaveGroup.contains(slave)) {
             slaveGroup.remove(slave);
+            if (sleepingGroup.contains(slave)) {
+                sleepingGroup.remove(slave);
+            }
             slavesByNameRev.remove(slave);
             slavesByName.remove(slaveName);
             TaskIntern wrapper = slavesActivity.get(slaveName);
-            if (launchedTasks.contains(wrapper)) {
+            if (!wrapper.isNull() && launchedTasks.contains(wrapper)) {
                 launchedTasks.remove(wrapper);
                 pendingTasks.add(wrapper);
             }
@@ -327,25 +292,15 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer#receiveSlave(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
      */
-    public void receiveSlave(Slave slave) {
+    public boolean recordSlave(Slave slave, String slaveName) {
         // We record the slave in our system
-        String slaveName = slave.getName();
         slavesByName.put(slaveName, slave);
         slavesByNameRev.put(slave, slaveName);
         slaveGroup.add(slave);
-        slavesActivity.put(slaveName, new TaskWrapperImpl());
-        // We connect the slave to us
-        slave.setProvider((TaskProvider) stubOnThis);
 
         // We tell the pinger to watch for this new slave
         pinger.addSlaveToWatch(slave);
-
-        // if there is some activity, we wake up the slave
-        if (!emptyPending()) {
-            slave.wakeup();
-        }
-        // One of the previously reserved resource is now available
-        resourceReserved--;
+        return true;
     }
 
     /* (non-Javadoc)
@@ -354,8 +309,10 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (!terminated) {
-            service.serveAll("sendResult");
-            service.serveAll("receiveSlave");
+            service.serveAll("getTask");
+            service.serveAll("sendResultAndGetTask");
+            service.serveAll("isDead");
+
             service.serveAll(new MainFilter());
         }
         try {
@@ -365,18 +322,24 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider#sendResult(org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern, org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider#sendResultAndGetTask(org.objectweb.proactive.extra.masterslave.interfaces.Task,java.lang.String)
      */
-    public void sendResult(TaskIntern task, String originatorName) {
+    public TaskIntern sendResultAndGetTask(TaskIntern task,
+        String originatorName) {
         if (launchedTasks.contains(task)) {
-            logger.debug("Result of task " + task.getId() + " received.");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Result of task " + task.getId() + " received.");
+            }
             launchedTasks.remove(task);
             if (!completedTasks.add(task)) {
                 logger.error("Task is already a completed Task");
             }
-            // This slave is now idle
-            slavesActivity.put(originatorName, new TaskWrapperImpl());
         }
+
+        // We assign a new task to the slave
+        TaskIntern newTask = getTask(slavesByName.get(originatorName),
+                originatorName);
+        return newTask;
     }
 
     /* (non-Javadoc)
@@ -392,7 +355,8 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
     public void solve(TaskIntern task) throws IllegalArgumentException {
         if (emptyPending()) {
             pendingTasks.add(task);
-            slaveGroupStub.wakeup();
+            // We wake up the sleeping guys
+            sleepingGroupStub.wakeup();
         } else {
             pendingTasks.add(task);
         }
@@ -423,7 +387,9 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
      */
     public boolean terminateIntern(boolean freeResources) {
         terminated = true;
-        logger.debug("Terminating Master...");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Terminating Master...");
+        }
 
         // We empty every queues
         pendingTasks.clear();
@@ -448,8 +414,9 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
         // We terminate the slave manager
         ProActive.waitFor(((SlaveManagerAdmin) smanager).terminate(
                 freeResources));
-
-        logger.debug("Master terminated...");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Master terminated...");
+        }
         return true;
     }
 
@@ -458,7 +425,9 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
      */
     public Collection<ResultIntern> waitAllResults()
         throws IllegalStateException, TaskException {
-        logger.debug("All Results received by the user...");
+        if (logger.isDebugEnabled()) {
+            logger.debug("All Results received by the user...");
+        }
         List<ResultIntern> results = new ArrayList<ResultIntern>();
         while (!completedTasks.isEmpty()) {
             results.add(waitOneResult());
@@ -482,8 +451,10 @@ public class AOMaster implements Serializable, TaskProvider, SlaveConsumer,
      */
     public ResultIntern waitResultOf(TaskIntern task)
         throws IllegalArgumentException, TaskException {
-        logger.debug("Result of task " + task.getId() +
-            " retrieved by the user");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Result of task " + task.getId() +
+                " retrieved by the user");
+        }
         Iterator<TaskIntern> it = completedTasks.iterator();
         while (it.hasNext()) {
             TaskIntern candidate = it.next();

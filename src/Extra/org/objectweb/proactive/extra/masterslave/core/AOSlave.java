@@ -88,8 +88,9 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * Creates a slave with the given name
      * @param name
      */
-    public AOSlave(String name) {
+    public AOSlave(String name, TaskProvider provider) {
         this.name = name;
+        this.provider = provider;
     }
 
     /* (non-Javadoc)
@@ -137,9 +138,8 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         stubOnThis = ProActive.getStubOnThis();
 
         try {
-            provider = null;
+            isSleeping = false;
             terminated = false;
-            isSleeping = true;
             body.setImmediateService("getName");
             body.setImmediateService("terminate");
         } catch (IOException e) {
@@ -154,56 +154,87 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         return memory.get(name);
     }
 
+    /**
+     * gets the initial task to solve
+     * @return task
+     */
+    private TaskIntern initialGetTask() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(name + " asks a new task...");
+        }
+
+        // InitialTask
+        TaskIntern currentTask = provider.getTask((Slave) stubOnThis, name);
+        // we make sure that we have the real task object and not a future)
+        currentTask = (TaskIntern) ProActive.getFutureValue(currentTask);
+        return currentTask;
+    }
+
+    /**
+     * Handle a task (run it)
+     * @param task task to run
+     * @return the same task, but containing the result
+     */
+    private TaskIntern handleTask(TaskIntern task) {
+        Serializable result = null;
+
+        // We run the task and listen to exception thrown by the task itself
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug(name + " runs task " + task.getId() + "...");
+            }
+            result = task.run(this);
+        } catch (Exception e) {
+            task.setException(e);
+        }
+        // We store the result inside our internal version of the task
+        task.setResult(result);
+        return task;
+    }
+
     /* (non-Javadoc)
     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
     */
     public void runActivity(Body body) {
         Service service = new Service(body);
+
         while (!terminated) {
-            if ((provider != null) && (!isSleeping)) {
-                logger.debug(name + " asks a new task...");
-                // We ask a new task to the master
-                TaskIntern currentTask = provider.getTask(name);
-                // we make sure that we have the real task object and not a future)
-                currentTask = (TaskIntern) ProActive.getFutureValue(currentTask);
-                // We verify that the task is not a null task (otherwise, we sleep)
-                if (!currentTask.isNull()) {
-                    Serializable result = null;
+            while (!isSleeping) {
+                TaskIntern newTask = initialGetTask();
+                while (!isSleeping) {
+                    // We verify that the task is not a null task (otherwise, we sleep)
+                    if (!newTask.isNull()) {
+                        newTask = handleTask(newTask);
 
-                    // We run the task and listen to exception thrown by the task itself
-                    try {
-                        logger.debug(name + " runs task " +
-                            currentTask.getId() + "...");
-                        result = currentTask.run(this);
-                    } catch (Exception e) {
-                        currentTask.setException(e);
-                    }
-                    // We store the result inside our internal version of the task
-                    currentTask.setResult(result);
-                    if (provider != null) {
-                        logger.debug(name + " sends the result of task " +
-                            currentTask.getId() + "...");
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(name + " sends the result of task " +
+                                newTask.getId() + " and asks a new task...");
+                        }
+
                         // We send the result back to the master
-                        provider.sendResult(currentTask, name);
+                        newTask = provider.sendResultAndGetTask(newTask, name);
+                        newTask = (TaskIntern) ProActive.getFutureValue(newTask);
+                    } else {
+                        // if the task is null, we automatically sleep
+                        isSleeping = true;
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(name + " sleeps...");
+                        }
                     }
-                } else {
-                    // if the task is null, we automatically sleep
-                    isSleeping = true;
-                    logger.debug(name + " sleeps...");
-                }
-            } else {
-                // The Slave is currently sleeping
-                try {
-                    Thread.sleep(SLAVE_CYCLE_TIMEMILLIS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
 
-            // We serve any outstanding request
-            if (!terminated) {
-                service.serveOldest();
+            // The Slave is currently sleeping
+            try {
+                Thread.sleep(SLAVE_CYCLE_TIMEMILLIS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+        }
+
+        // We serve any outstanding request
+        if (!terminated) {
+            service.serveOldest();
         }
     }
 
@@ -215,20 +246,17 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     }
 
     /* (non-Javadoc)
-    * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave#setProvider(org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider)
-    */
-    public void setProvider(TaskProvider provider) {
-        this.provider = provider;
-    }
-
-    /* (non-Javadoc)
     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave#terminate(boolean)
     */
-    public BooleanWrapper terminate(boolean freeResources) {
-        logger.debug("Terminating " + name + "...");
+    public BooleanWrapper terminate() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Terminating " + name + "...");
+        }
         this.terminated = true;
         try {
-            logger.debug(name + " terminated...");
+            if (logger.isDebugEnabled()) {
+                logger.debug(name + " terminated...");
+            }
             ProActive.getBodyOnThis().terminate();
         } catch (IOException e) {
         }
@@ -240,6 +268,8 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      */
     public void wakeup() {
         isSleeping = false;
-        logger.debug(name + " wakes up...");
+        if (logger.isDebugEnabled()) {
+            logger.debug(name + " wakes up...");
+        }
     }
 }

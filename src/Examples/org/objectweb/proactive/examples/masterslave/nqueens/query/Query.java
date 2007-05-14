@@ -3,11 +3,10 @@ package org.objectweb.proactive.examples.masterslave.nqueens.query;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
-public abstract class Query implements Serializable, Task<Long> {
+public abstract class Query implements Serializable {
     public int n;
     public int done;
     public int left;
@@ -61,7 +60,7 @@ public abstract class Query implements Serializable, Task<Long> {
         return (mask(n >>> 1, l - 1) + (((n % 2) == 0) ? "." : "*"));
     }
 
-    public abstract Long run(SlaveMemory memory);
+    public abstract long run();
 
     public abstract Vector split(Vector v);
 

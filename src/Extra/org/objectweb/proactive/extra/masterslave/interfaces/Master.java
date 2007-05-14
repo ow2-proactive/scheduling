@@ -138,6 +138,12 @@ public interface Master<T extends Task<R>, R extends Serializable> {
         throws IllegalArgumentException, TaskException;
 
     /**
+     * Tells if the master still has results to provide (useful in conjunction with waitOneResult)
+     * @return the answer
+     */
+    public boolean isAnyResultPending();
+
+    /**
      * Tells if all results are available <br/>
      * @return the answer
      * @throws IllegalStateException if no task have been submitted

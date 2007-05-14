@@ -56,19 +56,4 @@ public interface SlaveManager {
      * @return acceptation of the request (asynchronous)
      */
     public BooleanWrapper freeSlaves(Collection<Slave> nodes);
-
-    /**
-     * Ask the Slave Manager to reserve all available Slaves
-     * @param consumer the consumer that will be notified of slave availability
-     * @return acceptation of the request (asynchronous)
-     */
-    BooleanWrapper reserveAllSlaves(SlaveConsumer consumer);
-
-    /**
-     * Ask the Slave Manager to reserve a number of Slaves
-     * @param consumer the consumer that will be notified of slave availability
-     * @param nbToReserve number of slaves to reserve
-     * @return acceptation of the request (asynchronous)
-     */
-    BooleanWrapper reserveSlaves(SlaveConsumer consumer, int nbToReserve);
 }

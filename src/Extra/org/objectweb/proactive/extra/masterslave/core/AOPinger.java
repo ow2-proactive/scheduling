@@ -123,13 +123,19 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     }
 
     /**
+     * Reports that a slave is missing
      * @param slave
      */
     public void slaveMissing(Slave slave) {
-        logger.debug("A slave is missing...reporting back to the Master");
-        if (slaveGroup.contains(slave)) {
-            listener.isDead(slave);
-            slaveGroup.remove(slave);
+        synchronized (slaveGroup) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "A slave is missing...reporting back to the Master");
+            }
+            if (slaveGroup.contains(slave)) {
+                listener.isDead(slave);
+                slaveGroup.remove(slave);
+            }
         }
     }
 
@@ -138,7 +144,9 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
      */
     public BooleanWrapper terminate() {
         this.terminated = true;
-        logger.debug("Pinger terminated...");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Pinger terminated...");
+        }
         return new BooleanWrapper(true);
     }
 

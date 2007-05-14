@@ -25,8 +25,8 @@ public class OutQuery extends Query {
         board = b;
     }
 
-    public Long run(SlaveMemory memory) {
-        Long n = new Long(Out.run(this));
+    public long run() {
+        long n = Out.run(this);
 
         //System.out.println(mask(down,this.n)+" "+n);
         return (n);

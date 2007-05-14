@@ -53,17 +53,10 @@ public interface Slave {
     public void heartBeat();
 
     /**
-     * sets a new task provider for this slave
-     * @param provider
-     */
-    public void setProvider(TaskProvider provider);
-
-    /**
      * terminates this slave
-     * @param freeResources tells the slave what to do with its resources
      * @return
      */
-    public BooleanWrapper terminate(boolean freeResources);
+    public BooleanWrapper terminate();
 
     /**
      * Asks the slave to wake up

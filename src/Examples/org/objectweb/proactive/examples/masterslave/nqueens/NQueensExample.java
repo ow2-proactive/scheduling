@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.Vector;
 
 import org.objectweb.proactive.examples.masterslave.nqueens.query.Query;
+import org.objectweb.proactive.examples.masterslave.nqueens.query.QueryExtern;
 import org.objectweb.proactive.examples.masterslave.nqueens.query.QueryGenerator;
+import org.objectweb.proactive.examples.masterslave.util.Pair;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 
@@ -53,38 +55,60 @@ public class NQueensExample {
         init(args);
 
         // Creating the Master
-        ProActiveMaster master = new ProActiveMaster(descriptor_url, vn_name);
+        ProActiveMaster<QueryExtern, Pair<Long, Long>> master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>(descriptor_url,
+                vn_name);
 
-        // Generating the queries for the NQueens
-        Vector<Query> queries = QueryGenerator.generateQueries(nqueen_board_size,
-                nqueen_algorithm_depth);
         System.out.println("Launching NQUEENS solutions finder for n = " +
             nqueen_board_size + " with a depth of " + nqueen_algorithm_depth);
-        master.solveAll(queries);
-        try {
-            long sumResults = 0;
-            long begin = System.currentTimeMillis();
 
-            // Waiting for the results
-            Collection<Long> results = master.waitAllResults();
-            for (long res : results) {
-                sumResults += res;
+        long sumResults = 0;
+        long sumTime = 0;
+        long begin = System.currentTimeMillis();
+
+        // Generating the queries for the NQueens
+        Vector<Query> unresolvedqueries = QueryGenerator.generateQueries(nqueen_board_size,
+                nqueen_algorithm_depth);
+
+        // Splitting Queries
+        while (!unresolvedqueries.isEmpty()) {
+            Query query = unresolvedqueries.remove(0);
+            Vector<Query> splitted = QueryGenerator.splitAQuery(query);
+            if (!splitted.isEmpty()) {
+                for (Query splitquery : splitted) {
+                    master.solve(new QueryExtern(splitquery));
+                }
+            } else {
+                master.solve(new QueryExtern(query));
             }
-            long end = System.currentTimeMillis();
-            int nbslaves = master.slavepoolSize();
-
-            long hours = (end - begin) / 3600000;
-            System.out.println("" + hours +
-                String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
-
-            System.out.println("Total number of configurations found in " +
-                hours + String.format("h %1$tMm %1$tSs %1$tLms", end - begin) +
-                " for n = " + nqueen_board_size + " and with " + nbslaves +
-                " slaves : " + sumResults);
-        } catch (TaskException e) {
-            // Exception in the algorithm
-            e.printStackTrace();
         }
+
+        // Print results on the fly
+        while (master.isAnyResultPending()) {
+            try {
+                Pair<Long, Long> res = master.waitOneResult();
+                sumResults += res.getFirst();
+                sumTime += res.getSecond();
+                System.out.println("Current nb of results : " + sumResults);
+            } catch (TaskException e) {
+                // Exception in the algorithm
+                e.printStackTrace();
+            }
+        }
+
+        // Calculation finished, printing summary and total number of solutions
+        long end = System.currentTimeMillis();
+        int nbslaves = master.slavepoolSize();
+
+        System.out.println("Total number of configurations found for n = " +
+            nqueen_board_size + " and with " + nbslaves + " slaves : " +
+            sumResults);
+        System.out.println("Time needed with " + nbslaves + " slaves : " +
+            ((end - begin) / 3600000) +
+            String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
+        System.out.println("Total slaves calculation time : " +
+            (sumTime / 3600000) +
+            String.format("h %1$tMm %1$tSs %1$tLms", sumTime));
+
         master.terminate(true);
         System.exit(0);
     }

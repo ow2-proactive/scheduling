@@ -48,8 +48,8 @@ public class BaseQuery extends Query {
         super(n, done, left, down, right);
     }
 
-    public Long run(SlaveMemory slave) {
-        return new Long((Base.run(this)));
+    public long run() {
+        return Base.run(this);
     }
 
     public Vector split(Vector v) {
