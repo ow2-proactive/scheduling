@@ -60,6 +60,8 @@ import org.xml.sax.SAXException;
 
 
 public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
+    public static final String JINI_DEFAULT_PORT = "1099";
+
     // variables
     public static final String VARIABLES_DESCRIPTOR = "//pa:descriptorVariable";
     public static final String VARIABLES_PROGRAM = "//pa:programVariable";
@@ -438,7 +440,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             String port = getNodeExpandedValue(portItem);
             if (port == null) {
-                port = "1099";
+                port = JINI_DEFAULT_PORT;
             }
 
             VirtualNodeLookup vn = (VirtualNodeLookup) proActiveDescriptor.createVirtualNode(vnLookup,
@@ -627,9 +629,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                                                              .getNamedItem("value"));
                     targetProcess.setCommandPath(value);
                 } else if (child.getNodeName().equals(FILE_TRANSFER_DEPLOY_TAG)) {
-                    getFileTransfer("deploy", targetProcess, node);
+                    getFileTransfer("deploy", targetProcess, child);
                 } else if (child.getNodeName().equals(FILE_TRANSFER_RETRIEVE_TAG)) {
-                    getFileTransfer("copy", targetProcess, node);
+                    getFileTransfer("copy", targetProcess, child);
                 }
             }
         }
@@ -1486,7 +1488,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList serviceRefs = (NodeList) xpath.evaluate("pa:" +
                     SERVICE_REFERENCE_TAG + "/@refid", node,
                     XPathConstants.NODESET);
-            for (int i = 0; i < processRefs.getLength(); ++i) {
+            for (int i = 0; i < serviceRefs.getLength(); ++i) {
                 Node item = serviceRefs.item(i);
                 proActiveDescriptor.addServiceToSequenceList((DependentListProcess) targetProcess,
                     getNodeExpandedValue(item));
