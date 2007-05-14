@@ -349,11 +349,15 @@
 				<formatter type="xml"/>
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset dir="${cl.test.dir}">
-						<include name="unitTests/**/*.class"/>		
+   						<include name="unitTests/**/*.class"/>
 						<include name="functionalTests/**/*Test*.class"/>
 						<exclude name="functionalTests/security/*/*.class"/>
 						<exclude name="**/*$*.class"/>
 						<exclude name="functionalTests/*.class"/>
+						<exclude name="functionalTests/component/collectiveitf/**/*"/>
+						<exclude name="functionalTests/component/conform/**/*"/>
+						<exclude name="functionalTests/component/lookup/**/*"/>
+						<exclude name="functionalTests/component/migration/**/*"/>
 					</fileset>
 				</batchtest>
 			</junit>
