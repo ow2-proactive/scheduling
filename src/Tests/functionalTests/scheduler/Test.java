@@ -57,7 +57,6 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Launches the scheduler and adds deletes tasks then shutsdown
  */
-@Ignore("See bug #3276")
 public class Test extends FunctionalTest {
     private AdminScheduler adminAPI;
     private SchedulerUserAPI userAPI;
@@ -68,6 +67,7 @@ public class Test extends FunctionalTest {
     private SimpleResourceManager rm;
 
     @org.junit.Test
+    @Ignore("See bug #3276")
     public void action() throws Exception {
         boolean sucessfulTryCatch = true;
         Vector<UserResult> results = null;
