@@ -30,6 +30,9 @@
  */
 package functionalTests.component.conform;
 
+import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -37,34 +40,17 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 import functionalTests.component.conform.components.I;
 
-import junit.framework.TestCase;
 
-
-public class TestTypeFactory extends TestCase {
+public class TestTypeFactory extends Conformtest {
     protected Component boot;
     protected TypeFactory tf;
     protected GenericFactory gf;
 
-    // -------------------------------------------------------------------------
-    // Constructor and setup
-    // -------------------------------------------------------------------------
-    public TestTypeFactory(final String name) {
-        super(name);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        if (!"org.objectweb.proactive.core.component.Fractive".equals(
-                    ProActiveConfiguration.getInstance()
-                                              .getProperty("fractal.provider"))) {
-            ProActiveConfiguration.getInstance()
-                                  .setProperty("fractal.provider",
-                "org.objectweb.proactive.core.component.Fractive");
-        }
+    @Before
+    public void setUp() throws Exception {
         boot = Fractal.getBootstrapComponent();
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
@@ -73,11 +59,13 @@ public class TestTypeFactory extends TestCase {
     // -------------------------------------------------------------------------
     // Test interface types
     // -------------------------------------------------------------------------
+    @Test
     public void testInterfaceType() throws Exception {
         tf.createFcItfType("i", I.class.getName(), false, false, false);
         tf.createFcItfType("i", I.class.getName(), true, false, false);
     }
 
+    @Test
     public void testNoSuchClass() {
         try {
             // no such class
@@ -88,6 +76,7 @@ public class TestTypeFactory extends TestCase {
         }
     }
 
+    @Test
     public void testNotAnInterface() {
         try {
             // not an interface
@@ -102,6 +91,7 @@ public class TestTypeFactory extends TestCase {
     // -------------------------------------------------------------------------
     // Test component types
     // -------------------------------------------------------------------------
+    @Test
     public void testComponentType() throws Exception {
         InterfaceType sType = tf.createFcItfType("s", I.class.getName(), false,
                 false, false);
@@ -115,6 +105,7 @@ public class TestTypeFactory extends TestCase {
         tf.createFcType(new InterfaceType[] { sType, i1Type, i2Type });
     }
 
+    @Test
     public void testBadPrefixes() {
         try {
             // bad prefixes

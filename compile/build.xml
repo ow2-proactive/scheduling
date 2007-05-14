@@ -355,7 +355,6 @@
 						<exclude name="**/*$*.class"/>
 						<exclude name="functionalTests/*.class"/>
 						<exclude name="functionalTests/component/collectiveitf/**/*"/>
-						<exclude name="functionalTests/component/conform/**/*"/>
 						<exclude name="functionalTests/component/lookup/**/*"/>
 						<exclude name="functionalTests/component/migration/**/*"/>
 					</fileset>

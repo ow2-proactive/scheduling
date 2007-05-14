@@ -33,7 +33,8 @@ package functionalTests.component.conform;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -41,12 +42,11 @@ import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.util.Fractal;
 
+import functionalTests.ComponentTest;
 import functionalTests.component.conform.components.I;
 
-import junit.framework.TestCase;
 
-
-public abstract class Conformtest extends TestCase {
+public abstract class Conformtest extends ComponentTest {
     // FcItfName/FcItfSignature/isFcClientItf ^ internal, isFcOptionalItf, isFcCollectionItf
     protected final static String COMP = "component/org.objectweb.proactive.core.component.identity.ProActiveComponent/false,false,false";
     protected final static String BC = "binding-controller/org.objectweb.proactive.core.component.controller.ProActiveBindingController/false,false,false";
@@ -77,10 +77,6 @@ public abstract class Conformtest extends TestCase {
     //  protected final static String SC = "super-controller/org.objectweb.fractal.julia.control.content.SuperControllerNotifier/false,false,false";
     //  protected final static String F = "factory/org.objectweb.fractal.julia.factory.Template/false,false,false";
     protected final static String PKG = "functionalTests.component.conform.components";
-
-    public Conformtest(final String name) {
-        super(name);
-    }
 
     protected void checkInterface(I i) {
         i.m(true);
