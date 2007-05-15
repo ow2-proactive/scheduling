@@ -65,18 +65,4 @@ public class Test extends ComponentTest {
                 new Object[] {  });
         testAO.go();
     }
-
-    private int append(StringBuffer buffer, Message message) {
-        int nb_messages = 0;
-        if (ProActiveGroup.isGroup(message)) {
-            for (int i = 0; i < ProActiveGroup.size(message); i++) {
-                nb_messages += append(buffer,
-                    (Message) ProActiveGroup.get(message, i));
-            }
-        } else {
-            buffer.append(message.getMessage());
-            nb_messages++;
-        }
-        return nb_messages;
-    }
 }
