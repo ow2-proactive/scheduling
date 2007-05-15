@@ -148,7 +148,7 @@ public class Test extends ComponentTest {
             listItf += (string + ", ");
         }
         listItf += "]";
-        System.err.println("listItf" + listItf);
+        Arrays.sort(listFc);
         Assert.assertTrue("Wrong interface list: " + listItf,
             Arrays.equals(listFc, new String[] { "i2_01", "i2_02" }));
 
