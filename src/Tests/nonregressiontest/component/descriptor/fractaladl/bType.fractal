@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
-
-<definition name="nonregressiontest.component.descriptor.fractaladl.bType">
-  <interface signature="nonregressiontest.component.I2" role="server" name="i1"/>
-</definition>
