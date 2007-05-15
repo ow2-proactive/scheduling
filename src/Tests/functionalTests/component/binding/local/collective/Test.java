@@ -142,9 +142,9 @@ public class Test extends ComponentTest {
                .bindFc("i2_02", pB2.getFcInterface("i2"));
 
         // check that listFc() does not return the name of the collective interface
-        Assert.assertTrue("Wrong interface list:" + Fractal.getBindingController(pD1)
-                .listFc(),Arrays.equals(Fractal.getBindingController(pD1)
-                                               .listFc(),
+        Assert.assertTrue("Wrong interface list:" +
+            Fractal.getBindingController(pD1).listFc(),
+            Arrays.equals(Fractal.getBindingController(pD1).listFc(),
                 new String[] { "i2_01", "i2_02" }));
 
         // start them
