@@ -1626,6 +1626,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         NodeList childNodes = classpathNode.getChildNodes();
 
         StringBuffer sb = new StringBuffer();
+        boolean firstParameter = true;
 
         for (int i = 0; i < childNodes.getLength(); ++i) {
             Node subNode = childNodes.item(i);
@@ -1635,8 +1636,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node namedItem = subNode.getAttributes().getNamedItem("value");
             String parameter = getNodeExpandedValue(namedItem);
             if (parameter != null) {
-                if (i != 0) {
+                if (!firstParameter) {
                     sb.append(' ');
+                } else {
+                    firstParameter = false;
                 }
                 sb.append(parameter);
             }
@@ -1651,6 +1654,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         StringBuffer sb = new StringBuffer();
         String pathSeparator = System.getProperty("path.separator");
 
+        boolean firstPathComponent = true;
         for (int i = 0; i < childNodes.getLength(); ++i) {
             Node pathNode = childNodes.item(i);
             if (pathNode.getNodeType() != Node.ELEMENT_NODE) {
@@ -1658,8 +1662,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             }
             String pathElement = expandPath(pathNode);
 
-            if (i != 0) {
+            if (!firstPathComponent) {
                 sb.append(pathSeparator);
+            } else {
+                firstPathComponent = false;
             }
             sb.append(pathElement);
         }
