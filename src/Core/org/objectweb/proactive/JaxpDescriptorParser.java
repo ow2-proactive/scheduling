@@ -61,6 +61,8 @@ import org.xml.sax.SAXException;
 
 public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     public static final String JINI_DEFAULT_PORT = "1099";
+    public static final String XMLNS_PREFIX = "pa:";
+    public static final String MAIN_DEFINITIONS = "//pa:mainDefinition";
 
     // variables
     public static final String VARIABLES_DESCRIPTOR = "//pa:descriptorVariable";
@@ -123,6 +125,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             handleVariables();
 
+            handleMainDefinitions();
+
             handleComponentDefinitions();
 
             handleDeployment();
@@ -134,6 +138,59 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             throw new ProActiveException(e);
         } catch (XPathExpressionException e) {
             throw new ProActiveException(e);
+        }
+    }
+
+    private void handleMainDefinitions()
+        throws XPathExpressionException, SAXException {
+        NodeList nodes = (NodeList) xpath.evaluate(MAIN_DEFINITIONS, document,
+                XPathConstants.NODESET);
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            Node node = nodes.item(i);
+            String id = getNodeExpandedValue(node.getAttributes()
+                                                 .getNamedItem("id"));
+            String className = getNodeExpandedValue(node.getAttributes()
+                                                        .getNamedItem("class"));
+
+            if (className == null) {
+                throw new org.xml.sax.SAXException(
+                    "class Tag without any mainDefinition defined");
+            }
+            proActiveDescriptor.createMainDefinition(id);
+
+            proActiveDescriptor.setMainDefined(true);
+            proActiveDescriptor.mainDefinitionSetMainClass(className);
+
+            // process args
+            NodeList argNodes = (NodeList) xpath.evaluate(XMLNS_PREFIX +
+                    ARG_TAG + "/@value", node, XPathConstants.NODESET);
+            for (int j = 0; j < argNodes.getLength(); ++j) {
+                Node argNode = argNodes.item(j);
+                String argVal = getNodeExpandedValue(argNode);
+                if (argVal == null) {
+                    throw new org.xml.sax.SAXException(
+                        "value Tag without any arg defined");
+                }
+                proActiveDescriptor.mainDefinitionAddParameter(argVal);
+            }
+
+            // process mapToVirtualNodes
+            NodeList mapNodes = (NodeList) xpath.evaluate(XMLNS_PREFIX +
+                    MAP_TO_VIRTUAL_NODE_TAG + "/@value", node,
+                    XPathConstants.NODESET);
+            for (int j = 0; j < mapNodes.getLength(); ++j) {
+                Node mapNode = mapNodes.item(j);
+                String virtualNode = getNodeExpandedValue(mapNode);
+                if (virtualNode == null) {
+                    throw new org.xml.sax.SAXException(
+                        "value Tag without any mapToVirtualNode defined");
+                }
+
+                VirtualNode vn = (VirtualNode) proActiveDescriptor.createVirtualNode(virtualNode,
+                        false, true);
+
+                proActiveDescriptor.mainDefinitionAddVirtualNode(vn);
+            }
         }
     }
 
@@ -157,8 +214,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             // process args
             Map<String, String> argsMap = new Hashtable<String, String>();
-            NodeList args = (NodeList) xpath.evaluate("pa:arg", node,
-                    XPathConstants.NODESET);
+            NodeList args = (NodeList) xpath.evaluate(XMLNS_PREFIX + ARG_TAG,
+                    node, XPathConstants.NODESET);
             for (int j = 0; j < args.getLength(); ++j) {
                 Node argNode = args.item(j);
                 String argName = getNodeExpandedValue(argNode.getAttributes()
@@ -816,8 +873,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 ((LSFBSubProcess) targetProcess).setJobname(t);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" + BSUB_OPTIONS_TAG,
-                    node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    BSUB_OPTIONS_TAG, node, XPathConstants.NODE);
             if (optionNode != null) {
                 new BSubOptionsExtractor(targetProcess, optionNode);
             }
@@ -853,8 +910,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
 
-            Node optionNode = (Node) xpath.evaluate("pa:" + BSUB_OPTIONS_TAG,
-                    node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    GLOBUS_OPTIONS_TAG, node, XPathConstants.NODE);
             new GlobusOptionsExtractor(targetProcess, optionNode);
         }
 
@@ -1176,8 +1233,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 ((PrunSubProcess) targetProcess).setQueueName(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" + PRUN_OPTIONS_TAG,
-                    node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    PRUN_OPTIONS_TAG, node, XPathConstants.NODE);
             new PrunOptionsExtractor((PrunSubProcess) targetProcess, optionNode);
         }
 
@@ -1223,8 +1280,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 pbsSubProcess.setQueueName(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" + PBS_OPTIONS_TAG,
-                    node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    PBS_OPTIONS_TAG, node, XPathConstants.NODE);
             new PbsOptionsExtractor(pbsSubProcess, optionNode);
         }
 
@@ -1266,7 +1323,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 gridEngineSubProcess.setQueueName(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" +
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
                     GRID_ENGINE_OPTIONS_TAG, node, XPathConstants.NODE);
             new GridEngineOptionsExtractor(gridEngineSubProcess, optionNode);
         }
@@ -1326,8 +1383,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 oarSubProcess.setAccessProtocol(accessProtocol);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" + OAR_OPTIONS_TAG,
-                    node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    OAR_OPTIONS_TAG, node, XPathConstants.NODE);
             new OAROptionsExtractor(oarSubProcess, optionNode);
         }
 
@@ -1370,7 +1427,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 oarGridSubProcess.setAccessProtocol(accessProtocol);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" +
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
                     OARGRID_OPTIONS_TAG, node, XPathConstants.NODE);
             new OARGridOptionsExtractor(oarGridSubProcess, optionNode);
         }
@@ -1410,7 +1467,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 HostsInfos.setSecondaryName(hostName, internalIP);
             }
 
-            NodeList subProcessesRefIds = (NodeList) xpath.evaluate("pa:" +
+            NodeList subProcessesRefIds = (NodeList) xpath.evaluate(XMLNS_PREFIX +
                     HIERARCHICIAL_REFERENCE_TAG + "/@refid", node,
                     XPathConstants.NODESET);
             for (int i = 0; i < subProcessesRefIds.getLength(); ++i) {
@@ -1442,7 +1499,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 mpiProcess.setMpiCommandOptions(mpiCommandOptions);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" +
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
                     MPI_PROCESS_OPTIONS_TAG, node, XPathConstants.NODE);
             new MPIOptionsExtractor(mpiProcess, optionNode);
         }
@@ -1476,7 +1533,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
 
-            NodeList processRefs = (NodeList) xpath.evaluate("pa:" +
+            NodeList processRefs = (NodeList) xpath.evaluate(XMLNS_PREFIX +
                     PROCESS_REFERENCE_TAG + "/@refid", node,
                     XPathConstants.NODESET);
             for (int i = 0; i < processRefs.getLength(); ++i) {
@@ -1485,7 +1542,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     getNodeExpandedValue(item));
             }
 
-            NodeList serviceRefs = (NodeList) xpath.evaluate("pa:" +
+            NodeList serviceRefs = (NodeList) xpath.evaluate(XMLNS_PREFIX +
                     SERVICE_REFERENCE_TAG + "/@refid", node,
                     XPathConstants.NODESET);
             for (int i = 0; i < serviceRefs.getLength(); ++i) {
@@ -1500,7 +1557,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         public SequentialProcessExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
-            NodeList processRefs = (NodeList) xpath.evaluate("pa:" +
+            NodeList processRefs = (NodeList) xpath.evaluate(XMLNS_PREFIX +
                     PROCESS_REFERENCE_TAG + "/@refid", node,
                     XPathConstants.NODESET);
             for (int i = 0; i < processRefs.getLength(); ++i) {
@@ -1529,8 +1586,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 ngProcess.setQueue(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate("pa:" + NG_OPTIONS_TAG,
-                    node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    NG_OPTIONS_TAG, node, XPathConstants.NODE);
             new NGOptionsExtractor(ngProcess, optionNode);
         }
 
