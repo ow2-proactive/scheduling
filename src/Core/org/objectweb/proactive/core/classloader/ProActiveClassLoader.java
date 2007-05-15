@@ -134,7 +134,7 @@ public class ProActiveClassLoader extends URLClassLoader {
                 name.startsWith("sun.") || name.startsWith("com.sun.") ||
                 name.startsWith("org.xml.sax") || name.startsWith("org.omg") ||
                 name.startsWith("org.ietf.jgss") ||
-                name.startsWith("org.w3c.dom")) {
+                name.startsWith("org.w3c.dom") || name.startsWith("com.ibm")) {
             return getParent().loadClass(name);
         }
         if (name.equals("org.objectweb.proactive.core.ssh.http.Handler")) {
