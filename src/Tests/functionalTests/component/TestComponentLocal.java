@@ -28,6 +28,35 @@ public class TestComponentLocal extends ComponentTest {
     private static Component c1;
     private static Component c2;
 
+    /**
+     * @author Matthieu Morel
+     *
+     * Step 1. Creation of the components
+     *
+     * Creates the following components :
+     *
+     *                 __________________
+     *                 |                                                                        |                                        ________
+     *                 |                                                                        |                                        |                                |
+     *         i1        |                                                                        |i2                         i2        |        (p2)                |
+     *                 |                                                                        |                                        |_______|
+     *                 |                                                                        |
+     *                 |_(c1)______________|
+     *
+     *                 __________________
+     *                 |                                                                        |                                        ________
+     *                 |                                                                        |                                        |                                |
+     *         i1        |                                                                        |i2                         i1        |        (p1)                |i2
+     *                 |                                                                        |                                        |_______|
+     *                 |                                                                        |
+     *                 |_(c2)_____________|
+     *
+     *         where :
+     *                 (c1) and (c2) are composites, (p1) and (p2) are primitive components
+     *                 i1 represents an interface of type I1
+     *                 i2 represents an interface of type I2
+     *
+     */
     @org.junit.Test
     public void testCreationNewactiveComposite() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
@@ -80,6 +109,28 @@ public class TestComponentLocal extends ComponentTest {
         //            "p2:" + p2);
     }
 
+    /**
+     * @author Matthieu Morel
+     *
+     * Step 2 : assembles the following component system :
+     *
+     *                 ___________________________
+     *                 |                __________________                |
+     *                 |                |                        ______                        |                |                                                ________
+     *                 |                |                        |                        |                        |                |                                                |                                |
+     *         i1 | i1  |    i1        |(p1)        |i2            |i2   | i2           i2        |        (p2)                |
+     *                 |                |                        |_____|                        |                |                                                |                                |
+     *                 |                |                                                                        |                |                                                |_______|
+     *                 |                |_(c1)_____________|                |
+     *                 |                                                                                                        |
+     *                 |__(c2)____________________|
+     *
+     *         where :
+     *                 (c2) and (c1) are composite components, (p1) and (p2) are primitive components
+     *                 i1 represents an interface of type I1
+     *                 i2 represents an interface of type I2
+     *
+     */
     @org.junit.Test
     public void testAssemblyLocalComposite() throws Exception {
         //        System.err.println("ASSEMBLY c1:" + c1 + "c2:" + c2 + "p1:" + p1 +
@@ -111,6 +162,24 @@ public class TestComponentLocal extends ComponentTest {
         Assert.assertTrue(Arrays.equals(c1SubComponents, c1_sub_components));
     }
 
+    /**
+     * @author Matthieu Morel
+     *
+     * Step 3 : bindings, life cycle start, interface method invocation
+     *
+     *                 ___________________________
+     *                 |                __________________                |
+     *                 |                |                        ______                        |                |                                                ________
+     *                 |                |                        |                        |                        |                |                                                |                                |
+     *         i1-|-i1-|----i1        |(p1)        |i2----        |i2 --|-i2----------i2        |        (p2)                |
+     *                 |                |                        |_____|                        |                |                                                |                                |
+     *                 |                |                                                                        |                |                                                |_______|
+     *                 |                |_(c1)_____________|                |
+     *                 |                                                                                                        |
+     *                 |__(c2)____________________|
+     *
+     *
+     */
     @org.junit.Test
     public void testBindingLocalComposite() throws Exception {
         // BINDING
