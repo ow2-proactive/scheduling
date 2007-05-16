@@ -125,6 +125,7 @@ public class TestComponentRemote extends ComponentTest {
      */
     @org.junit.Test
     public void testAssemblyRemoteComposite() throws Exception {
+        new TestComponentRemote().testCreationNewactiveComposite();
         // ASSEMBLY
         Fractal.getContentController(c1).addFcSubComponent(p1);
         Fractal.getContentController(c2).addFcSubComponent(c1);
@@ -160,6 +161,7 @@ public class TestComponentRemote extends ComponentTest {
      */
     @org.junit.Test
     public void testBindingRemoteComposite() throws Exception {
+        new TestComponentRemote().testAssemblyRemoteComposite();
         // BINDING
         Fractal.getBindingController(c2).bindFc("i1", c1.getFcInterface("i1"));
         Fractal.getBindingController(c1).bindFc("i1", p1.getFcInterface("i1"));

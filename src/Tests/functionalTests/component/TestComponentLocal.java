@@ -133,6 +133,7 @@ public class TestComponentLocal extends ComponentTest {
      */
     @org.junit.Test
     public void testAssemblyLocalComposite() throws Exception {
+        new TestComponentLocal().testCreationNewactiveComposite();
         //        System.err.println("ASSEMBLY c1:" + c1 + "c2:" + c2 + "p1:" + p1 +
         //            "p2:" + p2);
         // ASSEMBLY
@@ -182,6 +183,7 @@ public class TestComponentLocal extends ComponentTest {
      */
     @org.junit.Test
     public void testBindingLocalComposite() throws Exception {
+        new TestComponentLocal().testAssemblyLocalComposite();
         // BINDING
         Fractal.getBindingController(c2).bindFc("i1", c1.getFcInterface("i1"));
         Fractal.getBindingController(c1).bindFc("i1", p1.getFcInterface("i1"));
