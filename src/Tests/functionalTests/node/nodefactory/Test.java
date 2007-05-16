@@ -47,21 +47,15 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private static final long serialVersionUID = -303170046021003591L;
     Node rmiNode;
-    Node jiniNode;
     private String rmiURL;
-    private String jiniURL = "jini://localhost/JININode" +
-        System.currentTimeMillis();
 
     @org.junit.Test
     public void action() throws Exception {
         NodeFactory.createNode(rmiURL);
-        NodeFactory.createNode(jiniURL);
         //        NodeFactory.createNode("ibis://localhost/IBISNode");
         rmiNode = NodeFactory.getNode(rmiURL);
-        jiniNode = NodeFactory.getNode(jiniURL);
         //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
-        assertTrue((rmiNode != null) && (jiniNode != null) &&
-            NodeFactory.isNodeLocal(rmiNode));
+        assertTrue((rmiNode != null) && NodeFactory.isNodeLocal(rmiNode));
     }
 
     @Before
@@ -83,6 +77,5 @@ public class Test extends FunctionalTest {
     @After
     public void endTest() throws Exception {
         NodeFactory.killNode(rmiURL);
-        NodeFactory.killNode(jiniURL);
     }
 }
