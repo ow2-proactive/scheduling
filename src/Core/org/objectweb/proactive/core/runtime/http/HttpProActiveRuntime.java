@@ -48,8 +48,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -406,7 +406,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         }
     }
 
-    public VirtualNode getVirtualNode(String virtualNodeName)
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
             return localruntime.getVirtualNode(virtualNodeName);
@@ -420,7 +420,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         req.send();
 
         try {
-            return (VirtualNode) req.getReturnedObject();
+            return (VirtualNodeInternal) req.getReturnedObject();
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
@@ -660,7 +660,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         }
     }
 
-    public ProActiveDescriptor getDescriptor(String url,
+    public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException {
         if (isLocal) {
             return localruntime.getDescriptor(url, isHierarchicalSearch);
@@ -675,7 +675,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         req.send();
 
         try {
-            return (ProActiveDescriptor) req.getReturnedObject();
+            return (ProActiveDescriptorInternal) req.getReturnedObject();
         } catch (Exception e) {
             throw new ProActiveException(e);
         }

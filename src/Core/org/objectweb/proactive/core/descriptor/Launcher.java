@@ -36,8 +36,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.MainDefinition;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * @author ProActive team
  */
 public class Launcher {
-    private ProActiveDescriptor pad;
+    private ProActiveDescriptorInternal pad;
     private boolean activated;
 
     /**
@@ -99,9 +99,9 @@ public class Launcher {
         // launch the main classes
         for (int i = 0; i < mainDefinitions.length; i++) {
             MainDefinition mainDefinition = mainDefinitions[i];
-            VirtualNode[] virtualNodes = mainDefinition.getVirtualNodes();
+            VirtualNodeInternal[] virtualNodes = mainDefinition.getVirtualNodes();
             for (int j = 0; j < virtualNodes.length; j++) {
-                VirtualNode virtualNode = virtualNodes[j];
+                VirtualNodeInternal virtualNode = virtualNodes[j];
                 Node node = virtualNode.getNode();
 
                 ProActive.newMain(mainDefinition.getMainClass(),
@@ -115,7 +115,7 @@ public class Launcher {
      * return the launcher's pad
      * @return ProActiveDescriptor
      */
-    public ProActiveDescriptor getProActiveDescriptor() {
+    public ProActiveDescriptorInternal getProActiveDescriptor() {
         return pad;
     }
 

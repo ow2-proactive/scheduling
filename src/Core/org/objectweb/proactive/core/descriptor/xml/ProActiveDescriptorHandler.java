@@ -37,8 +37,8 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
@@ -59,7 +59,7 @@ import org.xml.sax.SAXException;
  */
 public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     implements ProActiveDescriptorConstants {
-    protected ProActiveDescriptor proActiveDescriptor;
+    protected ProActiveDescriptorInternal proActiveDescriptor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -333,9 +333,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
      * This class receives virtualNode events
      */
     private class VirtualNodeHandler extends BasicUnmarshaller {
-        private ProActiveDescriptor pad;
+        private ProActiveDescriptorInternal pad;
 
-        private VirtualNodeHandler(ProActiveDescriptor pad) {
+        private VirtualNodeHandler(ProActiveDescriptorInternal pad) {
             this.pad = pad;
         }
 
@@ -438,9 +438,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
      * This class receives Security events
      */
     private class SecurityHandler extends AbstractUnmarshallerDecorator {
-        private ProActiveDescriptor proActiveDescriptor;
+        private ProActiveDescriptorInternal proActiveDescriptor;
 
-        public SecurityHandler(ProActiveDescriptor proActiveDescriptor) {
+        public SecurityHandler(ProActiveDescriptorInternal proActiveDescriptor) {
             super();
             this.proActiveDescriptor = proActiveDescriptor;
             this.addHandler(SECURITY_FILE_TAG,
@@ -465,9 +465,10 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
      * This class receives Security events
      */
     private class SecurityFileHandler extends BasicUnmarshaller {
-        private ProActiveDescriptor proActiveDescriptor;
+        private ProActiveDescriptorInternal proActiveDescriptor;
 
-        public SecurityFileHandler(ProActiveDescriptor proActiveDescriptor) {
+        public SecurityFileHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super();
             this.proActiveDescriptor = proActiveDescriptor;
         }

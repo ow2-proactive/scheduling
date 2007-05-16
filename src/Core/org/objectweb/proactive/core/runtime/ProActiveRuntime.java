@@ -40,8 +40,8 @@ import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -237,7 +237,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * does not exist, or has not been yet activated.
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public VirtualNode getVirtualNode(String virtualNodeName)
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName)
         throws ProActiveException;
 
     /**
@@ -387,7 +387,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * @throws ProActiveException
      * @throws IOException
      */
-    public ProActiveDescriptor getDescriptor(String url,
+    public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException;
 
     /**

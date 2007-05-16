@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueRuntimeID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -191,7 +191,7 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
     /**
      * @see ProActiveRuntime#getVirtualNode(String)
      */
-    public VirtualNode getVirtualNode(UniqueRuntimeID urid,
+    public VirtualNodeInternal getVirtualNode(UniqueRuntimeID urid,
         String virtualNodeName) throws ProActiveException;
 
     /**
@@ -317,8 +317,9 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
     public String getVNName(UniqueRuntimeID urid, String Nodename)
         throws ProActiveException;
 
-    public ProActiveDescriptor getDescriptor(UniqueRuntimeID urid, String url,
-        boolean isHierarchicalSearch) throws IOException, ProActiveException;
+    public ProActiveDescriptorInternal getDescriptor(UniqueRuntimeID urid,
+        String url, boolean isHierarchicalSearch)
+        throws IOException, ProActiveException;
 
     // Interface: Job
     public String getJobID(UniqueRuntimeID urid);

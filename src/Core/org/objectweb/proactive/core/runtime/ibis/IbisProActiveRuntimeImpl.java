@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -245,7 +245,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getActiveObjects(nodeName, objectName);
     }
 
-    public VirtualNode getVirtualNode(String virtualNodeName)
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName)
         throws RemoteException, ProActiveException {
         return proActiveRuntime.getVirtualNode(virtualNodeName);
     }
@@ -418,7 +418,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.newRemote(className);
     }
 
-    public ProActiveDescriptor getDescriptor(String url,
+    public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException {
         return proActiveRuntime.getDescriptor(url, isHierarchicalSearch);
     }

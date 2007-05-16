@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.event;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.node.Node;
 public class NodeCreationEvent extends ProActiveEvent {
     public static final int NODE_CREATED = 10;
     protected Node node;
-    protected VirtualNode vn;
+    protected VirtualNodeInternal vn;
     protected int nodeCreated;
 
     /**
@@ -57,8 +57,8 @@ public class NodeCreationEvent extends ProActiveEvent {
      * @param node the newly created node
      * @param nodeCreated the number of nodes already created
      */
-    public NodeCreationEvent(VirtualNode vn, int messageType, Node node,
-        int nodeCreated) {
+    public NodeCreationEvent(VirtualNodeInternal vn, int messageType,
+        Node node, int nodeCreated) {
         super(vn, messageType);
         this.node = node;
         this.vn = vn;
@@ -75,7 +75,7 @@ public class NodeCreationEvent extends ProActiveEvent {
     /**
      * @return Returns the vn.
      */
-    public VirtualNode getVirtualNode() {
+    public VirtualNodeInternal getVirtualNode() {
         return vn;
     }
 

@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -254,7 +254,7 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroup(String className, Object[][] params,
-        VirtualNode virtualNode)
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroup(className, params, virtualNode.getNodes());
@@ -300,7 +300,7 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroup(String className, Object[] params,
-        VirtualNode virtualNode)
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroup(className, params, virtualNode.getNodes());
@@ -515,7 +515,7 @@ public class ProActiveGroup {
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
-        Object[][] params, VirtualNode virtualNode)
+        Object[][] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroupBuiltWithMultithreading(className,
@@ -590,7 +590,7 @@ public class ProActiveGroup {
      */
     @Deprecated
     public static Object newGroupBuiltWithMultithreading(String className,
-        Object[] params, VirtualNode virtualNode)
+        Object[] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroupBuiltWithMultithreading(className,
@@ -671,7 +671,7 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroupInParallel(String className,
-        Object[][] params, VirtualNode virtualNode)
+        Object[][] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return newGroupInParallel(className, null, params, virtualNode);
@@ -730,7 +730,7 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroupInParallel(String className, Object[] params,
-        VirtualNode virtualNode)
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroupInParallel(className, null, params,
@@ -823,7 +823,8 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[][] params, VirtualNode virtualNode)
+        Class[] genericParameters, Object[][] params,
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroupInParallel(className, genericParameters,
@@ -893,7 +894,8 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroupInParallel(String className,
-        Class[] genericParameters, Object[] params, VirtualNode virtualNode)
+        Class[] genericParameters, Object[] params,
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroupInParallel(className, genericParameters,
@@ -1038,7 +1040,7 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroup(String className, Class[] genericParameters,
-        Object[][] params, VirtualNode virtualNode)
+        Object[][] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroup(className, genericParameters, params,
@@ -1088,7 +1090,7 @@ public class ProActiveGroup {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroup(String className, Class[] genericParameters,
-        Object[] params, VirtualNode virtualNode)
+        Object[] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProActiveGroup.newGroup(className, genericParameters, params,

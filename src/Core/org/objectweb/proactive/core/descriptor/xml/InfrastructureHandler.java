@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 
@@ -49,7 +49,8 @@ class InfrastructureHandler extends PassiveCompositeUnmarshaller
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
-    public InfrastructureHandler(ProActiveDescriptor proActiveDescriptor) {
+    public InfrastructureHandler(
+        ProActiveDescriptorInternal proActiveDescriptor) {
         super(false);
         CollectionUnmarshaller ch = new CollectionUnmarshaller();
         ch.addHandler(PROCESS_DEFINITION_TAG,

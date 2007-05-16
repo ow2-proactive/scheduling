@@ -24,8 +24,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
@@ -186,7 +186,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         "value Tag without any mapToVirtualNode defined");
                 }
 
-                VirtualNode vn = (VirtualNode) proActiveDescriptor.createVirtualNode(virtualNode,
+                VirtualNodeInternal vn = (VirtualNodeInternal) proActiveDescriptor.createVirtualNode(virtualNode,
                         false, true);
 
                 proActiveDescriptor.mainDefinitionAddVirtualNode(vn);
@@ -442,7 +442,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         // set the VM mappings to each virtual node
         //
         for (String s : vmMapping.keySet()) {
-            VirtualNode vn = proActiveDescriptor.createVirtualNode(s, false);
+            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(s,
+                    false);
             for (String vmName : vmMapping.get(s)) {
                 VirtualMachine vm = proActiveDescriptor.createVirtualMachine(vmName);
                 vn.addVirtualMachine(vm);
@@ -458,7 +459,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node mapParent = node.getParentNode().getParentNode();
             String virtualNodeName = getNodeExpandedValue(mapParent.getAttributes()
                                                                    .getNamedItem("virtualNode"));
-            VirtualNode vn = proActiveDescriptor.createVirtualNode(virtualNodeName,
+            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNodeName,
                     false);
             Node protocolAttr = node.getAttributes().getNamedItem("protocol");
             String protocol = getNodeExpandedValue(protocolAttr);

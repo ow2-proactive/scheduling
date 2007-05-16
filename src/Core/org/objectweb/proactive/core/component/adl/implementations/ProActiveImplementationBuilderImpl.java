@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
 import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -107,7 +107,8 @@ public class ProActiveImplementationBuilderImpl
     protected ObjectsContainer commonCreation(Object type, String name,
         String definition, ContentDescription contentDesc, VirtualNode adlVN,
         Map context) throws Exception {
-        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN = null;
+        org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN =
+            null;
         Component bootstrap = null;
         if (context != null) {
             bootstrap = (Component) ((Map) context).get("bootstrap");
@@ -133,8 +134,9 @@ public class ProActiveImplementationBuilderImpl
                     adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
             }
             if (context.get("deployment-descriptor") != null) {
-                deploymentVN = ((ProActiveDescriptor) context.get(
-                        "deployment-descriptor")).getVirtualNode(adlVN.getName());
+                deploymentVN = ((ProActiveDescriptorInternal) context
+                                .get("deployment-descriptor")).getVirtualNode(adlVN.getName())
+                                .getVirtualNodeInternal();
                 if (deploymentVN == null) {
                     if (adlVN.getName().equals("null")) {
                         logger.info(name +
@@ -163,7 +165,7 @@ public class ProActiveImplementationBuilderImpl
     }
 
     private Component createFComponent(Object type,
-        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
+        org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN,
         ControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Component bootstrap) throws Exception {
         Component result;
@@ -185,17 +187,17 @@ public class ProActiveImplementationBuilderImpl
     }
 
     protected class ObjectsContainer {
-        private org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN;
+        private org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN;
         private Component bootstrap;
 
         public ObjectsContainer(
-            org.objectweb.proactive.core.descriptor.data.VirtualNode dVn,
+            org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal dVn,
             Component bstrp) {
             deploymentVN = dVn;
             bootstrap = bstrp;
         }
 
-        public org.objectweb.proactive.core.descriptor.data.VirtualNode getDvn() {
+        public org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal getDvn() {
             return deploymentVN;
         }
 

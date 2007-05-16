@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.descriptor.xml;
 import java.util.StringTokenizer;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -72,10 +72,11 @@ import org.xml.sax.SAXException;
 public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     implements ProActiveDescriptorConstants {
     protected String id;
-    protected ProActiveDescriptor proActiveDescriptor;
+    protected ProActiveDescriptorInternal proActiveDescriptor;
     protected ExternalProcess targetProcess;
 
-    public ProcessDefinitionHandler(ProActiveDescriptor proActiveDescriptor) {
+    public ProcessDefinitionHandler(
+        ProActiveDescriptorInternal proActiveDescriptor) {
         super(false);
         this.proActiveDescriptor = proActiveDescriptor;
         this.addHandler(JVM_PROCESS_TAG,
@@ -160,10 +161,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     public class ProcessHandler extends AbstractUnmarshallerDecorator
         implements ProActiveDescriptorConstants {
-        protected ProActiveDescriptor proActiveDescriptor;
+        protected ProActiveDescriptorInternal proActiveDescriptor;
         protected boolean isRef;
 
-        public ProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public ProcessHandler(ProActiveDescriptorInternal proActiveDescriptor) {
             super();
             this.proActiveDescriptor = proActiveDescriptor;
             addHandler(ENVIRONMENT_TAG, new EnvironmentHandler());
@@ -414,7 +415,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     public class ProcessListHandler extends ProcessHandler
         implements ProActiveDescriptorConstants {
-        public ProcessListHandler(ProActiveDescriptor proActiveDescriptor) {
+        public ProcessListHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
         }
 
@@ -478,7 +480,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     //end of inner class ProcessHandler
     protected class PrunProcessHandler extends ProcessHandler {
-        public PrunProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public PrunProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(PRUN_OPTIONS_TAG, new PrunOptionHandler());
 
@@ -557,7 +560,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     }
 
     protected class PBSProcessHandler extends ProcessHandler {
-        public PBSProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public PBSProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(PBS_OPTIONS_TAG, new PBSOptionHandler());
         }
@@ -628,7 +632,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     }
 
     protected class GridEngineProcessHandler extends ProcessHandler {
-        public GridEngineProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public GridEngineProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(GRID_ENGINE_OPTIONS_TAG,
                 new GridEngineOptionHandler());
@@ -697,7 +702,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     protected class ClusterForkProcessHandler extends ProcessHandler {
         public ClusterForkProcessHandler(
-            ProActiveDescriptor proActiveDescriptor) {
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
         }
 
@@ -709,7 +714,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     }
 
     protected class OARProcessHandler extends ProcessHandler {
-        public OARProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public OARProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(OAR_OPTIONS_TAG, new OAROptionHandler());
         }
@@ -782,7 +788,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     }
 
     protected class OARGRIDProcessHandler extends ProcessHandler {
-        public OARGRIDProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public OARGRIDProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(OARGRID_OPTIONS_TAG, new OARGRIDOptionHandler());
         }
@@ -846,7 +853,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     protected class HierarchicalProcessHandler extends ProcessHandler {
         public HierarchicalProcessHandler(
-            ProActiveDescriptor proActiveDescriptor) {
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             addHandler(HIERARCHICIAL_REFERENCE_TAG,
                 new ProcessReferenceHandler());
@@ -885,7 +892,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     }
 
     protected class JVMProcessHandler extends ProcessHandler {
-        public JVMProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public JVMProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
 
             UnmarshallerHandler pathHandler = new PathHandler();
@@ -1027,14 +1035,16 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     // end of inner class JVMProcessHandler
     protected class RSHProcessHandler extends ProcessHandler {
-        public RSHProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public RSHProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
         }
     }
 
     //end of inner class RSHProcessHandler
     protected class MapRshProcessHandler extends ProcessHandler {
-        public MapRshProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public MapRshProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
 
             UnmarshallerHandler pathHandler = new PathHandler();
@@ -1074,21 +1084,24 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     //end of inner class MapRshProcessHandler
     protected class SSHProcessHandler extends ProcessHandler {
-        public SSHProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public SSHProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
         }
     }
 
     //end of inner class SSHProcessHandler
     protected class RLoginProcessHandler extends ProcessHandler {
-        public RLoginProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public RLoginProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
         }
     }
 
     //end of inner class RLoginProcessHandler
     protected class BSubProcessHandler extends ProcessHandler {
-        public BSubProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public BSubProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(BSUB_OPTIONS_TAG, new BsubOptionHandler());
         }
@@ -1168,7 +1181,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     // end of inner class BSubProcessHandler
     protected class GlobusProcessHandler extends ProcessHandler {
-        public GlobusProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public GlobusProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(GLOBUS_OPTIONS_TAG, new GlobusOptionHandler());
         }
@@ -1215,7 +1229,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     protected class GLiteProcessHandler extends ProcessHandler {
         protected Object resultObject = null;
 
-        public GLiteProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public GLiteProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             UnmarshallerHandler pathHandler = new PathHandler();
             BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
@@ -1471,7 +1486,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     //  END OF GLITE PROCESS HANDLER
     protected class UnicoreProcessHandler extends ProcessHandler {
-        public UnicoreProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public UnicoreProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(UNICORE_OPTIONS_TAG, new UnicoreOptionHandler());
 
@@ -1647,7 +1663,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     //end of Unicore Process Handler
     protected class NGProcessHandler extends ProcessHandler {
-        public NGProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public NGProcessHandler(ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(NG_OPTIONS_TAG, new NGOptionHandler());
         }
@@ -1709,7 +1725,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
     // MPI Process Handler
     protected class MPIProcessHandler extends ProcessHandler {
-        public MPIProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public MPIProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(MPI_PROCESS_OPTIONS_TAG, new MPIOptionHandler());
         }
@@ -1790,11 +1807,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     public class DependentProcessSequenceHandler
         extends AbstractUnmarshallerDecorator
         implements ProActiveDescriptorConstants {
-        protected ProActiveDescriptor proActiveDescriptor;
+        protected ProActiveDescriptorInternal proActiveDescriptor;
         protected boolean isRef;
 
         public DependentProcessSequenceHandler(
-            ProActiveDescriptor proActiveDescriptor) {
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super();
             this.proActiveDescriptor = proActiveDescriptor;
             this.addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
@@ -1846,10 +1863,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     // SEQUENTIALPROCESS process Handler
     public class SequentialProcessHandler extends AbstractUnmarshallerDecorator
         implements ProActiveDescriptorConstants {
-        protected ProActiveDescriptor proActiveDescriptor;
+        protected ProActiveDescriptorInternal proActiveDescriptor;
         protected boolean isRef;
 
-        public SequentialProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+        public SequentialProcessHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             super();
             this.proActiveDescriptor = proActiveDescriptor;
             this.addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());

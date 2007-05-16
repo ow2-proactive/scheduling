@@ -38,7 +38,7 @@ import javax.naming.directory.InvalidAttributeValueException;
 import org.glite.wms.jdlj.*; // /lib/glite/glite-wms-jdlj.jar
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
@@ -138,7 +138,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     public static void main(String[] args) {
-        ProActiveDescriptor pad;
+        ProActiveDescriptorInternal pad;
         try {
             pad = ProActive.getProactiveDescriptor(args[0]);
             pad.activateMappings();

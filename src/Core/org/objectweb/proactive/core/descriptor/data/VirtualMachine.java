@@ -44,8 +44,8 @@ import org.objectweb.proactive.core.process.ExternalProcess;
  * @author  ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
- * @see ProActiveDescriptor
- * @see VirtualNode
+ * @see ProActiveDescriptorInternal
+ * @see VirtualNodeInternal
  */
 public interface VirtualMachine extends ServiceUser {
 

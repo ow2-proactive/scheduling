@@ -37,9 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.Utils;
 
 
@@ -58,9 +58,9 @@ public class RefactorPAD {
      * @return ProActiveDescriptor
      * @throws IOException
      */
-    private static ProActiveDescriptor makeDeepCopy(ProActiveDescriptor pad)
-        throws IOException {
-        ProActiveDescriptor padCopy = (ProActiveDescriptor) Utils.makeDeepCopy(pad);
+    private static ProActiveDescriptorInternal makeDeepCopy(
+        ProActiveDescriptorInternal pad) throws IOException {
+        ProActiveDescriptorInternal padCopy = (ProActiveDescriptorInternal) Utils.makeDeepCopy(pad);
         return padCopy;
     }
 
@@ -70,9 +70,9 @@ public class RefactorPAD {
      * @return refactored pad
      * @throws IOException
      */
-    public static ProActiveDescriptor buildNoMainPAD(ProActiveDescriptor pad)
-        throws IOException {
-        ProActiveDescriptor noMain = makeDeepCopy(pad);
+    public static ProActiveDescriptorInternal buildNoMainPAD(
+        ProActiveDescriptorInternal pad) throws IOException {
+        ProActiveDescriptorInternal noMain = makeDeepCopy(pad);
 
         // first remove all main definitions references by clearing the map
         noMain.getMainDefinitionMapping().clear();
@@ -96,7 +96,7 @@ public class RefactorPAD {
             String id = keyList.get(i);
 
             //System.out.println("*** VN searched : " + id);
-            VirtualNode vn = (VirtualNode) virtualNodesMapping.get(id);
+            VirtualNodeInternal vn = (VirtualNodeInternal) virtualNodesMapping.get(id);
 
             //System.out.println("*** VN found : " + vn.getName());
             // test if the node is a virtual node lookup

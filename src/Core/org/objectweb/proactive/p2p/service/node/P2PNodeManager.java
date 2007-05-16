@@ -44,8 +44,9 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -73,7 +74,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private int nodeCounter = 0;
     private final String descriptorPath = ProActiveConfiguration.getInstance()
                                                                 .getProperty(PROPERPY_XML_PATH);
-    private ProActiveDescriptor pad = null;
+    private ProActiveDescriptorInternal pad = null;
 
     //--------------------------------------------------------------------------
     // Class Constructors

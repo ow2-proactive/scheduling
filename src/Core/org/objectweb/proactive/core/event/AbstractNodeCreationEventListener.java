@@ -31,8 +31,8 @@
 package org.objectweb.proactive.core.event;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
 /**
@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
  */
 public abstract class AbstractNodeCreationEventListener
     implements NodeCreationEventListener {
-    public AbstractNodeCreationEventListener(VirtualNode vn)
+    public AbstractNodeCreationEventListener(VirtualNodeInternal vn)
         throws ProActiveException {
         if (!vn.isLookup()) {
             ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);

@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.RMIRegistryLookupService;
@@ -46,10 +46,10 @@ import org.xml.sax.SAXException;
 
 public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
-    ProActiveDescriptor pad;
+    ProActiveDescriptorInternal pad;
     protected String serviceId;
 
-    public ServiceDefinitionHandler(ProActiveDescriptor pad) {
+    public ServiceDefinitionHandler(ProActiveDescriptorInternal pad) {
         super(false);
         this.pad = pad;
         this.addHandler(RMI_LOOKUP_TAG, new RMILookupHandler());

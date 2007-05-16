@@ -79,7 +79,7 @@ import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -445,7 +445,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      */
     public Component newFcInstance(Type type,
         ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode virtualNode) throws InstantiationException {
+        VirtualNodeInternal virtualNode) throws InstantiationException {
         if (virtualNode == null) {
             return newFcInstance(type, controllerDesc, contentDesc, (Node) null);
         }
@@ -470,7 +470,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     */
     public Component newNFcInstance(Type type,
         NFControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode virtualNode) throws InstantiationException {
+        VirtualNodeInternal virtualNode) throws InstantiationException {
         if (virtualNode == null) {
             return newNFcInstance(type, controllerDesc, contentDesc, (Node) null);
         }
@@ -497,7 +497,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      */
     public List<Component> newFcInstanceAsList(Type type,
         ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode virtualNode) throws InstantiationException {
+        VirtualNodeInternal virtualNode) throws InstantiationException {
         if (virtualNode == null) {
             return newFcInstanceAsList(type, controllerDesc, contentDesc,
                 (Node[]) null);
@@ -521,7 +521,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      */
     public List<Component> newNFcInstanceAsList(Type type,
         NFControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode virtualNode) throws InstantiationException {
+        VirtualNodeInternal virtualNode) throws InstantiationException {
         if (virtualNode == null) {
             return newNFcInstanceAsList(type, controllerDesc, contentDesc,
                 (Node[]) null);
@@ -593,7 +593,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      */
     public List<Component> newFcInstanceAsList(Type type,
         ControllerDescription controllerDesc, ContentDescription[] contentDesc,
-        VirtualNode virtualNode) throws InstantiationException {
+        VirtualNodeInternal virtualNode) throws InstantiationException {
         if (virtualNode == null) {
             return newFcInstanceAsList(type, controllerDesc, contentDesc,
                 (Node[]) null);
@@ -616,7 +616,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     */
     public List<Component> newNFcInstanceAsList(Type type,
         NFControllerDescription controllerDesc,
-        ContentDescription[] contentDesc, VirtualNode virtualNode)
+        ContentDescription[] contentDesc, VirtualNodeInternal virtualNode)
         throws InstantiationException {
         if (virtualNode == null) {
             return newNFcInstanceAsList(type, controllerDesc, contentDesc,

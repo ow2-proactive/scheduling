@@ -72,10 +72,10 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @author  ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
- * @see VirtualNode
+ * @see VirtualNodeInternal
  * @see VirtualMachine
  */
-public class ProActiveDescriptorImpl implements ProActiveDescriptor {
+public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
@@ -86,7 +86,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     private Map<String, MainDefinition> mainDefinitionMapping;
 
     /** map virtualNode name and objects */
-    private java.util.HashMap<String, VirtualNode> virtualNodeMapping;
+    private java.util.HashMap<String, VirtualNodeInternal> virtualNodeMapping;
 
     /** map jvm name and object */
     private java.util.HashMap<String, VirtualMachine> virtualMachineMapping;
@@ -128,7 +128,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     public ProActiveDescriptorImpl(String url) {
         mainDefinitionMapping = new HashMap<String, MainDefinition>();
-        virtualNodeMapping = new java.util.HashMap<String, VirtualNode>();
+        virtualNodeMapping = new java.util.HashMap<String, VirtualNodeInternal>();
         virtualMachineMapping = new java.util.HashMap<String, VirtualMachine>();
         processMapping = new java.util.HashMap();
         pendingProcessMapping = new java.util.HashMap<String, ProcessUpdater>();
@@ -193,7 +193,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * add a VirtualNode virtualNode to the last defined mainDefinition
      * @param virtualNode VirtualNode to add
      */
-    public void mainDefinitionAddVirtualNode(VirtualNode virtualNode) {
+    public void mainDefinitionAddVirtualNode(VirtualNodeInternal virtualNode) {
         getMainDefinition().addVirtualNode(virtualNode);
     }
 
@@ -252,11 +252,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * return the virtual nodes mapping
      * @return Map
      */
-    public Map<String, VirtualNode> getVirtualNodeMapping() {
+    public Map<String, VirtualNodeInternal> getVirtualNodeMapping() {
         return virtualNodeMapping;
     }
 
-    public void setVirtualNodeMapping(HashMap<String, VirtualNode> newMapping) {
+    public void setVirtualNodeMapping(
+        HashMap<String, VirtualNodeInternal> newMapping) {
         virtualNodeMapping = newMapping;
     }
 
@@ -279,20 +280,20 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         return mainDefinitions;
     }
 
-    public VirtualNode[] getVirtualNodes() {
+    public VirtualNodeInternal[] getVirtualNodes() {
         int i = 0;
-        VirtualNode[] virtualNodeArray = new VirtualNode[virtualNodeMapping.size()];
+        VirtualNodeInternal[] virtualNodeArray = new VirtualNodeInternal[virtualNodeMapping.size()];
         Collection collection = virtualNodeMapping.values();
 
         for (Iterator iter = collection.iterator(); iter.hasNext();) {
-            virtualNodeArray[i] = (VirtualNode) iter.next();
+            virtualNodeArray[i] = (VirtualNodeInternal) iter.next();
             i++;
         }
 
         return virtualNodeArray;
     }
 
-    public VirtualNode getVirtualNode(String name) {
+    public VirtualNodeInternal getVirtualNode(String name) {
         return virtualNodeMapping.get(name);
     }
 
@@ -348,13 +349,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         return ft;
     }
 
-    public VirtualNode createVirtualNode(String vnName, boolean lookup) {
+    public VirtualNodeInternal createVirtualNode(String vnName, boolean lookup) {
         return createVirtualNode(vnName, lookup, false);
     }
 
-    public VirtualNode createVirtualNode(String vnName, boolean lookup,
+    public VirtualNodeInternal createVirtualNode(String vnName, boolean lookup,
         boolean isMainNode) {
-        VirtualNode vn = getVirtualNode(vnName);
+        VirtualNodeInternal vn = getVirtualNode(vnName);
 
         if (jobID == null) {
             if (isMainDefined()) {
@@ -561,7 +562,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public void activateMappings() {
-        VirtualNode[] virtualNodeArray = getVirtualNodes();
+        VirtualNodeInternal[] virtualNodeArray = getVirtualNodes();
 
         for (int i = 0; i < virtualNodeArray.length; i++) {
             virtualNodeArray[i].activate();
@@ -569,7 +570,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public void activateMapping(String virtualNodeName) {
-        VirtualNode virtualNode = getVirtualNode(virtualNodeName);
+        VirtualNodeInternal virtualNode = getVirtualNode(virtualNodeName);
         virtualNode.activate();
     }
 
@@ -578,7 +579,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
         part.removeDescriptor(this.url);
 
-        VirtualNode[] vnArray = getVirtualNodes();
+        VirtualNodeInternal[] vnArray = getVirtualNodes();
 
         for (int i = 0; i < vnArray.length; i++) {
             vnArray[i].killAll(softly);
@@ -934,14 +935,14 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#setVariableContract(org.objectweb.proactive.core.xml.VariableContract)
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal#setVariableContract(org.objectweb.proactive.core.xml.VariableContract)
      */
     public void setVariableContract(VariableContract variableContract) {
         this.variableContract = variableContract;
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#getVariableContract()
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal#getVariableContract()
      */
     public VariableContract getVariableContract() {
         return this.variableContract;
@@ -963,5 +964,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
 
         return ts;
+    }
+
+    public ProActiveDescriptorInternal getProActiveDescriptorInternal() {
+        return this;
     }
 }

@@ -37,8 +37,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
@@ -62,7 +62,7 @@ public class ServiceThread extends Thread {
     private static final long LOOK_UP_FREQ = new Long(ProActiveConfiguration.getInstance()
                                                                             .getProperty(P2PConstants.PROPERTY_LOOKUP_FREQ)).longValue();
     private static final int MAX_NODE = P2PConstants.MAX_NODE;
-    private VirtualNode vn;
+    private VirtualNodeInternal vn;
     private UniversalService service;
     private VirtualMachine vm;
     private ProActiveRuntime localRuntime;
@@ -74,7 +74,7 @@ public class ServiceThread extends Thread {
                                                                              .getProperty(P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
     private long expirationTime;
 
-    public ServiceThread(VirtualNode vn, VirtualMachine vm) {
+    public ServiceThread(VirtualNodeInternal vn, VirtualMachine vm) {
         this.vn = vn;
         this.service = vm.getService();
         this.vm = vm;

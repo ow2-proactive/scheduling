@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  */
 class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
-    private ProActiveDescriptor proActiveDescriptor;
+    private ProActiveDescriptorInternal proActiveDescriptor;
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -58,7 +58,8 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     public MainDefinitionHandler() {
     }
 
-    public MainDefinitionHandler(ProActiveDescriptor proActiveDescriptor) {
+    public MainDefinitionHandler(
+        ProActiveDescriptorInternal proActiveDescriptor) {
         super();
         this.proActiveDescriptor = proActiveDescriptor;
         this.addHandler(ARG_TAG, new ArgHandler(proActiveDescriptor));
@@ -108,9 +109,9 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     //  ----- INNER CLASSES -----------------------------------------------------------------------------------
     //	
     private class ArgHandler extends BasicUnmarshaller {
-        ProActiveDescriptor proActiveDescriptor;
+        ProActiveDescriptorInternal proActiveDescriptor;
 
-        private ArgHandler(ProActiveDescriptor proActiveDescriptor) {
+        private ArgHandler(ProActiveDescriptorInternal proActiveDescriptor) {
             this.proActiveDescriptor = proActiveDescriptor;
         }
 
@@ -130,9 +131,10 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     }
 
     private class MapToVirtualNodeHandler extends BasicUnmarshaller {
-        ProActiveDescriptor proActiveDescriptor;
+        ProActiveDescriptorInternal proActiveDescriptor;
 
-        private MapToVirtualNodeHandler(ProActiveDescriptor proActiveDescriptor) {
+        private MapToVirtualNodeHandler(
+            ProActiveDescriptorInternal proActiveDescriptor) {
             this.proActiveDescriptor = proActiveDescriptor;
         }
 
@@ -146,7 +148,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
                     "value Tag without any mapToVirtualNode defined");
             }
 
-            VirtualNode vn = (VirtualNode) proActiveDescriptor.createVirtualNode(virtualNode,
+            VirtualNodeInternal vn = (VirtualNodeInternal) proActiveDescriptor.createVirtualNode(virtualNode,
                     false, true);
 
             proActiveDescriptor.mainDefinitionAddVirtualNode(vn);

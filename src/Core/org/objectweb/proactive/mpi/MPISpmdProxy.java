@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -208,7 +209,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         }
     }
 
-    public VirtualNode getVn() {
+    public VirtualNodeInternal getVn() {
         return this.target.getVn();
     }
 

@@ -73,9 +73,10 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
@@ -194,7 +195,7 @@ import ibis.rmi.RemoteException;
  *
  * @author  ProActive Team
  * @since   ProActive 0.7
- * @see ProActiveDescriptor
+ * @see ProActiveDescriptorInternal
  * @see ProActiveGroup
  *
  */
@@ -1548,7 +1549,7 @@ public class ProActive {
      * @throws ProActiveException
      * @throws RemoteException
      */
-    public static ProActiveDescriptor getProactiveDescriptor()
+    public static ProActiveDescriptorInternal getProactiveDescriptor()
         throws ProActiveException, IOException {
         String padURL = ProActiveConfiguration.getInstance()
                                               .getProperty("proactive.pad");
@@ -1568,11 +1569,11 @@ public class ProActive {
      * @param xmlDescriptorUrl The url of the XML document
      * @return ProActiveDescriptor. The object representation of the XML document
      * @throws ProActiveException if a problem occurs during the creation of the object
-     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
      */
-    public static ProActiveDescriptor getProactiveDescriptor(
+    public static ProActiveDescriptorInternal getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
         return getProActiveDescriptor(xmlDescriptorUrl, new VariableContract(),
             false);
@@ -1584,11 +1585,11 @@ public class ProActive {
      * @param xmlDescriptorUrl The url of the XML document
      * @return ProActiveDescriptor. The object representation of the XML document
      * @throws ProActiveException if a problem occurs during the creation of the object
-     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
      */
-    public static ProActiveDescriptor getProactiveDescriptor(
+    public static ProActiveDescriptorInternal getProactiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract)
         throws ProActiveException {
         if (variableContract == null) {
@@ -1599,7 +1600,7 @@ public class ProActive {
         return getProActiveDescriptor(xmlDescriptorUrl, variableContract, false);
     }
 
-    private static ProActiveDescriptor getProActiveDescriptor(
+    private static ProActiveDescriptorInternal getProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         //Get lock on XMLProperties global static variable
@@ -1607,7 +1608,7 @@ public class ProActive {
         org.objectweb.proactive.core.xml.VariableContract.xmlproperties = variableContract;
 
         //Get the pad
-        ProActiveDescriptor pad;
+        ProActiveDescriptorInternal pad;
         try {
             pad = internalGetProActiveDescriptor(xmlDescriptorUrl,
                     variableContract, hierarchicalSearch);
@@ -1642,7 +1643,7 @@ public class ProActive {
      * @throws ProActiveException
      * @throws RemoteException
      */
-    private static ProActiveDescriptor internalGetProActiveDescriptor(
+    private static ProActiveDescriptorInternal internalGetProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
@@ -1650,7 +1651,7 @@ public class ProActive {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        ProActiveDescriptor pad;
+        ProActiveDescriptorInternal pad;
         try {
             if (!hierarchicalSearch) {
                 //if not hierarchical search, we assume that the descriptor might has been
@@ -1677,7 +1678,7 @@ public class ProActive {
             }
             ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl,
                     variableContract);
-            pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
+            pad = (ProActiveDescriptorInternal) proActiveDescriptorHandler.getResultObject();
             part.registerDescriptor(pad.getUrl(), pad);
             return pad;
         } catch (org.xml.sax.SAXException e) {
@@ -1720,7 +1721,7 @@ public class ProActive {
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
-        VirtualNode vn = part.getVirtualNode(virtualnodeName);
+        VirtualNodeInternal vn = part.getVirtualNode(virtualnodeName);
         if (vn == null) {
             throw new ProActiveException("VirtualNode " + virtualnodeName +
                 " has not been yet activated or does not exist! Try to activate it first !");

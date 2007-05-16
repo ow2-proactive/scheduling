@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueRuntimeID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -130,7 +130,7 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
     public ArrayList getActiveObjects(UniqueRuntimeID ruid, String nodeName,
         String objectName) throws IOException, ProActiveException;
 
-    public VirtualNode getVirtualNode(UniqueRuntimeID ruid,
+    public VirtualNodeInternal getVirtualNode(UniqueRuntimeID ruid,
         String virtualNodeName) throws IOException, ProActiveException;
 
     public void registerVirtualNode(UniqueRuntimeID ruid,
@@ -174,8 +174,9 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
     public byte[] getClassDataFromThisRuntime(UniqueRuntimeID ruid,
         String className) throws IOException, ProActiveException;
 
-    public ProActiveDescriptor getDescriptor(UniqueRuntimeID ruid, String url,
-        boolean isHierarchicalSearch) throws IOException, ProActiveException;
+    public ProActiveDescriptorInternal getDescriptor(UniqueRuntimeID ruid,
+        String url, boolean isHierarchicalSearch)
+        throws IOException, ProActiveException;
 
     // 
     // -- SECURITY

@@ -69,7 +69,8 @@ public class TestDeployment {
             */
             System.out.println("Map map = pad.getVirtualNodeMapping();");
 
-            Map map = pad.getVirtualNodeMapping();
+            Map map = pad.getProActiveDescriptorInternal()
+                         .getVirtualNodeMapping();
             for (Object vnodeObject : map.keySet()) {
                 String vnodeName = (String) vnodeObject;
                 System.out.print(vnodeName + " : ");

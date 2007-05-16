@@ -82,7 +82,7 @@ public class Test extends FunctionalTest {
         node2 = vn2.getNode();
 
         vn1 = proActiveDescriptor.getVirtualNode("covn1");
-        VirtualMachine vm = vn1.getVirtualMachine();
+        VirtualMachine vm = vn1.getVirtualNodeInternal().getVirtualMachine();
         assertTrue(node1.getProActiveRuntime().getURL()
                         .equals(node2.getProActiveRuntime().getURL()) &&
             vm.getCreatorId().equals("covn2"));

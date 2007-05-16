@@ -51,8 +51,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.rmi.RmiRemoteBodyForwarderImpl;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -569,7 +569,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         return null;
     }
 
-    public VirtualNode getVirtualNode(UniqueRuntimeID urid,
+    public VirtualNodeInternal getVirtualNode(UniqueRuntimeID urid,
         String virtualNodeName) throws ProActiveException {
         if (urid == null) {
             return this.getVirtualNode(virtualNodeName);
@@ -937,8 +937,9 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         }
     }
 
-    public ProActiveDescriptor getDescriptor(UniqueRuntimeID urid, String url,
-        boolean isHierarchicalSearch) throws IOException, ProActiveException {
+    public ProActiveDescriptorInternal getDescriptor(UniqueRuntimeID urid,
+        String url, boolean isHierarchicalSearch)
+        throws IOException, ProActiveException {
         if (urid == null) {
             return this.getDescriptor(url, isHierarchicalSearch);
         } else {

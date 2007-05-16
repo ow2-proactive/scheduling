@@ -34,7 +34,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -48,9 +48,10 @@ import org.xml.sax.SAXException;
 public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
-    protected ProActiveDescriptor proActiveDescriptor;
+    protected ProActiveDescriptorInternal proActiveDescriptor;
 
-    public TechnicalServicesHandler(ProActiveDescriptor proActiveDescriptor) {
+    public TechnicalServicesHandler(
+        ProActiveDescriptorInternal proActiveDescriptor) {
         super(false);
         this.proActiveDescriptor = proActiveDescriptor;
         addHandler(TECHNICAL_SERVICES_DEF_TAG,

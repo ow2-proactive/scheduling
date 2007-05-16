@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
 /**
@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
  * @author  ProActive Team
  * @version 1.0,  2005/09/20
  * @since   ProActive 3.0
- * @see VirtualNode
+ * @see VirtualNodeInternal
  * @see VirtualMachine
  */
 public class MainDefinition implements Serializable {
@@ -54,7 +54,7 @@ public class MainDefinition implements Serializable {
     //
 
     /** all virtualNodes are put in a List of VirtualNode */
-    private List<VirtualNode> virtualNodeList;
+    private List<VirtualNodeInternal> virtualNodeList;
 
     /** fully qualified name of the main Class */
     private String mainClass;
@@ -66,14 +66,15 @@ public class MainDefinition implements Serializable {
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
     public MainDefinition(String mainClass, List<String> parameters,
-        List<VirtualNode> virtualNodeList) {
+        List<VirtualNodeInternal> virtualNodeList) {
         this.virtualNodeList = virtualNodeList;
         this.mainClass = mainClass;
         this.parameters = parameters;
     }
 
     public MainDefinition(String mainClass) {
-        this(mainClass, new ArrayList<String>(), new ArrayList<VirtualNode>());
+        this(mainClass, new ArrayList<String>(),
+            new ArrayList<VirtualNodeInternal>());
     }
 
     public MainDefinition() {
@@ -99,7 +100,7 @@ public class MainDefinition implements Serializable {
      * set the list of virtual nodes
      * @param virtualNodeList new list
      */
-    public void setVirtualNodeList(List<VirtualNode> virtualNodeList) {
+    public void setVirtualNodeList(List<VirtualNodeInternal> virtualNodeList) {
         this.virtualNodeList = virtualNodeList;
     }
 
@@ -123,7 +124,7 @@ public class MainDefinition implements Serializable {
      * return the list of virtual nodes
      * @return list of virtual nodes
      */
-    public List<VirtualNode> getVirtualNodeList() {
+    public List<VirtualNodeInternal> getVirtualNodeList() {
         return virtualNodeList;
     }
 
@@ -131,8 +132,8 @@ public class MainDefinition implements Serializable {
      * return a table of virtual nodes
      * @return a table of virtual nodes
      */
-    public VirtualNode[] getVirtualNodes() {
-        VirtualNode[] result = new VirtualNode[virtualNodeList.size()];
+    public VirtualNodeInternal[] getVirtualNodes() {
+        VirtualNodeInternal[] result = new VirtualNodeInternal[virtualNodeList.size()];
         for (int i = 0; i < result.length; i++) {
             result[i] = virtualNodeList.get(i);
         }
@@ -143,7 +144,7 @@ public class MainDefinition implements Serializable {
      * add a virtual node to the list of virtal nodes
      * @param virtualNode virtual node to add
      */
-    public void addVirtualNode(VirtualNode virtualNode) {
+    public void addVirtualNode(VirtualNodeInternal virtualNode) {
         virtualNodeList.add(virtualNode);
     }
 
@@ -152,7 +153,7 @@ public class MainDefinition implements Serializable {
      * @param i index of the virtual node to get
      * @return the i-th virtual node of the list
      */
-    public VirtualNode getVirtualNode(int i) {
+    public VirtualNodeInternal getVirtualNode(int i) {
         return virtualNodeList.get(i);
     }
 

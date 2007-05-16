@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
 /**
@@ -47,7 +47,7 @@ public interface LocalProActiveRuntime {
      * @param vn the virtualnode to register
      * @param vnName the name of the VirtualNode to register
      */
-    public void registerLocalVirtualNode(VirtualNode vn, String vnName);
+    public void registerLocalVirtualNode(VirtualNodeInternal vn, String vnName);
 
     /**
      * This method adds a reference to the runtime that created this runtime.

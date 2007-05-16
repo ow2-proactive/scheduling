@@ -57,8 +57,8 @@ import org.objectweb.proactive.filetransfer.FileVector;
  * @since   ProActive 1.0.2
  */
 public class VirtualNodeLookup extends RuntimeDeploymentProperties
-    implements VirtualNode {
-    private VirtualNode virtualNode;
+    implements VirtualNodeInternal {
+    private VirtualNodeInternal virtualNode;
     private String name;
     private String urlForLookup;
     private String lookupProtocol;
@@ -83,7 +83,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getProperty()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getProperty()
      */
     public String getProperty() {
         if (!isActivated) {
@@ -93,14 +93,14 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getName()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getName()
      */
     public String getName() {
         return this.name;
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getTimeout()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getTimeout()
      */
     public long getTimeout() {
         if (!isActivated) {
@@ -110,14 +110,14 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#addVirtualMachine(VirtualMachine)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#addVirtualMachine(VirtualMachine)
      */
     public void addVirtualMachine(VirtualMachine virtualMachine) {
         vnLogger.warn(message);
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getVirtualMachine()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getVirtualMachine()
      */
     public VirtualMachine getVirtualMachine() {
         if (!isActivated) {
@@ -127,7 +127,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#activate()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#activate()
      */
     public void activate() {
         if (!isActivated) {
@@ -139,7 +139,8 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                         this.name, this.lookupProtocol, this.portForLookup);
                 //		this.remoteProActiveRuntime = RuntimeFactory.getRuntime(urlForLookup,lookupProtocol);
                 //		this.virtualNode = remoteProActiveRuntime.getVirtualNode(this.name);
-                this.virtualNode = ProActive.lookupVirtualNode(urlForLookup);
+                this.virtualNode = ProActive.lookupVirtualNode(urlForLookup)
+                                            .getVirtualNodeInternal();
                 isActivated = true;
             } catch (ProActiveException e) {
                 e.printStackTrace();
@@ -151,7 +152,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNbMappedNodes()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getNbMappedNodes()
      */
     public int getNbMappedNodes() {
         if (!isActivated) {
@@ -170,7 +171,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getNumberOfCurrentlyCreatedNodes()
      */
     public int getNumberOfCurrentlyCreatedNodes() {
         if (!isActivated) {
@@ -180,7 +181,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNode()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getNode()
      */
     public Node getNode() throws NodeException {
         if (!isActivated) {
@@ -206,7 +207,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNode(int)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getNode(int)
      */
     @Deprecated
     public Node getNode(int index) throws NodeException {
@@ -222,7 +223,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNodesURL()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getNodesURL()
      */
     public String[] getNodesURL() throws NodeException {
         if (!isActivated) {
@@ -237,7 +238,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNodes()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getNodes()
      */
     public Node[] getNodes() throws NodeException {
         if (!isActivated) {
@@ -252,7 +253,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNode(String)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getNode(String)
      */
     public Node getNode(String url) throws NodeException {
         if (!isActivated) {
@@ -271,7 +272,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#createNodeOnCurrentJvm(String)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#createNodeOnCurrentJvm(String)
      */
     public void createNodeOnCurrentJvm(String protocol) {
         vnLogger.warn(message);
@@ -290,7 +291,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isLookup()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#isLookup()
      */
     public boolean isLookup() {
         return true;
@@ -311,7 +312,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#setRuntimeInformations(String,String)
      * At the moment the only property that can be set at runtime is LOOKUP_HOST.
      */
     public void setRuntimeInformations(String information, String value)
@@ -349,7 +350,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getMinNumberOfNodes()
      */
     public int getMinNumberOfNodes() {
         if (!isActivated) {
@@ -359,7 +360,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isMultiple()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#isMultiple()
      */
     public boolean isMultiple() {
         if (!isActivated) {
@@ -426,5 +427,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     public void setFileTransferParams(int fileBlockSize, int overlapping) {
         this.fileBlockSize = fileBlockSize;
         this.overlapping = overlapping;
+    }
+
+    public VirtualNodeInternal getVirtualNodeInternal() {
+        return this;
     }
 }

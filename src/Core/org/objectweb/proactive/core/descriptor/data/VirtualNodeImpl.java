@@ -94,12 +94,13 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @author  ProActive Team
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
- * @see ProActiveDescriptor
+ * @see ProActiveDescriptorInternal
  * @see VirtualMachine
  */
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
-    implements VirtualNode, Serializable, RuntimeRegistrationEventListener,
-        NodeCreationEventListener, ServiceUser {
+    implements VirtualNodeInternal, Serializable,
+        RuntimeRegistrationEventListener, NodeCreationEventListener,
+        ServiceUser {
 
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
@@ -220,7 +221,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      */
     VirtualNodeImpl(String name,
         ProActiveSecurityManager proactiveSecurityManager, String padURL,
-        boolean isMainVN, ProActiveDescriptor descriptor) {
+        boolean isMainVN, ProActiveDescriptorInternal descriptor) {
         // if we launch several times the same application 
         // we have to change the name of the main VNs because of
         // the register, otherwise we will monitor each time all the last
@@ -998,7 +999,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isLookup()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#isLookup()
      */
     public boolean isLookup() {
         return false;
@@ -1164,7 +1165,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#setRuntimeInformations(String,String)
      *      At the moment no property can be set at runtime on a
      *      VirtualNodeImpl.
      */
@@ -1223,14 +1224,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getMinNumberOfNodes()
      */
     public int getMinNumberOfNodes() {
         return minNumberOfNodes;
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isMultiple()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#isMultiple()
      */
     public boolean isMultiple() {
         return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
@@ -1738,7 +1739,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#fileTransferRetrieve()
      */
     public FileVector fileTransferRetrieve()
         throws IOException, ProActiveException {
@@ -1908,5 +1909,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void addTechnicalService(TechnicalService technicalWrapper) {
         this.technicalService = technicalWrapper;
+    }
+
+    public VirtualNodeInternal getVirtualNodeInternal() {
+        return this;
     }
 }

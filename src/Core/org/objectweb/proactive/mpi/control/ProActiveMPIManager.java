@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -89,7 +89,7 @@ public class ProActiveMPIManager implements Serializable {
         // loop on the MPISpmd object list
         try {
             for (int i = 0; i < spmdList.size(); i++) {
-                VirtualNode vn = (VirtualNode) ((MPISpmd) spmdList.get(currentJobNumber)).getVn();
+                VirtualNodeInternal vn = (VirtualNodeInternal) ((MPISpmd) spmdList.get(currentJobNumber)).getVn();
                 Node[] allNodes;
                 allNodes = vn.getNodes();
                 String remoteLibraryPath = ((MPISpmd) spmdList.get(currentJobNumber)).getRemoteLibraryPath();
@@ -352,7 +352,7 @@ public class ProActiveMPIManager implements Serializable {
             }
 
             for (int i = 0; i < this.mpiSpmdList.size(); i++) {
-                ((VirtualNode) ((MPISpmd) this.mpiSpmdList.get(i)).getVn()).killAll(false);
+                ((VirtualNodeInternal) ((MPISpmd) this.mpiSpmdList.get(i)).getVn()).killAll(false);
             }
             System.exit(0);
         } else {

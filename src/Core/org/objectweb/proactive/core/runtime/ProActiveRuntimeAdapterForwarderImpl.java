@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.UniqueRuntimeID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -379,7 +379,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getVirtualNode(java.lang.String)
      */
-    public VirtualNode getVirtualNode(String virtualNodeName)
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName)
         throws ProActiveException {
         try {
             return proActiveRuntime.getVirtualNode(urid, virtualNodeName);
@@ -543,7 +543,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
         return vmInformation.getJobID();
     }
 
-    public ProActiveDescriptor getDescriptor(String url,
+    public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException {
         try {
             return proActiveRuntime.getDescriptor(urid, url,

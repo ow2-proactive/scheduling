@@ -42,8 +42,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -122,7 +122,7 @@ public interface RemoteProActiveRuntime extends Serializable {
     public ArrayList getActiveObjects(String nodeName, String objectName)
         throws IOException, ProActiveException;
 
-    public VirtualNode getVirtualNode(String virtualNodeName)
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName)
         throws IOException, ProActiveException;
 
     public void registerVirtualNode(String virtualNodeName,
@@ -175,7 +175,7 @@ public interface RemoteProActiveRuntime extends Serializable {
     public void newRemote(String className)
         throws IOException, ClassNotFoundException, ProActiveException;
 
-    public ProActiveDescriptor getDescriptor(String url,
+    public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException;
 
     //

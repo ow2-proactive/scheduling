@@ -32,10 +32,10 @@ package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
@@ -54,7 +54,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  */
 class DeploymentHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
-    private ProActiveDescriptor proActiveDescriptor;
+    private ProActiveDescriptorInternal proActiveDescriptor;
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
-    public DeploymentHandler(ProActiveDescriptor proActiveDescriptor) {
+    public DeploymentHandler(ProActiveDescriptorInternal proActiveDescriptor) {
         super(false);
         this.proActiveDescriptor = proActiveDescriptor;
         this.addHandler(REGISTER_TAG, new RegisterHandler());
@@ -182,7 +182,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
      * This class receives map events
      */
     private class MapHandler extends PassiveCompositeUnmarshaller {
-        VirtualNode vn;
+        VirtualNodeInternal vn;
 
         private MapHandler() {
             //    	CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);

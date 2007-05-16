@@ -40,9 +40,10 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;
@@ -110,7 +111,7 @@ public class startLBoverP2P implements ProActiveInternalObject,
     public void doit(String JobId) throws ProActiveException {
         nodesBooked = 0;
         ProActiveConfiguration.load();
-        ProActiveDescriptor pad;
+        ProActiveDescriptorInternal pad;
         VirtualNode vn = null;
         arrivedNodes = new Vector();
         try {

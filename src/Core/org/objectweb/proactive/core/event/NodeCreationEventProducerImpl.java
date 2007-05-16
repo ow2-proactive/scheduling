@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.event;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -60,7 +60,7 @@ public class NodeCreationEventProducerImpl extends AbstractEventProducer
     //
     //-------------------PROTECTED METHODS------------------
     //
-    protected void notifyListeners(VirtualNode vn, int type, Node node,
+    protected void notifyListeners(VirtualNodeInternal vn, int type, Node node,
         int nodeCreated) {
         if (hasListeners()) {
             notifyAllListeners(new NodeCreationEvent(vn, type, node, nodeCreated));

@@ -63,9 +63,9 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
@@ -141,10 +141,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private VMInformation vmInformation;
 
     //map VirtualNodes and their names
-    private java.util.Hashtable<String, VirtualNode> virtualNodesMap;
+    private java.util.Hashtable<String, VirtualNodeInternal> virtualNodesMap;
 
     //map descriptor and their url
-    private java.util.Hashtable<String, ProActiveDescriptor> descriptorMap;
+    private java.util.Hashtable<String, ProActiveDescriptorInternal> descriptorMap;
 
     // map proActiveRuntime registered on this VM and their names
     private java.util.Hashtable<String, ProActiveRuntime> proActiveRuntimeMap;
@@ -164,8 +164,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
             this.proActiveRuntimeForwarderMap = new java.util.Hashtable();
             this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet<String>());
-            this.virtualNodesMap = new java.util.Hashtable<String, VirtualNode>();
-            this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptor>();
+            this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
+            this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
             this.nodeMap = new java.util.Hashtable<String, LocalNode>();
 
             try {
@@ -261,9 +261,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     //
 
     /**
-     * @see org.objectweb.proactive.core.runtime.LocalProActiveRuntime#registerLocalVirtualNode(VirtualNode vn, String vnName)
+     * @see org.objectweb.proactive.core.runtime.LocalProActiveRuntime#registerLocalVirtualNode(VirtualNodeInternal vn, String vnName)
      */
-    public void registerLocalVirtualNode(VirtualNode vn, String vnName) {
+    public void registerLocalVirtualNode(VirtualNodeInternal vn, String vnName) {
         //System.out.println("vn "+vnName+" registered");
         virtualNodesMap.put(vnName, vn);
     }
@@ -280,13 +280,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
     }
 
-    public void registerDescriptor(String url, ProActiveDescriptor pad) {
+    public void registerDescriptor(String url, ProActiveDescriptorInternal pad) {
         descriptorMap.put(url, pad);
     }
 
-    public ProActiveDescriptor getDescriptor(String url,
+    public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException {
-        ProActiveDescriptor pad = descriptorMap.get(url);
+        ProActiveDescriptorInternal pad = descriptorMap.get(url);
 
         // hierarchical search or not, look if we know the pad
         if (pad != null) {
@@ -543,7 +543,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
     }
 
-    public VirtualNode getVirtualNode(String virtualNodeName) {
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName) {
         //  	System.out.println("i am in get vn ");
         return virtualNodesMap.get(virtualNodeName);
     }
@@ -1111,7 +1111,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
         String padURL) throws ProActiveException {
-        ProActiveDescriptor pad = descriptorMap.get(padURL);
+        ProActiveDescriptorInternal pad = descriptorMap.get(padURL);
 
         if (pad == null) {
             logger.info("Cannot find descriptor, " + padURL);

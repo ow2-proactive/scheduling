@@ -1049,7 +1049,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             createPanel(s_host, s_name);
 
             try {
-                vnDispatcher.setRuntimeInformations("LOOKUP_HOST", s_host);
+                vnDispatcher.getVirtualNodeInternal()
+                            .setRuntimeInformations("LOOKUP_HOST", s_host);
                 c3ddispatcher = (C3DDispatcher) vnDispatcher.getUniqueAO();
                 i_user = c3ddispatcher.registerConsumer(me, createScene(),
                         s_name);

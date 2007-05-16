@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
@@ -170,7 +170,7 @@ public class ProSPMD {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newSPMDGroup(String className, Object[][] params,
-        VirtualNode virtualNode)
+        VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
         return ProSPMD.newSPMDGroup(className, params, virtualNode.getNodes());
@@ -246,7 +246,7 @@ public class ProSPMD {
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newSPMDGroupInParallel(String className,
-        Object[][] params, VirtualNode virtualNode)
+        Object[][] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         return ProSPMD.newSPMDGroupInParallel(className, params,
             virtualNode.getNodes());

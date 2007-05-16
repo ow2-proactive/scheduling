@@ -31,6 +31,7 @@
 package org.objectweb.proactive.mpi;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
 /**

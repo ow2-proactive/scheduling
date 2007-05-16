@@ -126,7 +126,8 @@ public class TestDeployRetrieve extends FunctionalTest {
         System.setProperty("schema.validation", validatingProperyOld);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
-        testVNode.setFileTransferParams(testblocksize, testflyingblocks);
+        testVNode.getVirtualNodeInternal()
+                 .setFileTransferParams(testblocksize, testflyingblocks);
         long initDeployment = System.currentTimeMillis();
         testVNode.activate();
         if (logger.isDebugEnabled()) {
@@ -156,7 +157,8 @@ public class TestDeployRetrieve extends FunctionalTest {
             logger.debug("Retrieving test files");
         }
         long initRetrieve = System.currentTimeMillis();
-        FileVector fileVector = testVNode.fileTransferRetrieve(); //async
+        FileVector fileVector = testVNode.getVirtualNodeInternal()
+                                         .fileTransferRetrieve(); //async
         fileVector.waitForAll(); //sync here
         long finitRetrieve = System.currentTimeMillis();
 

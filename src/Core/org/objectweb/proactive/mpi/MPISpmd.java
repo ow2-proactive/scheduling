@@ -33,7 +33,7 @@ package org.objectweb.proactive.mpi;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
 public interface MPISpmd {
@@ -80,7 +80,7 @@ public interface MPISpmd {
      * API method for getting MPI program virtual Node
      * @return Virtual Node - the name of the MPI program
      */
-    public VirtualNode getVn();
+    public VirtualNodeInternal getVn();
 
     /**
      * API method for adding class that will be instanciate on nodes of applications
