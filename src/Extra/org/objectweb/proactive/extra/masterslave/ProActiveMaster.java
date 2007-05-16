@@ -35,8 +35,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -197,40 +195,11 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return wrappings;
     }
 
-    /**
-     * Returns a list of wrappers associated with these tasks
-     * @param tasks
-     * @return list of internal tasks
-     * @throws NoSuchElementException
-     */
-    private List<TaskIntern> getWrappings(List<T> tasks)
-        throws NoSuchElementException {
-        List<TaskIntern> answer = new ArrayList<TaskIntern>();
-        for (Task task : tasks) {
-            if (!wrappedTasks.containsKey(task)) {
-                throw new NoSuchElementException();
-            }
-            answer.add(wrappedTasks.get(task));
-        }
-        return answer;
-    }
-
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isOneResultAvailable()
      */
     public boolean isOneResultAvailable() {
         return aomaster.isOneResultAvailable();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isResultAvailable(org.objectweb.proactive.extra.masterslave.interfaces.Task)
-     */
-    public boolean isResultAvailable(T task) throws IllegalArgumentException {
-        if (!wrappedTasks.containsKey(task)) {
-            throw new IllegalArgumentException("Non existent wrapping.");
-        }
-        TaskIntern wrapper = wrappedTasks.get(task);
-        return aomaster.isResultAvailable(wrapper);
     }
 
     /**
@@ -247,18 +216,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         wrappedTasksRev.remove(wrapper);
     }
 
-    /**
-     * Removes the internal wrapping associated with this collectioon of tasks
-     * @param tasks
-     * @throws IllegalArgumentException
-     */
-    private void removeWrappings(Collection<T> tasks)
-        throws IllegalArgumentException {
-        for (T task : tasks) {
-            removeWrapping(task);
-        }
-    }
-
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#slavepoolSize()
      */
@@ -267,19 +224,11 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solve(org.objectweb.proactive.extra.masterslave.interfaces.Task)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection, boolean)
      */
-    public void solve(T task) {
-        TaskIntern wrapper = createWrapping(task);
-        aomaster.solve(wrapper);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection)
-     */
-    public void solveAll(Collection<T> tasks) {
+    public void solveAll(Collection<T> tasks, boolean ordered) {
         Collection<TaskIntern> wrappers = createWrappings(tasks);
-        aomaster.solveAll(wrappers);
+        aomaster.solveAll(wrappers, ordered);
     }
 
     /* (non-Javadoc)
@@ -320,41 +269,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return (R) res.getResult();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitResultOf(org.objectweb.proactive.extra.masterslave.interfaces.Task)
-     */
-    public R waitResultOf(T task)
-        throws IllegalArgumentException, TaskException {
-        if (!wrappedTasks.containsKey(task)) {
-            throw new NoSuchElementException();
-        }
-        TaskIntern wrapper = wrappedTasks.get(task);
-        ResultIntern res = (ResultIntern) ProActive.getFutureValue(aomaster.waitResultOf(
-                    wrapper));
-        removeWrapping(task);
-        if (wrapper.threwException()) {
-            throw new TaskException(wrapper.getException());
-        }
-        return (R) res.getResult();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitResultsOf(java.util.List)
-     */
-    public List<R> waitResultsOf(List<T> tasks)
-        throws IllegalArgumentException, TaskException {
-        List<TaskIntern> wrappers = getWrappings(tasks);
-        List<ResultIntern> resultsIntern = (List<ResultIntern>) ProActive.getFutureValue(aomaster.waitResultsOf(
-                    wrappers));
-        List<R> results = new ArrayList<R>();
-        for (ResultIntern res : resultsIntern) {
-            results.add((R) res.getResult());
-        }
-        removeWrappings(tasks);
-        return results;
-    }
-
-    public boolean isAnyResultPending() {
-        return aomaster.isAnyResultPending();
+    public boolean isEmpty() {
+        return aomaster.isEmpty();
     }
 }

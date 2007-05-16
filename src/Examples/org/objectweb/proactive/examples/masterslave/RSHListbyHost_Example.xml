@@ -35,7 +35,9 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/bin"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Core"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Extra"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Examples"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>

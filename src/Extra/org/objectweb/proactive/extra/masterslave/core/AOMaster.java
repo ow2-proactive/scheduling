@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -80,7 +79,13 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
     // stub on this active object
     protected Object stubOnThis;
-    private boolean terminated;
+
+    // global variables
+    private boolean terminated; // is the master terminated
+    private static enum OrderingMode {UNSPECIFIED, UNORDERED, ORDERED;
+    }
+    private OrderingMode mode; // current ordering mode
+    private long firstId;
 
     // Slave manager (deploy slaves)
     protected SlaveManager smanager;
@@ -107,7 +112,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     protected HashSetQueue<TaskIntern> launchedTasks;
 
     // tasks that are completed
-    protected HashSetQueue<TaskIntern> completedTasks;
+    protected HashSetQueue<TaskIntern> completedTasks; // queue in unordered mode
+    protected ArrayList<TaskIntern> completedTasksOrdered; // list in ordered mode 
 
     public AOMaster() {
         // proactive emty no arg constructor
@@ -151,18 +157,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#areAllResultsAvailable()
      */
     public boolean areAllResultsAvailable() {
-        return pendingTasks.isEmpty() && launchedTasks.isEmpty();
-    }
+        if (mode == OrderingMode.UNSPECIFIED) {
+            throw new IllegalStateException("Master empty.");
+        }
 
-    /**
-     * are results of this list of tasks available
-     * @param tasks list of tasks
-     * @return true if all the results are available
-     * @throws NoSuchElementException
-     */
-    private boolean areResultsAvailable(List<TaskIntern> tasks)
-        throws NoSuchElementException {
-        return completedTasks.containsAll(tasks);
+        return pendingTasks.isEmpty() && launchedTasks.isEmpty();
     }
 
     /**
@@ -210,11 +209,13 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         stubOnThis = ProActive.getStubOnThis();
         // General initializations
         terminated = false;
+        mode = OrderingMode.UNSPECIFIED;
+        firstId = -1;
         // Queues 
         pendingTasks = new HashSetQueue<TaskIntern>();
         launchedTasks = new HashSetQueue<TaskIntern>();
         completedTasks = new HashSetQueue<TaskIntern>();
-        ;
+        completedTasksOrdered = new ArrayList();
 
         // Slaves
         try {
@@ -246,9 +247,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         }
     }
 
-    public boolean isAnyResultPending() {
-        return !(pendingTasks.isEmpty() && launchedTasks.isEmpty() &&
-        completedTasks.isEmpty());
+    public boolean isEmpty() {
+        return pendingTasks.isEmpty() && launchedTasks.isEmpty() &&
+        completedTasks.isEmpty() && completedTasksOrdered.isEmpty();
     }
 
     /* (non-Javadoc)
@@ -278,15 +279,13 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isOneResultAvailable()
      */
     public boolean isOneResultAvailable() {
-        return !completedTasks.isEmpty();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isResultAvailable()
-     */
-    public boolean isResultAvailable(TaskIntern task)
-        throws IllegalArgumentException {
-        return completedTasks.contains(task);
+        if (mode == OrderingMode.UNORDERED) {
+            return !completedTasks.isEmpty();
+        } else if (mode == OrderingMode.ORDERED) {
+            return (completedTasksOrdered.get(0) != null);
+        } else {
+            throw new IllegalStateException("Master is empty.");
+        }
     }
 
     /* (non-Javadoc)
@@ -313,7 +312,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             service.serveAll("sendResultAndGetTask");
             service.serveAll("isDead");
 
-            service.serveAll(new MainFilter());
+            service.serveOldest(new MainFilter());
         }
         try {
             body.terminate();
@@ -331,8 +330,12 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
                 logger.debug("Result of task " + task.getId() + " received.");
             }
             launchedTasks.remove(task);
-            if (!completedTasks.add(task)) {
-                logger.error("Task is already a completed Task");
+            if (mode == OrderingMode.UNORDERED) {
+                if (!completedTasks.add(task)) {
+                    logger.error("Task is already a completed Task");
+                }
+            } else {
+                completedTasksOrdered.set((int) (task.getId() - firstId), task);
             }
         }
 
@@ -349,12 +352,27 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         return slaveGroup.size();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solve(org.objectweb.proactive.extra.masterslave.interfaces.Task)
+    /**
+     * Adds a task to solve
+     * @param task
+     * @throws IllegalArgumentException
      */
-    public void solve(TaskIntern task) throws IllegalArgumentException {
+    private void solve(TaskIntern task) throws IllegalArgumentException {
+        //    	 if in ordered mode we prepare the future result slot 
+        if (mode == OrderingMode.ORDERED) {
+            // we store the first id of tasks to know the beginning of the task set
+            if (this.isEmpty()) {
+                firstId = task.getId();
+            }
+            completedTasksOrdered.add(null);
+        }
         if (emptyPending()) {
             pendingTasks.add(task);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Waking up sleeping slaves...");
+            }
+
             // We wake up the sleeping guys
             sleepingGroupStub.wakeup();
         } else {
@@ -365,9 +383,26 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection)
      */
-    public void solveAll(Collection<TaskIntern> tasks)
+    public void solveAll(Collection<TaskIntern> tasks, boolean ordered)
         throws IllegalArgumentException {
+        if (ordered && (mode == OrderingMode.UNORDERED)) {
+            throw new IllegalArgumentException(
+                "Master result Mode was already set to \"Unordered\".");
+        } else if (!ordered && (mode == OrderingMode.ORDERED)) {
+            throw new IllegalArgumentException(
+                "Master result Mode was already set to \"Ordered\".");
+        }
+
+        if (mode == OrderingMode.UNSPECIFIED) {
+            if (ordered) {
+                mode = OrderingMode.ORDERED;
+            } else {
+                mode = OrderingMode.UNORDERED;
+            }
+        }
+
         logger.debug("Adding " + tasks.size() + " tasks...");
+
         for (TaskIntern task : tasks) {
             solve(task);
         }
@@ -425,12 +460,15 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public Collection<ResultIntern> waitAllResults()
         throws IllegalStateException, TaskException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("All Results received by the user...");
-        }
         List<ResultIntern> results = new ArrayList<ResultIntern>();
-        while (!completedTasks.isEmpty()) {
-            results.add(waitOneResult());
+        if (mode == OrderingMode.UNORDERED) {
+            while (!completedTasks.isEmpty()) {
+                results.add(waitOneResult());
+            }
+        } else {
+            while (!completedTasksOrdered.isEmpty()) {
+                results.add(waitOneResult());
+            }
         }
         return results;
     }
@@ -440,43 +478,26 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public ResultIntern waitOneResult()
         throws IllegalStateException, TaskException {
-        TaskIntern wrapper = completedTasks.poll();
+        TaskIntern wrapper = null;
+        if (mode == OrderingMode.UNORDERED) {
+            wrapper = completedTasks.poll();
+        } else {
+            wrapper = completedTasksOrdered.get(0);
+            completedTasksOrdered.remove(0);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Result of task" + wrapper.getId() +
+                " received by the user.");
+        }
+
+        // If there is nothing more to serve, we reset the mode
+        if (this.isEmpty()) {
+            mode = OrderingMode.UNSPECIFIED;
+            firstId = -1;
+        }
 
         // We return the result
         return new ResultInternImpl(wrapper.getResult(), wrapper);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitResultOf(org.objectweb.proactive.extra.masterslave.interfaces.Task)
-     */
-    public ResultIntern waitResultOf(TaskIntern task)
-        throws IllegalArgumentException, TaskException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Result of task " + task.getId() +
-                " retrieved by the user");
-        }
-        Iterator<TaskIntern> it = completedTasks.iterator();
-        while (it.hasNext()) {
-            TaskIntern candidate = it.next();
-            if (candidate.equals(task)) {
-                it.remove();
-                return new ResultInternImpl(candidate.getResult(), candidate);
-            }
-        }
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitResultsOf(java.util.List)
-     */
-    public List<ResultIntern> waitResultsOf(List<TaskIntern> tasks)
-        throws IllegalArgumentException, TaskException {
-        ArrayList<ResultIntern> results = new ArrayList<ResultIntern>();
-        for (TaskIntern task : tasks) {
-            ResultIntern res = waitResultOf(task);
-            results.add(res);
-        }
-        return results;
     }
 
     /**
@@ -497,21 +518,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
                 return isOneResultAvailable();
             } else if (request.getMethodName().equals("waitAllResults")) {
                 return areAllResultsAvailable();
-            } else if (request.getMethodName().equals("waitResultOf")) {
-                try {
-                    return isResultAvailable((TaskIntern) request.getParameter(
-                            0));
-                } catch (NoSuchElementException e) {
-                    return true;
-                }
-            } else if (request.getMethodName().equals("waitResultsOf")) {
-                // TODO Might be unscalable if the number of tasks gets too high
-                try {
-                    return areResultsAvailable((List<TaskIntern>) request.getParameter(
-                            0));
-                } catch (NoSuchElementException e) {
-                    return true;
-                }
             } else {
                 return true;
             }

@@ -56,7 +56,8 @@ public class TestNative extends NativeTask {
         init(args);
 
         // Creating the Master
-        ProActiveMaster master = new ProActiveMaster(descriptor_url, vn_name);
+        ProActiveMaster<TestNative, String[]> master = new ProActiveMaster<TestNative, String[]>(descriptor_url,
+                vn_name);
 
         // Creating the tasks to be solved
         List<TestNative> tasks = new ArrayList<TestNative>();
@@ -65,7 +66,7 @@ public class TestNative extends NativeTask {
         }
 
         // Submitting the tasks
-        master.solveAll(tasks);
+        master.solveAll(tasks, false);
         Collection<String[]> results = null;
 
         // Collecting the results

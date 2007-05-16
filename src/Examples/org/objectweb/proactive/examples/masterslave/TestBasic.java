@@ -79,7 +79,8 @@ public class TestBasic implements Task<Integer> {
         init(args);
 
         //      Creating the Master
-        ProActiveMaster master = new ProActiveMaster(descriptor_url, vn_name);
+        ProActiveMaster<TestBasic, Integer> master = new ProActiveMaster<TestBasic, Integer>(descriptor_url,
+                vn_name);
 
         // Creating the tasks to be solved
         List<TestBasic> tasks = new ArrayList<TestBasic>();
@@ -88,7 +89,7 @@ public class TestBasic implements Task<Integer> {
         }
         long startTime = System.currentTimeMillis();
         // Submitting the tasks
-        master.solveAll(tasks);
+        master.solveAll(tasks, false);
 
         // Collecting the results
         Collection<Integer> results = master.waitAllResults();

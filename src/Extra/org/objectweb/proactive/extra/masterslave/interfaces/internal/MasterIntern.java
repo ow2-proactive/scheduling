@@ -32,7 +32,6 @@ package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.List;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -81,21 +80,17 @@ public interface MasterIntern {
     public void terminate(boolean freeResources);
 
     /**
-     * Adds a task to be solved by the master <br/>
-     * @param task
-     */
-    public void solve(TaskIntern task) throws IllegalArgumentException;
-
-    /**
      * Adds a collection of tasks to be solved by the master <br/>
-     * @param tasks
+     * Note that is a collection of tasks is submitted in one mode, it's impossible to submit tasks in a different mode until all the results have been retrieved (i.e. the master is empty)<br/>
+     * @param tasks collection of tasks
+     * @param ordered do we want to collect the results in the same order ?
      */
-    public void solveAll(Collection<TaskIntern> tasks)
+    public void solveAll(Collection<TaskIntern> tasks, boolean ordered)
         throws IllegalArgumentException;
 
     /**
      * Wait for all results, will block until all results are computed <br/>
-     * The ordering of the results in unspecified <br/>
+     * The ordering of the results depends on the mode used when submitted <br/>
      * @return a collection of objects containing the result and the original task associated
      * @throws IllegalStateException if no task have been submitted
      * @throws TaskException if a task threw an Exception
@@ -114,31 +109,6 @@ public interface MasterIntern {
         throws IllegalStateException, TaskException;
 
     /**
-     * Wait for the result of this task <br/>
-     * Will block until the specific result is available <br/>
-     * If the task is not known InvalidArgumentException is thrown <br/>
-     * @param task task to wait for
-     * @return expected result
-     * @throws IllegalArgumentException if the task is invalid
-     * @throws TaskException if the task threw an Exception
-     */
-    public ResultIntern waitResultOf(TaskIntern task)
-        throws IllegalArgumentException, TaskException;
-
-    /**
-     * Wait for the result of this list of tasks <br/>
-     * Will block until all the results are available. <br/>
-     * This method is the only one which guaranties that the results are received in a specified order (the same order as the given list of tasks) <br/>
-     * If a task is not known an InvalidArgumentException is thrown <br/>
-     * @param tasks an order list of tasks to wait for
-     * @return an ordered list of results
-     * @throws IllegalArgumentException if the task is invalid
-     * @throws TaskException if a task threw an Exception
-     */
-    public List<ResultIntern> waitResultsOf(List<TaskIntern> tasks)
-        throws IllegalArgumentException, TaskException;
-
-    /**
      * Tells if all results are available <br/>
      * @return the answer
      * @throws IllegalStateException if no task have been submitted
@@ -151,13 +121,4 @@ public interface MasterIntern {
      * @throws IllegalStateException if no task have been submitted
      */
     public boolean isOneResultAvailable() throws IllegalStateException;
-
-    /**
-     * Tells if result of a specific task is available <br/>
-     * @param task the associated task
-     * @return the answer
-     * @throws IllegalArgumentException if the task is invalid
-     */
-    public boolean isResultAvailable(TaskIntern task)
-        throws IllegalArgumentException;
 }

@@ -70,20 +70,22 @@ public class NQueensExample {
                 nqueen_algorithm_depth);
 
         // Splitting Queries
+        Vector<QueryExtern> toSolve = new Vector<QueryExtern>();
         while (!unresolvedqueries.isEmpty()) {
             Query query = unresolvedqueries.remove(0);
             Vector<Query> splitted = QueryGenerator.splitAQuery(query);
             if (!splitted.isEmpty()) {
                 for (Query splitquery : splitted) {
-                    master.solve(new QueryExtern(splitquery));
+                    toSolve.add(new QueryExtern(splitquery));
                 }
             } else {
-                master.solve(new QueryExtern(query));
+                toSolve.add(new QueryExtern(query));
             }
         }
+        master.solveAll(toSolve, false);
 
         // Print results on the fly
-        while (master.isAnyResultPending()) {
+        while (!master.isEmpty()) {
             try {
                 Pair<Long, Long> res = master.waitOneResult();
                 sumResults += res.getFirst();

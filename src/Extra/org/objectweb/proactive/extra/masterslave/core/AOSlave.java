@@ -230,11 +230,11 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
 
-        // We serve any outstanding request
-        if (!terminated) {
-            service.serveOldest();
+            // We serve any outstanding request
+            if (!terminated) {
+                service.serveOldest();
+            }
         }
     }
 
