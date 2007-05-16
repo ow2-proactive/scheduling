@@ -82,7 +82,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
     // global variables
     private boolean terminated; // is the master terminated
-    private static enum OrderingMode {UNSPECIFIED, UNORDERED, ORDERED;
+    private static enum OrderingMode {UNSPECIFIED,
+        UNORDERED,
+        ORDERED;
     }
     private OrderingMode mode; // current ordering mode
     private long firstId;
