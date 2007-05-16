@@ -41,6 +41,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.ControllerDescription;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.conform.components.I;
@@ -77,6 +78,22 @@ public abstract class Conformtest extends ComponentTest {
     //  protected final static String SC = "super-controller/org.objectweb.fractal.julia.control.content.SuperControllerNotifier/false,false,false";
     //  protected final static String F = "factory/org.objectweb.fractal.julia.factory.Template/false,false,false";
     protected final static String PKG = "functionalTests.component.conform.components";
+    protected final static ControllerDescription parametricPrimitive = new ControllerDescription("parametricPrimitive",
+            "parametricPrimitive",
+            "/functionalTests/component/conform/parametricPrimitive.xml", false);
+    protected final static ControllerDescription parametricComposite = new ControllerDescription("parametricComposite",
+            "parametricComposite",
+            "/functionalTests/component/conform/parametricComposite.xml", false);
+    protected final static ControllerDescription primitiveTemplate = new ControllerDescription("primitiveTemplate",
+            "primitiveTemplate",
+            "/functionalTests/component/conform/primitiveTemplate.xml", false);
+    protected final static ControllerDescription badPrimitive = new ControllerDescription("badPrimitive",
+            "badPrimitive",
+            "/functionalTests/component/conform/badPrimitive.xml", false);
+    protected final static ControllerDescription badParametricPrimitive = new ControllerDescription("badParametricPrimitive",
+            "badParametricPrimitive",
+            "/functionalTests/component/conform/badParametricPrimitive.xml",
+            false);
 
     protected void checkInterface(I i) {
         i.m(true);
