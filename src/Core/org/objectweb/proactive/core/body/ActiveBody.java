@@ -146,7 +146,13 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
      * method of the active object of the default live method of this body.
      */
     public void run() {
-        activityStarted();
+        // Notify the rmi thread that the body has been registered into
+        // the localBodyStore.
+        synchronized (this) {
+            activityStarted();
+            this.notify();
+        }
+
         // execute the initialization if needed. Only once
         if (initActive != null) {
             initActive.initActivity(this);
@@ -200,7 +206,6 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-
     /**
      * Creates the active thread and start it using this runnable body.
      */
@@ -213,7 +218,17 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         String inc = (this.ftmanager != null) ? ("" + this.ftmanager) : ("");
         Thread t = new Thread(this,
                 shortClassName(getName()) + " on " + getNodeURL() + inc);
-        t.start();
+
+        // Wait for the registration of this Body inside the LocalBodyStore 
+        // to avoid a race condition (t not yet scheduled and getActiveObjects() called)
+        synchronized (this) {
+            t.start();
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                logger.warn(e.getMessage(), e);
+            }
+        }
     }
 
     /**
