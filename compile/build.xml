@@ -354,7 +354,17 @@
 						<exclude name="functionalTests/security/*/*.class"/>
 						<exclude name="**/*$*.class"/>
 						<exclude name="functionalTests/*.class"/>
-						<exclude name="functionalTests/component/collectiveitf/**/*"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/MulticastTestItf.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/ServerItfTestItf.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/ServerParameterAnnotationTester.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/ServerTestItf.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/ServerItfTestItf.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/TestItf.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class"/>
+						<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class"/>
 						<exclude name="functionalTests/component/lookup/**/*"/>
 					</fileset>
 				</batchtest>
