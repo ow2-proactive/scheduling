@@ -100,36 +100,13 @@ public class TestGenericFactory extends Conformtest {
                     new Object[] { COMP, BC, LC, AC, NC, sI, cI })));
     }
 
-    /*
-      [
-       component/org.objectweb.proactive.core.component.identity.ProActiveComponent/false,false,false,
-       binding-controller/org.objectweb.proactive.core.component.controller.ProActiveBindingController/false,false,false,
-       server/functionalTests.component.conform.components.I/false,false,false,
-       lifecycle-controller/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController/false,false,false,
-       client/functionalTests.component.conform.components.I/true,false,false,
-       name-controller/org.objectweb.proactive.core.component.controller.ProActiveNameController/false,false,false,
-       super-controller/org.objectweb.proactive.core.component.controller.ProActiveSuperController/false,false,false]
-       [
-        binding-controller/org.objectweb.proactive.core.component.controller.ProActiveBindingController/false,false,false,
-        name-controller/org.objectweb.fractal.api.control.NameController/false,false,false,
-        migration-controller/org.objectweb.proactive.core.component.controller.MigrationController/false,false,false,
-        server/functionalTests.component.conform.components.I/false,false,false,
-        multicast-controller/org.objectweb.proactive.core.component.controller.MulticastController/false,false,false,
-        lifecycle-controller/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController/false,false,false,
-        gathercast-controller/org.objectweb.proactive.core.component.controller.GathercastController/false,false,false,
-        client/functionalTests.component.conform.components.I/true,false,false,
-        component-parameters-controller/org.objectweb.proactive.core.component.controller.ComponentParametersController/false,false,false,
-        super-controller/org.objectweb.proactive.core.component.controller.ProActiveSuperController/false,false,false
-        ]
-    */
     @Test
-    @Ignore
     public void testPrimitive() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
-        c.getFcInterfaces();
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, NC, sI, cI })));
+                    new Object[] { COMP, BC, MC, LC, MCC, GC, SC, NC, CP, sI, cI })));
+        //          new Object[] { COMP, BC, LC, SC, NC, sI, cI }
     }
 
     @Test

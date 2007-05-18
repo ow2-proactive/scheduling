@@ -38,6 +38,7 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -48,7 +49,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ProActiveComponentTypeImpl implements ComponentType, Serializable {
+public class ProActiveComponentTypeImpl implements ComponentType,
+    ProActiveInterfaceType, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
@@ -143,5 +145,41 @@ public class ProActiveComponentTypeImpl implements ComponentType, Serializable {
             System.arraycopy(types, 0, clone, 0, types.length);
             return clone;
         }
+    }
+
+    public String getFcItfName() {
+        return "component";
+    }
+
+    public String getFcItfSignature() {
+        return ProActiveComponent.class.getName();
+    }
+
+    public boolean isFcClientItf() {
+        return false;
+    }
+
+    public boolean isFcCollectionItf() {
+        return false;
+    }
+
+    public boolean isFcOptionalItf() {
+        return false;
+    }
+
+    public String getFcCardinality() {
+        return ProActiveTypeFactory.SINGLETON_CARDINALITY;
+    }
+
+    public boolean isFcGathercastItf() {
+        return false;
+    }
+
+    public boolean isFcMulticastItf() {
+        return false;
+    }
+
+    public boolean isFcSingletonItf() {
+        return true;
     }
 }

@@ -52,7 +52,9 @@ public abstract class Conformtest extends ComponentTest {
     protected final static String COMP = "component/org.objectweb.proactive.core.component.identity.ProActiveComponent/false,false,false";
     protected final static String BC = "binding-controller/org.objectweb.proactive.core.component.controller.ProActiveBindingController/false,false,false";
     protected final static String CC = "content-controller/org.objectweb.proactive.core.component.controller.ProActiveContentController/false,false,false";
-    protected final static String NC = "name-controller/org.objectweb.proactive.core.component.controller.ProActiveNameController/false,false,false";
+    protected final static String NC = "name-controller/org.objectweb.fractal.api.control.NameController/false,false,false";
+
+    //protected final static String NC = "name-controller/org.objectweb.proactive.core.component.controller.ProActiveNameController/false,false,false";
     protected final static String LC = "lifecycle-controller/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController/false,false,false";
     protected final static String SC = "super-controller/org.objectweb.proactive.core.component.controller.ProActiveSuperController/false,false,false";
     protected final static String F = "factory/org.objectweb.proactive.core.component.Fractive/false,false,false"; //org.objectweb.proactive.core.component.factory.ProActiveGenericFactory

@@ -91,7 +91,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class ProActiveComponentRepresentativeImpl
-    implements ProActiveComponentRepresentative, Serializable {
+    implements ProActiveComponentRepresentative, Interface, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected Map fcInterfaceReferences;
     protected Map nfInterfaceReferences;
@@ -268,6 +268,10 @@ public class ProActiveComponentRepresentativeImpl
         if (fcInterfaceReferences.containsKey(interfaceName)) {
             return fcInterfaceReferences.get(interfaceName);
         } else {
+            if (interfaceName.equals("component")) {
+                return this;
+            }
+
             // maybe the member of a collection itf?
             InterfaceType itfType = Utils.getItfType(interfaceName, this);
             if ((itfType != null) && itfType.isFcCollectionItf()) {
@@ -302,10 +306,11 @@ public class ProActiveComponentRepresentativeImpl
         Interface[] fcInterfaces = (Interface[]) (fcInterfaceReferences.values()
                                                                        .toArray(new Interface[fcInterfaceReferences.size()]));
         Interface[] result = new Interface[nfInterfaces.length +
-            fcInterfaces.length];
+            fcInterfaces.length + 1];
         System.arraycopy(nfInterfaces, 0, result, 0, nfInterfaces.length);
         System.arraycopy(fcInterfaces, 0, result, nfInterfaces.length,
             fcInterfaces.length);
+        result[result.length - 1] = this;
         return result;
     }
 
@@ -331,9 +336,15 @@ public class ProActiveComponentRepresentativeImpl
         this.proxy = proxy;
         // sets the same proxy for all interfaces of this component
         Object[] interfaces = getFcInterfaces();
-        ProActiveInterface[] interface_references = new ProActiveInterface[interfaces.length];
+        ProActiveInterface[] interface_references = new ProActiveInterface[interfaces.length -
+            1];
         for (int i = 0; i < interfaces.length; i++) {
-            interface_references[i] = (ProActiveInterface) interfaces[i];
+            if (interfaces[i].equals(this)) {
+                //TODO_C
+                ;
+            } else {
+                interface_references[i] = (ProActiveInterface) interfaces[i];
+            }
         }
         for (int i = 0; i < interface_references.length; i++) {
             if (useShortcuts) {
@@ -433,5 +444,21 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     public void _terminateAOImmediatly(Proxy proxy) {
+    }
+
+    public String getFcItfName() {
+        return "component";
+    }
+
+    public Component getFcItfOwner() {
+        return this;
+    }
+
+    public Type getFcItfType() {
+        return componentType;
+    }
+
+    public boolean isFcInternalItf() {
+        return false;
     }
 }
