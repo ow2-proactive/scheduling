@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.ProActiveException;
 /**
  * <p>
  * The <code>Node</code> interface offers a generic interface over various
- * implementations of the node such as RMI or JINI, this exception offer a way
+ * implementations of the node such as RMI or HTTP, this exception offer a way
  * to wrap the various exceptions triggered by the implementation.
  * A <code>NodeException</code> is raised if a problem occured due to the remote
  * nature of the concrete implementation of the node.

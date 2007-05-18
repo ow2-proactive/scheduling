@@ -121,7 +121,7 @@ public class SimpleObjectMigration implements Serializable {
          *
          * <ul>
          * <li>param1 : The source node url (like
-         * <code>jini://host1/JiniNode1</code>)
+         * <code>http://host1/HTTPNode1</code>)
          * <li>
          * <li>param2 : The destination node url (like
          * <code>rmi://host2/RmiNode2</code>)
@@ -148,7 +148,7 @@ public class SimpleObjectMigration implements Serializable {
             logger.info("USAGE   : java SimpleObjectMigration " +
                 "urlSourceNode        urlDestinationNode ");
             logger.info("Example : java SimpleObjectMigration " +
-                "rmi://host1/Mynode1  jini://host2/MyNode2 ");
+                "rmi://host1/Mynode1  http://host2/MyNode2 ");
             System.exit(1);
         }
 

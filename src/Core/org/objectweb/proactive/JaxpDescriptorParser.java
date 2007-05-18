@@ -60,7 +60,7 @@ import org.xml.sax.SAXException;
 
 
 public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
-    public static final String JINI_DEFAULT_PORT = "1099";
+    public static final String RMI_DEFAULT_PORT = "1099";
     public static final String XMLNS_PREFIX = "pa:";
     public static final String MAIN_DEFINITIONS = "//pa:mainDefinition";
 
@@ -490,15 +490,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             String protocol = getNodeExpandedValue(namedItem);
             Node portItem = node.getAttributes().getNamedItem("port");
 
-            if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) &&
-                    (portItem != null)) {
-                throw new org.xml.sax.SAXException(
-                    "For a jini lookup, no port number should be specified");
-            }
-
             String port = getNodeExpandedValue(portItem);
             if (port == null) {
-                port = JINI_DEFAULT_PORT;
+                port = RMI_DEFAULT_PORT;
             }
 
             VirtualNodeLookup vn = (VirtualNodeLookup) proActiveDescriptor.createVirtualNode(vnLookup,

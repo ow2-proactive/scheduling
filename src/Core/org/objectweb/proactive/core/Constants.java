@@ -77,8 +77,7 @@ public interface Constants {
     /** rmi tunneling over ssh protocol identifier */
     public static final String RMISSH_PROTOCOL_IDENTIFIER = "rmissh";
 
-    /** jini protocol identifier */
-    public static final String JINI_PROTOCOL_IDENTIFIER = "jini";
+    /** ibis protocol identifier */
     public static final String IBIS_PROTOCOL_IDENTIFIER = "ibis";
 
     /**xml-http protocol identifier */

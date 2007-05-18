@@ -241,14 +241,6 @@ public class Legend extends ViewPart {
 		Label node3Text = new Label(nodeDef, 0);
 		node3Text.setText("RMI/SSH Node");
 
-		// JINI Node
-
-		FigureCanvas node4Container = new FigureCanvas(nodeDef);
-		node4Container.setContents(new NodeFigure(Constants.JINI_PROTOCOL_IDENTIFIER));
-
-		Label node4Text = new Label(nodeDef, 0);
-		node4Text.setText("JINI Node");
-
 		/*--------- JVMs ---------*/
 
 		Group jvmDef = new Group(child, 0);

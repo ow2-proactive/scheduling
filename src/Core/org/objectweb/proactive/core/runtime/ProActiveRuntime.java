@@ -241,7 +241,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
         throws ProActiveException;
 
     /**
-     * Registers the virtualNode of the given name in a registry such RMIRegistry or Jini Service Lookup
+     * Registers the virtualNode of the given name in a registry such RMIRegistry
      * @param virtualNodeName
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */

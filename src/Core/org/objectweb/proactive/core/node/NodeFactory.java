@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * <p>
  * The <code>NodeFactory</code> provides a generic way to create and lookup <code>Node</code>
- * without protocol specific code (such as RMI or Jini).
+ * without protocol specific code (such as RMI or HTTP).
  * </p><p>
  * <code>NodeFactory</code> provides a set of static methods to create and lookup <code>Node</code>.
  * To create a node it is only necessary to associate the protocol in the node url.
@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * </p>
  * <pre>
  *    rmi://localhost/node1
- *    jini://localhost/node2
+ *    http://localhost/node2
  * </pre>
  * <p>
  * As long as a protocol specific factory has been registered for the

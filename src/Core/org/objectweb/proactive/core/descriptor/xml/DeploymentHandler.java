@@ -163,15 +163,9 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
 
             //System.out.println(port);
             if (checkNonEmpty(port)) {
-                if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER)) {
-                    throw new org.xml.sax.SAXException(
-                        "For a jini lookup, no port number should be specified");
-                }
-
                 vn.setLookupInformations(host, protocol, port);
 
-                //if no port is specified we use 1099 since it is the default port. Even if it is jini
-                // the UrlBuilder will not use the port when building the url
+                //if no port is specified we use 1099 since it is the default port.
             } else {
                 vn.setLookupInformations(host, protocol, "1099");
             }

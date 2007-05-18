@@ -34,8 +34,8 @@ import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 
 /**
- * An RMI/JINI adapter for a ProActiveRuntime to be able to receive remote calls with RMI. This helps isolate
- * RMI/JINI specific code into a small set of specific classes.
+ * An RMI adapter for a ProActiveRuntime to be able to receive remote calls with RMI. This helps isolate
+ * RMI specific code into a small set of specific classes.
  * @author ProActiveTeam
  * @version 1.0
  * @since ProActive 2.2

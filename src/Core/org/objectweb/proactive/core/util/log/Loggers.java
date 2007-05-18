@@ -54,7 +54,6 @@ public interface Loggers {
         ".communication.transport.http";
     public static final String MIGRATION = CORE + ".migration";
     public static final String REQUESTS = CORE + ".communication.requests";
-    public static final String JINI = CORE + ".jini";
     static final public String UTIL = CORE + ".util";
     static final public String LOG = CORE + ".util.log";
     static final public String XML = CORE + ".xml";

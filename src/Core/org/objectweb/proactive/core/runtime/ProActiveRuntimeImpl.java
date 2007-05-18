@@ -551,7 +551,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) {
         //This method has no effect here since the virtualNode has been registered in some registry
-        //like RMI or JINI
+        //like RMI
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {

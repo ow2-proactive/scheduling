@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.Constants;
 
 public enum Protocol {
 	
-	RMI, RMISSH, IBIS, JINI, HTTP, UNKNOWN;
+	RMI, RMISSH, IBIS, HTTP, UNKNOWN;
 
 	public String toString(){
 		return super.toString().toLowerCase();
@@ -53,8 +53,6 @@ public enum Protocol {
 			return RMISSH;
 		else if (s.compareToIgnoreCase(Constants.IBIS_PROTOCOL_IDENTIFIER) == 0)
 			return IBIS;
-		else if (s.compareToIgnoreCase(Constants.JINI_PROTOCOL_IDENTIFIER) == 0)
-			return JINI;
 		else if (s.compareToIgnoreCase(Constants.XMLHTTP_PROTOCOL_IDENTIFIER) == 0)
 			return HTTP;
 		else//Unknown protocol

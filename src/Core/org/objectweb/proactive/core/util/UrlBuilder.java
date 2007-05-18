@@ -178,8 +178,7 @@ public class UrlBuilder {
 
     /**
      * This method build an url in the form protocol://host:port/name where the port
-     * is given from system propeties, except when the protocol is jini. In that case the url
-     * looks like jini://host/name.
+     * is given from system propeties.
      * @param host
      * @param name
      * @return an Url built from properties
@@ -197,8 +196,7 @@ public class UrlBuilder {
             port = ProActiveConfiguration.getInstance()
                                          .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         }
-        if (protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) ||
-                (port == null)) {
+        if (port == null) {
             return buildUrl(host, name, protocol);
         } else {
             return buildUrl(host, name, protocol, new Integer(port).intValue());

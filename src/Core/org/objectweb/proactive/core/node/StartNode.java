@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
 import org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -239,10 +238,6 @@ public class StartNode {
         RmiRuntimeFactory.setShouldCreateRegistry(!noRegistry);
         RmiRuntimeFactory.setRegistryPortNumber(registryPortNumber);
 
-        if (multicastLocator) {
-            JiniRuntimeFactory.setMulticastLocator(multicastLocator);
-        }
-
         // create node
         createNode(nodeURL, noRebind);
     }
@@ -285,7 +280,7 @@ public class StartNode {
             " <node URL> [options]");
         logger.info(" - options");
         logger.info("     " + NO_CLASS_SERVER_OPTION_NAME +
-            " : indicates not to create a ClassServer for JINI and RMI.");
+            " : indicates not to create a ClassServer for RMI.");
         logger.info(
             "                      By default a ClassServer is automatically created");
         logger.info("                      to serve class files on demand.");
@@ -300,10 +295,5 @@ public class StartNode {
         logger.info("                java " + StartNode.class.getName() + " " +
             Constants.RMI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node2  " +
             NO_CLASS_SERVER_OPTION_NAME + " " + NO_REBIND_OPTION_NAME);
-        logger.info("                java " + StartNode.class.getName() + " " +
-            Constants.JINI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node3");
-        logger.info("                java " + StartNode.class.getName() + " " +
-            Constants.JINI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node4 " +
-            MULTICAST_LOCATOR_NAME);
     }
 }

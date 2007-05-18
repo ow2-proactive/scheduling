@@ -55,8 +55,6 @@ public class HostRTFinderFactory {
 			return new HttpHostRTFinder();
 		else if(protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER))
 			return new IbisHostRTFinder();
-		else if(protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER))
-			return new JiniHostRTFinder();
 		else
 			return null;
 	}

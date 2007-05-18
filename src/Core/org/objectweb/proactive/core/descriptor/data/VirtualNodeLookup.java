@@ -46,11 +46,11 @@ import org.objectweb.proactive.filetransfer.FileVector;
  * a <code>VirtualNode</code> represents one or several nodes.
  *
  * This class represents a remote VirtualNode resulting from a lookup in some registry such as RMIRegistry
- * or JINI Lookup  service.
+ *
  * Objects of this class will be created when in an XML descriptor a VirtualNode is declared
  * in the virtualNodesAcquisition tag and defined with
  * <pre>
- * lookup virtualNode="Dispatcher" host="hostname" protocol="rmi or jini"
+ * lookup virtualNode="Dispatcher" host="hostname" protocol="rmi or http"
  * </pre>
  * @author  ProActive Team
  * @version 1.0,  2003/04/01

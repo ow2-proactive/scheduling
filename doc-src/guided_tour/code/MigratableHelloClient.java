@@ -2,7 +2,7 @@ public class MigratableHelloClient {
     /** entry point for the program
      * @param args destination nodes
      * for example :
-    * rmi://localhost/node1 jini://localhost/node2*/
+    * rmi://localhost/node1 http://localhost/node2*/
     public static void main(String[] args) { // instanciation-based creation of the active object
 
         MigratableHello migratable_hello = MigratableHello.createMigratableHello("agent1");

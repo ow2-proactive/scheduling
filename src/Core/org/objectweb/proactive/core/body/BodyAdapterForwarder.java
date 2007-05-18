@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 /**
  * An adapter for a RemoteBodyForwarder. The Adpater is the generic entry point for remote calls
- * to a RemoteBodyForwarder using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * to a RemoteBodyForwarder using different protocols such as RMI, RMISSH, IBIS, HTTP.
  * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
  *
  * A BodyAdapterForwarder has also an UniqueID which permit to associate an adapter to a body

@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 /**
  * An adapter for a RemoteProActiveRuntimeForwarder. The Adpater is the generic entry point for remote calls
- * to a RemoteProActiveRuntimeForwarder using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * to a RemoteProActiveRuntimeForwarder using different protocols such as RMI, RMISSH, IBIS, HTTP.
  * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
  *
  * All calls done on a ProActiveRuntimeAdapterForwarderImpl, method1(foo, bar) for example, are

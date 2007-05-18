@@ -49,7 +49,6 @@ public class NodeFigure extends AbstractRectangleFigure{
 
 	public static final Color RMI_COLOR;
 	public static final Color RMISSH_COLOR;
-	public static final Color JINI_COLOR;
 	public static final Color HTTP_COLOR;
 
 	public static final Color DEFAULT_BORDER_COLOR;
@@ -58,7 +57,6 @@ public class NodeFigure extends AbstractRectangleFigure{
 		Display device = Display.getCurrent();
 		RMI_COLOR = new Color(device, 208, 208, 224);
 		RMISSH_COLOR = new Color(device, 248, 255, 224);
-		JINI_COLOR = ColorConstants.cyan;
 		HTTP_COLOR = ColorConstants.orange;
 		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
 	}
@@ -103,8 +101,6 @@ public class NodeFigure extends AbstractRectangleFigure{
 			backgroundColor = HTTP_COLOR;
 		else if(protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER))
 			backgroundColor = RMI_COLOR;//TODO
-		else if(protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER))
-			backgroundColor = JINI_COLOR;
 	}
 
 	//

@@ -1431,7 +1431,7 @@ public class ProActive {
     }
 
     /**
-     * Looks-up all Active Objects registered on a host, using a registry(RMI or JINI or HTTP or IBIS)
+     * Looks-up all Active Objects registered on a host, using a registry(RMI or HTTP or IBIS)
      * The registry where to look for is fully determined with the protocol included in the url.
      * @param url The url where to perform the lookup. The url takes the following form:
      * protocol://machine_name:port. Protocol and port can be ommited if respectively RMI and 1099:
@@ -1699,11 +1699,11 @@ public class ProActive {
     }
 
     /**
-     * Registers locally the given VirtualNode in a registry such RMIRegistry or JINI Lookup Service or HTTP registry.
+     * Registers locally the given VirtualNode in a registry such RMIRegistry or HTTP registry.
      * The VirtualNode to register must exist on the local runtime. This is done when using XML Deployment Descriptors
      * @param virtualNode the VirtualNode to register.
      * @param registrationProtocol The protocol used for registration or null in order to use the protocol used to start the jvm.
-     * At this time RMI, JINI, HTTP, IBIS are supported. If set to null, the registration protocol will be set to the system property:
+     * At this time RMI, HTTP, IBIS are supported. If set to null, the registration protocol will be set to the system property:
      * proactive.communication.protocol
      * @param replacePreviousBinding
      * @throws ProActiveException If the VirtualNode with the given name has not been yet activated or does not exist on the local runtime
@@ -1731,7 +1731,7 @@ public class ProActive {
     }
 
     /**
-     * Looks-up a VirtualNode previously registered in a registry(RMI or JINI or HTTP or IBIS)
+     * Looks-up a VirtualNode previously registered in a registry(RMI or HTTP or IBIS)
      * The registry where to look for is fully determined with the protocol included in the url
      * @param url The url where to perform the lookup. The url takes the following form:
      * protocol://machine_name:port/name. Protocol and port can be ommited if respectively RMI and 1099:
@@ -1753,7 +1753,7 @@ public class ProActive {
     }
 
     /**
-     * Unregisters the virtualNode previoulsy registered in a registry such as JINI or RMI.
+     * Unregisters the virtualNode previoulsy registered in a registry such RMI.
      * Calling this method removes the VirtualNode from the local runtime.
      * @param virtualNode The VirtualNode to unregister
      * @throws ProActiveException if a problem occurs whle unregistering the VirtualNode

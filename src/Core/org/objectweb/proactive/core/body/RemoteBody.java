@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * An object implementing this interface provides the minimum service a body offers
- * remotely. This interface is extended by protocol-specific(RMI, RMI/SSH, IBIS, HTTP, JINI)
+ * remotely. This interface is extended by protocol-specific(RMI, RMI/SSH, IBIS, HTTP)
  * remote interfaces to allow the body to be accessed remotely.
  * @author ProActiveTeam
  * @version 1.0

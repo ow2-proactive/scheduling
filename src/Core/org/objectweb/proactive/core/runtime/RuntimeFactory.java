@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * <p>
  * The <code>RuntimeFactory</code> provides a generic way to create and lookup <code>ProActiveRuntime</code>
- * without protocol specific code (such as RMI, HTTP, IBIS, RMI/SSH, JINI).
+ * without protocol specific code (such as RMI, HTTP, IBIS, RMI/SSH).
  * </p><p>
  * <code>RuntimeFactory</code> provides a set of static methods to create and lookup <code>ProActiveRuntime</code>
  * and to associate protocol specific factory to concrete protocols. To create a proActiveRuntime it is only
@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * </p>
  * <pre>
  *                 RuntimeFactory.getProtocolSpecificRuntime("rmi");
- *                 RuntimeFactory.getProtocolSpecificRuntime("jini");
+ *                 RuntimeFactory.getProtocolSpecificRuntime("http");
  * </pre>
  * <p>
  * As long as a protocol specific factory has been registered to this <code>RuntimeFactory</code> for the
@@ -253,9 +253,6 @@ public abstract class RuntimeFactory {
     }
 
     private static void registerProtocolFactories() {
-        setFactory(Constants.JINI_PROTOCOL_IDENTIFIER,
-            "org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory");
-
         setFactory(Constants.IBIS_PROTOCOL_IDENTIFIER,
             "org.objectweb.proactive.core.runtime.ibis.IbisRuntimeFactory");
 

@@ -246,8 +246,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             String protocol = ProActiveConfiguration.getInstance()
                                                     .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
-            if (!protocol.equals(Constants.JINI_PROTOCOL_IDENTIFIER) &&
-                    !protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
+            if (!protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
                 port = Integer.parseInt(ProActiveConfiguration.getInstance()
                                                               .getProperty("proactive." +
                             protocol + ".port"));

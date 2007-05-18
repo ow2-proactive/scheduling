@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
  * When ProActive needs to interact with a remote JVM, it will lookup for one node associated
  * with that JVM (using typically the RMI Registry) and use this node to perform the interaction.
  * </p><p>
- * We expect several concrete implementations of the Node to be wrtten such as a RMI node, a JINI node ...
+ * We expect several concrete implementations of the Node to be wrtten such as a RMI node, a HTTP node ...
  * </p>
  *
  * @author  ProActive Team

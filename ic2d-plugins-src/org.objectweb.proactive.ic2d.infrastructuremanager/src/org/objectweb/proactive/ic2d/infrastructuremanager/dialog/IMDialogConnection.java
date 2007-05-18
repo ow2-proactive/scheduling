@@ -117,7 +117,6 @@ public class IMDialogConnection extends Dialog {
 		combo.add(Constants.RMI_PROTOCOL_IDENTIFIER);
 		combo.add(Constants.XMLHTTP_PROTOCOL_IDENTIFIER);
 		combo.add(Constants.IBIS_PROTOCOL_IDENTIFIER);
-		combo.add(Constants.JINI_PROTOCOL_IDENTIFIER);
 		combo.setText(Constants.RMI_PROTOCOL_IDENTIFIER);
 		FormData protocolFormData = new FormData();
 		protocolFormData.top = new FormAttachment(0, -1);

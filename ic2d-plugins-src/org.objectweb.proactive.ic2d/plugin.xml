@@ -28,6 +28,10 @@
         <property
               name="aboutText"
               value="%About.text"/>
+        <property
+              name="appName"
+              value="IC2D">
+        </property>
      </product>
   </extension>
   

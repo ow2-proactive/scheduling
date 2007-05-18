@@ -77,12 +77,6 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
         proActiveRuntimeF = (ProActiveRuntimeForwarder) super.proActiveRuntime;
     }
 
-    public RmiProActiveRuntimeForwarderImpl(boolean isJini)
-        throws RemoteException {
-        super(isJini);
-        proActiveRuntimeF = (ProActiveRuntimeForwarder) super.proActiveRuntime;
-    }
-
     public RmiProActiveRuntimeForwarderImpl(RMIClientSocketFactory csf,
         RMIServerSocketFactory ssf)
         throws RemoteException, AlreadyBoundException {

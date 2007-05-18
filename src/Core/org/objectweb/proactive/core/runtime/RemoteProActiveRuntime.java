@@ -64,7 +64,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate
  * protocol-specific code into a small set of specific classes, thus enabling reuse when
  * using another remote objects library.
- * Implemented protocols are RMI, RMISSH, IBIS, JINI, HTTP
+ * Implemented protocols are RMI, RMISSH, IBIS, HTTP
  * @author ProActiveTeam
  * @version 1.0
  * @since ProActive 2.2

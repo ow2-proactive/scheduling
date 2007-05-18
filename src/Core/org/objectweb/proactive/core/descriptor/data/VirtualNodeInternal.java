@@ -126,7 +126,7 @@ public interface VirtualNodeInternal extends VirtualNode {
      * one information that can be set is LOOKUP_HOST. This information has a sense if in the XML descriptor
      * this VirtualNode is defined with the line:
      * <pre>
-     * lookup virtualNode="vnName" host="*" protocol="rmi or jini", ie the name of the host where to perform the lookup
+     * lookup virtualNode="vnName" host="*" protocol="rmi or http", ie the name of the host where to perform the lookup
      * will be known at runtime.
      * </pre>
      * We expect to implement several runtime informations.

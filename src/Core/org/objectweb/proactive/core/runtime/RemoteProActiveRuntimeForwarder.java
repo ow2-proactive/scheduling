@@ -64,7 +64,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * An adapter for a ProActiveRuntimeForwarder to be able to receive remote calls. This helps isolate
  * protocol-specific code into a small set of specific classes, thus enabling reuse when
  * using another remote objects library.
- * Implemented protocols are RMI, RMISSH, IBIS, JINI, HTTP
+ * Implemented protocols are RMI, RMISSH, IBIS, HTTP
  *
  * Note that contrary to BodyForwarder a RuntimeForwarder <b>IS</b> a Runtime.
  *

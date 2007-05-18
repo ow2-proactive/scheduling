@@ -105,10 +105,6 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         construct();
     }
 
-    public RmiProActiveRuntimeImpl(boolean isJini)
-        throws java.rmi.RemoteException {
-    }
-
     //	
     // -- CONSTRUCTORS -----------------------------------------------
     //

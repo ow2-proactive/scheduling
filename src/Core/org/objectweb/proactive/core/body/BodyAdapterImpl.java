@@ -62,7 +62,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 /**
  * An adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
- * to a RemoteBody using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * to a RemoteBody using different protocols such as RMI, RMISSH, IBIS, HTTP.
  * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
  * @author ProActiveTeam
  * @since ProActive 2.2
