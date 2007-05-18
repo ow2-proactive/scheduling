@@ -86,15 +86,6 @@ public interface UniversalBodyForwarder {
 
     public void disableAC(UniqueID id) throws java.io.IOException;
 
-    public void setImmediateService(UniqueID id, String methodName)
-        throws IOException;
-
-    public void setImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException;
-
-    public void removeImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException;
-
     // 
     // -- SECURITY
     //

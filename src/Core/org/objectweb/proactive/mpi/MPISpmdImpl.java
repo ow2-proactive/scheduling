@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.AbstractExternalProcess;
@@ -72,6 +73,20 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
 
     // empty no-args constructor 
     public MPISpmdImpl() {
+    }
+
+    /**
+     * Set the immediate services for this active object
+     */
+    public int setImmediateServices() {
+        ProActive.setImmediateService("killMPI");
+        ProActive.setImmediateService("getStatus");
+        ProActive.setImmediateService("isFinished");
+        ProActive.setImmediateService("getSpmdClassesParams");
+        ProActive.setImmediateService("getSpmdClasses");
+        ProActive.setImmediateService("getClassesParams");
+        ProActive.setImmediateService("getClasses");
+        return 0; //synchronous call
     }
 
     /**

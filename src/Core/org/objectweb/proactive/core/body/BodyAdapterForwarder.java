@@ -292,32 +292,6 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#setImmediateService(java.lang.String)
-     */
-    public void setImmediateService(String methodName)
-        throws IOException {
-        proxiedRemoteBody.setImmediateService(bodyID, methodName);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#setImmediateService(java.lang.String, java.lang.Class[])
-     */
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
-        proxiedRemoteBody.setImmediateService(bodyID, methodName,
-            parametersTypes);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#removeImmediateService(java.lang.String, java.lang.Class[])
-     */
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
-        proxiedRemoteBody.removeImmediateService(bodyID, methodName,
-            parametersTypes);
-    }
-
-    /**
      * @see org.objectweb.proactive.core.body.UniversalBody#terminateSession(long)
      */
     public void terminateSession(long sessionID)

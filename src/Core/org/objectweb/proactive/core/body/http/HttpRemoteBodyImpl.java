@@ -220,45 +220,6 @@ public class HttpRemoteBodyImpl implements RemoteBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#setImmediateService(java.lang.String)
-     */
-    public void setImmediateService(String methodName)
-        throws IOException {
-        if (isLocal) {
-            body.setImmediateService(methodName);
-        } else {
-            ArrayList<Object> paramsList = new ArrayList<Object>();
-            paramsList.add(methodName);
-            (new BodyRequest("setImmediateService", paramsList, bodyID, this.url)).send();
-        }
-    }
-
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
-        if (isLocal) {
-            body.setImmediateService(methodName, parametersTypes);
-        } else {
-            ArrayList<Object> paramsList = new ArrayList<Object>();
-            paramsList.add(methodName);
-            paramsList.add(parametersTypes);
-            new BodyRequest("setImmediateService", paramsList, bodyID, this.url).send();
-        }
-    }
-
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
-        if (isLocal) {
-            body.removeImmediateService(methodName, parametersTypes);
-        } else {
-            ArrayList<Object> paramsList = new ArrayList<Object>();
-            paramsList.add(methodName);
-            paramsList.add(parametersTypes);
-            new BodyRequest("removeImmediateService", paramsList, bodyID,
-                this.url).send();
-        }
-    }
-
-    /**
      * @see org.objectweb.proactive.core.body.UniversalBody#terminateSession(long)
      */
     public void terminateSession(long sessionID)

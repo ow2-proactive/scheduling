@@ -49,21 +49,6 @@ public class RequestReceiverForwarder implements RequestReceiver {
         return request.send(remoteBody);
     }
 
-    public void setImmediateService(String methodName)
-        throws java.io.IOException {
-        remoteBody.setImmediateService(methodName);
-    }
-
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
-        remoteBody.removeImmediateService(methodName, parametersTypes);
-    }
-
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
-        remoteBody.setImmediateService(methodName, parametersTypes);
-    }
-
     public boolean isInImmediateService() throws IOException {
         return false;
     }

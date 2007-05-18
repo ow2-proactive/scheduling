@@ -96,16 +96,7 @@ public class FileTransferEngine implements ProActiveInternalObject {
     }
 
     private void setImmediateServices(FileTransferService fts) {
-        try {
-            ProActive.setImmediateService(fts, "requestFileTransfer",
-                new Class[] { FileTransferRequest.class });
-            ProActive.setImmediateService(fts, "getFileTransferRequestStatus",
-                new Class[] { FileTransferRequest.class });
-        } catch (IOException e1) {
-            logger.error(
-                "Unable to activate immediate service on method: FileTransferService.requestFileTransfer(...)");
-            e1.printStackTrace();
-        }
+        fts.setImmediateSevices();
     }
 
     public void putFTS(FileTransferService fts) {

@@ -84,7 +84,7 @@ public class FIFOPolicy implements GenericPolicy {
                 //creates a new active executer and then pings it to make sure it is alive then adds it to the pool, it also sets killing it as an immediate service
                 AE = ((ActiveExecuter) ProActive.newActive(ActiveExecuter.class.getName(),
                         null, node));
-                ProActive.setImmediateService(AE, "kill");
+                AE.setImmediateServices();
                 AE.ping();
                 executers.add(new NodeNExecuter(AE, node));
             } catch (Exception e) {

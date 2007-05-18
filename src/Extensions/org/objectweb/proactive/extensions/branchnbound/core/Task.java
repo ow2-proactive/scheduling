@@ -62,6 +62,15 @@ public abstract class Task implements Serializable, Comparable {
     }
 
     /**
+     * Set the immediate services for this active object
+     */
+    public int setImmediateServices() {
+        ProActive.setImmediateService("setBestKnownResult");
+        ProActive.setImmediateService("immediateTerminate");
+        return 0; // for synchronous call
+    }
+
+    /**
      *
      * @return the computed result of this task.
      */

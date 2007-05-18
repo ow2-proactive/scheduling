@@ -35,6 +35,7 @@ import java.io.Serializable;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
@@ -100,5 +101,15 @@ public class ComponentParametersControllerImpl
      */
     public String getFcName() {
         return componentParameters.getName();
+    }
+
+    public int setImmediateServices() {
+        ProActive.setImmediateService("getComponentParameters");
+        return 0; // synchrnous call
+    }
+
+    public int removeImmediateServices() {
+        ProActive.removeImmediateService("getComponentParameters");
+        return 0; // synchrnous call
     }
 }

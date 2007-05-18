@@ -159,6 +159,13 @@ public class LocalBodyStore {
     }
 
     /**
+     * Remove the association between the body and the thread calling the method.
+     */
+    public void removeCurrentThreadBody() {
+        bodyPerThread.remove();
+    }
+
+    /**
      * Returns the body belonging to this JVM whose ID is the one specified.
      * Returns null if a body with such an id is not found in this jvm
      * @param bodyID the ID to look for

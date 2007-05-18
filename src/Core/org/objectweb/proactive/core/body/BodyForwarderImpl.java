@@ -309,17 +309,6 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see UniversalBody#removeImmediateService(String, Class[]) */
-    public void removeImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException {
-        BodyAdapter rbody = bodies.get(id);
-        if (rbody != null) {
-            rbody.removeImmediateService(methodName, parametersTypes);
-        } else {
-            throw new IOException("No BodyAdapter associated to id=" + id);
-        }
-    }
-
     /** @see org.objectweb.proactive.core.security.SecurityEntity#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[]) */
     public byte[][] secretKeyExchange(UniqueID id, long sessionID, byte[] tmp,
         byte[] tmp1, byte[] tmp2, byte[] tmp3, byte[] tmp4)
@@ -329,28 +318,6 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         if (rbody != null) {
             return rbody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
                 tmp4);
-        } else {
-            throw new IOException("No BodyAdapter associated to id=" + id);
-        }
-    }
-
-    /** @see UniversalBody#setImmediateService(String, Class[]) */
-    public void setImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException {
-        BodyAdapter rbody = bodies.get(id);
-        if (rbody != null) {
-            rbody.setImmediateService(methodName, parametersTypes);
-        } else {
-            throw new IOException("No BodyAdapter associated to id=" + id);
-        }
-    }
-
-    /** @see UniversalBody#setImmediateService(String) */
-    public void setImmediateService(UniqueID id, String methodName)
-        throws IOException {
-        BodyAdapter rbody = bodies.get(id);
-        if (rbody != null) {
-            rbody.setImmediateService(methodName);
         } else {
             throw new IOException("No BodyAdapter associated to id=" + id);
         }

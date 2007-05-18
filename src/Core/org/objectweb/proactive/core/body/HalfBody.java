@@ -173,6 +173,10 @@ public class HalfBody extends AbstractBody {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
+    public void removeImmediateService(String methodName) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
     public void setImmediateService(String methodName, Class[] parametersTypes) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }

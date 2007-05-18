@@ -573,7 +573,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
             try {
                 while (RegistryHelper.getRegistry().list().length > 0) {
                     // the thread sleeps for 10 minutes
-                    Thread.sleep(600000);
+                    Thread.sleep(600001);
                 }
 
                 ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);

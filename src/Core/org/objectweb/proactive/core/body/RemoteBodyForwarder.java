@@ -112,24 +112,6 @@ public interface RemoteBodyForwarder {
      */
     public void disableAC(UniqueID id) throws java.io.IOException;
 
-    /**
-     * @see RemoteBody#setImmediateService(String)
-     */
-    public void setImmediateService(UniqueID id, String methodName)
-        throws java.io.IOException;
-
-    /**
-     * @see RemoteBody#setImmediateService(String, Class[])
-     */
-    public void setImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException;
-
-    /**
-     * @see RemoteBody#removeImmediateService(String, Class[])
-     */
-    public void removeImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException;
-
     //
     // -- Security
     //

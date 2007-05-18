@@ -96,8 +96,7 @@ public class Worker implements Serializable {
                         task), workerNodeUrl);
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
             this.currentTask = activedTask;
-            ProActive.setImmediateService(this.currentTask, "setBestKnownResult");
-            ProActive.setImmediateService(this.currentTask, "immediateTerminate");
+            this.currentTask.setImmediateServices();
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't actived the task", e);
             exception = e;

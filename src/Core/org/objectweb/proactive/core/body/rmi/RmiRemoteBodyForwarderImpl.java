@@ -141,21 +141,6 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
         body.disableAC(id);
     }
 
-    public void setImmediateService(UniqueID id, String methodName)
-        throws java.io.IOException {
-        body.setImmediateService(id, methodName);
-    }
-
-    public void removeImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException {
-        body.removeImmediateService(id, methodName, parametersTypes);
-    }
-
-    public void setImmediateService(UniqueID id, String methodName,
-        Class[] parametersTypes) throws IOException {
-        body.setImmediateService(id, methodName, parametersTypes);
-    }
-
     // SECURITY
     public void terminateSession(UniqueID id, long sessionID)
         throws IOException, SecurityNotAvailableException {

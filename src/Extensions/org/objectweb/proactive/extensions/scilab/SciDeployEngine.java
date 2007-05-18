@@ -143,12 +143,7 @@ public class SciDeployEngine {
         SciEngine sciEngine = (SciEngine) ProActive.newActive(SciEngine.class.getName(),
                 param, currentNode);
         mapNode.put(idEngine, currentNode);
-        try {
-            ProActive.setImmediateService(sciEngine, "killWorker");
-            ProActive.setImmediateService(sciEngine, "exit");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sciEngine.setImmediateServices();
         return sciEngine;
     }
 
@@ -165,12 +160,7 @@ public class SciDeployEngine {
         Object[] param = new Object[] { idEngine };
         SciEngine sciEngine = (SciEngine) ProActive.newActive(SciEngine.class.getName(),
                 param);
-        try {
-            ProActive.setImmediateService(sciEngine, "killWorker");
-            ProActive.setImmediateService(sciEngine, "exit");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sciEngine.setImmediateServices();
         return sciEngine;
     }
 

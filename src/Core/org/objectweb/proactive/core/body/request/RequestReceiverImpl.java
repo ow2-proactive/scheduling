@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -73,9 +74,12 @@ public class RequestReceiverImpl implements RequestReceiver,
                         request.getMethodName());
                 }
                 this.inImmediateService.incrementAndGet();
+                // associate temporarily the calling/executing thread to the called body
+                //                LocalBodyStore.getInstance().setCurrentThreadBody(bodyReceiver);
                 try {
                     bodyReceiver.serve(request);
                 } finally {
+                    //                    LocalBodyStore.getInstance().removeCurrentThreadBody();
                     this.inImmediateService.decrementAndGet();
                 }
                 if (logger.isDebugEnabled()) {
@@ -129,8 +133,12 @@ public class RequestReceiverImpl implements RequestReceiver,
         this.immediateServices.put(methodName, ANY_PARAMETERS);
     }
 
+    public void removeImmediateService(String methodName) {
+        this.immediateServices.remove(methodName);
+    }
+
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
+        Class[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (!ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
                 List<Class[]> list = (List<Class[]>) immediateServices.get(methodName);
@@ -156,8 +164,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         }
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
+    public void setImmediateService(String methodName, Class[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
                 // there is already a filter on all methods with that name, whatever the parameters

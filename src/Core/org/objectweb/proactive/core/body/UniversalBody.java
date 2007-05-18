@@ -142,34 +142,6 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
      */
     public void disableAC() throws java.io.IOException;
 
-    /**
-     * For setting an immediate service for this body.
-     * An immediate service is a method that will bw excecuted by the calling thread.
-     * @exception java.io.IOException if a pb occurs during this method call
-     */
-    public void setImmediateService(String methodName)
-        throws IOException;
-
-    /**
-     * Adds an immediate service for this body
-     * An immediate service is a method that will bw excecuted by the calling thread.
-     * @param methodName the name of the method
-     * @param parametersTypes the types of the parameters of the method
-     * @exception java.io.IOException if a pb occurs during this method call
-     */
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException;
-
-    /**
-     * Removes an immediate service for this body
-     * An immediate service is a method that will bw excecuted by the calling thread.
-     * @param methodName the name of the method
-     * @param parametersTypes the types of the parameters of the method
-     * @exception java.io.IOException if a pb occurs during this method call
-     */
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException;
-
     // FAULT TOLERANCE
 
     /**

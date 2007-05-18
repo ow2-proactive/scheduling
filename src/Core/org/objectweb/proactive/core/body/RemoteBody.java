@@ -134,20 +134,6 @@ public interface RemoteBody extends Serializable, SecurityEntity {
     public void disableAC() throws java.io.IOException;
 
     /**
-     * For setting an immediate service for this body.
-     * An immediate service is a method that will bw excecuted by the calling thread.
-     * @exception java.io.IOException if an exception occured during the remote communication
-     */
-    public void setImmediateService(String methodName)
-        throws java.io.IOException;
-
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException;
-
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException;
-
-    /**
      * For sending a message to the FTManager linked to this object
      * @param fte the message
      * @return depends on the message meaning

@@ -67,6 +67,15 @@ public class SciEngine implements Serializable {
         this.idEngine = idEngine;
     }
 
+    /**
+     * Set the immediate services for this active object
+     */
+    public int setImmediateServices() {
+        ProActive.setImmediateService("killWorker");
+        ProActive.setImmediateService("exit");
+        return 0; // synchronous call
+    }
+
     public void exit() {
         //logger.debug("->SciEngineWorker In:exit");
         this.killWorker();

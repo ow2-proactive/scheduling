@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
@@ -59,6 +60,14 @@ public class ActiveExecuter implements java.io.Serializable {
      */
     public void kill() {
         System.exit(0);
+    }
+
+    /**
+     * Set the immediates services for this active object
+     */
+    public int setImmediateServices() {
+        ProActive.setImmediateService("kill");
+        return 0; //synchronous call
     }
 
     /**

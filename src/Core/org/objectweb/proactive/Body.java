@@ -133,4 +133,35 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @param newNodeURL the new URL of the node
      */
     public void updateNodeURL(String newNodeURL);
+
+    /**
+     * For setting an immediate service for this body.
+     * An immediate service is a method that will bw excecuted by the calling thread.
+     */
+    public void setImmediateService(String methodName);
+
+    /**
+     * Removes an immediate service for this body
+     * An immediate service is a method that will bw excecuted by the calling thread.
+     * @param methodName the name of the method
+     * @param parametersTypes the types of the parameters of the method
+     */
+    public void removeImmediateService(String methodName);
+
+    /**
+     * Adds an immediate service for this body
+     * An immediate service is a method that will bw excecuted by the calling thread.
+     * @param methodName the name of the method
+     * @param parametersTypes the types of the parameters of the method
+     */
+    public void setImmediateService(String methodName, Class[] parametersTypes);
+
+    /**
+     * Removes an immediate service for this body
+     * An immediate service is a method that will bw excecuted by the calling thread.
+     * @param methodName the name of the method
+     * @param parametersTypes the types of the parameters of the method
+     */
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes);
 }

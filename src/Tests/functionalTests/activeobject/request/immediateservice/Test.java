@@ -48,7 +48,7 @@ public class Test extends FunctionalTest {
     @Before
     public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
-        ProActive.setImmediateService(a, "getObject");
+        // getObject is set as an IS in the runActivity of A
         dum = a.getObject();
         ProActive.terminateActiveObject(a, true);
     }

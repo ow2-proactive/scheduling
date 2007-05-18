@@ -136,15 +136,10 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      */
     public void initActivity(Body body) {
         stubOnThis = ProActive.getStubOnThis();
-
-        try {
-            isSleeping = false;
-            terminated = false;
-            body.setImmediateService("getName");
-            body.setImmediateService("terminate");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        isSleeping = false;
+        terminated = false;
+        ProActive.setImmediateService("getName");
+        ProActive.setImmediateService("terminate");
     }
 
     /* (non-Javadoc)

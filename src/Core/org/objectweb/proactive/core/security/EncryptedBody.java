@@ -238,8 +238,10 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#setImmediateService(java.lang.String)
      */
-    public void setImmediateService(String methodName)
-        throws IOException {
+    public void setImmediateService(String methodName) {
+    }
+
+    public void removeImmediateService(String methodName) {
     }
 
     /* (non-Javadoc)
@@ -403,12 +405,11 @@ public class EncryptedBody implements Body, Serializable {
     public void createShortcut(Shortcut shortcut) throws IOException {
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
+    public void setImmediateService(String methodName, Class[] parametersTypes) {
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
+        Class[] parametersTypes) {
     }
 
     public BodyAdapter getRemoteAdapter() {

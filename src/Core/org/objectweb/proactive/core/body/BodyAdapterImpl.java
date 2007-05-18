@@ -242,30 +242,6 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
         proxiedRemoteBody.disableAC();
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#setImmediateService(java.lang.String)
-     */
-    public void setImmediateService(String methodName)
-        throws IOException {
-        proxiedRemoteBody.setImmediateService(methodName);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#setImmediateService(java.lang.String, java.lang.Class[])
-     */
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
-        proxiedRemoteBody.setImmediateService(methodName, parametersTypes);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#removeImmediateService(java.lang.String, java.lang.Class[])
-     */
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
-        proxiedRemoteBody.removeImmediateService(methodName, parametersTypes);
-    }
-
     //--------------------------------------------
     // implements SecurityEntity
     //--------------------------------------------

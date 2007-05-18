@@ -150,21 +150,6 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody.disableAC();
     }
 
-    public void setImmediateService(String methodName)
-        throws java.io.IOException {
-        this.wrappedBody.setImmediateService(methodName);
-    }
-
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
-        this.wrappedBody.removeImmediateService(methodName, parametersTypes);
-    }
-
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
-        this.wrappedBody.setImmediateService(methodName, parametersTypes);
-    }
-
     protected void updateServer() {
         //        System.out.println("UniversalBodyWrapper.updateServer");
         //  LocationServer server = LocationServerFactory.getLocationServer();

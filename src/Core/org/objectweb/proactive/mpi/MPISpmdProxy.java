@@ -72,18 +72,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         MPI_PROXY_LOGGER.debug("[MPI Proxy] creating MPI SPMD active object: " +
             name);
         MPI_PROXY_LOGGER.debug("[MPI Proxy] status : " + status);
-
-        try {
-            ProActive.setImmediateService(target, "killMPI");
-            ProActive.setImmediateService(target, "getStatus");
-            ProActive.setImmediateService(target, "isFinished");
-            ProActive.setImmediateService(target, "getSpmdClassesParams");
-            ProActive.setImmediateService(target, "getSpmdClasses");
-            ProActive.setImmediateService(target, "getClassesParams");
-            ProActive.setImmediateService(target, "getClasses");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        target.setImmediateServices();
     }
 
     /**

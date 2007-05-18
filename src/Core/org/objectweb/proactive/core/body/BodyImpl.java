@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
+import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -271,6 +272,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         messageEventProducer = null;
         try {
             this.localBodyStrategy.getRequestQueue().destroy();
+            this.getFuturePool().disableAC();
         } catch (ProActiveRuntimeException e) {
             bodyLogger.warn("Terminating already terminated body " +
                 this.getID(), e);
@@ -278,19 +280,23 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         setLocalBodyImpl(new InactiveLocalBodyStrategy());
     }
 
-    public void setImmediateService(String methodName)
-        throws java.io.IOException {
-        this.requestReceiver.setImmediateService(methodName);
+    public void setImmediateService(String methodName) {
+        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
-        this.requestReceiver.setImmediateService(methodName, parametersTypes);
+    public void setImmediateService(String methodName, Class[] parametersTypes) {
+        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName,
+            parametersTypes);
+    }
+
+    public void removeImmediateService(String methodName) {
+        ((RequestReceiverImpl) this.requestReceiver).removeImmediateService(methodName);
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
-        this.requestReceiver.removeImmediateService(methodName, parametersTypes);
+        Class[] parametersTypes) {
+        ((RequestReceiverImpl) this.requestReceiver).removeImmediateService(methodName,
+            parametersTypes);
     }
 
     public void updateNodeURL(String newNodeURL) {

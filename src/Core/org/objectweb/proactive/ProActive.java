@@ -2192,55 +2192,51 @@ public class ProActive {
     }
 
     /**
-     * Set an immediate execution for the target active object obj of the method String,
-     * ie request of name methodName will be executed right away upon arrival at the target
+     * Set an immediate execution for the caller active object of the method methodName,
+     * ie request of name methodName will be executed right away upon arrival at the caller
      * AO context.
      * Warning: the execution of an Immediate Service method is achieved in parallel of  the
      * current services, so it is the programmer responsibility to ensure that Immediate Services
      * do not interfere with any other methods.
-     * @param obj the object on which to set this immediate service
      * @param methodName the name of the method
-     * @throws IOException
      */
-    public static void setImmediateService(Object obj, String methodName)
-        throws java.io.IOException {
-        UniversalBody body = getRemoteBody(obj);
-        body.setImmediateService(methodName);
+    public static void setImmediateService(String methodName) {
+        getBodyOnThis().setImmediateService(methodName);
     }
 
     /**
-     * Set an immediate execution for the target active object obj of the method String,
-     * ie request of name methodName will be executed right away upon arrival at the target
-     * AO context.
+     * Set an immediate execution for the caller active object obj of the method methodName with
+     * parameters parametersType, ie request of name methodName will be executed right away upon
+     * arrival at the caller AO context.
      * Warning: the execution of an Immediate Service method is achieved in parallel of  the
      * current services, so it is the programmer responsibility to ensure that Immediate Services
      * do not interfere with any other methods.
-     * @param obj the object on which to set this immediate service
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
-     * @throws IOException
      */
-    public static void setImmediateService(Object obj, String methodName,
-        Class[] parametersTypes) throws IOException {
-        UniversalBody body = getRemoteBody(obj);
-        body.setImmediateService(methodName, parametersTypes);
+    public static void setImmediateService(String methodName,
+        Class[] parametersTypes) {
+        getBodyOnThis().setImmediateService(methodName, parametersTypes);
+    }
+
+    /**
+     * Removes an immmediate execution for the active object obj, i.e. requests corresponding to the name
+     * will be executed by the calling thread, and not added in the request queue.
+     * @param methodName the name of the method
+     */
+    public static void removeImmediateService(String methodName) {
+        getBodyOnThis().removeImmediateService(methodName);
     }
 
     /**
      * Removes an immmediate execution for the active object obj, i.e. requests corresponding to the name and types of parameters
      * will be executed by the calling thread, and not added in the request queue.
-     * BE CAREFUL : for the first release of this method, do not make use of getCurrentThreadBody nor
-     * getStubOnThis in the method defined by methodName !!
-     *
-     * @param obj the object from which to remove this immediate service
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
-     * @throws IOException
      */
-    public static void removeImmediateService(Object obj, String methodName,
-        Class[] parametersTypes) throws IOException {
-        UniversalBody body = getRemoteBody(obj);
-        body.removeImmediateService(methodName, parametersTypes);
+    public static void removeImmediateService(String methodName,
+        Class[] parametersTypes) {
+        getBodyOnThis().removeImmediateService(methodName, parametersTypes);
     }
 
     /**

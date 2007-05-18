@@ -74,6 +74,14 @@ public class FileTransferService implements ProActiveInternalObject {
         forwardFile = new FileForwarder(this);
     }
 
+    public int setImmediateSevices() {
+        ProActive.setImmediateService("requestFileTransfer",
+            new Class[] { FileTransferRequest.class });
+        ProActive.setImmediateService("getFileTransferRequestStatus",
+            new Class[] { FileTransferRequest.class });
+        return 0; // synchronous call
+    }
+
     public LongWrapper getFileLength(File f) {
         return new LongWrapper(f.length());
     }

@@ -143,21 +143,6 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
         body.disableAC();
     }
 
-    public void setImmediateService(String methodName)
-        throws java.io.IOException {
-        body.setImmediateService(methodName);
-    }
-
-    public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
-        body.removeImmediateService(methodName, parametersTypes);
-    }
-
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
-        body.setImmediateService(methodName, parametersTypes);
-    }
-
     // SECURITY
     public void terminateSession(long sessionID)
         throws IOException, SecurityNotAvailableException {
