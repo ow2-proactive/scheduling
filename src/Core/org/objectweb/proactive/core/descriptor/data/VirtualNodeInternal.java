@@ -94,19 +94,6 @@ public interface VirtualNodeInternal extends VirtualNode {
     public int createdNodeCount();
 
     /**
-     * Returns the number of Nodes already created (at the time of the reception of method call) among the Nodes mapped to this VirtualNode
-     * in the XML Descriptor
-     * @return int the number of nodes created at  the time of the method call
-     */
-    public int getNumberOfCurrentlyCreatedNodes();
-
-    /**
-     * Returns the number of Nodes that could successfully be created at the end of the deployment
-     *  @return int the number of nodes effectively created
-     */
-    public int getNumberOfCreatedNodesAfterDeployment();
-
-    /**
      * Creates a node with the given protocol(or null) on the current jvm, ie the jvm that originates the creation of this VirtualNode.
      * This newly created node will is mapped on this VirtualNode
      * @param protocol the protocol to create the node. If null protocol will be set to the system property: proactive.communication.protocol.
@@ -138,14 +125,6 @@ public interface VirtualNodeInternal extends VirtualNode {
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException;
-
-    /**
-     * Returns the minimum number of nodes needed for this VirtualNode.
-     * This number represents the minimum number of nodes,  this VirtualNode needs in order to be
-     * suitable for the application. Default value is the total number of nodes requested in the
-     * XML file
-     */
-    public int getMinNumberOfNodes();
 
     /**
      * checks the cardinality of the virtual node (i.e. whether the node is mapped to several nodes or not)
