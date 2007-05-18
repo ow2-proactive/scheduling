@@ -55,7 +55,7 @@ public class Test extends FunctionalTest {
     private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/ft/testFT_PML.xml").getPath();
-    private static int AWAITED_RESULT = -395585227;
+    private static int AWAITED_RESULT = 1771014405;
 
     @org.junit.Test
     public void action() throws Exception {
@@ -101,7 +101,7 @@ public class Test extends FunctionalTest {
         b.setNeighbour(a);
         a.setLauncher(c);
 
-        c.go(a, 500);
+        c.go(a, 1000);
 
         //failure in 11 sec...
         Thread.sleep(11000);
