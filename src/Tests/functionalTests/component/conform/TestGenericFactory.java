@@ -82,22 +82,24 @@ public class TestGenericFactory extends Conformtest {
     // Test direct component creation
     // -------------------------------------------------------------------------
     @Test
-    @Ignore
     public void testFPrimitive() throws Exception {
-        Component c = gf.newFcInstance(t, "flatPrimitive", C.class.getName());
+        Component c = gf.newFcInstance(t, flatPrimitive, C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, NC, sI, cI })));
+                    new Object[] { COMP, BC, MC, LC, MCC, GC, SC, NC, CP, sI, cI })));
+        //          new Object[] { COMP, BC, LC, NC, sI, cI })));
     }
 
     @Test
-    @Ignore
     public void testFParametricPrimitive() throws Exception {
-        Component c = gf.newFcInstance(u, "flatParametricPrimitive",
+        Component c = gf.newFcInstance(u, flatParametricPrimitive,
                 C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, AC, NC, sI, cI })));
+                    new Object[] {
+                        COMP, BC, MC, LC, AC, MCC, GC, SC, NC, CP, sI, cI
+                    })));
+        //          new Object[] { COMP, BC, LC, AC, NC, sI, cI })));
     }
 
     @Test
@@ -110,12 +112,14 @@ public class TestGenericFactory extends Conformtest {
     }
 
     @Test
-    @Ignore
     public void testParametricPrimitive() throws Exception {
         Component c = gf.newFcInstance(u, parametricPrimitive, C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, AC, NC, sI, cI })));
+                    new Object[] {
+                        COMP, BC, MC, LC, MCC, GC, SC, NC, CP, AC, sI, cI
+                    })));
+        //          new Object[] { COMP, BC, LC, SC, AC, NC, sI, cI })));
     }
 
     @Test
@@ -124,7 +128,10 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(t, "composite", null);
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, CC, LC, SC, NC, sI, cI })));
+                    new Object[] {
+                        COMP, BC, MC, LC, MCC, GC, SC, NC, CP, CC, sI, cI
+                    })));
+        //          new Object[] { COMP, BC, CC, LC, SC, NC, sI, cI })));
     }
 
     @Test

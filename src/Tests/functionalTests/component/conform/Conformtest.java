@@ -30,6 +30,7 @@
  */
 package functionalTests.component.conform;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -83,9 +84,13 @@ public abstract class Conformtest extends ComponentTest {
     protected final static ControllerDescription parametricPrimitive = new ControllerDescription("parametricPrimitive",
             "parametricPrimitive",
             "/functionalTests/component/conform/parametricPrimitive.xml", false);
-    protected final static ControllerDescription parametricComposite = new ControllerDescription("parametricComposite",
-            "parametricComposite",
-            "/functionalTests/component/conform/parametricComposite.xml", false);
+    protected final static ControllerDescription flatPrimitive = new ControllerDescription("flatPrimitive",
+            "flatPrimitive",
+            "/functionalTests/component/conform/flatPrimitive.xml", false);
+    protected final static ControllerDescription flatParametricPrimitive = new ControllerDescription("flatParametricPrimitive",
+            "flatParametricPrimitive",
+            "/functionalTests/component/conform/flatParametricPrimitive.xml",
+            false);
     protected final static ControllerDescription primitiveTemplate = new ControllerDescription("primitiveTemplate",
             "primitiveTemplate",
             "/functionalTests/component/conform/primitiveTemplate.xml", false);
@@ -96,6 +101,9 @@ public abstract class Conformtest extends ComponentTest {
             "badParametricPrimitive",
             "/functionalTests/component/conform/badParametricPrimitive.xml",
             false);
+    protected final static ControllerDescription parametricComposite = new ControllerDescription("parametricComposite",
+            "parametricComposite",
+            "/functionalTests/component/conform/parametricComposite.xml", false);
 
     protected void checkInterface(I i) {
         i.m(true);
@@ -120,9 +128,24 @@ public abstract class Conformtest extends ComponentTest {
         assertEquals("1", i.n("1", (byte) 0));
     }
 
+    private boolean containsAll(Collection<?> c1, Collection<?> c) {
+        Iterator<?> e = c.iterator();
+        while (e.hasNext()) {
+            Object o = e.next();
+
+            //System.err.println("containall:" + o);
+            if (!c1.contains(o)) {
+                //System.err.println("containallDIFF:\n" + o + "\n" + c1);
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected void checkComponent(Component c, Set itfs)
         throws Exception {
         Set extItfs = getExternalItfs(c);
+        //System.err.println("containAll: " + containsAll(itfs, extItfs));
         assertEquals("Wrong external interface list", itfs, extItfs);
         Iterator i = itfs.iterator();
         while (i.hasNext()) {
