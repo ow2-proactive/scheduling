@@ -39,7 +39,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.NFControllerDescription;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -153,7 +153,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      *             if the component cannot be created.
      */
     Component newFcInstance(Type type, ControllerDescription controllerDesc,
-        ContentDescription contentDesc, VirtualNodeInternal virtualNode)
+        ContentDescription contentDesc, VirtualNode virtualNode)
         throws InstantiationException;
 
     /**
@@ -178,7 +178,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @throws InstantiationException if the component cannot be created.
      */
     Component newNFcInstance(Type type, NFControllerDescription controllerDesc,
-        ContentDescription contentDesc, VirtualNodeInternal virtualNode)
+        ContentDescription contentDesc, VirtualNode virtualNode)
         throws InstantiationException;
 
     /**
@@ -206,7 +206,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      */
     List<Component> newFcInstanceAsList(Type type,
         ControllerDescription controllerDesc, ContentDescription[] contentDesc,
-        VirtualNodeInternal virtualNode) throws InstantiationException;
+        VirtualNode virtualNode) throws InstantiationException;
 
     /**
      * Creates a list of non-functional components on a given virtual node.<br>
@@ -233,7 +233,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      */
     List<Component> newNFcInstanceAsList(Type type,
         NFControllerDescription controllerDesc,
-        ContentDescription[] contentDesc, VirtualNodeInternal virtualNode)
+        ContentDescription[] contentDesc, VirtualNode virtualNode)
         throws InstantiationException;
 
     /**
@@ -317,7 +317,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      */
     List<Component> newFcInstanceAsList(Type type,
         ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNodeInternal virtualNode) throws InstantiationException;
+        VirtualNode virtualNode) throws InstantiationException;
 
     /**
      * Creates a list of non-functional components on a given virtual node.<br>
@@ -344,7 +344,7 @@ public interface ProActiveGenericFactory extends GenericFactory {
      */
     List<Component> newNFcInstanceAsList(Type type,
         NFControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNodeInternal virtualNode) throws InstantiationException;
+        VirtualNode virtualNode) throws InstantiationException;
 
     /**
      * Creates a component on a given virtual node. It creates one component

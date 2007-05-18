@@ -41,7 +41,7 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
 /**
@@ -54,7 +54,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
  * It is also possible to use this class directly from its static main method.
  */
 public class Launcher {
-    static ProActiveDescriptorInternal deploymentDescriptor;
+    static ProActiveDescriptor deploymentDescriptor;
 
     private Launcher() {
     }

@@ -61,7 +61,7 @@ public class ProActiveNFImplementationBuilderImpl
     }
 
     private Component createNFComponent(Object type,
-        org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN,
+        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
         NFControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Component bootstrap) throws Exception {
         Component result;
