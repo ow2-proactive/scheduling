@@ -37,7 +37,6 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
-import ibis.io.ArrayOutputStream;
 import ibis.io.BufferedArrayOutputStream;
 import ibis.io.IbisSerializationOutputStream;
 
@@ -78,7 +77,7 @@ public class ObjectToByteConverter {
 
     protected static byte[] ibisConvert(Object o) throws IOException {
         ByteArrayOutputStream bo = new ByteArrayOutputStream();
-        ArrayOutputStream ao = new BufferedArrayOutputStream(bo);
+        BufferedArrayOutputStream ao = new BufferedArrayOutputStream(bo);
         IbisSerializationOutputStream so = new IbisSerializationOutputStream(ao);
         so.writeObject(o);
         so.flush();

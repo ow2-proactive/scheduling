@@ -400,7 +400,7 @@
 				<jvmarg value="-Dibis.serialization=sun" />
 				<jvmarg value="-Dibis.name_server.host=localhost" />
 				<jvmarg value="-Dibis.name_server.pool=rutget" />
-				<jvmarg value="-Dibis.pool_host_number=1" />
+				<jvmarg value="-Dibis.pool.host_number=1" />
 				<jvmarg value="-Dibis.name_server.key=12" />
 				<jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties" />
 			</jvmargs>
@@ -445,6 +445,8 @@
 			</fileset>
 		</jar>		
 		</target>
+	
+	
 	<!-- ================================================================ -->
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
@@ -631,6 +633,7 @@
 		</parallel>
 	</target>
 
+
 	<!-- ================================================================ -->
 	<!--               Ibisc to generate stubs/skels                      -->
 	<!-- ================================================================ -->
@@ -638,15 +641,20 @@
 		<delete>
 			<fileset dir="${classes.dir}" includes="**/rmi*.java" />
 		</delete>
-		<java classname="ibis.frontend.rmi.Main" fork="true" dir="${classes.dir}/org/objectweb/proactive/core/body/ibis/">
+		<java classname="ibis.frontend.rmi.Rmic"
+			  fork="true"
+			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/body/ibis/">
 			<classpath refid="project.classpath" />
 			<arg value="org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl" />
 		</java>
-		<java classname="ibis.frontend.rmi.Main" fork="true" dir="${classes.dir}/org/objectweb/proactive/core/runtime/ibis/">
+		<java classname="ibis.frontend.rmi.Rmic"
+			  fork="true"
+			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/runtime/ibis/">
 			<classpath refid="project.classpath" />
-			<arg value="org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntimeImpl" />
+			<arg value="org.objectweb.proactive.core.runtime.ibis.IbisProActiveRuntimeImpl" />
 		</java>
-		<javac srcdir="${classes.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${cl.proactive.dir}" destdir="${cl.proactive.dir}"
+			   deprecation="on" source="${source}" debug="${debug}">
 			<include name="**/*.java" />
 			<classpath refid="project.classpath" />
 		</javac>
