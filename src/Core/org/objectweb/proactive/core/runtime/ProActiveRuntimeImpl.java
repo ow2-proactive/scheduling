@@ -246,7 +246,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             prng = new SecureRandom();
         }
 
-        return prng.nextInt();
+        return prng.nextInt(Integer.MAX_VALUE);
     }
 
     //
