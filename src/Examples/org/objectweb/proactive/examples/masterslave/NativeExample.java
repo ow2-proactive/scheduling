@@ -1,8 +1,6 @@
 package org.objectweb.proactive.examples.masterslave;
 
-import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,51 +16,25 @@ import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
  * @author fviale
  *
  */
-public class TestNative extends NativeTask {
-    public static URL descriptor_url;
-    public static String vn_name;
-
-    /**
-     * A task executing a native command
-     * @param command
-     */
-    public TestNative(String command) {
-        super(command);
-    }
-
-    /**
-     * Initializing the example with command line arguments
-     * @param args
-     * @throws MalformedURLException
-     */
-    public static void init(String[] args) throws MalformedURLException {
-        if (args.length == 0) {
-            descriptor_url = (new File(args[0])).toURI().toURL();
-            vn_name = args[1];
-        } else if (args.length == 2) {
-            descriptor_url = (new File(args[0])).toURI().toURL();
-            vn_name = args[1];
-        } else {
-            System.out.println(
-                "Usage: <java_command> descriptor_path virtual_node_name");
-        }
-    }
+public class NativeExample extends AbstractExample {
 
     /**
      * @param args
      */
     public static void main(String[] args) throws MalformedURLException {
+        NativeExample instance = new NativeExample();
+
         // Getting command line parameters
-        init(args);
+        instance.init(args);
 
         // Creating the Master
-        ProActiveMaster<TestNative, String[]> master = new ProActiveMaster<TestNative, String[]>(descriptor_url,
-                vn_name);
+        ProActiveMaster<SimpleNativeTask, String[]> master = new ProActiveMaster<SimpleNativeTask, String[]>(instance.descriptor_url,
+                instance.vn_name);
 
         // Creating the tasks to be solved
-        List<TestNative> tasks = new ArrayList<TestNative>();
+        List<SimpleNativeTask> tasks = new ArrayList<SimpleNativeTask>();
         for (int i = 0; i < 20; i++) {
-            tasks.add(new TestNative("hostname"));
+            tasks.add(new SimpleNativeTask("hostname"));
         }
 
         // Submitting the tasks
@@ -86,5 +58,21 @@ public class TestNative extends NativeTask {
         master.terminate(true);
 
         System.exit(0);
+    }
+
+    /**
+     * A task executing a native command
+     * @author fviale
+     *
+     */
+    public static class SimpleNativeTask extends NativeTask {
+        public SimpleNativeTask(String command) {
+            super(command);
+        }
+    }
+
+    @Override
+    protected void init_specialized(String[] args) {
+        // nothing to do
     }
 }

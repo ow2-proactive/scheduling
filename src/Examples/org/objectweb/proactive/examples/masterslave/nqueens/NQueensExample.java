@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Vector;
 
+import org.objectweb.proactive.examples.masterslave.AbstractExample;
 import org.objectweb.proactive.examples.masterslave.nqueens.query.Query;
 import org.objectweb.proactive.examples.masterslave.nqueens.query.QueryExtern;
 import org.objectweb.proactive.examples.masterslave.nqueens.query.QueryGenerator;
@@ -19,44 +20,19 @@ import org.objectweb.proactive.extra.masterslave.TaskException;
  * @author fviale
  *
  */
-public class NQueensExample {
-    public static final int DEFAULT_NQUEEN_BOARD = 20;
-    public static final int DEFAULT_NQUEEN_ALG_DEPTH = 3;
-    public static URL descriptor_url;
-    public static String vn_name;
+public class NQueensExample extends AbstractExample {
     public static int nqueen_board_size;
     public static int nqueen_algorithm_depth;
 
-    /**
-     * Initializing the example with command line arguments
-     * @param args
-     * @throws MalformedURLException
-     */
-    public static void init(String[] args) throws MalformedURLException {
-        if (args.length == 2) {
-            descriptor_url = (new File(args[0])).toURI().toURL();
-            ;
-            vn_name = args[1];
-            nqueen_board_size = DEFAULT_NQUEEN_BOARD;
-            nqueen_algorithm_depth = DEFAULT_NQUEEN_ALG_DEPTH;
-        } else if (args.length == 4) {
-            descriptor_url = (new File(args[0])).toURI().toURL();
-            vn_name = args[1];
-            nqueen_board_size = Integer.parseInt(args[2]);
-            nqueen_algorithm_depth = Integer.parseInt(args[3]);
-        } else {
-            System.out.println(
-                "Usage: <java_command> descriptor_path virtual_node_name [nqueen_board_size nqueen_algorithm_depth]");
-        }
-    }
-
     public static void main(String[] args) throws MalformedURLException {
+        NQueensExample instance = new NQueensExample();
+
         // Getting command line parameters
-        init(args);
+        instance.init(args, 2, " nqueen_board_size nqueen_algorithm_depth");
 
         // Creating the Master
-        ProActiveMaster<QueryExtern, Pair<Long, Long>> master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>(descriptor_url,
-                vn_name);
+        ProActiveMaster<QueryExtern, Pair<Long, Long>> master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>(instance.descriptor_url,
+                instance.vn_name);
 
         System.out.println("Launching NQUEENS solutions finder for n = " +
             nqueen_board_size + " with a depth of " + nqueen_algorithm_depth);
@@ -113,5 +89,11 @@ public class NQueensExample {
 
         master.terminate(true);
         System.exit(0);
+    }
+
+    @Override
+    protected void init_specialized(String[] args) {
+        nqueen_board_size = Integer.parseInt(args[2]);
+        nqueen_algorithm_depth = Integer.parseInt(args[3]);
     }
 }
