@@ -1,8 +1,6 @@
 @echo off
 echo. 
-echo --- Fractal HelloWorld example ----------------------------------------
-echo --- 
-echo --- The expected result is an exception
+echo --- GCM C3D example ----------------------------------------
 echo --- 
 
 rem if "%1" == "help" goto usage
@@ -11,12 +9,7 @@ goto doit
 
 :usage
 echo. 
-echo helloworld-fractal.bat <optional parameters>
-echo		
-echo		parameters are :
-echo			- parser
-echo			- wrapper
-echo			- distributed (needs parser)  echo. 
+echo c3d_component.bat 
 goto doit
 
 
@@ -25,10 +18,11 @@ SETLOCAL
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 set JAVA_CMD=%JAVA_CMD% -Dfractal.provider=org.objectweb.proactive.core.component.Fractive
-%JAVA_CMD%  org.objectweb.proactive.examples.components.helloworld.HelloWorld %1 %2 %3 
+%JAVA_CMD%  org.objectweb.proactive.examples.components.c3d.Main %1 %2 %3 %4 %5
 ENDLOCAL
 
 :end
 pause
 echo. 
 echo ---------------------------------------------------------
+
