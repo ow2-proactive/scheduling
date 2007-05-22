@@ -65,7 +65,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
  *
  * @author vbodnart
  */
-public final class CoreTimersContainer implements TimerProvidable {
+public class CoreTimersContainer implements TimerProvidable {
 
     /** Since the timer container is attahced to a body we use its logger */
     private static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);

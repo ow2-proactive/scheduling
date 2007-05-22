@@ -46,7 +46,7 @@ import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalServi
  *
  * @author vbodnart
  */
-public final class TimItBasicReductor {
+public class TimItBasicReductor {
 
     /** A list of result bags */
     private List<ResultBag> results = new java.util.Vector<ResultBag>();

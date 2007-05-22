@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.Node;
  *
  * @author vbodnart
  */
-public final class TimItBasicManager {
+public class TimItBasicManager {
 
     /** The unique instance of this manager */
     private static TimItBasicManager instance = new TimItBasicManager();
