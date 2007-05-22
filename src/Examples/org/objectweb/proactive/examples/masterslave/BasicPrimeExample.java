@@ -78,7 +78,7 @@ public class BasicPrimeExample extends AbstractExample {
         Collection<Boolean> results = master.waitAllResults();
         long endTime = System.currentTimeMillis();
 
-        // Displaying statistics
+        // Displaying result
         displayResult(results, startTime, endTime, master.slavepoolSize());
 
         // Terminating the Master
