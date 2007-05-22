@@ -54,8 +54,14 @@ import org.objectweb.proactive.benchmarks.timit.util.basic.ResultBag;
 public class BasicResultWriter {
     public static final DecimalFormat df = new DecimalFormat("###.###",
             new DecimalFormatSymbols(java.util.Locale.US));
+
+    /** The xml document */
     private Document document;
+
+    /** The root xml element */
     private Element eTimit;
+
+    /** The name of the output file */
     private String filename;
 
     /**
@@ -85,6 +91,23 @@ public class BasicResultWriter {
     }
 
     /**
+     * Use this method to add timers results to a single file.
+     * @param bag A bag of timer results
+     */
+    public void addGlobalInformationElement(String globalInformation) {
+        if (globalInformation == null) {
+            return;
+        }
+
+        // Create the globalInformation element
+        Element globalInformationElement = new Element("globalInformation");
+        globalInformationElement.setAttribute(new Attribute("value",
+                globalInformation));
+        // Attach the globalInformationElement element as a child to the timit element
+        this.eTimit.addContent(globalInformationElement);
+    }
+
+    /**
      * This method is used to fill a specified element with timers results.
      * @param rootElement The root element that will be filled
      * @param bag A bag of timer results
@@ -109,32 +132,70 @@ public class BasicResultWriter {
         Element timersElement = new Element("timers");
         rootElement.addContent(timersElement);
 
-        // Iterate through the list of timers
-        Iterator<BasicTimer> timersListIterator = timersList.iterator();
-        Iterator descendantsIterator = null;
-        Element parentElement = null;
-        BasicTimer currentTimer = null;
-
-        while (timersListIterator.hasNext()) {
-            currentTimer = timersListIterator.next();
+        // Finding and adding all roots
+        for (int i = 0; i < timersList.size(); i++) {
+            // If the current is the root add it to the tree
+            BasicTimer currentTimer = timersList.get(i);
             if (currentTimer.getParent() == null) {
                 timersElement.addContent(createTimerElement(currentTimer));
+                timersList.remove(i);
+                i--;
+            }
+        }
+
+        // Build the hierarchical tree
+        for (int i = 0; i < timersList.size(); i++) {
+            // If the current is the root add it to the tree
+            BasicTimer currentTimer = timersList.get(i);
+            int indexOfParent = timersList.indexOf(currentTimer.getParent());
+
+            // If the parent is not in the list
+            if (indexOfParent == -1) {
+                // Then the parent should be in the tree and we can try to add
+                // the current to the tree
+                if (addTimerToItsParentElement(currentTimer, timersElement) == false) {
+                    throw new RuntimeException("The timer " +
+                        currentTimer.getName() +
+                        " has no parent in the tree and no parent in the list.");
+                } else {
+                    // Else remove the current from the list
+                    timersList.remove(i);
+                    i--;
+                }
+
+                // If the parent is in the list
             } else {
-                // Find the timer with the name of the parent and attach its child
-                descendantsIterator = timersElement.getDescendants();
-                while (descendantsIterator.hasNext()) {
-                    parentElement = (Element) descendantsIterator.next();
-                    // Match the parent
-                    if (parentElement.getAttributeValue("name")
-                                         .equals(currentTimer.getParent()
-                                                                 .getName())) {
-                        parentElement.addContent(createTimerElement(
-                                currentTimer));
-                        break;
-                    }
+                // Then try to add the parent to the tree
+                if (addTimerToItsParentElement(currentTimer.getParent(),
+                            timersElement)) {
+                    // Remove the current.parent from the list
+                    timersList.remove(indexOfParent);
+                    i--;
                 }
             }
         }
+    }
+
+    /**
+     * Finds the parent of the timer then creates the element and
+     * attaches it to the tree.
+     * @param timerToAdd The timer to add in the xml tree
+     * @param rootElement The root element
+     * @return true if the parent was found and timer attached else return false
+     */
+    private boolean addTimerToItsParentElement(BasicTimer timerToAdd,
+        Element rootElement) {
+        // If the current element is the parent of the timerToAdd then add it
+        Iterator<Element> it = rootElement.getDescendants();
+        while (it.hasNext()) {
+            Element ee = it.next();
+            if (timerToAdd.getParent().getName()
+                              .equals(ee.getAttributeValue("name"))) {
+                ee.addContent(createTimerElement(timerToAdd));
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -148,8 +209,6 @@ public class BasicResultWriter {
         // Set the name as an attribute
         newTimerElement.setAttribute(new Attribute("name",
                 currentTimer.getName()));
-        // Set the user readable totalTime of the timer as an attribute
-        // newTimerElement.setAttribute(new Attribute("totalTime", SimpleResultWriter.checkBestFormat(currentTimer.getTotalTime())));
         // Set the totalTime in millis of the timer as an attribute
         newTimerElement.setAttribute(new Attribute("totalTimeInMillis",
                 "" + (((double) currentTimer.getTotalTime()) / 1000000d)));

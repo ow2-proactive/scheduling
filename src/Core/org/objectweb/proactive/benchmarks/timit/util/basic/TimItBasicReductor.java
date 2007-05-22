@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.basic;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
 import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService;
@@ -46,10 +46,16 @@ import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalServi
  *
  * @author vbodnart
  */
-public class TimItBasicReductor {
+public final class TimItBasicReductor {
 
     /** A list of result bags */
     private List<ResultBag> results = new java.util.Vector<ResultBag>();
+
+    /** The name of the output file */
+    private String filename;
+
+    /** Some global information to add to the output file */
+    private String globalInformation;
 
     /** Used to generate or not an output file */
     private boolean generateOutputFile;
@@ -58,7 +64,7 @@ public class TimItBasicReductor {
     private boolean printOutput;
 
     /** A counter of awaited results from timer containers */
-    private int awaitedResults;
+    private int awaitedResults = 0;
 
     /**
      * An empty constructor because this object will be active.
@@ -83,7 +89,7 @@ public class TimItBasicReductor {
      * given to a timer container.
      */
     public void incrementAwaitedResult() {
-        this.awaitedResults++;
+        awaitedResults++;
     }
 
     /**
@@ -93,9 +99,12 @@ public class TimItBasicReductor {
     public void generateAllStatistics() {
         this.generateOutputFile = Boolean.parseBoolean(TimItTechnicalService.getGenerateOutputFile());
         this.printOutput = Boolean.parseBoolean(TimItTechnicalService.getPrintOutput());
-        BasicResultWriter finalWriter = new BasicResultWriter(
-                "TimItApplicationOutput" + System.currentTimeMillis());
-
+        //String filename = "TimItApplicationOutput" + System.currentTimeMillis();
+        File folder = new File("output");
+        folder.mkdir();
+        BasicResultWriter finalWriter = new BasicResultWriter(folder.getAbsolutePath() +
+                "/" + filename);
+        finalWriter.addGlobalInformationElement(globalInformation);
         Iterator<ResultBag> resultsIterator = this.results.iterator();
         while (resultsIterator.hasNext()) {
             ResultBag currentResultBag = resultsIterator.next();
@@ -126,13 +135,21 @@ public class TimItBasicReductor {
      */
     public boolean receiveTimers(String className, String shortUniqueID,
         List<BasicTimer> timersList, String otherInformation) {
-        this.results.add(new ResultBag(className, shortUniqueID, timersList,
+        results.add(new ResultBag(className, shortUniqueID, timersList,
                 otherInformation));
         // decrement the awaited results
-        this.awaitedResults--;
-        // If necessary terminate this active object
-        if (this.awaitedResults <= 0) {
-            this.terminate();
+        awaitedResults--;
+        // If all result are received prepare to finish
+        if (awaitedResults <= 0) {
+            filename = ProActive.getBodyOnThis().getID().shortString();
+            TimItBasicManager.getInstance().setReductorNull();
+            awaitedResults = 0;
+
+            try {
+                ProActive.getBodyOnThis().terminate();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         // This is used to make the method synchronous
@@ -158,25 +175,15 @@ public class TimItBasicReductor {
                 otherInformation);
         this.generateOutputFile = Boolean.parseBoolean(TimItTechnicalService.getGenerateOutputFile());
         this.printOutput = Boolean.parseBoolean(TimItTechnicalService.getPrintOutput());
+        File folder = new File("output");
+        folder.mkdir();
+        this.filename = folder.getAbsolutePath() + "/output" +
+            (Math.random() * 1000) + "" + this.hashCode();
         if (this.generateOutputFile) {
             b.printToFile();
         }
         if (this.printOutput) {
             b.printXMLFormattedTree();
-        }
-    }
-
-    /**
-     * Since an instance of this class could be active this method should be
-     * called to therminate its activity.
-     */
-    public void terminate() {
-        try {
-            Body b = ProActive.getBodyOnThis();
-            b.getFuturePool().disableAC();
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -225,5 +232,21 @@ public class TimItBasicReductor {
      */
     public void setResults(List<ResultBag> results) {
         this.results = results;
+    }
+
+    /**
+     * A getter for the global information
+     * @return The globalInformation string
+     */
+    public String getGlobalInformation() {
+        return globalInformation;
+    }
+
+    /**
+     * A setter for the globalInformation.
+     * @param globalInformation
+     */
+    public void setGlobalInformation(String globalInformation) {
+        this.globalInformation = globalInformation;
     }
 }

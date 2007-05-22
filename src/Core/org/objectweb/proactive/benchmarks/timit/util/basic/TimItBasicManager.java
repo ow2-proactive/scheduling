@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.Node;
  *
  * @author vbodnart
  */
-public class TimItBasicManager {
+public final class TimItBasicManager {
 
     /** The unique instance of this manager */
     private static TimItBasicManager instance = new TimItBasicManager();
@@ -109,7 +109,7 @@ public class TimItBasicManager {
      * Used to check the need for the creation of a common reductor.
      * @param node The location of the timed active object.
      * @return True if timers are activated false otherwise
-     * @throws ProActiveException
+     * @throws ProActiveException If there is a problem with the node
      */
     public static boolean checkNodeProperties(Node node)
         throws ProActiveException {
@@ -117,7 +117,17 @@ public class TimItBasicManager {
             return false;
         }
         String s = node.getProperty("timitActivation");
+
         return (s != null) && !"".equals(s) &&
         !"false".equalsIgnoreCase(node.getProperty("reduceResults"));
+    }
+
+    /**
+     * Sets the reductor reference at null.
+     * Be sure to do this after terminating the precedent reductor if there
+     * were one.
+     */
+    public void setReductorNull() {
+        this.timItBasicReductor = null;
     }
 }

@@ -36,7 +36,7 @@ package org.objectweb.proactive.benchmarks.timit.util.basic;
  *
  * @author vbodnart
  */
-public class BasicTimer implements java.io.Serializable {
+public final class BasicTimer implements java.io.Serializable {
 
     /** A static variable to switch to debug mode */
     public static final boolean DEBUG = false; //ProActiveLogger.getLogger(Loggers.BODY).isDebugEnabled();    
