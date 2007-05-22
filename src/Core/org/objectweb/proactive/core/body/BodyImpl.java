@@ -36,6 +36,7 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -134,6 +135,19 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     public BodyImpl(Object reifiedObject, String nodeURL,
         MetaObjectFactory factory, String jobId) {
         super(reifiedObject, nodeURL, factory, jobId);
+
+        //      TIMING
+        if (!CoreTimersContainer.checkReifiedObject(reifiedObject)) {
+            final String timitActivationPropertyValue = CoreTimersContainer.checkNodeProperty(nodeURL);
+            super.timersContainer = CoreTimersContainer.contructOnDemand(super.bodyID,
+                    factory, timitActivationPropertyValue);
+            if (super.timersContainer != null) {
+                TimerWarehouse.enableTimers();
+                // START TOTAL TIMER
+                TimerWarehouse.startTimer(super.bodyID, TimerWarehouse.TOTAL);
+            }
+        }
+
         this.requestReceiver = factory.newRequestReceiverFactory()
                                       .newRequestReceiver();
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();

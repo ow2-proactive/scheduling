@@ -175,20 +175,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         MetaObjectFactory factory, String jobId) {
         super(nodeURL, factory.newRemoteBodyFactory(), jobId);
 
-        // TIMING
-        if (!(this instanceof HalfBody) &&
-                !CoreTimersContainer.checkReifiedObject(reifiedObject)) {
-            final String timitActivationPropertyValue = CoreTimersContainer.checkNodeProperty(nodeURL);
-            this.timersContainer = CoreTimersContainer.contructOnDemand(this.bodyID,
-                    factory, timitActivationPropertyValue,
-                    reifiedObject.toString());
-            if (this.timersContainer != null) {
-                TimerWarehouse.enableTimers();
-                // START TOTAL TIMER
-                TimerWarehouse.startTimer(this.bodyID, TimerWarehouse.TOTAL);
-            }
-        }
-
         this.threadStore = factory.newThreadStoreFactory().newThreadStore();
 
         // GROUP
