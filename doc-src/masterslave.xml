@@ -1,259 +1,249 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="masterslave">
-	<title>Master/Slave API</title>
+<chapter id="MasterSlave">
+  <title>Master/Slave API</title>
 
-	<para>The outline of this short handbook:</para>
+  <para>The outline of this short handbook:</para>
 
-	<orderedlist>
-		<listitem>
-			<para>
-				<link linkend="ms_overview">Introduction</link>
-			</para>
-		</listitem>
+  <orderedlist>
+    <listitem>
+      <para><link linkend="ms_overview">Introduction</link></para>
+    </listitem>
 
-		<listitem>
-			<para>
-				<link linkend="ms_principle">Principle and Usage</link>
-			</para>
-		</listitem>
+    <listitem>
+      <para><link linkend="ms_principle">Principle and Usage</link></para>
+    </listitem>
 
-		<listitem>
-			<para>
-				<link linkend="ms_api">The API Description</link>
-			</para>
-		</listitem>
+    <listitem>
+      <para><link linkend="ms_api">The API Description</link></para>
+    </listitem>
 
-		<listitem>
-			<para>
-				<link linkend="ms_example">A Simple Example</link>
-			</para>
-		</listitem>
-		
-	</orderedlist>
+    <listitem>
+      <para><link linkend="ms_example">A Simple Example</link></para>
+    </listitem>
+  </orderedlist>
 
-	<sect1 id="ms_overview">
-		<title>Overview</title>
+  <sect1 id="ms_overview">
+    <title>Overview</title>
 
-		<para>
-			Master/Slave computations are the most common case of
-			distributed computations. They are often described as
-			"embarassingly parallel problems", which means that no
-			particular effort is needed to segment the problem into a
-			very large number of parallel tasks, and there is no
-			essential dependency (or communication) between those
-			parallel tasks.
-		</para>
+    <para><emphasis>Master/Slave computations</emphasis> are the most common case of distributed
+    computations. They are often described as <emphasis>embarassingly parallel
+    problems</emphasis>, which means that no particular effort is needed to segment the
+    problem into a very large number of parallel tasks, and there is no
+    essential dependency (or communication) between those parallel
+    tasks.</para>
 
-		<para>
-			The main goal of this Master/Slave API is to provide an
-			easy to use framework to parallelize these embarassingly
-			parallel applications.
-		</para>
+    <para>The main goal of the Master/Slave API is to provide an <emphasis>easy to use
+    framework</emphasis> to parallelize these embarassingly parallel applications.</para>
 
-		<para>The main features are:</para>
+    <para>The main features are:</para>
 
-		<itemizedlist>
-			<listitem>
-				<para>
-					Automatic scheduling of tasks to the slaves.
-				</para>
-			</listitem>
+    <itemizedlist>
+      <listitem>
+        <para>Automatic <emphasis>scheduling</emphasis> of tasks to the
+        slaves.</para>
+      </listitem>
 
-			<listitem>
-				<para>
-					Automatic load-balancing between the slaves.
-				</para>
-			</listitem>
+      <listitem>
+        <para>Automatic <emphasis>load-balancing</emphasis> between the
+        slaves.</para>
+      </listitem>
 
-			<listitem>
-				<para>
-					Automatic fault-tolerance mechanism (i.e. when a
-					slave is missing, the task is rescheduled).
-				</para>
-			</listitem>
+      <listitem>
+        <para>Automatic <emphasis>fault-tolerance</emphasis> mechanism (i.e.
+        when a slave is missing, the task is rescheduled).</para>
+      </listitem>
 
-			<listitem>
-				<para>
-					Very simple mechanism of solution gathering.
-				</para>
-			</listitem>
+      <listitem>
+        <para>Very simple mechanism of <emphasis>solution
+        gathering</emphasis>.</para>
+      </listitem>
 
-			<listitem>
-				<para>
-					All internal concepts of ProActive are hidden from
-					the user.
-				</para>
-			</listitem>
+      <listitem>
+        <para>All internal concepts of ProActive are hidden from the
+        user.</para>
+      </listitem>
 
-			<listitem>
-				<para>Open API for extensions.</para>
-			</listitem>
-		</itemizedlist>
+      <listitem>
+        <para>Open API for extensions.</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
 
-	</sect1>
+  <sect1 id="ms_principle">
+    <title>The Master/Slave API Principles and Usage</title>
 
-	<sect1 id="ms_principle">
-		<title>The Master/Slave API Principles and Usage</title>
+    <para>The usage of the Master/Slave API is simple and it consists
+    basically of four steps:</para>
 
-		<para>
-			The usage of the Master/Slave API is simple and it consists
-			basically of three steps:
-		</para>
-		<orderedlist>
-			<listitem>
-				<para>Deployment of the master/slave framework.</para>
-			</listitem>
+    <orderedlist>
+      <listitem>
+        <para><emphasis>Deployment</emphasis> of the master/slave framework.</para>
+      </listitem>
 
-			<listitem>
-				<para>Task definition and submission.</para>
-			</listitem>
+      <listitem>
+        <para>Task <emphasis>definition</emphasis> and <emphasis>submission</emphasis>.</para>
+      </listitem>
 
-			<listitem>
-				<para>Results gathering.</para>
-			</listitem>
-		</orderedlist>
+      <listitem>
+        <para><emphasis>Results gathering</emphasis>.</para>
+      </listitem>
+      
+      <listitem>
+        <para>Optionally, <emphasis>release</emphasis> of acquired resources.</para>
+      </listitem>
+    </orderedlist>
 
-		<sect2 id="ms_principle_deployment">
-			<title>Deployment of the master/slave framework</title>
+    <sect2 id="ms_principle_deployment">
+      <title>Deployment of the master/slave framework</title>
 
-			<para>
-				<figure>
-					<title>
-						Deployment of the master/slave framework
-					</title>
+      <para>The deployment of the Master/Slave framework relies on the
+      <emphasis>ProActive deployment mechanism</emphasis>. In order to deploy a set of worker, the master needs either:</para>
 
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="images/MasterSlave1.png" format="PNG"
-								contentwidth="100" width="6in" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-			</para>
+      <itemizedlist>
+        <listitem>
+          <para>A <emphasis>ProActive deployment descriptor</emphasis> : in this case the master
+          will use the descriptor to deploy its resources.</para>
+        </listitem>
 
-			<para>
-				The deployment of the Master/Slave framework relies on
-				the ProActive deployment mechanism. In order to allow
-				the master to deploy some slaves you will need to
-				provide him either:
-			</para>
-			<itemizedlist>
-				<listitem>
-					<para>
-						A ProActive deployment descriptor : in this case
-						the framework will use the descriptor to deploy
-						its resources.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						Already deployed Proactive resources (a
-						VirtualNode object or a Collection of Node
-						objects).
-					</para>
-				</listitem>
-			</itemizedlist>
-		</sect2>
-		<sect2 id="ms_principle_submission">
-			<title>Tasks definition and submission</title>
+        <listitem>
+          <para>A set of already deployed <emphasis>Proactive resources</emphasis> (i.e. a
+          VirtualNode object or a Collection of Node objects).</para>
+        </listitem>
+      </itemizedlist>
 
-			<para>
-				<figure>
-					<title>Tasks definition and submission</title>
+      <para>For a better explanation of the ProActive deployment mechanism and
+      of ProActive deployment descriptors, see <xref
+      linkend="XML_Descriptors" />.</para>
+      
+      <para>
+      	<figure>
+          <title>Deployment of the master/slave framework</title>
 
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="images/MasterSlave2.png" format="PNG"
-								contentwidth="100" width="6in" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-			</para>
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100" fileref="images/MasterSlave1.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+      </para>
+      <para/>
+        
+    </sect2>
 
-			<para>
-				In order to submit tasks to the Master, the Task
-				interface from the Master/Slave API needs to be
-				implemented. In this interface, the unique method "run"
-				will correspond to the code being executed remotely.
-				After tasks have been submitted to him, the master will
-				dispatch tasks automatically to the slaves.
-			</para>
-		</sect2>
-		<sect2 id="ms_principle_gathering">
-			<title>Results gathering</title>
+    <sect2 id="ms_principle_submission">
+    
+      <title>Tasks definition and submission</title>
 
-			<para>
-				<figure>
-					<title>Results gathering</title>
+      <para>In order to submit tasks to the Master, the <emphasis>Task</emphasis> interface from
+      the Master/Slave API needs to be implemented. In this interface, the
+      unique method <emphasis>run</emphasis> will correspond to the code being executed remotely.
+      After tasks have been submitted to him, the master will dispatch tasks
+      automatically to the slaves.</para>
+      
+      <para>
+      	<figure>
+          <title>Tasks definition and submission</title>
 
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="images/MasterSlave3.png" format="PNG"
-								contentwidth="100" width="6in" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-			</para>
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100" fileref="images/MasterSlave2.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+      </para>
+      <para/>
+    </sect2>
 
-			<para>
-				Results will be collected by the master when the
-				calculations are complete. The user will collect the
-				results from the master directly. Two modes are
-				available for collecting the results :
-				<itemizedlist>
-					<listitem>
-						<para>
-							Unordered mode : in this mode, the user will
-							collect the results in an unspecified order,
-							depending on tasks completion order.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							Ordered mode : in this mode, the user will
-							collect the results in the same order as the
-							order used during task submission.
-						</para>
-					</listitem>
-				</itemizedlist>
+    <sect2 id="ms_principle_gathering">
+      <title>Results gathering</title>
 
-				The figures below explain the two different modes :
-				<figure>
-					<title>Unordered mode</title>
 
-					<mediaobject>
-						<imageobject>
-							<imagedata fileref="images/MSResult1.png"
-								format="PNG" contentwidth="100" width="6in" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<figure>
-					<title>Ordered mode</title>
 
-					<mediaobject>
+      <para><emphasis>Results</emphasis> will be collected by the master when the calculations are
+      complete. Users can either wait that one or all results are available.
+      Users have also the option to ask the master for result availabity and continue their own work until results are finally available.
+      </para> 
+      
+      <para><figure>
+          <title>Results gathering</title>
 
-						<imageobject>
-							<imagedata fileref="images/MSResult2.png"
-								format="PNG" contentwidth="100" width="6in" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-			</para>
-		</sect2>
-	</sect1>
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100" fileref="images/MasterSlave3.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure></para>
+        
+      <para>
+      Two modes are available to receive the results : 
+      	<itemizedlist>
+          <listitem>
+            <para><emphasis>Unordered mode</emphasis> : in this mode, users will receive the
+            results in an <emphasis>unspecified order</emphasis>, depending on tasks completion
+            order.</para>
+          </listitem>
 
-	<sect1 id="ms_api">
-		<title>The API Details</title>
-		
-		<sect2>
-			<title>Master creation and deployment</title>		
-			
-<programlisting lang="java">    /**
+          <listitem>
+            <para><emphasis>Ordered mode</emphasis> : in this mode, users will receive the
+            results in the <emphasis>same order</emphasis> as the order used during task
+            submission.</para>
+
+          </listitem>
+        </itemizedlist>
+        </para>
+         <para>
+            The figures below explain the two different modes :
+         </para>
+         <para> 
+      		<figure>
+          	<title>Unordered mode</title>
+
+          	<mediaobject>
+            	<imageobject>
+              	<imagedata contentwidth="100" fileref="images/MSResult1.png"
+                         format="PNG" width="6in" />
+            	</imageobject>
+          		</mediaobject>
+        	</figure>
+        	</para> 
+        	<para>
+        	<figure>
+          		<title>Ordered mode</title>
+
+          	<mediaobject>
+            	<imageobject>
+              		<imagedata contentwidth="100" fileref="images/MSResult2.png"
+                         format="PNG" width="6in" />
+            	</imageobject>
+          	</mediaobject>
+        	</figure>
+        </para>
+        <para/>
+    </sect2>
+  </sect1>
+
+  <sect1 id="ms_api">
+    <title>The API Details</title>
+
+    <sect2>
+      <title>Master creation and deployment</title>
+      
+      <para> The Master/Slave API entry point and main class is the following:
+      </para>
+      <screen>org.objectweb.proactive.examples.masterslave.ProActiveMaster</screen>
+      <para>
+      The methods of this class are described in the interface:
+      </para>
+      <screen>org.objectweb.proactive.examples.masterslave.interfaces.Master</screen>
+      <para>
+      The following constructors can be used to create a Master:
+      </para>
+
+      <programlisting lang="java">    /**
      * Creates a master with a collection of nodes
      * @param nodes
      */
@@ -271,15 +261,18 @@
      * @param virtualNode
      */
     public ProActiveMaster(VirtualNode virtualNode);</programlisting>
-			<para>
-				This allows to create a master and deploy it using different schemes (through a Descriptor, through already deployed ProActive resources,etc ...).
-			</para>
-		</sect2>
 
-		<sect2>
-			<title>Task Definition</title>
-			
-<programlisting lang="java">public interface Task&lt;R extends Serializable&gt; extends Serializable {
+      <para>These constructors allow to create a master and deploy it using different
+      schemes (through a Descriptor, through already deployed ProActive
+      resources,etc ...).</para>
+    </sect2>
+
+    <sect2>
+      <title>Task Definition</title>
+
+      <para>The task interface is defined at: <screen>org.objectweb.proactive.examples.masterslave.interfaces.Task</screen></para>
+
+      <programlisting lang="java">public interface Task&lt;R extends Serializable&gt; extends Serializable {
     /**
      * A task to be executed
      * @param memory access to the slave memory
@@ -289,35 +282,36 @@
     public R run(SlaveMemory memory) throws Exception;
 }</programlisting>
 
-			<para>
-				A user needs only to implement the
-				<emphasis role="bold">Task</emphasis>
-				interface to define his task. The <emphasis role="bold">SlaveMemory</emphasis> parameter can allow an user to store some data in the slave directly. Another task can then retreive the same data later on. This is useful, for example, when one wants to reuse a database connection and save starting a new connection over and over again.   
-			</para>
-		</sect2>
+      <para>Users need to implement the <emphasis>Task</emphasis> interface to define their tasks. The <emphasis>SlaveMemory</emphasis> parameter can allow users to store
+      some data in the slave directly. Another task can then retreive the same
+      data later on. This is useful, for example, when one wants to reuse a
+      database connection and save the time needed for starting a new connection between each task.</para>
+    </sect2>
 
-		<sect2>
-			<title>Task submission</title>	
-			
-<programlisting lang="java">    /**
+    <sect2>
+      <title>Task submission</title>
+
+      <programlisting lang="java">    /**
      * Adds a collection of tasks to be solved by the master
-     * Note that is a collection of tasks is submitted in one mode, it's impossible to submit tasks in a different mode until all the results have been retrieved (i.e. the master is empty)<br/>
+     * Note that is a collection of tasks is submitted in one mode, it's impossible to submit tasks in a different mode until all the results have been retrieved (i.e. the master is empty)
      * @param tasks collection of tasks
      * @param ordered do we want to collect the results in the same order ?
      * @throws IllegalArgumentsException if the mode is changed or if a task is submitted twice
      */
     public void solve(Collection&lt;T&gt; tasks, boolean ordered)
         throws IllegalArgumentException;</programlisting>
-			<para>
-				For task submission, one single method is used. The ordered or unordered mode is chosen when tasks are submitted and can't be changed afterwards (subsequent calls to solve need to keep the same mode).
-				When all results have been gathered from one serie of tasks and the master becomes "empty", the mode can then be set differently.
-			</para>
-		</sect2>
-		
-		<sect2>
-			<title>Collecting results</title>
-			
-<programlisting lang="java">    /**
+
+      <para>For task submission, one single method is used. The <emphasis>ordered</emphasis> or
+      <emphasis>unordered</emphasis> mode is chosen when tasks are submitted and can't be changed
+      afterwards (subsequent calls to solve need to keep the same mode). When
+      all results have been gathered from one serie of tasks and the master
+      becomes "empty", the mode can then be set differently.</para>
+    </sect2>
+
+    <sect2>
+      <title>Collecting results</title>
+
+      <programlisting lang="java">    /**
      * Wait for all results, will block until all results are computed
      * The ordering of the results depends on the mode used when submitted
      * @return a collection of objects containing the result
@@ -356,58 +350,57 @@
      * @return the answer
      */
     public boolean isEmpty();</programlisting>
-			<para>
-				Five methods can be used in order to collect results:
-				<itemizedlist>
-					<listitem>
-						<para>
-						The first two method will block the current thread until the corresponding result(s) is(are) available.
-						If an exception occurs during the execution of one task, this exception will be thrown back to the user by the wait methods.  
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-						The second two methods will give indications on results availability but will not block the user thread.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-						The last method will tell when the master have given back all the results from the tasks that have been submitted.
-						</para>
-					</listitem>  
-				</itemizedlist>
-			</para>
-		</sect2>
-		
-		<sect2>
-			<title>Terminating the master</title>
-			<programlisting lang="java">
+
+      <para>Five methods can be used in order to collect results:
+      <itemizedlist>
+          <listitem>
+            <para>The first two method will block the current thread until the
+            corresponding result(s) is(are) available. If an exception occurs
+            during the execution of one task, this exception will be thrown
+            back to the user by the wait method.</para>
+          </listitem>
+
+          <listitem>
+            <para>The second two methods will give indications on results
+            availability but will not block the user thread.</para>
+          </listitem>
+
+          <listitem>
+            <para>The last method will tell when the user has received every results previously submitted.</para>
+          </listitem>
+        </itemizedlist></para>
+    </sect2>
+
+    <sect2>
+      <title>Terminating the master</title>
+
+      <programlisting lang="java">
     /**
-     * Terminates the master and (eventually free every resources) <br/>
+     * Terminates the master (and eventually free every resources)
      * @param freeNodeResources tells if the master should as well free the node resources
      * @return success
      */
     public void terminate(boolean freeResources);</programlisting>
-			<para>
-			One single method is used to terminate the master. A boolean parameter tells the master to free resources or not (i.e. terminate remote JVMs).  
-			</para>
-		</sect2>		
-	</sect1>
 
-	<sect1 id="ms_example">
-		<title>A Simple Example</title>
+      <para>One single method is used to terminate the master. A boolean
+      parameter tells the master to free resources or not (i.e. terminate
+      remote JVMs).</para>
+    </sect2>
+  </sect1>
 
-		<para>
-			This very simple example tells if a number is prime or not. 
-			
-			the complete example is available, along with more complex ones under package:
-		</para>
-		<screen>org.objectweb.proactive.examples.masterslave</screen>
-		
-		<para>
-			First the task class definition, it tests if any number of a given interval divides the prime candidate 
-		</para>
-<programlisting lang="java">    public static class FindPrimeTask implements Task&lt;Boolean&gt; {
+  <sect1 id="ms_example">
+    <title>A Simple Example</title>
+
+    <para>This very simple example tells if a number is prime or not. the
+    complete example is available, along with more complex ones under
+    package:</para>
+
+    <screen>org.objectweb.proactive.examples.masterslave</screen>
+
+    <para>First, the task definition: it tests if any number of a given
+    interval divides the prime candidate.</para>
+
+    <programlisting lang="java">    public static class FindPrimeTask implements Task&lt;Boolean&gt; {
         private long begin;
         private long end;
         private long prime;
@@ -430,12 +423,12 @@
             return new Boolean(true);
         }
     }</programlisting>
-    
-		<para>
-			Then the main method, first the command_line parameters are interpreted and the master is created using a deployment descriptor :
-		</para>
-		
-<programlisting lang="java">    public static void main(String[] args)
+
+    <para>The example main method: first the command_line parameters are
+    interpreted and the master is created using a deployment descriptor
+    .</para>
+
+    <programlisting lang="java">    public static void main(String[] args)
         throws TaskException, MalformedURLException {
         NativeExample instance = new NativeExample();
         //   Getting command line parameters
@@ -444,11 +437,10 @@
         //      Creating the Master
         ProActiveMaster&lt;FindPrimeTask, Boolean&gt; master = new ProActiveMaster&lt;FindPrimeTask, Boolean&gt;(instance.descriptor_url,
                 instance.vn_name);</programlisting>
-        <para>
-			Then the tasks are created and submitted to the master.
-		</para> 
 
-<programlisting lang="java">        // Creating the tasks to be solved
+    <para>Then, the tasks are created and submitted to the master.</para>
+
+    <programlisting lang="java">        // Creating the tasks to be solved
         List&lt;FindPrimeTask&gt; tasks = new ArrayList&lt;FindPrimeTask&gt;();
         long square_root_of_candidate = (long) Math.ceil(Math.sqrt(
                     prime_to_find));
@@ -460,12 +452,11 @@
         long startTime = System.currentTimeMillis();
         // Submitting the tasks
         master.solveAll(tasks, false);</programlisting>
-        
-        <para>
-			Then the results are gathered and some statistics are displayed.
-		</para> 
 
-<programlisting lang="java">        // Collecting the results
+    <para>Then, the results are gathered and some statistics are
+    displayed.</para>
+
+    <programlisting lang="java">        // Collecting the results
         Collection&lt;Boolean&gt; results = master.waitAllResults();
         long endTime = System.currentTimeMillis();
         
@@ -473,7 +464,7 @@
         boolean prime = true;
 
         for (Boolean result : results) {
-            prime = prime && result;
+            prime = prime &amp;&amp; result;
         }
 
         long effective_time = (int) (endTime - startTime);
@@ -482,15 +473,11 @@
             (prime ? " is prime." : " is not prime."));
 
         System.out.println("Calculation time (ms): " + effective_time);</programlisting>
-        
-        <para>
-			Finally, the master is terminated (all resources are freed) and the program exits.
-		</para> 
 
-<programlisting lang="java">         //   Terminating the Master
-        master.terminate(true);
+    <para>Finally, the master is terminated (all resources are freed) and the
+    program exits.</para>
 
-        System.exit(0);
-    }</programlisting>
-	</sect1>
+    <programlisting lang="java">		master.terminate(true);
+	System.exit(0);</programlisting>
+  </sect1>
 </chapter>

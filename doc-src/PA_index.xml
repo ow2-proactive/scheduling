@@ -14,6 +14,7 @@
 <!ENTITY OOSPMD SYSTEM "OOSPMD.xml">
 <!ENTITY Migration SYSTEM "Migration.xml">
 <!ENTITY exceptions SYSTEM "exceptions.xml">
+<!ENTITY MasterSlave SYSTEM "masterslave.xml">
 <!ENTITY bnb SYSTEM "bnb.xml">
 <!ENTITY Calcium SYSTEM "Calcium.xml">
 <!ENTITY PAConfiguration SYSTEM "Configuration.xml">
@@ -75,7 +76,7 @@
     &TroubleShooting;
   </part>
  
-	<part id="ProActiveGuidedTour">
+  <part id="ProActiveGuidedTour">
    <title>Guided Tour and Tutorial</title>
    &guidedindex;
    &capabilities-intro;
@@ -92,11 +93,16 @@
     &ProActiveBasis;
     &AOCreation;
     &TypedGroupCommunication;
-    &OOSPMD;
     &Migration;
     &exceptions;
+  </part>
+  
+    <part id="HighLevelAPI">
+   <title>High Level APIs</title>
+    &MasterSlave;
     &bnb;
     &Calcium;
+    &OOSPMD;
   </part>
 
   <part id="ProActiveDeployment">
@@ -106,9 +112,7 @@
     &VariableContract;
     &FileTransfer;
     &SSHTunneling;
-    &faultTolerance;
     &technicalService;
-    &scheduler;
    </part>
    
    <part id="ProActiveComponents">
@@ -122,10 +126,11 @@
     &perspectives;
    </part>
    
-   <part id="ProActiveAdvancedTopics">
-    <title>Advanced</title>
+   <part id="ProActiveAdvancedFeatures">
+    <title>Advanced Features</title>
     &p2p;
     &loadbalancing;
+    &faultTolerance;
     &Security;
     &WSDoc;
     &OSGi;
@@ -135,16 +140,13 @@
 
    <part id="ProActiveTools">
     <title>Graphical User Interface (GUI) and tools</title>
-    <!--
-    &IC2D;
-    &plugin;
-    -->
     &IC2D_EclipsePlugin;
     &scilab;
+    &scheduler;
     &TimIt;
    </part>
 
-   <part id="ProActiveExtensions">
+   <part id="ExtendingProActive">
     <title>Extending ProActive</title>
     &writeDoc;
     &extendingIC2D;
