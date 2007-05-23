@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.mop;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -442,6 +443,36 @@ public abstract class Utils extends Object {
             }
         }
         return false;
+    }
+
+    /**
+     * This method optimizes the copy of primitive arrays.
+     * This deep copy method does not replace the standard one
+     * and uses it. The deep copy is replaced only for arrays of primitive
+     * data type of 1 dimension by using the System.arraycopy method.
+     * @param source The source array to copy
+     * @return The deep copy of the source array
+     */
+    public static final Object[] makeDeepCopy(Object[] source)
+        throws java.io.IOException {
+        if (source == null) {
+            return null;
+        }
+        Class cl;
+        Object obj;
+        final Object[] ret = new Object[source.length];
+        int len = 0;
+        for (int i = 0; i < ret.length; i++) {
+            if (((obj = source[i]) != null) && (cl = obj.getClass()).isArray() &&
+                    cl.getComponentType().isPrimitive()) {
+                len = Array.getLength(obj);
+                ret[i] = Array.newInstance(cl.getComponentType(), len);
+                System.arraycopy(obj, 0, ret[i], 0, len);
+            } else {
+                ret[i] = makeDeepCopy(obj);
+            }
+        }
+        return ret;
     }
 
     public static Object makeDeepCopy(Object source) throws java.io.IOException {
