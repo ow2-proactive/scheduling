@@ -336,7 +336,6 @@
 			<mkdir dir="${junit.dir}"/>
 		
 			<junit printsummary="yes" forkmode="perTest" showoutput="yes">
-				<sysproperty key="PROACTIVE_TEST" value="1"/>
 				<jvmarg value="-Dproactive.dir=${base.dir}"/>
 	
 				<classpath refid="test.classpath"/>
