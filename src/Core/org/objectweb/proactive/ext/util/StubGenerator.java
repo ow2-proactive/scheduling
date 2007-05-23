@@ -169,7 +169,7 @@ public class StubGenerator {
                 StubGenerator.generateClass(str,
                     destDir.toString() + File.separator);
             } catch (Throwable e) {
-                System.out.println("FAILED " + str);
+                System.out.println("Stub generation failed: " + str);
             }
         }
 
