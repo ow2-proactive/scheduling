@@ -164,4 +164,20 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      */
     public void removeImmediateService(String methodName,
         Class[] parametersTypes);
+
+    /**
+     * Terminate the body. After this call the body is no more alive and no more active.
+     * The body is unuseable after this call. If some automatic continuations are registred
+     * in the futurepool of this body, the ACThread will be killed when the last registred AC
+     * is sent.
+     */
+    public void terminate();
+
+    /**
+     * @see terminate(). If completeACs is true, this call has the same behavior than terminate().
+     * Otherwise, the ACThread is killed even if some ACs remain in the futurepool.
+     * @param completeACs if true, this call has the same behavior than terminate(). Otherwise,
+     * the ACThread is killed even if some ACs remain in the futurepool.
+     */
+    public void terminate(boolean completeACs);
 }

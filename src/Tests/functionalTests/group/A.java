@@ -106,7 +106,7 @@ public class A implements InitActive, RunActive, EndActive,
     }
 
     public void endBodyActivity() throws Exception {
-        ProActive.getBodyOnThis().terminate();
+        ProActive.terminateActiveObject(true);
     }
 
     public void initActivity(Body body) {

@@ -81,7 +81,7 @@ public class SimpleResourceManager implements GenericResourceManager,
                 logger.debug(
                     "finished deactivating nodes, will terminate Resource Manager");
             }
-            ProActive.getBodyOnThis().terminate();
+            ProActive.terminateActiveObject(true);
             //sucess
             return new BooleanWrapper(true);
         } catch (Exception e) {

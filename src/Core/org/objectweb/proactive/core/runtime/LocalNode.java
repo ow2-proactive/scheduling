@@ -220,14 +220,10 @@ public class LocalNode {
             Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
 
             if (body != null) {
-                try {
-                    ProActiveLogger.getLogger(Loggers.NODE)
-                                   .info("node " + this.name +
-                        " is being killed, terminating body " + bodyID);
-                    body.terminate();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                ProActiveLogger.getLogger(Loggers.NODE)
+                               .info("node " + this.name +
+                    " is being killed, terminating body " + bodyID);
+                body.terminate();
             }
         }
     }

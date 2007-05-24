@@ -108,13 +108,6 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
         return body.receiveReply(id, r);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.rmi.RmiRemoteBody#terminate()
-     */
-    public void terminate(UniqueID id) throws IOException {
-        body.terminate(id);
-    }
-
     public String getNodeURL(UniqueID id) {
         return body.getNodeURL(id);
     }

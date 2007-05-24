@@ -155,7 +155,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         setLocalBodyImpl(new ActiveLocalBodyStrategy(reifiedObject,
                 factory.newRequestQueueFactory().newRequestQueue(bodyID),
                 factory.newRequestFactory()));
-        this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
+        this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
         String ftstate = ProActiveConfiguration.getInstance().getFTState();
@@ -279,19 +279,28 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
     /**
      * Signals that the activity of this body, managed by the active thread has just stopped.
+     * @param completeACs if true, and if there are remaining AC in the futurepool, the AC thread
+     * is not killed now; it will be killed after the sending of the last remaining AC.
      */
     @Override
-    protected void activityStopped() {
-        super.activityStopped();
+    protected void activityStopped(boolean completeACs) {
+        super.activityStopped(completeACs);
         messageEventProducer = null;
         try {
             this.localBodyStrategy.getRequestQueue().destroy();
-            this.getFuturePool().disableAC();
         } catch (ProActiveRuntimeException e) {
-            bodyLogger.warn("Terminating already terminated body " +
-                this.getID(), e);
+            // this method can be called twos times if the automatic contunation thread
+            // is killed *after* the activity thread.
+            bodyLogger.debug("Terminating already terminated body " +
+                this.getID());
         }
-        setLocalBodyImpl(new InactiveLocalBodyStrategy());
+        this.getFuturePool().terminateAC(completeACs);
+        if (!completeACs) {
+            setLocalBodyImpl(new InactiveLocalBodyStrategy());
+        } else {
+            // the futurepool is still needed for remaining ACs
+            setLocalBodyImpl(new InactiveLocalBodyStrategy(this.getFuturePool()));
+        }
     }
 
     public void setImmediateService(String methodName) {
@@ -510,7 +519,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         "Exception occured in while sending reply to request = " +
                         request.getMethodName(), e, BodyImpl.this,
                         request.getSourceBodyID());
-
                 NFEManager.fireNFE(nfe, BodyImpl.this);
             }
         }
@@ -572,10 +580,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // end inner class LocalBodyImpl
     private class InactiveLocalBodyStrategy implements LocalBodyStrategy,
         java.io.Serializable {
+        // An inactive body strategy can have a futurepool if some ACs to do
+        // remain after the termination of the active object
+        private FuturePool futures;
+
         //
         // -- CONSTRUCTORS -----------------------------------------------
         //
         public InactiveLocalBodyStrategy() {
+        }
+
+        public InactiveLocalBodyStrategy(FuturePool remainingsACs) {
+            this.futures = remainingsACs;
         }
 
         //
@@ -585,8 +601,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // -- implements LocalBody -----------------------------------------------
         //
         public FuturePool getFuturePool() {
-            //throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
-            return null;
+            return this.futures;
         }
 
         public BlockingRequestQueue getRequestQueue() {

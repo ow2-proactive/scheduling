@@ -546,11 +546,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
     }
 
     public void terminate() {
-        try {
-            org.objectweb.proactive.ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ProActive.terminateActiveObject(true);
     }
 
     public class UserFrame extends Frame implements ActionListener,

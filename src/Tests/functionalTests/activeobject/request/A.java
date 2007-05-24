@@ -32,9 +32,13 @@ package functionalTests.activeobject.request;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 /**
@@ -48,7 +52,21 @@ public class A implements Serializable, RunActive {
     private static final long serialVersionUID = 7313731330586627985L;
     int counter = 0;
 
+    // for ACs after termination test
+    private A delegate;
+
     public A() {
+    }
+
+    public void initDeleguate() {
+        try {
+            this.delegate = (A) ProActive.newActive(A.class.getName(),
+                    new Object[0]);
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
     }
 
     public void runActivity(Body body) {
@@ -77,7 +95,20 @@ public class A implements Serializable, RunActive {
         return counter;
     }
 
+    public StringWrapper getValue() {
+        try {
+            Thread.sleep(4000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new StringWrapper("Returned value");
+    }
+
+    public StringWrapper getDelegateValue() {
+        return this.delegate.getValue();
+    }
+
     public void exit() throws Exception {
-        ProActive.getBodyOnThis().terminate();
+        ProActive.terminateActiveObject(true);
     }
 }

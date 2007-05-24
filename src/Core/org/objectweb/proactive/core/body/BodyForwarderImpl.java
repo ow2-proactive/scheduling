@@ -335,17 +335,6 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see UniversalBody#terminate() */
-    public void terminate(UniqueID id) throws IOException {
-        BodyAdapter rbody = bodies.get(id);
-        if (rbody != null) {
-            // TODO probably remove this AO from our cache
-            rbody.terminate();
-        } else {
-            throw new IOException("No BodyAdapter associated to id=" + id);
-        }
-    }
-
     /** @see org.objectweb.proactive.core.security.SecurityEntity#terminateSession(long) */
     public void terminateSession(UniqueID id, long sessionID)
         throws IOException, SecurityNotAvailableException {

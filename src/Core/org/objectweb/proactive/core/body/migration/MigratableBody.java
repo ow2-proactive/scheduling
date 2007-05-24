@@ -252,6 +252,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
 
             // try to migrate
             migratedBody = migrationManager.migrateTo(node, this);
+
             if (isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(migratedBody);
             }
@@ -276,7 +277,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
 
         if (!byCopy) {
             this.migrationManager.changeBodyAfterMigration(this, migratedBody);
-            activityStopped();
+            activityStopped(false);
         } else {
             bodyID = savedID;
             nodeURL = saveNodeURL;

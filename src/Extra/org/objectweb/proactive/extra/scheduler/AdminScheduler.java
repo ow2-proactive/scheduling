@@ -150,7 +150,7 @@ public class AdminScheduler {
                 "FIX ME:Bugs #945 in proacive forge Will sleep in adminscheduler to allow for automatic continuation to propagate");
             Thread.sleep(1000);
 
-            ProActive.getBodyOnThis().terminate();
+            ProActive.terminateActiveObject(true);
         } catch (Exception e) {
             //boolean vaLUE INDICATES SOMEHTHING WENT WRONG	 
             shutDownResult = false;

@@ -95,7 +95,7 @@ public class HalfBody extends AbstractBody {
 
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
         setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
-        this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
+        this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
         String ftstate = ProActiveConfiguration.getInstance().getFTState();

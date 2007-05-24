@@ -110,13 +110,6 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.receiveReply(r);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
-     */
-    public void terminate() throws IOException {
-        this.wrappedBody.terminate();
-    }
-
     public String getNodeURL() {
         return this.wrappedBody.getNodeURL();
     }

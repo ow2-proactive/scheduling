@@ -62,14 +62,18 @@ public class FuturePool extends Object implements java.io.Serializable {
     // this map is rebuilt on deserailisation of the object
     public transient FutureMap futures;
 
-    // ID of the body corresponding to this futurePool
-    private UniqueID ownerBody;
+    // body corresponding to this futurePool
+    private Body ownerBody;
 
     // Active queue of AC services
     private transient ActiveACQueue queueAC;
 
-    // toggle for enabling or disabling automatic continuation 
-    private boolean acEnabled;
+    // toggles for enabling or disabling automatic continuation 
+    // outgoing ACs has to be registred if true
+    private boolean registerACs;
+
+    // incoming replies can be sent by ACs
+    private boolean sendACs;
 
     // table used for storing values which arrive in the futurePool BEFORE the registration
     // of its corresponding future.
@@ -83,9 +87,12 @@ public class FuturePool extends Object implements java.io.Serializable {
         valuesForFutures = new java.util.HashMap<String, FutureResult>();
         this.newState = false;
         if ("enable".equals(ProActiveConfiguration.getInstance().getACState())) {
-            this.acEnabled = true;
+            this.registerACs = true;
+            this.sendACs = true;
+            this.queueAC = new ActiveACQueue();
         } else {
-            this.acEnabled = false;
+            this.registerACs = false;
+            this.sendACs = false;
         }
     }
 
@@ -173,17 +180,17 @@ public class FuturePool extends Object implements java.io.Serializable {
     //
 
     /**
-     * Setter of the ID of the body corresonding to this FuturePool
-     * @param i ID of the owner body.
+     * Setter of the body corresonding to this FuturePool
+     * @param b the owner body.
      */
-    public void setOwnerBody(UniqueID i) {
-        ownerBody = i;
+    public void setOwnerBody(Body b) {
+        ownerBody = b;
     }
 
     /**
-     * Getter of the ID of the body corresonding to this FuturePool
+     * Getter of the body corresonding to this FuturePool
      */
-    public UniqueID getOwnerBody() {
+    public Body getOwnerBody() {
         return ownerBody;
     }
 
@@ -192,8 +199,10 @@ public class FuturePool extends Object implements java.io.Serializable {
      * this FuturePool
      * */
     public void enableAC() {
-        // queueAC is created in a lazy manner (see receiveFutureValue)
-        this.acEnabled = true;
+        // queueAC is started in a lazy manner (see receiveFutureValue)
+        this.queueAC = new ActiveACQueue();
+        this.registerACs = true;
+        this.sendACs = true;
     }
 
     /**
@@ -201,11 +210,38 @@ public class FuturePool extends Object implements java.io.Serializable {
      * this FuturePool
      * */
     public void disableAC() {
-        this.acEnabled = false;
-        if (this.queueAC != null) {
-            this.queueAC.killMe();
-            this.queueAC = null;
+        this.registerACs = false;
+        // this.sendACs is still true to send remaining ACs
+        this.queueAC.killMe(true);
+    }
+
+    /**
+     * To terminate the AC thread.
+     * @param completeACs if true, the thread will be terminated as soon as no automatic continuation
+     * remain in the futurepool. Otherwise, the thread is killed.
+     */
+    public void terminateAC(boolean completeACs) {
+        if (!completeACs) {
+            // kill ACqueue now
+            this.registerACs = false;
+            this.sendACs = false;
+            if (this.queueAC != null) {
+                this.queueAC.killMe(false);
+                this.queueAC = null;
+            }
+        } else {
+            // ACqueue status become KILL_AFTER_COMPLETION
+            // ACs can still occur
+            this.queueAC.killMe(true);
         }
+    }
+
+    /**
+     * Return true if some ACs are remaining is this futurepool.
+     * @return true if some ACs are remaining is this futurepool, false otherwise.
+     */
+    public synchronized boolean remainingAC() {
+        return this.futures.remainingAC();
     }
 
     /**
@@ -247,31 +283,23 @@ public class FuturePool extends Object implements java.io.Serializable {
                 }
                 setCopyMode(false);
                 // register futures potentially generated during the copy of result
-                AbstractBody localBody = ((AbstractBody) (LocalBodyStore.getInstance()
-                                                                        .getLocalBody(this.ownerBody)));
-
-                // halfbody ?
-                if (localBody == null) {
-                    localBody = ((AbstractBody) (LocalBodyStore.getInstance()
-                                                               .getLocalHalfBody(this.ownerBody)));
-                }
-                localBody.registerIncomingFutures();
+                ((AbstractBody) ownerBody).registerIncomingFutures();
             }
             stateChange();
 
             // 2) create and put ACservices
-            if (acEnabled) {
+            if (this.registerACs) {
                 ArrayList<UniversalBody> bodiesToContinue = futures.getAutomaticContinuation(id,
                         creatorID);
                 if ((bodiesToContinue != null) &&
                         (bodiesToContinue.size() != 0)) {
                     ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
 
-                    // lazy creation of the AC thread
-                    if (this.queueAC == null) {
-                        this.queueAC = new ActiveACQueue();
+                    // lazy starting of the AC thread
+                    if (!this.queueAC.isAlive()) {
                         this.queueAC.start();
                     }
+
                     // the added reply is a deep copy (concurrent modification of result)
                     // ACs are registred during this deep copy (no copy mode)
                     // Warn : this copy does not avoid the copy for local communications !
@@ -311,7 +339,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-        futureObject.setSenderID(ownerBody);
+        futureObject.setSenderID(ownerBody.getID());
         futures.receiveFuture(futureObject);
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
@@ -362,7 +390,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * Registration key is the calling thread.
      */
     public void registerDestinations(ArrayList<UniversalBody> dests) {
-        if (acEnabled) {
+        if (registerACs) {
             FuturePool.registerBodiesDestination(dests);
         }
     }
@@ -371,7 +399,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * To clear registred destination for the calling thread.
      */
     public void removeDestinations() {
-        if (acEnabled) {
+        if (registerACs) {
             FuturePool.removeBodiesDestination();
         }
     }
@@ -394,9 +422,9 @@ public class FuturePool extends Object implements java.io.Serializable {
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         out.defaultWriteObject();
-        if (acEnabled) {
+        if (this.sendACs) {
             // queue could not be created because of lazy creation
-            if (this.queueAC == null) {
+            if (!this.queueAC.isAlive()) {
                 // notify the reader that queueAC is null
                 out.writeBoolean(false);
             } else {
@@ -405,14 +433,13 @@ public class FuturePool extends Object implements java.io.Serializable {
                 // send the queue of AC requests
                 out.writeObject(queueAC.getQueue());
                 // stop the ActiveQueue thread if this is not a checkpointing serialization
-                FTManager ftm = ((AbstractBody) (LocalBodyStore.getInstance()
-                                                               .getLocalBody(this.ownerBody))).getFTManager();
+                FTManager ftm = ((AbstractBody) ownerBody).getFTManager();
                 if (ftm != null) {
                     if (!ftm.isACheckpoint()) {
-                        queueAC.killMe();
+                        queueAC.killMe(false);
                     }
                 } else {
-                    queueAC.killMe();
+                    queueAC.killMe(false);
                 }
             }
         }
@@ -424,19 +451,32 @@ public class FuturePool extends Object implements java.io.Serializable {
         // futuremap is empty
         // futures are registred in FutureProxy.read()
         this.futures = new FutureMap();
-        if (acEnabled) {
+        if (this.sendACs) {
             // if queueExists is true, ACqueue has been created
-            boolean queueExists = in.readBoolean();
-            if (queueExists) {
+            boolean queueStarted = in.readBoolean();
+            if (queueStarted) {
                 // create a new ActiveACQueue
                 ArrayList<ACService> queue = (ArrayList<ACService>) (in.readObject());
                 queueAC = new ActiveACQueue(queue);
                 queueAC.start();
+            } else {
+                queueAC = new ActiveACQueue();
             }
         }
     }
 
     //--------------------------------INNER CLASS------------------------------------//
+
+    /**
+     * Active queue status :
+     * ALIVE is the normal state,
+     * if state is KILL_NOW, the queue must be killed even if there is some ACs to do in the futurepool.
+     * if state is KILL_AFTER_COMPLETION, the queue will be killed when no more ACs remain in the futurepool.
+     */
+    private enum KillStatus {ALIVE,
+        KILL_NOW,
+        KILL_AFTER_COMPLETION;
+    }
 
     /**
      * Active Queue for AC. This queue has his own thread to perform ACservices
@@ -448,7 +488,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     private class ActiveACQueue extends Thread {
         private ArrayList<ACService> queue;
         private int counter;
-        private boolean kill;
+        private KillStatus status;
 
         //
         // -- CONSTRUCTORS -----------------------------------------------
@@ -456,14 +496,14 @@ public class FuturePool extends Object implements java.io.Serializable {
         public ActiveACQueue() {
             queue = new ArrayList<ACService>();
             counter = 0;
-            kill = false;
+            status = KillStatus.ALIVE;
             this.setName("Thread for AC");
         }
 
         public ActiveACQueue(ArrayList<ACService> queue) {
             this.queue = queue;
             counter = queue.size();
-            kill = false;
+            status = KillStatus.ALIVE;
             this.setName("Thread for AC");
         }
 
@@ -498,44 +538,35 @@ public class FuturePool extends Object implements java.io.Serializable {
         /**
          * To stop the thread.
          */
-        public synchronized void killMe() {
-            kill = true;
+        public synchronized void killMe(boolean completeACs) {
+            status = completeACs ? KillStatus.KILL_AFTER_COMPLETION
+                                 : KillStatus.KILL_NOW;
             notifyAll();
         }
 
         @Override
         public void run() {
-            // get a reference on the owner body
-            // try until it's not null because deserialization of the body 
-            // may be not finished when we restart the thread.
-            Body owner = null;
+            // associate this thread to the owner body
+            LocalBodyStore.getInstance()
+                          .setCurrentThreadBody(FuturePool.this.getOwnerBody());
 
             while (true) {
                 // if there is no AC to do, wait...
                 waitForAC();
                 // if body is dead, kill the thread
-                if (kill) {
+                if (status == KillStatus.KILL_NOW) {
+                    LocalBodyStore.getInstance().removeCurrentThreadBody();
                     break;
-                }
-                while (owner == null) {
-                    owner = LocalBodyStore.getInstance().getLocalBody(ownerBody);
-                    // Associating the thread with the body
-                    LocalBodyStore.getInstance().setCurrentThreadBody(owner);
-                    // it's a halfbody...
-                    if (owner == null) {
-                        owner = LocalBodyStore.getInstance()
-                                              .getLocalHalfBody(ownerBody);
-                        LocalBodyStore.getInstance().setCurrentThreadBody(owner);
-                    }
                 }
 
                 // there are ACs to do !
                 try {
                     // enter in the threadStore 
-                    owner.enterInThreadStore();
+                    FuturePool.this.getOwnerBody().enterInThreadStore();
 
                     // if body has migrated, kill the thread
-                    if (kill) {
+                    if (status == KillStatus.KILL_NOW) {
+                        LocalBodyStore.getInstance().removeCurrentThreadBody();
                         break;
                     }
 
@@ -545,12 +576,28 @@ public class FuturePool extends Object implements java.io.Serializable {
                     }
 
                     // exit from the threadStore
-                    owner.exitFromThreadStore();
+                    FuturePool.this.getOwnerBody().exitFromThreadStore();
                 } catch (Exception e2) {
                     // to unblock active object
-                    owner.exitFromThreadStore();
+                    FuturePool.this.getOwnerBody().exitFromThreadStore();
                     throw new ProActiveRuntimeException("Error while sending reply for AC ",
                         e2);
+                }
+
+                // kill it after completion of the remaining ACs...
+                if ((status == KillStatus.KILL_AFTER_COMPLETION) &&
+                        (!FuturePool.this.getOwnerBody().getFuturePool()
+                                             .remainingAC())) {
+                    // if the body is not active, the ACthread has been killed by a call to terminateAC().
+                    // Then complete the termination.
+                    if (!FuturePool.this.getOwnerBody().isActive()) {
+                        FuturePool.this.getOwnerBody().terminate(false);
+                    }
+                    // else the ACthread has been killed by a call to disableAC().
+                    // no need to terminate the body.
+                    LocalBodyStore.getInstance().removeCurrentThreadBody();
+                    status = KillStatus.KILL_NOW;
+                    break;
                 }
             }
         }
@@ -558,7 +605,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         // synchronized wait on ACRequest queue
         private synchronized void waitForAC() {
             try {
-                while ((counter == 0) && !kill) {
+                while ((counter == 0) && (status != KillStatus.KILL_NOW)) {
                     wait();
                 }
             } catch (InterruptedException e) {
@@ -604,14 +651,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     UniversalBody dest = (UniversalBody) (dests.get(i));
 
                     // FAULT-TOLERANCE
-                    AbstractBody ownerBody = (AbstractBody) (LocalBodyStore.getInstance()
-                                                                           .getLocalBody(FuturePool.this.ownerBody));
-                    if (ownerBody == null) {
-                        //this might be a halfbody !
-                        ownerBody = (AbstractBody) (LocalBodyStore.getInstance()
-                                                                  .getLocalHalfBody(FuturePool.this.ownerBody));
-                    }
-                    FTManager ftm = ownerBody.getFTManager();
+                    FTManager ftm = ((AbstractBody) FuturePool.this.getOwnerBody()).getFTManager();
 
                     if (remainingSends > 1) {
                         // create a new reply to keep the original copy unchanged for next sending ...

@@ -305,7 +305,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
-            if (this.isDead) {
+            // if the futurepool is not null while body is dead, 
+            // this AO still has ACs to do.
+            if (this.isDead && (this.getFuturePool() == null)) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             } else {
                 ftres = this.ftmanager.onReceiveReply(reply);
@@ -317,7 +319,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         try {
             enterInThreadStore();
-            if (isDead) {
+            if (isDead && (this.getFuturePool() == null)) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             }
 
@@ -676,7 +678,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // -- implements Body -----------------------------------------------
     //
     public void terminate() {
-        if (isDead) {
+        this.terminate(true);
+    }
+
+    public void terminate(boolean completeACs) {
+        if (isDead && (this.getFuturePool() == null)) {
             return;
         }
         if (Profiling.TIMERS_COMPILED) {
@@ -685,14 +691,16 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 // Stops wfr, serve and total
                 this.timersContainer.stopAll();
                 // We need to finalize statistics of the timers container
-                // for this body                		        		
+                // for this body                                        
                 this.timersContainer.sendResults(this.getName(),
                     this.bodyID.shortString());
                 this.timersContainer = null;
             }
         }
         isDead = true;
-        activityStopped();
+        // the ACthread is not killed if completeACs is true AND there is
+        // some ACs remaining...
+        activityStopped(completeACs && this.getFuturePool().remainingAC());
         this.remoteBody = null;
         // unblock is thread was block
         acceptCommunication();
@@ -890,8 +898,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /**
      * Signals that the activity of this body, managed by the active thread has just stopped.
+     * @param completeACs if true, and if there are remaining AC in the futurepool, the AC thread
+     * is not killed now; it will be killed after the sending of the last remaining AC.
      */
-    protected void activityStopped() {
+    protected void activityStopped(boolean completeACs) {
         if (!isActive) {
             return;
         }
@@ -987,7 +997,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     BodyAdapter ba = (BodyAdapter) (toKill.getRemoteAdapter());
                     ba.changeProxiedBody(this);
                     this.remoteBody = ba;
-                    toKill.terminate();
+                    toKill.terminate(false);
                     toKill.acceptCommunication();
                 }
             }

@@ -81,13 +81,6 @@ public interface RemoteBody extends Serializable, SecurityEntity {
     public int receiveReply(Reply r) throws java.io.IOException;
 
     /**
-     * Terminate the body. After this call the body is no more alive and no more active
-     * although the active thread is not interrupted. The body is unuseable after this call.
-     * @exception java.io.IOException if an exception occured during the remote communication
-     */
-    public void terminate() throws java.io.IOException;
-
-    /**
      * Returns the url of the node this body is associated to
      * The url of the node can change if the active object migrates
      * @return the url of the node this body is associated to

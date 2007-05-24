@@ -217,12 +217,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     public void terminate() {
         this.c3ddispatcher.unregisterConsumer(i_user);
         this.gui.trash();
-
-        try {
-            org.objectweb.proactive.ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ProActive.terminateActiveObject(true);
     }
 
     /**

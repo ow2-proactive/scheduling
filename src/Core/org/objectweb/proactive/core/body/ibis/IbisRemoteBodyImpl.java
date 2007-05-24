@@ -103,13 +103,6 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
         return body.receiveReply(r);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.ibis.IbisRemoteBody#terminate()
-     */
-    public void terminate() throws IOException {
-        body.terminate();
-    }
-
     public String getNodeURL() {
         return body.getNodeURL();
     }

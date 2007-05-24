@@ -77,11 +77,6 @@ public interface RemoteBodyForwarder {
     public int receiveReply(UniqueID id, Reply r) throws java.io.IOException;
 
     /**
-     * @see RemoteBody#terminate()
-     */
-    public void terminate(UniqueID id) throws java.io.IOException;
-
-    /**
      * @see RemoteBody#getNodeURL()
      */
     public String getNodeURL(UniqueID id) throws java.io.IOException;

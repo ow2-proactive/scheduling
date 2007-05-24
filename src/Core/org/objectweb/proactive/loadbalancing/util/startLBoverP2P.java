@@ -220,9 +220,6 @@ public class startLBoverP2P implements ProActiveInternalObject,
     }
 
     public void killMe() {
-        try {
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-        }
+        ProActive.terminateActiveObject(true);
     }
 }

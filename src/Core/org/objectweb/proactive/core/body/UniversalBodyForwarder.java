@@ -80,8 +80,6 @@ public interface UniversalBodyForwarder {
 
     public BodyAdapter getRemoteAdapter(UniqueID id);
 
-    public void terminate(UniqueID id) throws java.io.IOException;
-
     public void enableAC(UniqueID id) throws java.io.IOException;
 
     public void disableAC(UniqueID id) throws java.io.IOException;

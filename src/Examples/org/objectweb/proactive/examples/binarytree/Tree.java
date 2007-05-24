@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.examples.binarytree;
 
-import java.io.IOException;
+import org.objectweb.proactive.ProActive;
 
 
 public class Tree {
@@ -141,11 +141,7 @@ public class Tree {
         if (left != null) {
             left.delete();
         }
-        try {
-            (org.objectweb.proactive.ProActive.getBodyOnThis()).terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ProActive.terminateActiveObject(true);
     }
 
     public String getKey() {

@@ -124,13 +124,6 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
     public BodyAdapter getRemoteAdapter();
 
     /**
-     * Terminate the body. After this call the body is no more alive and no more active
-     * although the active thread is not interrupted. The body is unuseable after this call.
-     * @exception java.io.IOException if a pb occurs during this method call
-     */
-    public void terminate() throws java.io.IOException;
-
-    /**
      * Enables automatic continuation mechanism for this body
      * @exception java.io.IOException if a pb occurs during this method call
      */

@@ -631,7 +631,7 @@ public class Scheduler implements RunActive, RequestFilter {
     public BooleanWrapper terminateScheduler() {
         if (shutdown == true) {
             try {
-                ProActive.getBodyOnThis().terminate();
+                ProActive.terminateActiveObject(true);
                 logger.info("Scheduler terminated successfully");
             } catch (Exception e) {
                 logger.info("error terminating scheudler, will return false" +

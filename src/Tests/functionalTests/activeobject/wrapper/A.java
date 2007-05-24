@@ -110,11 +110,7 @@ public class A implements RunActive, Serializable {
     }
 
     public void terminate() {
-        try {
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        ProActive.terminateActiveObject(true);
     }
 
     public void runActivity(Body body) {

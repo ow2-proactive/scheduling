@@ -94,6 +94,13 @@ public class EncryptedBody implements Body, Serializable {
     public void terminate() {
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.objectweb.proactive.Body#terminate(boolean)
+     */
+    public void terminate(boolean completeACs) {
+    }
+
     /* (non-Javadoc)
      * @see org.objectweb.proactive.Body#isAlive()
      */

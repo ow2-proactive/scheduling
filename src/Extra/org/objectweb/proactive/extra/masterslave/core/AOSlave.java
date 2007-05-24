@@ -248,13 +248,10 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
             logger.debug("Terminating " + name + "...");
         }
         this.terminated = true;
-        try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(name + " terminated...");
-            }
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(name + " terminated...");
         }
+        ProActive.terminateActiveObject(true);
         return new BooleanWrapper(true);
     }
 

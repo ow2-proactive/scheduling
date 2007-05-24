@@ -144,12 +144,7 @@ public class TimItBasicReductor {
             filename = ProActive.getBodyOnThis().getID().shortString();
             TimItBasicManager.getInstance().setReductorNull();
             awaitedResults = 0;
-
-            try {
-                ProActive.getBodyOnThis().terminate();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            ProActive.terminateActiveObject(true);
         }
 
         // This is used to make the method synchronous
@@ -188,8 +183,8 @@ public class TimItBasicReductor {
     }
 
     /**
-     * @return the generateOutputFile
-     */
+    * @return the generateOutputFile
+    */
     public boolean isGenerateOutputFile() {
         return generateOutputFile;
     }

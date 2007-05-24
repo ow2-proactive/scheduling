@@ -198,7 +198,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
             }
 
             if (isActive()) {
-                activityStopped();
+                activityStopped(!this.getFuturePool().remainingAC());
             }
         }
     }
@@ -233,10 +233,12 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
 
     /**
      * Signals that the activity of this body, managed by the active thread has just stopped.
+     * @param completeACs if true, and if there are remaining AC in the futurepool, the AC thread
+     * is not killed now; it will be killed after the sending of the last remaining AC.
      */
     @Override
-    protected void activityStopped() {
-        super.activityStopped();
+    protected void activityStopped(boolean completeACs) {
+        super.activityStopped(completeACs);
         runActive = null;
     }
 

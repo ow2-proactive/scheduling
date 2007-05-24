@@ -113,13 +113,6 @@ public class RmiRemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
         return body.receiveReply(r);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.rmi.RmiRemoteBody#terminate()
-     */
-    public void terminate() throws IOException {
-        body.terminate();
-    }
-
     public String getNodeURL() {
         return body.getNodeURL();
     }

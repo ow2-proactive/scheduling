@@ -156,10 +156,6 @@ public abstract class Task implements Serializable, Comparable {
      * Terminate this task.
      */
     public void immediateTerminate() {
-        try {
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            logger.fatal("Couldn't terminate the task", e);
-        }
+        ProActive.terminateActiveObject(true);
     }
 }

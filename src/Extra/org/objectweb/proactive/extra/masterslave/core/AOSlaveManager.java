@@ -255,7 +255,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                 logger.debug(
                     "finished deactivating nodes, will terminate Resource Manager");
             }
-            ProActive.getBodyOnThis().terminate();
+            ProActive.terminateActiveObject(true);
             //sucess
             if (logger.isDebugEnabled()) {
                 logger.debug("SlaveManager terminated...");

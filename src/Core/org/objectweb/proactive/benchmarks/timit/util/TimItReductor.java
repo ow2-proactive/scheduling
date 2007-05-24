@@ -272,12 +272,6 @@ public class TimItReductor implements Serializable {
     }
 
     public void terminate() {
-        try {
-            Body b = ProActive.getBodyOnThis();
-            b.getFuturePool().disableAC();
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ProActive.terminateActiveObject(true);
     }
 }

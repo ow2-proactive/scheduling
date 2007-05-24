@@ -94,11 +94,7 @@ public class Agent implements InitActive, RunActive, EndActive,
     }
 
     public void endBodyActivity() {
-        try {
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ProActive.terminateActiveObject(true);
     }
 
     public void initActivity(Body body) {

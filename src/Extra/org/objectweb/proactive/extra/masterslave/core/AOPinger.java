@@ -116,10 +116,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
                 e.printStackTrace();
             }
         }
-        try {
-            body.terminate();
-        } catch (IOException e) {
-        }
+        body.terminate();
     }
 
     /**

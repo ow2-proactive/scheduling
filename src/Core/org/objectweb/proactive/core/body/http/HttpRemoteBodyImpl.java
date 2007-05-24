@@ -143,18 +143,6 @@ public class HttpRemoteBodyImpl implements RemoteBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
-     */
-    public void terminate() throws java.io.IOException {
-        if (isLocal) {
-            body.terminate();
-        } else {
-            (new BodyRequest("terminate", new ArrayList<Object>(), bodyID,
-                this.url)).send();
-        }
-    }
-
-    /**
      * @throws HTTPRemoteException
      * @see org.objectweb.proactive.core.body.UniversalBody#getNodeURL()
      */

@@ -352,15 +352,11 @@ public class ActiveObjectClass implements java.io.Serializable {
      * should be called to terminate its activity.
      */
     public void terminate() {
-        try {
-            this.localReference = null;
-            this.remoteReference = null;
-            Body b = ProActive.getBodyOnThis();
-            b.getFuturePool().disableAC();
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.localReference = null;
+        this.remoteReference = null;
+        Body b = ProActive.getBodyOnThis();
+        //b.getFuturePool().disableAC();
+        ProActive.terminateActiveObject(true);
     }
 
     /**

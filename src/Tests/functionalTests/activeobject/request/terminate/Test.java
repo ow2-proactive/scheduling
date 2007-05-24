@@ -32,28 +32,48 @@ package functionalTests.activeobject.request.terminate;
 
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.FunctionalTest;
 import functionalTests.activeobject.request.A;
-
+import static junit.framework.Assert.assertTrue;
 
 /**
  * Test sending termination method
  */
 public class Test extends FunctionalTest {
     private static final long serialVersionUID = 9207669520580816164L;
-    A a;
+    A a1;
+    A a2;
+    StringWrapper returnedValue;
 
     @Before
     public void action() throws Exception {
-        a = (A) ProActive.newActive(A.class.getName(), new Object[0]);
-        a.method1();
-        a.exit();
-        //  Thread.sleep(5000);
+        a1 = (A) ProActive.newActive(A.class.getName(), new Object[0]);
+        a1.method1();
+        a1.exit();
+
+        // test with remaining ACs
+        a2 = (A) ProActive.newActive(A.class.getName(), new Object[0]);
+        a2.initDeleguate();
+        returnedValue = a2.getDelegateValue();
+        a2.exit();
     }
 
-    @org.junit.Test(expected = Exception.class)
-    public void postConditions() throws Exception {
-        a.method1();
+    @org.junit.Test
+    public void postConditions() {
+        assertTrue(returnedValue.stringValue().equals("Returned value"));
+        int exceptionCounter = 0;
+        try {
+            a1.method1();
+        } catch (RuntimeException e) {
+            exceptionCounter++;
+        }
+        try {
+            a2.method1();
+        } catch (RuntimeException e) {
+            exceptionCounter++;
+        }
+        assertTrue(exceptionCounter == 2);
     }
 }

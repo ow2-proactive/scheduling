@@ -589,11 +589,7 @@ public class Worker extends Timed implements java.io.Serializable {
      * @see org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher
      */
     public void terminate() {
-        try {
-            ProActive.getBodyOnThis().terminate();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ProActive.terminateActiveObject(true);
     }
 
     // //////////////////////////////////////////////////////////////////////////

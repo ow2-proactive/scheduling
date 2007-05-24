@@ -161,7 +161,7 @@ public class UserScheduler extends SchedulerUserAPI {
                 "FIX ME: Bugs #945 in proacive forge Will sleep in user scheduler to allow for automatic continuation to propagate");
             Thread.sleep(1000);
 
-            ProActive.getBodyOnThis().terminate();
+            ProActive.terminateActiveObject(true);
         } catch (Exception e) {
             logger.info("error terminating userscheulder " + e.getMessage());
             //shut down failed, will return false

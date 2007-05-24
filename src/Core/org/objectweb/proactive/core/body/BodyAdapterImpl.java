@@ -222,13 +222,6 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
-     */
-    public void terminate() throws IOException {
-        proxiedRemoteBody.terminate();
-    }
-
-    /**
      * @see org.objectweb.proactive.core.body.UniversalBody#enableAC()
      */
     public void enableAC() throws IOException {

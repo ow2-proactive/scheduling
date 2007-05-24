@@ -155,6 +155,27 @@ public class FutureMap extends Object implements java.io.Serializable {
     }
 
     /**
+     * Return true if some ACs are remaining is this futuremap.
+     * @return true if some ACs are remaining is this futuremap, false otherwise.
+     */
+    public boolean remainingAC() {
+        Iterator<UniqueID> itAll = this.indexedByBodyID.keySet().iterator();
+        while (itAll.hasNext()) {
+            Map<Long, FuturesAndACs> currentMap = this.indexedByBodyID.get(itAll.next());
+            Iterator<Long> itCur = currentMap.keySet().iterator();
+            while (itCur.hasNext()) {
+                FuturesAndACs curFAC = currentMap.get(itCur.next());
+                if (curFAC.getDestinationsAC() != null) {
+                    if (curFAC.getDestinationsAC().size() != 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Remove entry corresponding to (id, creatorID) in the futureMap.
      * @param id sequence id of the future
      * @param creatorID UniqueID of the creator body of the future
@@ -173,7 +194,6 @@ public class FutureMap extends Object implements java.io.Serializable {
     public synchronized void setCopyMode(boolean mode) {
         Collection<HashMap<Long, FuturesAndACs>> c1 = indexedByBodyID.values();
         Iterator<HashMap<Long, FuturesAndACs>> it1 = c1.iterator();
-
         while (it1.hasNext()) {
             Collection<FuturesAndACs> c2 = (it1.next()).values();
             Iterator<FuturesAndACs> it2 = c2.iterator();

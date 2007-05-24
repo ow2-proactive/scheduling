@@ -2172,22 +2172,45 @@ public class ProActive {
     }
 
     /**
-     * Kill an Active Object while calling terminate() method on its body.
+     * Kill an Active Object by calling terminate() method on its body.
      * @param ao the active object to kill
      * @param immediate if this boolean is true, this method is served as an immediate service.
+     * The termination is then synchronous.
      * The active object dies immediatly. Else, the kill request is served as a normal request, it
-     * is put on the request queue.
+     * is put on the request queue. The termination is asynchronous.
      */
     public static void terminateActiveObject(Object ao, boolean immediate) {
-        Proxy proxy = ((StubObject) ao).getProxy();
-        try {
-            if (immediate) {
-                NonFunctionalServices.terminateAOImmediately(proxy);
-            } else {
-                NonFunctionalServices.terminateAO(proxy);
+        if (MOP.isReifiedObject(ao)) {
+            Proxy proxy = ((StubObject) ao).getProxy();
+            try {
+                if (immediate) {
+                    NonFunctionalServices.terminateAOImmediately(proxy);
+                } else {
+                    NonFunctionalServices.terminateAO(proxy);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } else {
+            throw new ProActiveRuntimeException("The given object " + ao +
+                " is not a reified object");
+        }
+    }
+
+    /**
+     * Kill the calling active object by calling terminate() method on its body.
+     * @param immediate if this boolean is true, this method is served as an immediate service.
+     * The termination is then synchronous.
+     * The active object dies immediatly. Else, the kill request is served as a normal request, it
+     * is put on the request queue. The termination is asynchronous.
+     */
+    public static void terminateActiveObject(boolean immediate) {
+        if (immediate) {
+            // TODO the implementation should use 
+            // terminateActiveObject(ProActive.getStubOnThis(), immediate);
+            ProActive.getBodyOnThis().terminate();
+        } else {
+            terminateActiveObject(ProActive.getStubOnThis(), immediate);
         }
     }
 

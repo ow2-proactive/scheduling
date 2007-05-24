@@ -36,6 +36,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -351,6 +353,7 @@ public class NodeImpl implements Node, Serializable {
      */
     public void killAllActiveObjects() throws NodeException, IOException {
         ArrayList bodyArray;
+        boolean local = NodeFactory.isNodeLocal(this);
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
         } catch (ProActiveException e) {
@@ -360,7 +363,19 @@ public class NodeImpl implements Node, Serializable {
         }
         for (int i = 0; i < bodyArray.size(); i++) {
             UniversalBody body = (UniversalBody) ((ArrayList) bodyArray.get(i)).get(0);
-            body.terminate();
+            if (local) {
+                ((Body) body).terminate();
+            } else {
+                try {
+                    // reify for remote terminate
+                    ProActive.terminateActiveObject(ProActive.createStubObject(
+                            Object.class.getName(), body), true);
+                } catch (MOPException e) {
+                    throw new IOException(
+                        "Cannot contact Active Objects on this node: " +
+                        this.nodeInformation.getURL(), e);
+                }
+            }
         }
     }
 

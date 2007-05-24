@@ -316,10 +316,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
             service.serveOldest(new MainFilter());
         }
-        try {
-            body.terminate();
-        } catch (IOException e) {
-        }
+        body.terminate();
     }
 
     /* (non-Javadoc)

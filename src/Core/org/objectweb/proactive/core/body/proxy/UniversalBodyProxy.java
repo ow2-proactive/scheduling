@@ -324,6 +324,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                     TimerWarehouse.AFTER_SERIALIZATION);
             }
         }
+
         sourceBody.getFuturePool().removeDestinations();
 
         if (Profiling.TIMERS_COMPILED) {
