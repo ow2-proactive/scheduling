@@ -373,7 +373,8 @@ public class NodeImpl implements Node, Serializable {
                 } catch (MOPException e) {
                     throw new IOException(
                         "Cannot contact Active Objects on this node: " +
-                        this.nodeInformation.getURL(), e);
+                        this.nodeInformation.getURL() + " caused by " +
+                        e.getMessage());
                 }
             }
         }
