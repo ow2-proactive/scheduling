@@ -91,6 +91,7 @@ public interface Loggers {
     public static final String P2P_VN = P2P + ".vn"; //descriptor
     public static final String P2P_DESC_SERV = P2P_VN + ".service"; // threads, nodes lookup
     public static final String P2P_SERVICE = P2P + ".service";
+    public static final String P2P_MESSAGE = P2P + ".message";
     public static final String P2P_NODES = P2P + ".nodes"; // lookup and nodes sharing
     public static final String P2P_ACQUAINTANCES = P2P + ".acquaintances";
     public static final String P2P_FIRST_CONTACT = P2P + ".first_contact";
