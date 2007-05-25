@@ -1,6 +1,8 @@
 package org.objectweb.proactive;
 
+import java.io.CharArrayWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -13,6 +15,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -27,10 +30,13 @@ import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
+import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
+import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
+import org.objectweb.proactive.core.descriptor.services.RMIRegistryLookupService;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
+import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
-import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
@@ -57,9 +63,18 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 
 public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
+    
+    static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+    static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema"; 
+    static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+    public static final String DESCRIPTOR_NAMESPACE = "urn:proactive:deployment:3.3";
+
+    
     public static final String RMI_DEFAULT_PORT = "1099";
     public static final String XMLNS_PREFIX = "pa:";
     public static final String MAIN_DEFINITIONS = "//pa:mainDefinition";
@@ -91,19 +106,48 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     // infrastructure
     public static final String INFRASTRUCTURE = "//pa:infrastructure";
     public static final String PROCESS_DEFINITIONS = "//pa:processDefinition/*";
-    public static final String SERVICE_DEFINITION = "//pa:serviceDefinition";
+    public static final String SERVICE_DEFINITIONS = "//pa:serviceDefinition/*";
 
     // technical services
     public static final String TECHNICAL_SERVICES = "//pa:technicalServiceDefinition";
+    
     protected ProActiveDescriptorImpl proActiveDescriptor;
     private XPath xpath;
     private String xmlDescriptorUrl;
     private VariableContract variableContract;
 
+    protected class MyDefaultHandler extends DefaultHandler {
+        private CharArrayWriter buff = new CharArrayWriter();
+        private String errMessage = "";
+        /* With a handler class, just override the methods you need to use
+        */
+
+        // Start Error Handler code here
+        public void warning(SAXParseException e) {
+            System.out.println("Warning Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
+        }
+        
+        public void error(SAXParseException e) throws SAXParseException {
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
+            System.out.println(errMessage);
+            throw e;
+        }
+
+        public void fatalError(SAXParseException e) throws SAXParseException {
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
+            System.out.println(errMessage);
+            throw e;
+        }
+    }
+
+    
     public JaxpDescriptorParser(String xmlDescriptorUrl,
-        VariableContract variableContract) {
+        VariableContract variableContract) throws MalformedURLException, SAXException {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
+        domFactory.setValidating(true);
+        domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, new String[] { "http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd" });
         this.xmlDescriptorUrl = xmlDescriptorUrl;
         this.variableContract = variableContract;
     }
@@ -112,7 +156,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         DocumentBuilder builder;
         try {
             builder = domFactory.newDocumentBuilder();
-
+            builder.setErrorHandler(new MyDefaultHandler());
+            
             proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
             proActiveDescriptor.setVariableContract(variableContract);
 
@@ -131,7 +176,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             handleDeployment();
 
-            handleInfrastructure(); // TODO - process and service definitions
+            handleInfrastructure();
 
             handleTechnicalServices();
         } catch (ParserConfigurationException e) {
@@ -543,6 +588,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         NodeList t = (NodeList) xpath.evaluate(INFRASTRUCTURE, document,
                 XPathConstants.NODESET);
         Node infrastructureContext = t.item(0);
+        
         NodeList nodes = (NodeList) xpath.evaluate(PROCESS_DEFINITIONS,
                 infrastructureContext, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
@@ -596,6 +642,126 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new ProcessListExtractor(node, infrastructureContext);
             }
         }
+        
+        
+        nodes = (NodeList) xpath.evaluate(SERVICE_DEFINITIONS,
+                infrastructureContext, XPathConstants.NODESET);
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            Node node = nodes.item(i);
+            
+            String serviceID = getNodeExpandedValue(node.getParentNode().getAttributes().getNamedItem("id"));
+            
+            String serviceType = node.getNodeName();
+            
+            UniversalService service = null;
+            
+            if (serviceType.equals(RMI_LOOKUP_TAG)) {
+                
+                String lookupURL = getNodeExpandedValue(node.getAttributes().getNamedItem("url"));
+                service = new RMIRegistryLookupService(lookupURL);                
+                
+            } else if (serviceType.equals(P2P_SERVICE_TAG)) {
+                
+                P2PDescriptorService p2pDescriptorService = new P2PDescriptorService();
+                
+                service = p2pDescriptorService;
+                
+                String nodesAsked = getNodeExpandedValue(node.getAttributes().getNamedItem("nodesAsked"));
+                if (nodesAsked != null) {
+                    if (nodesAsked.equals("MAX")) {
+                        p2pDescriptorService.setNodeNumberToMAX();
+                    } else {                        
+                        p2pDescriptorService.setNodeNumber(Integer.parseInt(
+                                nodesAsked));
+                    }
+                }
+                
+                String acq = getNodeExpandedValue(node.getAttributes().getNamedItem("acq"));
+                if (acq != null) {
+                    p2pDescriptorService.setAcq(acq);
+                }
+                
+                String port = getNodeExpandedValue(node.getAttributes().getNamedItem("port"));
+                if (port != null) {
+                    p2pDescriptorService.setPort(port);
+                }
+
+                String noa = getNodeExpandedValue(node.getAttributes().getNamedItem("NOA"));
+                if (noa != null) {
+                    p2pDescriptorService.setNoa(noa);
+                }
+
+                String ttu = getNodeExpandedValue(node.getAttributes().getNamedItem("TTU"));
+                if (ttu != null) {
+                    p2pDescriptorService.setTtu(ttu);
+                }
+
+                String ttl = getNodeExpandedValue(node.getAttributes().getNamedItem("TTL"));
+                if (ttl != null) {
+                    p2pDescriptorService.setTtl(ttl);
+                }
+
+                String multi_proc_nodes = getNodeExpandedValue(node.getAttributes().getNamedItem("multi_proc_nodes"));
+                if (multi_proc_nodes != null) {
+                    p2pDescriptorService.setMultiProcNodes(multi_proc_nodes);
+                }
+
+                String xml_path = getNodeExpandedValue(node.getAttributes().getNamedItem("xml_path"));
+                if (xml_path != null) {
+                    p2pDescriptorService.setXmlPath(xml_path);
+                }
+
+                String node_family_regexp = getNodeExpandedValue(node.getAttributes().getNamedItem(
+                        "node_family_regexp"));
+                if (node_family_regexp != null) {
+                    p2pDescriptorService.setNodeFamilyRegexp(node_family_regexp);
+                }
+                
+                NodeList peerNodes = (NodeList) xpath.evaluate("/pa:peerSet/pa:peer",
+                        node, XPathConstants.NODESET);
+                
+                String[] peerList = new String[peerNodes.getLength()];
+                for(int pp = 0; pp < peerNodes.getLength(); ++pp) {
+                    peerList[pp] = peerNodes.item(pp).getNodeValue();
+                }
+                p2pDescriptorService.setPeerList(peerList);
+                
+                
+            } else if (serviceType.equals(FT_CONFIG_TAG)) {
+                FaultToleranceService ftService = new FaultToleranceService();
+                service = ftService;
+                
+                NodeList childNodes = node.getChildNodes();
+                for(int j = 0; j < childNodes.getLength(); ++j) {
+                    Node childNode = childNodes.item(j);
+
+                    String url = getNodeExpandedValue(childNode.getAttributes().getNamedItem("url"));
+                    
+                    if (childNode.getNodeName().equals(FT_RECPROCESS_TAG)) {
+                        ftService.setRecoveryProcessURL(url);
+                    } else if (childNode.getNodeName().equals(FT_LOCSERVER_TAG)) {
+                        ftService.setLocationServerURL(url);
+                    } else if (childNode.getNodeName().equals(FT_CKPTSERVER_TAG)) {
+                        ftService.setCheckpointServerURL(url);
+                    } else if (childNode.getNodeName().equals(FT_RESSERVER_TAG)) {
+                        ftService.setAttachedResourceServer(url);
+                    } else if (childNode.getNodeName().equals(FT_TTCVALUE_TAG)) {
+                        String value = getNodeExpandedValue(childNode.getAttributes().getNamedItem("value"));
+                        ftService.setTtcValue(value);
+                    } else if (childNode.getNodeName().equals(FT_GLOBALSERVER_TAG)) {
+                        ftService.setGlobalServerURL(url);
+                    } else if (childNode.getNodeName().equals(FT_PROTO_TAG)) {
+                        String type = getNodeExpandedValue(childNode.getAttributes().getNamedItem("type"));
+                        ftService.setProtocolType(type);
+                    }
+                }
+                
+            }
+            
+            proActiveDescriptor.addService(serviceID, service);
+            
+        }
+        
     }
 
     protected class BasicProcessExtractor {
@@ -1740,6 +1906,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     private static final String javaHome = System.getProperty("java.home");
     protected Document document;
     private DocumentBuilderFactory domFactory;
+    protected SchemaFactory schemaFactory;
 
     private String expandPath(Node pathNode) throws SAXException {
         String name = pathNode.getNodeName();
@@ -1821,11 +1988,12 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     class ProActiveNamespaceContext implements NamespaceContext {
+
         public String getNamespaceURI(String prefix) {
             if (prefix == null) {
                 throw new NullPointerException("Null prefix");
             } else if ("pa".equals(prefix)) {
-                return "http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd";
+                return DESCRIPTOR_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }
