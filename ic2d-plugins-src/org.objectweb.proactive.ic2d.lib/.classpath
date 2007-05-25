@@ -58,7 +58,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/ws/soap.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws/xml-apis.jar"/>
-	<classpathentry exported="true" kind="lib" path="ProActive.jar" />
+	<classpathentry exported="true" kind="lib" path="ProActive.jar"/>
 	<classpathentry kind="lib" path="lib/components/asm-2.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/timit/batik-awt-util.jar"/>
 	<classpathentry kind="lib" path="lib/timit/batik-dom.jar"/>
@@ -69,5 +69,9 @@
 	<classpathentry kind="lib" path="lib/timit/jcommon-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/timit/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/timit/jfreechart-1.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jung/colt.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jung/commons-collections-3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jung/concurrent.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jung/jung-1.7.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

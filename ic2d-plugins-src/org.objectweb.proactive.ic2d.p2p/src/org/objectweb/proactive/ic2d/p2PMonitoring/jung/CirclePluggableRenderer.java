@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
+import org.objectweb.proactive.ProActive;
+
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.visualization.PluggableRenderer;
 import edu.uci.ics.jung.visualization.contrib.CircleLayout;
@@ -20,6 +22,7 @@ public class CirclePluggableRenderer extends PluggableRenderer {
 	
 	public CirclePluggableRenderer(CircleLayout l) {
 		layout = l;
+		
 	}
 
 	@Override

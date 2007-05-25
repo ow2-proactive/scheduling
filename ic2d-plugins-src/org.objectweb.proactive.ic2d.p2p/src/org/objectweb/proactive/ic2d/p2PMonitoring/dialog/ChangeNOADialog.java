@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.p2PMonitoring.dialog;
 
-import java.net.UnknownHostException;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -43,20 +41,15 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.webservices.soap.ProActiveProvider;
-import org.objectweb.proactive.p2p.dynamicnoa.ChangeNOAMessage;
-import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.messages.Message;
+import org.objectweb.proactive.p2p.v2.service.P2PService;
+import org.objectweb.proactive.p2p.v2.dynamicnoa.ChangeMaxNOAMessage;
+import org.objectweb.proactive.p2p.v2.service.messages.Message;
 
 
 public class ChangeNOADialog extends Dialog {
@@ -228,7 +221,7 @@ public class ChangeNOADialog extends Dialog {
     	            distNode = NodeFactory.getNode(ref);
     	            p2p = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
     	            System.out.println("Dumper ready to change NOA");
-    	            Message m = new ChangeNOAMessage(1,noa);
+    	            Message m = new ChangeMaxNOAMessage(1,noa);
     	            p2p.message(m);
     	            System.out.println("Fini!");
     	            //p2p.message(new ChangeNOAMessage(1,5));

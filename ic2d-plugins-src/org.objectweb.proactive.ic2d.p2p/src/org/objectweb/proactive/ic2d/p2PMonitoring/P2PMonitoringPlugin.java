@@ -20,6 +20,7 @@ public class P2PMonitoringPlugin extends AbstractUIPlugin {
 	 */
 	public P2PMonitoringPlugin() {
 		plugin = this;
+	
 	}
 
 	/**

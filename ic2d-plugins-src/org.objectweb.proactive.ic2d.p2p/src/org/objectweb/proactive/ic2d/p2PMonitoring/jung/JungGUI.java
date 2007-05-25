@@ -1,24 +1,19 @@
 package org.objectweb.proactive.ic2d.p2PMonitoring.jung;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.p2p.monitoring.Dumper;
-import org.objectweb.proactive.p2p.monitoring.Link;
-import org.objectweb.proactive.p2p.monitoring.P2PNode;
-import org.objectweb.proactive.p2p.monitoring.event.P2PNetworkListener;
+import org.objectweb.proactive.p2p.v2.monitoring.Dumper;
+import org.objectweb.proactive.p2p.v2.monitoring.Link;
+import org.objectweb.proactive.p2p.v2.monitoring.P2PNode;
+import org.objectweb.proactive.p2p.v2.monitoring.event.P2PNetworkListener;
 
 import edu.uci.ics.jung.graph.Edge;
 import edu.uci.ics.jung.graph.Graph;
@@ -26,8 +21,8 @@ import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.decorators.ConstantEdgeStringer;
 import edu.uci.ics.jung.graph.decorators.EdgeShape;
 import edu.uci.ics.jung.graph.decorators.StringLabeller;
-import edu.uci.ics.jung.graph.decorators.StringLabeller.UniqueLabelException;
 import edu.uci.ics.jung.graph.decorators.ToolTipFunction;
+import edu.uci.ics.jung.graph.decorators.StringLabeller.UniqueLabelException;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
 import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
 import edu.uci.ics.jung.visualization.DefaultSettableVertexLocationFunction;
