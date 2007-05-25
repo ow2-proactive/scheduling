@@ -746,8 +746,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int j = 0; j < childNodes.getLength(); ++j) {
                     Node childNode = childNodes.item(j);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
                     String url = getNodeExpandedValue(childNode.getAttributes()
                                                                .getNamedItem("url"));
 
@@ -764,8 +765,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         String value = getNodeExpandedValue(childNode.getAttributes()
                                                                      .getNamedItem("value"));
                         ftService.setTtcValue(value);
-                    } else if (nodeName
-                                            .equals(FT_GLOBALSERVER_TAG)) {
+                    } else if (nodeName.equals(FT_GLOBALSERVER_TAG)) {
                         ftService.setGlobalServerURL(url);
                     } else if (nodeName.equals(FT_PROTO_TAG)) {
                         String type = getNodeExpandedValue(childNode.getAttributes()
@@ -846,8 +846,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
-                if (child.getNodeType() != Node.ELEMENT_NODE)
+                if (child.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
+                }
 
                 String nodeName = child.getNodeName();
                 if (nodeName.equals(PROCESS_REFERENCE_TAG)) {
@@ -899,8 +900,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList childNodes = node.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); ++i) {
                 Node childNode = childNodes.item(i);
-                if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
+                }
 
                 String nodeName = childNode.getNodeName();
                 if (nodeName.equals(FILE_TRANSFER_COPY_PROTOCOL_TAG)) {
@@ -945,8 +947,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
-                if (child.getNodeType() != Node.ELEMENT_NODE)
+                if (child.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
+                }
 
                 String nodeName = child.getNodeName();
                 if (nodeName.equals(CLASSPATH_TAG)) {
@@ -1013,8 +1016,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
-                if (child.getNodeType() != Node.ELEMENT_NODE)
+                if (child.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
+                }
 
                 if (child.getNodeName().equals(SCRIPT_PATH_TAG)) {
                     String path = getPath(child);
@@ -1076,8 +1080,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeValue = getNodeExpandedValue(childNode);
@@ -1112,9 +1117,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 GlobusProcess globusProcess = (GlobusProcess) targetProcess;
                 NodeList childNodes = node.getChildNodes();
                 for (int j = 0; j < childNodes.getLength(); ++j) {
-                    Node child = childNodes.item(j);       
-                    if (child.getNodeType() != Node.ELEMENT_NODE)
+                    Node child = childNodes.item(j);
+                    if (child.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeValue = getNodeExpandedValue(child);
                     String nodeName = child.getNodeName();
@@ -1209,8 +1215,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
                 Node child = childNodes.item(j);
-                if (child.getNodeType() != Node.ELEMENT_NODE)
+                if (child.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
+                }
 
                 String nodeName = child.getNodeName();
                 if (nodeName.equals(GLITE_CONFIG_TAG)) {
@@ -1256,8 +1263,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     if (nodeName.equals(GLITE_PATH_TAG)) {
@@ -1327,31 +1335,30 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             NodeList childNodes = node.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); ++i) {
                 Node childNode = childNodes.item(i);
-                if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                     continue;
+                }
 
                 String nodeName = childNode.getNodeName();
                 if (nodeName.equals(UNICORE_DIR_PATH_TAG)) {
                     String path = getPath(childNode);
                     unicoreProcess.uParam.setUnicoreDir(path);
-                } else if (nodeName
-                                        .equals(UNICORE_KEYFILE_PATH_TAG)) {
+                } else if (nodeName.equals(UNICORE_KEYFILE_PATH_TAG)) {
                     String path = getPath(childNode);
                     unicoreProcess.uParam.setKeyFilePath(path);
                 } else if (nodeName.equals(UNICORE_OPTIONS_TAG)) {
                     NodeList grandChildren = childNode.getChildNodes();
                     for (int j = 0; j < grandChildren.getLength(); ++j) {
                         Node grandChildNode = grandChildren.item(j);
-                        if (grandChildNode.getNodeType() != Node.ELEMENT_NODE)
+                        if (grandChildNode.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
+                        }
 
                         String grandChildNodeName = grandChildNode.getNodeName();
-                        if (grandChildNodeName
-                                              .equals(UNICORE_USITE_TAG)) {
+                        if (grandChildNodeName.equals(UNICORE_USITE_TAG)) {
                             new UnicoreUSiteExtractor(grandChildNode,
                                 unicoreProcess);
-                        } else if (grandChildNodeName
-                                                     .equals(UNICORE_VSITE_TAG)) {
+                        } else if (grandChildNodeName.equals(UNICORE_VSITE_TAG)) {
                             new UnicoreVSiteExtractor(grandChildNode,
                                 unicoreProcess);
                         }
@@ -1452,8 +1459,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeExpandedValue = getNodeExpandedValue(childNode);
@@ -1502,8 +1510,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeExpandedValue = getNodeExpandedValue(childNode);
@@ -1549,8 +1558,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeExpandedValue = getNodeExpandedValue(childNode);
@@ -1611,8 +1621,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeExpandedValue = getNodeExpandedValue(childNode);
@@ -1659,8 +1670,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeExpandedValue = getNodeExpandedValue(childNode);
@@ -1733,8 +1745,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeExpandedValue = getNodeExpandedValue(childNode);
@@ -1823,8 +1836,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
-                    if (childNode.getNodeType() != Node.ELEMENT_NODE)
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
+                    }
 
                     String nodeName = childNode.getNodeName();
                     String nodeExpandedValue = getNodeExpandedValue(childNode);
