@@ -1635,6 +1635,20 @@ public class ProActive {
         //return getProactiveDescriptor(xmlDescriptorUrl, false);
     }
 
+    private static ProActiveDescriptorInternal internalGetProActiveDescriptor(
+        String xmlDescriptorUrl, VariableContract variableContract,
+        boolean hierarchicalSearch) throws ProActiveException {
+        ProActiveDescriptorInternal descriptor;
+        if (System.getProperty("proactive.old.parser") != null) {
+            descriptor = internalGetProActiveDescriptor_old(xmlDescriptorUrl,
+                    variableContract, hierarchicalSearch);
+        } else {
+            descriptor = internalGetProActiveDescriptor_new(xmlDescriptorUrl,
+                    variableContract, hierarchicalSearch);
+        }
+        return descriptor;
+    }
+
     /**
      * return the pad matching with the given url or parse it from the file system
      * @param xmlDescriptorUrl url of the pad
@@ -1643,7 +1657,71 @@ public class ProActive {
      * @throws ProActiveException
      * @throws RemoteException
      */
-    private static ProActiveDescriptorInternal internalGetProActiveDescriptor(
+    private static ProActiveDescriptorInternal internalGetProActiveDescriptor_new(
+        String xmlDescriptorUrl, VariableContract variableContract,
+        boolean hierarchicalSearch) throws ProActiveException {
+        RuntimeFactory.getDefaultRuntime();
+        if (xmlDescriptorUrl.indexOf(':') == -1) {
+            xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
+        }
+        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveDescriptorInternal pad;
+        try {
+            if (!hierarchicalSearch) {
+                //if not hierarchical search, we assume that the descriptor might has been
+                //register with the default jobID
+                pad = part.getDescriptor(xmlDescriptorUrl +
+                        ProActive.getJobId(), hierarchicalSearch);
+            } else {
+                pad = part.getDescriptor(xmlDescriptorUrl, hierarchicalSearch);
+            }
+        } catch (Exception e) {
+            throw new ProActiveException(e);
+        }
+
+        // if pad found, returns it
+        if (pad != null) {
+            return pad;
+        }
+
+        // else parses it
+        try {
+            if (logger.isInfoEnabled()) {
+                logger.info("************* Reading deployment descriptor: " +
+                    xmlDescriptorUrl + " ********************");
+            }
+            JaxpDescriptorParser parser = new JaxpDescriptorParser(xmlDescriptorUrl,
+                    variableContract);
+            parser.parse();
+            pad = parser.getProActiveDescriptor();
+            part.registerDescriptor(pad.getUrl(), pad);
+            return pad;
+        } catch (org.xml.sax.SAXException e) {
+            //e.printStackTrace(); hides errors when testing parameters in xml descriptors
+            logger.fatal(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\".");
+            throw new ProActiveException(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\"." + e);
+        } catch (java.io.IOException e) {
+            //e.printStackTrace(); hides errors when testing parameters in xml descriptors
+            logger.fatal(
+                "A problem occured when getting the proActiveDescriptor at location \"" +
+                xmlDescriptorUrl + "\".");
+            throw new ProActiveException(e);
+        }
+    }
+
+    /**
+     * return the pad matching with the given url or parse it from the file system
+     * @param xmlDescriptorUrl url of the pad
+     * @param hierarchicalSearch must search in hierarchy ?
+     * @return the pad found or a new pad parsed from xmlDescriptorUrl
+     * @throws ProActiveException
+     * @throws RemoteException
+     */
+    private static ProActiveDescriptorInternal internalGetProActiveDescriptor_old(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
