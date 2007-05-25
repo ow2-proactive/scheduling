@@ -65,7 +65,7 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
  */
 public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     P2PConstants, Serializable, ProActiveInternalObject {
-	private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private Vector<Node> waitingNodesList;
     private Vector<String> nodesToKillList;
     private long expirationTime;
@@ -109,7 +109,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         this.jobId = jobId;
         this.nodeFamilyRegexp = nodeFamilyRegexp;
     }
-
 
     // -------------------------------------------------------------------------
     // Access methods
@@ -218,7 +217,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         }
         return new P2PNodeAck(false);
     }
- 
 
     public void giveNodeForMax(Vector<Node> givenNodes,
         P2PNodeManager remoteNodeManager) {
@@ -369,23 +367,22 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             logger.debug("Asking nodes");
 
             Message m = null;
-            UniversalUniqueID uuid =UniversalUniqueID.randomUUID();
+            UniversalUniqueID uuid = UniversalUniqueID.randomUUID();
             if (this.numberOfAskedNodes == 1) {
-                m = new RequestSingleNodeMessage(TTL, uuid, this.localP2pService,
-                        this.stub, this.vnName, this.jobId);
+                m = new RequestSingleNodeMessage(TTL, uuid,
+                        this.localP2pService, this.stub, this.vnName, this.jobId);
             } else {
-//         //       if (onlyUnderloadedAnswer) {
-//                    m = new RequestNodesMessage(TTL, uuid, this.localP2pService,
-//                            this.numberOfAskedNodes - this.acquiredNodes, stub,
-//                            this.vnName, this.jobId, onlyUnderloadedAnswer, null);
-//                } else {
-                   m=new RequestNodesMessage(TTL,
-                            uuid, this.localP2pService,
-                            this.numberOfAskedNodes - this.acquiredNodes, stub,
-                            this.vnName, this.jobId, true, this.nodeFamilyRegexp);
-                }
-//            }
-            this.localP2pService.requestNodes( m);
+                //         //       if (onlyUnderloadedAnswer) {
+                //                    m = new RequestNodesMessage(TTL, uuid, this.localP2pService,
+                //                            this.numberOfAskedNodes - this.acquiredNodes, stub,
+                //                            this.vnName, this.jobId, onlyUnderloadedAnswer, null);
+                //                } else {
+                m = new RequestNodesMessage(TTL, uuid, this.localP2pService,
+                        this.numberOfAskedNodes - this.acquiredNodes, stub,
+                        this.vnName, this.jobId, true, this.nodeFamilyRegexp);
+            }
+            //            }
+            this.localP2pService.requestNodes(m);
             // Send a message to everybody
             //            if (onlyUnderloadedAnswer) {
             ////                this.localP2pService.askingNode(1, null, this.localP2pService,

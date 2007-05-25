@@ -23,17 +23,21 @@ public class ExplorationMessage extends BreadthFirstMessage
             //because he might have received replies
             //and have reached its NOA
             try {
-                String[] result = (String[])  null; //this.sender.registerRequest(target.stubOnThis).toArray(new String[] {});
-             
+                String[] result = (String[]) null; //this.sender.registerRequest(target.stubOnThis).toArray(new String[] {});
+
                 if (result == null) {
                     logger.info("ExplorationMessage me = " +
                         P2PService.getHostNameAndPortFromUrl(
-                            ProActive.getActiveObjectNodeUrl(target.stubOnThis))+ " adding " +P2PService.getHostNameAndPortFromUrl(
-                                    ProActive.getActiveObjectNodeUrl(this.sender)) );
+                            ProActive.getActiveObjectNodeUrl(target.stubOnThis)) +
+                        " adding " +
+                        P2PService.getHostNameAndPortFromUrl(
+                            ProActive.getActiveObjectNodeUrl(this.sender)));
                     //indeed, the peer really wants us
-               //     target.registerRequest(this.sender);
-                   target.getAcquaintanceManager().startAcquaintanceHandShake(P2PService.getHostNameAndPortFromUrl(
-                           ProActive.getActiveObjectNodeUrl(this.sender)),this.sender);
+                    //     target.registerRequest(this.sender);
+                    target.getAcquaintanceManager()
+                          .startAcquaintanceHandShake(P2PService.getHostNameAndPortFromUrl(
+                            ProActive.getActiveObjectNodeUrl(this.sender)),
+                        this.sender);
                 }
             } catch (Exception e) {
                 logger.info("Trouble with registering remote peer", e);

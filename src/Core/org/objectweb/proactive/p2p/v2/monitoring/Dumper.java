@@ -124,15 +124,15 @@ public class Dumper {
     public void dumpForPeerSim() {
         //now dump the links
         int i = 0;
-        
-     //   HashMap<String, P2PNode> senders = network.getSenders();
-       //we use a hashtable because we will get collisions 
+
+        //   HashMap<String, P2PNode> senders = network.getSenders();
+        //we use a hashtable because we will get collisions 
         HashMap<String, ArrayList<String>> sourceDest = new HashMap<String, ArrayList<String>>();
-       
+
         //use to build the conversion name -> Integer
-      HashMap<String, Integer> nameConversion = new HashMap<String, Integer>();
-      int number = 1;  
-      
+        HashMap<String, Integer> nameConversion = new HashMap<String, Integer>();
+        int number = 1;
+
         HashMap<String, Link> links = network.getLinks();
         Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) links.entrySet();
 
@@ -140,64 +140,62 @@ public class Dumper {
         Iterator<Map.Entry<String, Link>> it = map2.iterator();
         while (it.hasNext()) {
             Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
-//            //  System.out.println("---- looking for sender " + entry.getSource());
-  //          System.out.println(entry.getSource() + " <---> " +
-//                entry.getDestination());
-            
+
+            //            //  System.out.println("---- looking for sender " + entry.getSource());
+            //          System.out.println(entry.getSource() + " <---> " +
+            //                entry.getDestination());
             if (sourceDest.get(entry.getSource()) != null) {
-            	ArrayList<String> tmp = sourceDest.get(entry.getSource());
-            	tmp.add(entry.getDestination());
-        	    //  sourceDest.put(entry.getSource(), entry.getDestination());
+                ArrayList<String> tmp = sourceDest.get(entry.getSource());
+                tmp.add(entry.getDestination());
+                //  sourceDest.put(entry.getSource(), entry.getDestination());
             } else {
-            	ArrayList<String> tmp = new ArrayList<String>();
-            	tmp.add(entry.getDestination());
-            	sourceDest.put(entry.getSource(),tmp);
+                ArrayList<String> tmp = new ArrayList<String>();
+                tmp.add(entry.getDestination());
+                sourceDest.put(entry.getSource(), tmp);
             }
+
             //have we seen this source or destination before?
             if (nameConversion.get(entry.getSource()) == null) {
-            	nameConversion.put(entry.getSource(),new Integer(number));
-            	number++;
+                nameConversion.put(entry.getSource(), new Integer(number));
+                number++;
             }
             if (nameConversion.get(entry.getDestination()) == null) {
-            	nameConversion.put(entry.getDestination(),new Integer(number));
-            	number++;
-            }    
+                nameConversion.put(entry.getDestination(), new Integer(number));
+                number++;
+            }
         }
-        
-        
+
         Set<String> sources = sourceDest.keySet();
         for (String key : sources) {
-        	ArrayList tmp = sourceDest.get(key);
-        	Iterator<P2PNode> it2 = tmp.iterator();
-        String result = nameConversion.get(key).toString();
-        	while(it2.hasNext()) {
-        		result = result + " " + nameConversion.get(it2.next());
-        	}
-        	System.out.println(result);
-        	
+            ArrayList tmp = sourceDest.get(key);
+            Iterator<P2PNode> it2 = tmp.iterator();
+            String result = nameConversion.get(key).toString();
+            while (it2.hasNext()) {
+                result = result + " " + nameConversion.get(it2.next());
+            }
+            System.out.println(result);
         }
-        
+
         System.out.println("Total number of peers " + nameConversion.size());
-//        Set<String> sources = sourceDest.keySet();
-//        
-//        for (String key : sources) {
-//        	System.out.println("Processing  "+ key);
-//        	String value = sourceDest.remove(key);
-//        	String result = key;
-//        	while (value != null) {
-//        		result = result + " " + value;
-//        		value = sourceDest.remove(key);
-//        	}
-//        	System.out.println(result);
-//		}
-//        Iterator itSource = sources.iterator();
-//        while (itSource.hasNext()) {
-//        	
-//        	//for each source, check all destinations
-//        	String key = (String) itSource.next();
-//        	
-//        }
-        
+        //        Set<String> sources = sourceDest.keySet();
+        //        
+        //        for (String key : sources) {
+        //        	System.out.println("Processing  "+ key);
+        //        	String value = sourceDest.remove(key);
+        //        	String result = key;
+        //        	while (value != null) {
+        //        		result = result + " " + value;
+        //        		value = sourceDest.remove(key);
+        //        	}
+        //        	System.out.println(result);
+        //		}
+        //        Iterator itSource = sources.iterator();
+        //        while (itSource.hasNext()) {
+        //        	
+        //        	//for each source, check all destinations
+        //        	String key = (String) itSource.next();
+        //        	
+        //        }
     }
 
     public void dumpAsText() {
@@ -337,9 +335,9 @@ public class Dumper {
                     case 2: {
                         //we are either reading a machine name or some garbage
                         if (s.indexOf("---") < 0) {
-                        	 //System.out.println(s);
+                            //System.out.println(s);
                             s = this.cleanURL(s);
-                           
+
                             network.addAsSender(s);
                             network.addLink(current, s);
                             try {
@@ -363,7 +361,8 @@ public class Dumper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-     //   this.dumpAsText();
+
+        //   this.dumpAsText();
         //        this.generateGraphNodes(dump);
         //        this.generateGraphLinks(dump);
     }
@@ -374,9 +373,9 @@ public class Dumper {
         }
 
         //    try {
-     //   System.out.println(s);
-        if (s.indexOf("//") ==-1) {
-        	s="//" + s;
+        //   System.out.println(s);
+        if (s.indexOf("//") == -1) {
+            s = "//" + s;
         }
         return P2PService.getHostNameAndPortFromUrl(s); //.getHostNameFromUrl(s)+":"+UrlBuilder.getPortFromUrl(s); //getHostNameAndPortFromUrl(s);
                                                         //        } catch (UnknownHostException e) {

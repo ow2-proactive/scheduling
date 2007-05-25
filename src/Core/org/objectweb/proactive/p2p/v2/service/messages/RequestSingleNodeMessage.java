@@ -11,15 +11,15 @@ public class RequestSingleNodeMessage extends RandomWalkMessage {
     protected String vnName;
     protected String jobId;
     protected P2PNodeLookup lookup;
-    
-    public RequestSingleNodeMessage(int ttl, UniversalUniqueID uuid, P2PService service, P2PNodeLookup lookup, String vnName, String jobId
-        ) {
-    	this.TTL = ttl;
-    	this.uuid = uuid;
+
+    public RequestSingleNodeMessage(int ttl, UniversalUniqueID uuid,
+        P2PService service, P2PNodeLookup lookup, String vnName, String jobId) {
+        this.TTL = ttl;
+        this.uuid = uuid;
         this.sender = service;
         this.vnName = vnName;
         this.jobId = jobId;
-        this.lookup=lookup;
+        this.lookup = lookup;
     }
 
     @Override
@@ -39,22 +39,18 @@ public class RequestSingleNodeMessage extends RandomWalkMessage {
                 nodeAvailable.getNodeInformation().setJobID(jobId);
             }
             try {
-              lookup.giveNode(nodeAvailable,
-                        askedNode.getNodeManager());
+                lookup.giveNode(nodeAvailable, askedNode.getNodeManager());
             } catch (Exception lookupExcption) {
-                logger.info("Cannot contact the remote lookup",
-                    lookupExcption);
+                logger.info("Cannot contact the remote lookup", lookupExcption);
                 target.nodeManager.noMoreNodeNeeded(nodeAvailable);
                 return;
             }
         }
-        
-        
     }
 
-//    @Override
-//    public void transmit(P2PService acq) {
-//    	System.out.println("RequestSingleNodeMessage.transmit()");
-//        acq.randomPeer().getANode(this);
-//    }
+    //    @Override
+    //    public void transmit(P2PService acq) {
+    //    	System.out.println("RequestSingleNodeMessage.transmit()");
+    //        acq.randomPeer().getANode(this);
+    //    }
 }

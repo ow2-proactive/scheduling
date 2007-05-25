@@ -21,7 +21,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class AcquaintancesWrapper implements Serializable{
+public class AcquaintancesWrapper implements Serializable {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
     private P2PService acquaintances = null;
     private Group groupOfAcquaintances = null;
@@ -46,15 +46,15 @@ public class AcquaintancesWrapper implements Serializable{
 
     public boolean add(P2PService p, String peerUrl) {
         boolean result = this.groupOfAcquaintances.add(p);
-        //this.groupOfAcquaintances.indexOf(p);
 
+        //this.groupOfAcquaintances.indexOf(p);
         if (result) {
-//            try {
-                logger.info("----- Adding " + peerUrl);
-                urlList.add(P2PService.getHostNameAndPortFromUrl(peerUrl));
-//            } catch (UnknownHostException e) {
-//                e.printStackTrace();
-//            }
+            //            try {
+            logger.info("----- Adding " + peerUrl);
+            urlList.add(P2PService.getHostNameAndPortFromUrl(peerUrl));
+            //            } catch (UnknownHostException e) {
+            //                e.printStackTrace();
+            //            }
         }
 
         return result;
@@ -62,11 +62,11 @@ public class AcquaintancesWrapper implements Serializable{
 
     public boolean remove(P2PService p, String peerUrl) {
         logger.info("------ Removing " + p);
-//        try {
-			urlList.remove(P2PService.getHostNameAndPortFromUrl(peerUrl));
-//		} catch (UnknownHostException e) {
-//			e.printStackTrace();
-//		}
+        //        try {
+        urlList.remove(P2PService.getHostNameAndPortFromUrl(peerUrl));
+        //		} catch (UnknownHostException e) {
+        //			e.printStackTrace();
+        //		}
         return this.groupOfAcquaintances.remove(p);
     }
 
@@ -86,19 +86,18 @@ public class AcquaintancesWrapper implements Serializable{
         return this.groupOfAcquaintances.size();
     }
 
-//    public void dumpAcquaintances() {
-//        Iterator it = urlList.iterator();
-//        logger.info("***********************");
-//        while (it.hasNext()) {
-//            logger.info(it.next());
-//        }
-//        logger.info("***********************");
-//    }
-
+    //    public void dumpAcquaintances() {
+    //        Iterator it = urlList.iterator();
+    //        logger.info("***********************");
+    //        while (it.hasNext()) {
+    //            logger.info(it.next());
+    //        }
+    //        logger.info("***********************");
+    //    }
     public String[] getAcquaintancesURLs() {
         return (String[]) urlList.toArray(new String[] {  });
     }
-    
+
     class AutomaticPurgeGroup implements NFEListener {
         public boolean handleNFE(NonFunctionalException nfe) {
             Iterator exceptions;
@@ -119,9 +118,10 @@ public class AcquaintancesWrapper implements Serializable{
                 while (exceptions.hasNext()) {
                     ExceptionInGroup eig = (ExceptionInGroup) exceptions.next();
                     group.remove(eig.getObject());
-                
+
                     int index = eig.getIndex();
-                    System.out.println("AutomaticPurgeGroup.handleNFE() removing " + index);
+                    System.out.println(
+                        "AutomaticPurgeGroup.handleNFE() removing " + index);
                     urlList.remove(index);
                 }
             }
@@ -129,6 +129,4 @@ public class AcquaintancesWrapper implements Serializable{
             return true;
         }
     }
-    
-    
 }

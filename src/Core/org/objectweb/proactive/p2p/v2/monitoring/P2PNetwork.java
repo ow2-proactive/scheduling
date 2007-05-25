@@ -79,7 +79,7 @@ public class P2PNetwork {
      * @param dest
      */
     public void addLink(String source, String dest) {
-    	//System.out.println(source + " <--> " + dest);
+        //System.out.println(source + " <--> " + dest);
         Link l = null;
         Link previousValue = null;
         if (source.compareTo(dest) <= 0) {
@@ -108,9 +108,11 @@ public class P2PNetwork {
 
     protected void notifyListenersNewPeer(P2PNode node) {
         Iterator it = listeners.iterator();
-       // System.out.println("P2PNetwork.notifyListenersNewPeer() " + node);
+
+        // System.out.println("P2PNetwork.notifyListenersNewPeer() " + node);
         while (it.hasNext()) {
-        	System.out.println("            P2PNetwork.notifyListenersNewPeer() ");
+            System.out.println(
+                "            P2PNetwork.notifyListenersNewPeer() ");
             P2PNetworkListener element = (P2PNetworkListener) it.next();
             element.newPeer(node);
         }

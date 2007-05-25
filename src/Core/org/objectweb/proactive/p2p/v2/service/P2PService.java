@@ -92,13 +92,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * Reference to the current Node.
      */
     private Node p2pServiceNode = null;
-    
-    
+
     static {
-    	ProActiveConfiguration.load();
+        ProActiveConfiguration.load();
     }
-    private static final int MSG_MEMORY = System.getProperty(P2PConstants.PROPERTY_MSG_MEMORY) == null ? 0:  Integer.parseInt(System.getProperty(
-                P2PConstants.PROPERTY_MSG_MEMORY));
+
+    private static final int MSG_MEMORY = (System.getProperty(P2PConstants.PROPERTY_MSG_MEMORY) == null)
+        ? 0
+        : Integer.parseInt(System.getProperty(P2PConstants.PROPERTY_MSG_MEMORY));
 
     //    private static final int NOA = Integer.parseInt(System.getProperty(
     //                P2PConstants.PROPERTY_NOA));
@@ -149,19 +150,18 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         };
 
     public static String getHostNameAndPortFromUrl(String url) {
-    	//String validUrl = checkUrl(url);
-//    	String validUrl = url;
-//        int n = validUrl.indexOf("//");
-//        int m = validUrl.lastIndexOf("/"); // looking for the end of the host
-//        if (m == (n + 1)) {
-//            //the url has no name i.e it is a host url
-//            //
-//            return validUrl.substring(n + 2, validUrl.length());
-//        } else {
-//            //check if there is a port
-//            return validUrl.substring(n + 2, m);
-//        }
-
+        //String validUrl = checkUrl(url);
+        //    	String validUrl = url;
+        //        int n = validUrl.indexOf("//");
+        //        int m = validUrl.lastIndexOf("/"); // looking for the end of the host
+        //        if (m == (n + 1)) {
+        //            //the url has no name i.e it is a host url
+        //            //
+        //            return validUrl.substring(n + 2, validUrl.length());
+        //        } else {
+        //            //check if there is a port
+        //            return validUrl.substring(n + 2, m);
+        //        }
         return UrlBuilder.getHostNameFromUrl(url) + ":" +
         UrlBuilder.getPortFromUrl(url);
     }
@@ -524,9 +524,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         UniversalBody body = (UniversalBody) ProActiveRuntimeImpl.getProActiveRuntime()
                                                                  .getActiveObjects(P2P_NODE_NAME,
                 P2PService.class.getName()).get(0);
-        return (P2PService) MOP.newInstance(P2PService.class,
-            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-            new Object[] { body });
+        return (P2PService) MOP.newInstance(P2PService.class, (Object[]) null,
+            Constants.DEFAULT_BODY_PROXY_CLASS_NAME, new Object[] { body });
     }
 
     /**

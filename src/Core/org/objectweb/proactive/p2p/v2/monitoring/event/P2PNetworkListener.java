@@ -10,10 +10,7 @@ import org.objectweb.proactive.p2p.v2.monitoring.P2PNode;
  * @author fhuet
  */
 public interface P2PNetworkListener {
+    public void newPeer(P2PNode node);
 
-	public void newPeer(P2PNode node);
-	
-	public void newLink(Link link);
-	
-	
+    public void newLink(Link link);
 }
