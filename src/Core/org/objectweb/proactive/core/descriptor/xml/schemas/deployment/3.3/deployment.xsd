@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="3.3"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
-	xmlns:pas="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd">
+	targetNamespace="urn:proactive:deployment:3.3"
+	xmlns="urn:proactive:deployment:3.3"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:pa="urn:proactive:deployment:3.3"
+	xmlns:pas="urn:proactive:security:1.0">
 	<xs:import
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
-		schemaLocation="SecuritySchema.xsd" id="security_schema" />
+		namespace="urn:proactive:security:1.0"
+		schemaLocation="../../security/1.0/security.xsd" id="security_schema" />
 	<!-- 
 		The following element ProActiveDescriptor defines the root of the schema
 	-->
@@ -355,8 +355,6 @@
 			<xs:element name="technicalServices"
 				type="TechnicalServiceType" minOccurs="0" />
 		</xs:sequence>
-		<xs:attribute name="schemaVersion" type="xs:decimal"
-			use="required" fixed="3.3" />
 	</xs:complexType>
 
 	<xs:complexType name="VariablesType">
@@ -931,15 +929,16 @@
 			fixed="org.objectweb.proactive.core.process.JVMNodeProcess" />
 		<xs:attribute name="closeStream" type="CloseStreamType"
 			use="optional" />
-		<xs:attribute name="priority" type="PriorityType" use="optional"/>
-		<xs:attribute name="os" type="OSType" use="optional"/>
+		<xs:attribute name="priority" type="PriorityType"
+			use="optional" />
+		<xs:attribute name="os" type="OSType" use="optional" />
 	</xs:complexType>
 	<xs:simpleType name="PriorityType">
 		<xs:union memberTypes="variableRefType">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="low"/>
-					<xs:enumeration value="normal"/>
+					<xs:enumeration value="low" />
+					<xs:enumeration value="normal" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:union>
@@ -948,8 +947,8 @@
 		<xs:union memberTypes="variableRefType">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="unix"/>
-					<xs:enumeration value="windows"/>
+					<xs:enumeration value="unix" />
+					<xs:enumeration value="windows" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:union>

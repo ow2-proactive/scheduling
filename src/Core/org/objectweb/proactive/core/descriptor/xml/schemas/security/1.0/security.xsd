@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
-	elementFormDefault="qualified" 
-	attributeFormDefault="unqualified"
+	targetNamespace="urn:proactive:security:1.0"
+	xmlns="urn:proactive:security:1.0"
+	elementFormDefault="qualified" attributeFormDefault="unqualified"
 	version="1.0">
 	<!--  The following element  defines the root of the schema -->
 
@@ -16,7 +15,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="ApplicationName" minOccurs="1"
-					maxOccurs="1" type="xs:string"/>
+					maxOccurs="1" type="xs:string" />
 				<xs:element name="Certificate" minOccurs="1"
 					maxOccurs="1" type="xs:string" />
 				<xs:element name="PrivateKey" minOccurs="1"
@@ -28,12 +27,14 @@
 				<xs:element name="Rules" minOccurs="1" maxOccurs="1">
 					<xs:complexType>
 						<xs:sequence>
-								<xs:element ref="Rule" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element ref="Rule" minOccurs="0"
+								maxOccurs="unbounded" />
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
-			 <xs:attribute name="schemaVersion" type="xs:decimal" use="required" fixed="1.0"/>
+			<xs:attribute name="schemaVersion" type="xs:decimal"
+				use="required" fixed="1.0" />
 		</xs:complexType>
 	</xs:element>
 

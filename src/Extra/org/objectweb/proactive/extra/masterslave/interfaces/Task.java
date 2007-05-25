@@ -42,10 +42,10 @@ import java.io.Serializable;
 public interface Task<R extends Serializable> extends Serializable {
 
     /**
-     * A task to be executed
+     * A task to be executed<br/>
      * @param memory access to the slave memory
      * @return the result
-     * @throws Exception
+     * @throws Exception any exception thrown by the task
      */
     public R run(SlaveMemory memory) throws Exception;
 }

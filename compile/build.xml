@@ -66,7 +66,6 @@
 		<delete dir="${classlibs.dir}" />
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
-		<delete file="descriptors/examples/DescriptorExamples.xsd"/>
 		<delete dir="${junit.dir}" />
 		<delete dir="${emma.dir}" />
 	</target>
@@ -146,13 +145,6 @@
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
 			</fileset>
 		</copy>
-		<!-- copy descriptor schema -->
-		<copy todir="${cl.proactive.dir}/${proactive.core.path}/descriptor/xml/" overwrite="yes">
-			<fileset dir="${base.dir}/descriptors">
-				<include name="*.xsd"/>
-			</fileset>
-		</copy>
-		<copy todir="${base.dir}/descriptors/examples" overwrite="yes" file="${base.dir}/descriptors/DescriptorSchema.xsd"/>
 	</target>
 
 

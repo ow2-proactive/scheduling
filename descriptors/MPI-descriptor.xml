@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor schemaVersion="3.3"
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+<ProActiveDescriptor
+	xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd DescriptorSchema.xsd">
+	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="JacobiMPI" />

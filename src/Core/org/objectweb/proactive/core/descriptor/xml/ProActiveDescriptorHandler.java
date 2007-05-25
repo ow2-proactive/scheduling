@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -136,7 +135,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         ClassLoader classLoader = ProActiveDescriptorHandler.class.getClassLoader();
 
         Enumeration<URL> schemaURLs = classLoader.getResources(
-                "org/objectweb/proactive/core/descriptor/xml/" + schema);
+                "org/objectweb/proactive/core/descriptor/xml/schemas/" +
+                schema);
 
         // among the various descriptor schema that we may find, we will always
         // favor the one that is in the jar file
@@ -153,58 +153,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         }
 
         if (schemaURLcandidate == null) {
-            // In case the application is executed neither via the ant
-            // script, nor via the jar file, we need to find the schema
-            // manually
-
-            // we locate the proactive code
-            Enumeration<URL> classURLs = ProActiveDescriptorHandler.class.getClassLoader()
-                                                                         .getResources("org/objectweb/proactive/core/descriptor/xml/");
-
-            // we make sure that we found a file structure (and not a jar)
-            URL classURLcandidate = null;
-
-            while (classURLs.hasMoreElements()) {
-                URL classURL = classURLs.nextElement();
-
-                if (classURL.getProtocol().equals("file")) {
-                    classURLcandidate = classURL;
-                }
-            }
-
-            try {
-                if (classURLcandidate != null) {
-                    java.net.URI uriSchema;
-                    uriSchema = classURLcandidate.toURI();
-                    // we navigate to the descriptor schema
-                    URI outsideSchema = new URI(
-                            "../../../../../../../../descriptors/" + schema);
-
-                    uriSchema = uriSchema.resolve(outsideSchema);
-
-                    logger.debug("Schema found:" + uriSchema);
-
-                    java.io.File test = new java.io.File(uriSchema);
-
-                    // we make sure that we have found the right file
-                    if (test.isFile() && test.getName().equals(schema)) {
-                        schemaURLcandidate = uriSchema.toURL();
-                    } else {
-                        logger.error("The schema " + schema +
-                            " could not be located in your environment. Consider compiling ProActive using ant");
-                        schemaURLcandidate = null;
-                    }
-                } else {
-                    logger.error("The schema " + schema +
-                        " could not be located in your environment. Consider compiling ProActive using ant");
-                    schemaURLcandidate = null;
-                }
-            } catch (Exception e) {
-                logger.debug(e.getMessage());
-                logger.error("The schema " + schema +
-                    " could not be located in your environment. Consider compiling ProActive using ant");
-                schemaURLcandidate = null;
-            }
+            logger.error("The schema " + schema +
+                " could not be located in your environment. Consider compiling ProActive using ant");
         }
 
         return schemaURLcandidate;
@@ -218,7 +168,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         String uri = xmlDescriptorUrl;
 
         String[] schemas = new String[] {
-                "DescriptorSchema.xsd", "SecuritySchema.xsd"
+                "deployment/3.3/deployment.xsd", "security/1.0/security.xsd"
             };
 
         Vector<String> selectedSchemas = new Vector<String>();
