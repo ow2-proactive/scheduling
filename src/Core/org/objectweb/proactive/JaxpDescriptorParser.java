@@ -22,6 +22,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -56,6 +57,8 @@ import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
 import org.objectweb.proactive.core.util.HostsInfos;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.w3c.dom.Document;
@@ -68,13 +71,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
-    
     static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-    static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema"; 
+    static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
     static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
     public static final String DESCRIPTOR_NAMESPACE = "urn:proactive:deployment:3.3";
-
-    
     public static final String RMI_DEFAULT_PORT = "1099";
     public static final String XMLNS_PREFIX = "pa:";
     public static final String MAIN_DEFINITIONS = "//pa:mainDefinition";
@@ -110,44 +110,51 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
     // technical services
     public static final String TECHNICAL_SERVICES = "//pa:technicalServiceDefinition";
-    
     protected ProActiveDescriptorImpl proActiveDescriptor;
     private XPath xpath;
     private String xmlDescriptorUrl;
     private VariableContract variableContract;
+    static Logger logger = ProActiveLogger.getLogger(Loggers.XML);
 
     protected class MyDefaultHandler extends DefaultHandler {
         private CharArrayWriter buff = new CharArrayWriter();
         private String errMessage = "";
+
         /* With a handler class, just override the methods you need to use
         */
 
         // Start Error Handler code here
         public void warning(SAXParseException e) {
-            System.out.println("Warning Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
+            logger.warn("Warning Line " + e.getLineNumber() + ": " +
+                e.getMessage() + "\n");
         }
-        
+
         public void error(SAXParseException e) throws SAXParseException {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
-            System.out.println(errMessage);
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
+                    e.getMessage() + "\n");
+            logger.error(errMessage);
             throw e;
         }
 
         public void fatalError(SAXParseException e) throws SAXParseException {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
-            System.out.println(errMessage);
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
+                    e.getMessage() + "\n");
+            logger.fatal(errMessage);
             throw e;
         }
     }
 
-    
     public JaxpDescriptorParser(String xmlDescriptorUrl,
-        VariableContract variableContract) throws MalformedURLException, SAXException {
+        VariableContract variableContract)
+        throws MalformedURLException, SAXException {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, new String[] { "http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd" });
+        domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
+            new String[] {
+                "http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
+            });
         this.xmlDescriptorUrl = xmlDescriptorUrl;
         this.variableContract = variableContract;
     }
@@ -157,11 +164,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         try {
             builder = domFactory.newDocumentBuilder();
             builder.setErrorHandler(new MyDefaultHandler());
-            
+
             proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
             proActiveDescriptor.setVariableContract(variableContract);
 
-            System.out.println("Parsing " + xmlDescriptorUrl);
+            logger.debug("Parsing " + xmlDescriptorUrl);
             document = builder.parse(xmlDescriptorUrl);
             XPathFactory factory = XPathFactory.newInstance();
 
@@ -588,7 +595,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         NodeList t = (NodeList) xpath.evaluate(INFRASTRUCTURE, document,
                 XPathConstants.NODESET);
         Node infrastructureContext = t.item(0);
-        
+
         NodeList nodes = (NodeList) xpath.evaluate(PROCESS_DEFINITIONS,
                 infrastructureContext, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
@@ -642,101 +649,107 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new ProcessListExtractor(node, infrastructureContext);
             }
         }
-        
-        
+
         nodes = (NodeList) xpath.evaluate(SERVICE_DEFINITIONS,
                 infrastructureContext, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
-            
-            String serviceID = getNodeExpandedValue(node.getParentNode().getAttributes().getNamedItem("id"));
-            
+
+            String serviceID = getNodeExpandedValue(node.getParentNode()
+                                                        .getAttributes()
+                                                        .getNamedItem("id"));
+
             String serviceType = node.getNodeName();
-            
+
             UniversalService service = null;
-            
+
             if (serviceType.equals(RMI_LOOKUP_TAG)) {
-                
-                String lookupURL = getNodeExpandedValue(node.getAttributes().getNamedItem("url"));
-                service = new RMIRegistryLookupService(lookupURL);                
-                
+                String lookupURL = getNodeExpandedValue(node.getAttributes()
+                                                            .getNamedItem("url"));
+                service = new RMIRegistryLookupService(lookupURL);
             } else if (serviceType.equals(P2P_SERVICE_TAG)) {
-                
                 P2PDescriptorService p2pDescriptorService = new P2PDescriptorService();
-                
+
                 service = p2pDescriptorService;
-                
-                String nodesAsked = getNodeExpandedValue(node.getAttributes().getNamedItem("nodesAsked"));
+
+                String nodesAsked = getNodeExpandedValue(node.getAttributes()
+                                                             .getNamedItem("nodesAsked"));
                 if (nodesAsked != null) {
                     if (nodesAsked.equals("MAX")) {
                         p2pDescriptorService.setNodeNumberToMAX();
-                    } else {                        
+                    } else {
                         p2pDescriptorService.setNodeNumber(Integer.parseInt(
                                 nodesAsked));
                     }
                 }
-                
-                String acq = getNodeExpandedValue(node.getAttributes().getNamedItem("acq"));
+
+                String acq = getNodeExpandedValue(node.getAttributes()
+                                                      .getNamedItem("acq"));
                 if (acq != null) {
                     p2pDescriptorService.setAcq(acq);
                 }
-                
-                String port = getNodeExpandedValue(node.getAttributes().getNamedItem("port"));
+
+                String port = getNodeExpandedValue(node.getAttributes()
+                                                       .getNamedItem("port"));
                 if (port != null) {
                     p2pDescriptorService.setPort(port);
                 }
 
-                String noa = getNodeExpandedValue(node.getAttributes().getNamedItem("NOA"));
+                String noa = getNodeExpandedValue(node.getAttributes()
+                                                      .getNamedItem("NOA"));
                 if (noa != null) {
                     p2pDescriptorService.setNoa(noa);
                 }
 
-                String ttu = getNodeExpandedValue(node.getAttributes().getNamedItem("TTU"));
+                String ttu = getNodeExpandedValue(node.getAttributes()
+                                                      .getNamedItem("TTU"));
                 if (ttu != null) {
                     p2pDescriptorService.setTtu(ttu);
                 }
 
-                String ttl = getNodeExpandedValue(node.getAttributes().getNamedItem("TTL"));
+                String ttl = getNodeExpandedValue(node.getAttributes()
+                                                      .getNamedItem("TTL"));
                 if (ttl != null) {
                     p2pDescriptorService.setTtl(ttl);
                 }
 
-                String multi_proc_nodes = getNodeExpandedValue(node.getAttributes().getNamedItem("multi_proc_nodes"));
+                String multi_proc_nodes = getNodeExpandedValue(node.getAttributes()
+                                                                   .getNamedItem("multi_proc_nodes"));
                 if (multi_proc_nodes != null) {
                     p2pDescriptorService.setMultiProcNodes(multi_proc_nodes);
                 }
 
-                String xml_path = getNodeExpandedValue(node.getAttributes().getNamedItem("xml_path"));
+                String xml_path = getNodeExpandedValue(node.getAttributes()
+                                                           .getNamedItem("xml_path"));
                 if (xml_path != null) {
                     p2pDescriptorService.setXmlPath(xml_path);
                 }
 
-                String node_family_regexp = getNodeExpandedValue(node.getAttributes().getNamedItem(
-                        "node_family_regexp"));
+                String node_family_regexp = getNodeExpandedValue(node.getAttributes()
+                                                                     .getNamedItem("node_family_regexp"));
                 if (node_family_regexp != null) {
                     p2pDescriptorService.setNodeFamilyRegexp(node_family_regexp);
                 }
-                
+
                 NodeList peerNodes = (NodeList) xpath.evaluate("/pa:peerSet/pa:peer",
                         node, XPathConstants.NODESET);
-                
+
                 String[] peerList = new String[peerNodes.getLength()];
-                for(int pp = 0; pp < peerNodes.getLength(); ++pp) {
+                for (int pp = 0; pp < peerNodes.getLength(); ++pp) {
                     peerList[pp] = peerNodes.item(pp).getNodeValue();
                 }
                 p2pDescriptorService.setPeerList(peerList);
-                
-                
             } else if (serviceType.equals(FT_CONFIG_TAG)) {
                 FaultToleranceService ftService = new FaultToleranceService();
                 service = ftService;
-                
+
                 NodeList childNodes = node.getChildNodes();
-                for(int j = 0; j < childNodes.getLength(); ++j) {
+                for (int j = 0; j < childNodes.getLength(); ++j) {
                     Node childNode = childNodes.item(j);
 
-                    String url = getNodeExpandedValue(childNode.getAttributes().getNamedItem("url"));
-                    
+                    String url = getNodeExpandedValue(childNode.getAttributes()
+                                                               .getNamedItem("url"));
+
                     if (childNode.getNodeName().equals(FT_RECPROCESS_TAG)) {
                         ftService.setRecoveryProcessURL(url);
                     } else if (childNode.getNodeName().equals(FT_LOCSERVER_TAG)) {
@@ -746,22 +759,22 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     } else if (childNode.getNodeName().equals(FT_RESSERVER_TAG)) {
                         ftService.setAttachedResourceServer(url);
                     } else if (childNode.getNodeName().equals(FT_TTCVALUE_TAG)) {
-                        String value = getNodeExpandedValue(childNode.getAttributes().getNamedItem("value"));
+                        String value = getNodeExpandedValue(childNode.getAttributes()
+                                                                     .getNamedItem("value"));
                         ftService.setTtcValue(value);
-                    } else if (childNode.getNodeName().equals(FT_GLOBALSERVER_TAG)) {
+                    } else if (childNode.getNodeName()
+                                            .equals(FT_GLOBALSERVER_TAG)) {
                         ftService.setGlobalServerURL(url);
                     } else if (childNode.getNodeName().equals(FT_PROTO_TAG)) {
-                        String type = getNodeExpandedValue(childNode.getAttributes().getNamedItem("type"));
+                        String type = getNodeExpandedValue(childNode.getAttributes()
+                                                                    .getNamedItem("type"));
                         ftService.setProtocolType(type);
                     }
                 }
-                
             }
-            
+
             proActiveDescriptor.addService(serviceID, service);
-            
         }
-        
     }
 
     protected class BasicProcessExtractor {
@@ -1988,7 +2001,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     class ProActiveNamespaceContext implements NamespaceContext {
-
         public String getNamespaceURI(String prefix) {
             if (prefix == null) {
                 throw new NullPointerException("Null prefix");
