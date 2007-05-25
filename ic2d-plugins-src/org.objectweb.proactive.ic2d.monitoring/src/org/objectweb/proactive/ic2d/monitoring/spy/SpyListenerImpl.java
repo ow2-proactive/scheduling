@@ -59,11 +59,7 @@ public class SpyListenerImpl implements SpyListener{
     public void terminate() {
         Body body = ProActive.getBodyOnThis();
         if (body != null) {
-            try {
-                body.terminate();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            body.terminate();
         }
     }
 

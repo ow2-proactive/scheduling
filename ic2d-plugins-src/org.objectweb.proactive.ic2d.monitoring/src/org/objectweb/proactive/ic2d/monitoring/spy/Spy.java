@@ -172,11 +172,7 @@ public class Spy implements RunActive, ProActiveInternalObject {
 		}
 		spyEventManager.removeBodyEventListener();
 		spyEventManager.removeFutureEventListener();
-		try {
-			body.terminate();
-		} catch (IOException e) {
-			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
-		}
+		body.terminate();
 	}
 	
 	
