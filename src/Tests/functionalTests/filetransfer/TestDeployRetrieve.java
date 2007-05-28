@@ -35,6 +35,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -101,6 +102,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         cleanIfNecessary(this.fileRetrieved);
     }
 
+    @Ignore
     @Test
     public void action() throws Exception {
         long fileTestSum = TestAPI.checkSum(fileTest);
