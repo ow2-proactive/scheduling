@@ -113,7 +113,6 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                     }
                 }
             } catch (Throwable e) {
-                e.printStackTrace();
                 this.exceptionList.add(new ExceptionInGroup(object, this.index,
                         e.fillInStackTrace()));
             }
