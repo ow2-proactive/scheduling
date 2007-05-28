@@ -40,11 +40,7 @@
 	<classpathentry kind="lib" path="lib/globus/cryptix.jar"/>
 	<classpathentry kind="lib" path="lib/globus/cryptix32.jar"/>
 	<classpathentry kind="lib" path="lib/globus/puretls.jar"/>
-	<classpathentry kind="lib" path="lib/ibis/ibis.jar"/>
 	<classpathentry kind="lib" path="lib/javassist.jar"/>
-	<classpathentry kind="lib" path="lib/jini/jini-core.jar"/>
-	<classpathentry kind="lib" path="lib/jini/jini-ext.jar"/>
-	<classpathentry kind="lib" path="lib/jini/reggie.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/osgi/http.jar"/>
 	<classpathentry kind="lib" path="lib/osgi/moduleloader.jar"/>
@@ -84,5 +80,11 @@
 	<classpathentry kind="lib" path="lib/scilab/javasci.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
+	<classpathentry kind="lib" path="lib/ibis/bcel-5.1.jar"/>
+	<classpathentry kind="lib" path="lib/ibis/bcel-5.1-fixes-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/ibis/colobus-0.1.jar"/>
+	<classpathentry kind="lib" path="lib/ibis/ibis-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/ibis/ibis-connect-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/ibis/ibis-util-1.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

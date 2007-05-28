@@ -78,21 +78,6 @@ then
 fi
 
 #--------------------------------------------------
-# jars to set when using Jini
-if [ -f $PROACTIVE/lib/jini/jini-core.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini/jini-core.jar
-fi
-if [ -f $PROACTIVE/lib/jini/jini-ext.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini/jini-ext.jar
-fi
-if [ -f $PROACTIVE/lib/jini/reggie.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini/reggie.jar
-fi
-
-#--------------------------------------------------
 # jars to set when using Globus
 if [ -f $PROACTIVE/lib/globus/cog-jglobus-1.2.jar ]
 then

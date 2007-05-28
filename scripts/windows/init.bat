@@ -34,13 +34,6 @@ IF EXIST "%PROACTIVE%\ic2d.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ic2d.jar
 IF EXIST "%PROACTIVE%\lib\javassist.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\javassist.jar
 
 rem -------------------------------------------------
-rem jars for Jini
-rem -------------------------------------------------
-IF EXIST "%PROACTIVE%\lib\jini\jini-core.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\jini-core.jar
-IF EXIST "%PROACTIVE%\lib\jini\jini-ext.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\jini-ext.jar
-IF EXIST "%PROACTIVE%\lib\jini\reggie.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\reggie.jar
-
-rem -------------------------------------------------
 rem jars for Globus
 rem -------------------------------------------------
 IF EXIST "%PROACTIVE%\lib\globus\cog-jglobus.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cog-jglobus.jar
