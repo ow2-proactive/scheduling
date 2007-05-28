@@ -11,8 +11,7 @@ Require-Bundle: org.eclipse.ui,
  org.objectweb.proactive.ic2d.console,
  org.objectweb.proactive.ic2d.lib,
  org.eclipse.ui.console,
- org.eclipse.ui.views,
- P2P
+ org.eclipse.ui.views
 Eclipse-LazyStart: true
 Bundle-ClassPath: .
 Export-Package: .,
