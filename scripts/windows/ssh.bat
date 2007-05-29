@@ -20,7 +20,7 @@ goto doit
 :doit
 SETLOCAL
 call init.bat
-%JAVA_CMD%  org.objectweb.proactive.core.ssh.SSHClient %1 %2 %3 %4 %5 %6
+%JAVA_CMD%  org.objectweb.proactive.core.ssh.SSHClient %*
 ENDLOCAL
 
 :end
