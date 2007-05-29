@@ -17,7 +17,7 @@ IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
 set XMLDESCRIPTOR=..\..\..\descriptors\C3D_Dispatcher_Renderer.xml 
-%JAVA_CMD%  org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher %XMLDESCRIPTOR% %1 
+%JAVA_CMD%  org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher %XMLDESCRIPTOR% %* 
 ENDLOCAL
 
 :end

@@ -11,7 +11,7 @@ CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
 
-$JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.WSClient $1
+$JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.WSClient $@
 
 echo
 echo ------------------------------------------------------------

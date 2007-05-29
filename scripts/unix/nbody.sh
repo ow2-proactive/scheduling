@@ -20,7 +20,7 @@ export XMLDESCRIPTOR=$PROACTIVE/descriptors/Workers.xml
 fi
 
 
-$JAVACMD org.objectweb.proactive.examples.nbody.common.Start $XMLDESCRIPTOR $1 $2 $3
+$JAVACMD org.objectweb.proactive.examples.nbody.common.Start $XMLDESCRIPTOR $@
 
 echo
 echo ---------------------------------------------------------

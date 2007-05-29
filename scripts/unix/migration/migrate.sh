@@ -21,6 +21,6 @@ PROACTIVE=$workingDir/../../../.
 CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
-$JAVACMD org.objectweb.proactive.examples.migration.SimpleObjectMigration $1 $2
+$JAVACMD org.objectweb.proactive.examples.migration.SimpleObjectMigration $@
 echo
 echo ---------------------------------------------------------

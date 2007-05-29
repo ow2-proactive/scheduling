@@ -7,7 +7,7 @@ rem if "%1" == "" goto usage
 SETLOCAL
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
-%JAVA_CMD%  org.objectweb.proactive.examples.chat.Chat %1 %2 %3
+%JAVA_CMD%  org.objectweb.proactive.examples.chat.Chat %*
 ENDLOCAL
 
 :usage

@@ -6,7 +6,7 @@ echo. An example can be found in ProActive/descriptors/Eratosthenes.xml
 
 SETLOCAL
 call init.bat
-%JAVA_CMD% org.objectweb.proactive.examples.eratosthenes.Main %1
+%JAVA_CMD% org.objectweb.proactive.examples.eratosthenes.Main %*
 ENDLOCAL
 
 echo. 

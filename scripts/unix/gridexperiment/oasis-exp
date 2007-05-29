@@ -16,7 +16,7 @@ umask 002
 
 exec > $dlog 2>&1
 
-echo "$0 $*: start: $(date)"
+echo "$0 $@: start: $(date)"
 
 idle=$(vmstat 30 2)
 idle=${idle##* }

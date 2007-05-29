@@ -20,7 +20,7 @@ goto cmd
 
 :cmd
 
-%JAVA_CMD% org.objectweb.proactive.examples.nbody.common.Start %XMLDESCRIPTOR% %1 %2 %3
+%JAVA_CMD% org.objectweb.proactive.examples.nbody.common.Start %XMLDESCRIPTOR% %*
 ENDLOCAL
 
 pause

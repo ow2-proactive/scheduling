@@ -18,7 +18,7 @@ rem the node in parameter. If the node cannot be found it will be
 rem created locally.
 rem Remote host url template is  : //remotehost/node1, can be added as parameter
 
-%JAVA_CMD% org.objectweb.proactive.examples.hello.HelloApplet %1
+%JAVA_CMD% org.objectweb.proactive.examples.hello.HelloApplet %*
 ENDLOCAL
 
 :end

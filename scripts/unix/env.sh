@@ -36,6 +36,7 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/IC2D-old
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/GCMTests
 fi
 if [ -f $PROACTIVE/ProActive.jar ]
 then
