@@ -8,7 +8,7 @@ workingDir=`dirname $0`
 PROACTIVE=$workingDir/../../../.
 CLASSPATH=.
 fi
-. $PROACTIVE/scripts/unix/nbody.sh -displayft $@
+. $PROACTIVE/scripts/unix/nbody.sh -displayft "$@"
 
 
 

@@ -16,7 +16,7 @@ fi
 
 workingDir=`dirname $0`
 . $workingDir/env.sh
-$JAVACMD org.objectweb.proactive.core.node.StartNode $@
+$JAVACMD org.objectweb.proactive.core.node.StartNode "$@"
 
 echo
 echo ---------------------------------------------------------

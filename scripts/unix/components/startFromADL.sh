@@ -12,5 +12,5 @@ fi
 JAVACMD=$JAVACMD" -Dfractal.provider=org.objectweb.proactive.core.component.Fractive"
 
 echo --- Fractal ADL Launcher --------------------------------
-$JAVACMD org.objectweb.proactive.examples.components.StartFromADL $@
+$JAVACMD org.objectweb.proactive.examples.components.StartFromADL "$@"
 echo ---------------------------------------------------------

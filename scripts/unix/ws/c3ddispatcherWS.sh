@@ -20,6 +20,6 @@ CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
 export XMLDESCRIPTOR=$workingDir/../../../descriptors/C3D_Dispatcher_Renderer.xml
-$JAVACMD org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR $@
+$JAVACMD org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR "$@"
 echo
 echo ---------------------------------------------------------

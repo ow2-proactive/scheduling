@@ -11,7 +11,7 @@ CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
 
-$JAVACMD org.objectweb.proactive.examples.chat.Chat $@
+$JAVACMD org.objectweb.proactive.examples.chat.Chat "$@"
 
 echo
 echo ---------------------------------------------------------

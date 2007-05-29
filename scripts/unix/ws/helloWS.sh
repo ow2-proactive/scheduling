@@ -13,7 +13,7 @@ fi
 
 
 
-$JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld $@
+$JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld "$@"
 
 echo
 echo ------------------------------------------------------------

@@ -21,7 +21,7 @@ fi
 workingDir=`dirname $0`
 . $workingDir/env.sh
 
-$JAVACMD -Dflowshopparser.taillard=false org.objectweb.proactive.examples.flowshop.Main -bench $_bench -desc $_desc $@
+$JAVACMD -Dflowshopparser.taillard=false org.objectweb.proactive.examples.flowshop.Main -bench $_bench -desc $_desc "$@"
 
 echo
 echo ------------------------------------------------------------

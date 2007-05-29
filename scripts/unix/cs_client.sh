@@ -18,7 +18,7 @@ fi
 
 workingDir=`dirname $0`
 . $workingDir/env.sh
-$JAVACMD org.objectweb.proactive.examples.cs.Client $@
+$JAVACMD org.objectweb.proactive.examples.cs.Client "$@"
 
 echo
 echo ---------------------------------------------------------

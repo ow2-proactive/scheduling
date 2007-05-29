@@ -29,7 +29,7 @@ fi
 
 JAVACMD=$JAVACMD" -Dfractal.provider=org.objectweb.proactive.core.component.Fractive"
 
-$JAVACMD org.objectweb.proactive.examples.components.helloworld.HelloWorld $@
+$JAVACMD org.objectweb.proactive.examples.components.helloworld.HelloWorld "$@"
 
 
 
