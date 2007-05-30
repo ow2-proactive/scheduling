@@ -100,7 +100,7 @@ public abstract class Conformtest extends ComponentTest {
             Constants.PRIMITIVE,
             "/functionalTests/component/conform/primitiveTemplate.xml", false);
     protected final static ControllerDescription badPrimitive = new ControllerDescription("badPrimitive",
-    		Constants.PRIMITIVE,
+            Constants.PRIMITIVE,
             "/functionalTests/component/conform/badPrimitive.xml", false);
     protected final static ControllerDescription badParametricPrimitive = new ControllerDescription("badParametricPrimitive",
             Constants.PRIMITIVE,
