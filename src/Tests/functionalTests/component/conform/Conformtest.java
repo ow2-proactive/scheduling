@@ -42,6 +42,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
 
 import functionalTests.ComponentTest;
@@ -82,27 +83,31 @@ public abstract class Conformtest extends ComponentTest {
     //  protected final static String F = "factory/org.objectweb.fractal.julia.factory.Template/false,false,false";
     protected final static String PKG = "functionalTests.component.conform.components";
     protected final static ControllerDescription parametricPrimitive = new ControllerDescription("parametricPrimitive",
-            "parametricPrimitive",
+            Constants.PRIMITIVE,
             "/functionalTests/component/conform/parametricPrimitive.xml", false);
+    protected final static ControllerDescription parametricPrimitiveTemplate = new ControllerDescription("parametricPrimitive",
+            Constants.PRIMITIVE,
+            "/functionalTests/component/conform/parametricPrimitiveTemplate.xml",
+            false);
     protected final static ControllerDescription flatPrimitive = new ControllerDescription("flatPrimitive",
-            "flatPrimitive",
+            Constants.PRIMITIVE,
             "/functionalTests/component/conform/flatPrimitive.xml", false);
     protected final static ControllerDescription flatParametricPrimitive = new ControllerDescription("flatParametricPrimitive",
-            "flatParametricPrimitive",
+            Constants.PRIMITIVE,
             "/functionalTests/component/conform/flatParametricPrimitive.xml",
             false);
     protected final static ControllerDescription primitiveTemplate = new ControllerDescription("primitiveTemplate",
-            "primitiveTemplate",
+            Constants.PRIMITIVE,
             "/functionalTests/component/conform/primitiveTemplate.xml", false);
     protected final static ControllerDescription badPrimitive = new ControllerDescription("badPrimitive",
-            "badPrimitive",
+    		Constants.PRIMITIVE,
             "/functionalTests/component/conform/badPrimitive.xml", false);
     protected final static ControllerDescription badParametricPrimitive = new ControllerDescription("badParametricPrimitive",
-            "badParametricPrimitive",
+            Constants.PRIMITIVE,
             "/functionalTests/component/conform/badParametricPrimitive.xml",
             false);
     protected final static ControllerDescription parametricComposite = new ControllerDescription("parametricComposite",
-            "parametricComposite",
+            Constants.COMPOSITE,
             "/functionalTests/component/conform/parametricComposite.xml", false);
 
     protected void checkInterface(I i) {
