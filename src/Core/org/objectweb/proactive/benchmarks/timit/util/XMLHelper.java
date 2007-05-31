@@ -64,8 +64,18 @@ public class XMLHelper {
      * @return the XML Document
      */
     public static Document readFile(String filename) {
+        return readFile(new File(filename));
+    }
+
+    /**
+     * Get XML Document thanks to its filename
+     *
+     * @param the XML file
+     * @return the XML Document
+     */
+    public static Document readFile(File file) {
         try {
-            return new SAXBuilder().build(new File(filename));
+            return new SAXBuilder().build(file);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -87,8 +97,31 @@ public class XMLHelper {
             FileOutputStream fos = new FileOutputStream(XMLHelper.createFileWithDirs(
                         filename));
             out.output(document, fos);
+            fos.flush();
+            fos.close();
         } catch (Exception e) {
             System.err.println("Unable to write the XML file: " + filename);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Save document into XML file
+     *
+     * @param document
+     *            the Document to save
+     * @param filename
+     *            the XML file name to save
+     */
+    public static void writeFile(Document document, File file) {
+        try {
+            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+            FileOutputStream fos = new FileOutputStream(file);
+            out.output(document, fos);
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            System.err.println("Unable to write the XML file: " + file);
             e.printStackTrace();
         }
     }

@@ -359,7 +359,7 @@ public class TimIt {
      * @deprecated
      */
     @Deprecated
-    private static void threadsCleaning() {
+    public static void threadsCleaning() {
         ThreadGroup tg = Thread.currentThread().getThreadGroup().getParent();
         Thread[] threads = new Thread[200];
         int len = tg.enumerate(threads, true);

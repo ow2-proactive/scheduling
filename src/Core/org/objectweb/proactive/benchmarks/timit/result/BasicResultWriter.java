@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.benchmarks.timit.result;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Iterator;
@@ -43,6 +44,7 @@ import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.benchmarks.timit.util.basic.ResultBag;
+import org.objectweb.proactive.core.mop.Utils;
 
 
 /**
@@ -209,9 +211,14 @@ public class BasicResultWriter {
         // Set the name as an attribute
         newTimerElement.setAttribute(new Attribute("name",
                 currentTimer.getName()));
+        double totalTimeValueInMillis = ((double) currentTimer.getTotalTime()) / 1000000d;
         // Set the totalTime in millis of the timer as an attribute
         newTimerElement.setAttribute(new Attribute("totalTimeInMillis",
-                "" + (((double) currentTimer.getTotalTime()) / 1000000d)));
+                "" + totalTimeValueInMillis));
+        // Set the avgTime in millis of the timer as an attribute
+        newTimerElement.setAttribute(new Attribute("avgTimeInMillis",
+                "" +
+                (totalTimeValueInMillis / currentTimer.getStartStopCoupleCount())));
         // Set the number of startStopCoupleCount value
         newTimerElement.setAttribute(new Attribute("startStopCoupleCount",
                 "" + currentTimer.getStartStopCoupleCount()));
@@ -269,5 +276,112 @@ public class BasicResultWriter {
             }
         }
         return TimIt.df.format(result) + " " + format;
+    }
+
+    /**
+     * This method takes a list of documents of same structure and computes
+     * the average.
+     * @param documents A list of documents of same structure
+     * @return A copy of the first document in the list that contains all average values
+     */
+    public static Document getAverage(java.util.List<Document> documents) {
+        // Check documents list
+        if ((documents == null) || (documents.size() == 0)) {
+            return null;
+        }
+
+        // Use first document to fill avg times in it
+        Document result = null;
+        try {
+            result = (Document) Utils.makeDeepCopy(documents.get(0));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // If the list contains only one doc return it
+        if (documents.size() == 1) {
+            return result;
+        }
+
+        // Iterate through the root to fill the map
+        java.util.Map<String, Element> resultElementsMap = new java.util.HashMap<String, Element>();
+
+        Iterator<Element> itResultElements = result.getRootElement()
+                                                   .getDescendants();
+        String currentParentName = "";
+        while (itResultElements.hasNext()) {
+            Object o = itResultElements.next();
+            if (o instanceof Element) {
+                Element current = (Element) o;
+                if (current.getName().equals("ao")) {
+                    currentParentName = current.getAttributeValue("className");
+                }
+                if (current.getName().equals("timer")) {
+                    String timerName = current.getAttributeValue("name");
+                    resultElementsMap.put(timerName + "_" + currentParentName,
+                        current);
+                }
+            }
+        }
+
+        // Iterate through the documents
+        Iterator<Document> itDocuments = documents.iterator();
+
+        // Skip first documents since its used for average
+        if (itDocuments.hasNext()) {
+            itDocuments.next();
+        }
+
+        // Since the iterator has been moved to the next document
+        // Begin the counter from 1
+        int counter = 1;
+        int listSize = documents.size();
+
+        while (itDocuments.hasNext()) {
+            itResultElements = itDocuments.next().getRootElement()
+                                          .getDescendants();
+            currentParentName = "";
+            while (itResultElements.hasNext()) {
+                Object o = itResultElements.next();
+
+                // If element
+                if (o instanceof Element) {
+                    Element current = (Element) o;
+                    if (current.getName().equals("ao")) {
+                        currentParentName = current.getAttributeValue(
+                                "className");
+                    }
+                    if (current.getName().equals("timer")) {
+                        String timerName = current.getAttributeValue("name");
+                        double currentTotalValue = Double.valueOf(current.getAttributeValue(
+                                    "totalTimeInMillis"));
+                        double currentAvgValue = Double.valueOf(current.getAttributeValue(
+                                    "avgTimeInMillis"));
+                        Element resultElement = resultElementsMap.get(timerName +
+                                "_" + currentParentName);
+                        if (resultElement != null) {
+                            double resultTotalValue = Double.valueOf(resultElement.getAttributeValue(
+                                        "totalTimeInMillis"));
+                            double resultAvgValue = Double.valueOf(resultElement.getAttributeValue(
+                                        "avgTimeInMillis"));
+                            resultTotalValue += currentTotalValue;
+                            resultAvgValue += currentAvgValue;
+                            // If last doc then add and make average
+                            if (counter == (listSize - 1)) {
+                                resultTotalValue = resultTotalValue / listSize;
+                                resultAvgValue = resultAvgValue / listSize;
+                            }
+                            resultElement.setAttribute("totalTimeInMillis",
+                                "" + resultTotalValue);
+                            resultElement.setAttribute("avgTimeInMillis",
+                                "" + resultAvgValue);
+                        }
+                    }
+                }
+            }
+            counter++;
+        }
+
+        return result;
     }
 }
