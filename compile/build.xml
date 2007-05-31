@@ -11,6 +11,10 @@
 	<property name="bundle.dir" value="${base.dir}/dist/bundle" />
 	<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
 	<property name="manifest.connector.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/connector/Manifest/"/>
+
+	<!-- Performance test properties -->
+	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest"/>
+
 	<!--
 		Create a timestamp for this build 
 		If ${version} is defined its value is used as string version for this build
@@ -92,7 +96,7 @@
 				<delete dir="@{tmpdir}" />
 			</sequential>
 		</macrodef>
-		
+
 		<parallel threadsperprocessor="1">
 			<checkDir prop="check.proactive"  dir="${src.proactive.dir}"  tmpdir="${classes.dir}/tmp/ProActive"/>
 			<checkDir prop="check.extensions" dir="${src.extensions.dir}" tmpdir="${classes.dir}/tmp/Extensions" />
@@ -185,9 +189,9 @@
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
 		</java>
-		
+
 		<!-- XXX: MPI should be in Extensions -->
-	
+
 		<if>
 			<bool>
 				<and>
@@ -197,8 +201,8 @@
 					<available file="mpiIsBrokenIDontWantIt" filepath="/bin"/>
 				</and>
 			</bool>
-				
-				
+
+
 			<!-- Delete existing header file to avoid conflict -->
 			<delete>
 				<fileset dir="${src.proactive.dir}/org/objectweb/proactive/mpi/control">
@@ -206,7 +210,7 @@
 					<include name="org_objectweb_proactive_mpi_control_ProActiveMPIComm_MessageRecvHandler.h"/>
 				</fileset>
 			</delete>
-		
+
 			<!-- Generate header file (based on classpath) -->
 			<javah 
 				classpath="${cl.proactive.dir}" 
@@ -218,11 +222,11 @@
 			<exec dir="${cl.proactive.dir}" executable="mpicc" os="Linux">
 				<arg line=" -I${java.home}/../include -I${java.home}/../include/linux ${src.proactive.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c -o ${cl.proactive.dir}/${proactive.path}/mpi/control/libProActiveMPIComm.so -shared" />
 			</exec>
-							
+
 			<!-- Delete object file generated in classes repository -->
 			<delete>
 				<fileset dir="${cl.proactive.dir}">
-				    <include name="ProActiveMPIComm.o"/>
+					<include name="ProActiveMPIComm.o"/>
 				</fileset>
 			</delete>
 
@@ -239,7 +243,7 @@
 				<arg line="configure.sh " />
 			</exec>
 
-			<else>			
+			<else>
 				<echo>Wrapping with control is only available for Unix and mpicc must be installed</echo>
 			</else>
 		</if>
@@ -256,14 +260,14 @@
 		</subant>
 	</target>
 
-	
+
 	<target name="extra" depends="core" description="Compile the ProActive extensions classes" >
 		<subant target="-compile" inheritall="yes" failonerror="true" >
 			<fileset dir="${src.extra.dir}" includes="**/build.xml"/>
 		</subant>
 	</target>
 
-	
+
 	<target name="p2p_daemon">
 		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS">
 			<arg line="-Wall -g -o proactivep2p -x c proactivep2p.cpp proactivep2p.h" />
@@ -326,21 +330,21 @@
 
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
-		
+
 			<junit printsummary="yes" forkmode="perTest" showoutput="yes">
 				<jvmarg value="-Dproactive.dir=${base.dir}"/>
-	
+
 				<classpath refid="test.classpath"/>
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
 				<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=@{nodeDescriptor}" />
 				<jvmargs/>
 
-		
+
 				<formatter type="xml"/>
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset dir="${cl.test.dir}">
-   						<include name="unitTests/**/*.class"/>
+						<include name="unitTests/**/*.class"/>
 						<include name="functionalTests/**/*Test*.class"/>
 						<exclude name="functionalTests/security/*/*.class"/>
 						<exclude name="**/*$*.class"/>
@@ -371,8 +375,8 @@
 	<target name="junit" depends="proActiveJar" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
-	
-<!--	
+
+	<!--	
 	<target name="runTestsLocalHttp" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
 			<junitMacro nodedescriptor="/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml">
 			<jvmargs>
@@ -383,7 +387,7 @@
 			</runTestsMacro>
 	</target>
 -->
-	
+
 	<target name="junitIbis" depends="proActiveJar">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocalIbis.xml">
 			<jvmargs>
@@ -432,12 +436,12 @@
 			<fileset dir="${cl.extra.dir}" includes="**"/>
 
 			<fileset dir="${osgi.res.dir}" >
-			   <include name="metadata.xml" />
+				<include name="metadata.xml" />
 			</fileset>
-		</jar>		
-		</target>
-	
-	
+		</jar>
+	</target>
+
+
 	<!-- ================================================================ -->
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
@@ -652,7 +656,7 @@
 	</target>
 
 
-	
+
 	<target name="jdepend"  depends="compile" description="JDepend report">
 		<macrodef name="jdependMacro">
 			<attribute name="outputfile" />
@@ -693,21 +697,21 @@
 	<!--  =============================================================== -->
 	<target name="librariesBundle">
 		<mkdir dir="${bundle.dir}" />
-		<jar manifest="${manifest.dir}/ManifestLibraries.mf" jarfile="${bundle.dir}/librariesBundle.jar">			
+		<jar manifest="${manifest.dir}/ManifestLibraries.mf" jarfile="${bundle.dir}/librariesBundle.jar">
 			<fileset dir="${lib.dir}/">
-				<include name="javassist.jar" /> 
+				<include name="javassist.jar" />
 				<include name="log4j.jar" />
 				<include name="xercesImpl.jar" />
-				<include name="bouncycastle.jar" />  
+				<include name="bouncycastle.jar" />
 				<include name="components/fractal.jar" />
 			</fileset>
-		</jar> 
+		</jar>
 	</target>
 
 	<!-- ================================================================ -->
 	<!--                          IC2D Libraries                          -->
 	<!--  =============================================================== -->
-	
+
 	<target name="ic2dLib" depends="proActiveJar" description="Copy all needed libraries to IC2D">
 		<property name="ic2d-plugin.dir" value="${base.dir}/ic2d-plugins-src" />
 		<property name="plugin.lib" value="org.objectweb.proactive.ic2d.lib" />
@@ -716,6 +720,33 @@
 		</copy>
 		<copy file="${PAdist.dir}/ProActive.jar" todir="${ic2d-plugin.dir}/${plugin.lib}" />
 	</target>
-	
+
+	<!-- ================================================================ -->
+	<!--                          Performance test                        -->
+	<!-- ================================================================ -->
+
+	<target name="runPerformanceTest" depends="" description="Run performance test on the current host.">
+		<property name="n" value="" />
+		<property name="o" value="" />
+		<property name="p" value="" />
+		<property name="c" value="" />
+		<property name="x" value="" />
+		<echo message="Starting the performance test." />
+		<java classname="${performanceTestClass}" fork="true">
+			<classpath refid="project.classpath" />
+			<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
+			<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
+			<arg value="-n" />
+			<arg value="${n}" />
+			<arg value="-o" />
+			<arg value="${o}" />
+			<arg value="-p" />
+			<arg value="${p}" />
+			<arg value="-c" />
+			<arg value="${c}" />
+			<arg value="-x" />
+			<arg value="${x}" />
+		</java>
+	</target>
 
 </project>
