@@ -121,11 +121,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     protected UniqueID senderID;
 
     /**
-     * This table is needed for the NFE mechanism
-     */
-    protected HashMap futureLevel = null;
-
-    /**
      * The exception level in the stack in which this future is
      * registered
      */
