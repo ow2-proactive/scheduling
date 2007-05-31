@@ -31,7 +31,6 @@
 package org.objectweb.proactive.benchmarks.timit.util.basic;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,7 +48,7 @@ import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalServi
 public class TimItBasicReductor {
 
     /** A list of result bags */
-    private List<ResultBag> results = new java.util.Vector<ResultBag>();
+    private List<ResultBag> results = new java.util.ArrayList<ResultBag>();
 
     /** The name of the output file */
     private String filename;
@@ -77,6 +76,9 @@ public class TimItBasicReductor {
      * all stats generation will perform after all timers are received.
      */
     public void registerShutdownHook() {
+        if (TimItBasicConfigurator.FIRE_STATISTICS_AFTER_REDUCTION) {
+            return;
+        }
         Runtime.getRuntime().addShutdownHook(new Thread() {
                 public void run() {
                     generateAllStatistics();
@@ -99,8 +101,7 @@ public class TimItBasicReductor {
     public void generateAllStatistics() {
         this.generateOutputFile = Boolean.parseBoolean(TimItTechnicalService.getGenerateOutputFile());
         this.printOutput = Boolean.parseBoolean(TimItTechnicalService.getPrintOutput());
-        //String filename = "TimItApplicationOutput" + System.currentTimeMillis();
-        File folder = new File("output");
+        File folder = new File(TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY);
         folder.mkdir();
         BasicResultWriter finalWriter = new BasicResultWriter(folder.getAbsolutePath() +
                 "/" + filename);
@@ -141,9 +142,15 @@ public class TimItBasicReductor {
         awaitedResults--;
         // If all result are received prepare to finish
         if (awaitedResults <= 0) {
-            filename = ProActive.getBodyOnThis().getID().shortString();
-            TimItBasicManager.getInstance().setReductorNull();
             awaitedResults = 0;
+            filename = buildFilename();
+            TimItBasicManager.getInstance().setReductorNull();
+
+            // If no shutdown hooks have been added fire stats 
+            if (TimItBasicConfigurator.FIRE_STATISTICS_AFTER_REDUCTION) {
+                this.generateAllStatistics();
+            }
+
             ProActive.terminateActiveObject(true);
         }
 
@@ -183,8 +190,8 @@ public class TimItBasicReductor {
     }
 
     /**
-    * @return the generateOutputFile
-    */
+     * @return the generateOutputFile
+     */
     public boolean isGenerateOutputFile() {
         return generateOutputFile;
     }
@@ -243,5 +250,38 @@ public class TimItBasicReductor {
      */
     public void setGlobalInformation(String globalInformation) {
         this.globalInformation = globalInformation;
+    }
+
+    /**
+     * Builds a filename from predefined prefixes and suffixes.
+     * @return The filename based on the current version of ProActive
+     */
+    public static final String buildFilename() {
+        String result = TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX;
+        String paVersion = getShortProActiveVersion();
+        if ((paVersion != null) && !"".equals(paVersion)) {
+            result += paVersion;
+        } else {
+            result += "unknownPaVersion";
+        }
+        return result + "_" +
+        ("".equals(TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) ? ""
+                                                                      : TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) +
+        "_" + ProActive.getBodyOnThis().getID().shortString() +
+        TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_SUFFIX;
+    }
+
+    /**
+     * Returns the short id of the ProActive version
+     * @return String a short id of the ProActive version
+     */
+    public static final String getShortProActiveVersion() {
+        String result = "";
+        String paVersion = ProActive.getProActiveVersion();
+        if ((paVersion != null) && !"".equals(paVersion)) {
+            String[] temp = paVersion.split(" ");
+            result += temp[2];
+        }
+        return result;
     }
 }
