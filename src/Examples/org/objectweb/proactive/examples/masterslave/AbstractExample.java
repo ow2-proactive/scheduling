@@ -33,7 +33,7 @@ public abstract class AbstractExample {
      * @throws MalformedURLException
      */
     public void init(String[] args) throws MalformedURLException {
-        this.init(args, number_of_parameters, "");
+        this.init(args, 0, "");
     }
 
     /**
@@ -51,6 +51,7 @@ public abstract class AbstractExample {
             init_specialized(args);
         } else {
             System.out.println(usage_message + text);
+            System.exit(1);
         }
     }
 
