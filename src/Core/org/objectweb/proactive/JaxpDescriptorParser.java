@@ -731,12 +731,12 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     p2pDescriptorService.setNodeFamilyRegexp(node_family_regexp);
                 }
 
-                NodeList peerNodes = (NodeList) xpath.evaluate("/pa:peerSet/pa:peer",
+                NodeList peerNodes = (NodeList) xpath.evaluate("pa:peerSet/pa:peer",
                         node, XPathConstants.NODESET);
 
                 String[] peerList = new String[peerNodes.getLength()];
                 for (int pp = 0; pp < peerNodes.getLength(); ++pp) {
-                    peerList[pp] = peerNodes.item(pp).getNodeValue();
+                    peerList[pp] = peerNodes.item(pp).getFirstChild().getNodeValue();
                 }
                 p2pDescriptorService.setPeerList(peerList);
             } else if (serviceType.equals(FT_CONFIG_TAG)) {
