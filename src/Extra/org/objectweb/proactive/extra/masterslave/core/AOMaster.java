@@ -382,7 +382,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection)
      */
-    public void solveAll(Collection<TaskIntern> tasks, boolean ordered)
+    public void solve(Collection<TaskIntern> tasks, boolean ordered)
         throws IllegalArgumentException {
         if (ordered && (mode == OrderingMode.UNORDERED)) {
             throw new IllegalArgumentException(

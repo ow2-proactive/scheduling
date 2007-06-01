@@ -38,7 +38,7 @@ public class NativeExample extends AbstractExample {
         }
 
         // Submitting the tasks
-        master.solveAll(tasks, false);
+        master.solve(tasks, false);
         Collection<String[]> results = null;
 
         // Collecting the results

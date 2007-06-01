@@ -72,7 +72,7 @@ public class BasicPrimeExample extends AbstractExample {
         }
         long startTime = System.currentTimeMillis();
         // Submitting the tasks
-        master.solveAll(tasks, false);
+        master.solve(tasks, false);
 
         // Collecting the results
         Collection<Boolean> results = master.waitAllResults();

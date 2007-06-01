@@ -85,7 +85,7 @@ public interface MasterIntern {
      * @param tasks collection of tasks
      * @param ordered do we want to collect the results in the same order ?
      */
-    public void solveAll(Collection<TaskIntern> tasks, boolean ordered)
+    public void solve(Collection<TaskIntern> tasks, boolean ordered)
         throws IllegalArgumentException;
 
     /**

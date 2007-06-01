@@ -226,9 +226,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection, boolean)
      */
-    public void solveAll(Collection<T> tasks, boolean ordered) {
+    public void solve(Collection<T> tasks, boolean ordered) {
         Collection<TaskIntern> wrappers = createWrappings(tasks);
-        aomaster.solveAll(wrappers, ordered);
+        aomaster.solve(wrappers, ordered);
     }
 
     /* (non-Javadoc)

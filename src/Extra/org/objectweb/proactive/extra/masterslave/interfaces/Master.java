@@ -87,7 +87,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * @param ordered do we want to collect the results in the same order ?
      * @throws IllegalArgumentsException if the mode is changed or if a task is submitted twice
      */
-    public void solveAll(Collection<T> tasks, boolean ordered)
+    public void solve(Collection<T> tasks, boolean ordered)
         throws IllegalArgumentException;
 
     /**
