@@ -46,11 +46,23 @@ public abstract class AbstractExample {
     public void init(String[] args, int number_of_extra_parameters, String text)
         throws MalformedURLException {
         if (args.length == (number_of_parameters + number_of_extra_parameters)) {
-            descriptor_url = (new File(args[0])).toURI().toURL();
+            File descriptorFile = new File(args[0]);
+            if (!descriptorFile.exists()) {
+                System.err.println("" + descriptorFile + " does not exist");
+                System.exit(1);
+            } else if (!descriptorFile.canRead()) {
+                System.err.println("" + descriptorFile + " can't be read");
+                System.exit(1);
+            } else if (!descriptorFile.isFile()) {
+                System.err.println("" + descriptorFile +
+                    " is not a regular file");
+                System.exit(1);
+            }
+            descriptor_url = descriptorFile.toURI().toURL();
             vn_name = args[1];
             init_specialized(args);
         } else {
-            System.out.println(usage_message + text);
+            System.err.println(usage_message + text);
             System.exit(1);
         }
     }

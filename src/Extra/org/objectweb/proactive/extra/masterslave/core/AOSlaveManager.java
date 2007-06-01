@@ -116,8 +116,8 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                 ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
                 addResources(pad.getVirtualNode(virtualNodeName));
             } catch (Exception e) {
-                logger.error("Couldnt add the specified resources " +
-                    e.toString());
+                logger.error("Couldnt add the specified resources.");
+                e.printStackTrace();
             }
         }
     }
@@ -262,8 +262,8 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
             }
             return new BooleanWrapper(true);
         } catch (Exception e) {
-            logger.error("Couldnt Terminate the Resource manager" +
-                e.toString());
+            logger.error("Couldnt Terminate the Resource manager");
+            e.printStackTrace();
 
             return new BooleanWrapper(false);
         }
