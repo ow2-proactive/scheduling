@@ -111,7 +111,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * The exception level in the stack in which this future is
      * registered
      */
-    private ExceptionMaskLevel exceptionLevel;
+    private transient ExceptionMaskLevel exceptionLevel;
 
     /**
      * The proxy that created this future. Set as transient to avoid
