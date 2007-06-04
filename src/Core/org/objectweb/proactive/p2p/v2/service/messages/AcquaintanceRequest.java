@@ -5,7 +5,6 @@ import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.p2p.v2.service.P2PService;
-import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 
 public class AcquaintanceRequest extends Message implements Serializable {

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ext.util;
 
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;

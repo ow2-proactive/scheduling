@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.body.future;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;

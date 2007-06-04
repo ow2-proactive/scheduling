@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
 

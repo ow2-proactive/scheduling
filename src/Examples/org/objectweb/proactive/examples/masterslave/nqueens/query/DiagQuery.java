@@ -2,8 +2,6 @@ package org.objectweb.proactive.examples.masterslave.nqueens.query;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
-
 
 public class DiagQuery extends Query {
     public int sym;

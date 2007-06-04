@@ -40,8 +40,6 @@ import org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
-import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
 /**

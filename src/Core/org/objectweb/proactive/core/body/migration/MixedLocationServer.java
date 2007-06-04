@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.body.migration;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;

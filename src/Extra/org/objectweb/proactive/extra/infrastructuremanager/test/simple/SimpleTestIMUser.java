@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
 import java.io.IOException;
-import java.util.Date;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.descriptor.services;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;

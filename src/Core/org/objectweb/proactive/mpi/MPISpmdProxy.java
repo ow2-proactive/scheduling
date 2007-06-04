@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.mpi;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 

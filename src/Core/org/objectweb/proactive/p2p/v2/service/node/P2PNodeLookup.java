@@ -49,7 +49,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.service.messages.Message;
 import org.objectweb.proactive.p2p.v2.service.messages.RequestNodesMessage;

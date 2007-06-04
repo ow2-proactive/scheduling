@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.branchnbound.core;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
 

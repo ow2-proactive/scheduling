@@ -124,6 +124,7 @@ public class ControllerDescription implements Serializable {
      */
     public ControllerDescription(String name, String hierarchicalType,
         String controllersConfigFileLocation, boolean synchronous) {
+        //FIXME use an enum to avoid unknow hierarchicalType
         this.hierarchicalType = hierarchicalType;
         this.name = name;
         if (!Constants.PRIMITIVE.equals(hierarchicalType)) {

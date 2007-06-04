@@ -2,7 +2,6 @@ package org.objectweb.proactive.p2p.v2.dynamicnoa;
 
 import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.service.messages.Message;
-import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 
 public class ChangeMaxNOAMessage extends Message {

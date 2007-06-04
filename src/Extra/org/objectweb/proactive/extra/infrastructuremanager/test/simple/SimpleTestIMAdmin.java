@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 

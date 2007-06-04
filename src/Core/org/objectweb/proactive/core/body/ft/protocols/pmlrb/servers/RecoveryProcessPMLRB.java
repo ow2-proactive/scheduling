@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers.FTManagerPMLRB;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryJob;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl;

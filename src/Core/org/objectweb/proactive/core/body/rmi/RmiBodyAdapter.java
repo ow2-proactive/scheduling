@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.body.rmi;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.rmi.ConnectException;
 
 import org.objectweb.proactive.core.Constants;

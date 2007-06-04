@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.examples.timit.jacobi;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;

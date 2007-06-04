@@ -1,8 +1,5 @@
 package org.objectweb.proactive.p2p.v2.monitoring;
 
-import java.net.UnknownHostException;
-
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.service.messages.DumpAcquaintancesMessage;
 import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;

@@ -31,10 +31,8 @@
 package functionalTests.component.migration;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import functionalTests.ComponentTest;
-import functionalTests.component.Message;
 
 
 /**

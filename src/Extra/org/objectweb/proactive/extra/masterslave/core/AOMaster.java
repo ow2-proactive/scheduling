@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extra.masterslave.core;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;

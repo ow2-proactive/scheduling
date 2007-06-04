@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.p2p.v2.service.node;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 import java.util.Iterator;
@@ -51,7 +50,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;

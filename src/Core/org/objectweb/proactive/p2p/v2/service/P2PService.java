@@ -57,7 +57,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.p2p.v2.service.exception.P2POldMessageException;
-import org.objectweb.proactive.p2p.v2.service.messages.AcquaintanceRequest;
 import org.objectweb.proactive.p2p.v2.service.messages.DumpAcquaintancesMessage;
 import org.objectweb.proactive.p2p.v2.service.messages.ExplorationMessage;
 import org.objectweb.proactive.p2p.v2.service.messages.Message;

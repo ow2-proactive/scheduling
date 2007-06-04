@@ -27,24 +27,21 @@
  */
 package org.objectweb.proactive.extensions.calcium.diagnosis;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.diagnosis.causes.*;
-import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.*;
-import org.objectweb.proactive.extensions.calcium.examples.nqueens.*;
-import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.*;
-import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.*;
-import org.objectweb.proactive.extensions.calcium.skeletons.Fork;
-import org.objectweb.proactive.extensions.calcium.statistics.Exercise;
+import org.objectweb.proactive.extensions.calcium.diagnosis.causes.Cause;
+import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.CoarseGranularity;
+import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.DeepTree;
+import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.FineGranularity;
+import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.Inference;
+import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.LastTaskPenalty;
+import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.UnderusedResources;
+import org.objectweb.proactive.extensions.calcium.diagnosis.inferences.WideTree;
 import org.objectweb.proactive.extensions.calcium.statistics.Stats;
-import org.objectweb.proactive.extensions.calcium.statistics.StatsImpl;
-import org.objectweb.proactive.extensions.calcium.statistics.Timer;
-import org.objectweb.proactive.extensions.calcium.statistics.Workout;
 
 
 public class Efficiency {

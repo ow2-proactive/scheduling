@@ -1,9 +1,6 @@
 package org.objectweb.proactive.examples.masterslave.nqueens;
 
-import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
 import java.util.Vector;
 
 import org.objectweb.proactive.examples.masterslave.AbstractExample;

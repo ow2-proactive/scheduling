@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 

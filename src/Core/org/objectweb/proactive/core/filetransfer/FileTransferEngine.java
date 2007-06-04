@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.filetransfer;
 
-import java.io.IOException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;

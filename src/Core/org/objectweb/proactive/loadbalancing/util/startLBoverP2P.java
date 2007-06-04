@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.loadbalancing.util;
 
-import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.util.Iterator;
 import java.util.Vector;
@@ -43,7 +42,6 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.node;
 
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;

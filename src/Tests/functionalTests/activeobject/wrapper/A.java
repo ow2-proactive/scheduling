@@ -30,7 +30,6 @@
  */
 package functionalTests.activeobject.wrapper;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;

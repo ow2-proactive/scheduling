@@ -30,8 +30,6 @@
  */
 package functionalTests.descriptor.coallocation;
 
-import java.io.File;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;

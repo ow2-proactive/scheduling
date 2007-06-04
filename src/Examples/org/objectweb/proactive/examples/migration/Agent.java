@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.examples.migration;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;

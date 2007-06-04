@@ -30,13 +30,9 @@
  */
 package org.objectweb.proactive.core.body.http.util;
 
-import java.io.IOException;
 import java.util.HashMap;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.node.NodeException;
 
 
 /**

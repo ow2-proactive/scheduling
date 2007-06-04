@@ -30,11 +30,9 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;

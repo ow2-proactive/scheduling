@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.infrastructuremanager.core;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;

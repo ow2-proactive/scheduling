@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.component.representative;
 
 import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;

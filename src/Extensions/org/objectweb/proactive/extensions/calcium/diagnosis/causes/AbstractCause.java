@@ -28,7 +28,6 @@
 package org.objectweb.proactive.extensions.calcium.diagnosis.causes;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 

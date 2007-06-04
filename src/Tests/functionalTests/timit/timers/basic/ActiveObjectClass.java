@@ -30,8 +30,6 @@
  */
 package functionalTests.timit.timers.basic;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;

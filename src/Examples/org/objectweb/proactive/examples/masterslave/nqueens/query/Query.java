@@ -3,8 +3,6 @@ package org.objectweb.proactive.examples.masterslave.nqueens.query;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.extra.masterslave.interfaces.Task;
-
 
 public abstract class Query implements Serializable {
     public int n;

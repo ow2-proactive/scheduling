@@ -3,7 +3,6 @@ package org.objectweb.proactive.p2p.v2.service.messages;
 import java.io.Serializable;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
