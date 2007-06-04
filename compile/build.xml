@@ -360,7 +360,6 @@
 						<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class"/>
-						<exclude name="functionalTests/component/lookup/**/*"/>
 					</fileset>
 				</batchtest>
 			</junit>

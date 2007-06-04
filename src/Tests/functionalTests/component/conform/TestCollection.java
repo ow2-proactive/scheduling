@@ -103,31 +103,6 @@ public class TestCollection extends Conformtest {
     @Test
     public void testPrimitiveWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
-        /*
-        [
-        component/org.objectweb.proactive.core.component.identity.ProActiveComponent/false,false,false,
-
-        binding-controller/org.objectweb.proactive.core.component.controller.ProActiveBindingController/false,false,false,
-        name-controller/org.objectweb.proactive.core.component.controller.ProActiveNameController/false,false,false,
-        server/org.objectweb.proactive.core.component.test.components.I/false,false,false,
-        lifecycle-controller/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController/false,false,false,
-        client/org.objectweb.proactive.core.component.test.components.I/true,true,false,
-        super-controller/org.objectweb.proactive.core.component.controller.ProActiveSuperController/false,false,false]
-
-        [
-        binding-controller/org.objectweb.proactive.core.component.controller.ProActiveBindingController/false,false,false,
-        name-controller/org.objectweb.fractal.api.control.NameController/false,false,false,
-        server/org.objectweb.proactive.core.component.test.components.I/false,false,false,
-        lifecycle-controller/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController/false,false,false,
-        client/org.objectweb.proactive.core.component.test.components.I/true,true,false,
-        super-controller/org.objectweb.proactive.core.component.controller.ProActiveSuperController/false,false,false
-
-        migration-controller/org.objectweb.proactive.core.component.controller.MigrationController/false,false,false,
-        multicast-controller/org.objectweb.proactive.core.component.controller.MulticastController/false,false,false,
-        gathercast-controller/org.objectweb.proactive.core.component.controller.GathercastController/false,false,false,
-        component-parameters-controller/org.objectweb.proactive.core.component.controller.ComponentParametersController/false,false,false,
-        ]
-        */
         checkComponent(c,
             new HashSet(Arrays.asList(
                     new Object[] {
@@ -147,23 +122,26 @@ public class TestCollection extends Conformtest {
 
     @Test
     @Ignore
+    // missing factory/org.objectweb.proactive.core.component.Fractive/false,false,false,
     public void testPrimitiveTemplateWithCollection() throws Exception {
-        Component c = gf.newFcInstance(t, "primitiveTemplate",
-                new Object[] { "primitive", C.class.getName() });
+        Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
         checkComponent(c,
             new HashSet(Arrays.asList(
-                    new Object[] { COMP, BC, F, SC, NC, serverI, clientI })));
+                    new Object[] {
+                        COMP, BC, F, SC, NC, MC, MCC, GC, CP, serverI, clientI
+                    })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
+                    new Object[] {
+                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, serverI, clientI
+                    })));
     }
 
     @Test
     @Ignore
     public void testCompositeTemplateWithCollection() throws Exception {
-        Component c = gf.newFcInstance(t, "compositeTemplate",
-                new Object[] { "composite", null });
+        Component c = gf.newFcInstance(t, compositeTemplate, "composite");
         checkComponent(c,
             new HashSet(Arrays.asList(
                     new Object[] { COMP, BC, CC, F, SC, NC, serverI, clientI })));
@@ -228,8 +206,7 @@ public class TestCollection extends Conformtest {
     @Test
     @Ignore
     public void testPrimitiveTemplateGetFcInterface() throws Exception {
-        Component c = gf.newFcInstance(t, "primitiveTemplate",
-                new Object[] { "primitive", C.class.getName() });
+        Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
         Interface i;
         i = (Interface) c.getFcInterface("servers0");
         assertEquals("Bad interface", servers0I, getItf(i, false));
@@ -243,14 +220,15 @@ public class TestCollection extends Conformtest {
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
+                    new Object[] {
+                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, serverI, clientI
+                    })));
     }
 
     @Test
     @Ignore
     public void testCompositeTemplateGetFcInterface() throws Exception {
-        Component c = gf.newFcInstance(t, "compositeTemplate",
-                new Object[] { "composite", null });
+        Component c = gf.newFcInstance(t, compositeTemplate, null);
         Interface i;
         i = (Interface) c.getFcInterface("servers0");
         assertEquals("Bad interface", servers0I, getItf(i, false));
@@ -311,11 +289,9 @@ public class TestCollection extends Conformtest {
     }
 
     @Test
-    @Ignore
     public void testPrimitiveTemplateNoSuchCollectionItf()
         throws Exception {
-        Component c = gf.newFcInstance(t, "primitiveTemplate",
-                new Object[] { "primitive", C.class.getName() });
+        Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
         try {
             c.getFcInterface("server0");
             fail();
@@ -332,8 +308,7 @@ public class TestCollection extends Conformtest {
     @Ignore
     public void testCompositeTemplateNoSuchCollectionItf()
         throws Exception {
-        Component c = gf.newFcInstance(t, "compositeTemplate",
-                new Object[] { "composite", null });
+        Component c = gf.newFcInstance(t, compositeTemplate, null);
         try {
             c.getFcInterface("server0");
             fail();

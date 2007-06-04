@@ -109,6 +109,9 @@ public abstract class Conformtest extends ComponentTest {
     protected final static ControllerDescription parametricComposite = new ControllerDescription("parametricComposite",
             Constants.COMPOSITE,
             "/functionalTests/component/conform/parametricComposite.xml", false);
+    protected final static ControllerDescription compositeTemplate = new ControllerDescription("parametricComposite",
+            Constants.COMPOSITE,
+            "/functionalTests/component/conform/compositeTemplate.xml", false);
 
     protected void checkInterface(I i) {
         i.m(true);

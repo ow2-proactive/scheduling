@@ -31,6 +31,7 @@
 package functionalTests.component.lookup;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -61,6 +62,7 @@ public class Test extends ComponentTest {
     }
 
     @org.junit.Test
+    @Ignore
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory typeFactory = Fractal.getTypeFactory(boot);
