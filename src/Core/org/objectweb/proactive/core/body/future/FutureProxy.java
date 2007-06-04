@@ -72,18 +72,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     // -- STATIC MEMBERS -----------------------------------------------
     //
 
-    /**
-     *  The size of the pool we use for recycling FutureProxy objects.
-     */
-    public static final int RECYCLE_POOL_SIZE = 1000;
-    private static FutureProxy[] recyclePool;
-
-    /**
-     *  Indicates if the recycling of FutureProxy objects is on.
-     */
-    private static boolean shouldPoolFutureProxyObjects;
-    private static int index;
-
     /** Static point for management of events related to futures.
      * This FutureEventProducer is responsible for all FutureProxys of this VM */
     private static FutureEventProducerImpl futureEventProducer;
@@ -175,17 +163,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     public synchronized static FutureProxy getFutureProxy() {
         FutureProxy result;
-        if (shouldPoolFutureProxyObjects && (index > 0)) {
-            // gets the object from the pool
-            index--;
-            result = recyclePool[index];
-            recyclePool[index] = null;
-        } else {
-            try {
-                result = new FutureProxy();
-            } catch (ConstructionOfReifiedObjectFailedException e) {
-                result = null;
-            }
+        try {
+            result = new FutureProxy();
+        } catch (ConstructionOfReifiedObjectFailedException e) {
+            result = null;
         }
         return result;
     }
@@ -435,11 +416,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    @Override
-    protected void finalize() {
-        returnFutureProxy(this);
-    }
-
     public void setCopyMode(boolean mode) {
         copyMode = mode;
     }
@@ -537,47 +513,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
         return false;
-    }
-
-    private static synchronized void setShouldPoolFutureProxyObjects(
-        boolean value) {
-        if (shouldPoolFutureProxyObjects == value) {
-            return;
-        }
-        shouldPoolFutureProxyObjects = value;
-        if (shouldPoolFutureProxyObjects) {
-            // Creates the recycle poll for FutureProxy objects
-            recyclePool = new FutureProxy[RECYCLE_POOL_SIZE];
-            index = 0;
-        } else {
-            // If we do not want to recycle FutureProxy objects anymore,
-            // let's free some memory by permitting the reyclePool to be
-            // garbage-collecting
-            recyclePool = null;
-        }
-    }
-
-    private static synchronized void returnFutureProxy(FutureProxy futureProxy) {
-        if (!shouldPoolFutureProxyObjects) {
-            return;
-        }
-
-        // If there's still one slot left in the pool
-        if (recyclePool[index] == null) {
-            // Cleans up a FutureProxy object
-            // It is prefereable to do it here rather than at the moment
-            // the object is picked out of the pool, because it allows
-            // garbage-collecting the objects referenced in here
-            futureProxy.target = null;
-            futureProxy.exceptionLevel = null;
-
-            // Inserts the object in the pool
-            recyclePool[index] = futureProxy;
-            index++;
-            if (index == RECYCLE_POOL_SIZE) {
-                index = RECYCLE_POOL_SIZE - 1;
-            }
-        }
     }
 
     /**
