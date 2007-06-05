@@ -860,8 +860,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                             "found a Process defined inside a non composite process");
                     }
 
-                    ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
-                    proActiveDescriptor.registerProcess(cep, refid);
+                    holdProcessRegistration(refid);
                 } else if (nodeName.equals(COMMAND_PATH_TAG)) {
                     String value = getNodeExpandedValue(child.getAttributes()
                                                              .getNamedItem("value"));
@@ -872,6 +871,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     getFileTransfer("copy", targetProcess, child);
                 }
             }
+        }
+
+        protected void holdProcessRegistration(String refid) {
+            ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
+            proActiveDescriptor.registerProcess(cep, refid);
         }
 
         private FileTransferWorkShop getFileTransfer(String fileTransferQueue,
@@ -1867,6 +1871,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class ProcessListExtractor extends ProcessExtractor {
+        private String heldProcessRegistrationRefId;
+
         public ProcessListExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
@@ -1905,6 +1911,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             if (hostlist != null) {
                 listProcessDecorator.setHostList(hostlist, domain);
+                if (heldProcessRegistrationRefId != null) {
+                    ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
+                    proActiveDescriptor.registerProcess(cep,
+                        heldProcessRegistrationRefId);
+                }
             }
 
             if ((closeStream != null) && closeStream.equals("yes")) {
@@ -1917,6 +1928,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             if (username != null) {
                 targetProcess.setUsername(username);
             }
+        }
+
+        @Override
+        protected void holdProcessRegistration(String refid) {
+            this.heldProcessRegistrationRefId = refid;
         }
     }
 
