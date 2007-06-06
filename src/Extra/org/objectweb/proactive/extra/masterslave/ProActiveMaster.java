@@ -47,7 +47,6 @@ import org.objectweb.proactive.extra.masterslave.core.TaskAlreadySubmittedExcept
 import org.objectweb.proactive.extra.masterslave.core.TaskWrapperImpl;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
