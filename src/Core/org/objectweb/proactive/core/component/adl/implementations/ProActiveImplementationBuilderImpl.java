@@ -134,9 +134,11 @@ public class ProActiveImplementationBuilderImpl
                     adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
             }
             if (context.get("deployment-descriptor") != null) {
-                deploymentVN = ((ProActiveDescriptor) context
-                                .get("deployment-descriptor")).getVirtualNode(adlVN.getName())
-                                .getVirtualNodeInternal();
+                org.objectweb.proactive.core.descriptor.data.VirtualNode vn = ((ProActiveDescriptor) context.get(
+                        "deployment-descriptor")).getVirtualNode(adlVN.getName());
+                if (vn != null) {
+                    deploymentVN = vn.getVirtualNodeInternal();
+                }
                 if (deploymentVN == null) {
                     if (adlVN.getName().equals("null")) {
                         logger.info(name +
