@@ -84,34 +84,44 @@ public abstract class Conformtest extends ComponentTest {
     protected final static String PKG = "functionalTests.component.conform.components";
     protected final static ControllerDescription parametricPrimitive = new ControllerDescription("parametricPrimitive",
             Constants.PRIMITIVE,
-            "/functionalTests/component/conform/parametricPrimitive.xml", false);
+            "/functionalTests/component/conform/membrane/parametricPrimitive.xml",
+            false);
     protected final static ControllerDescription parametricPrimitiveTemplate = new ControllerDescription("parametricPrimitive",
             Constants.PRIMITIVE,
-            "/functionalTests/component/conform/parametricPrimitiveTemplate.xml",
+            "/functionalTests/component/conform/membrane/parametricPrimitiveTemplate.xml",
             false);
     protected final static ControllerDescription flatPrimitive = new ControllerDescription("flatPrimitive",
             Constants.PRIMITIVE,
-            "/functionalTests/component/conform/flatPrimitive.xml", false);
+            "/functionalTests/component/conform/membrane/flatPrimitive.xml",
+            false);
     protected final static ControllerDescription flatParametricPrimitive = new ControllerDescription("flatParametricPrimitive",
             Constants.PRIMITIVE,
-            "/functionalTests/component/conform/flatParametricPrimitive.xml",
+            "/functionalTests/component/conform/membrane/flatParametricPrimitive.xml",
             false);
     protected final static ControllerDescription primitiveTemplate = new ControllerDescription("primitiveTemplate",
             Constants.PRIMITIVE,
-            "/functionalTests/component/conform/primitiveTemplate.xml", false);
+            "/functionalTests/component/conform/membrane/primitiveTemplate.xml",
+            false);
+    protected final static ControllerDescription flatPrimitiveTemplate = new ControllerDescription("flatPrimitiveTemplate",
+            Constants.PRIMITIVE,
+            "/functionalTests/component/conform/membrane/flatPrimitiveTemplate.xml",
+            false);
     protected final static ControllerDescription badPrimitive = new ControllerDescription("badPrimitive",
             Constants.PRIMITIVE,
-            "/functionalTests/component/conform/badPrimitive.xml", false);
+            "/functionalTests/component/conform/membrane/badPrimitive.xml",
+            false);
     protected final static ControllerDescription badParametricPrimitive = new ControllerDescription("badParametricPrimitive",
             Constants.PRIMITIVE,
-            "/functionalTests/component/conform/badParametricPrimitive.xml",
+            "/functionalTests/component/conform/membrane/badParametricPrimitive.xml",
             false);
     protected final static ControllerDescription parametricComposite = new ControllerDescription("parametricComposite",
             Constants.COMPOSITE,
-            "/functionalTests/component/conform/parametricComposite.xml", false);
+            "/functionalTests/component/conform/membrane/parametricComposite.xml",
+            false);
     protected final static ControllerDescription compositeTemplate = new ControllerDescription("parametricComposite",
             Constants.COMPOSITE,
-            "/functionalTests/component/conform/compositeTemplate.xml", false);
+            "/functionalTests/component/conform/membrane/compositeTemplate.xml",
+            false);
 
     protected void checkInterface(I i) {
         i.m(true);
