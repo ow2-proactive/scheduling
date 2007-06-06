@@ -35,6 +35,8 @@ import java.util.HashSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.objectweb.fractal.api.control.BindingController;
+
+
 class BindingConformtest extends Conformtest {
     protected void checkList(BindingController bc, String[] expected) {
         String[] names = bc.listFc();
