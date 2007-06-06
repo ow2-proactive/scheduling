@@ -414,11 +414,13 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             return fComponent(type, container);
         } catch (ActiveObjectCreationException e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Active object creation error while creating component:",
+                logger.debug("Active object creation error while creating component: ",
                     e);
             } else {
                 logger.info(
-                    "Active object creation error while creating component, activate debug logger level for more information.");
+                    "Active object creation error while creating component; throws exception with the following message: " +
+                    e.getMessage() +
+                    " Activate debug logger level for more information.");
             }
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
