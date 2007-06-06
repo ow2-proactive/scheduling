@@ -59,27 +59,4 @@ public class ProxyOne implements org.objectweb.proactive.core.mop.Proxy {
             return null;
         }
     }
-
-    //	/**
-    //	 * Get information about the handlerizable object
-    //	 * @return
-    //	 */
-    //	public String getHandlerizableInfo() throws java.io.IOException {
-    //		return null;
-    //	}
-    //
-    //	/** 
-    //	 * Give a reference to a local map of handlers
-    //	 * @return A reference to a map of handlers
-    //	 */
-    //	public HashMap getHandlersLevel() throws java.io.IOException {
-    //		return null;
-    //	}
-    //
-    //	/** 
-    //	 * Clear the local map of handlers
-    //	 */
-    //	public void clearHandlersLevel() throws java.io.IOException {
-    //	
-    //	}
 }
