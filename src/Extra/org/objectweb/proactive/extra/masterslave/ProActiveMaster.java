@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -153,13 +154,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         aomaster.addResources(virtualnode);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#areAllResultsAvailable()
-     */
-    public boolean areAllResultsAvailable() {
-        return aomaster.areAllResultsAvailable();
-    }
-
     /**
      * Creates an internal wrapper of the given task
      * This wrapper will identify the task internally via an ID
@@ -186,20 +180,13 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @return wrapped version
      * @throws IllegalArgumentException if the same task has already been wrapped
      */
-    private Collection<TaskIntern> createWrappings(Collection<T> tasks)
+    private List<TaskIntern> createWrappings(List<T> tasks)
         throws IllegalArgumentException {
-        Collection<TaskIntern> wrappings = new ArrayList<TaskIntern>();
+        List<TaskIntern> wrappings = new ArrayList<TaskIntern>();
         for (T task : tasks) {
             wrappings.add(createWrapping(task));
         }
         return wrappings;
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isOneResultAvailable()
-     */
-    public boolean isOneResultAvailable() {
-        return aomaster.isOneResultAvailable();
     }
 
     /**
@@ -226,9 +213,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection, boolean)
      */
-    public void solve(Collection<T> tasks, boolean ordered) {
-        Collection<TaskIntern> wrappers = createWrappings(tasks);
-        aomaster.solve(wrappers, ordered);
+    public void solve(List<T> tasks) {
+        List<TaskIntern> wrappers = createWrappings(tasks);
+        aomaster.solve(wrappers);
     }
 
     /* (non-Javadoc)
@@ -242,12 +229,15 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitAllResults()
      */
-    public Collection<R> waitAllResults() throws TaskException {
-        Collection<ResultIntern> resultsIntern = (Collection<ResultIntern>) ProActive.getFutureValue(aomaster.waitAllResults());
-        Collection<R> results = new ArrayList<R>();
-        for (ResultIntern res : resultsIntern) {
+    public List<R> waitAllResults() throws TaskException {
+        List<TaskIntern> completed = (List<TaskIntern>) ProActive.getFutureValue(aomaster.waitAllResults());
+        List<R> results = new ArrayList<R>();
+        for (TaskIntern res : completed) {
+            if (res.threwException()) {
+                throw new TaskException(res.getException());
+            }
             results.add((R) res.getResult());
-            T task = wrappedTasksRev.get(res.getTask());
+            T task = wrappedTasksRev.get(res);
             removeWrapping(task);
         }
         return results;
@@ -257,19 +247,46 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitOneResult()
      */
     public R waitOneResult() throws TaskException {
-        ResultIntern res = (ResultIntern) ProActive.getFutureValue(aomaster.waitOneResult());
-        TaskIntern wrapper = res.getTask();
+        TaskIntern completed = (TaskIntern) ProActive.getFutureValue(aomaster.waitOneResult());
+        if (completed.threwException()) {
+            throw new TaskException(completed.getException());
+        }
 
         //  we remove the mapping between the task and its wrapper
-        T task = wrappedTasksRev.get(wrapper);
+        T task = wrappedTasksRev.get(completed);
         removeWrapping(task);
-        if (wrapper.threwException()) {
-            throw new TaskException(wrapper.getException());
+        if (completed.threwException()) {
+            throw new TaskException(completed.getException());
         }
-        return (R) res.getResult();
+        return (R) completed.getResult();
     }
 
     public boolean isEmpty() {
         return aomaster.isEmpty();
+    }
+
+    public int countAvailableResults() {
+        return aomaster.countAvailableResults();
+    }
+
+    public void setResultReceptionOrder(
+        org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode mode) {
+        aomaster.setResultReceptionOrder(mode);
+    }
+
+    public List<R> waitKResults(int k)
+        throws IllegalStateException, IllegalArgumentException, TaskException {
+        List<TaskIntern> completed = (List<TaskIntern>) ProActive.getFutureValue(aomaster.waitKResults(
+                    k));
+        List<R> results = new ArrayList<R>();
+        for (TaskIntern res : completed) {
+            if (res.threwException()) {
+                throw new TaskException(res.getException());
+            }
+            results.add((R) res.getResult());
+            T task = wrappedTasksRev.get(res);
+            removeWrapping(task);
+        }
+        return results;
     }
 }

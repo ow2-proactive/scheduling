@@ -55,7 +55,7 @@ public class NQueensExample extends AbstractExample {
                 toSolve.add(new QueryExtern(query));
             }
         }
-        master.solve(toSolve, false);
+        master.solve(toSolve);
 
         // Print results on the fly
         while (!master.isEmpty()) {

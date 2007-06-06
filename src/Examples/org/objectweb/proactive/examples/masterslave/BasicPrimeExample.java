@@ -47,13 +47,37 @@ public class BasicPrimeExample extends AbstractExample {
     }
 
     /**
+     * Creates the prime computation tasks to be solved
+     * @return
+     */
+    public List<FindPrimeTask> createTasks() {
+        List<FindPrimeTask> tasks = new ArrayList<FindPrimeTask>();
+
+        // We don't need to check numbers greater than the square-root of the candidate in this algorithm
+        long square_root_of_candidate = (long) Math.ceil(Math.sqrt(
+                    prime_to_find));
+        // 
+        tasks.add(new FindPrimeTask(prime_to_find, 2,
+                square_root_of_candidate / number_of_intervals));
+        for (int i = 1; i < (number_of_intervals - 1); i++) {
+            tasks.add(new FindPrimeTask(prime_to_find,
+                    ((square_root_of_candidate / number_of_intervals) * i) + 1,
+                    (square_root_of_candidate / number_of_intervals) * (i + 1)));
+        }
+        tasks.add(new FindPrimeTask(prime_to_find,
+                (square_root_of_candidate / number_of_intervals) * (number_of_intervals -
+                1), square_root_of_candidate));
+        return tasks;
+    }
+
+    /**
      * @param args
      * @throws TaskException
      * @throws MalformedURLException
      */
     public static void main(String[] args)
         throws TaskException, MalformedURLException {
-        NativeExample instance = new NativeExample();
+        BasicPrimeExample instance = new BasicPrimeExample();
         //   Getting command line parameters
         instance.init(args, 2, " prime_to_find number_of_intervals");
 
@@ -61,21 +85,15 @@ public class BasicPrimeExample extends AbstractExample {
         ProActiveMaster<FindPrimeTask, Boolean> master = new ProActiveMaster<FindPrimeTask, Boolean>(instance.descriptor_url,
                 instance.vn_name);
 
-        // Creating the tasks to be solved
-        List<FindPrimeTask> tasks = new ArrayList<FindPrimeTask>();
-        long square_root_of_candidate = (long) Math.ceil(Math.sqrt(
-                    prime_to_find));
-        for (int i = 0; i < number_of_intervals; i++) {
-            tasks.add(new FindPrimeTask(prime_to_find,
-                    square_root_of_candidate / (number_of_intervals / i),
-                    square_root_of_candidate / (number_of_intervals / (i + 1))));
-        }
+        System.out.println("" + prime_to_find);
+
         long startTime = System.currentTimeMillis();
-        // Submitting the tasks
-        master.solve(tasks, false);
+        // Creating and Submitting the tasks
+        master.solve(instance.createTasks());
 
         // Collecting the results
         Collection<Boolean> results = master.waitAllResults();
+        System.out.println(results);
         long endTime = System.currentTimeMillis();
 
         // Displaying result
@@ -91,6 +109,10 @@ public class BasicPrimeExample extends AbstractExample {
     protected void init_specialized(String[] args) {
         prime_to_find = Long.parseLong(args[2]);
         number_of_intervals = Integer.parseInt(args[3]);
+        if (number_of_intervals <= 2) {
+            System.out.println("Wrong number of intervals : " +
+                number_of_intervals);
+        }
     }
 
     public static class FindPrimeTask implements Task<Boolean> {

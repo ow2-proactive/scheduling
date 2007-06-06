@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
  *
  * @param <R>
  */
-public interface TaskIntern<R extends Serializable> extends Task<R> {
+public interface TaskIntern<R extends Serializable> extends Task<R>, Comparable {
     /**
      * get the actual task
      * @return the task

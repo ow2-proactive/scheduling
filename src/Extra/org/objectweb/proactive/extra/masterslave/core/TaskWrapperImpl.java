@@ -157,4 +157,21 @@ public class TaskWrapperImpl implements TaskIntern {
     public boolean threwException() {
         return isException;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(Object o) {
+        if (o == null) {
+            throw new NullPointerException();
+        } else if (o instanceof TaskIntern) {
+            return (int) (id - ((TaskIntern) o).getId());
+        } else {
+            throw new IllegalArgumentException("" + o);
+        }
+    }
+
+    public String toString() {
+        return "ID: " + id + " Result: " + result + " Exception: " + exception;
+    }
 }
