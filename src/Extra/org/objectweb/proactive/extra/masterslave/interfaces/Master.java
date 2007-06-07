@@ -92,8 +92,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
 
     /**
      * Terminates the slave manager and (eventually free every resources) <br/>
-     * @param freeNodeResources tells if the Slave Manager should as well free the node resources
-     * @return success
+     * @param freeResources tells if the Slave Manager should as well free the node resources
      */
     public void terminate(boolean freeResources);
 

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -58,6 +59,26 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  * <li>Submit tasks through the use of the <b><i>solve</i></b> methods</li>
  * <li>Collect results through the <b><i>wait</i></b> methods</li>
  * </ol>
+ * <br/>
+ * The <b><i>SlaveMemory</i></b> concept is meant to allow user to store information directly inside the slaves where tasks are executed. <br/>
+ * The SlaveMemory has the same structure as a Dictionary with &lt;key, value&gt; pairs where keys are string and values are any Java object. <br/>
+ * <br/>
+ * A user can specify, when creating the master, the initial memory that every slave will have by providing a Map of &lt;String,Object&gt; pairs to the ProActiveMaster constructors.<br/>
+ * <br/>
+ * When tasks will later on be executed on the slaves, the tasks will be able to access this memory through the slavememory parameter of the <b><i>run</i></b> method.
+ * <br/>
+ * The results can be received using two different recpetion order modes: <br/>
+ * <ul>
+ * <li>In the <b><i>CompletionOrder mode</i></b>, which is the default, results are received in the same order as they are completed by the slaves (i.e. order is unspecified).</li>
+ * <li>In the <b><i>SubmissionOrder mode</i></b>, results are received in the same order as they are submitted to the master.</li>
+ * </ul>
+ * <br/>
+ *
+ * @see org.objectweb.proactive.extra.masterslave.interfaces.Task
+ * @see org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory
+ * @see org.objectweb.proactive.extra.masterslave.interfaces.Master
+ *
+ *
  * @author fviale
  *
  * @param <T> Task of result R
@@ -76,8 +97,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * An empty master (you can add resources afterwards)
      */
     public ProActiveMaster() {
-        wrappedTasks = new HashMap<T, TaskIntern>();
-        wrappedTasksRev = new HashMap<TaskIntern, T>();
+        this(new HashMap<String, Object>());
     }
 
     /**
@@ -85,12 +105,28 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @param nodes
      */
     public ProActiveMaster(Collection<Node> nodes) {
-        this();
+        this(nodes, new HashMap<String, Object>());
+    }
+
+    /**
+     * Creates a master with a collection of nodes
+     * @param nodes
+     */
+    public ProActiveMaster(Collection<Node> nodes,
+        Map<String, Object> initialMemory) {
+        this(initialMemory);
+        aomaster.addResources(nodes);
+    }
+
+    /**
+     * Creates an empty master with an initial slave memory
+     */
+    public ProActiveMaster(Map<String, Object> initialMemory) {
+        wrappedTasks = new HashMap<T, TaskIntern>();
+        wrappedTasksRev = new HashMap<TaskIntern, T>();
         try {
             aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
-                    new Object[] {  });
-
-            aomaster.addResources(nodes);
+                    new Object[] { initialMemory });
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -100,36 +136,41 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
 
     /**
      * Creates a master with a descriptorURL and an array of virtual node names
-     * @param descriptorURL
-     * @param virtualNodeNames
+     * @param descriptorURL url of the ProActive descriptor
+     * @param virtualNodeName name of the virtual node to deploy inside the ProActive descriptor
      */
     public ProActiveMaster(URL descriptorURL, String virtualNodeName) {
-        this();
-        try {
-            aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
-                    new Object[] {  });
-            aomaster.addResources(descriptorURL, virtualNodeName);
-        } catch (ActiveObjectCreationException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NodeException e) {
-            throw new IllegalArgumentException(e);
-        }
+        this(descriptorURL, virtualNodeName, new HashMap<String, Object>());
+    }
+
+    /**
+     * Creates a master with a descriptorURL and an array of virtual node names
+     * @param descriptorURL descriptor to use
+     * @param virtualNodeName name of the virtual node
+     * @param initialMemory initial memory that
+     */
+    public ProActiveMaster(URL descriptorURL, String virtualNodeName,
+        Map<String, Object> initialMemory) {
+        this(initialMemory);
+        aomaster.addResources(descriptorURL, virtualNodeName);
     }
 
     /**
      * Creates a master with the given virtual node
-     * @param virtualNode
+     * @param virtualNode ProActive virtual node object
      */
     public ProActiveMaster(VirtualNode virtualNode) {
-        try {
-            aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
-                    new Object[] {  });
-            aomaster.addResources(virtualNode);
-        } catch (ActiveObjectCreationException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NodeException e) {
-            throw new IllegalArgumentException(e);
-        }
+        this(virtualNode, new HashMap<String, Object>());
+    }
+
+    /**
+     * Creates a master with the given virtual node
+     * @param virtualNode ProActive virtual node object
+     */
+    public ProActiveMaster(VirtualNode virtualNode,
+        Map<String, Object> initialMemory) {
+        this(initialMemory);
+        aomaster.addResources(virtualNode);
     }
 
     /* (non-Javadoc)
@@ -151,6 +192,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      */
     public void addResources(VirtualNode virtualnode) {
         aomaster.addResources(virtualnode);
+    }
+
+    public int countAvailableResults() {
+        return aomaster.countAvailableResults();
     }
 
     /**
@@ -188,6 +233,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return wrappings;
     }
 
+    public boolean isEmpty() {
+        return aomaster.isEmpty();
+    }
+
     /**
      * Removes the internal wrapping associated with this task
      * @param task
@@ -200,6 +249,11 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
 
         TaskIntern wrapper = wrappedTasks.remove(task);
         wrappedTasksRev.remove(wrapper);
+    }
+
+    public void setResultReceptionOrder(
+        org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode mode) {
+        aomaster.setResultReceptionOrder(mode);
     }
 
     /* (non-Javadoc)
@@ -242,6 +296,22 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return results;
     }
 
+    public List<R> waitKResults(int k)
+        throws IllegalStateException, IllegalArgumentException, TaskException {
+        List<TaskIntern> completed = (List<TaskIntern>) ProActive.getFutureValue(aomaster.waitKResults(
+                    k));
+        List<R> results = new ArrayList<R>();
+        for (TaskIntern res : completed) {
+            if (res.threwException()) {
+                throw new TaskException(res.getException());
+            }
+            results.add((R) res.getResult());
+            T task = wrappedTasksRev.get(res);
+            removeWrapping(task);
+        }
+        return results;
+    }
+
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitOneResult()
      */
@@ -258,34 +328,5 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
             throw new TaskException(completed.getException());
         }
         return (R) completed.getResult();
-    }
-
-    public boolean isEmpty() {
-        return aomaster.isEmpty();
-    }
-
-    public int countAvailableResults() {
-        return aomaster.countAvailableResults();
-    }
-
-    public void setResultReceptionOrder(
-        org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode mode) {
-        aomaster.setResultReceptionOrder(mode);
-    }
-
-    public List<R> waitKResults(int k)
-        throws IllegalStateException, IllegalArgumentException, TaskException {
-        List<TaskIntern> completed = (List<TaskIntern>) ProActive.getFutureValue(aomaster.waitKResults(
-                    k));
-        List<R> results = new ArrayList<R>();
-        for (TaskIntern res : completed) {
-            if (res.threwException()) {
-                throw new TaskException(res.getException());
-            }
-            results.add((R) res.getResult());
-            T task = wrappedTasksRev.get(res);
-            removeWrapping(task);
-        }
-        return results;
     }
 }

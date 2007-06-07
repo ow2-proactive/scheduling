@@ -57,6 +57,7 @@
 						<parameter value="-Dproactive.rmi.port=${ID}"/>
 						<parameter value="-Xms64m -Xmx512m "/>
 						<parameter value="-Dsun.rmi.server.exceptionTrace=true"/>
+						<parameter value="-Dproactive.http.port=13216"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

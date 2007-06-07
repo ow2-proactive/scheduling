@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,6 +86,9 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     private boolean isTerminated;
     private TaskProvider provider;
 
+    // memory of the slaves
+    private Map<String, Object> initialMemory;
+
     public AOSlaveManager() {
     } //proactive no arg constructor
 
@@ -92,8 +96,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      *
      * @param provider
      */
-    public AOSlaveManager(TaskProvider provider) {
+    public AOSlaveManager(TaskProvider provider,
+        Map<String, Object> initialMemory) {
         this.provider = provider;
+        this.initialMemory = initialMemory;
     }
 
     /* (non-Javadoc)
@@ -161,7 +167,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
 
             // Creates the slave which will automatically connect to the master
             ProActive.newActive(AOSlave.class.getName(),
-                new Object[] { slavename, provider }, node);
+                new Object[] { slavename, provider, initialMemory }, node);
             if (logger.isDebugEnabled()) {
                 logger.debug("Slave " + slavename + " created on " +
                     node.getNodeInformation().getName());

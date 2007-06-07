@@ -44,7 +44,8 @@ public interface TaskProvider<T extends TaskIntern<R>, R extends Serializable> {
 
     /**
      * Returns a task which needs to be executed
-     * @param originatorName the name of the slave which asks the tasks
+     * @param Slave the slave object which asks the tasks (stub)
+     * @param slaveName the name of the slave which asks the tasks
      * @return a new task to compute
      */
     public T getTask(Slave slave, String slaveName);

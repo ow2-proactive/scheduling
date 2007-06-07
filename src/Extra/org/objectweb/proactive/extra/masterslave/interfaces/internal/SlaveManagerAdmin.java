@@ -67,7 +67,7 @@ public interface SlaveManagerAdmin {
 
     /**
      * Terminates the slave manager and free every resources (if asked)
-     * @param freeNodeResources tells if the Slave Manager should as well free the node resources
+     * @param freeResources tells if the Slave Manager should as well free the node resources
      * @return success
      */
     public BooleanWrapper terminate(boolean freeResources);

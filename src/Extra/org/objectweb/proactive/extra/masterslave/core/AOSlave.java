@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -74,7 +74,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     private boolean isSleeping;
 
     // The memory of the slave (the slave can keep some data between different tasks executions (connection to a database, file descriptor, etc ...)
-    private HashMap<String, Object> memory = new HashMap<String, Object>();
+    private Map<String, Object> memory;
 
     /**
      * Required for Active Objects
@@ -86,10 +86,14 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     /**
      * Creates a slave with the given name
      * @param name
+     * @param provider the entity which will provide tasks to the slave
+     * @param initialMemory initial memory of the slave
      */
-    public AOSlave(String name, TaskProvider provider) {
+    public AOSlave(String name, TaskProvider provider,
+        Map<String, Object> initialMemory) {
         this.name = name;
         this.provider = provider;
+        this.memory = initialMemory;
     }
 
     /* (non-Javadoc)
@@ -138,6 +142,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         isSleeping = false;
         terminated = false;
         ProActive.setImmediateService("getName");
+        ProActive.setImmediateService("heartBeat");
         ProActive.setImmediateService("terminate");
     }
 

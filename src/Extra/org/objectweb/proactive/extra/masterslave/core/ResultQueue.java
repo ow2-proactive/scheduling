@@ -62,7 +62,7 @@ public class ResultQueue implements Serializable {
 
     /**
      * Tells if all results are currently available in the queue
-     * @return
+     * @return the answer
      */
     public boolean areAllResultsAvailable() {
         if (mode == Master.OrderingMode.CompletionOrder) {
@@ -84,8 +84,8 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Count the number of results available for the given order
-     * @return
+     * Count the number of results available for the current reception order
+     * @return the number of results available for the current reception order
      */
     public int countAvailableResults() {
         if (mode == Master.OrderingMode.CompletionOrder) {
@@ -103,7 +103,7 @@ public class ResultQueue implements Serializable {
 
     /**
      * Counts the number of pending tasks
-     * @return
+     * @return the number of pending tasks
      */
     public int countPendingResults() {
         return idsubmitted.size();
@@ -111,9 +111,10 @@ public class ResultQueue implements Serializable {
 
     /**
      * Returns all completed tasks (if and only if there are no pending tasks)
-     * @return
+     * @return a list containing all completed tasks, if all tasks are completed
+     * @throws NoSuchElementException if some tasks are not completed
      */
-    public List<TaskIntern> getAll() {
+    public List<TaskIntern> getAll() throws NoSuchElementException {
         if (areAllResultsAvailable()) {
             List<TaskIntern> answer = new ArrayList<TaskIntern>();
             Iterator<TaskIntern> it;
@@ -133,10 +134,11 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Returns the next completed task
-     * @return
+     * Returns the next completed task (depending of the current ResultReceptionOrder)
+     * @return the next completed task, if the next task in the current ResultReceptionOrder is available
+     * @throws NoSuchElementException if no task in the current ResultReceptionOrder are available
      */
-    public TaskIntern getNext() {
+    public TaskIntern getNext() throws NoSuchElementException {
         if (isOneResultAvailable()) {
             TaskIntern answer;
             if (mode == Master.OrderingMode.CompletionOrder) {
@@ -154,9 +156,10 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Returns the next k completed tasks
+     * Returns the next completed task (depending of the current ResultReceptionOrder)
      * @param k number of completed tasks to get
-     * @return
+     * @return a list containing the k next completed tasks, if the k next tasks in the current ResultReceptionOrder are available
+     * @throws NoSuchElementException if not enough tasks in the current ResultReceptionOrder are available
      */
     public List<TaskIntern> getNextK(int k) {
         if (countAvailableResults() >= k) {
@@ -181,7 +184,7 @@ public class ResultQueue implements Serializable {
 
     /**
      * Tells that the queue has neither results nor pending tasks
-     * @return
+     * @return true if the result queue has neither results nor pending tasks, false otherwise
      */
     public boolean isEmpty() {
         if (mode == Master.OrderingMode.CompletionOrder) {
@@ -192,8 +195,8 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Tells that there is at least one result available for the given order
-     * @return
+     * Tells that there is at least one result available for the current reception order
+     * @return true if there is at least one result available for the current reception order, false otherwise
      */
     public boolean isOneResultAvailable() {
         if (mode == Master.OrderingMode.CompletionOrder) {
@@ -207,8 +210,8 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Changes the current ordering mode
-     * @param mode
+     * Changes the current result ordering mode
+     * @param mode the new result ordering mode
      */
     public void setMode(Master.OrderingMode mode) {
         if ((mode == Master.OrderingMode.CompletionOrder) &&

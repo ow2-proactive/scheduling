@@ -54,7 +54,7 @@ public interface Slave {
 
     /**
      * terminates this slave
-     * @return
+     * @return true if the object terminated successfully
      */
     public BooleanWrapper terminate();
 

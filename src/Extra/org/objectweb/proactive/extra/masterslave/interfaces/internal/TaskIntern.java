@@ -70,7 +70,7 @@ public interface TaskIntern<R extends Serializable> extends Task<R>, Comparable 
 
     /**
      * tells if the task is null (nothing to do)
-     * @return
+     * @return true if the task is null, false otherwise
      */
     public boolean isNull();
 

@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -90,6 +91,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     // Slaves : effective resources
     Slave slaveGroupStub;
     Group slaveGroup;
+    // Slave memory
+    Map<String, Object> initialMemory;
 
     // Sleeping slaves (we might want to wake them up)
     Slave sleepingGroupStub;
@@ -113,15 +116,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     }
 
     /**
-     * Creates a master with an existing slave manager
-     * @param rmanager
-     * @throws IllegalArgumentException
+     * Creates the master with the initial memory of the slaves
+     * @param initialMemory
      */
-    public AOMaster(SlaveManager rmanager) throws IllegalArgumentException {
-        if (rmanager == null) {
-            throw new IllegalArgumentException(new NullPointerException());
-        }
-        this.smanager = rmanager;
+    public AOMaster(Map<String, Object> initialMemory) {
+        this.initialMemory = initialMemory;
     }
 
     /* (non-Javadoc)
@@ -228,7 +227,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         try {
             // The resource manager
             smanager = (AOSlaveManager) ProActive.newActive(AOSlaveManager.class.getName(),
-                    new Object[] { stubOnThis });
+                    new Object[] { stubOnThis, initialMemory });
 
             // The slave pinger
             pinger = (SlaveWatcher) ProActive.newActive(AOPinger.class.getName(),
@@ -383,7 +382,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * Synchronous version of terminate
      * @param freeResources
-     * @return
+     * @return true if completed successfully
      */
     public boolean terminateIntern(boolean freeResources) {
         terminated = true;

@@ -53,7 +53,7 @@ public interface SlaveWatcher {
 
     /**
      * terminates the watcher's activity
-     * @return
+     * @return true if the object terminated successfully
      */
     public BooleanWrapper terminate();
 }

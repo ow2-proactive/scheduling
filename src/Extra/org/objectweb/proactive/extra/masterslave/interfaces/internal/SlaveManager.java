@@ -52,7 +52,7 @@ public interface SlaveManager {
 
     /**
      * Returns a collection of slaves to the slave manager
-     * @param Collection of slaves to be returned
+     * @param nodes Collection of slaves to be returned
      * @return acceptation of the request (asynchronous)
      */
     public BooleanWrapper freeSlaves(Collection<Slave> nodes);
