@@ -17,7 +17,8 @@ import org.objectweb.proactive.core.mop.Proxy;
 public class SynchronousProxy implements Proxy, Serializable {
     protected RemoteObject remoteObject;
 
-    public SynchronousProxy(ConstructorCall contructorCall, Object[] params) throws ProActiveException{
+    public SynchronousProxy(ConstructorCall contructorCall, Object[] params)
+        throws ProActiveException {
         Object p0 = params[0];
 
         if (p0 instanceof RemoteObject) {
@@ -49,7 +50,8 @@ public class SynchronousProxy implements Proxy, Serializable {
         return null;
     }
 
-    public void setRemoteObject(RemoteRemoteObject rro) throws ProActiveException{
+    public void setRemoteObject(RemoteRemoteObject rro)
+        throws ProActiveException {
         this.remoteObject = new RemoteObjectAdapter(rro);
     }
 

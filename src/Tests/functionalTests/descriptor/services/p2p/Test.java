@@ -95,7 +95,8 @@ public class Test extends FunctionalTest {
         VirtualNode vn = this.pad.getVirtualNode("p2pvn");
         this.nodeTab = vn.getNodes();
 
-        System.out.println("Test.action() +++  vn.getNodes (should be 3) "   + Arrays.toString(vn.getNodes()));
+        System.out.println("Test.action() +++  vn.getNodes (should be 3) " +
+            Arrays.toString(vn.getNodes()));
 
         boolean resultTest = (this.nodeTab.length == 2);
         this.process.stopProcess();

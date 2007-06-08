@@ -738,7 +738,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             //wait for pending file transfer
             FileVector fw = this.fileTransferDeployedStatus.get(node.getNodeInformation()
-                                                               .getName());
+                                                                    .getName());
 
             if (fw != null) {
                 fw.waitForAll(); //wait-by-necessity
@@ -747,7 +747,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             return node;
         } else {
             throw new NodeException("Cannot get a node from Virtual Node " +
-                this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
+                this.name + ". Descriptor in use : \"" + this.descriptorURL +
+                "\".");
         }
     }
 
@@ -758,11 +759,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (node == null) {
             throw new NodeException(
                 "Cannot return the first node, no nodes hava been created for Virtual Node " +
-                this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
+                this.name + ". Descriptor in use : \"" + this.descriptorURL +
+                "\".");
         }
 
         FileVector fw = this.fileTransferDeployedStatus.get(node.getNodeInformation()
-                                                           .getName());
+                                                                .getName());
 
         if (fw != null) {
             fw.waitForAll(); //wait-by-necessity
@@ -786,15 +788,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                 for (int i = 0; i < this.createdNodes.size(); i++) {
                     nodeNames[i] = this.createdNodes.get(i).getNodeInformation()
-                                               .getURL();
+                                                    .getURL();
                 }
             }
         } else {
             if (!this.MAX_P2P) {
                 throw new NodeException(
                     "Cannot return nodes, no nodes have been created for Virtual Node " +
-                    this.name + ". Descriptor in use : \"" + this.descriptorURL +
-                    "\".");
+                    this.name + ". Descriptor in use : \"" +
+                    this.descriptorURL + "\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
@@ -829,8 +831,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (!this.MAX_P2P) {
                 throw new NodeException(
                     "Cannot return nodes, no nodes have been created for Virtual Node " +
-                    this.name + ". Descriptor in use : \"" + this.descriptorURL +
-                    "\".");
+                    this.name + ". Descriptor in use : \"" +
+                    this.descriptorURL + "\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
@@ -857,7 +859,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             synchronized (this.createdNodes) {
                 for (int i = 0; i < this.createdNodes.size(); i++) {
                     if (this.createdNodes.get(i).getNodeInformation().getURL()
-                                        .equals(url)) {
+                                             .equals(url)) {
                         node = this.createdNodes.get(i);
 
                         break;
@@ -1051,8 +1053,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine virtualMachine = null;
 
         for (int i = 0; i < this.virtualMachines.size(); i++) {
-            if ((this.virtualMachines.get(i)).getName()
-                     .equals(event.getVmName())) {
+            if ((this.virtualMachines.get(i)).getName().equals(event.getVmName())) {
                 virtualMachine = this.virtualMachines.get(i);
             }
         }
@@ -1074,8 +1075,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         // Not synchronized because it is now impossible to add a new VirtualMachine
         for (int i = 0; i < this.virtualMachines.size(); i++) {
-            if ((this.virtualMachines.get(i)).getName()
-                     .equals(event.getVmName())) {
+            if ((this.virtualMachines.get(i)).getName().equals(event.getVmName())) {
                 virtualMachine = this.virtualMachines.get(i);
             }
         }
@@ -1094,7 +1094,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // Check if the virtualNode that originates the process is among awaited
         // VirtualNodes
         if (this.awaitedVirtualNodes.containsKey(event.getCreatorID())) {
-            createNodes(event, this.awaitedVirtualNodes.get(event.getCreatorID()));
+            createNodes(event,
+                this.awaitedVirtualNodes.get(event.getCreatorID()));
         }
     }
 
@@ -1234,7 +1235,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#isMultiple()
      */
     public boolean isMultiple() {
-        return ((this.virtualMachines.size() + this.localVirtualMachines.size()) > 1);
+        return ((this.virtualMachines.size() +
+        this.localVirtualMachines.size()) > 1);
     }
 
     //
@@ -1381,9 +1383,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 }
             } else {
                 throw new NodeException("After many retries, only " +
-                    this.nbCreatedNodes + " nodes are created on " + tempNodeCount +
-                    " expected for Virtual Node \"" + this.name +
-                    "\" in descriptor \"" + this.descriptorURL + "\".");
+                    this.nbCreatedNodes + " nodes are created on " +
+                    tempNodeCount + " expected for Virtual Node \"" +
+                    this.name + "\" in descriptor \"" + this.descriptorURL +
+                    "\".");
             }
         }
     }

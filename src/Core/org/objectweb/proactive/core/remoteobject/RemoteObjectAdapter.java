@@ -29,7 +29,7 @@ public class RemoteObjectAdapter implements RemoteObject {
     public RemoteObjectAdapter() {
     }
 
-    public RemoteObjectAdapter(RemoteRemoteObject ro) throws ProActiveException{
+    public RemoteObjectAdapter(RemoteRemoteObject ro) throws ProActiveException {
         this.remoteObject = ro;
         try {
             this.uri = ro.getURI();
@@ -58,7 +58,8 @@ public class RemoteObjectAdapter implements RemoteObject {
         } catch (IOException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to contact remote object at " +
-                this.uri.toString() + " when calling " + message.getMethodName());
+                this.uri.toString() + " when calling " +
+                message.getMethodName());
             //e.printStackTrace();
             //            throw new ProActiveException(e.getMessage());
             return new SynchronousReplyImpl();
