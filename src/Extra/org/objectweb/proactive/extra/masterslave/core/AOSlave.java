@@ -59,7 +59,6 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
 
     // stub on this active object
     protected Object stubOnThis;
-    public static long SLAVE_CYCLE_TIMEMILLIS = 500;
 
     // Name of the slave
     private String name;
@@ -75,6 +74,9 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
 
     // The memory of the slave (the slave can keep some data between different tasks executions (connection to a database, file descriptor, etc ...)
     private Map<String, Object> memory;
+
+    // idle time of the slave
+    private long slaveIdleTime;
 
     /**
      * Required for Active Objects
@@ -141,6 +143,8 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         stubOnThis = ProActive.getStubOnThis();
         isSleeping = false;
         terminated = false;
+        slaveIdleTime = Long.parseLong(System.getProperty(
+                    "proactive.masterslave.msidletime"));
         ProActive.setImmediateService("getName");
         ProActive.setImmediateService("heartBeat");
         ProActive.setImmediateService("terminate");
@@ -225,9 +229,9 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
 
             // The Slave is currently sleeping
             try {
-                Thread.sleep(SLAVE_CYCLE_TIMEMILLIS);
+                Thread.sleep(slaveIdleTime);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                // do nothing
             }
 
             // We serve any outstanding request

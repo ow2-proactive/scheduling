@@ -80,7 +80,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     protected Object stubOnThis;
 
     // global variables
-    private boolean terminated; // is the master terminated
+    protected boolean terminated; // is the master terminated
+    protected long masterIdleTime;
 
     // Slave manager (deploy slaves)
     protected SlaveManager smanager;
@@ -89,17 +90,18 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     protected SlaveWatcher pinger;
 
     // Slaves : effective resources
-    Slave slaveGroupStub;
-    Group slaveGroup;
+    protected Slave slaveGroupStub;
+    protected Group slaveGroup;
+
     // Slave memory
-    Map<String, Object> initialMemory;
+    protected Map<String, Object> initialMemory;
 
     // Sleeping slaves (we might want to wake them up)
-    Slave sleepingGroupStub;
-    Group sleepingGroup;
-    HashMap<String, Slave> slavesByName;
-    HashMap<Slave, String> slavesByNameRev;
-    HashMap<String, TaskIntern> slavesActivity;
+    protected Slave sleepingGroupStub;
+    protected Group sleepingGroup;
+    protected HashMap<String, Slave> slavesByName;
+    protected HashMap<Slave, String> slavesByNameRev;
+    protected HashMap<String, TaskIntern> slavesActivity;
 
     // Task Queues :
     // tasks that wait for an available slave
@@ -204,6 +206,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         stubOnThis = ProActive.getStubOnThis();
         // General initializations
         terminated = false;
+        masterIdleTime = Long.parseLong(System.getProperty(
+                    "proactive.masterslave.msidletime"));
         // Queues 
         pendingTasks = new HashSetQueue<TaskIntern>();
         launchedTasks = new HashSetQueue<TaskIntern>();
@@ -301,6 +305,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             service.serveAll("isDead");
 
             service.serveOldest(new MainFilter());
+            try {
+                Thread.sleep(masterIdleTime);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
         }
         body.terminate();
     }
