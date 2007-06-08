@@ -30,8 +30,6 @@
  */
 package functionalTests.descriptor.services.p2p;
 
-import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -40,6 +38,9 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+
+import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -56,14 +57,14 @@ public class Test extends FunctionalTest {
 
     static {
         if ("ibis".equals(ProActiveConfiguration.getInstance()
-                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
             P2P_XML_LOCATION_UNIX = Test.class.getResource(
                     "/functionalTests/descriptor/services/p2p/TestP2PIbis.xml")
-                    .getPath();
+                                              .getPath();
         } else {
             P2P_XML_LOCATION_UNIX = Test.class.getResource(
                     "/functionalTests/descriptor/services/p2p/TestP2P.xml")
-                    .getPath();
+                                              .getPath();
         }
     }
 
@@ -76,12 +77,12 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
         process1.setClassname(
-                "org.objectweb.proactive.p2p.service.StartP2PService");
+            "org.objectweb.proactive.p2p.service.StartP2PService");
         process1.setParameters("-port 2900");
 
         process = new JVMProcessImpl(new StandardOutputMessageLogger());
         process.setClassname(
-                "org.objectweb.proactive.p2p.service.StartP2PService");
+            "org.objectweb.proactive.p2p.service.StartP2PService");
         process.setParameters("-port 3000 -s //localhost:2900");
 
         process1.startProcess();
