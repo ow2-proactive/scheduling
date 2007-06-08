@@ -30,8 +30,6 @@
  */
 package functionalTests.descriptor.services.p2p;
 
-import java.util.Arrays;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -43,6 +41,7 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
+
 
 /**
  * Test service: P2P JVM acquisition in deployment descriptor
@@ -94,9 +93,6 @@ public class Test extends FunctionalTest {
         this.pad.activateMappings();
         VirtualNode vn = this.pad.getVirtualNode("p2pvn");
         this.nodeTab = vn.getNodes();
-
-        System.out.println("Test.action() +++  vn.getNodes (should be 3) " +
-            Arrays.toString(vn.getNodes()));
 
         boolean resultTest = (this.nodeTab.length == 2);
         this.process.stopProcess();
