@@ -592,8 +592,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) {
-        //This method has no effect here since the virtualNode has been registered in some registry
-        //like RMI
+        String url = UrlBuilder.buildUrlFromProperties(UrlBuilder.getHostNameFromUrl(
+                    getInternalURL()), virtualNodeName);
+
+        this.roe.activateProtocol(URI.create(url));
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {
