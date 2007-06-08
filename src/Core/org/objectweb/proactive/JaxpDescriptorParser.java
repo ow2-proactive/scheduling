@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
@@ -445,6 +446,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         //
         NodeList deploymentNodes = (NodeList) xpath.evaluate(DEPLOYMENT,
                 document, XPathConstants.NODESET);
+
+        if (deploymentNodes.getLength() == 0) {
+            throw new ProActiveRuntimeException(
+                "No 'deployment' node found in descriptor");
+        }
 
         Node deploymentContextItem = deploymentNodes.item(0);
         NodeList nodes = (NodeList) xpath.evaluate(REGISTER,
