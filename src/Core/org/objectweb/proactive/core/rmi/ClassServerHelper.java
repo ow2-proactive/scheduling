@@ -101,8 +101,8 @@ public class ClassServerHelper {
             currentClassServer = new ClassServer(classpath);
         }
         String codebase = this.getCodebase();
-        System.setProperty("java.rmi.server.codebase", codebase);
 
+        //        System.setProperty("java.rmi.server.codebase", codebase);
         return codebase;
     }
 

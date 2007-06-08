@@ -647,6 +647,12 @@
 			<classpath refid="project.classpath" />
 			<arg value="org.objectweb.proactive.core.runtime.ibis.IbisProActiveRuntimeImpl" />
 		</java>
+		<java classname="ibis.frontend.rmi.Rmic"
+			  fork="true"
+			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/remoteobject/ibis/">
+			<classpath refid="project.classpath" />
+			<arg value="org.objectweb.proactive.core.remoteobject.ibis.IbisRemoteObjectImpl" />
+		</java>
 		<javac srcdir="${cl.proactive.dir}" destdir="${cl.proactive.dir}"
 			   deprecation="on" source="${source}" debug="${debug}">
 			<include name="**/*.java" />

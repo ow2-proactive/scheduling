@@ -40,9 +40,9 @@ import java.net.Socket;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpUtils;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

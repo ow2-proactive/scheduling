@@ -102,7 +102,7 @@ public class ProActiveServicesImpl implements ProActiveService {
     }
 
     /**
-     * @see org.objectweb.proactive.osgi.ProActiveService#unregister(java.lang.String)
+     * @see org.objectweb.proactive.osgi.ProActiveService#unregister(URI)
      */
     public void unregister(String url) throws IOException {
         ProActive.unregister(url);

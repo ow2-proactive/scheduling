@@ -46,8 +46,8 @@ import org.apache.soap.util.xml.QName;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.wsdl.WSDLGenerator;
 

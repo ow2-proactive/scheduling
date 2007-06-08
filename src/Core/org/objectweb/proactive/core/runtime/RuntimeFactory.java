@@ -30,12 +30,19 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.net.URI;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -80,8 +87,8 @@ public abstract class RuntimeFactory {
 
     static {
         ProActiveConfiguration.load();
-        createClassServer();
-        registerProtocolFactories();
+        //createClassServer();
+        //        registerProtocolFactories();
         //getLocalRuntime();
     }
 
@@ -96,7 +103,7 @@ public abstract class RuntimeFactory {
      * @param factoryClassName the fully qualified name of the class of the factory
      * responsible of creating the proActiveRuntime for that protocol
      */
-    public static synchronized void setFactory(String protocol,
+    protected static synchronized void setFactory(String protocol,
         String factoryClassName) {
         if (runtimeLogger.isDebugEnabled()) {
             runtimeLogger.debug("protocol2 =  " + protocol + " " +
@@ -112,7 +119,7 @@ public abstract class RuntimeFactory {
      * @param factoryObject the class of the factory
      * responsible of creating the proactiveRuntime for that protocol
      */
-    public static synchronized void setFactory(String protocol,
+    protected static synchronized void setFactory(String protocol,
         RuntimeFactory factoryObject) {
         protocolFactoryMapping.put(protocol, factoryObject.getClass().getName());
         instanceFactoryMapping.put(protocol, factoryObject);
@@ -138,6 +145,8 @@ public abstract class RuntimeFactory {
         ProActiveRuntime defaultRuntime = null;
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
+            //            defaultRuntime = getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
+            //                                                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             defaultRuntime = getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
                                                                               .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             if (runtimeLogger.isDebugEnabled()) {
@@ -165,13 +174,23 @@ public abstract class RuntimeFactory {
      */
     public static ProActiveRuntime getProtocolSpecificRuntime(String protocol)
         throws ProActiveException {
-        RuntimeFactory factory = getFactory(protocol);
-        ProActiveRuntime proActiveRuntime = factory.getProtocolSpecificRuntimeImpl();
-        if (proActiveRuntime == null) {
-            throw new ProActiveException(
-                "Cannot create a ProActiveRuntime based on " + protocol);
+        ProActiveRuntimeImpl proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+
+        RemoteRemoteObject rro = proActiveRuntime.getRemoteObjectExposer()
+                                                 .getRemoteObject(protocol);
+
+        if (rro == null) {
+            URI url = RemoteObjectFactory.generateUrl(protocol,
+                    URIBuilder.getNameFromURI(URI.create(
+                            proActiveRuntime.getURL())));
+            proActiveRuntime.getRemoteObjectExposer().activateProtocol(url);
+            rro = proActiveRuntime.getRemoteObjectExposer()
+                                  .getRemoteObject(protocol);
+
+            //            throw new ProActiveException("Cannot create a ProActiveRuntime based on " + protocol);
         }
-        return proActiveRuntime;
+
+        return (ProActiveRuntime) new RemoteObjectAdapter(rro).getObjectProxy();
     }
 
     /**
@@ -189,13 +208,13 @@ public abstract class RuntimeFactory {
 
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
-        RuntimeFactory factory = getFactory(protocol);
+        //        RuntimeFactory factory = getFactory(protocol);
+        RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(protocol)
+                                             .lookup(URI.create(
+                    proActiveRuntimeURL));
 
         //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
-        if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("factory = " + factory);
-        }
-        return factory.getRemoteRuntimeImpl(proActiveRuntimeURL);
+        return (ProActiveRuntime) ro.getObjectProxy();
     }
 
     //

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.security;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  * SecureEntity defines all security related method a secure generic object must
  * implement. An entity can be an active object, a runtime, a domain.
  */
-public interface SecurityEntity {
+public interface SecurityEntity extends Serializable {
 
     /**
      * entity certificate

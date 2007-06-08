@@ -28,39 +28,41 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util;
+package org.objectweb.proactive.core.remoteobject.http.util;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 
 
 /**
- * This interface is used to encapsulate any kind of HTTP message.
  * @author vlegrand
- * @see java.io.Serializable
+ *
+ * To change the template for this generated type comment go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public abstract class HttpMessage implements Serializable {
-    protected Object returnedObject;
-    private String url;
-
-    //    private int port;
-    public HttpMessage(String url) {
-        this.url = url;
-        //        this.port = port;
-    }
+public class HttpUtils {
+    public static final String SERVICE_REQUEST_CONTENT_TYPE = "application/java";
+    public static final String SERVICE_REQUEST_URI = "/ProActiveHTTP";
 
     /**
-     * Processes the message.
-     * @return an object as a result of the execution of the message
+     *  Search a Body matching with a given unique ID
+     * @param id The unique id of the body we are searching for
+     * @return The body associated with the ID
      */
-    public abstract Object processMessage() throws Exception;
+    public static Body getBody(UniqueID id) {
+        LocalBodyStore bodyStore = LocalBodyStore.getInstance();
 
-    /**
-     * @throws HTTPRemoteException
-     */
-    public final void send() throws HTTPRemoteException {
-        HttpMessageSender hms = new HttpMessageSender(this.url);
-        this.returnedObject = hms.sendMessage(this);
+        Body body = bodyStore.getLocalBody(id);
+
+        if (body == null) {
+            body = LocalBodyStore.getInstance().getLocalHalfBody(id);
+        }
+
+        if (body == null) {
+            body = LocalBodyStore.getInstance().getForwarder(id);
+        }
+
+        return body;
     }
 }

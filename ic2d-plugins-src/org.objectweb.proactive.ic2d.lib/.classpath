@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibis/bcel-5.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibis/bcel-5.1-fixes-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibis/colobus-0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibis/ibis-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibis/ibis-connect-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibis/ibis-util-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/examples/clibwrapper_jiio.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/components/dtdparser.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/components/fractal.jar"/>

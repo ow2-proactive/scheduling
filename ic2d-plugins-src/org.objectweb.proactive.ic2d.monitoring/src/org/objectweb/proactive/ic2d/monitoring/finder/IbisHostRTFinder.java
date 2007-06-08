@@ -33,16 +33,16 @@ package org.objectweb.proactive.ic2d.monitoring.finder;
 import ibis.rmi.registry.LocateRegistry;
 import ibis.rmi.registry.Registry;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
-import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.core.Constants;
 
 public class IbisHostRTFinder implements HostRTFinder {
 
@@ -63,9 +63,24 @@ public class IbisHostRTFinder implements HostRTFinder {
 			for (int i = 0; i < names.length; ++i) {
 				String name = names[i];
 				if (name.indexOf("PA_JVM") != -1) {
-					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
-					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
-					runtimes.add(proActiveRuntime);
+//					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
+//					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
+//					runtimes.add(proActiveRuntime);
+					
+					URI url = new URI(host.getProtocol(),null,host.getHostName(),host.getPort(),"/"+name,null,null);
+					System.out.println("RMIHostRTFinder.findPARuntime()  "  + url);
+					RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);  
+					
+					System.out.println("RMIHostRTFinder.findPARuntime()  "  + ro);
+					
+					Object stub = ro.getObjectProxy();
+					
+					System.out.println("RMIHostRTFinder.findPARuntime()  "  + stub);
+					if (stub instanceof ProActiveRuntime) {
+						runtimes.add((ProActiveRuntime ) stub);
+					}
+					
+					
 				}
 			}
 		}

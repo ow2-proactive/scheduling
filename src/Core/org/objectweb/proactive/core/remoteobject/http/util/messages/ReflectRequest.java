@@ -28,14 +28,14 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.messages;
+package org.objectweb.proactive.core.remoteobject.http.util.messages;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

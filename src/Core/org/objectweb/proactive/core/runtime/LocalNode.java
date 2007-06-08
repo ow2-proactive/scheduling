@@ -30,13 +30,17 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.apache.axis.NoEndPointException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -53,6 +57,7 @@ public class LocalNode {
     private ProActiveSecurityManager securityManager;
     private String virtualNodeName;
     private Properties localProperties;
+    private RemoteObjectExposer roe;
 
     public LocalNode(String nodeName, String jobId,
         ProActiveSecurityManager securityManager, String virtualNodeName) {
@@ -76,6 +81,13 @@ public class LocalNode {
                            .debug("registering node certificate for VN " +
                 this.virtualNodeName);
         }
+
+        roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
+                ProActiveRuntimeImpl.getProActiveRuntime());
+    }
+
+    public void activateProtocol(URI nodeURL) {
+        roe.activateProtocol(nodeURL);
     }
 
     /**
@@ -225,6 +237,8 @@ public class LocalNode {
                 body.terminate();
             }
         }
+
+        roe.unregisterAll();
     }
 
     /**

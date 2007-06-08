@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureResult;
@@ -138,6 +139,23 @@ public class RequestImpl extends MessageImpl implements Request,
         this.sender = sender;
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;
+
+        if (enableStackTrace == null) {
+            /* First time */
+            enableStackTrace = new Boolean(!"false".equals(
+                        ProActiveConfiguration.getInstance()
+                                              .getProperty("proactive.stack_trace")));
+        }
+        if (enableStackTrace.booleanValue()) {
+            this.stackTrace = new Exception().getStackTrace();
+        }
+    }
+
+    // Constructor of synchronous requests 
+    public RequestImpl(MethodCall methodCall, boolean isOneWay) {
+        super(ProActive.getBodyOnThis().getID(), 0, isOneWay,
+            methodCall.getName());
+        this.methodCall = methodCall;
 
         if (enableStackTrace == null) {
             /* First time */
@@ -397,7 +415,11 @@ public class RequestImpl extends MessageImpl implements Request,
         }
 
         out.defaultWriteObject();
-        out.writeObject(sender.getRemoteAdapter());
+        if (sender != null) {
+            out.writeObject(sender.getRemoteAdapter());
+        } else {
+            out.writeObject(sender);
+        }
 
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.stopTimer(this.sourceID, TimerWarehouse.SERIALIZATION);

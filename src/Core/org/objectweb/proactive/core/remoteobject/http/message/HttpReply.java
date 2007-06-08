@@ -28,61 +28,54 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.messages;
+package org.objectweb.proactive.core.remoteobject.http.message;
 
 import java.io.IOException;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpUtils;
 
 
-public class HttpRequest extends HttpMessage implements Serializable {
-    private Request request;
-    private UniqueID IdBody;
+/**
+ * This kind of HTTP message isusefull to receive and send replies.
+ * @author vlegrand
+ * @see HttpMessage
+ */
+public class HttpReply extends HttpMessage implements Serializable {
+    private Reply reply;
+    private UniqueID idBody;
 
-    public HttpRequest(Request request, UniqueID idBody, String url) {
+    /**
+     *  Constructs an HTTP Message containing a ProActive Reply
+     * @param reply The ProActive Reply to encapsulate
+     * @param idBody The unique id of the targeted active object
+     */
+    public HttpReply(Reply reply, UniqueID idBody, String url) {
         super(url);
-        this.request = request;
-        this.IdBody = idBody;
+        this.reply = reply;
+        this.idBody = idBody;
     }
 
     public int getReturnedObject() {
         if (this.returnedObject != null) {
             return ((Integer) this.returnedObject).intValue();
         }
-
         return 0; // or throws an exception ...
     }
 
-    /**
-     *
-     */
     @Override
     public Object processMessage() {
-        if (this.request != null) {
-            try {
-                Body body = HttpUtils.getBody(IdBody);
-
-                //TODO 
-                if (body == null) {
-                    try {
-                        Thread.sleep(1000);
-                        body = HttpUtils.getBody(IdBody);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-                return new Integer(body.receiveRequest(this.request));
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (RenegotiateSessionException e) {
-                e.printStackTrace();
+        try {
+            Body body = HttpUtils.getBody(idBody);
+            if (this.reply != null) {
+                return new Integer(body.receiveReply(this.reply));
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return null;

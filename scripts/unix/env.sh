@@ -117,9 +117,12 @@ fi
 
 #--------------------------------------------------
 # jar to set when using Ibis
-if [ -f $PROACTIVE/lib/ibis/ibis.jar ]
+if [ -d $PROACTIVE/lib/ibis ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ibis/ibis.jar
+    for i in $PROACTIVE/lib/ibis/*.jar 
+    do 
+        CLASSPATH=$CLASSPATH:$i
+    done
 fi
 
 #--------------------------------------------------
@@ -263,8 +266,8 @@ export CLASSPATH
 
 
 JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PROACTIVE/scripts/proactive.java.policy -Dlog4j.configuration=file:$PROACTIVE/scripts/proactive-log4j "
-
-#JAVACMD="$JAVACMD -Dcom.sun.management.jmxremote "
+#export LD_LIBRARY_PATH=~/softs/yjp/bin/linux-amd64
+#JAVACMD="$JAVACMD -agentlib:yjpagent -Dcom.sun.management.jmxremote "
 export JAVACMD
 
 

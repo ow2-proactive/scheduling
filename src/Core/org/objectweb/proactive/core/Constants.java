@@ -132,4 +132,7 @@ public interface Constants {
 
     /** this property identifies proactive's configuration file */
     public static final String PROPERTY_PA_CONFIGURATION_FILE = "proactive.configuration";
+
+    /** this property identifies the https protocol */
+    public static final String HTTPSSH_PROTOCOL_IDENTIFIER = "httpssh";
 }

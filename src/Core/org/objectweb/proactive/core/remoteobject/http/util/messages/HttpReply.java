@@ -28,16 +28,16 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.messages;
+package org.objectweb.proactive.core.remoteobject.http.util.messages;
 
 import java.io.IOException;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
 import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpUtils;
 
 
 /**

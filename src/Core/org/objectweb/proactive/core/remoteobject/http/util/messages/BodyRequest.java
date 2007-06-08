@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.messages;
+package org.objectweb.proactive.core.remoteobject.http.util.messages;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +38,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpUtils;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 
 

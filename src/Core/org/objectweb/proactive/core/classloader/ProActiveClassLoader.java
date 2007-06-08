@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -134,7 +135,9 @@ public class ProActiveClassLoader extends URLClassLoader {
                 name.startsWith("sun.") || name.startsWith("com.sun.") ||
                 name.startsWith("org.xml.sax") || name.startsWith("org.omg") ||
                 name.startsWith("org.ietf.jgss") ||
-                name.startsWith("org.w3c.dom") || name.startsWith("com.ibm")) {
+                name.startsWith("org.w3c.dom") || name.startsWith("com.ibm") ||
+                name.startsWith("org.jcp") || name.startsWith("org.apache") ||
+                name.contains("org.objectweb.proactive.core")) {
             return getParent().loadClass(name);
         }
         if (name.equals("org.objectweb.proactive.core.ssh.http.Handler")) {

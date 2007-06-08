@@ -41,7 +41,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 import functionalTests.FunctionalTest;
-
+import static junit.framework.Assert.assertTrue;
 
 /**
  * 2 steps hierarchical deployment with dynamic classloading through runtimes.
@@ -90,6 +90,8 @@ public class Test extends FunctionalTest {
         A a = (A) ProActive.newActive("functionalTests.runtime.classloader.A",
                 new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
         a.createActiveObjectB();
+
+        assertTrue(true);
     }
 
     private void searchAndReplace(String oldFilePath, String newFilePath,

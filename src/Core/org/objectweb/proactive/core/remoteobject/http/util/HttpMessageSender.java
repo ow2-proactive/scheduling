@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util;
+package org.objectweb.proactive.core.remoteobject.http.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -40,7 +40,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
+import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 
 
 /**

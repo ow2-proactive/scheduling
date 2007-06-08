@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util;
+package org.objectweb.proactive.core.remoteobject.http.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

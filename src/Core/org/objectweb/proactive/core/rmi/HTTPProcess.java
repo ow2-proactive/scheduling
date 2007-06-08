@@ -33,8 +33,8 @@ package org.objectweb.proactive.core.rmi;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 
 
 /**
@@ -53,25 +53,6 @@ public class HTTPProcess {
         this.info = info;
         this.in = in;
     }
-
-    //    private void  test () {
-    //        
-    //        int b;
-    //        try {
-    //            b = in.read ();
-    //            int count = 0;
-    //            while (b != -1) {
-    //                b = in.read ();
-    //                count ++;
-    //            }
-    ////            System.out.println("TEST = " + count);
-    //        } catch (IOException e) {
-    //            // TODO Auto-generated catch block
-    //            e.printStackTrace();
-    //        }
-    //       
-    //        
-    //    }
 
     /**
      *

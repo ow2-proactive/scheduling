@@ -639,7 +639,7 @@ public abstract class MOP {
         }
     }
 
-    private static StubObject createStubObject(String nameOfBaseClass,
+    public static StubObject createStubObject(String nameOfBaseClass,
         Class targetClass, Class[] genericParameters)
         throws ClassNotFoundException, ReifiedCastException,
             ClassNotReifiableException {

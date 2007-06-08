@@ -38,6 +38,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -85,7 +86,7 @@ public class UrlBuilder {
      */
     public static String buildUrl(String host, String name, String protocol) {
         return buildUrl(host, name, protocol,
-            getDefaultPortForProtocol(protocol));
+            RemoteObjectFactory.getDefaultPortForProtocol(protocol));
     }
 
     /**
@@ -97,29 +98,6 @@ public class UrlBuilder {
      */
     public static String buildUrl(String host, String name) {
         return buildUrl(host, name, null);
-    }
-
-    /**
-     * returns the default port set for the given protocol
-     * @param protocol the protocol
-     * @return the default port number associated to the protocol
-     */
-    public static int getDefaultPortForProtocol(String protocol) {
-        if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            if (ProActiveConfiguration.getInstance()
-                                          .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
-                return Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                              .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT));
-            }
-        } else if ((Constants.RMI_PROTOCOL_IDENTIFIER.equals(protocol)) ||
-                Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol) ||
-                Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            return Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                          .getProperty(Constants.PROPERTY_PA_RMI_PORT));
-        }
-
-        // default would be to return the RMI default port
-        return -1;
     }
 
     /**
@@ -178,7 +156,7 @@ public class UrlBuilder {
 
     /**
      * This method build an url in the form protocol://host:port/name where the port
-     * is given from system propeties.
+     * and protocol are retrieved from system properties
      * @param host
      * @param name
      * @return an Url built from properties
@@ -239,11 +217,11 @@ public class UrlBuilder {
     public static String getNameFromUrl(String url) {
         URI u = URI.create(url);
         String path = u.getPath();
-        if (path != null) {
+        if ((path != null) && (path.startsWith("/"))) {
             // remove the intial '/'
             return path.substring(1);
         }
-        return null;
+        return path;
     }
 
     /**
@@ -261,11 +239,18 @@ public class UrlBuilder {
     /**
      * Returns the url without protocol
      */
-    public static String removeProtocol(String url, String protocol) {
-        if (url.startsWith(protocol)) {
-            return url.substring(protocol.length() + 1);
-        }
-        return url;
+
+    //    public static String removeProtocol(String url, String protocol) {
+    //        if (url.startsWith(protocol)) {
+    //            return url.substring(protocol.length() + 1);
+    //        }
+    //        return url;
+    //    }
+    public static String removeProtocol(String url) {
+        String tmp = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
+                UrlBuilder.getNameFromUrl(url), null,
+                UrlBuilder.getPortFromUrl(url));
+        return tmp;
     }
 
     public static String getHostNameFromUrl(String url) {
@@ -291,11 +276,7 @@ public class UrlBuilder {
     public static int getPortFromUrl(String url) {
         try {
             URI uri = new URI(url);
-            if (uri.getPort() != -1) {
-                return uri.getPort();
-            } else {
-                return getDefaultPortForProtocol(uri.getScheme());
-            }
+            return uri.getPort();
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
             return -1;
@@ -354,6 +335,10 @@ public class UrlBuilder {
      */
     public static String fromLocalhostToHostname(String localName)
         throws UnknownHostException {
+        if (localName == null) {
+            localName = "localhost";
+        }
+
         java.net.InetAddress hostInetAddress = java.net.InetAddress.getLocalHost();
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {

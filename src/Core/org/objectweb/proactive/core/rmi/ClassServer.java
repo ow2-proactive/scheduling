@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.rmi;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
@@ -47,6 +48,7 @@ public class ClassServer implements Runnable {
     protected static int MAX_RETRY = 500;
     private static java.util.Random random = new java.util.Random();
     protected static int port;
+    private boolean active = true;
 
     static {
         String newport;
@@ -81,12 +83,15 @@ public class ClassServer implements Runnable {
         if (port == 0) {
             port = boundServerSocket(Integer.parseInt(
                         ProActiveConfiguration.getInstance()
-                                              .getProperty("proactive.http.port")),
+                                              .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT)),
                     MAX_RETRY);
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
         }
+
+        ProActiveConfiguration.getInstance()
+                              .setProperty("proactive.http.port", port + "");
 
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
         //        System.out.println("URL du classServer : " + hostname + ":" + port);
@@ -113,7 +118,7 @@ public class ClassServer implements Runnable {
      * Constructs a ClassFileServer.
      * @param paths the classpath where the server locates classes
      */
-    public ClassServer(String paths) throws java.io.IOException {
+    protected ClassServer(String paths) throws java.io.IOException {
         this(0, paths);
     }
 
@@ -149,8 +154,7 @@ public class ClassServer implements Runnable {
         }
 
         if (this.paths == null) {
-            logger.info(
-                " --> This ClassFileServer is reading resources from classpath " +
+            logger.info(" --> This ClassFileServer is listening on port " +
                 port);
         } else {
             logger.info(
@@ -200,7 +204,7 @@ public class ClassServer implements Runnable {
         java.net.Socket socket = null;
 
         // accept a connection
-        while (true) {
+        while (active) {
             try {
                 socket = server.accept();
 
@@ -218,6 +222,9 @@ public class ClassServer implements Runnable {
 
     private void newListener() {
         Thread t = new Thread(this, "ClassServer-" + hostname + ":" + port);
+
+        //        MyShutdownHook shutdownHook = new MyShutdownHook();
+        //        Runtime.getRuntime().addShutdownHook(shutdownHook);
         t.setDaemon(true);
         t.start();
     }
@@ -230,7 +237,6 @@ public class ClassServer implements Runnable {
                 return basePortNumber;
             } catch (java.io.IOException e) {
                 basePortNumber += random.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
-                System.setProperty("proactive.http.port", basePortNumber + "");
             }
         }
 

@@ -119,8 +119,7 @@ public class RmiRuntimeFactory extends RuntimeFactory {
         //if (s == null) return null;
         try {
             RemoteProActiveRuntime remoteProActiveRuntime;
-            String URL = UrlBuilder.removeProtocol(s,
-                    Constants.RMI_PROTOCOL_IDENTIFIER);
+            String URL = UrlBuilder.removeProtocol(s);
             remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(URL);
             //System.out.println(remoteProActiveRuntime.getClass().getName());
             return createRuntimeAdapter(remoteProActiveRuntime);

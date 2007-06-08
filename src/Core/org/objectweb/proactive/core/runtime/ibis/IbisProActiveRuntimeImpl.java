@@ -430,11 +430,9 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         throws RemoteException {
         try {
             if (replacePreviousBinding) {
-                Naming.rebind(UrlBuilder.removeProtocol(url,
-                        Constants.IBIS_PROTOCOL_IDENTIFIER), this);
+                Naming.rebind(UrlBuilder.removeProtocol(url), this);
             } else {
-                Naming.bind(UrlBuilder.removeProtocol(url,
-                        Constants.IBIS_PROTOCOL_IDENTIFIER), this);
+                Naming.bind(UrlBuilder.removeProtocol(url), this);
             }
 
             if (url.indexOf("PA_JVM") < 0) {
@@ -451,8 +449,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
     private void unregister(String url) throws RemoteException {
         try {
-            Naming.unbind(UrlBuilder.removeProtocol(url,
-                    Constants.IBIS_PROTOCOL_IDENTIFIER));
+            Naming.unbind(UrlBuilder.removeProtocol(url));
 
             if (url.indexOf("PA_JVM") < 0) {
                 runtimeLogger.info(url + " unbound in registry");

@@ -97,5 +97,6 @@
 
 		<!-- Workaround to fix rmissh/unicore conflict -->
 		<prop key="proactive.unicore.forkclient" value="true" />
+		<prop key="proactive.runtime.stayalive" value="true" />
 	</properties>
 </ProActiveUserProperties>

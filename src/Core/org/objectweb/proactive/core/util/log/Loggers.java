@@ -166,4 +166,8 @@ public interface Loggers {
         ".slavemanager";
     static final public String MASTERSLAVE_PINGER = MASTERSLAVE + ".pinger";
     static final public String MASTERSLAVE_SLAVES = MASTERSLAVE + ".slaves";
+
+    // remote Objects
+    static final public String REMOTEOBJECT = CORE + ".remoteobject";
+    public static final String CLASS_SERVER = CORE + ".class_server";
 }

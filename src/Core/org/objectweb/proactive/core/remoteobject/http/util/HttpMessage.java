@@ -28,20 +28,43 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.exceptions;
+package org.objectweb.proactive.core.remoteobject.http.util;
+
+import java.io.Serializable;
+
+import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 
 
 /**
- * @author sbeucler
- *
- * @see java.rmi.UnexpectedException
+ * This interface is used to encapsulate any kind of HTTP message.
+ * @author vlegrand
+ * @see java.io.Serializable
  */
-public class HTTPUnexpectedException extends HTTPRemoteException {
-    public HTTPUnexpectedException(String s) {
-        super(s);
+public abstract class HttpMessage implements Serializable {
+    protected Object returnedObject;
+    protected String url;
+
+    //    private int port;
+    public HttpMessage(String url) {
+        this.url = url;
+        //        this.port = port;
     }
 
-    public HTTPUnexpectedException(String s, Throwable ex) {
-        super(s, ex);
+    /**
+     * Processes the message.
+     * @return an object as a result of the execution of the message
+     */
+    public abstract Object processMessage() throws Exception;
+
+    public boolean isOneWay() {
+        return false;
+    }
+
+    /**
+     * @throws HTTPRemoteException
+     */
+    public final void send() throws HTTPRemoteException {
+        HttpMessageSender hms = new HttpMessageSender(this.url);
+        this.returnedObject = hms.sendMessage(this);
     }
 }

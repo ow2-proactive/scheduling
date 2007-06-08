@@ -47,7 +47,7 @@ import org.apache.soap.server.RPCRouter;
 import org.apache.soap.util.Provider;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 

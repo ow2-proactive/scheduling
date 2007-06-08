@@ -30,13 +30,17 @@
  */
 package org.objectweb.proactive.core.descriptor.services;
 
+import java.io.IOException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
+import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -58,8 +62,10 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     protected static String serviceName = P2P_NODE_NAME;
     protected int askedNodes = 0;
     protected P2PService serviceP2P;
+    protected int port;
     private Vector peerList;
     protected String nodeFamilyRegexp = null;
+    private String acquistion;
 
     public P2PDescriptorService() {
     }
@@ -68,7 +74,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @see org.objectweb.proactive.core.descriptor.services.UniversalService#startService()
      */
     public ProActiveRuntime[] startService() throws ProActiveException {
-        if (serviceP2P == null) {
+        if (this.serviceP2P == null) {
             // Testing  if a P2P ssrvice is already running ?
             P2PService precedentService = this.getPrecedentService();
             if (precedentService != null) {
@@ -77,6 +83,28 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                 this.serviceP2P.firstContact(this.peerList);
             } else {
                 // Start a new one
+                try {
+                    JVMProcessImpl process = new JVMProcessImpl(new StandardOutputMessageLogger());
+                    process.setClassname(
+                        "org.objectweb.proactive.p2p.service.StartP2PService");
+
+                    if (this.acquistion == null) {
+                        this.acquistion = ProActiveConfiguration.getInstance()
+                                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+                    }
+
+                    process.setParameters("-port " + this.port + " -acq " +
+                        this.acquistion);
+
+                    process.startProcess();
+                    Thread.sleep(7000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 StartP2PService startServiceP2P = new StartP2PService(this.peerList);
                 startServiceP2P.start();
                 this.serviceP2P = startServiceP2P.getP2PService();
@@ -97,7 +125,6 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                 Integer.parseInt(ProActiveConfiguration.getInstance()
                                                        .getProperty(PROPERTY_PORT)));
 
-        ;
         try {
             Node serviceNode = NodeFactory.getNode(url);
             Object[] ao = serviceNode.getActiveObjects(P2PService.class.getName());
@@ -108,13 +135,13 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                 return (P2PService) ao[0];
             } else {
                 if (logger.isInfoEnabled()) {
-                    logger.info("No P2P service is runned");
+                    logger.info("No P2P service is running");
                 }
                 return null;
             }
         } catch (Exception e) {
             if (logger.isInfoEnabled()) {
-                logger.info("No P2P service is runned");
+                logger.info("No P2P service is running");
             }
             return null;
         }
@@ -124,7 +151,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @return Returns the askedNodes.
      */
     public int getNodeNumber() {
-        return askedNodes;
+        return this.askedNodes;
     }
 
     /**
@@ -157,6 +184,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @param acq the acquisition method.
      */
     public void setAcq(String acq) {
+        this.acquistion = acq;
         System.setProperty(PROPERTY_ACQUISITION, acq);
     }
 
@@ -165,6 +193,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @param port the listening port.
      */
     public void setPort(String port) {
+        this.port = Integer.parseInt(port);
         System.setProperty(PROPERTY_PORT, port);
     }
 

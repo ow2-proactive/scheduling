@@ -61,8 +61,7 @@ public class RMIRegistryLookupService implements UniversalService {
      */
     public ProActiveRuntime[] startService() throws ProActiveException {
         ProActiveRuntime part = RuntimeFactory.getRuntime(UrlBuilder.removeProtocol(
-                    url,
-                    org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER),
+                    url),
                 org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER);
         runtimeArray[0] = part;
         return runtimeArray;

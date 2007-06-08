@@ -89,7 +89,7 @@ public class StartRuntime {
             this.nodeNumber = args[2];
 
             //   this.portNumber = Integer.parseInt(args[4]);
-            this.nodenumber = (new Integer(nodeNumber)).intValue();
+            this.nodenumber = (new Integer(this.nodeNumber)).intValue();
             this.protocolId = args[3];
             this.vmName = args[4];
         }
@@ -128,6 +128,16 @@ public class StartRuntime {
         }
 
         new StartRuntime(args).run();
+        if (System.getProperty("proactive.runtime.stayalive") != null) {
+            Object o = new Object();
+            synchronized (o) {
+                try {
+                    o.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -137,15 +147,25 @@ public class StartRuntime {
      */
     private void run() {
         ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        impl.getVMInformation().setCreationProtocolID(protocolId);
+        impl.getVMInformation().setCreationProtocolID(this.protocolId);
 
-        if (defaultRuntimeURL != null) {
+        if (this.defaultRuntimeURL != null) {
             ProActiveRuntime PART;
             try {
-                PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
-                        UrlBuilder.getProtocol(defaultRuntimeURL));
+                PART = RuntimeFactory.getRuntime(this.defaultRuntimeURL,
+                        UrlBuilder.getProtocol(this.defaultRuntimeURL));
                 register(PART);
                 impl.setParent(PART);
+
+                Object o = new Object();
+                synchronized (o) {
+                    try {
+                        o.wait();
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
             } catch (ProActiveException e) {
                 e.printStackTrace();
                 //				 if we cannot get the parent, this jvm is useless
@@ -161,14 +181,14 @@ public class StartRuntime {
      */
     private void register(ProActiveRuntime PART) {
         try {
-            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
-                                                                                               .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+            this.proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
+                                                                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
 
-            PART.register(proActiveRuntime, proActiveRuntime.getURL(),
-                creatorID,
+            PART.register(this.proActiveRuntime,
+                this.proActiveRuntime.getURL(), this.creatorID,
                 ProActiveConfiguration.getInstance()
                                       .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
-                vmName);
+                this.vmName);
         } catch (ProActiveException e) {
             e.printStackTrace();
 

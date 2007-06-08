@@ -38,9 +38,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.http.util.HTTPRegistry;
-import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedException;
-import org.objectweb.proactive.core.body.http.util.messages.HttpLookupMessage;
+import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
+import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPUnexpectedException;
+import org.objectweb.proactive.core.remoteobject.http.util.messages.HttpLookupMessage;
 import org.objectweb.proactive.core.rmi.ClassServer;
 
 
@@ -90,7 +90,10 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
         } catch (MalformedURLException e) {
             url = ClassServer.getUrl() + urn;
         }
-        HTTPRegistry.getInstance().bind(urn, this);
+
+        // TODO register in the http registry has been disabled
+        // until a full remote object convertion
+        //        HTTPRegistry.getInstance().bind(urn, this);
         //        urn = urn.substring(urn.lastIndexOf('/') + 1);
         if (bodyLogger.isInfoEnabled()) {
             bodyLogger.info("register object  at " + url);
@@ -134,7 +137,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
         urn = u.getPath();
         HttpLookupMessage message = new HttpLookupMessage(urn, url, port);
         message.send();
-        UniversalBody result = message.getReturnedObject();
+        UniversalBody result = (UniversalBody) message.getReturnedObject();
         if (result == null) {
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
@@ -170,7 +173,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @return the body mapping the urn
      */
     public static synchronized UniversalBody getBodyFromUrn(String urn) {
-        return HTTPRegistry.getInstance().lookup(urn);
+        return (UniversalBody) HTTPRegistry.getInstance().lookup(urn);
     }
 
     /**

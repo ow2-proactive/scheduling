@@ -28,27 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.exceptions;
-
-import java.io.IOException;
+package org.objectweb.proactive.core.remoteobject.http.util.exceptions;
 
 
 /**
- * Exception raised when problems occur in HTTP communications
  * @author sbeucler
- * @see java.rmi.RemoteException
+ *
+ * @see java.rmi.UnexpectedException
  */
-public class HTTPRemoteException extends IOException {
-    public HTTPRemoteException() {
-        super();
-    }
-
-    public HTTPRemoteException(String s) {
+public class HTTPUnexpectedException extends HTTPRemoteException {
+    public HTTPUnexpectedException(String s) {
         super(s);
     }
 
-    public HTTPRemoteException(String s, Throwable ex) {
-        super(s);
-        initCause(ex);
+    public HTTPUnexpectedException(String s, Throwable ex) {
+        super(s, ex);
     }
 }

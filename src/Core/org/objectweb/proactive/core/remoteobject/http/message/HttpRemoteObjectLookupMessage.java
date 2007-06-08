@@ -28,13 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.messages;
+package org.objectweb.proactive.core.remoteobject.http.message;
 
 import java.io.Serializable;
+import java.net.URI;
 
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.http.HTTPRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.http.HttpRemoteObjectImpl;
+import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 
 
 /**
@@ -42,7 +47,8 @@ import org.objectweb.proactive.core.body.http.util.HttpMessage;
  * @author vlegrand
  * @see HttpMessage
  */
-public class HttpLookupMessage extends HttpMessage implements Serializable {
+public class HttpRemoteObjectLookupMessage extends HttpMessage
+    implements Serializable {
     private String urn;
 
     //Caller Side
@@ -51,8 +57,8 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
      * Constructs an HTTP Message
      * @param urn The urn of the Object (it can be an active object or a runtime).
      */
-    public HttpLookupMessage(String urn, String url, int port) {
-        super(url);
+    public HttpRemoteObjectLookupMessage(String urn, URI url, int port) {
+        super(url.toString());
         this.urn = urn;
         if (!this.urn.startsWith("/")) {
             this.urn = "/" + urn;
@@ -63,8 +69,8 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
      * Get the returned object.
      * @return the returned object
      */
-    public UniversalBody getReturnedObject() {
-        return (UniversalBody) this.returnedObject;
+    public RemoteRemoteObject getReturnedObject() {
+        return (RemoteRemoteObject) this.returnedObject;
     }
 
     //Callee side
@@ -76,9 +82,19 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
     @Override
     public Object processMessage() {
         if (this.urn != null) {
-            UniversalBody ub = HttpBodyAdapter.getBodyFromUrn(urn);
-            if (ub != null) {
-                this.returnedObject = ub;
+            RemoteObject ro = HTTPRegistry.getInstance().lookup(url);
+
+            //            System.out.println("HttpRemoteObjectLookupMessage.processMessage() ++ ro at " + url +" : " +ro) ;
+            if (ro != null) {
+                RemoteRemoteObject rro = null;
+                try {
+                    rro = new HTTPRemoteObjectFactory().newRemoteObject(ro);
+                    ((HttpRemoteObjectImpl) rro).setURI(URI.create(url));
+                } catch (ProActiveException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                this.returnedObject = rro;
             }
         }
         return this.returnedObject;

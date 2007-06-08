@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.finder;
 
+import java.net.URI;
 import java.rmi.ConnectException;
 import java.rmi.ConnectIOException;
 import java.rmi.registry.LocateRegistry;
@@ -37,16 +38,13 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
-import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 
 public class RMIHostRTFinder implements HostRTFinder{
 
@@ -86,9 +84,23 @@ public class RMIHostRTFinder implements HostRTFinder{
 			String name = names[i];
 			if (name.indexOf("PA_JVM") != -1) {
 				try {
-					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
-					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
-					runtimes.add(proActiveRuntime);
+//					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
+//					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
+					
+					URI url = new URI(Constants.RMI_PROTOCOL_IDENTIFIER,null,host.getHostName(),host.getPort(),"/"+name,null,null);
+					System.out.println("RMIHostRTFinder.findPARuntime()  "  + url);
+					RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(Constants.RMI_PROTOCOL_IDENTIFIER).lookup(url);  
+					
+					System.out.println("RMIHostRTFinder.findPARuntime()  "  + ro);
+					
+					Object stub = ro.getObjectProxy();
+					
+					System.out.println("RMIHostRTFinder.findPARuntime()  "  + stub);
+					if (stub instanceof ProActiveRuntime) {
+						runtimes.add((ProActiveRuntime ) stub);
+					}
+					
+					
 				} catch(Exception e) {
 					//System.out.println("RMIHostRTFinder.findPARuntime() ***"+host.getFullName());
 					console.debug(e);

@@ -28,11 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util;
+package org.objectweb.proactive.core.remoteobject.http.util;
 
 import java.util.HashMap;
 
-import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
 
 
 /**
@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 public class HTTPRegistry {
     private static final String REGISTRY_NAME = "HTTP_REGISTRY";
     private static HTTPRegistry instance;
-    private static HashMap<String, UniversalBody> bodyMap = new HashMap<String, UniversalBody>();
+    private static HashMap<String, RemoteObject> rRemteObjectMap = new HashMap<String, RemoteObject>();
 
     private HTTPRegistry() {
     }
@@ -64,8 +64,8 @@ public class HTTPRegistry {
      * @param name  the name of the body
      * @param body the body to be binded
      */
-    public void bind(String name, UniversalBody body) {
-        bodyMap.put(name, body);
+    public void bind(String name, RemoteObject body) {
+        rRemteObjectMap.put(name, body);
     }
 
     /**
@@ -73,7 +73,7 @@ public class HTTPRegistry {
      * @param name the name binded with a body
      */
     public void unbind(String name) {
-        bodyMap.remove(name);
+        rRemteObjectMap.remove(name);
     }
 
     /**
@@ -81,8 +81,8 @@ public class HTTPRegistry {
      * @return the names list
      */
     public String[] list() {
-        String[] list = new String[bodyMap.size()];
-        bodyMap.keySet().toArray(list);
+        String[] list = new String[rRemteObjectMap.size()];
+        rRemteObjectMap.keySet().toArray(list);
         return list;
     }
 
@@ -91,7 +91,7 @@ public class HTTPRegistry {
      * @param name The name of the body to be retrieved
      * @return the binded body
      */
-    public UniversalBody lookup(String name) {
-        return bodyMap.get(name);
+    public RemoteObject lookup(String name) {
+        return rRemteObjectMap.get(name);
     }
 }

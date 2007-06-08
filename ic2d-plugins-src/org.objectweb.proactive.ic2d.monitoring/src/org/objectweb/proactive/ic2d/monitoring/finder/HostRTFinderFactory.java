@@ -47,15 +47,16 @@ public class HostRTFinderFactory {
 	 * @return A HostRTFinder
 	 */
 	public static HostRTFinder createHostRTFinder(String protocol) {
-		if(protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER))
-			return new RMIHostRTFinder();
-		else if(protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER))
-			return new RMIHostRTFinder();
-		else if(protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER))
-			return new HttpHostRTFinder();
-		else if(protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER))
-			return new IbisHostRTFinder();
-		else
-			return null;
+//		if(protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER))
+//			return new RmiRemoteObjectHostFinder();
+//		else if(protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER))
+//			return new RmiRemoteObjectHostFinder();
+//		else if(protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER))
+//			return new HttpRemoteObjectHostRTFinder();
+//		else if(protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER))
+//			return new IbisHostRTFinder();
+//		else
+//			return null;
+		return new RemoteObjectHostRTFinder();
 	}
 }

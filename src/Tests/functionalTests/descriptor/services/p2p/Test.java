@@ -74,26 +74,26 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
-        process1.setClassname(
+        this.process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
+        this.process1.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
-        process1.setParameters("-port 2900");
+        this.process1.setParameters("-port 2900");
 
-        process = new JVMProcessImpl(new StandardOutputMessageLogger());
-        process.setClassname(
+        this.process = new JVMProcessImpl(new StandardOutputMessageLogger());
+        this.process.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
-        process.setParameters("-port 3000 -s //localhost:2900");
+        this.process.setParameters("-port 3000 -s //localhost:2900/");
 
-        process1.startProcess();
-        Thread.sleep(5000);
-        process.startProcess();
+        this.process1.startProcess();
         Thread.sleep(7000);
-        pad = ProActive.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);
-        pad.activateMappings();
-        VirtualNode vn = pad.getVirtualNode("p2pvn");
-        nodeTab = vn.getNodes();
+        this.process.startProcess();
+        Thread.sleep(7000);
+        this.pad = ProActive.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);
+        this.pad.activateMappings();
+        VirtualNode vn = this.pad.getVirtualNode("p2pvn");
+        this.nodeTab = vn.getNodes();
 
-        boolean resultTest = (nodeTab.length == 3);
+        boolean resultTest = (this.nodeTab.length == 3);
         this.process.stopProcess();
         this.process1.stopProcess();
 

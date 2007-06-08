@@ -129,6 +129,9 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
             this.proActiveRuntimeURL = buildRuntimeURL();
 
             try {
+                System.out.println("RmiProActiveRuntimeImpl.construct() url " +
+                    proActiveRuntimeURL);
+
                 //java.rmi.Naming.bind(proActiveRuntimeURL, this);
                 register(proActiveRuntimeURL, false);
                 registerAttempts = 0; //registration was ok
@@ -415,11 +418,9 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
         try {
             if (replacePreviousBinding) {
-                java.rmi.Naming.rebind(UrlBuilder.removeProtocol(url,
-                        getProtocol()), this);
+                java.rmi.Naming.rebind(UrlBuilder.removeProtocol(url), this);
             } else {
-                java.rmi.Naming.bind(UrlBuilder.removeProtocol(url,
-                        getProtocol()), this);
+                java.rmi.Naming.bind(UrlBuilder.removeProtocol(url), this);
             }
 
             if (url.indexOf("PA_JVM") < 0) {
@@ -437,7 +438,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
 
     private void unregister(String url) throws java.rmi.RemoteException {
         try {
-            java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url, getProtocol()));
+            java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url));
 
             if (url.indexOf("PA_JVM") < 0) {
                 runtimeLogger.info(url + " unbound in registry");

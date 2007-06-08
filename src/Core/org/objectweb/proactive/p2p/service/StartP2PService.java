@@ -502,9 +502,10 @@ public class StartP2PService implements P2PConstants {
         String url = null;
 
         try {
-            url = paRuntime.createLocalNode(P2PConstants.P2P_NODE_NAME, false,
-                    null, paRuntime.getVMInformation().getName(),
-                    paRuntime.getJobID());
+            url = paRuntime.createLocalNode(UrlBuilder.buildUrl("localhost",
+                        P2PConstants.P2P_NODE_NAME, acquisitionMethod,
+                        Integer.parseInt(portNumber)), false, null,
+                    paRuntime.getVMInformation().getName(), paRuntime.getJobID());
         } catch (AlreadyBoundException e) {
             logger.warn("This name " + P2PConstants.P2P_NODE_NAME +
                 " is already bound in the registry", e);
@@ -562,7 +563,7 @@ public class StartP2PService implements P2PConstants {
         private String xml_path = ProActiveConfiguration.getInstance()
                                                         .getProperty(PROPERPY_XML_PATH);
         private String peerListFile = null;
-        private Vector peers = new Vector();
+        private final Vector peers = new Vector();
         private String no_sharing = ProActiveConfiguration.getInstance()
                                                           .getProperty(PROPERTY_NO_SHARING);
     }

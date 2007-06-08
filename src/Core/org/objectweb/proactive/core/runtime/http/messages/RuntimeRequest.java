@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.objectweb.proactive.core.body.http.util.messages.ReflectRequest;
+import org.objectweb.proactive.core.remoteobject.http.util.messages.ReflectRequest;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 

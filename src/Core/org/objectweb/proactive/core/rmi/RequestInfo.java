@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpUtils;
 
 
 public class RequestInfo {

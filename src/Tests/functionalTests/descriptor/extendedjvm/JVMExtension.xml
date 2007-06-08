@@ -64,6 +64,7 @@
 				     <absolutePath value="proactive.home/lib/xercesImpl.jar"/>
 				     <absolutePath value="proactive.home/lib/bouncycastle.jar"/>
 				     <absolutePath value="proactive.home/lib/components/fractal.jar"/>
+				     <absolutePath value="proactive.home/lib/javassist.jar"/>
 					</classpath>
 					<policyFile>
 						  <absolutePath value="proactive.home/src/Tests/functionalTests/descriptor/extendedjvm/test.policy"/>

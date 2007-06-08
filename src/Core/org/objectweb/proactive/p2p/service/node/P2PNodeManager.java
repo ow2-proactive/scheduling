@@ -50,7 +50,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -67,9 +69,9 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Node p2pServiceNode = null;
     private ProActiveRuntime proactiveRuntime = null;
-    private Vector<Node> availbaleNodes = new Vector<Node>();
-    private Vector<Object> bookedNodes = new Vector<Object>();
-    private Vector usingNodes = new Vector();
+    private final Vector<Node> availbaleNodes = new Vector<Node>();
+    private final Vector<Object> bookedNodes = new Vector<Object>();
+    private final Vector usingNodes = new Vector();
     private int nodeCounter = 0;
     private final String descriptorPath = ProActiveConfiguration.getInstance()
                                                                 .getProperty(PROPERPY_XML_PATH);
@@ -274,7 +276,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      */
     private Node createNewNode()
         throws NodeException, ProActiveException, AlreadyBoundException {
-        // security 
+        // security
         ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
         ProActiveSecurityManager newNodeSecurityManager = null;
         if (psm != null) {
@@ -284,9 +286,13 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                            .debug("Node created without security manager");
         }
 
-        Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
-                "_" + this.nodeCounter++, true, newNodeSecurityManager,
-                P2PConstants.VN_NAME);
+        Node newNode = NodeFactory.createNode(UrlBuilder.buildUrl("localhost",
+                    P2PConstants.SHARED_NODE_NAME + "_" + this.nodeCounter++,
+                    UrlBuilder.getProtocol(ProActiveRuntimeImpl.getProActiveRuntime()
+                                                               .getURL()),
+                    UrlBuilder.getPortFromUrl(ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                  .getURL())),
+                true, newNodeSecurityManager, P2PConstants.VN_NAME);
         this.availbaleNodes.add(newNode);
         logger.info("New shared node created @" +
             newNode.getNodeInformation().getURL());
@@ -351,7 +357,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         }
 
         // Killing deployed nodes at the JVM shutdown
-        XmlNodeKiller killer = new XmlNodeKiller(pad);
+        XmlNodeKiller killer = new XmlNodeKiller(this.pad);
         Runtime.getRuntime().addShutdownHook(new Thread(killer));
 
         logger.info(this.availbaleNodes.size() + " shared nodes deployed");

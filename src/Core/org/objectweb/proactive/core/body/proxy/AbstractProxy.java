@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.body.proxy;
 
-
-//import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;

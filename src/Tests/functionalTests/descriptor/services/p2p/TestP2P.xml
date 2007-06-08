@@ -10,7 +10,6 @@
 			<map virtualNode="p2pvn">
 				<jvmSet>
 					<vmName value="Jvm1"/>
-					<vmName value="Jvm2"/>
 				</jvmSet>
 			</map>
 		</mapping>
@@ -19,11 +18,6 @@
 				<acquisition>
 					<serviceReference refid="p2pservice"/>
 				</acquisition>
-			</jvm>
-			<jvm name="Jvm2">
-				<creation>
-					<processReference refid="localJVM"></processReference>
-				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
@@ -41,7 +35,7 @@
 			<serviceDefinition id="p2pservice">
 				<P2PService nodesAsked="2" port="2410" NOA="10" TTU="60000" TTL="10">
 					<peerSet>
-						<peer>rmi://localhost:3000</peer>
+						<peer>//localhost:3000/</peer>
 					</peerSet>
 				</P2PService>
 			</serviceDefinition>

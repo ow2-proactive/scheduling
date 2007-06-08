@@ -116,7 +116,7 @@ public class IbisRuntimeFactory extends RuntimeFactory {
 
         try {
             RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) ibis.rmi.Naming.lookup(UrlBuilder.removeProtocol(
-                        s, "ibis:"));
+                        s));
 
             if (runtimeLogger.isDebugEnabled()) {
                 runtimeLogger.debug(remoteProActiveRuntime.getClass().getName());
