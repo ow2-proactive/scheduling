@@ -1,6 +1,5 @@
 package org.objectweb.proactive.core.remoteobject;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.URI;
 import java.security.PublicKey;
@@ -30,16 +29,12 @@ public class RemoteObjectAdapter implements RemoteObject {
     public RemoteObjectAdapter() {
     }
 
-    public RemoteObjectAdapter(RemoteRemoteObject ro) {
+    public RemoteObjectAdapter(RemoteRemoteObject ro) throws ProActiveException{
         this.remoteObject = ro;
         try {
             this.uri = ro.getURI();
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ProActiveException(e);
         }
     }
 
@@ -53,7 +48,7 @@ public class RemoteObjectAdapter implements RemoteObject {
                     this.remoteObject.receiveMessage(message);
                     return new SynchronousReplyImpl();
                 } catch (RemoteObjectConnection roc) {
-                    // unmarchalling exception could occurs 
+                    // unmarchalling exception could occurs
                     // means that remote object has been killed
                     return new SynchronousReplyImpl();
                 }
@@ -63,7 +58,7 @@ public class RemoteObjectAdapter implements RemoteObject {
         } catch (IOException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to contact remote object at " +
-                uri.toString() + " when calling " + message.getMethodName());
+                this.uri.toString() + " when calling " + message.getMethodName());
             //e.printStackTrace();
             //            throw new ProActiveException(e.getMessage());
             return new SynchronousReplyImpl();

@@ -185,18 +185,18 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     protected long globalTimeOut;
     private Object uniqueActiveObject = null;
 
-    // Security 
+    // Security
     private ProActiveSecurityManager proactiveSecurityManager;
     protected String jobID = ProActive.getJobId();
 
     // FAULT TOLERANCE
     private FaultToleranceService ftService;
-    private Vector<Node> p2pNodes = new Vector<Node>();
+    private final Vector<Node> p2pNodes = new Vector<Node>();
 
     // PAD infos
     private boolean mainVirtualNode;
     private String padURL;
-    private Vector<P2PNodeLookup> p2pNodeslookupList = new Vector<P2PNodeLookup>();
+    private final Vector<P2PNodeLookup> p2pNodeslookupList = new Vector<P2PNodeLookup>();
 
     //REGISTRATION ATTEMPTS
     private final int REGISTRATION_ATTEMPTS = 2;
@@ -222,7 +222,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     VirtualNodeImpl(String name,
         ProActiveSecurityManager proactiveSecurityManager, String padURL,
         boolean isMainVN, ProActiveDescriptorInternal descriptor) {
-        // if we launch several times the same application 
+        // if we launch several times the same application
         // we have to change the name of the main VNs because of
         // the register, otherwise we will monitor each time all the last
         // main VNs with the same name.
@@ -232,21 +232,21 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             this.name = name;
         }
 
-        virtualMachines = new java.util.ArrayList<VirtualMachine>(5);
-        localVirtualMachines = new java.util.ArrayList<String>();
-        createdNodes = new java.util.ArrayList<Node>();
-        createdRuntimeF = new ArrayList<ProActiveRuntime>();
-        awaitedVirtualNodes = new Hashtable<String, VirtualMachine>();
-        fileTransferDeploy = new ArrayList<FileTransferDefinition>();
-        fileTransferDeployedStatus = new HashMap<String, FileVector>();
-        fileTransferRetrieve = new ArrayList<FileTransferDefinition>();
-        proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
-        overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
+        this.virtualMachines = new java.util.ArrayList<VirtualMachine>(5);
+        this.localVirtualMachines = new java.util.ArrayList<String>();
+        this.createdNodes = new java.util.ArrayList<Node>();
+        this.createdRuntimeF = new ArrayList<ProActiveRuntime>();
+        this.awaitedVirtualNodes = new Hashtable<String, VirtualMachine>();
+        this.fileTransferDeploy = new ArrayList<FileTransferDefinition>();
+        this.fileTransferDeployedStatus = new HashMap<String, FileVector>();
+        this.fileTransferRetrieve = new ArrayList<FileTransferDefinition>();
+        this.proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        this.fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
+        this.overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
 
         if (logger.isDebugEnabled()) {
             logger.debug("vn " + this.name + " registered on " +
-                proActiveRuntimeImpl.getVMInformation().getVMID().toString());
+                this.proActiveRuntimeImpl.getVMInformation().getVMID().toString());
         }
 
         // SECURITY
@@ -272,11 +272,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     public String getProperty() {
-        return property;
+        return this.property;
     }
 
     public long getTimeout() {
-        return timeout;
+        return this.timeout;
     }
 
     /**
@@ -302,11 +302,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void addVirtualMachine(VirtualMachine virtualMachine) {
-        if (isActivated) {
+        if (this.isActivated) {
             // Do not call this method when the VN has been activated or it will open the door
             // to various race conditions.
             logger.error(
@@ -315,10 +315,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             return;
         }
 
-        virtualMachines.add(virtualMachine);
+        this.virtualMachines.add(virtualMachine);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("mapped VirtualNode=" + name +
+            logger.debug("mapped VirtualNode=" + this.name +
                 " with VirtualMachine=" + virtualMachine.getName());
         }
     }
@@ -328,10 +328,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             return;
         }
 
-        fileTransferDeploy.add(ft);
+        this.fileTransferDeploy.add(ft);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("mapped VirtualNode=" + name +
+            logger.debug("mapped VirtualNode=" + this.name +
                 " with FileTransferDeploy id=" + ft.getId());
         }
     }
@@ -341,20 +341,20 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             return;
         }
 
-        fileTransferRetrieve.add(ft);
+        this.fileTransferRetrieve.add(ft);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("mapped VirtualNode=" + name +
+            logger.debug("mapped VirtualNode=" + this.name +
                 " with FileTransferRetrieve id=" + ft.getId());
         }
     }
 
     public VirtualMachine getVirtualMachine() {
-        if (virtualMachines.isEmpty()) {
+        if (this.virtualMachines.isEmpty()) {
             return null;
         }
 
-        VirtualMachine vm = (VirtualMachine) virtualMachines.get(lastVirtualMachineIndex);
+        VirtualMachine vm = this.virtualMachines.get(this.lastVirtualMachineIndex);
 
         return vm;
     }
@@ -366,7 +366,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return A VirtualMachine associated with the name parameter. If no VM is found then null is returned.
      */
     public VirtualMachine getVirtualMachine(String name) {
-        Iterator it = virtualMachines.iterator();
+        Iterator it = this.virtualMachines.iterator();
 
         while (it.hasNext()) {
             VirtualMachine vm = (VirtualMachine) it.next();
@@ -383,22 +383,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * Activates all the Nodes mapped to this VirtualNode in the XML Descriptor
      */
     public void activate() {
-        if (!isActivated) {
-            for (Iterator<VirtualMachine> it = virtualMachines.iterator();
+        if (!this.isActivated) {
+            for (Iterator<VirtualMachine> it = this.virtualMachines.iterator();
                     it.hasNext();) {
                 VirtualMachine vm = it.next();
 
                 if (vm.getCreatorId() == null) {
                     vm.setCreatorId(this.name);
                 } else {
-                    awaitedVirtualNodes.put(vm.getCreatorId(), vm);
+                    this.awaitedVirtualNodes.put(vm.getCreatorId(), vm);
                 }
             }
 
-            proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
-            proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
+            this.proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
+            this.proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
 
-            for (int i = 0; i < virtualMachines.size(); i++) {
+            for (int i = 0; i < this.virtualMachines.size(); i++) {
                 VirtualMachine vm = getVirtualMachine();
 
                 // first check if it is a process that is attached to the vm
@@ -439,12 +439,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                         // check if the first element is a Service or a process
                         if (((AbstractSequentialListProcessDecorator) process).isFirstElementIsService()) {
-                            UniversalService firstService = (UniversalService) ((AbstractSequentialListProcessDecorator) process).getFirstService();
+                            UniversalService firstService = ((AbstractSequentialListProcessDecorator) process).getFirstService();
 
                             //   It is a service that is mapped to the vm.
                             startService(firstService, vm);
-                            globalTimeOut = System.currentTimeMillis() +
-                                timeout;
+                            this.globalTimeOut = System.currentTimeMillis() +
+                                this.timeout;
 
                             try {
                                 waitForAllNodesCreation();
@@ -453,7 +453,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                 e.printStackTrace();
                             }
                         } else {
-                            ExternalProcess firstProcess = (ExternalProcess) ((AbstractSequentialListProcessDecorator) process).getFirstProcess();
+                            ExternalProcess firstProcess = ((AbstractSequentialListProcessDecorator) process).getFirstProcess();
 
                             // build the process with the rest of hierarchie
                             if (rankOfSequentialProcess > 0) {
@@ -465,9 +465,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                             setParameters(firstProcess, vm);
 
                             try {
-                                proActiveRuntimeImpl.createVM(firstProcess);
-                                globalTimeOut = System.currentTimeMillis() +
-                                    timeout;
+                                this.proActiveRuntimeImpl.createVM(firstProcess);
+                                this.globalTimeOut = System.currentTimeMillis() +
+                                    this.timeout;
                                 waitForAllNodesCreation();
                             } catch (java.io.IOException e) {
                                 e.printStackTrace();
@@ -480,7 +480,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                             ExternalProcess nextProcess = null;
 
                             // loop on each process in the sequence
-                            while ((nextProcess = (ExternalProcess) ((AbstractSequentialListProcessDecorator) process).getNextProcess()) != null) {
+                            while ((nextProcess = ((AbstractSequentialListProcessDecorator) process).getNextProcess()) != null) {
                                 boolean launchProcessManually = false;
 
                                 /* if process is a dependent process then each process
@@ -505,13 +505,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                                 if (!launchProcessManually) {
                                     setParameters(nextProcess, vm);
-                                    proActiveRuntimeImpl.createVM(nextProcess);
+                                    this.proActiveRuntimeImpl.createVM(nextProcess);
                                     // initialization of the global timeout
-                                    globalTimeOut = System.currentTimeMillis() +
-                                        timeout;
+                                    this.globalTimeOut = System.currentTimeMillis() +
+                                        this.timeout;
                                     waitForAllNodesCreation();
                                 } else {
-                                    mpiProcess = nextProcess;
+                                    this.mpiProcess = nextProcess;
                                 }
                             }
                         } catch (java.io.IOException e) {
@@ -529,7 +529,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                             try {
                                 // It is this virtual Node that originates the creation of the vm
-                                proActiveRuntimeImpl.createVM(process);
+                                this.proActiveRuntimeImpl.createVM(process);
                             } catch (java.io.IOException e) {
                                 e.printStackTrace();
                                 logger.error("cannot activate virtualNode " +
@@ -547,16 +547,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             // local nodes creation
-            for (int i = 0; i < localVirtualMachines.size(); i++) {
-                String protocol = localVirtualMachines.get(i);
+            for (int i = 0; i < this.localVirtualMachines.size(); i++) {
+                String protocol = this.localVirtualMachines.get(i);
                 internalCreateNodeOnCurrentJvm(protocol);
             }
 
             //initialization of the global timeout
-            globalTimeOut = System.currentTimeMillis() + timeout;
-            isActivated = true;
+            this.globalTimeOut = System.currentTimeMillis() + this.timeout;
+            this.isActivated = true;
 
-            if (registration) {
+            if (this.registration) {
                 register();
             }
 
@@ -579,11 +579,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return int, the termination status of the mpi process
      */
     public ExternalProcess getMPIProcess() {
-        return (ExternalProcess) makeDeepCopy(mpiProcess);
+        return (ExternalProcess) makeDeepCopy(this.mpiProcess);
     }
 
     public boolean hasMPIProcess() {
-        return !(mpiProcess == null);
+        return !(this.mpiProcess == null);
     }
 
     //returns the sequential process in the process hierarchie
@@ -621,7 +621,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 return res;
             } else {
                 res++;
-                process = ((ExternalProcess) ((ExternalProcessDecorator) process).getTargetProcess());
+                process = (((ExternalProcessDecorator) process).getTargetProcess());
             }
         }
 
@@ -633,7 +633,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return boolean
      */
     public boolean isMainVirtualNode() {
-        return mainVirtualNode;
+        return this.mainVirtualNode;
     }
 
     /**
@@ -641,7 +641,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return String
      */
     public String getPadURL() {
-        return padURL;
+        return this.padURL;
     }
 
     /**
@@ -649,7 +649,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @param isMainVirtualNode
      */
     public void setIsMainVirtualNode(boolean isMainVirtualNode) {
-        mainVirtualNode = isMainVirtualNode;
+        this.mainVirtualNode = isMainVirtualNode;
     }
 
     /**
@@ -665,12 +665,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNbMappedNodes()
      */
     public int getNbMappedNodes() {
-        if (isActivated) {
-            return nbMappedNodes;
+        if (this.isActivated) {
+            return this.nbMappedNodes;
         } else {
             int nbMappedNodesTmp = 0;
 
-            for (int i = 0; i < virtualMachines.size(); i++) {
+            for (int i = 0; i < this.virtualMachines.size(); i++) {
                 VirtualMachine vm = getVirtualMachine();
 
                 // first check if it is a process that is attached to the vm
@@ -705,7 +705,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
      */
     public int getNumberOfCurrentlyCreatedNodes() {
-        return nbCreatedNodes;
+        return this.nbCreatedNodes;
     }
 
     /*
@@ -719,7 +719,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             logger.error("Problem occured while waiting for nodes creation");
         }
 
-        return nbCreatedNodes;
+        return this.nbCreatedNodes;
     }
 
     /**
@@ -732,12 +732,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         Node node;
         waitForNodeCreation();
 
-        if (!createdNodes.isEmpty()) {
-            node = createdNodes.get(lastNodeIndex);
+        if (!this.createdNodes.isEmpty()) {
+            node = this.createdNodes.get(this.lastNodeIndex);
             increaseNodeIndex();
 
             //wait for pending file transfer
-            FileVector fw = fileTransferDeployedStatus.get(node.getNodeInformation()
+            FileVector fw = this.fileTransferDeployedStatus.get(node.getNodeInformation()
                                                                .getName());
 
             if (fw != null) {
@@ -747,21 +747,21 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             return node;
         } else {
             throw new NodeException("Cannot get a node from Virtual Node " +
-                this.name + ". Descriptor in use : \"" + descriptorURL + "\".");
+                this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
         }
     }
 
     @Deprecated
     public Node getNode(int index) throws NodeException {
-        Node node = createdNodes.get(index);
+        Node node = this.createdNodes.get(index);
 
         if (node == null) {
             throw new NodeException(
                 "Cannot return the first node, no nodes hava been created for Virtual Node " +
-                this.name + ". Descriptor in use : \"" + descriptorURL + "\".");
+                this.name + ". Descriptor in use : \"" + this.descriptorURL + "\".");
         }
 
-        FileVector fw = fileTransferDeployedStatus.get(node.getNodeInformation()
+        FileVector fw = this.fileTransferDeployedStatus.get(node.getNodeInformation()
                                                            .getName());
 
         if (fw != null) {
@@ -780,20 +780,20 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             logger.error(e.getMessage());
         }
 
-        if (!createdNodes.isEmpty()) {
-            synchronized (createdNodes) {
-                nodeNames = new String[createdNodes.size()];
+        if (!this.createdNodes.isEmpty()) {
+            synchronized (this.createdNodes) {
+                nodeNames = new String[this.createdNodes.size()];
 
-                for (int i = 0; i < createdNodes.size(); i++) {
-                    nodeNames[i] = createdNodes.get(i).getNodeInformation()
+                for (int i = 0; i < this.createdNodes.size(); i++) {
+                    nodeNames[i] = this.createdNodes.get(i).getNodeInformation()
                                                .getURL();
                 }
             }
         } else {
-            if (!MAX_P2P) {
+            if (!this.MAX_P2P) {
                 throw new NodeException(
                     "Cannot return nodes, no nodes have been created for Virtual Node " +
-                    this.name + ". Descriptor in use : \"" + descriptorURL +
+                    this.name + ". Descriptor in use : \"" + this.descriptorURL +
                     "\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
@@ -817,19 +817,19 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             logger.error(e.getMessage());
         }
 
-        if (!createdNodes.isEmpty()) {
-            synchronized (createdNodes) {
-                nodeTab = new Node[createdNodes.size()];
+        if (!this.createdNodes.isEmpty()) {
+            synchronized (this.createdNodes) {
+                nodeTab = new Node[this.createdNodes.size()];
 
-                for (int i = 0; i < createdNodes.size(); i++) {
-                    nodeTab[i] = createdNodes.get(i);
+                for (int i = 0; i < this.createdNodes.size(); i++) {
+                    nodeTab[i] = this.createdNodes.get(i);
                 }
             }
         } else {
-            if (!MAX_P2P) {
+            if (!this.MAX_P2P) {
                 throw new NodeException(
                     "Cannot return nodes, no nodes have been created for Virtual Node " +
-                    this.name + ". Descriptor in use : \"" + descriptorURL +
+                    this.name + ". Descriptor in use : \"" + this.descriptorURL +
                     "\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
@@ -853,12 +853,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             logger.error(e.getMessage());
         }
 
-        if (!createdNodes.isEmpty()) {
-            synchronized (createdNodes) {
-                for (int i = 0; i < createdNodes.size(); i++) {
-                    if (createdNodes.get(i).getNodeInformation().getURL()
+        if (!this.createdNodes.isEmpty()) {
+            synchronized (this.createdNodes) {
+                for (int i = 0; i < this.createdNodes.size(); i++) {
+                    if (this.createdNodes.get(i).getNodeInformation().getURL()
                                         .equals(url)) {
-                        node = createdNodes.get(i);
+                        node = this.createdNodes.get(i);
 
                         break;
                     }
@@ -869,7 +869,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             throw new NodeException(
                 "Cannot return nodes, no nodes hava been created. Descriptor in use : \"" +
-                descriptorURL + "\".");
+                this.descriptorURL + "\".");
         }
     }
 
@@ -877,7 +877,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         Node node;
         ProActiveRuntime part = null;
 
-        if (isActivated) {
+        if (this.isActivated) {
             // Killing p2p nodes
             if (this.p2pNodeslookupList.size() > 0) {
                 for (int index = 0; index < this.p2pNodeslookupList.size();
@@ -888,8 +888,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             // Killing other nodes
-            for (int i = 0; i < createdNodes.size(); i++) {
-                node = createdNodes.get(i);
+            for (int i = 0; i < this.createdNodes.size(); i++) {
+                node = this.createdNodes.get(i);
                 part = node.getProActiveRuntime();
 
                 if (this.p2pNodes.contains(node)) {
@@ -921,16 +921,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 }
             }
 
-            isActivated = false;
+            this.isActivated = false;
 
             try {
                 //if registered in any regigistry, unregister everything
-                if (registration) {
+                if (this.registration) {
                     ProActive.unregisterVirtualNode(this);
                 }
                 //else unregister just in the local runtime
                 else {
-                    proActiveRuntimeImpl.unregisterVirtualNode(this.name);
+                    this.proActiveRuntimeImpl.unregisterVirtualNode(this.name);
                 }
             } catch (ProActiveException e) {
                 e.printStackTrace();
@@ -938,11 +938,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             // if not activated unregister it from the local runtime
         } else {
-            proActiveRuntimeImpl.unregisterVirtualNode(this.name);
+            this.proActiveRuntimeImpl.unregisterVirtualNode(this.name);
         }
 
-        for (int i = 0; i < createdRuntimeF.size(); i++) {
-            part = createdRuntimeF.get(i);
+        for (int i = 0; i < this.createdRuntimeF.size(); i++) {
+            part = this.createdRuntimeF.get(i);
 
             try {
                 part.killRT(true);
@@ -962,16 +962,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         }
 
-        localVirtualMachines.add(protocol);
+        this.localVirtualMachines.add(protocol);
     }
 
     public Object getUniqueAO() throws ProActiveException {
-        if (!property.equals("unique_singleAO")) {
+        if (!this.property.equals("unique_singleAO")) {
             logger.warn(
                 "!!!!!!!!!!WARNING. This VirtualNode is not defined with unique_single_AO property in the XML descriptor. Calling getUniqueAO() on this VirtualNode can lead to unexpected behaviour");
         }
 
-        if (uniqueActiveObject == null) {
+        if (this.uniqueActiveObject == null) {
             try {
                 Node node = getNode();
 
@@ -980,22 +980,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         "!!!!!!!!!!WARNING. More than one active object is created on this VirtualNode.");
                 }
 
-                uniqueActiveObject = node.getActiveObjects()[0];
+                this.uniqueActiveObject = node.getActiveObjects()[0];
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        if (uniqueActiveObject == null) {
+        if (this.uniqueActiveObject == null) {
             throw new ProActiveException(
                 "No active object are registered on this VirtualNode");
         }
 
-        return uniqueActiveObject;
+        return this.uniqueActiveObject;
     }
 
     public boolean isActivated() {
-        return isActivated;
+        return this.isActivated;
     }
 
     /**
@@ -1030,19 +1030,19 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             // Try to avoid the contention at EventListener level
             // A listener shouldn't perform long computation, so a thread is spawned
-            rrThreadpool.execute(new RuntimeRegisteredPerform(event));
+            this.rrThreadpool.execute(new RuntimeRegisteredPerform(event));
         }
     }
 
     private class RuntimeRegisteredPerform implements Runnable {
-        private RuntimeRegistrationEvent event;
+        private final RuntimeRegistrationEvent event;
 
         public RuntimeRegisteredPerform(RuntimeRegistrationEvent _event) {
             this.event = _event;
         }
 
         public void run() {
-            runtimeRegisteredPerform(event);
+            runtimeRegisteredPerform(this.event);
         }
     }
 
@@ -1050,10 +1050,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         RuntimeRegistrationEvent event) {
         VirtualMachine virtualMachine = null;
 
-        for (int i = 0; i < virtualMachines.size(); i++) {
-            if (((VirtualMachine) virtualMachines.get(i)).getName()
+        for (int i = 0; i < this.virtualMachines.size(); i++) {
+            if ((this.virtualMachines.get(i)).getName()
                      .equals(event.getVmName())) {
-                virtualMachine = (VirtualMachine) virtualMachines.get(i);
+                virtualMachine = this.virtualMachines.get(i);
             }
         }
 
@@ -1066,17 +1066,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         }
 
-        createdRuntimeF.add(event.getRegisteredRuntime());
+        this.createdRuntimeF.add(event.getRegisteredRuntime());
     }
 
     private void runtimeRegisteredPerform(RuntimeRegistrationEvent event) {
         VirtualMachine virtualMachine = null;
 
         // Not synchronized because it is now impossible to add a new VirtualMachine
-        for (int i = 0; i < virtualMachines.size(); i++) {
-            if (((VirtualMachine) virtualMachines.get(i)).getName()
+        for (int i = 0; i < this.virtualMachines.size(); i++) {
+            if ((this.virtualMachines.get(i)).getName()
                      .equals(event.getVmName())) {
-                virtualMachine = (VirtualMachine) virtualMachines.get(i);
+                virtualMachine = this.virtualMachines.get(i);
             }
         }
 
@@ -1093,8 +1093,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         // Check if the virtualNode that originates the process is among awaited
         // VirtualNodes
-        if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
-            createNodes(event, awaitedVirtualNodes.get(event.getCreatorID()));
+        if (this.awaitedVirtualNodes.containsKey(event.getCreatorID())) {
+            createNodes(event, this.awaitedVirtualNodes.get(event.getCreatorID()));
         }
     }
 
@@ -1113,16 +1113,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         url = null;
 
         try {
-            int nodeNumber = (new Integer((String) _virtualMachine.getNbNodesOnCreatedVMs())).intValue();
+            int nodeNumber = (new Integer(_virtualMachine.getNbNodesOnCreatedVMs())).intValue();
 
             for (int i = 1; i <= nodeNumber; i++) {
                 ProActiveSecurityManager siblingPSM = null;
 
-                if (proactiveSecurityManager != null) {
-                    siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
+                if (this.proactiveSecurityManager != null) {
+                    siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(this.name);
                 }
 
-                int registerAttempts = REGISTRATION_ATTEMPTS;
+                int registerAttempts = this.REGISTRATION_ATTEMPTS;
 
                 while (registerAttempts > 0) { // If there is an
                                                // AlreadyBoundException, we
@@ -1155,7 +1155,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                 if (registerAttempts == 0) {
                     logger.warn("createLocalNode failed " +
-                        REGISTRATION_ATTEMPTS + " times for runtime " +
+                        this.REGISTRATION_ATTEMPTS + " times for runtime " +
                         nodeHost);
                 }
             }
@@ -1177,7 +1177,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //            throw new ProActiveException("No property can be set at runtime on this VirtualNode",
         //                e);
         //        }
-        //No need to check if the property exist since no property can be set 
+        //No need to check if the property exist since no property can be set
         // at runtime on a VNImpl. This might change in the future.
         throw new ProActiveException(
             "No property can be set at runtime on this VirtualNode");
@@ -1227,14 +1227,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#getMinNumberOfNodes()
      */
     public int getMinNumberOfNodes() {
-        return minNumberOfNodes;
+        return this.minNumberOfNodes;
     }
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#isMultiple()
      */
     public boolean isMultiple() {
-        return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
+        return ((this.virtualMachines.size() + this.localVirtualMachines.size()) > 1);
     }
 
     //
@@ -1254,11 +1254,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             //create the node
             ProActiveSecurityManager siblingPSM = null;
 
-            if (proactiveSecurityManager != null) {
-                siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
+            if (this.proactiveSecurityManager != null) {
+                siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(this.name);
             }
 
-            int registrationAttempts = REGISTRATION_ATTEMPTS;
+            int registrationAttempts = this.REGISTRATION_ATTEMPTS;
 
             while (registrationAttempts > 0) { //If there is an AlreadyBoundException, we generate an other random node name
                 String nodeName = this.name +
@@ -1285,7 +1285,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * Waits until at least one Node mapped to this VirtualNode in the XML Descriptor is created
      */
     private synchronized void waitForNodeCreation() throws NodeException {
-        while (!nodeCreated) {
+        while (!this.nodeCreated) {
             if (!timeoutExpired()) {
                 try {
                     wait(getTimeToSleep());
@@ -1315,17 +1315,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * Waits until all Nodes mapped to this VirtualNode in the XML Descriptor are created
      */
     public void waitForAllNodesCreation() throws NodeException {
-        int tempNodeCount = nbMappedNodes;
+        int tempNodeCount = this.nbMappedNodes;
 
         if (tempNodeCount != P2PConstants.MAX_NODE) {
             //nodeCount equal 0 means there is only a P2P service with MAX number of nodes requested
             // so if different of 0, we can set to false the boolean
-            MAX_P2P = false;
+            this.MAX_P2P = false;
         }
 
-        if (waitForTimeout) {
+        if (this.waitForTimeout) {
             try {
-                Thread.sleep(timeout);
+                Thread.sleep(this.timeout);
             } catch (InterruptedException e2) {
                 e2.printStackTrace();
             }
@@ -1336,7 +1336,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         //wait for the nodes to complete their deployment file transfer
-        Collection<FileVector> c = fileTransferDeployedStatus.values();
+        Collection<FileVector> c = this.fileTransferDeployedStatus.values();
         Iterator<FileVector> it = c.iterator();
 
         while (it.hasNext()) {
@@ -1359,11 +1359,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws NodeException {
         // check if we can release the vn before all nodes expected, are created
         // i.e the minNumber of nodes is set
-        if (minNumberOfNodes != 0) {
-            tempNodeCount = minNumberOfNodes;
+        if (this.minNumberOfNodes != 0) {
+            tempNodeCount = this.minNumberOfNodes;
         }
 
-        while (nbCreatedNodes < tempNodeCount) {
+        while (this.nbCreatedNodes < tempNodeCount) {
             if (!timeoutExpired()) {
                 try {
                     wait(getTimeToSleep());
@@ -1374,16 +1374,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // the timeToSleep is < 0. It means that the timeout expired
                     // that is why we catch the runtime exception
                     throw new NodeException("After many retries, only " +
-                        nbCreatedNodes + " nodes are created on " +
+                        this.nbCreatedNodes + " nodes are created on " +
                         tempNodeCount + " expected for Virtual Node \"" +
-                        this.name + "\" in descriptor \"" + descriptorURL +
+                        this.name + "\" in descriptor \"" + this.descriptorURL +
                         "\".");
                 }
             } else {
                 throw new NodeException("After many retries, only " +
-                    nbCreatedNodes + " nodes are created on " + tempNodeCount +
+                    this.nbCreatedNodes + " nodes are created on " + tempNodeCount +
                     " expected for Virtual Node \"" + this.name +
-                    "\" in descriptor \"" + descriptorURL + "\".");
+                    "\" in descriptor \"" + this.descriptorURL + "\".");
             }
         }
     }
@@ -1391,12 +1391,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private boolean timeoutExpired() {
         long currentTime = System.currentTimeMillis();
 
-        return (globalTimeOut < currentTime);
+        return (this.globalTimeOut < currentTime);
     }
 
     private long getTimeToSleep() {
         // if timeToSleep is < 0 we throw an exception
-        long timeToSleep = globalTimeOut - System.currentTimeMillis();
+        long timeToSleep = this.globalTimeOut - System.currentTimeMillis();
 
         if (timeToSleep > 0) {
             return timeToSleep;
@@ -1418,7 +1418,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         ExternalProcess process = vm.getProcess();
 
         // we need to do a deep copy of the process otherwise,
-        //modifications will be applied on one object that might 
+        //modifications will be applied on one object that might
         // be referenced by other virtualNodes .i.e check started
         if (!vmAlreadyAssigned) {
             copyProcess = (ExternalProcess) makeDeepCopy(process);
@@ -1454,7 +1454,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         int cnt = process.getNodeNumber();
 
         if (cnt == UniversalProcess.UNKNOWN_NODE_NUMBER) {
-            waitForTimeout = true;
+            this.waitForTimeout = true;
         } else {
             increaseNumberOfNodes(cnt * nodeNumber);
         }
@@ -1490,11 +1490,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             // if it is a main node we set the property for retrieving the pad
-            if (mainVirtualNode || process.isHierarchical()) {
-                jvmProcess.setJvmOptions(" -Dproactive.pad=" + padURL);
+            if (this.mainVirtualNode || process.isHierarchical()) {
+                jvmProcess.setJvmOptions(" -Dproactive.pad=" + this.padURL);
             }
 
-            jvmProcess.setJvmOptions("-Dproactive.jobid=" + jobID);
+            jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 nodeNumber + " " + protocolId + " " + vm.getName());
 
@@ -1511,13 +1511,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         FileTransferWorkShop ftsRetrieve = process.getFileTransferWorkShopRetrieve();
 
         if ((ftsDeploy != null) && ftsDeploy.isImplicit()) {
-            for (int i = 0; i < fileTransferDeploy.size(); i++)
-                ftsDeploy.addFileTransfer(fileTransferDeploy.get(i));
+            for (int i = 0; i < this.fileTransferDeploy.size(); i++)
+                ftsDeploy.addFileTransfer(this.fileTransferDeploy.get(i));
         }
 
         if ((ftsRetrieve != null) && ftsRetrieve.isImplicit()) {
-            for (int i = 0; i < fileTransferRetrieve.size(); i++)
-                ftsRetrieve.addFileTransfer(fileTransferRetrieve.get(i));
+            for (int i = 0; i < this.fileTransferRetrieve.size(); i++)
+                ftsRetrieve.addFileTransfer(this.fileTransferRetrieve.get(i));
         }
     }
 
@@ -1558,38 +1558,38 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     private void increaseIndex() {
-        if (virtualMachines.size() > 1) {
-            lastVirtualMachineIndex = (lastVirtualMachineIndex + 1) % virtualMachines.size();
+        if (this.virtualMachines.size() > 1) {
+            this.lastVirtualMachineIndex = (this.lastVirtualMachineIndex + 1) % this.virtualMachines.size();
         }
     }
 
     private void increaseNumberOfNodes(int n) {
-        nbMappedNodes = nbMappedNodes + n;
+        this.nbMappedNodes = this.nbMappedNodes + n;
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Number of nodes = " + nbMappedNodes);
+            logger.debug("Number of nodes = " + this.nbMappedNodes);
         }
     }
 
     private void increaseNodeIndex() {
-        if (createdNodes.size() > 1) {
-            lastNodeIndex = (lastNodeIndex + 1) % createdNodes.size();
+        if (this.createdNodes.size() > 1) {
+            this.lastNodeIndex = (this.lastNodeIndex + 1) % this.createdNodes.size();
         }
     }
 
     private synchronized void performOperations(ProActiveRuntime part,
         String url, String protocol, String vmName) {
         Node node = new NodeImpl(part, url, protocol, this.jobID, vmName);
-        synchronized (createdNodes) {
-            createdNodes.add(node);
+        synchronized (this.createdNodes) {
+            this.createdNodes.add(node);
         }
 
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
-        nodeCreated = true;
-        nbCreatedNodes++;
+        this.nodeCreated = true;
+        this.nbCreatedNodes++;
 
-        //Performe FileTransferDeploy (if needed)       
+        //Performe FileTransferDeploy (if needed)
         FileVector fw = fileTransferDeploy(node);
         this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
             fw);
@@ -1598,12 +1598,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             this.technicalService.apply(node);
         }
 
-        // wakes up Thread that are waiting for the node creation 
+        // wakes up Thread that are waiting for the node creation
         notifyAll();
 
         //notify all listeners that a node has been created
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, node,
-            nbCreatedNodes);
+            this.nbCreatedNodes);
     }
 
     private void register() {
@@ -1612,7 +1612,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             //  	ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
             //  	part.registerVirtualnode(this.name,false);
-            ProActive.registerVirtualNode(this, registrationProtocol, false);
+            ProActive.registerVirtualNode(this, this.registrationProtocol, false);
         } catch (NodeException e) {
             logger.error(e.getMessage());
         } catch (ProActiveException e) {
@@ -1643,10 +1643,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (nodeRequested != ((P2PDescriptorService) service).getMAX()) {
                 increaseNumberOfNodes(nodeRequested);
 
-                //nodeRequested = MAX means that the service will try to get every nodes 
+                //nodeRequested = MAX means that the service will try to get every nodes
                 // it can. So we can't predict how many nodes will return.
             } else {
-                MAX_P2P = true;
+                this.MAX_P2P = true;
             }
         } else {
             //increase with 1 node
@@ -1670,10 +1670,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (nodeRequested != ((P2PDescriptorService) service).getMAX()) {
                 increaseNumberOfNodes(nodeRequested);
 
-                //nodeRequested = MAX means that the service will try to get every nodes 
+                //nodeRequested = MAX means that the service will try to get every nodes
                 // it can. So we can't predict how many nodes will return.
             } else {
-                MAX_P2P = true;
+                this.MAX_P2P = true;
             }
         } else {
             //increase with 1 node
@@ -1685,7 +1685,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        if (isActivated) {
+        if (this.isActivated) {
             try {
                 waitForAllNodesCreation();
             } catch (NodeException e) {
@@ -1702,7 +1702,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        rrThreadpool = Executors.newCachedThreadPool();
+        this.rrThreadpool = Executors.newCachedThreadPool();
     }
 
     // -------------------------------------------------------------------------
@@ -1717,8 +1717,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         Node newNode = event.getNode();
         this.createdNodes.add(newNode);
         this.p2pNodes.add(newNode);
-        nbCreatedNodes++;
-        nodeCreated = true;
+        this.nbCreatedNodes++;
+        this.nodeCreated = true;
 
         if (this.technicalService != null) {
             this.technicalService.apply(newNode);
@@ -1727,7 +1727,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //notify all listeners that a node has been created
         notifyAll();
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, newNode,
-            nbCreatedNodes);
+            this.nbCreatedNodes);
     }
 
     /**
@@ -1805,7 +1805,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             long init = System.currentTimeMillis();
             fileVector.add(FileTransfer.pullFiles(nodes[i], srcFile, dstFile,
-                    fileBlockSize, overlapping));
+                    this.fileBlockSize, this.overlapping));
 
             if (FILETRANSFER_LOGGER.isDebugEnabled()) {
                 FILETRANSFER_LOGGER.debug("Returned pullFiles in:" +
@@ -1889,7 +1889,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         try {
             fileWrapper.add(FileTransfer.pushFiles(node, filesSrc, filesDst,
-                    fileBlockSize, overlapping));
+                    this.fileBlockSize, this.overlapping));
         } catch (Exception e) {
             logger.error("Unable to pushFile files to node " +
                 node.getNodeInformation().getName());

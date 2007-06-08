@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.remoteobject;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -16,7 +17,7 @@ import org.objectweb.proactive.core.mop.Proxy;
 public class SynchronousProxy implements Proxy, Serializable {
     protected RemoteObject remoteObject;
 
-    public SynchronousProxy(ConstructorCall contructorCall, Object[] params) {
+    public SynchronousProxy(ConstructorCall contructorCall, Object[] params) throws ProActiveException{
         Object p0 = params[0];
 
         if (p0 instanceof RemoteObject) {
@@ -30,7 +31,7 @@ public class SynchronousProxy implements Proxy, Serializable {
         Request r = new RequestImpl(c,
                 c.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE));
 
-        SynchronousReplyImpl reply = (SynchronousReplyImpl) remoteObject.receiveMessage(r);
+        SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
         if (reply != null) {
             if (reply.getSynchResult() instanceof Throwable) {
@@ -48,7 +49,7 @@ public class SynchronousProxy implements Proxy, Serializable {
         return null;
     }
 
-    public void setRemoteObject(RemoteRemoteObject rro) {
+    public void setRemoteObject(RemoteRemoteObject rro) throws ProActiveException{
         this.remoteObject = new RemoteObjectAdapter(rro);
     }
 
