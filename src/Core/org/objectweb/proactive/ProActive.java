@@ -2052,6 +2052,7 @@ public class ProActive {
     public static int waitForAny(java.util.Vector futures, long timeout)
         throws ProActiveException {
         FuturePool fp = getBodyOnThis().getFuturePool();
+        long start = System.nanoTime() / 1000000;
 
         synchronized (fp) {
             while (true) {
@@ -2067,14 +2068,22 @@ public class ProActive {
 
                     index++;
                 }
-                fp.waitForReply(timeout);
+                long remainingTimeout = 0;
+                if (timeout != 0) {
+                    remainingTimeout = (System.nanoTime() / 1000000) - start -
+                        timeout;
+                    if (remainingTimeout <= 0) {
+                        throw new ProActiveException(
+                            "Timeout expired while waiting for future update");
+                    }
+                }
+                fp.waitForReply(remainingTimeout);
             }
         }
     }
 
     /**
      * Blocks the calling thread until all futures in the vector are available.
-     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
      * @param futures vector of futures
      */
     public static void waitForAll(java.util.Vector futures) {
@@ -2089,58 +2098,38 @@ public class ProActive {
     /**
      * Blocks the calling thread until all futures in the vector are available or until
      * the timeout expires.
-     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
      * @param futures vector of futures
      * @param timeout to wait in ms
      * @throws ProActiveException if the timeout expires
      */
     public static void waitForAll(java.util.Vector futures, long timeout)
         throws ProActiveException {
-        FuturePool fp = getBodyOnThis().getFuturePool();
-
-        synchronized (fp) {
-            boolean oneIsMissing = true;
-
-            while (oneIsMissing) {
-                oneIsMissing = false;
-
-                java.util.Iterator it = futures.iterator();
-
-                while (it.hasNext()) {
-                    Object current = it.next();
-
-                    if (isAwaited(current)) {
-                        oneIsMissing = true;
-                    }
-                }
-
-                if (oneIsMissing) {
-                    fp.waitForReply(timeout);
+        long start = System.nanoTime() / 1000000;
+        for (Object future : futures) {
+            long remainingTimeout = 0;
+            if (timeout != 0) {
+                remainingTimeout = (System.nanoTime() / 1000000) - start -
+                    timeout;
+                if (remainingTimeout <= 0) {
+                    throw new ProActiveException(
+                        "Timeout expired while waiting for future update");
                 }
             }
+            ProActive.waitFor(future, remainingTimeout);
         }
     }
 
     /**
      * Blocks the calling thread until the N-th of the futures in the vector is available.
-     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
      * @param futures vector of futures
+     * @param n index of future to wait
      */
     public static void waitForTheNth(java.util.Vector futures, int n) {
-        FuturePool fp = getBodyOnThis().getFuturePool();
-
-        synchronized (fp) {
-            Object current = futures.get(n);
-
-            if (isAwaited(current)) {
-                waitFor(current);
-            }
-        }
+        waitFor(futures.get(n));
     }
 
     /**
      * Blocks the calling thread until the N-th of the futures in the vector is available.
-     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
      * @param futures vector of futures
      * @param n
      * @param timeout to wait in ms
@@ -2148,15 +2137,7 @@ public class ProActive {
      */
     public static void waitForTheNth(java.util.Vector futures, int n,
         long timeout) throws ProActiveException {
-        FuturePool fp = getBodyOnThis().getFuturePool();
-
-        synchronized (fp) {
-            Object current = futures.get(n);
-
-            if (isAwaited(current)) {
-                waitFor(current, timeout);
-            }
-        }
+        waitFor(futures.get(n), timeout);
     }
 
     /**
