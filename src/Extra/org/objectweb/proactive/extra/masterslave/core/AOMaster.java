@@ -148,13 +148,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#areAllResultsAvailable()
-     */
-    private boolean areAllResultsAvailable() {
-        return resultQueue.areAllResultsAvailable();
-    }
-
-    /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#countAvailableResults()
      */
     public int countAvailableResults() {
@@ -261,7 +254,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             TaskIntern wrapper = slavesActivity.get(slaveName);
             if (!wrapper.isNull() && launchedTasks.contains(wrapper)) {
                 launchedTasks.remove(wrapper);
-                pendingTasks.add(wrapper);
+                if (pendingTasks.isEmpty()) {
+                    slaveGroupStub.wakeup();
+                } else {
+                    pendingTasks.add(wrapper);
+                }
             }
         }
     }
@@ -271,13 +268,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public boolean isEmpty() {
         return resultQueue.isEmpty();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isOneResultAvailable()
-     */
-    private boolean isOneResultAvailable() {
-        return resultQueue.isOneResultAvailable();
     }
 
     /* (non-Javadoc)
@@ -484,9 +474,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             // We filter the requests with the following strategy :
             // If a request asks for the result of a(several) task(s), we don't serve it(them) until the result(s) is(are) available
             if (request.getMethodName().equals("waitOneResult")) {
-                return isOneResultAvailable();
+                return resultQueue.isOneResultAvailable();
             } else if (request.getMethodName().equals("waitAllResults")) {
-                return areAllResultsAvailable();
+                return resultQueue.areAllResultsAvailable();
             } else if (request.getMethodName().equals("waitKResults")) {
                 int k = (Integer) request.getParameter(0);
                 if (((resultQueue.countPendingResults() +

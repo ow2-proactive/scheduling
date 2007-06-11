@@ -289,7 +289,12 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
-            results.add((R) res.getResult());
+            Serializable obj = res.getResult();
+            if (obj != null) {
+                results.add((R) res.getResult());
+            } else {
+                results.add(null);
+            }
             T task = wrappedTasksRev.get(res);
             removeWrapping(task);
         }
@@ -305,7 +310,12 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
-            results.add((R) res.getResult());
+            Serializable obj = res.getResult();
+            if (obj != null) {
+                results.add((R) res.getResult());
+            } else {
+                results.add(null);
+            }
             T task = wrappedTasksRev.get(res);
             removeWrapping(task);
         }
@@ -327,6 +337,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         if (completed.threwException()) {
             throw new TaskException(completed.getException());
         }
-        return (R) completed.getResult();
+        Serializable obj = completed.getResult();
+        if (obj != null) {
+            return (R) completed.getResult();
+        }
+        return null;
     }
 }
