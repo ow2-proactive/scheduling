@@ -112,8 +112,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         if (p0 instanceof UniversalBody) {
             // This is simple connection to an existant local body
             this.universalBody = (UniversalBody) p0;
-            this.bodyID = universalBody.getID();
-            isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
+            isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
             if (logger.isDebugEnabled()) {
                 //logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+" isLocal="+isLocal);
             }
@@ -157,7 +156,6 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 //added line -------------------------
                 isLocal = false;
             }
-            this.bodyID = universalBody.getID();
             if (logger.isDebugEnabled()) {
                 //logger.debug("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
             }
@@ -237,7 +235,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             //return node.createBody(bodyConstructorCall);
             //--------------added lines
             if (logger.isDebugEnabled()) {
-                logger.debug("RemoteBodyProxy created bodyID=" + bodyID +
+                logger.debug("RemoteBodyProxy created bodyID=" + getBodyID() +
                     " from ConstructorCall");
             }
             return part.createBody(node.getNodeInformation().getName(),
@@ -288,10 +286,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
         // Maybe we could use some optimisation here
         //UniqueID id = universalBody.getID();
-        UniversalBody newBody = sourceBody.checkNewLocation(bodyID);
+        UniversalBody newBody = sourceBody.checkNewLocation(getBodyID());
         if (newBody != null) {
             universalBody = newBody;
-            isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
+            isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
         }
         ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
         destinations.add(universalBody.getRemoteAdapter());
@@ -384,7 +382,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-        Body localBody = LocalBodyStore.getInstance().getLocalBody(bodyID);
+        universalBody = (UniversalBody) in.readObject();
+        Body localBody = LocalBodyStore.getInstance().getLocalBody(getBodyID());
 
         // Thread.dumpStack();
         if (logger.isDebugEnabled()) {
@@ -393,11 +392,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         if (localBody != null) {
             // the body is local
             universalBody = localBody;
-            in.readObject();
             isLocal = true;
         } else {
             // the body is not local
-            universalBody = (UniversalBody) in.readObject();
             isLocal = false;
         }
         if (logger.isDebugEnabled()) {

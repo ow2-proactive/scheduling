@@ -69,17 +69,12 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-    protected UniqueID bodyID;
     protected Integer cachedHashCode = null;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public AbstractBodyProxy() {
-    }
-
-    AbstractBodyProxy(UniqueID bodyID) {
-        this.bodyID = bodyID;
     }
 
     //
@@ -89,7 +84,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     // -- implements BodyProxy -----------------------------------------------
     //
     public UniqueID getBodyID() {
-        return bodyID;
+        return getBody().getID();
     }
 
     //
@@ -173,8 +168,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             if (MOP.isReifiedObject(arg)) {
                 Proxy proxy = ((StubObject) arg).getProxy();
                 if (proxy instanceof AbstractBodyProxy) {
-                    return new Boolean(bodyID.equals(
-                            ((AbstractBodyProxy) proxy).bodyID));
+                    return new Boolean(getBodyID()
+                                           .equals(((AbstractBodyProxy) proxy).getBodyID()));
                 }
             }
             return new Boolean(false);
@@ -260,7 +255,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
         // Set the id of the body creator in the created future
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
-        fp.setCreatorID(bodyID);
+        fp.setCreatorID(getBodyID());
         fp.setOriginatingProxy(this);
 
         try {
@@ -284,7 +279,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         throws Throwable, Exception, RenegotiateSessionException {
         // Setting methodCall.res to null means that we do not use the future mechanism
         FutureProxy fp = FutureProxy.getFutureProxy();
-        fp.setCreatorID(bodyID);
+        fp.setCreatorID(getBodyID());
         fp.setOriginatingProxy(this);
 
         try {
