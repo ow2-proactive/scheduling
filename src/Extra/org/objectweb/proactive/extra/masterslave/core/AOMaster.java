@@ -57,6 +57,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveDeadListener;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager;
@@ -314,14 +315,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider#sendResultAndGetTask(org.objectweb.proactive.extra.masterslave.interfaces.Task,java.lang.String)
      */
-    public TaskIntern sendResultAndGetTask(TaskIntern task,
+    public TaskIntern sendResultAndGetTask(ResultIntern result,
         String originatorName) {
-        if (launchedTasks.contains(task)) {
+        if (launchedTasks.contains(result)) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Result of task " + task.getId() + " received.");
+                logger.debug("Result of task " + result.getId() + " received.");
             }
-            launchedTasks.remove(task);
-            resultQueue.addCompletedTask(task);
+            launchedTasks.remove(result);
+            resultQueue.addCompletedTask(result);
         }
 
         // We assign a new task to the slave
@@ -427,7 +428,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitAllResults()
      */
-    public List<TaskIntern> waitAllResults()
+    public List<ResultIntern> waitAllResults()
         throws IllegalStateException, TaskException {
         if (logger.isDebugEnabled()) {
             logger.debug("All results received by the user.");
@@ -438,7 +439,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitKResults(int)
      */
-    public List<TaskIntern> waitKResults(int k)
+    public List<ResultIntern> waitKResults(int k)
         throws IllegalArgumentException, TaskException {
         if ((resultQueue.countPendingResults() +
                 resultQueue.countAvailableResults()) < k) {
@@ -455,9 +456,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitOneResult()
      */
-    public TaskIntern waitOneResult()
+    public ResultIntern waitOneResult()
         throws IllegalStateException, TaskException {
-        TaskIntern task = resultQueue.getNext();
+        ResultIntern task = resultQueue.getNext();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Result of task" + task.getId() +

@@ -32,8 +32,6 @@ package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.extra.masterslave.interfaces.Task;
-
 
 /**
  * Internal view of a task in the Master/Slave API<br/>
@@ -41,19 +39,39 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
  * Adds the notion of a "Task ID"<br/>
  * @author fviale
  *
- * @param <R> the type of the result
+ * @param <R>
  */
-public interface TaskIntern<R extends Serializable> extends Task<R>, Comparable,
+public interface ResultIntern<R extends Serializable> extends Comparable,
     Identified, Serializable {
-    /**
-     * get the actual task
-     * @return the task
-     */
-    Task<R> getTask();
 
     /**
-     * tells if the task is null (nothing to do)
-     * @return true if the task is null, false otherwise
+     * get the result of the task
+     * @return the result
      */
-    public boolean isNull();
+    public R getResult();
+
+    /**
+     * sets the result of the task
+     * @param res the result
+     */
+    public void setResult(R res);
+
+    /**
+     * tells if the task threw a functional exception
+     * @return answer
+     */
+    public boolean threwException();
+
+    /**
+     * returns the actual functional exception thrown by the task
+     * @return the exception
+     * @throws an IllegalStateException is no Exception was thrown
+     */
+    public Throwable getException() throws IllegalStateException;
+
+    /**
+     * sets the exception thrown by the task
+     * @param e the exception
+     */
+    public void setException(Throwable e);
 }

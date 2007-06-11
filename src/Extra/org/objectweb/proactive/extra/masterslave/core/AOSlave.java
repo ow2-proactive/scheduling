@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider;
@@ -178,21 +179,22 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * @param task task to run
      * @return the same task, but containing the result
      */
-    private TaskIntern handleTask(TaskIntern task) {
-        Serializable result = null;
+    private ResultIntern handleTask(TaskIntern task) {
+        Serializable resultObj = null;
+        ResultInternImpl result = new ResultInternImpl(task);
 
         // We run the task and listen to exception thrown by the task itself
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug(name + " runs task " + task.getId() + "...");
             }
-            result = task.run(this);
+            resultObj = task.run(this);
         } catch (Exception e) {
-            task.setException(e);
+            result.setException(e);
         }
         // We store the result inside our internal version of the task
-        task.setResult(result);
-        return task;
+        result.setResult(resultObj);
+        return result;
     }
 
     /* (non-Javadoc)
@@ -207,15 +209,16 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
                 while (!isSleeping) {
                     // We verify that the task is not a null task (otherwise, we sleep)
                     if (!newTask.isNull()) {
-                        newTask = handleTask(newTask);
+                        ResultIntern result = handleTask(newTask);
 
                         if (logger.isDebugEnabled()) {
                             logger.debug(name + " sends the result of task " +
-                                newTask.getId() + " and asks a new task...");
+                                result.getId() + " and asks a new task...");
                         }
+                        newTask = null;
 
                         // We send the result back to the master
-                        newTask = provider.sendResultAndGetTask(newTask, name);
+                        newTask = provider.sendResultAndGetTask(result, name);
                         newTask = (TaskIntern) ProActive.getFutureValue(newTask);
                     } else {
                         // if the task is null, we automatically sleep

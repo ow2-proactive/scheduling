@@ -10,6 +10,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
@@ -27,10 +28,10 @@ public class ResultQueue implements Serializable {
     private TreeSet<Long> idsubmitted = new TreeSet<Long>();
 
     // sorted set of results (for submission order)
-    private SortedSet<TaskIntern> orderedResults = new TreeSet<TaskIntern>();
+    private SortedSet<ResultIntern> orderedResults = new TreeSet<ResultIntern>();
 
     // unordered list of results (for 
-    private LinkedList<TaskIntern> unorderedResults = new LinkedList<TaskIntern>();
+    private LinkedList<ResultIntern> unorderedResults = new LinkedList<ResultIntern>();
 
     /**
      * Creates the result queue with the given ordering mode
@@ -44,7 +45,7 @@ public class ResultQueue implements Serializable {
      * Adds a completed task to the queue
      * @param task completed task
      */
-    public void addCompletedTask(TaskIntern task) {
+    public void addCompletedTask(ResultIntern task) {
         if (mode == Master.OrderingMode.CompletionOrder) {
             unorderedResults.add(task);
         } else {
@@ -92,7 +93,7 @@ public class ResultQueue implements Serializable {
             return unorderedResults.size();
         } else {
             int resultcount = 0;
-            Iterator<TaskIntern> it = orderedResults.iterator();
+            Iterator<ResultIntern> it = orderedResults.iterator();
             Iterator<Long> it2 = idsubmitted.iterator();
             while (it.hasNext() && (it.next().getId() == it2.next())) {
                 resultcount++;
@@ -110,14 +111,14 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Returns all completed tasks (if and only if there are no pending tasks)
+     * Returns the results of all completed tasks (if and only if there are no pending tasks)
      * @return a list containing all completed tasks, if all tasks are completed
      * @throws NoSuchElementException if some tasks are not completed
      */
-    public List<TaskIntern> getAll() throws NoSuchElementException {
+    public List<ResultIntern> getAll() throws NoSuchElementException {
         if (areAllResultsAvailable()) {
-            List<TaskIntern> answer = new ArrayList<TaskIntern>();
-            Iterator<TaskIntern> it;
+            List<ResultIntern> answer = new ArrayList<ResultIntern>();
+            Iterator<ResultIntern> it;
             if (mode == Master.OrderingMode.CompletionOrder) {
                 it = unorderedResults.iterator();
             } else {
@@ -134,17 +135,17 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Returns the next completed task (depending of the current ResultReceptionOrder)
-     * @return the next completed task, if the next task in the current ResultReceptionOrder is available
+     * Returns the the result of the next completed task (depending of the current ResultReceptionOrder)
+     * @return the result of the next completed task, if the next task in the current ResultReceptionOrder is available
      * @throws NoSuchElementException if no task in the current ResultReceptionOrder are available
      */
-    public TaskIntern getNext() throws NoSuchElementException {
+    public ResultIntern getNext() throws NoSuchElementException {
         if (isOneResultAvailable()) {
-            TaskIntern answer;
+            ResultIntern answer;
             if (mode == Master.OrderingMode.CompletionOrder) {
                 answer = unorderedResults.poll();
             } else {
-                Iterator<TaskIntern> it = orderedResults.iterator();
+                Iterator<ResultIntern> it = orderedResults.iterator();
                 answer = it.next();
                 it.remove();
             }
@@ -156,15 +157,15 @@ public class ResultQueue implements Serializable {
     }
 
     /**
-     * Returns the next completed task (depending of the current ResultReceptionOrder)
+     * Returns the results of all k next completed task (depending of the current ResultReceptionOrder)
      * @param k number of completed tasks to get
-     * @return a list containing the k next completed tasks, if the k next tasks in the current ResultReceptionOrder are available
+     * @return a list containing the results of the k next completed tasks, if the k next tasks in the current ResultReceptionOrder are available
      * @throws NoSuchElementException if not enough tasks in the current ResultReceptionOrder are available
      */
-    public List<TaskIntern> getNextK(int k) {
+    public List<ResultIntern> getNextK(int k) {
         if (countAvailableResults() >= k) {
-            List<TaskIntern> answer = new ArrayList<TaskIntern>();
-            Iterator<TaskIntern> it;
+            List<ResultIntern> answer = new ArrayList<ResultIntern>();
+            Iterator<ResultIntern> it;
             if (mode == Master.OrderingMode.CompletionOrder) {
                 it = unorderedResults.iterator();
             } else {
@@ -216,17 +217,17 @@ public class ResultQueue implements Serializable {
     public void setMode(Master.OrderingMode mode) {
         if ((mode == Master.OrderingMode.CompletionOrder) &&
                 (this.mode == Master.OrderingMode.SubmitionOrder)) {
-            Iterator<TaskIntern> it = orderedResults.iterator();
+            Iterator<ResultIntern> it = orderedResults.iterator();
             while (it.hasNext()) {
-                TaskIntern res = it.next();
+                ResultIntern res = it.next();
                 unorderedResults.add(res);
                 it.remove();
             }
         } else if ((mode == Master.OrderingMode.SubmitionOrder) &&
                 (this.mode == Master.OrderingMode.CompletionOrder)) {
-            Iterator<TaskIntern> it = unorderedResults.iterator();
+            Iterator<ResultIntern> it = unorderedResults.iterator();
             while (it.hasNext()) {
-                TaskIntern res = it.next();
+                ResultIntern res = it.next();
                 orderedResults.add(res);
                 it.remove();
             }

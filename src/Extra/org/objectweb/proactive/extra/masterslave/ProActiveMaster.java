@@ -48,6 +48,7 @@ import org.objectweb.proactive.extra.masterslave.core.TaskAlreadySubmittedExcept
 import org.objectweb.proactive.extra.masterslave.core.TaskWrapperImpl;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
@@ -315,9 +316,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitAllResults()
      */
     public List<R> waitAllResults() throws TaskException {
-        List<TaskIntern> completed = (List<TaskIntern>) ProActive.getFutureValue(aomaster.waitAllResults());
+        List<ResultIntern> completed = (List<ResultIntern>) ProActive.getFutureValue(aomaster.waitAllResults());
         List<R> results = new ArrayList<R>();
-        for (TaskIntern res : completed) {
+        for (ResultIntern res : completed) {
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
@@ -335,10 +336,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
 
     public List<R> waitKResults(int k)
         throws IllegalStateException, IllegalArgumentException, TaskException {
-        List<TaskIntern> completed = (List<TaskIntern>) ProActive.getFutureValue(aomaster.waitKResults(
+        List<ResultIntern> completed = (List<ResultIntern>) ProActive.getFutureValue(aomaster.waitKResults(
                     k));
         List<R> results = new ArrayList<R>();
-        for (TaskIntern res : completed) {
+        for (ResultIntern res : completed) {
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
@@ -358,7 +359,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitOneResult()
      */
     public R waitOneResult() throws TaskException {
-        TaskIntern completed = (TaskIntern) ProActive.getFutureValue(aomaster.waitOneResult());
+        ResultIntern completed = (ResultIntern) ProActive.getFutureValue(aomaster.waitOneResult());
         if (completed.threwException()) {
             throw new TaskException(completed.getException());
         }
