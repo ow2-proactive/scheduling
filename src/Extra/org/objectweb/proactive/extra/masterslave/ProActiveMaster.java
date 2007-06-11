@@ -120,6 +120,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
 
     /**
      * Creates an empty master with an initial slave memory
+     * @param initialMemory initial memory that every slaves deployed by the master will have
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {
         wrappedTasks = new HashMap<T, TaskIntern>();
@@ -135,7 +136,29 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /**
-     * Creates a master with a descriptorURL and an array of virtual node names
+     * Creates a master with a descriptorURL
+     * Every virtual nodes will be activated in the descriptor to collect the resources
+     * @param descriptorURL url of the ProActive descriptor
+     */
+    public ProActiveMaster(URL descriptorURL) {
+        this(descriptorURL, new HashMap<String, Object>());
+    }
+
+    /**
+     * Creates a master with a descriptorURL
+     * Every virtual nodes will be activated in the descriptor to collect the resources
+     * @param descriptorURL descriptor to use
+     * @param virtualNodeName name of the virtual node
+     * @param initialMemory initial memory that every slaves deployed by the master will have
+     */
+    public ProActiveMaster(URL descriptorURL, Map<String, Object> initialMemory) {
+        this(initialMemory);
+        aomaster.addResources(descriptorURL);
+    }
+
+    /**
+     * Creates a master with a descriptorURL and the name of a virtual node
+     * Only this virtual node will be activated in the descriptor to collect the resources
      * @param descriptorURL url of the ProActive descriptor
      * @param virtualNodeName name of the virtual node to deploy inside the ProActive descriptor
      */
@@ -144,10 +167,11 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /**
-     * Creates a master with a descriptorURL and an array of virtual node names
+     * Creates a master with a descriptorURL and a virtual node name
+     * Only this virtual node will be activated in the descriptor to collect the resources
      * @param descriptorURL descriptor to use
      * @param virtualNodeName name of the virtual node
-     * @param initialMemory initial memory that
+     * @param initialMemory initial memory that every slaves deployed by the master will have
      */
     public ProActiveMaster(URL descriptorURL, String virtualNodeName,
         Map<String, Object> initialMemory) {
@@ -166,6 +190,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * Creates a master with the given virtual node
      * @param virtualNode ProActive virtual node object
+     * @param initialMemory initial memory that every slaves deployed by the master will have
      */
     public ProActiveMaster(VirtualNode virtualNode,
         Map<String, Object> initialMemory) {
@@ -178,6 +203,13 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      */
     public void addResources(Collection<Node> nodes) {
         aomaster.addResources(nodes);
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.net.URL)
+     */
+    public void addResources(URL descriptorURL) {
+        aomaster.addResources(descriptorURL);
     }
 
     /* (non-Javadoc)

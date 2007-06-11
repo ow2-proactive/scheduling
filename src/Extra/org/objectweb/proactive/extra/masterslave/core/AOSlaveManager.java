@@ -114,6 +114,23 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     }
 
     /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#addResources(java.net.URL)
+     */
+    public void addResources(URL descriptorURL) {
+        if (!isTerminated) {
+            try {
+                ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
+                for (VirtualNode vn : pad.getVirtualNodes()) {
+                    addResources(vn);
+                }
+            } catch (Exception e) {
+                logger.error("Couldnt add the specified resources.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#addResources(java.net.URL, java.lang.String[])
      */
     public void addResources(URL descriptorURL, String virtualNodeName) {

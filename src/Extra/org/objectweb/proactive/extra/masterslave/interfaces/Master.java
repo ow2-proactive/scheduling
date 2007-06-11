@@ -72,9 +72,15 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     public void addResources(Collection<Node> nodes);
 
     /**
-    * Asks the resource manager to activate the given virtual nodes inside the given descriptor <br/>
+     * Asks the resource manager to activate every virtual nodes inside the given descriptor <br/>
+     * @param descriptorURL URL of a deployment descriptor
+     */
+    public void addResources(URL descriptorURL);
+
+    /**
+    * Asks the resource manager to activate the given virtual node inside the given descriptor <br/>
     * @param descriptorURL URL of a deployment descriptor
-    * @param virtualNodeName names of virtual nodes to activate
+    * @param virtualNodeName name of the virtual node to activate
     */
     public void addResources(URL descriptorURL, String virtualNodeName);
 

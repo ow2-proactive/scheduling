@@ -46,10 +46,17 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public interface SlaveManagerAdmin {
 
     /**
+     * Asks the slave manager to activate every virtual nodes inside the given descriptor
+     * and use the generated nodes as resources
+     * @param descriptorURL URL of a deployment descriptor
+     */
+    public void addResources(URL descriptorURL);
+
+    /**
      * Asks the slave manager to activate the given virtual nodes inside the given descriptor
      * and use the generated nodes as resources
      * @param descriptorURL URL of a deployment descriptor
-     * @param virtualNodeName names of virtual nodes to activate
+     * @param virtualNodeName names of the virtual node to activate
      */
     public void addResources(URL descriptorURL, String virtualNodeName);
 

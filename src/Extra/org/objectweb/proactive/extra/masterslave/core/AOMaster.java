@@ -133,6 +133,13 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     }
 
     /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.net.URL)
+     */
+    public void addResources(URL descriptorURL) {
+        ((SlaveManagerAdmin) smanager).addResources(descriptorURL);
+    }
+
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.net.URL, java.lang.String[])
      */
     public void addResources(URL descriptorURL, String virtualNodeName) {
