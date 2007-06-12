@@ -2,8 +2,6 @@ package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
-import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Identified;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;

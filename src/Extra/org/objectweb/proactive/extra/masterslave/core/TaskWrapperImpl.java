@@ -45,19 +45,10 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  */
 public class TaskWrapperImpl implements TaskIntern {
     // The id of the task
-    private long id = -1;
+    private long id = NULL_TASK_ID;
 
     // The actual task object
     private Task realTask = null;
-
-    // the result
-    private Serializable result = null;
-
-    // when this task has thrown an exception
-    private boolean isException = false;
-
-    // the exception thrown
-    private Throwable exception = null;
 
     /**
      *
@@ -131,9 +122,5 @@ public class TaskWrapperImpl implements TaskIntern {
         } else {
             throw new IllegalArgumentException("" + o);
         }
-    }
-
-    public String toString() {
-        return "ID: " + id + " Result: " + result + " Exception: " + exception;
     }
 }

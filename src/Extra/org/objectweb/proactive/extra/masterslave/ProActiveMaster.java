@@ -44,12 +44,10 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.masterslave.core.AOMaster;
-import org.objectweb.proactive.extra.masterslave.core.TaskAlreadySubmittedException;
-import org.objectweb.proactive.extra.masterslave.core.TaskWrapperImpl;
+import org.objectweb.proactive.extra.masterslave.core.AOTaskRepository;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
 /**
@@ -68,7 +66,7 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  * <br/>
  * When tasks will later on be executed on the slaves, the tasks will be able to access this memory through the slavememory parameter of the <b><i>run</i></b> method.
  * <br/>
- * The results can be received using two different recpetion order modes: <br/>
+ * The results can be received using two different reception order modes: <br/>
  * <ul>
  * <li>In the <b><i>CompletionOrder mode</i></b>, which is the default, results are received in the same order as they are completed by the slaves (i.e. order is unspecified).</li>
  * <li>In the <b><i>SubmissionOrder mode</i></b>, results are received in the same order as they are submitted to the master.</li>
@@ -88,11 +86,7 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     implements Master<T, R>, Serializable {
     protected AOMaster aomaster = null;
-
-    // IDs management : we keep an internal version of the tasks with an ID internally generated
-    protected HashMap<T, TaskIntern> wrappedTasks;
-    protected HashMap<TaskIntern, T> wrappedTasksRev;
-    protected long taskCounter = 0;
+    protected AOTaskRepository aorepository = null;
 
     /**
      * An empty master (you can add resources afterwards)
@@ -124,11 +118,12 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @param initialMemory initial memory that every slaves deployed by the master will have
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {
-        wrappedTasks = new HashMap<T, TaskIntern>();
-        wrappedTasksRev = new HashMap<TaskIntern, T>();
         try {
+            aorepository = (AOTaskRepository) ProActive.newActive(AOTaskRepository.class.getName(),
+                    new Object[] {  });
+
             aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
-                    new Object[] { initialMemory });
+                    new Object[] { aorepository, initialMemory });
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -238,16 +233,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @return wrapped version
      * @throws IllegalArgumentException if the same task has already been wrapped
      */
-    private TaskIntern createWrapping(T task) throws IllegalArgumentException {
-        if (wrappedTasks.containsKey(task)) {
-            throw new IllegalArgumentException(new TaskAlreadySubmittedException());
-        }
-
-        TaskIntern wrapper = new TaskWrapperImpl(taskCounter, task);
-        taskCounter = (taskCounter + 1) % (Long.MAX_VALUE - 1);
-        wrappedTasks.put(task, wrapper);
-        wrappedTasksRev.put(wrapper, task);
-        return wrapper;
+    private long createId(T task) throws IllegalArgumentException {
+        return aorepository.addTask(task, task.hashCode());
     }
 
     /**
@@ -257,31 +244,16 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @return wrapped version
      * @throws IllegalArgumentException if the same task has already been wrapped
      */
-    private List<TaskIntern> createWrappings(List<T> tasks)
-        throws IllegalArgumentException {
-        List<TaskIntern> wrappings = new ArrayList<TaskIntern>();
+    private List<Long> createIds(List<T> tasks) throws IllegalArgumentException {
+        List<Long> wrappings = new ArrayList<Long>();
         for (T task : tasks) {
-            wrappings.add(createWrapping(task));
+            wrappings.add(createId(task));
         }
         return wrappings;
     }
 
     public boolean isEmpty() {
         return aomaster.isEmpty();
-    }
-
-    /**
-     * Removes the internal wrapping associated with this task
-     * @param task
-     * @throws IllegalArgumentException
-     */
-    private void removeWrapping(T task) throws IllegalArgumentException {
-        if (!wrappedTasks.containsKey(task)) {
-            throw new IllegalArgumentException("Non existent wrapping.");
-        }
-
-        TaskIntern wrapper = wrappedTasks.remove(task);
-        wrappedTasksRev.remove(wrapper);
     }
 
     public void setResultReceptionOrder(
@@ -300,7 +272,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection, boolean)
      */
     public void solve(List<T> tasks) {
-        List<TaskIntern> wrappers = createWrappings(tasks);
+        List<Long> wrappers = createIds(tasks);
         aomaster.solve(wrappers);
     }
 
@@ -310,6 +282,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     public void terminate(boolean freeResources) {
         // we use here the synchronous version
         aomaster.terminateIntern(freeResources);
+        aorepository.terminate();
     }
 
     /* (non-Javadoc)
@@ -328,8 +301,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
             } else {
                 results.add(null);
             }
-            T task = wrappedTasksRev.get(res);
-            removeWrapping(task);
+            aorepository.removeId(res.getId());
         }
         return results;
     }
@@ -349,8 +321,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
             } else {
                 results.add(null);
             }
-            T task = wrappedTasksRev.get(res);
-            removeWrapping(task);
+            aorepository.removeId(res.getId());
         }
         return results;
     }
@@ -365,8 +336,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         }
 
         //  we remove the mapping between the task and its wrapper
-        T task = wrappedTasksRev.get(completed);
-        removeWrapping(task);
+        aorepository.removeId(completed.getId());
         if (completed.threwException()) {
             throw new TaskException(completed.getException());
         }

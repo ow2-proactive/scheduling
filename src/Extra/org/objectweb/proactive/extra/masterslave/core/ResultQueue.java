@@ -11,7 +11,6 @@ import java.util.TreeSet;
 
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
 /**
@@ -57,8 +56,8 @@ public class ResultQueue implements Serializable {
      * Specifies that a new tasks have been submitted
      * @param task pending task
      */
-    public void addPendingTask(TaskIntern task) {
-        idsubmitted.add(task.getId());
+    public void addPendingTask(Long taskId) {
+        idsubmitted.add(taskId);
     }
 
     /**
@@ -125,8 +124,10 @@ public class ResultQueue implements Serializable {
                 it = orderedResults.iterator();
             }
             while (it.hasNext()) {
-                answer.add(it.next());
+                ResultIntern res = it.next();
+                answer.add(res);
                 it.remove();
+                idsubmitted.remove(res.getId());
             }
             return answer;
         } else {
@@ -173,9 +174,11 @@ public class ResultQueue implements Serializable {
             }
             int count = 0;
             while (it.hasNext() && (count < k)) {
-                answer.add(it.next());
+                ResultIntern res = it.next();
+                answer.add(res);
                 it.remove();
                 count++;
+                idsubmitted.remove(res.getId());
             }
             return answer;
         } else {

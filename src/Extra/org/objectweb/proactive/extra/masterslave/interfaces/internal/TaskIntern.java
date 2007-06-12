@@ -45,6 +45,12 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
  */
 public interface TaskIntern<R extends Serializable> extends Task<R>, Comparable,
     Identified, Serializable {
+
+    /**
+     * The ID of the NullTask
+     */
+    public static long NULL_TASK_ID = -1;
+
     /**
      * get the actual task
      * @return the task

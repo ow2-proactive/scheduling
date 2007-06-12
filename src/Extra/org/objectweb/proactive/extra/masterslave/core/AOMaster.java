@@ -65,6 +65,7 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManage
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveWatcher;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository;
 import org.objectweb.proactive.extra.masterslave.util.HashSetQueue;
 
 
@@ -102,17 +103,20 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     protected Group sleepingGroup;
     protected HashMap<String, Slave> slavesByName;
     protected HashMap<Slave, String> slavesByNameRev;
-    protected HashMap<String, TaskIntern> slavesActivity;
+    protected HashMap<String, Long> slavesActivity;
 
     // Task Queues :
     // tasks that wait for an available slave
-    protected HashSetQueue<TaskIntern> pendingTasks;
+    protected HashSetQueue<Long> pendingTasks;
 
     // tasks that are currently processing
-    protected HashSetQueue<TaskIntern> launchedTasks;
+    protected HashSetQueue<Long> launchedTasks;
 
     // tasks that are completed
     protected ResultQueue resultQueue;
+
+    // the repository where to locate tasks
+    private TaskRepository repository;
 
     public AOMaster() {
         // proactive emty no arg constructor
@@ -122,8 +126,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * Creates the master with the initial memory of the slaves
      * @param initialMemory
      */
-    public AOMaster(Map<String, Object> initialMemory) {
+    public AOMaster(TaskRepository repository, Map<String, Object> initialMemory) {
         this.initialMemory = initialMemory;
+        this.repository = repository;
     }
 
     /* (non-Javadoc)
@@ -180,7 +185,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         }
 
         if (emptyPending()) {
-            slavesActivity.put(slaveName, new TaskWrapperImpl());
+            slavesActivity.put(slaveName, TaskIntern.NULL_TASK_ID);
             sleepingGroup.add(slave);
             // we return the null task, this will cause the slave to sleep for a while
             return new TaskWrapperImpl();
@@ -188,15 +193,18 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             if (sleepingGroup.contains(slave)) {
                 sleepingGroup.remove(slave);
             }
-            Iterator<TaskIntern> it = pendingTasks.iterator();
-            TaskIntern wrapper = it.next();
+            Iterator<Long> it = pendingTasks.iterator();
+            long taskId = it.next();
             // We remove the task from the pending list
             it.remove();
             // We add the task inside the launched list
-            launchedTasks.add(wrapper);
-            slavesActivity.put(slaveName, wrapper);
+            launchedTasks.add(taskId);
+            slavesActivity.put(slaveName, taskId);
+            TaskIntern taskfuture = repository.getTask(taskId);
+            TaskIntern realTask = (TaskIntern) ProActive.getFutureValue(taskfuture);
+            repository.saveTask(taskId);
 
-            return wrapper;
+            return realTask;
         }
     }
 
@@ -210,8 +218,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         masterIdleTime = Long.parseLong(System.getProperty(
                     "proactive.masterslave.msidletime"));
         // Queues 
-        pendingTasks = new HashSetQueue<TaskIntern>();
-        launchedTasks = new HashSetQueue<TaskIntern>();
+        pendingTasks = new HashSetQueue<Long>();
+        launchedTasks = new HashSetQueue<Long>();
         resultQueue = new ResultQueue(Master.OrderingMode.CompletionOrder);
 
         // Slaves
@@ -220,7 +228,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
             sleepingGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
             sleepingGroup = ProActiveGroup.getGroup(sleepingGroupStub);
-            slavesActivity = new HashMap<String, TaskIntern>();
+            slavesActivity = new HashMap<String, Long>();
             slavesByName = new HashMap<String, Slave>();
             slavesByNameRev = new HashMap<Slave, String>();
         } catch (ClassNotReifiableException e) {
@@ -252,6 +260,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         if (logger.isDebugEnabled()) {
             logger.debug(slaveName + " reported missing... removing it");
         }
+
+        // we remove the slave from our lists
         if (slaveGroup.contains(slave)) {
             slaveGroup.remove(slave);
             if (sleepingGroup.contains(slave)) {
@@ -259,13 +269,17 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             }
             slavesByNameRev.remove(slave);
             slavesByName.remove(slaveName);
-            TaskIntern wrapper = slavesActivity.get(slaveName);
-            if (!wrapper.isNull() && launchedTasks.contains(wrapper)) {
-                launchedTasks.remove(wrapper);
+            // if the slave was handling a task we put the task back to the pending queue
+            Long taskId = slavesActivity.get(slaveName);
+            if ((taskId != TaskIntern.NULL_TASK_ID) &&
+                    launchedTasks.contains(taskId)) {
+                launchedTasks.remove(taskId);
                 if (pendingTasks.isEmpty()) {
-                    slaveGroupStub.wakeup();
+                    // if the queue was empty before the task is rescheduled, we wake-up all sleeping slaves
+                    sleepingGroupStub.wakeup();
+                    pendingTasks.add(taskId);
                 } else {
-                    pendingTasks.add(wrapper);
+                    pendingTasks.add(taskId);
                 }
             }
         }
@@ -317,12 +331,16 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public TaskIntern sendResultAndGetTask(ResultIntern result,
         String originatorName) {
-        if (launchedTasks.contains(result)) {
+        long taskId = result.getId();
+        if (launchedTasks.contains(taskId)) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Result of task " + result.getId() + " received.");
+                logger.debug("Result of task " + taskId + " received.");
             }
-            launchedTasks.remove(result);
+            launchedTasks.remove(taskId);
+            // We add the result in the result queue
             resultQueue.addCompletedTask(result);
+            // We remove the task from the repository (it won't be needed anymore)
+            repository.removeTask(taskId);
         }
 
         // We assign a new task to the slave
@@ -352,8 +370,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     public void solve(List tasks) throws IllegalArgumentException {
         logger.debug("Adding " + tasks.size() + " tasks...");
 
-        for (TaskIntern task : (List<TaskIntern>) tasks) {
-            solve(task);
+        for (Long taskId : (List<Long>) tasks) {
+            solve(taskId);
         }
     }
 
@@ -362,11 +380,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @param task
      * @throws IllegalArgumentException
      */
-    private void solve(TaskIntern task) throws IllegalArgumentException {
-        resultQueue.addPendingTask(task);
+    private void solve(Long taskId) throws IllegalArgumentException {
+        resultQueue.addPendingTask(taskId);
 
         if (emptyPending()) {
-            pendingTasks.add(task);
+            pendingTasks.add(taskId);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Waking up sleeping slaves...");
@@ -375,7 +393,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             // We wake up the sleeping guys
             sleepingGroupStub.wakeup();
         } else {
-            pendingTasks.add(task);
+            pendingTasks.add(taskId);
         }
     }
 
