@@ -165,6 +165,8 @@ public interface Loggers {
     static final public String MASTERSLAVE_SLAVEMANAGER = MASTERSLAVE +
         ".slavemanager";
     static final public String MASTERSLAVE_PINGER = MASTERSLAVE + ".pinger";
+    static final public String MASTERSLAVE_REPOSITORY = MASTERSLAVE +
+        ".repository";
     static final public String MASTERSLAVE_SLAVES = MASTERSLAVE + ".slaves";
 
     // remote Objects

@@ -13,13 +13,17 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository;
 
 
 public class AOTaskRepository implements TaskRepository, Serializable {
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_REPOSITORY);
     protected HashSet<Integer> hashCodes = new HashSet<Integer>();
     protected HashMap<Long, Integer> idTohashCode = new HashMap<Long, Integer>();
     protected HashMap<Long, TaskIntern> idToTaskIntern = new HashMap<Long, TaskIntern>();
