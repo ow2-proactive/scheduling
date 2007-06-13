@@ -9,6 +9,9 @@ import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 
@@ -20,6 +23,8 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultInter
  *
  */
 public class ResultQueue implements Serializable {
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
+
     //	 current ordering mode
     private Master.OrderingMode mode;
 
@@ -44,11 +49,11 @@ public class ResultQueue implements Serializable {
      * Adds a completed task to the queue
      * @param task completed task
      */
-    public void addCompletedTask(ResultIntern task) {
+    public void addCompletedTask(ResultIntern result) {
         if (mode == Master.OrderingMode.CompletionOrder) {
-            unorderedResults.add(task);
+            unorderedResults.add(result);
         } else {
-            orderedResults.add(task);
+            orderedResults.add(result);
         }
     }
 
@@ -127,7 +132,11 @@ public class ResultQueue implements Serializable {
                 ResultIntern res = it.next();
                 answer.add(res);
                 it.remove();
-                idsubmitted.remove(res.getId());
+                long taskId = res.getId();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Result " + taskId + " received by the user.");
+                }
+                idsubmitted.remove(taskId);
             }
             return answer;
         } else {
@@ -159,7 +168,7 @@ public class ResultQueue implements Serializable {
 
     /**
      * Returns the results of all k next completed task (depending of the current ResultReceptionOrder)
-     * @param k number of completed tasks to get
+     * @param k number of compllocalJVMeted tasks to get
      * @return a list containing the results of the k next completed tasks, if the k next tasks in the current ResultReceptionOrder are available
      * @throws NoSuchElementException if not enough tasks in the current ResultReceptionOrder are available
      */
@@ -235,5 +244,6 @@ public class ResultQueue implements Serializable {
                 it.remove();
             }
         }
+        this.mode = mode;
     }
 }
