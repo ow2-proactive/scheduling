@@ -222,7 +222,16 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
             String controllerItfName = (String) iteratorOnControllers.next();
 
             try {
+                if (null == controllerItfName) {
+                    throw new Exception(
+                        "You must specify the java interface of a controller.");
+                }
                 Class<?> controllerItf = Class.forName(controllerItfName);
+                if (null == controllers.get(controllerItf.getName())) {
+                    throw new Exception(
+                        "You must specify the java implementation for the controller describe by the interface " +
+                        controllerItfName + ".");
+                }
                 controllerClass = Class.forName((String) controllers.get(
                             controllerItf.getName()));
                 Constructor<?> controllerClassConstructor = controllerClass.getConstructor(new Class[] {
@@ -254,11 +263,16 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                         " was specified as output interceptor in the configuration file, but it is not an output interceptor since it does not implement the OutputInterceptor interface");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("could not create controller", e);
+                }
                 throw new ProActiveRuntimeException(
-                    "could not create controller " +
-                    controllers.get(controllerItfName) + " : " +
-                    e.getMessage(), e);
+                    "could not create controller '" +
+                    controllers.get(controllerItfName) +
+                    "' (please check your configuration file " +
+                    componentParameters.getControllerDescription()
+                                       .getControllersConfigFileLocation() +
+                    " : " + e.getMessage(), e);
             }
 
             // there are some special cases for some controllers
@@ -377,7 +391,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                     if (collectionItfsMembers.containsKey(interfaceName)) {
                         return collectionItfsMembers.get(interfaceName);
                     } else {
-                        //					 generate a new interface and add it to the list of members of collection its
+                        // generate a new interface and add it to the list of members of collection its
                         try {
                             Interface clientItf = MetaObjectInterfaceClassGenerator.instance()
                                                                                    .generateFunctionalInterface(interfaceName,
@@ -385,8 +399,8 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                             collectionItfsMembers.put(interfaceName, clientItf);
                             return clientItf;
                         } catch (InterfaceGenerationFailedException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
+                            logger.info("Generation of the interface '" +
+                                interfaceName + "' failed.", e1);
                         }
                     }
                 }

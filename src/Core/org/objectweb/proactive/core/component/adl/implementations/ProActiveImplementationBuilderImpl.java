@@ -140,7 +140,7 @@ public class ProActiveImplementationBuilderImpl
                     deploymentVN = vn.getVirtualNodeInternal();
                 }
                 if (deploymentVN == null) {
-                    if (adlVN.getName().equals("ttnull")) {
+                    if (adlVN.getName().equals("null")) {
                         logger.info(name +
                             " will be instantiated in the current virtual machine (\"null\" was specified as the virtual node name)");
                     } else {
