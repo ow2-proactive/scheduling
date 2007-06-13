@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.JVMProcess.PriorityLevel;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
@@ -58,6 +59,7 @@ import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
 import org.objectweb.proactive.core.util.HostsInfos;
+import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
@@ -954,6 +956,20 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
             JVMProcess jvmProcess = ((JVMProcess) targetProcess);
+
+            Node namedItem = node.getAttributes().getNamedItem("priority");
+            String priority = getNodeExpandedValue(namedItem);
+            if (priority != null) {
+                ((JVMProcess) targetProcess).setPriority(PriorityLevel.valueOf(
+                        priority));
+            }
+
+            namedItem = node.getAttributes().getNamedItem("os");
+            String os = getNodeExpandedValue(namedItem);
+            if (os != null) {
+                ((JVMProcess) targetProcess).setOperatingSystem(OperatingSystem.valueOf(
+                        os));
+            }
 
             NodeList childNodes = node.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
