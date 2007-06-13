@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -74,13 +76,22 @@ public class RemoteObjectHostRTFinder implements HostRTFinder{
 			
 					URI url = uris[i];
 			
-					RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);  
-							
-					Object stub = ro.getObjectProxy();
-							
-					if (stub instanceof ProActiveRuntime) {
-						runtimes.add((ProActiveRuntime ) stub);
+					try {
+					    RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);
+					    Object stub = ro.getObjectProxy();
+                        
+	                    if (stub instanceof ProActiveRuntime) {
+	                        runtimes.add((ProActiveRuntime ) stub);
+	                    }
+					} catch (ProActiveException pae) {
+					    // the lookup returned an active object, and an active object is 
+					    // not a remote object (for now...)
+					    // TODO : Arnaud, Active objects should become Remote Objects...
+					    console.log("Found active object in registry at " + url);
 					}
+					
+					
+				
 							
 				}	
 					
