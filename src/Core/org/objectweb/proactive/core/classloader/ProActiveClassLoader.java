@@ -45,12 +45,14 @@ import java.util.StringTokenizer;
  * classpath and, according to the classloader delegation model, and because it
  * is the system classloader, it will load *all* application classes except the
  * system classes. When asked to load a class, this classloader successively
- * tries to : 1. check if the class is a system class, in that case delegates to
- * the parent classloader (primordial class loader) 2. delegate the loading to
- * the super class URLClassLoader, which looks into the classpath. 3. delegate
- * the search of the class data to a ProActiveClassLoaderHelper, then defines
- * the class from the retreived data (bytecode) (if the local ProActiveRuntime
- * has been created) The ProActiveClassLoaderHelper looks for the given class in
+ * tries to load the class by using:
+ * <ol>
+ *         <li>the URLClassLoader (classpath)</li>
+ *         <li>the SystemClassLoader (JDK)</li>
+ *         <li>the ProActiveClassLoader (Dynamic downloading)</li>
+ * <ol>
+ *
+ * The ProActiveClassLoaderHelper looks for the given class in
  * other runtimes.
  *
  * @author cmathieu
@@ -68,19 +70,13 @@ public class ProActiveClassLoader extends URLClassLoader {
     /**
      * A ProActiveClassLoaderHelper
      *
-     * Need to be an Object otherwise it will be
-     * loaded by the System Classloader
+     * Need to be an Object otherwise it will be loaded by the System
+     * Classloader
      */
     private Object helper;
 
     /** The method to be used to get class data */
     private Method helper_getClassData;
-
-    /** prefix of classes that must to be loaded by the System classloader */
-    final private static String[] JDKPackages = {
-            "java", "javax", "sun", "com.sun", "org.xml.sax", "org.omg",
-            "org.ietf.jgss", "org.w3c.dom", "com.ibm", "org.jcp", "org.apache"
-        };
 
     public ProActiveClassLoader() {
         this(null);
@@ -108,7 +104,6 @@ public class ProActiveClassLoader extends URLClassLoader {
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-        // System.out.println("Trying to load " + name);
         Class<?> c = null;
 
         // Check if the class has been already loaded by this ClassLoader
@@ -116,18 +111,13 @@ public class ProActiveClassLoader extends URLClassLoader {
             return c;
         }
 
-        if (isJDKClass(name)) {
-            return getParent().loadClass(name);
-        }
-
+        // We don't want to find some classes but don't know really why ! 
         if (name.equals("org.objectweb.proactive.core.ssh.http.Handler")) {
-            // class does not exist
             throw new ClassNotFoundException(name);
         }
 
-        // FIXME temporary walkaround
+        // do not attempt to download any 1.2- rmi skeleton
         if (name.endsWith("_Skel")) {
-            // do not attempt to download any 1.2- rmi skeleton
             throw new ClassNotFoundException(name);
         }
 
@@ -136,51 +126,62 @@ public class ProActiveClassLoader extends URLClassLoader {
             throw new ClassNotFoundException(name);
         }
 
-        // System.out.println("ProActiveClassloader loaded class : " + name);
         return c;
     }
 
     /**
-     * Looks for the given class in parents, classpath, and if not found
-     * delegates the search to a ProActiveClassLoaderHelper
+     * Looks for the given class using three different classloaders
+     *
+     * Three classloaders are used in the following order:
+     *  <ol>
+     *          <li>URLClassLoader</li>
+     *          <li>SystemClassLoader</li>
+     *          <li>ProActiveClassLoaderHelper</li>
+     *  </ol>
      *
      * @see ClassLoader#findClass(java.lang.String)
      */
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        //		System.out.println("Trying to find " + name);
-        Class c = null;
+        // System.out.println("Trying to find " + name);
+        Class<?> c = null;
         try {
-            // 1. look in classpath (not from the parent classloader)
+            /* 1- URLClassLoader: find classes inside the classpath */
             c = super.findClass(name);
-
+            // System.out.println("Loaded " + name + " using the URLClassLoader");
             if (!runtimeReady && name.equals(RUNTIME_CLASSNAME)) {
+                // PART is now loaded, PACLHelper can be used
                 runtimeReady = true;
             }
         } catch (ClassNotFoundException e) {
-            // 2. Try to load the class from parent runtime
-
-            // 2.1 ProActive is not ready, load it
-            if (!runtimeReady) {
-                System.err.println(
-                    "Trying to use the ProActiveClassLoading but the Runtime is not ready");
-                System.err.println(
-                    "Please fill a bug report, this should not happen");
-
-                /* Use super.findClass to load RUNTIME_CLASSNAME if needed */
-            }
-
-            //			System.out.println("Using PACLHelper to find : " + name);
-            byte[] class_data = null;
             try {
-                class_data = (byte[]) helper_getClassData.invoke(helper,
-                        new Object[] { name });
-                if (class_data != null) {
-                    c = defineClass(name, class_data, 0, class_data.length,
-                            getClass().getProtectionDomain());
+                /* 2- SystemClassLoader: find classes inside the JDK */
+                c = getParent().loadClass(name);
+                // System.out.println("Loaded " + name + " using the SystemClassLoader");
+            } catch (ClassNotFoundException ex) {
+
+                /* 3- ProActiveClassLoaderHelper: find classes from Parent Runtime */
+                if (runtimeReady) {
+                    byte[] class_data = null;
+                    try {
+                        class_data = (byte[]) helper_getClassData.invoke(helper,
+                                new Object[] { name });
+                        if (class_data != null) {
+                            c = defineClass(name, class_data, 0,
+                                    class_data.length,
+                                    getClass().getProtectionDomain());
+                        }
+
+                        // System.out.println("Loaded " + name + " using the PAClassLoader");
+                    } catch (Exception e1) {
+                        throw new ClassNotFoundException(name, e1);
+                    }
+                } else {
+                    System.err.println(
+                        "Trying to use the ProActiveClassLoading but the Runtime is not ready");
+                    System.err.println(
+                        "Please fill a bug report, this should not happen");
                 }
-            } catch (Exception e1) {
-                throw new ClassNotFoundException(name, e1);
             }
         }
 
@@ -189,39 +190,6 @@ public class ProActiveClassLoader extends URLClassLoader {
         }
 
         return c;
-    }
-
-    /**
-     * Does this class belong to the JDK or not ?
-     *
-     * JDK classes need to be loaded by the System classloader not the ProActive
-     * classloader.
-     *
-     * @param name
-     *            class name
-     * @return true if the class should be loaded by the System classloader
-     */
-    protected boolean isJDKClass(String name) {
-        if (name == null) {
-            return false;
-        }
-
-        // Looking up the package
-        String packageName = null;
-        int pos = name.lastIndexOf('.');
-        if (pos != -1) {
-            packageName = name.substring(0, pos);
-        } else {
-            return false;
-        }
-
-        for (int i = 0; i < JDKPackages.length; i++) {
-            if (packageName.startsWith(JDKPackages[i])) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
