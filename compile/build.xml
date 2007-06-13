@@ -574,7 +574,7 @@
 	<!--  =============================================================== -->
 
 	<target name="update_copyright_and_version" depends="util">
-		<java classname="util.UpdateCopyrightAndVersion" fork="true">
+		<java classname="sources.UpdateCopyrightAndVersion" fork="true">
 			<classpath refid="project.classpath" />
 			<!--  base dir -->
 			<arg value="${base.dir}" />
