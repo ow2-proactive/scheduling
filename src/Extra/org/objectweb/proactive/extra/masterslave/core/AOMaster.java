@@ -83,7 +83,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
     // global variables
     protected boolean terminated; // is the master terminated
-    protected long masterIdleTime;
 
     // Slave manager (deploy slaves)
     protected SlaveManager smanager;
@@ -215,8 +214,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         stubOnThis = ProActive.getStubOnThis();
         // General initializations
         terminated = false;
-        masterIdleTime = Long.parseLong(System.getProperty(
-                    "proactive.masterslave.msidletime"));
         // Queues 
         pendingTasks = new HashSetQueue<Long>();
         launchedTasks = new HashSetQueue<Long>();
@@ -312,16 +309,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (!terminated) {
+            service.waitForRequest();
             service.serveAll("getTask");
             service.serveAll("sendResultAndGetTask");
             service.serveAll("isDead");
-
-            service.serveOldest(new MainFilter());
-            try {
-                Thread.sleep(masterIdleTime);
-            } catch (InterruptedException e) {
-                // do nothing
-            }
+            service.serveAll(new MainFilter());
         }
         body.terminate();
     }
