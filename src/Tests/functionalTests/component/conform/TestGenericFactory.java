@@ -255,8 +255,7 @@ public class TestGenericFactory extends Conformtest {
     public void testBadControllerDescriptor1() throws Exception {
         try {
             // error in controller descriptor
-            gf.newFcInstance(t, "badPrimitive", C.class.getName());
-            //gf.newFcInstance(t, "badPrimitive", C.class.getName());
+            gf.newFcInstance(t, badPrimitive, C.class.getName());
             fail();
         } catch (InstantiationException e) {
         }
@@ -266,7 +265,7 @@ public class TestGenericFactory extends Conformtest {
     public void testBadControllerDescriptor2() throws Exception {
         try {
             // error in controller descriptor
-            gf.newFcInstance(u, "badParametricPrimitive", C.class.getName());
+            gf.newFcInstance(u, badParametricPrimitive, C.class.getName());
             fail();
         } catch (InstantiationException e) {
         }

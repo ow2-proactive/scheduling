@@ -16,9 +16,9 @@
             <interface>org.objectweb.proactive.core.component.controller.ProActiveContentController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl</implementation>
         </controller>
+        <!-- implementation missing for the LifeCycleController interface -->
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>

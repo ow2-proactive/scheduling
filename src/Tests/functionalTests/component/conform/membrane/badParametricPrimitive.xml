@@ -4,8 +4,8 @@
  name="defaultConfiguration">
  <!--  This is the default configuration file for the controllers and interceptors of a **primitive** component in the proactive implementation.-->
     <controllers>
+        <!-- interface missing for the BindingController interface -->
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl</implementation>
         </controller>
         <controller>
