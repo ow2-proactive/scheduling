@@ -1,6 +1,6 @@
 #!/bin/bash
 #build file for Unix system
-compileDir=$(readlink -f `dirname $0`)
+compileDir=$(cd `dirname $0` && /bin/pwd)
 if [ $# -lt 1 ]
 then
   args="-projecthelp"
