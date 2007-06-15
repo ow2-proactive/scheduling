@@ -4,7 +4,7 @@
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
 	elementFormDefault="qualified">
 
-	<complexType name="variableType" abstract="true">
+	<complexType name="variableType">
 		<attribute name="name">
 			<simpleType>
 				<restriction base="string"></restriction>
@@ -17,15 +17,28 @@
 		</attribute>
 	</complexType>
 
+	<element name="abstractVariable" abstract="true"
+		type="pa:variableType">
+	</element>
+	<element name="descriptorVariable"
+		substitutionGroup="pa:abstractVariable" type="pa:variableType">
+	</element>
+	<element name="javaPropertyVariable"
+		substitutionGroup="pa:abstractVariable" type="pa:variableType">
+	</element>
+
+	<complexType name="abstractGCMType" abstract="true"></complexType>
+
 	<complexType name="environmentType">
-		<sequence>
-			<element name="descriptorVariable" type="pa:variableType"
-				minOccurs="0" maxOccurs="unbounded">
-			</element>
-			<element name="javaPropertyVariable" type="pa:variableType"
-				minOccurs="0" maxOccurs="unbounded">
-			</element>
-		</sequence>
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element ref="pa:abstractVariable"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<simpleType name="nameType">
@@ -45,7 +58,7 @@
 		</restriction>
 	</simpleType>
 
-	<complexType name="shType">
+	<complexType name="shType" abstract="true">
 		<sequence>
 			<element name="environment" type="pa:environmentType"
 				maxOccurs="1" minOccurs="0">
@@ -79,33 +92,66 @@
 		</complexContent>
 	</complexType>
 
+	<element name="abstractShElement" type="pa:shType"></element>
+	<element name="ssh" substitutionGroup="pa:abstractShElement"
+		type="pa:sshType">
+	</element>
+	<element name="rsh" substitutionGroup="pa:abstractShElement"
+		type="pa:rshType">
+	</element>
+
 	<complexType name="peerSetType"></complexType>
+	<complexType name="abstractAcquisitionType" abstract="true"></complexType>
+
 	<complexType name="p2pType">
-		<sequence>
-			<element name="peerSet" type="pa:peerSetType"></element>
-		</sequence>
-		<attribute name="nodesAsked" type="positiveInteger"></attribute>
+		<complexContent>
+			<extension base="pa:abstractAcquisitionType">
+				<sequence>
+					<element name="peerSet" type="pa:peerSetType"></element>
+				</sequence>
+				<attribute name="nodesAsked" type="positiveInteger"></attribute>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<complexType name="lookupType">
-		<attribute name="type">
-			<simpleType>
-				<restriction base="string">
-					<enumeration value="RMI"></enumeration>
-					<enumeration value="HTTP"></enumeration>
-					<enumeration value="IBIS"></enumeration>
-				</restriction>
-			</simpleType>
-		</attribute>
-		<attribute name="hostlist" type="string"></attribute>
-		<attribute name="port" type="positiveInteger"></attribute>
+		<complexContent>
+			<extension base="pa:abstractAcquisitionType">
+				<attribute name="type">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="RMI"></enumeration>
+							<enumeration value="HTTP"></enumeration>
+							<enumeration value="IBIS"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="hostlist" type="string"></attribute>
+				<attribute name="port" type="positiveInteger"></attribute>
+			</extension>
+		</complexContent>
 	</complexType>
 
+	<element name="abstractAcquisitionElement"
+		type="pa:abstractAcquisitionType">
+	</element>
+	<element name="lookup" type="pa:lookupType"
+		substitutionGroup="pa:abstractAcquisitionElement">
+	</element>
+	<element name="p2p" type="pa:p2pType"
+		substitutionGroup="pa:abstractAcquisitionElement">
+	</element>
+
 	<complexType name="acquisitionType">
-		<sequence>
-			<element name="lookup" type="pa:lookupType" minOccurs="0"></element>
-			<element name="p2p" type="pa:p2pType" minOccurs="0"></element>
-		</sequence>
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element ref="pa:abstractAcquisitionElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<simpleType name="refType">
@@ -114,7 +160,7 @@
 		</restriction>
 	</simpleType>
 
-	<complexType name="abstractLaunchType" abstract="true"></complexType>
+	<complexType name="abstractLaunchType"></complexType>
 
 	<complexType name="applicationType">
 		<complexContent>
@@ -139,19 +185,53 @@
 	</complexType>
 
 	<complexType name="bridgeType">
-		<sequence>
-			<element name="application" type="pa:applicationType"
-				maxOccurs="unbounded" minOccurs="0">
-			</element>
-			<element name="dispatcher" type="pa:dispatcherType"
-				minOccurs="0" maxOccurs="unbounded">
-			</element>
-			<element name="bridge" type="pa:bridgeType" minOccurs="0"
-				maxOccurs="unbounded">
-			</element>
-		</sequence>
-		<attribute name="ref" type="pa:refType"></attribute>
-		<attribute name="relay" type="string"></attribute>
+		<complexContent>
+			<extension base="pa:abstractLaunchType">
+				<sequence>
+					<element name="application"
+						type="pa:applicationType" maxOccurs="unbounded" minOccurs="0">
+					</element>
+					<element name="dispatcher" type="pa:dispatcherType"
+						minOccurs="0" maxOccurs="unbounded">
+					</element>
+					<element name="bridge" type="pa:bridgeType"
+						minOccurs="0" maxOccurs="unbounded">
+					</element>
+				</sequence>
+				<attribute name="ref" type="pa:refType"></attribute>
+				<attribute name="relay" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="abstractLaunchElement" abstract="true"
+		type="pa:abstractLaunchType">
+	</element>
+
+	<element name="application"
+		substitutionGroup="pa:abstractLaunchElement"
+		type="pa:applicationType">
+	</element>
+
+	<element name="dispatcher"
+		substitutionGroup="pa:abstractLaunchElement"
+		type="pa:dispatcherType">
+	</element>
+
+	<element name="bridge" substitutionGroup="pa:abstractLaunchElement"
+		type="pa:bridgeType">
+	</element>
+
+	<complexType name="launchType">
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element ref="pa:abstractLaunchElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<complexType name="toolType">
@@ -176,65 +256,76 @@
 		<attribute name="homeDirectory" type="pa:pathElementType"></attribute>
 	</complexType>
 
+	<complexType name="abstractInfrastructureType"></complexType>
+
 	<complexType name="hostPropertiesType">
-		<sequence>
-			<element name="host" type="pa:hostType"></element>
-		</sequence>
+		<complexContent>
+			<extension base="pa:abstractInfrastructureType">
+				<sequence>
+					<element name="host" type="pa:hostType"></element>
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<complexType name="deployersType">
-		<sequence>
-			<element name="ssh" type="pa:sshType" minOccurs="0"
-				maxOccurs="unbounded">
-			</element>
-			<element name="rsh" type="pa:rshType" minOccurs="0"
-				maxOccurs="unbounded">
-			</element>
-		</sequence>
+		<complexContent>
+			<extension base="pa:abstractInfrastructureType">
+				<sequence>
+					<element ref="pa:abstractShElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
+
+	<element name="abstractInfrastructureElement"
+		type="pa:abstractInfrastructureType">
+	</element>
+	<element name="hostProperties"
+		substitutionGroup="pa:abstractInfrastructureElement"
+		type="pa:hostPropertiesType">
+	</element>
+
+	<element name="dispatchers" type="pa:deployersType"
+		substitutionGroup="pa:abstractInfrastructureElement">
+	</element>
+	<element name="bridges" type="pa:deployersType"
+		substitutionGroup="pa:abstractInfrastructureElement">
+	</element>
 
 	<complexType name="infrastructureType">
-		<sequence>
-			<element name="hostProperties" type="pa:hostPropertiesType"
-				minOccurs="0">
-			</element>
-			<element name="dispatchers" type="pa:deployersType"
-				minOccurs="0">
-			</element>
-			<element name="bridges" type="pa:deployersType"
-				minOccurs="0">
-			</element>
-		</sequence>
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element ref="pa:abstractInfrastructureElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
 	</complexType>
 
-	<complexType name="launchType">
-		<sequence>
-			<element name="application" type="pa:applicationType"
-				minOccurs="0" maxOccurs="unbounded">
-			</element>
-			<element name="dispatcher" type="pa:dispatcherType"
-				minOccurs="0" maxOccurs="unbounded">
-			</element>
-			<element name="bridge" type="pa:bridgeType" minOccurs="0"
-				maxOccurs="unbounded">
-			</element>
-		</sequence>
-	</complexType>
+	<element name="abstractGCMElement" type="pa:abstractGCMType"></element>
+	<element name="environment" type="pa:environmentType"
+		substitutionGroup="pa:abstractGCMElement">
+	</element>
+	<element name="acquisition" type="pa:acquisitionType"
+		substitutionGroup="pa:abstractGCMElement">
+	</element>
+	<element name="launch" type="pa:launchType"
+		substitutionGroup="pa:abstractGCMElement">
+	</element>
+	<element name="infrastructure" type="pa:infrastructureType"
+		substitutionGroup="pa:abstractGCMElement">
+	</element>
 
 	<element name="GCMDeployment">
 		<complexType>
 			<sequence>
-				<element name="environment" type="pa:environmentType"
-					minOccurs="0">
-				</element>
-				<element name="acquisition" type="pa:acquisitionType"
-					minOccurs="0">
-				</element>
-				<element name="launch" type="pa:launchType"
-					minOccurs="0">
-				</element>
-				<element name="infrastructure"
-					type="pa:infrastructureType" minOccurs="0">
+				<element ref="pa:abstractGCMElement"
+					maxOccurs="unbounded">
 				</element>
 			</sequence>
 		</complexType>

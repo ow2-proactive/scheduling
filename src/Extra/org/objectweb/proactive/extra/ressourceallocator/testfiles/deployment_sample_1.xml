@@ -8,8 +8,8 @@
 		<!-- 
 			Uniquement JavaPropertiesVariable et descriptorVariable
 		-->
-		<descriptorVariable name="foo" value="bar" />
 		<javaPropertyVariable name="foo" value="bar" />
+		<descriptorVariable name="foo" value="bar" />
 	</environment>
 
 	<acquisition>
