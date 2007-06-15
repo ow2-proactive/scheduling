@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!-- Lancement d'un ProActiveRuntime en ecrasant les parametres par defaut -->
+<GCMApplication
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../schema/ApplicationDescriptorSchema.xsd">
+    <ressourceAllocator descriptor="INRIA_LAN.xml" >
+        <ProActive relpath="Workspace/ProActive/" javarelpath="Java/java">
+            <classpath type="append"> <!-- other possible value : 'overwrite' -->
+                <hostrelative>lib/user.jar</hostrelative>
+            </classpath>
+            
+            <securityPolicy>config/security.policy</securityPolicy>
+            <log4jProperties>config/log4j.properties</log4jProperties>
+            <userProperties>config/proactive.properties</userProperties>
+        </ProActive>
+    </ressourceAllocator>
+</GCMApplication>
+
+

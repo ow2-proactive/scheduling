@@ -1,0 +1,34 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+					targetNamespace="http://abbeyworkshop.com/todo"
+					xmlns="http://abbeyworkshop.com/todo"
+					elementFormDefault="qualified"
+					attributeFormDefault="unqualified"
+>
+
+<xs:simpleType name="nameType">
+	<xs:restriction base="xs:string">
+		<xs:maxLength value="50" />
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="itemType">
+	<xs:restriction base="xs:string">
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="listType">
+	<xs:sequence>
+		<xs:element name="item" type="itemType" minOccurs="1" maxOccurs="unbounded" />
+	</xs:sequence>
+	<xs:attribute name="name" type="nameType" />
+</xs:complexType>
+
+<xs:complexType name="todoType">
+	<xs:sequence>
+		<xs:element name="list" type="listType" minOccurs="0" maxOccurs="unbounded" />
+	</xs:sequence>
+</xs:complexType>
+
+<xs:element name="todo" type="todoType" />
+
+</xs:schema>

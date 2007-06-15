@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+            Execute le script killProActive.sh dont la position sur les hotes est indiquees
+            dans INRIA_LAN.xml.
+            
+            Si la ressource n'est pas definie pour au moins un hote, le deploiement est impossible
+-->
+<GCMApplication
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../schema/ApplicationDescriptorSchema.xsd">
+    <ressourceAllocator descriptor="INRIA_LAN.xml">
+        <Executable relpath="killProActive.sh"/>
+    </ressourceAllocator>
+</GCMApplication>

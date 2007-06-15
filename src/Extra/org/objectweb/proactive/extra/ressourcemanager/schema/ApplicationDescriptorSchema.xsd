@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	elementFormDefault="qualified">
+
+	<simpleType name="idType">
+		<annotation>
+			<documentation>
+				An id, used in several elements
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="[1-9a-zA-Z_]+"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="capacityType">
+		<restriction base="string">
+			<pattern value="([1-9]+)|max"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="pathElementType">
+		<annotation>
+			<documentation>
+				A path to a jar or a directory
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<complexType name="pathType">
+		<choice>
+			<element name="hostrelative" type="pa:pathElementType"
+				maxOccurs="unbounded" minOccurs="0"/>
+			<element name="absolute" type="pa:pathElementType"
+				maxOccurs="unbounded" minOccurs="0"/>
+		</choice>
+	</complexType>
+
+	<complexType name="classpathType">
+		<complexContent>
+			<extension base="pa:pathType">
+				<attribute name="type">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="append"></enumeration>
+							<enumeration value="overwrite"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="fileTransferType">
+		<all>
+			<element name="source">
+				<complexType>
+					<attribute name="path" type="pa:pathElementType"></attribute>
+				</complexType>
+			</element>
+			<element name="dest">
+				<complexType>
+					<attribute name="relpath"
+						type="pa:pathElementType">
+					</attribute>
+				</complexType>
+			</element>
+		</all>
+	</complexType>
+
+	<complexType name="proactiveType">
+		<all>
+			<element name="bootclasspath" type="pa:pathType"
+				minOccurs="0">
+			</element>
+			<element name="classpath" type="pa:classpathType"
+				minOccurs="0">
+			</element>
+			<element name="securityPolicy" type="pa:pathElementType"
+				minOccurs="0">
+			</element>
+			<element name="log4jProperties" type="pa:pathElementType"
+				minOccurs="0">
+			</element>
+			<element name="userProperties" type="pa:pathElementType"
+				minOccurs="0">
+			</element>
+		</all>
+		<attribute name="closeStream" type="boolean"></attribute>
+		<attribute name="name" type="string"></attribute>
+		<attribute ref="pa:PriorityAttr"></attribute>
+		<attribute ref="pa:OSAttr"></attribute>
+		<attribute name="relpath" type="pa:pathElementType"
+			use="optional">
+		</attribute>
+		<attribute name="javarelpath" type="pa:pathElementType"
+			use="optional">
+		</attribute>
+
+	</complexType>
+
+	<attribute name="OSAttr">
+		<simpleType>
+			<restriction base="string">
+				<enumeration value="Unix"></enumeration>
+				<enumeration value="Windows"></enumeration>
+			</restriction>
+		</simpleType>
+	</attribute>
+
+	<attribute name="PriorityAttr">
+		<simpleType>
+			<restriction base="string">
+				<enumeration value="Low"></enumeration>
+				<enumeration value="Normal"></enumeration>
+				<enumeration value="High"></enumeration>
+			</restriction>
+		</simpleType>
+	</attribute>
+
+
+	<complexType name="jreType">
+		<sequence>
+			<element name="parameter" type="pa:parameterType" />
+		</sequence>
+		<attribute name="path" type="string"></attribute>
+	</complexType>
+
+	<simpleType name="parameterType">
+		<restriction base="string"></restriction>
+	</simpleType>
+
+
+	<complexType name="ressourceAllocatorType">
+		<sequence>
+			<element name="fileTransfer" type="pa:fileTransferType"
+				minOccurs="0" maxOccurs="unbounded">
+			</element>
+			<element name="Executable" minOccurs="0">
+				<complexType>
+					<attribute name="relpath"
+						type="pa:pathElementType">
+					</attribute>
+				</complexType>
+			</element>
+			<element name="ProActive" type="pa:proactiveType"
+				minOccurs="0">
+			</element>
+		</sequence>
+		<attribute name="id" type="pa:idType"></attribute>
+		<attribute name="descriptor" type="pa:pathElementType"></attribute>
+	</complexType>
+
+	<complexType name="virtualNodeType">
+		<sequence>
+			<element name="fileTranfer" type="pa:fileTransferType"
+				minOccurs="0" maxOccurs="unbounded">
+			</element>
+			<element name="ressourceAllocators" minOccurs="0"
+				maxOccurs="unbounded">
+				<complexType>
+					<sequence>
+						<element name="ressourceAllocator"
+							maxOccurs="unbounded">
+							<complexType>
+								<attribute name="refid"
+									type="pa:idType">
+								</attribute>
+							</complexType>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+		<attribute name="name" type="string" use="required"></attribute>
+		<attribute name="raref" type="string"></attribute>
+		<attribute name="capacity" type="pa:capacityType"></attribute>
+	</complexType>
+
+	<complexType name="coallocationType">
+		<sequence>
+			<element name="virtualNode" type="pa:virtualNodeType"
+				maxOccurs="unbounded">
+			</element>
+		</sequence>
+		<attribute name="raref" type="string"></attribute>
+		<attribute name="capacity" type="pa:capacityType"></attribute>
+	</complexType>
+
+	<complexType name="applicationType">
+		<sequence>
+			<element name="virtualNode" type="pa:virtualNodeType"
+				maxOccurs="unbounded">
+			</element>
+			<element name="coallocation" type="pa:coallocationType" minOccurs="0" maxOccurs="unbounded"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="GCMApplicationType">
+		<all>
+			<element name="ressourceAllocator"
+				type="pa:ressourceAllocatorType">
+			</element>
+			<element name="application" type="pa:applicationType"
+				minOccurs="0">
+			</element>
+			<element name="ProActive" type="pa:proactiveType"
+				minOccurs="0">
+			</element>
+		</all>
+	</complexType>
+
+	<element name="GCMApplication" type="pa:GCMApplicationType"></element>
+
+</schema>

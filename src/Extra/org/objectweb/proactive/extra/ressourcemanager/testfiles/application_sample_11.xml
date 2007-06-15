@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+    Une application composee deux virtualNodes
+    VN1 => cap=12
+    VN2 et VN3 sont coallouees => tout ce qui reste disponible
+    
+    Transfert de fichier pour VN1 
+-->    
+<GCMApplication>
+    <ressourceAllocator id="RA" descriptor="INRIA_LAN.xml" >
+        <ProActive name="proactive"/> 
+    </ressourceAllocator>   
+    
+    <application>
+        <virtualNode name="VN1" raref="RA" capacity="12">
+            <fileTransfer>
+                <source path="myapplication/data/"/>
+                <dest    relpath="data" />                    
+            </fileTransfer>
+        </virtualNode>
+        
+        <coallocation raref="RA" capacity="max">
+            <virtualNode name="VN2"/>
+            <virtualNode name="VN3"/>
+        </coallocation>  
+    </application>
+</GCMApplication>    
+

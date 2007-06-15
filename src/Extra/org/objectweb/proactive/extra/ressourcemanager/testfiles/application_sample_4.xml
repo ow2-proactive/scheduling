@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+      Lancement d'un ProActiveRuntime de la maniere la plus simple
+  -->
+<GCMApplication
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../schema/ApplicationDescriptorSchema.xsd">
+    <ressourceAllocator descriptor="INRIA_LAN.xml">
+        <ProActive name="proactive"/> 
+    </ressourceAllocator>
+    
+ </GCMApplication>
