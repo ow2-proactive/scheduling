@@ -64,9 +64,6 @@ public class ProActiveClassLoader extends URLClassLoader {
     /** The ProActive Runtime class */
     final private static String RUNTIME_CLASSNAME = "org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl";
 
-    /** Is the Runtime class loaded ? */
-    private boolean runtimeReady = false;
-
     /**
      * A ProActiveClassLoaderHelper
      *
@@ -143,16 +140,12 @@ public class ProActiveClassLoader extends URLClassLoader {
      */
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        // System.out.println("Trying to find " + name);
+        //         System.out.println("Trying to find " + name);
         Class<?> c = null;
         try {
             /* 1- URLClassLoader: find classes inside the classpath */
             c = super.findClass(name);
             // System.out.println("Loaded " + name + " using the URLClassLoader");
-            if (!runtimeReady && name.equals(RUNTIME_CLASSNAME)) {
-                // PART is now loaded, PACLHelper can be used
-                runtimeReady = true;
-            }
         } catch (ClassNotFoundException e) {
             try {
                 /* 2- SystemClassLoader: find classes inside the JDK */
@@ -161,26 +154,18 @@ public class ProActiveClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException ex) {
 
                 /* 3- ProActiveClassLoaderHelper: find classes from Parent Runtime */
-                if (runtimeReady) {
-                    byte[] class_data = null;
-                    try {
-                        class_data = (byte[]) helper_getClassData.invoke(helper,
-                                new Object[] { name });
-                        if (class_data != null) {
-                            c = defineClass(name, class_data, 0,
-                                    class_data.length,
-                                    getClass().getProtectionDomain());
-                        }
-
-                        // System.out.println("Loaded " + name + " using the PAClassLoader");
-                    } catch (Exception e1) {
-                        throw new ClassNotFoundException(name, e1);
+                byte[] class_data = null;
+                try {
+                    class_data = (byte[]) helper_getClassData.invoke(helper,
+                            new Object[] { name });
+                    if (class_data != null) {
+                        c = defineClass(name, class_data, 0, class_data.length,
+                                getClass().getProtectionDomain());
                     }
-                } else {
-                    System.err.println(
-                        "Trying to use the ProActiveClassLoading but the Runtime is not ready");
-                    System.err.println(
-                        "Please fill a bug report, this should not happen");
+
+                    // System.out.println("Loaded " + name + " using the PAClassLoader");
+                } catch (Exception e1) {
+                    throw new ClassNotFoundException(name, e1);
                 }
             }
         }

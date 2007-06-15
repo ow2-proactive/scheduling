@@ -87,9 +87,14 @@ public class ProActiveClassLoaderHelper {
                 debug("found " + className + " in ancestor runtime");
                 return class_data;
             }
+        } catch (NullPointerException e) {
+            // The PART is probably not ready 
+            // class downloading is not yet available
+
+            //System.out.println("XXX name=" + className);
+            //e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
-            // continue
         }
 
         // 3. standard proactive stub?
