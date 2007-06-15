@@ -365,8 +365,11 @@ static int execute(const char *cmd, const char *flag)
         return EXIT_FATAL;
 
     pid = fork();
-    if (pid < 0)
+    if (pid < 0) {
+        close(fd[0]);
+        close(fd[1]);
         return EXIT_FATAL;
+    }
 
     if (pid == 0) {
         /* Child */
@@ -404,6 +407,7 @@ static int execute(const char *cmd, const char *flag)
         java_out = fdopen(fd[0], "r");
         if (java_out == NULL) {
             kill(child_pid, SIGKILL);
+            close(fd[0]);
             return EXIT_FATAL;
         }
 
@@ -414,6 +418,7 @@ static int execute(const char *cmd, const char *flag)
         }
 
         wait_pid = waitpid(pid, &status, 0);
+        close(fd[0]);
         if (wait_pid < 0)
             return EXIT_FATAL;
 
