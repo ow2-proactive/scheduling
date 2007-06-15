@@ -4,7 +4,7 @@
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
 	elementFormDefault="qualified">
 
-	<complexType name="variableType">
+	<complexType name="variableType" abstract="true">
 		<attribute name="name">
 			<simpleType>
 				<restriction base="string"></restriction>
@@ -19,11 +19,11 @@
 
 	<complexType name="environmentType">
 		<sequence>
-			<element name="descriptorVariable" type="pa:variableType" minOccurs="0"
-				maxOccurs="unbounded">
+			<element name="descriptorVariable" type="pa:variableType"
+				minOccurs="0" maxOccurs="unbounded">
 			</element>
-			<element name="javaPropertyVariable" type="pa:variableType" minOccurs="0"
-				maxOccurs="unbounded">
+			<element name="javaPropertyVariable" type="pa:variableType"
+				minOccurs="0" maxOccurs="unbounded">
 			</element>
 		</sequence>
 	</complexType>
@@ -63,8 +63,8 @@
 		<complexContent>
 			<extension base="pa:shType">
 				<sequence>
-					<element name="privateKey"
-						type="pa:pathElementType" minOccurs="0">
+					<element name="privateKey" type="pa:pathElementType"
+						minOccurs="0">
 					</element>
 				</sequence>
 				<attribute name="commandOptions" type="string"></attribute>
@@ -114,17 +114,28 @@
 		</restriction>
 	</simpleType>
 
+	<complexType name="abstractLaunchType" abstract="true"></complexType>
+
 	<complexType name="applicationType">
-		<attribute name="ref" type="pa:refType"></attribute>
+		<complexContent>
+			<extension base="pa:abstractLaunchType">
+				<attribute name="ref" type="pa:refType"></attribute>
+			</extension>
+		</complexContent>
+
 	</complexType>
 
 	<complexType name="dispatcherType">
-		<sequence>
-			<element name="application" type="pa:applicationType"
-				maxOccurs="unbounded">
-			</element>
-		</sequence>
-		<attribute name="ref" type="pa:refType"></attribute>
+		<complexContent>
+			<extension base="pa:abstractLaunchType">
+				<sequence>
+					<element name="application"
+						type="pa:applicationType" maxOccurs="unbounded">
+					</element>
+				</sequence>
+				<attribute name="ref" type="pa:refType"></attribute>
+			</extension>
+		</complexContent>
 	</complexType>
 
 	<complexType name="bridgeType">
