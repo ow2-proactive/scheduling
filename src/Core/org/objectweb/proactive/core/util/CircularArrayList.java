@@ -30,11 +30,18 @@
  */
 package org.objectweb.proactive.core.util;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
+import org.junit.Test;
+import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -103,28 +110,6 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         }
         sb.append("\n");
         return sb.toString();
-    }
-
-    public static void main(String[] args) {
-        CircularArrayList c = new CircularArrayList(5);
-        c.add(0, new Integer(8));
-        logger.info(c.toString());
-        c.add(0, new Integer(7));
-        logger.info(c.toString());
-        c.add(0, new Integer(6));
-        logger.info(c.toString());
-        c.add(0, new Integer(5));
-        logger.info(c.toString());
-        c.add(0, new Integer(4));
-        logger.info(c.toString());
-        c.add(0, new Integer(3));
-        logger.info(c.toString());
-        c.add(0, new Integer(2));
-        logger.info(c.toString());
-        c.add(0, new Integer(1));
-        logger.info(c.toString());
-        c.add(0, new Integer(0));
-        logger.info(c.toString());
     }
 
     @Override
@@ -362,6 +347,68 @@ public class CircularArrayList extends java.util.AbstractList implements java.ut
         if ((index >= size) || (index < 0)) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " +
                 size);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    static public class UnitTestCircularArrayList {
+        private CircularArrayList cal;
+
+        @Before
+        public void setUp() {
+            cal = new CircularArrayList();
+        }
+
+        /**
+             * Add and remove 50 elements and check that size() is ok
+             */
+        @Test
+        public void addAndRemove() {
+            int nbElem = 50;
+
+            for (int i = 0; i < nbElem; i++)
+                cal.add(i);
+            assertTrue(cal.size() == nbElem);
+
+            for (int i = 0; i < nbElem; i++)
+                cal.remove(0);
+            assertTrue(cal.size() == 0);
+        }
+
+        /**
+             * Remove() on an empty list must thrown an {@link IndexOutOfBoundsException} exception
+             */
+        @Test(expected = IndexOutOfBoundsException.class)
+        public void removeTooManyElems() {
+            cal.remove(0);
+        }
+
+        /**
+             * Serialization
+             * @throws IOException
+             */
+        @Test
+        public void serialization() throws IOException {
+            int nbElem = 50;
+
+            for (int i = 0; i < nbElem; i++)
+                cal.add(i);
+
+            CircularArrayList r = (CircularArrayList) Utils.makeDeepCopy(cal);
+            assertTrue(r.equals(cal));
+        }
+
+        @Test
+        public void collectionAsParameter() {
+            Collection<Integer> col = new ArrayList<Integer>();
+            for (int i = 0; i < 50; i++)
+                col.add(i);
+
+            CircularArrayList o = new CircularArrayList(col);
+
+            assertTrue(col.equals(o));
+
+            assertTrue(o.size() == col.size());
         }
     }
 }
