@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import static junit.framework.Assert.assertTrue;
 
-
 /**
  * <p>
  * Originally written by Dr. Heinz Kabutz in the very excellent
