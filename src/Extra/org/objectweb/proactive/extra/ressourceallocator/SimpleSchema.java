@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.ressourcemanager;
+package org.objectweb.proactive.extra.ressourceallocator;
 
 import java.io.CharArrayWriter;
 import java.io.IOException;
