@@ -33,14 +33,10 @@ package org.objectweb.proactive.ic2d.monitoring.finder;
 import java.net.URI;
 import java.rmi.ConnectException;
 import java.rmi.ConnectIOException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -89,10 +85,6 @@ public class RemoteObjectHostRTFinder implements HostRTFinder{
 					    // TODO : Arnaud, Active objects should become Remote Objects...
 					    console.log("Found active object in registry at " + url);
 					}
-					
-					
-				
-							
 				}	
 					
 			}

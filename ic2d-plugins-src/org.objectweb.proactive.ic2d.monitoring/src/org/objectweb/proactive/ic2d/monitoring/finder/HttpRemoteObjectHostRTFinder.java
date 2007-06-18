@@ -10,7 +10,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
@@ -25,7 +24,7 @@ public class HttpRemoteObjectHostRTFinder implements HostRTFinder {
 		
 		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
 		
-		ProActiveRuntimeAdapterImpl adapter = null;
+		//ProActiveRuntimeAdapterImpl adapter = null;
 		try {
 //			adapter = new ProActiveRuntimeAdapterImpl(new HttpProActiveRuntime(
 //			        UrlBuilder.buildUrl(host.getHostName(), "", Constants.XMLHTTP_PROTOCOL_IDENTIFIER, host.getPort())));

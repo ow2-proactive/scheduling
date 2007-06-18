@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.finder;
 
-import org.objectweb.proactive.core.Constants;
 
 /**
  * Factory design pattern.

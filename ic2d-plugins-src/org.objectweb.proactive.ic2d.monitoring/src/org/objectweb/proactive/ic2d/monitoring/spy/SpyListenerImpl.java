@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.spy;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 

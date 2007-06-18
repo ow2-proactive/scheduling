@@ -39,7 +39,6 @@ import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.ConnectionLocator;
 import org.eclipse.draw2d.ConnectionRouter;
 import org.eclipse.draw2d.DelegatingLayout;
-import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PolygonDecoration;

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.spy;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.objectweb.proactive.Body;
@@ -46,8 +45,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.gc.ObjectGraph;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.ic2d.console.Console;
-import org.objectweb.proactive.ic2d.monitoring.Activator;
 
 
 /**

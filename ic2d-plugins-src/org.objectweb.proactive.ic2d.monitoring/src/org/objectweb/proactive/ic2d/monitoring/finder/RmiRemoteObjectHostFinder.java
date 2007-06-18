@@ -38,7 +38,6 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;

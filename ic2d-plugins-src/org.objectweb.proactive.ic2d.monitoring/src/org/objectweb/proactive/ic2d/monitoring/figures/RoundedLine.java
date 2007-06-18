@@ -32,7 +32,6 @@ package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.Polyline;
-import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.swt.SWT;
