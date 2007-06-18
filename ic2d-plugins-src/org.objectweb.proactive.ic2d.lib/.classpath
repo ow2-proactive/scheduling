@@ -37,10 +37,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/globus/cryptix32.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/globus/cryptix-asn1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/globus/puretls.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibis/ibis.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jini/jini-core.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jini/jini-ext.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jini/reggie.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi/http.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi/moduleloader.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/osgi/oscar.jar"/>
