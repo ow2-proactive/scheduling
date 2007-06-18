@@ -37,16 +37,16 @@ public class SimpleSchema {
                 System.out.println("The parser is validating");
             }
 
-            //Create Parser
+            // Create Parser
             parser = factory.newSAXParser();
 
             // Enable Schemas
             parser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-            //            parser.setFeature("http://apache.org/xml/features/validation/dynamic",
-            //                    true);
+            // parser.setFeature("http://apache.org/xml/features/validation/dynamic",
+            // true);
 
-            //Create XMLReader
+            // Create XMLReader
             xmlReader = parser.getXMLReader();
 
             ContentHandler cHandler = new MyDefaultHandler();
@@ -61,19 +61,13 @@ public class SimpleSchema {
         }
     }
 
-    public void parseDocument(String xmlFile) {
-        try {
-            xmlReader.parse(xmlFile);
-            if (valid) {
-                System.out.println("Document is valid!");
-            }
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public boolean parseDocument(String xmlFile) throws Exception {
+        xmlReader.parse(xmlFile);
+        if (valid) {
+            System.out.println("Document is valid!");
+            return true;
         }
+        return false;
     }
 
     public static void main(String[] args) {
@@ -96,8 +90,9 @@ public class SimpleSchema {
         private CharArrayWriter buff = new CharArrayWriter();
         private String errMessage = "";
 
-        /* With a handler class, just override the methods you need to use
-        */
+        /*
+         * With a handler class, just override the methods you need to use
+         */
 
         // Start Error Handler code here
         public void warning(SAXParseException e) {
