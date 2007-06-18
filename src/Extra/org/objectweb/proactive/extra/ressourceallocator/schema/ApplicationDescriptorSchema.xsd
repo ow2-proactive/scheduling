@@ -34,13 +34,19 @@
 		</restriction>
 	</simpleType>
 
+	<element name="abstractPathElement" type="pa:pathElementType"
+		abstract="true">
+	</element>
+
+	<element name="hostrelative" type="pa:pathElementType"
+		substitutionGroup="pa:abstractPathElement" />
+	<element name="absolute" type="pa:pathElementType"
+		substitutionGroup="pa:abstractPathElement" />
+
 	<complexType name="pathType">
-		<choice>
-			<element name="hostrelative" type="pa:pathElementType"
-				maxOccurs="unbounded" minOccurs="0"/>
-			<element name="absolute" type="pa:pathElementType"
-				maxOccurs="unbounded" minOccurs="0"/>
-		</choice>
+		<sequence>
+			<element ref="pa:abstractPathElement"></element>
+		</sequence>
 	</complexType>
 
 	<complexType name="classpathType">
@@ -199,7 +205,9 @@
 			<element name="virtualNode" type="pa:virtualNodeType"
 				maxOccurs="unbounded">
 			</element>
-			<element name="coallocation" type="pa:coallocationType" minOccurs="0" maxOccurs="unbounded"></element>
+			<element name="coallocation" type="pa:coallocationType"
+				minOccurs="0" maxOccurs="unbounded">
+			</element>
 		</sequence>
 	</complexType>
 
