@@ -62,7 +62,11 @@ public class FunctionalTest {
         logger.trace("Killing remaining ProActive Runtime");
         killProActive();
 
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
+        try {
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
+        } catch (IllegalArgumentException e) {
+            logger.trace("shutdownHook already registered");
+        }
 
         long timeout = TIMEOUT;
         String ptt = System.getProperty("proactive.test.timeout");
