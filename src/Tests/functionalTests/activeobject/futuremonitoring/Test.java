@@ -53,6 +53,7 @@ public class Test extends FunctionalTest {
         boolean exception = false;
         A a = (A) ProActive.newActive(A.class.getName(), null, this.node);
         A future = a.crash();
+
         //FutureMonitoring.monitorFuture(future);
         try {
             System.out.println(future);
