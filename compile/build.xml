@@ -19,7 +19,7 @@
 
 	<path id="emma.lib" >
 		<pathelement location="${base.dir}/compile/lib/emma_ant.jar" />
-		<pathelement location="${base.dir}/dev/lib/emma.jar" />
+		<pathelement location="${base.dir}/compile/lib/emma.jar" />
 	</path>
 
 	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
