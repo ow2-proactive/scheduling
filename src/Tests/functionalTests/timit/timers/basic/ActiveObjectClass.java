@@ -106,10 +106,6 @@ public class ActiveObjectClass implements java.io.Serializable {
         if (wfrTimer.isStarted()) {
             return "Problem with the WaitForRequest timer it's still started during the service of a request.";
         }
-        if (wfrTimer.getTotalTime() <= 0) {
-            return "Problem with the WaitForRequest timer its time is : " +
-            wfrTimer.getTotalTime();
-        }
         return "true";
     }
 
