@@ -15,6 +15,17 @@
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest"/>
 
+	<!-- emma -->
+
+	<path id="emma.lib" >
+		<pathelement location="${base.dir}/compile/lib/emma_ant.jar" />
+		<pathelement location="${base.dir}/dev/lib/emma.jar" />
+	</path>
+
+	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
+
+
+
 	<!--
 		Create a timestamp for this build 
 		If ${version} is defined its value is used as string version for this build
@@ -71,7 +82,6 @@
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
 		<delete dir="${junit.dir}" />
-		<delete dir="${emma.dir}" />
 	</target>
 
 
@@ -312,6 +322,7 @@
 	<macrodef name="junitMacro">
 		<attribute name="nodeDescriptor" />
 		<element name="jvmargs" optional="yes" />
+		<element name="additionalClasspath" optional="yes" />
 		<sequential>
 			<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 				<classpath refid="project.classpath" />
@@ -334,11 +345,19 @@
 			<junit printsummary="yes" forkmode="perTest" showoutput="yes">
 				<jvmarg value="-Dproactive.dir=${base.dir}"/>
 
+
+				<classpath>
+					<additionalClasspath/>
+					<path refid="test.classpath"/>
+				</classpath>
+
 				<classpath refid="test.classpath"/>
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
 				<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=@{nodeDescriptor}" />
-				
+
+				<jvmargs/>
+			
 				<!--
 					Remote Debug:
 					<jvmarg value="-Xdebug" />
@@ -348,7 +367,6 @@
 					<jvmarg value="-agentlib:yjpagent" />
 				-->	
 
-				<jvmargs/>
 
 
 				<formatter type="xml"/>
@@ -384,6 +402,32 @@
 	<target name="junit" depends="proActiveJar" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
+
+	<target name="junitCoverage" depends="proActiveJar" description="Same as junit but with code coverage enabled">
+
+		<delete dir="${classes.dir}/emma"/>
+		<mkdir  dir="${classes.dir}/emma"/>
+
+		<emma enabled="true">
+			<instr
+				instrpathref="test.classpath"
+				destdir="${classes.dir}/emma"
+				metadatafile="${classes.dir}/metadata.emma"
+				merge="true">
+				<filter excludes="org.bouncycastle.*" />
+			</instr>	
+		</emma>
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
+			<jvmargs>
+				<jvmarg value="-Demma.coverage.out.file=${base.dir}/coverage.emma" />
+				<jvmarg value="-Demma.coverage.out.merge=true" />
+			</jvmargs>
+			<additionalClassPath>
+				<pathelement location="${classes.dir}/emma"/>
+				<path refid="emma.lib"/>
+			</additionalClassPath>
+		</junitMacro>
+	</target>	
 
 	<!--	
 	<target name="runTestsLocalHttp" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
