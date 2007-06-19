@@ -180,29 +180,39 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         return waitingForRequest;
     }
 
-    public synchronized void waitForRequest(long timeout) {
-        while (isEmpty() && shouldWait) {
+    /**
+     * Does not check for pending requests before waiting
+     */
+    private synchronized void internalWaitForRequest(long timeout) {
+        if (Profiling.TIMERS_COMPILED) {
+            TimerWarehouse.startTimer(this.ownerID,
+                TimerWarehouse.WAIT_FOR_REQUEST);
+        }
+        if (hasListeners()) {
+            notifyAllListeners(new RequestQueueEvent(ownerID,
+                    RequestQueueEvent.WAIT_FOR_REQUEST));
+        }
+        try {
+            this.waitingForRequest = timeout == 0;
+            this.wait(timeout);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            this.waitingForRequest = false;
+            // THIS CODE IS NEVER EXECUTED IF THE ACTIVE OBJECT IS TERMINATED
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.startTimer(this.ownerID,
+                TimerWarehouse.stopTimer(this.ownerID,
                     TimerWarehouse.WAIT_FOR_REQUEST);
             }
-            if (hasListeners()) {
-                notifyAllListeners(new RequestQueueEvent(ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                this.waitingForRequest = timeout == 0;
-                this.wait(timeout);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                this.waitingForRequest = false;
-                // THIS CODE IS NEVER EXECUTED IF THE ACTIVE OBJECT IS TERMINATED
-                if (Profiling.TIMERS_COMPILED) {
-                    TimerWarehouse.stopTimer(this.ownerID,
-                        TimerWarehouse.WAIT_FOR_REQUEST);
-                }
-            }
+        }
+    }
+
+    /**
+     * User API: checks for pending requests before waiting
+     */
+    public synchronized void waitForRequest(long timeout) {
+        while (isEmpty() && shouldWait) {
+            internalWaitForRequest(timeout);
         }
     }
 
@@ -234,7 +244,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
             : ((requestFilter == null) ? removeYoungest()
                                        : removeYoungest(requestFilter));
         while ((r == null) && shouldWait) {
-            waitForRequest(timeout);
+            internalWaitForRequest(timeout);
             r = oldest
                 ? ((requestFilter == null) ? removeOldest()
                                            : removeOldest(requestFilter))
@@ -300,7 +310,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         while (((this.isEmpty() && this.shouldWait) || this.suspended ||
                 (this.indexOfRequestToServe() == -1)) &&
                 !this.specialExecution) {
-            waitForRequest(timeout);
+            internalWaitForRequest(timeout);
             if ((System.currentTimeMillis() - timeStartWaiting) > timeout) {
                 return removeOldest();
             }
@@ -331,7 +341,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         while (((this.isEmpty() && this.shouldWait) || this.suspended ||
                 (this.indexOfRequestToServe() == -1)) &&
                 !this.specialExecution) {
-            waitForRequest(0);
+            internalWaitForRequest(0);
         }
         if (this.specialExecution) {
             this.specialExecution = false;
