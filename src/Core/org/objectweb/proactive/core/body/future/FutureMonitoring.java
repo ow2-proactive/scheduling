@@ -142,8 +142,12 @@ public class FutureMonitoring implements Runnable {
             new Exception("Cannot monitor this future, unknown updater body").printStackTrace();
             return;
         }
+        String url = body.getNodeURL();
         synchronized (futuresToMonitor) {
-            String url = body.getNodeURL();
+            /*
+             * Avoid a race with the suppression in the ConcurrentHashMap when the
+             * ConcurrentLinkedQueue is empty.
+             */
             ConcurrentLinkedQueue<FutureProxy> futures = futuresToMonitor.get(url);
             if (futures == null) {
                 futures = new ConcurrentLinkedQueue<FutureProxy>();
