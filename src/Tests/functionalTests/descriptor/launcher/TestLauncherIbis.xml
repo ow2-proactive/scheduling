@@ -57,6 +57,7 @@
 						<parameter value="-Dibis.name_server.host=localhost"/>
 						<parameter value="-Dibis.name_server.pool=rutget"/>
 						<parameter value="-Dibis.name_server.key=12"/>
+						<parameter value="-Dproactive.test=true"/>
 					</jvmParameters>
 				</jvmProcess>					
 			</processDefinition>

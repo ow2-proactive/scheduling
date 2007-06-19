@@ -50,6 +50,9 @@
 		<processes>
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<jvmParameters>
+						<parameter value="-Dproactive.test=true"/>
+					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 			

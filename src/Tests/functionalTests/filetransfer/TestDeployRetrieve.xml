@@ -104,11 +104,17 @@
 						<absolutePath
 							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
 					</policyFile>
+					<jvmParameters>
+						<parameter value="-Dproactive.test=true"/>
+					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="localJVM">
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<jvmParameters>
+						<parameter value="-Dproactive.test=true"/>
+					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 		</processes>
