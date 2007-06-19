@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
+import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
 import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
@@ -2053,6 +2054,10 @@ public class ProActive {
         throws ProActiveException {
         FuturePool fp = getBodyOnThis().getFuturePool();
         long start = System.nanoTime() / 1000000;
+
+        for (Object future : futures) {
+            FutureMonitoring.monitorFuture(future);
+        }
 
         synchronized (fp) {
             while (true) {

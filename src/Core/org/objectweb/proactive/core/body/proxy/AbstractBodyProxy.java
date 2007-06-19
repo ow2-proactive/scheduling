@@ -255,7 +255,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
         // Set the id of the body creator in the created future
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
-        fp.setCreatorID(getBodyID());
+        fp.setCreator(this.getBody());
         fp.setOriginatingProxy(this);
 
         try {
@@ -279,7 +279,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         throws Throwable, Exception, RenegotiateSessionException {
         // Setting methodCall.res to null means that we do not use the future mechanism
         FutureProxy fp = FutureProxy.getFutureProxy();
-        fp.setCreatorID(getBodyID());
+        fp.setCreator(this.getBody());
         fp.setOriginatingProxy(this);
 
         try {

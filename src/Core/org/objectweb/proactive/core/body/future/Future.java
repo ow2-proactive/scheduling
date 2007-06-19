@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.future;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.UniversalBody;
 
 
 /**
@@ -82,14 +83,19 @@ public interface Future extends LocalFuture {
     public long getID();
 
     /**
-     * To set the creatorID, ie the UniqueID of the body which create this future
+     * To set the creator, ie the body which created this future
      */
-    public void setCreatorID(UniqueID i);
+    public void setCreator(UniversalBody creator);
 
     /**
      * To get the creatorID.
      */
     public UniqueID getCreatorID();
+
+    /**
+     * To get the creator.
+     */
+    public UniversalBody getCreator();
 
     /**
      * To set the senderID, ie the UniqueID of the body that will send this future,
