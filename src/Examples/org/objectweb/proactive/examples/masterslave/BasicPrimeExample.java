@@ -85,14 +85,12 @@ public class BasicPrimeExample extends AbstractExample {
         ProActiveMaster<FindPrimeTask, Boolean> master = new ProActiveMaster<FindPrimeTask, Boolean>(instance.descriptor_url,
                 instance.vn_name);
 
-        System.out.println("" + prime_to_find);
-
         long startTime = System.currentTimeMillis();
         // Creating and Submitting the tasks
         master.solve(instance.createTasks());
 
         // Collecting the results
-        Collection<Boolean> results = master.waitAllResults();
+        List<Boolean> results = master.waitAllResults();
         System.out.println(results);
         long endTime = System.currentTimeMillis();
 
