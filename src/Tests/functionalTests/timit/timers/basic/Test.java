@@ -39,6 +39,8 @@ import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
+
+
 public class Test extends FunctionalTest {
     private ActiveObjectClass a1;
     private ActiveObjectClass a1bis;
@@ -62,6 +64,11 @@ public class Test extends FunctionalTest {
         // Provide the remote reference of a1 and a1bis to a2
         this.a2 = (ActiveObjectClass) ProActive.newActive(ActiveObjectClass.class.getName(),
                 new Object[] { this.a1, this.a1bis, "a2" }, nodes[1]);
+        // In order to test the value of the WaitForRequest timer
+        // the main will wait a WAITING_TIME, therefore the a2 will be in
+        // WaitForRequest for at
+        // least 100
+        Thread.sleep(100);
     }
 
     public boolean preConditions() throws Exception {
@@ -80,7 +87,8 @@ public class Test extends FunctionalTest {
         String result = this.a2.checkIfTotalIsStarted();
         assertTrue(result, "true".equals(result));
 
-        // Check if the WaitForRequest timer is stopped during a service of a request
+        // Check if the WaitForRequest timer is stopped during a service of a
+        // request
         result = this.a2.checkIfWfrIsStopped();
         assertTrue(result, "true".equals(result));
 
@@ -89,11 +97,12 @@ public class Test extends FunctionalTest {
         assertTrue(result, "true".equals(result));
 
         // For the next requests a2 is going to use timers
-        // SendRequest, BeforeSerialization, Serialization and AfterSerialization timers must be used 
+        // SendRequest, BeforeSerialization, Serialization and
+        // AfterSerialization timers must be used
         result = this.a2.performSyncCallOnRemote();
         assertTrue(result, "true".equals(result));
 
-        // SendRequest and LocalCopy timers must be used 
+        // SendRequest and LocalCopy timers must be used
         result = this.a2.performSyncCallOnLocal();
         assertTrue(result, "true".equals(result));
 
@@ -102,9 +111,9 @@ public class Test extends FunctionalTest {
         assertTrue(result, "true".equals(result));
 
         // disable the result output
-        //this.t = TimItBasicManager.getInstance().getTimItCommonReductor();
-        //t.setGenerateOutputFile(false);
-        //t.setPrintOutput(false);            
+        // this.t = TimItBasicManager.getInstance().getTimItCommonReductor();
+        // t.setGenerateOutputFile(false);
+        // t.setPrintOutput(false);
     }
 
     @After
