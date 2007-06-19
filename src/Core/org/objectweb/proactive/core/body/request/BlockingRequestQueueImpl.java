@@ -181,25 +181,27 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     }
 
     public synchronized void waitForRequest(long timeout) {
-        if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startTimer(this.ownerID,
-                TimerWarehouse.WAIT_FOR_REQUEST);
-        }
-        if (hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID,
-                    RequestQueueEvent.WAIT_FOR_REQUEST));
-        }
-        try {
-            this.waitingForRequest = timeout == 0;
-            this.wait(timeout);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            this.waitingForRequest = false;
-            // THIS CODE IS NEVER EXECUTED IF THE ACTIVE OBJECT IS TERMINATED
+        while (isEmpty() && shouldWait) {
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.stopTimer(this.ownerID,
+                TimerWarehouse.startTimer(this.ownerID,
                     TimerWarehouse.WAIT_FOR_REQUEST);
+            }
+            if (hasListeners()) {
+                notifyAllListeners(new RequestQueueEvent(ownerID,
+                        RequestQueueEvent.WAIT_FOR_REQUEST));
+            }
+            try {
+                this.waitingForRequest = timeout == 0;
+                this.wait(timeout);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                this.waitingForRequest = false;
+                // THIS CODE IS NEVER EXECUTED IF THE ACTIVE OBJECT IS TERMINATED
+                if (Profiling.TIMERS_COMPILED) {
+                    TimerWarehouse.stopTimer(this.ownerID,
+                        TimerWarehouse.WAIT_FOR_REQUEST);
+                }
             }
         }
     }
