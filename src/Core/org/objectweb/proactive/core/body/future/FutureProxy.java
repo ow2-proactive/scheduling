@@ -56,6 +56,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
@@ -321,17 +322,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 id = null;
             }
         }
-        int timeoutCounter = 1;
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
-            timeoutCounter--;
-            // counter < 0 means that it is the second time we enter in the loop
-            // while still not available, i.e timeout has expired
-            if (timeoutCounter < 0) {
+            if (time.isTimeoutElapsed()) {
                 throw new ProActiveException(
                     "Timeout expired while waiting for the future update");
             }
             try {
-                this.wait(timeout);
+                this.wait(time.getRemainingTimeout());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

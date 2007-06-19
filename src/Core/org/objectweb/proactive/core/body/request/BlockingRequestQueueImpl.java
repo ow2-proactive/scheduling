@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.event.RequestQueueEvent;
@@ -41,6 +42,7 @@ import org.objectweb.proactive.core.group.spmd.MethodBarrier;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrierWithMethodName;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
@@ -211,8 +213,10 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
      * User API: checks for pending requests before waiting
      */
     public synchronized void waitForRequest(long timeout) {
-        while (isEmpty() && shouldWait) {
-            internalWaitForRequest(timeout);
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
+
+        while (isEmpty() && shouldWait && !time.isTimeoutElapsed()) {
+            internalWaitForRequest(time.getRemainingTimeout());
         }
     }
 
@@ -243,8 +247,9 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
                                        : removeOldest(requestFilter))
             : ((requestFilter == null) ? removeYoungest()
                                        : removeYoungest(requestFilter));
-        while ((r == null) && shouldWait) {
-            internalWaitForRequest(timeout);
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
+        while ((r == null) && shouldWait && !time.isTimeoutElapsed()) {
+            internalWaitForRequest(time.getRemainingTimeout());
             r = oldest
                 ? ((requestFilter == null) ? removeOldest()
                                            : removeOldest(requestFilter))
@@ -303,17 +308,14 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
      * @return the request found in the queue.
      */
     protected Request barrierBlockingRemoveOldest(long timeout) {
-        long timeStartWaiting = 0;
-        if (timeout > 0) {
-            timeStartWaiting = System.currentTimeMillis();
-        }
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (((this.isEmpty() && this.shouldWait) || this.suspended ||
                 (this.indexOfRequestToServe() == -1)) &&
                 !this.specialExecution) {
-            internalWaitForRequest(timeout);
-            if ((System.currentTimeMillis() - timeStartWaiting) > timeout) {
+            if (time.isTimeoutElapsed()) {
                 return removeOldest();
             }
+            internalWaitForRequest(time.getRemainingTimeout());
         }
         if (specialExecution) {
             specialExecution = false;

@@ -102,6 +102,7 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.NodeCreationListenerForAoCreation;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.ProcessForAoCreation;
+import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -2053,7 +2054,7 @@ public class ProActive {
     public static int waitForAny(java.util.Vector futures, long timeout)
         throws ProActiveException {
         FuturePool fp = getBodyOnThis().getFuturePool();
-        long start = System.nanoTime() / 1000000;
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
 
         for (Object future : futures) {
             FutureMonitoring.monitorFuture(future);
@@ -2073,16 +2074,11 @@ public class ProActive {
 
                     index++;
                 }
-                long remainingTimeout = 0;
-                if (timeout != 0) {
-                    remainingTimeout = (System.nanoTime() / 1000000) - start -
-                        timeout;
-                    if (remainingTimeout <= 0) {
-                        throw new ProActiveException(
-                            "Timeout expired while waiting for future update");
-                    }
+                if (time.isTimeoutElapsed()) {
+                    throw new ProActiveException(
+                        "Timeout expired while waiting for future update");
                 }
-                fp.waitForReply(remainingTimeout);
+                fp.waitForReply(time.getRemainingTimeout());
             }
         }
     }
@@ -2109,18 +2105,13 @@ public class ProActive {
      */
     public static void waitForAll(java.util.Vector futures, long timeout)
         throws ProActiveException {
-        long start = System.nanoTime() / 1000000;
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         for (Object future : futures) {
-            long remainingTimeout = 0;
-            if (timeout != 0) {
-                remainingTimeout = (System.nanoTime() / 1000000) - start -
-                    timeout;
-                if (remainingTimeout <= 0) {
-                    throw new ProActiveException(
-                        "Timeout expired while waiting for future update");
-                }
+            if (time.isTimeoutElapsed()) {
+                throw new ProActiveException(
+                    "Timeout expired while waiting for future update");
             }
-            ProActive.waitFor(future, remainingTimeout);
+            ProActive.waitFor(future, time.getRemainingTimeout());
         }
     }
 
