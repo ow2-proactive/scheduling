@@ -338,6 +338,16 @@
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
 				<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=@{nodeDescriptor}" />
+				
+				<!--
+					Remote Debug:
+					<jvmarg value="-Xdebug" />
+					<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000" />
+					
+					Yourkit (don't forget to set your LD_LIBRARY_PATH):
+					<jvmarg value="-agentlib:yjpagent" />
+				-->	
+
 				<jvmargs/>
 
 
