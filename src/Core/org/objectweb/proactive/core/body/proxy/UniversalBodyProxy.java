@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
+import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.gc.GCTag;
@@ -323,7 +324,12 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             }
         }
 
-        sourceBody.getFuturePool().removeDestinations();
+        FuturePool fp = sourceBody.getFuturePool();
+
+        // A synchronous termination request may have destroyed the future pool
+        if (fp != null) {
+            fp.removeDestinations();
+        }
 
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.stopTimer(sourceBody.getID(),

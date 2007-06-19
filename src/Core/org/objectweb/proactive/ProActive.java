@@ -2269,13 +2269,7 @@ public class ProActive {
      * is put on the request queue. The termination is asynchronous.
      */
     public static void terminateActiveObject(boolean immediate) {
-        if (immediate) {
-            // TODO the implementation should use 
-            // terminateActiveObject(ProActive.getStubOnThis(), immediate);
-            ProActive.getBodyOnThis().terminate();
-        } else {
-            terminateActiveObject(ProActive.getStubOnThis(), immediate);
-        }
+        terminateActiveObject(ProActive.getStubOnThis(), immediate);
     }
 
     /**
