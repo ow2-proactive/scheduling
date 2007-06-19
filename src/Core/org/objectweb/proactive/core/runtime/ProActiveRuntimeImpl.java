@@ -41,6 +41,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -422,6 +423,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         return nodeNames;
+    }
+
+    public Collection<LocalNode> getLocalNodes() {
+        return this.nodeMap.values();
     }
 
     /**
