@@ -8,7 +8,6 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.dgc.data.ObjectGraph;
 import org.objectweb.proactive.ic2d.dgc.figures.DgcAOFigure;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.State;
 import org.objectweb.proactive.ic2d.monitoring.editparts.AOEditPart;
 
 
