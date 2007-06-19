@@ -25,6 +25,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	public String getInitialWindowPerspectiveId() {
-		return "org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective";//MonitoringPerspective.ID /*DefaultPerspective.ID*/;
+		return DefaultPerspective.ID;
+		//return "org.objectweb.proactive.ic2d.DefaultPerspective";
 	}
 }

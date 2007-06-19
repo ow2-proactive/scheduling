@@ -32,6 +32,15 @@
               name="appName"
               value="IC2D">
         </property>
+        <property
+              name="startupForegroundColor"
+              value="000000"/>
+        <property
+              name="startupMessageRect"
+              value="7,264,441,21"/>
+        <property
+              name="startupProgressRect"
+              value="0,280,455,69"/>
      </product>
   </extension>
   
