@@ -7,7 +7,7 @@ if "%1" == "" goto projecthelp
 
 :build
 SETLOCAL
-set CLASSPATH=lib\ant-launcher.jar;%CLASSPATH%
+set CLASSPATH=compile\lib\ant-launcher.jar;%CLASSPATH%
 echo %CLASSPATH%
 cd ..
 "%JAVA_HOME%\bin\java" "-Dant.home=compile" "-Dant.library.dir=compile/lib"  -Xmx256000000 org.apache.tools.ant.launch.Launcher -buildfile compile/build.xml %1 %2 %3 %4 %5 %WHEN_NO_ARGS%
