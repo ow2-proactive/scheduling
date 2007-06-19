@@ -91,7 +91,6 @@ public class BasicPrimeExample extends AbstractExample {
 
         // Collecting the results
         List<Boolean> results = master.waitAllResults();
-        System.out.println(results);
         long endTime = System.currentTimeMillis();
 
         // Displaying result
