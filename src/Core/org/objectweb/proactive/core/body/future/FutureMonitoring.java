@@ -149,7 +149,7 @@ public class FutureMonitoring implements Runnable {
                 futures = new ConcurrentLinkedQueue<FutureProxy>();
                 futuresToMonitor.put(url, futures);
             }
-            if (fp.isAwaited()) {
+            if (fp.isAwaited() && !futures.contains(fp)) {
                 futures.add(fp);
             }
         }
