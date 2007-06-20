@@ -407,19 +407,23 @@
 
 		<delete dir="${classes.dir}/emma"/>
 		<mkdir  dir="${classes.dir}/emma"/>
+		<delete dir="${base.dir}/emma"/>
+		<mkdir  dir="${base.dir}/emma"/>
 
+		<!-- Instrumentation -->
 		<emma enabled="true">
 			<instr
 				instrpathref="test.classpath"
 				destdir="${classes.dir}/emma"
-				metadatafile="${classes.dir}/metadata.emma"
+				metadatafile="${base.dir}/emma/metadata.emma"
 				merge="true">
-				<filter excludes="org.bouncycastle.*" />
+				<filter includes="org.objectweb.proactive.*" />
 			</instr>	
 		</emma>
+
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
 			<jvmargs>
-				<jvmarg value="-Demma.coverage.out.file=${base.dir}/coverage.emma" />
+				<jvmarg value="-Demma.coverage.out.file=${base.dir}/emma/coverage.emma" />
 				<jvmarg value="-Demma.coverage.out.merge=true" />
 			</jvmargs>
 			<additionalClassPath>
@@ -427,6 +431,26 @@
 				<path refid="emma.lib"/>
 			</additionalClassPath>
 		</junitMacro>
+
+		<!-- Reporting -->
+		<emma enabled="true" >
+			<report 
+				sort="+block,+name,+method,+class"
+				metrics="method:70,block:80,line:80,class:100">
+				<sourcepath>
+					<dirset dir="${src.dir}">
+						<include name="*"/>
+					</dirset>
+				</sourcepath>
+				<infileset dir="${base.dir}/emma" includes="*.emma, *.ec, *.em" />
+				<xml 
+					outfile="${base.dir}/emma/coverage.xml"
+					depth="all" />
+				<html 
+					outfile="${base.dir}/emma/coverage.html"
+					depth="all" />
+      			</report>
+		</emma>
 	</target>	
 
 	<!--	
