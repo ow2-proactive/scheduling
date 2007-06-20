@@ -16,14 +16,11 @@
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest"/>
 
 	<!-- emma -->
-
 	<path id="emma.lib" >
 		<pathelement location="${base.dir}/compile/lib/emma_ant.jar" />
 		<pathelement location="${base.dir}/compile/lib/emma.jar" />
 	</path>
-
 	<taskdef resource="emma_ant.properties" classpathref="emma.lib" />
-
 
 
 	<!--
@@ -351,7 +348,6 @@
 					<path refid="test.classpath"/>
 				</classpath>
 
-				<classpath refid="test.classpath"/>
 				<jvmarg value="-Djava.security.policy=${base.dir}/compile/proactive.java.policy" />
 				<jvmarg value="-Dlog4j.configuration=file:${base.dir}/compile/proactive-log4j" />
 				<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=@{nodeDescriptor}" />
@@ -373,9 +369,10 @@
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset dir="${cl.test.dir}">
 						<include name="unitTests/**/*.class"/>
+						<exclude name="**/*$*.class"/>
+<!--
 						<include name="functionalTests/**/*Test*.class"/>
 						<exclude name="functionalTests/security/*/*.class"/>
-						<exclude name="**/*$*.class"/>
 						<exclude name="functionalTests/*.class"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class"/>
@@ -388,6 +385,7 @@
 						<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class"/>
+-->
 					</fileset>
 				</batchtest>
 			</junit>
@@ -401,6 +399,49 @@
 
 	<target name="junit" depends="proActiveJar" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
+	</target>
+
+
+	<!-- clover -->
+	
+	<target name="with.clover">
+		<taskdef resource="clovertasks"/>
+		<clover-setup initString="ProActiveCoverage.db"/>
+	</target>
+
+	<target name="clover.report" depends="with.clover">
+		<taskdef resource="clovertasks"/>
+		<!-- generate a historypoint for the current coverage -->
+		<clover-historypoint historyDir="${clover.historypoint.dir}"/>
+		<clover-report>
+			<!-- generate a current report -->
+			<current 
+				title="ProActive"
+				outfile="${clover.report.dir}">
+				<format type="html"/>
+				<sourcepath>
+					<dirset dir="${src.dir}">
+						<include name="*"/>
+					</dirset>
+				</sourcepath>
+			</current>
+			<!-- generate a historical report -->
+			<historical 
+				outfile="${clover.historyreport.dir}"
+				historyDir="${clover.historypoint.dir}">
+				<format type="html"/>
+			</historical>
+		</clover-report>
+	</target>
+
+
+
+	<target name="clover.junit" depends="proActiveJar" description="Same as junit but with code coverage enabled">
+		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
+			<additionalClassPath>
+				<pathelement location="${ant.home}/lib/clover.jar"/>
+			</additionalClassPath>
+		</junitMacro>
 	</target>
 
 	<target name="junitCoverage" depends="proActiveJar" description="Same as junit but with code coverage enabled">
@@ -511,7 +552,9 @@
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
 	<target name="proActiveJar" depends="dist-mk-dir, compile" description="Create the ProActive jar, to be used for instance on a distant host">
-		<jar manifest="${manifest.dir}/Manifest.mf"  jarfile="${PAdist.dir}/ProActive.jar">
+		<jar 
+			manifest="${manifest.dir}/Manifest.mf"  
+			destfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${cl.proactive.dir}" includes="**"/>
 			<fileset dir="${cl.extensions.dir}" includes="**"/>
 			<fileset dir="${cl.extra.dir}" includes="**"/>

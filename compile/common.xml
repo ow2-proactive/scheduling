@@ -47,6 +47,12 @@
 	<property name="debug" value="on" />
 	<property name="source" value="1.5" />
 
+	<!-- Clover -->
+	<property name="clover.report.dir"        value="${base.dir}/clover" />
+	<property name="clover.historyreport.dir" value="${base.dir}/clover_history" />
+	<property name="clover.historypoint.dir"  value="${base.dir}/clover_db" />
+
+
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 	
 	<!-- ================================================================ -->
@@ -56,7 +62,6 @@
 	<path id="project.libs">
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
-			<include name="jini/*.jar" />
 			<include name="globus/*.jar" />
 			<include name="ws/*.jar" />
 			<include name="osgi/*.jar" />
