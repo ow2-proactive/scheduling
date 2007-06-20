@@ -417,7 +417,7 @@
 				destdir="${classes.dir}/emma"
 				metadatafile="${base.dir}/emma/metadata.emma"
 				merge="true">
-				<filter includes="org.objectweb.proactive.*" />
+				<filter includes="org.objectweb.proactive.*" excludes="pa.*, *_Stub" />
 			</instr>	
 		</emma>
 
@@ -435,8 +435,9 @@
 		<!-- Reporting -->
 		<emma enabled="true" >
 			<report 
-				sort="+block,+name,+method,+class"
-				metrics="method:70,block:80,line:80,class:100">
+				sort="+block,+name,+method,+class,+line"
+				metrics="method:60,line:50,class:80"
+				units="instr">
 				<sourcepath>
 					<dirset dir="${src.dir}">
 						<include name="*"/>
@@ -444,12 +445,14 @@
 				</sourcepath>
 				<infileset dir="${base.dir}/emma" includes="*.emma, *.ec, *.em" />
 				<xml 
+					columns="name, class, method, block, line"
 					outfile="${base.dir}/emma/coverage.xml"
-					depth="method" 
+					depth="source" 
 					encoding="UTF-8"/>
 				<html 
+					columns="name, class, method, block, line"
 					outfile="${base.dir}/emma/coverage.html"
-					depth="class" />
+					depth="source" />
       			</report>
 		</emma>
 	</target>	
