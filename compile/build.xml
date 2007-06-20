@@ -445,10 +445,11 @@
 				<infileset dir="${base.dir}/emma" includes="*.emma, *.ec, *.em" />
 				<xml 
 					outfile="${base.dir}/emma/coverage.xml"
-					depth="all" />
+					depth="method" 
+					encoding="UTF-8"/>
 				<html 
 					outfile="${base.dir}/emma/coverage.html"
-					depth="all" />
+					depth="class" />
       			</report>
 		</emma>
 	</target>	
