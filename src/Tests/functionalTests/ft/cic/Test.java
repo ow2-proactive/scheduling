@@ -62,6 +62,7 @@ public class Test extends FunctionalTest {
         // deployer le FTServer !
         this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         // this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.NullMessageLogger());
+        this.server.setJvmOptions("-Dproactive.test=true");
         this.server.setClassname(
             "org.objectweb.proactive.core.body.ft.servers.StartFTServer");
         this.server.startProcess();

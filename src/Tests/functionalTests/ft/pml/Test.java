@@ -64,6 +64,7 @@ public class Test extends FunctionalTest {
         // this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.NullMessageLogger());
         this.server.setClassname(
             "org.objectweb.proactive.core.body.ft.servers.StartFTServer");
+        this.server.setJvmOptions("-Dproactive.test=true");
         this.server.setParameters("-proto pml");
         this.server.startProcess();
         Thread.sleep(3000);
