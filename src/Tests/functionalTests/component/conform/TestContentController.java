@@ -132,30 +132,22 @@ public class TestContentController extends Conformtest {
     // -------------------------------------------------------------------------
     // Test remove errors
     // -------------------------------------------------------------------------
-    @Test
-    @Ignore
+    @Test(expected = IllegalContentException.class)
     public void testNotASubComponent() throws Exception {
         ContentController cc = Fractal.getContentController(c);
-        try {
-            cc.removeFcSubComponent(d);
-            fail();
-        } catch (IllegalContentException e) {
-        }
+        // must throw an IllegalContentException
+        cc.removeFcSubComponent(d);
     }
 
-    @Test
-    @Ignore
+    @Test(expected = IllegalContentException.class)
     public void testWouldCreateNonLocalExportBinding()
         throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(e);
         Fractal.getBindingController(c)
                .bindFc("client", e.getFcInterface("client"));
-        try {
-            cc.removeFcSubComponent(e);
-            fail();
-        } catch (IllegalContentException e) {
-        }
+        // must throw an IllegalContentException
+        cc.removeFcSubComponent(e);
     }
 
     @Test
