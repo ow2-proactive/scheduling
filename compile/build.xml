@@ -370,7 +370,6 @@
 					<fileset dir="${cl.test.dir}">
 						<include name="unitTests/**/*.class"/>
 						<exclude name="**/*$*.class"/>
-<!--
 						<include name="functionalTests/**/*Test*.class"/>
 						<exclude name="functionalTests/security/*/*.class"/>
 						<exclude name="functionalTests/*.class"/>
@@ -385,7 +384,6 @@
 						<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class"/>
 						<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class"/>
--->
 					</fileset>
 				</batchtest>
 			</junit>
