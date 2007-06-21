@@ -69,7 +69,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
     public void compile(final List path, final ComponentContainer container,
         final TaskMap tasks, final Map context) throws ADLException {
         ObjectsContainer obj = init(path, container, tasks, context);
-        fControllers(obj.getImplementation(), obj.getController(),
+        controllers(obj.getImplementation(), obj.getController(),
             obj.getName(), obj);
         end(tasks, container, context, obj.getName(), obj.getDefinition(),
             obj.getControllerDesc(), obj.getContentDesc(), obj.getVn(), true);
@@ -171,17 +171,10 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         ControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode n, boolean isFunctional) {
         AbstractInstanceProviderTask createTask = null;
-        if (isFunctional) {
-            createTask = new CreateTask((ProActiveImplementationBuilder) builder,
-                    container, name, definition,
-                    (ControllerDescription) controllerDesc, contentDesc, n,
-                    context);
-        } else {
-            createTask = new ProActiveNFImplementationCompiler.CreateNFTask((ProActiveImplementationBuilder) builder,
-                    container, name, definition,
-                    (ControllerDescription) controllerDesc, contentDesc, n,
-                    context);
-        }
+
+        createTask = new CreateTask((ProActiveImplementationBuilder) builder,
+                container, name, definition,
+                (ControllerDescription) controllerDesc, contentDesc, n, context);
 
         FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type",
                 container);
@@ -190,7 +183,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         tasks.addTask("create", container, createTask);
     }
 
-    private void fControllers(String implementation, String controller,
+    private void controllers(String implementation, String controller,
         String name, ObjectsContainer obj) {
         ContentDescription contentDesc = null;
         ControllerDescription controllerDesc = null;

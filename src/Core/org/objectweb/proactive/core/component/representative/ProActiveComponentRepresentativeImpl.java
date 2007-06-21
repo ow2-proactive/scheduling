@@ -436,7 +436,7 @@ public class ProActiveComponentRepresentativeImpl
         stubOnBaseObject = stub;
     }
 
-    private boolean isPrimitive() {
+    public boolean isPrimitive() {
         return Constants.PRIMITIVE.equals(hierarchicalType);
     }
 

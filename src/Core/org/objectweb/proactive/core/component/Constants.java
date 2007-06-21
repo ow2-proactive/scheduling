@@ -49,6 +49,7 @@ public interface Constants {
     public final static String MIGRATION_CONTROLLER = "migration-controller";
     public final static String COMPONENT = "component";
     public final static String CYCLIC_NODE_SUFFIX = "-cyclicInstanceNumber-";
+    public final static String MEMBRANE_CONTROLLER = "membrane-controller";
 
     // hierarchical types of component
     public final static String COMPOSITE = "composite";

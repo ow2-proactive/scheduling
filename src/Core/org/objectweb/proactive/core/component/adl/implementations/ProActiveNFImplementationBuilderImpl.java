@@ -37,8 +37,8 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.NFControllerDescription;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.group.Group;
@@ -48,10 +48,10 @@ import org.objectweb.proactive.core.group.Group;
  * @author Paul Naoumenko
  */
 public class ProActiveNFImplementationBuilderImpl
-    extends ProActiveImplementationBuilderImpl
-    implements ProActiveNFImplementationBuilder {
+    extends ProActiveImplementationBuilderImpl {
+    @Override
     public Object createComponent(Object type, String name, String definition,
-        NFControllerDescription controllerDesc, ContentDescription contentDesc,
+        ControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Map context) throws Exception {
         ObjectsContainer obj = commonCreation(type, name, definition,
                 contentDesc, adlVN, context);
@@ -62,7 +62,7 @@ public class ProActiveNFImplementationBuilderImpl
 
     private Component createNFComponent(Object type,
         org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
-        NFControllerDescription controllerDesc, ContentDescription contentDesc,
+        ControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Component bootstrap) throws Exception {
         Component result;
 

@@ -11,7 +11,7 @@ require any argument (the backend is always the same) -->
     <content class="org.objectweb.fractal.adl.BasicFactory"/>
   </component>
   <component name="loader" definition="org.objectweb.proactive.core.component.adl.ProActiveLoader"/>
-  <component name="compiler" definition="org.objectweb.proactive.core.component.adl.ProActiveNFCompiler"/>
+  <component name="compiler" definition="org.objectweb.proactive.core.component.adl.ProActiveCompiler"/>
   <component name="backend" definition="org.objectweb.proactive.core.component.adl.ProActiveNFBackend"/>
   <component name="scheduler" definition="org.objectweb.fractal.adl.BasicScheduler"/>  <binding client="this.factory" server="factory.factory"/>
   <binding client="factory.loader" server="loader.loader"/>

@@ -38,7 +38,6 @@ import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.NFControllerDescription;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
@@ -179,7 +178,7 @@ public class ProActiveComponentGroup {
      * @throws java.lang.InstantiationException
      */
     public static ProActiveComponentRepresentative newNFComponentRepresentativeGroup(
-        ComponentType componentType, NFControllerDescription controllerDesc)
+        ComponentType componentType, ControllerDescription controllerDesc)
         throws ClassNotFoundException, InstantiationException {
         try {
             ProActiveComponentRepresentative result = null;
