@@ -419,7 +419,9 @@
 				<format type="html"/>
 				<sourcepath>
 					<dirset dir="${src.dir}">
-						<include name="*"/>
+						<include name="Core"/>
+						<include name="Extensions"/>
+						<include name="Extra"/>
 					</dirset>
 				</sourcepath>
 			</current>
@@ -430,6 +432,7 @@
 				<format type="html"/>
 			</historical>
 		</clover-report>
+		<clover-clean/>
 	</target>
 
 
@@ -591,7 +594,6 @@
 	<!--  =============================================================== -->
 
 	<target name="dist-mk-dir" description="Make distribution directories">
-		<delete dir="${dist.dir}" />
 		<mkdir dir="${dist.dir}" />
 		<mkdir dir="${PAdist.dir}" />
 	</target>
