@@ -52,7 +52,7 @@ public interface TaskRepository {
 
     /**
      * Terminates the repository activity
-     * @return
+     * @return true if completion succeeded
      */
     boolean terminate();
 }

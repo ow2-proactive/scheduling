@@ -55,7 +55,6 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
