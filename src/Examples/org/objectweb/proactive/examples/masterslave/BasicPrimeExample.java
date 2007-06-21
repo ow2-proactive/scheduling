@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
@@ -74,9 +75,11 @@ public class BasicPrimeExample extends AbstractExample {
      * @param args
      * @throws TaskException
      * @throws MalformedURLException
+     * @throws TaskAlreadySubmittedException
      */
     public static void main(String[] args)
-        throws TaskException, MalformedURLException {
+        throws TaskException, MalformedURLException,
+            TaskAlreadySubmittedException {
         BasicPrimeExample instance = new BasicPrimeExample();
         //   Getting command line parameters
         instance.init(args, 2, " prime_to_find number_of_intervals");

@@ -9,6 +9,7 @@ import org.objectweb.proactive.examples.masterslave.nqueens.query.QueryExtern;
 import org.objectweb.proactive.examples.masterslave.nqueens.query.QueryGenerator;
 import org.objectweb.proactive.examples.masterslave.util.Pair;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 
 
@@ -21,7 +22,8 @@ public class NQueensExample extends AbstractExample {
     public static int nqueen_board_size;
     public static int nqueen_algorithm_depth;
 
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args)
+        throws MalformedURLException, TaskAlreadySubmittedException {
         NQueensExample instance = new NQueensExample();
 
         // Getting command line parameters

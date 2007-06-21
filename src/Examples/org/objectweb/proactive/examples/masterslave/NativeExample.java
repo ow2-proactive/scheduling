@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.objectweb.proactive.examples.masterslave.BasicPrimeExample.FindPrimeTask;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
 
@@ -21,8 +22,10 @@ public class NativeExample extends AbstractExample {
 
     /**
      * @param args
+     * @throws TaskAlreadySubmittedException
      */
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args)
+        throws MalformedURLException, TaskAlreadySubmittedException {
         NativeExample instance = new NativeExample();
 
         // Getting command line parameters
