@@ -34,6 +34,7 @@ import java.io.Serializable;
 
 
 /**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * Internal view of a task in the Master/Slave API<br/>
  * Adds the possibility to set the result for a task<br/>
  * Adds the notion of a "Task ID"<br/>
@@ -42,7 +43,7 @@ import java.io.Serializable;
  * @param <R>
  */
 public interface ResultIntern<R extends Serializable> extends Comparable,
-    Identified, Serializable {
+    Identifiable, Serializable {
 
     /**
      * get the result of the task

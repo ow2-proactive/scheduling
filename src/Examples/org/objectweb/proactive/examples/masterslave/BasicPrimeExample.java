@@ -82,8 +82,8 @@ public class BasicPrimeExample extends AbstractExample {
         instance.init(args, 2, " prime_to_find number_of_intervals");
 
         //      Creating the Master
-        ProActiveMaster<FindPrimeTask, Boolean> master = new ProActiveMaster<FindPrimeTask, Boolean>(instance.descriptor_url,
-                instance.vn_name);
+        ProActiveMaster<FindPrimeTask, Boolean> master = new ProActiveMaster<FindPrimeTask, Boolean>();
+        master.addResources(instance.descriptor_url, instance.vn_name);
 
         long startTime = System.currentTimeMillis();
         // Creating and Submitting the tasks

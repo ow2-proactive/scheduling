@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * A SlaveManager keeps a pool of Slaves in the Master/Slave API <br/>
  * A SlaveManager is connected to a SlaveConsumer (i.e. the Master in the M/S API) which needs slaves.<br/>
  * @author fviale

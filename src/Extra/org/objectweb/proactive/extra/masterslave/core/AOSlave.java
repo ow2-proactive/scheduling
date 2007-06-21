@@ -50,7 +50,8 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvide
 
 
 /**
- * The Slaves Active Objects are the workers in the Master/Slave API.<br/>
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * The Slaves Active Objects are the workers in the Master/Slave API.<br>
  * They execute tasks needed by the master
  * @author fviale
  */

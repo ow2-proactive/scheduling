@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * A SlaveWatcher is responsible of watching slaves'activity<br/>
  * @author fviale
  */

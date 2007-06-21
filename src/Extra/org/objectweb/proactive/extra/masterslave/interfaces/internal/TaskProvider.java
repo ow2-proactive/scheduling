@@ -34,6 +34,7 @@ import java.io.Serializable;
 
 
 /**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * A Task Provider provides tasks to be executed and excepts results of these tasks (i.e. the Master from the slave point of view)
  * @author fviale
  *

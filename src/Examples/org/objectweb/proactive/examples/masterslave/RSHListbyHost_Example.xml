@@ -64,7 +64,7 @@
 			<processDefinition id="rsh_list">
 				<processListbyHost
 					class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
-					hostlist="amda anaconda apple cheypa crios crusoe duff galpage gaudi hajjoura lo maledie meije naruto petawawa pollux psychoquack schubby sidonie tranquility trinidad nyx pincoya">
+					hostlist="amda anaconda apple cheypa crios crusoe duff galpage gaudi hajjoura lo maledie meije naruto petawawa pollux schubby sidonie tranquility trinidad nyx pincoya">
 					<processReference refid="localJVM"></processReference>
 				</processListbyHost>
 			</processDefinition>

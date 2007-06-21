@@ -1,8 +1,15 @@
 package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * Interface for a repository which contains task objects, each task has an internal ID.
+ * @author fviale
+ *
+ */
 public interface TaskRepository {
 
     /**
@@ -10,8 +17,9 @@ public interface TaskRepository {
      * @param task the task to add
      * @param hashCode the hashCode of the task in the user address space
      * @return the id of this task
+     * @throws TaskAlreadySubmittedException if the task has already been submitted
      */
-    long addTask(Task task, int hashCode);
+    long addTask(Task task, int hashCode) throws TaskAlreadySubmittedException;
 
     /**
      * returns the task associated with this id

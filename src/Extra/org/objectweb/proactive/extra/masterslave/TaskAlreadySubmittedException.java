@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.masterslave.core;
+package org.objectweb.proactive.extra.masterslave;
 
 
 /**

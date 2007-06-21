@@ -37,6 +37,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 
 
@@ -72,20 +73,22 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     public void addResources(Collection<Node> nodes);
 
     /**
-     * Asks the resource manager to activate every virtual nodes inside the given descriptor <br/>
+     * Adds the given descriptor to the master<br>
+     * Every virtual nodes inside the given descriptor will be activated<br/>
      * @param descriptorURL URL of a deployment descriptor
      */
     public void addResources(URL descriptorURL);
 
     /**
-    * Asks the resource manager to activate the given virtual node inside the given descriptor <br/>
+    * Adds the given descriptor to the master<br>
+    * Only the specified virtual node inside the given descriptor will be activated <br/>
     * @param descriptorURL URL of a deployment descriptor
     * @param virtualNodeName name of the virtual node to activate
     */
     public void addResources(URL descriptorURL, String virtualNodeName);
 
     /**
-     * Adds the given virtual node to the master <br/>
+     * Adds every resource inside the given virtual node to the master <br/>
      * @param virtualnode
      */
     public void addResources(VirtualNode virtualnode);
@@ -105,9 +108,10 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     /**
      * Adds a list of tasks to be solved by the master <br/>
      * @param tasks list of tasks
+     * @throws TaskAlreadySubmittedException
      * @throws IllegalArgumentsException if the mode is changed or if a task is submitted twice
      */
-    public void solve(List<T> tasks) throws IllegalArgumentException;
+    public void solve(List<T> tasks) throws TaskAlreadySubmittedException;
 
     /**
      * Wait for all results, will block until all results are computed <br>
@@ -153,9 +157,9 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     public int countAvailableResults();
 
     /**
-     * sets the current ordering mode <br/>
+     * Sets the current ordering mode <br/>
      * If reception mode is switched while computations are in progress,<br/>
-     * subsequent calls to waitResults methods will be done according to the new mode.<br/>
+     * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
      * @param mode the new mode for result gathering
      */
     public void setResultReceptionOrder(OrderingMode mode);

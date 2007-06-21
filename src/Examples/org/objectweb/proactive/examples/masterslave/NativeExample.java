@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.objectweb.proactive.examples.masterslave.BasicPrimeExample.FindPrimeTask;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
@@ -28,8 +29,8 @@ public class NativeExample extends AbstractExample {
         instance.init(args);
 
         // Creating the Master
-        ProActiveMaster<SimpleNativeTask, String[]> master = new ProActiveMaster<SimpleNativeTask, String[]>(instance.descriptor_url,
-                instance.vn_name);
+        ProActiveMaster<SimpleNativeTask, String[]> master = new ProActiveMaster<SimpleNativeTask, String[]>();
+        master.addResources(instance.descriptor_url, instance.vn_name);
 
         // Creating the tasks to be solved
         List<SimpleNativeTask> tasks = new ArrayList<SimpleNativeTask>();

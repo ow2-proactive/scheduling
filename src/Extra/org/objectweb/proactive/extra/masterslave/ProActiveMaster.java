@@ -40,6 +40,8 @@ import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -89,32 +91,42 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     protected AOTaskRepository aorepository = null;
 
     /**
-     * An empty master (you can add resources afterwards)
+     * Creates a local master (you can add resources afterwards)
      */
     public ProActiveMaster() {
         this(new HashMap<String, Object>());
     }
 
     /**
-     * Creates a master with a collection of nodes
-     * @param nodes
+     * Creates a remote master that will be created on top of the given Node <br>
+     * Resources can be added to the master afterwards
      */
-    public ProActiveMaster(Collection<Node> nodes) {
-        this(nodes, new HashMap<String, Object>());
+    public ProActiveMaster(Node remoteNodeToUse) {
+        this(remoteNodeToUse, new HashMap<String, Object>());
     }
 
     /**
-     * Creates a master with a collection of nodes
-     * @param nodes
+     * Creates an empty local master with an initial slave memory
+     * @param initialMemory initial memory that every slaves deployed by the master will have
      */
-    public ProActiveMaster(Collection<Node> nodes,
+    public ProActiveMaster(Node remoteNodeToUse,
         Map<String, Object> initialMemory) {
-        this(initialMemory);
-        aomaster.addResources(nodes);
+        try {
+            aorepository = (AOTaskRepository) ProActive.newActive(AOTaskRepository.class.getName(),
+                    new Object[] {  }, remoteNodeToUse);
+
+            aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
+                    new Object[] { aorepository, initialMemory },
+                    remoteNodeToUse);
+        } catch (ActiveObjectCreationException e) {
+            throw new IllegalArgumentException(e);
+        } catch (NodeException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**
-     * Creates an empty master with an initial slave memory
+     * Creates an empty local master with an initial slave memory
      * @param initialMemory initial memory that every slaves deployed by the master will have
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {
@@ -132,66 +144,42 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /**
-     * Creates a master with a descriptorURL
-     * Every virtual nodes will be activated in the descriptor to collect the resources
+     * Creates a remote master with the URL of a descriptor and the name of a virtual node
+     * The master will be created on top of a single resource deployed by this virtual node
      * @param descriptorURL url of the ProActive descriptor
+     * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
      */
-    public ProActiveMaster(URL descriptorURL) {
-        this(descriptorURL, new HashMap<String, Object>());
+    public ProActiveMaster(URL descriptorURL, String masterVNName) {
+        this(descriptorURL, masterVNName, new HashMap<String, Object>());
     }
 
     /**
-     * Creates a master with a descriptorURL
-     * Every virtual nodes will be activated in the descriptor to collect the resources
-     * @param descriptorURL descriptor to use
-     * @param virtualNodeName name of the virtual node
-     * @param initialMemory initial memory that every slaves deployed by the master will have
-     */
-    public ProActiveMaster(URL descriptorURL, Map<String, Object> initialMemory) {
-        this(initialMemory);
-        aomaster.addResources(descriptorURL);
-    }
-
-    /**
-     * Creates a master with a descriptorURL and the name of a virtual node
-     * Only this virtual node will be activated in the descriptor to collect the resources
+     * Creates a remote master with the URL of a descriptor and the name of a virtual node
+     * The master will be created on top of a single resource deployed by this virtual node
      * @param descriptorURL url of the ProActive descriptor
-     * @param virtualNodeName name of the virtual node to deploy inside the ProActive descriptor
-     */
-    public ProActiveMaster(URL descriptorURL, String virtualNodeName) {
-        this(descriptorURL, virtualNodeName, new HashMap<String, Object>());
-    }
-
-    /**
-     * Creates a master with a descriptorURL and a virtual node name
-     * Only this virtual node will be activated in the descriptor to collect the resources
-     * @param descriptorURL descriptor to use
-     * @param virtualNodeName name of the virtual node
+     * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
      * @param initialMemory initial memory that every slaves deployed by the master will have
      */
-    public ProActiveMaster(URL descriptorURL, String virtualNodeName,
+    public ProActiveMaster(URL descriptorURL, String masterVNName,
         Map<String, Object> initialMemory) {
-        this(initialMemory);
-        aomaster.addResources(descriptorURL, virtualNodeName);
-    }
+        try {
+            ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
+            VirtualNode masterVN = pad.getVirtualNode(masterVNName);
+            masterVN.activate();
 
-    /**
-     * Creates a master with the given virtual node
-     * @param virtualNode ProActive virtual node object
-     */
-    public ProActiveMaster(VirtualNode virtualNode) {
-        this(virtualNode, new HashMap<String, Object>());
-    }
+            Node masterNode = masterVN.getNode();
+            aorepository = (AOTaskRepository) ProActive.newActive(AOTaskRepository.class.getName(),
+                    new Object[] {  }, masterNode);
 
-    /**
-     * Creates a master with the given virtual node
-     * @param virtualNode ProActive virtual node object
-     * @param initialMemory initial memory that every slaves deployed by the master will have
-     */
-    public ProActiveMaster(VirtualNode virtualNode,
-        Map<String, Object> initialMemory) {
-        this(initialMemory);
-        aomaster.addResources(virtualNode);
+            aomaster = (AOMaster) ProActive.newActive(AOMaster.class.getName(),
+                    new Object[] { aorepository, initialMemory }, masterNode);
+        } catch (ActiveObjectCreationException e) {
+            throw new IllegalArgumentException(e);
+        } catch (NodeException e) {
+            throw new IllegalArgumentException(e);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 
     /* (non-Javadoc)
@@ -222,6 +210,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         aomaster.addResources(virtualnode);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#countAvailableResults()
+     */
     public int countAvailableResults() {
         return aomaster.countAvailableResults();
     }
@@ -231,9 +222,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * This wrapper will identify the task internally via an ID
      * @param task task to be wrapped
      * @return wrapped version
-     * @throws IllegalArgumentException if the same task has already been wrapped
+     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
      */
-    private long createId(T task) throws IllegalArgumentException {
+    private long createId(T task) throws TaskAlreadySubmittedException {
         return aorepository.addTask(task, task.hashCode());
     }
 
@@ -242,9 +233,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * This wrapper will identify the task internally via an ID
      * @param tasks collection of tasks to be wrapped
      * @return wrapped version
-     * @throws IllegalArgumentException if the same task has already been wrapped
+     * @throws TaskAlreadySubmittedException if the same task has already been wrapped
      */
-    private List<Long> createIds(List<T> tasks) throws IllegalArgumentException {
+    private List<Long> createIds(List<T> tasks)
+        throws TaskAlreadySubmittedException {
         List<Long> wrappings = new ArrayList<Long>();
         for (T task : tasks) {
             wrappings.add(createId(task));
@@ -252,10 +244,16 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return wrappings;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isEmpty()
+     */
     public boolean isEmpty() {
         return aomaster.isEmpty();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#setResultReceptionOrder(org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode)
+     */
     public void setResultReceptionOrder(
         org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode mode) {
         aomaster.setResultReceptionOrder(mode);
@@ -271,7 +269,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection, boolean)
      */
-    public void solve(List<T> tasks) {
+    public void solve(List<T> tasks) throws TaskAlreadySubmittedException {
         List<Long> wrappers = createIds(tasks);
         aomaster.solve(wrappers);
     }
@@ -306,6 +304,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return results;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitKResults(int)
+     */
     public List<R> waitKResults(int k)
         throws IllegalStateException, IllegalArgumentException, TaskException {
         List<ResultIntern> completed = (List<ResultIntern>) ProActive.getFutureValue(aomaster.waitKResults(

@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
@@ -70,8 +71,9 @@ import org.objectweb.proactive.extra.masterslave.util.HashSetQueue;
 
 
 /**
- * Main Active Object of the Master/Slave API <br/>
- * Literally : the entity to which an user can submit tasks to be solved
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * Main Active Object of the Master/Slave API <br>
+ * Literally : the entity to which an user can submit tasks to be solved<br>
  * @author fviale
  */
 public class AOMaster implements Serializable, TaskProvider, InitActive,
@@ -359,7 +361,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solve(java.util.List)
      */
-    public void solve(List tasks) throws IllegalArgumentException {
+    public void solve(List tasks) {
         logger.debug("Adding " + tasks.size() + " tasks...");
 
         for (Long taskId : (List<Long>) tasks) {
@@ -372,7 +374,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @param task
      * @throws IllegalArgumentException
      */
-    private void solve(Long taskId) throws IllegalArgumentException {
+    private void solve(Long taskId) {
         resultQueue.addPendingTask(taskId);
 
         if (emptyPending()) {

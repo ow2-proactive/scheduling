@@ -17,8 +17,9 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultInter
 
 
 /**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * This class is responsible for keeping the completed results.<br/>
- * The class will serve the results in a Completion order mode or a Submission order mode<br/>
+ * The class will serve the results in completion order mode or in submission order mode<br/>
  * @author fviale
  *
  */

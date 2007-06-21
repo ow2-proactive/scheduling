@@ -2,11 +2,17 @@ package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.Identified;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.Identifiable;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * A result of a task, contains the result itself, or an exception if one has been thrown
+ * @author fviale
+ *
+ */
 public class ResultInternImpl implements ResultIntern {
     // The id of the task
     private long id = -1;
@@ -28,8 +34,8 @@ public class ResultInternImpl implements ResultIntern {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj) {
-        if (obj instanceof Identified) {
-            return id == ((Identified) obj).getId();
+        if (obj instanceof Identifiable) {
+            return id == ((Identifiable) obj).getId();
         }
         return false;
     }
@@ -93,8 +99,8 @@ public class ResultInternImpl implements ResultIntern {
     public int compareTo(Object o) {
         if (o == null) {
             throw new NullPointerException();
-        } else if (o instanceof Identified) {
-            return (int) (id - ((Identified) o).getId());
+        } else if (o instanceof Identifiable) {
+            return (int) (id - ((Identifiable) o).getId());
         } else {
             throw new IllegalArgumentException("" + o);
         }

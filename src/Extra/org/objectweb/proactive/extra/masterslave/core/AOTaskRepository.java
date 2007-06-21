@@ -17,11 +17,20 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository;
 
 
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * This active object acts as a repository of tasks that are currently processed by the master<br>
+ * The master asks this repository for the real task by giving the task id.<br>
+ * The purpose of this class is to save having duplicated task objects within the framework <br>
+ * @author fviale
+ *
+ */
 public class AOTaskRepository implements TaskRepository, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_REPOSITORY);
     protected HashSet<Integer> hashCodes = new HashSet<Integer>();
@@ -38,9 +47,9 @@ public class AOTaskRepository implements TaskRepository, Serializable {
      * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository#addTask(org.objectweb.proactive.extra.masterslave.interfaces.Task, int)
      */
     public long addTask(Task task, int hashCode)
-        throws IllegalArgumentException {
+        throws TaskAlreadySubmittedException {
         if (hashCodes.contains(hashCode)) {
-            throw new IllegalArgumentException("task already submitted");
+            throw new TaskAlreadySubmittedException();
         }
         hashCodes.add(hashCode);
         idTohashCode.put(taskCounter, hashCode);

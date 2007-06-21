@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 
 
 /**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * An object implementing this interface expects to be notified when a Slave is missing<br/>
  * @author fviale
  *

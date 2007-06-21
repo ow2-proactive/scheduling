@@ -44,6 +44,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -61,7 +62,8 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvide
 
 
 /**
- * The Slave Manager Active Object is responsible for the deployment of Slaves :<br/>
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * The Slave Manager Active Object is responsible for the deployment of Slaves :<br>
  * <ul>
  * <li> Through a ProActive deployment descriptor</li>
  * <li> Using an existing VirtualNode objectcollection of Nodes</li>
@@ -93,8 +95,9 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     } //proactive no arg constructor
 
     /**
-     *
-     * @param provider
+     * Creates a task manager with the given task provider
+     * @param provider the entity that will give tasks to the slaves created
+     * @param initialMemory the initial memory of the slaves
      */
     public AOSlaveManager(TaskProvider provider,
         Map<String, Object> initialMemory) {
@@ -123,7 +126,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                 for (VirtualNode vn : pad.getVirtualNodes()) {
                     addResources(vn);
                 }
-            } catch (Exception e) {
+            } catch (ProActiveException e) {
                 logger.error("Couldnt add the specified resources.");
                 e.printStackTrace();
             }
@@ -138,7 +141,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
             try {
                 ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
                 addResources(pad.getVirtualNode(virtualNodeName));
-            } catch (Exception e) {
+            } catch (ProActiveException e) {
                 logger.error("Couldnt add the specified resources.");
                 e.printStackTrace();
             }
@@ -158,7 +161,6 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                     Node[] nodes = virtualnode.getNodes();
                     addResources(Arrays.asList(nodes));
                 } catch (NodeException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }

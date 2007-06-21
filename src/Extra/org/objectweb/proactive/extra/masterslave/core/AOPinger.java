@@ -26,8 +26,9 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveWatche
 
 
 /**
- * The Pinger Active Object is responsible for watching slaves'activity. <br/>
- * It reports slaves failure to the Master
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * The Pinger Active Object is responsible for watching slaves'activity. <br>
+ * It reports slaves failure to the Master<br>
  * @author fviale
  *
  */

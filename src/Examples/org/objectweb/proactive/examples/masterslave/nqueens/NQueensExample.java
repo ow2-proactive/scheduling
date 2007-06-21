@@ -28,8 +28,8 @@ public class NQueensExample extends AbstractExample {
         instance.init(args, 2, " nqueen_board_size nqueen_algorithm_depth");
 
         // Creating the Master
-        ProActiveMaster<QueryExtern, Pair<Long, Long>> master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>(instance.descriptor_url,
-                instance.vn_name);
+        ProActiveMaster<QueryExtern, Pair<Long, Long>> master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>();
+        master.addResources(instance.descriptor_url, instance.vn_name);
 
         System.out.println("Launching NQUEENS solutions finder for n = " +
             nqueen_board_size + " with a depth of " + nqueen_algorithm_depth);

@@ -34,12 +34,13 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterslave.interfaces.Task;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.Identified;
+import org.objectweb.proactive.extra.masterslave.interfaces.internal.Identifiable;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
 
 
 /**
- * The internal wrapper of a task, contains an internal ID, the task result and the exception eventually thrown
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * The internal version of a task, contains an internal ID and the task itself
  * @author fviale
  *
  */
@@ -70,8 +71,8 @@ public class TaskWrapperImpl implements TaskIntern {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj) {
-        if (obj instanceof Identified) {
-            return id == ((Identified) obj).getId();
+        if (obj instanceof Identifiable) {
+            return id == ((Identifiable) obj).getId();
         }
         return false;
     }
@@ -117,8 +118,8 @@ public class TaskWrapperImpl implements TaskIntern {
     public int compareTo(Object o) {
         if (o == null) {
             throw new NullPointerException();
-        } else if (o instanceof Identified) {
-            return (int) (id - ((Identified) o).getId());
+        } else if (o instanceof Identifiable) {
+            return (int) (id - ((Identifiable) o).getId());
         } else {
             throw new IllegalArgumentException("" + o);
         }
