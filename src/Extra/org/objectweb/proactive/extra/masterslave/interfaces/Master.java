@@ -108,8 +108,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     /**
      * Adds a list of tasks to be solved by the master <br/>
      * @param tasks list of tasks
-     * @throws TaskAlreadySubmittedException
-     * @throws IllegalArgumentsException if the mode is changed or if a task is submitted twice
+     * @throws TaskAlreadySubmittedException if a task is submitted twice
      */
     public void solve(List<T> tasks) throws TaskAlreadySubmittedException;
 
