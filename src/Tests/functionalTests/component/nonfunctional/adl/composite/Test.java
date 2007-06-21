@@ -29,6 +29,7 @@ public class Test extends ComponentTest {
     /* (non-Javadoc)
      * @see testsuite.test.FunctionalTest#action()
      */
+    @org.junit.Test
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
 
