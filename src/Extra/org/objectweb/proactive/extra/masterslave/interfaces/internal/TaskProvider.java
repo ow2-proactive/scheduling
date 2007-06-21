@@ -46,7 +46,7 @@ public interface TaskProvider<TI extends TaskIntern<R>, RI extends ResultIntern<
 
     /**
      * Returns a task which needs to be executed
-     * @param Slave the slave object which asks the tasks (stub)
+     * @param slave the slave object which asks the tasks (stub)
      * @param slaveName the name of the slave which asks the tasks
      * @return a new task to compute
      */

@@ -48,7 +48,7 @@ public class ResultQueue implements Serializable {
 
     /**
      * Adds a completed task to the queue
-     * @param task completed task
+     * @param result result of the completed task
      */
     public void addCompletedTask(ResultIntern result) {
         if (mode == Master.OrderingMode.CompletionOrder) {
@@ -60,7 +60,7 @@ public class ResultQueue implements Serializable {
 
     /**
      * Specifies that a new tasks have been submitted
-     * @param task pending task
+     * @param taskId id of the pending task
      */
     public void addPendingTask(Long taskId) {
         idsubmitted.add(taskId);
