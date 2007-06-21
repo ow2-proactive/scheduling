@@ -1367,6 +1367,49 @@ if(result_from_method == null){
         </listitem>
       </itemizedlist>
     </sect2>
+    <sect2>
+      <title>Lightweight Failure detection</title>
+
+      <para>Waiting for the update of a future in a ProActive application could
+      freeze it if the node responsible for updating the future experiences a
+      failure. To this end, ProActive has a comprehensive solution with the
+      generic fault tolerance mechanism, but it can be too expensive to
+      checkpoint active objects, when only fault detection of stateless active
+      objects is needed for example.</para>
+
+      <para>By default, ProActive continuously pings active objects expected
+      to update awaited futures. It is also possible to manually trigger the
+      continuous ping using the FutureMonitoring.monitorFuture(future) API.
+      </para>
+      
+      <para>In order to honor the "lightweight" property, some limitations of
+      this mechanism must be kept in mind:</para>
+      
+      <itemizedlist>
+        <listitem>
+          <para>Automatic continuations are not supported. If an active object
+          in an automatic continuation chain fails to propagate the update of
+          the future, potential recipients will successfully ping the original
+          creator of the future, so they will not detect the failure and will
+          stay blocked.</para>
+        </listitem>
+
+        <listitem>
+          <para>The mechanism is implemented by pinging every 21 seconds an
+          active object among the monitored ones. Only one active object per
+          node is ever pinged, implying that the outcome for this active object
+          will be replicated on all other active objects in the same node.
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>When using the fault tolerance this mechanism is disabled as it
+          could interfere with the former. This should not be a problem as the
+          features provided by the fault tolerance mechanism is a super set of
+          this one.</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
   </sect1>
 
   <sect1 id="AC">
