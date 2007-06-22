@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GCMApplication
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../schema/ApplicationDescriptorSchema.xsd">
+
+    <ressourceProvider id="INRIA_LAN">
+        <file path="deployment.xml"/>
+    </ressourceProvider>
+
+	<application>
+		<resourceProvider refid="INRIA_LAN">
+		<!-- 
+		<command refid="myscript">
+		<command name="uname">
+		-->
+		<command relpath="toto.sh">
+			<arg>-D</arg>
+			<arg>-O</arg>
+			<!-- Or <args></args> -->
+			
+			<filetransfert>
+				<source relpath="outputDir">
+				<dest   path="/user/cmathieu/home/results/"/>
+			</filetransfert>
+		</command>
+		
+	</application>
+    
+ </GCMApplication>        
