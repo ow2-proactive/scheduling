@@ -5,21 +5,21 @@
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../schema/ApplicationDescriptorSchema.xsd">
 
 	<!-- Regle integrite:
-		- un fichier ne peut se trouver que dans un seul bloc ressourceAcquisition
+		- un fichier ne peut se trouver que dans un seul bloc resourceAcquisition
 		- un virtual node peut referencer plusieurs RA
 			Avant d'activer un RA
 	-->
-	<ressourceProvider id="INRIA_CLUSTERS">
+	<resourceProvider id="INRIA_CLUSTERS">
 		<file path="deployment2.xml" />
 		<file path="deployment3.xml" />
-	</ressourceProvider>
+	</resourceProvider>
 
-	<ressourceProvider id="INRIA_LAN">
+	<resourceProvider id="INRIA_LAN">
 		<file path="deployment.xml" />
-	</ressourceProvider>
+	</resourceProvider>
 
 
-	<ProActive>
+	<proactive>
 		<virtualNode id="master" capacity="1">
 			<resourceProvider refid="INRIA_LAN" />
 		</virtualNode>
@@ -34,6 +34,6 @@
 			<resourceProvider refid="INRIA_CLUSTERS" />
 		</virtualNode>
 
-	</ProActive>
+	</proactive>
 
 </GCMApplication>

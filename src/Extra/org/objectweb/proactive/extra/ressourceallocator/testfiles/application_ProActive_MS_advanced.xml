@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<GCMApplication xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+<GCMApplication
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ..//schema/ApplicationDescriptorSchema.xsd">
 
 
-	<ressourceProvider id="INRIA_LAN">
+	<resourceProvider id="INRIA_LAN">
 		<file path="deployment.xml" />
 
-		<filetransfert>
+		<fileTransfer>
 			<source path="/user/cmathieu/home/ProActive" />
 			<dest relpath="Scratch/ProActive" />
-		</filetransfert>
-	</ressourceProvider>
+		</fileTransfer>
+	</resourceProvider>
 
 	<proactive relpath="Scratch/ProActive/">
-		<java relpath="myApps/Java/bin/java" />
 
 		<configuration>
+			<java relpath="myApps/Java/bin/java" />
 			<proactiveClasspath>
 				<pathElement base="proactive" relpath="lib/log4j.jar" />
 				<pathElement base="proactive" relpath="lib/fractal.jar" />
-				<pathElement base="home" relpath="myApps/ganymed-ssh.jar" />
+				<pathElement base="home"
+					relpath="myApps/ganymed-ssh.jar" />
 			</proactiveClasspath>
 			<applicationClasspath>
 				<pathElement relpath="myApps/nqueens.jar" />
 			</applicationClasspath>
-			<securityPolicy base="proactive" relpath="config/security.policy" />
+			<securityPolicy base="proactive"
+				relpath="config/security.policy" />
 			<log4jProperties base="home" relpath="log4j.properties" />
 		</configuration>
 
@@ -37,5 +40,5 @@
 		<virtualNode id="slaves" capacity="max">
 			<resourceProvider refid="INRIA_LAN" />
 		</virtualNode>
-		</ProActive>
+	</proactive>
 </GCMApplication>
