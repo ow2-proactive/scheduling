@@ -5,31 +5,29 @@
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema ../schema/DeploymentDescriptorSchema.xsd">
 
 	<environment>
-		<descriptorVariable name="USERNAME" value="cmathieu"/>
+		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
 	<launch>
-		<dispatcher ref="LAN_INRIA">
-			<host refid="INRIA_x86_64"/>
+		<dispatcher refid="LAN_INRIA">
+			<host refid="INRIA_x86_64" />
 		</dispatcher>
 	</launch>
 
 	<infrastructure>
 		<hosts>
-			<host id="INRIA_x86_64" HostCapacity="4" VMCapacity="2" >
+			<host id="INRIA_x86_64" hostCapacity="4" vmCapacity="2">
 				<homeDirectory>/user/${USERNAME}/home</homeDirectory>
-				<tool id="java"        path="/usr/java/j2sdk/bin/java" /> 
-				<tool id="proactive" path="$HOME/myApps/ProActive_3.2.1" />			
+				<tool id="java" path="/usr/java/j2sdk/bin/java" />
+				<tool id="proactive"
+					path="$HOME/myApps/ProActive_3.2.1" />
 			</host>
 		</hosts>
-		
+
 		<dispatchers>
-			<sshGroup
-				name="LAN_INRIA"
-				hostList="cheypa schubby petawawa naruto" 
-				domain="inria.fr"
-				username="${USERNAME}"
-				commandPath="/usr/local/bin/ssh">
+			<sshGroup name="LAN_INRIA"
+				hostList="cheypa schubby petawawa naruto" domain="inria.fr"
+				username="${USERNAME}" commandPath="/usr/local/bin/ssh">
 			</sshGroup>
 		</dispatchers>
 	</infrastructure>

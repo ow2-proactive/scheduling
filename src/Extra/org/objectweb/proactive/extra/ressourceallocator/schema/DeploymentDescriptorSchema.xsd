@@ -43,7 +43,7 @@
 
 	<simpleType name="nameType">
 		<restriction base="string">
-			<pattern value="[a-zA-Z_.]+" />
+			<pattern value="[a-zA-Z_.{}$]+" />
 		</restriction>
 	</simpleType>
 
@@ -72,7 +72,7 @@
 		<attribute name="jvmPerHost" type="integer"></attribute>
 	</complexType>
 
-	<complexType name="sshType">
+	<complexType name="sshGroupType">
 		<complexContent>
 			<extension base="pa:shType">
 				<sequence>
@@ -93,8 +93,8 @@
 	</complexType>
 
 	<element name="abstractShElement" type="pa:shType"></element>
-	<element name="ssh" substitutionGroup="pa:abstractShElement"
-		type="pa:sshType">
+	<element name="sshGroup" substitutionGroup="pa:abstractShElement"
+		type="pa:sshGroupType">
 	</element>
 	<element name="rsh" substitutionGroup="pa:abstractShElement"
 		type="pa:rshType">
@@ -162,24 +162,13 @@
 
 	<complexType name="abstractLaunchType"></complexType>
 
-	<complexType name="applicationType">
-		<complexContent>
-			<extension base="pa:abstractLaunchType">
-				<attribute name="ref" type="pa:refType"></attribute>
-			</extension>
-		</complexContent>
-
-	</complexType>
-
 	<complexType name="dispatcherType">
 		<complexContent>
 			<extension base="pa:abstractLaunchType">
 				<sequence>
-					<element name="application"
-						type="pa:applicationType" maxOccurs="unbounded">
-					</element>
+					<element name="host" type="pa:hostRefType"></element>
 				</sequence>
-				<attribute name="ref" type="pa:refType"></attribute>
+				<attribute name="refid" type="pa:refType"></attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -188,9 +177,6 @@
 		<complexContent>
 			<extension base="pa:abstractLaunchType">
 				<sequence>
-					<element name="application"
-						type="pa:applicationType" maxOccurs="unbounded" minOccurs="0">
-					</element>
 					<element name="dispatcher" type="pa:dispatcherType"
 						minOccurs="0" maxOccurs="unbounded">
 					</element>
@@ -198,7 +184,7 @@
 						minOccurs="0" maxOccurs="unbounded">
 					</element>
 				</sequence>
-				<attribute name="ref" type="pa:refType"></attribute>
+				<attribute name="refid" type="pa:refType"></attribute>
 				<attribute name="relay" type="string"></attribute>
 			</extension>
 		</complexContent>
@@ -206,11 +192,6 @@
 
 	<element name="abstractLaunchElement" abstract="true"
 		type="pa:abstractLaunchType">
-	</element>
-
-	<element name="application"
-		substitutionGroup="pa:abstractLaunchElement"
-		type="pa:applicationType">
 	</element>
 
 	<element name="dispatcher"
@@ -235,30 +216,28 @@
 	</complexType>
 
 	<complexType name="toolType">
-		<attribute name="name" type="string"></attribute>
+		<attribute name="id" type="string"></attribute>
 		<attribute name="path" type="pa:pathElementType"></attribute>
 		<attribute name="version" type="string"></attribute>
 	</complexType>
 
-	<complexType name="toolsType">
-		<sequence>
-			<element name="tool" type="pa:toolType"
-				maxOccurs="unbounded">
-			</element>
-		</sequence>
-	</complexType>
-
 	<complexType name="hostType">
 		<sequence>
-			<element name="tools" type="pa:toolsType"></element>
+			<element name="homeDirectory" type="pa:pathElementType"></element>
+			<element name="tool" type="pa:toolType" maxOccurs="unbounded"></element>
 		</sequence>
-		<attribute name="name" type="string"></attribute>
-		<attribute name="homeDirectory" type="pa:pathElementType"></attribute>
+		<attribute name="id" type="string"></attribute>
+		<attribute name="hostCapacity" type="int"></attribute>
+		<attribute name="vmCapacity" type="int"></attribute>
+	</complexType>
+
+	<complexType name="hostRefType">
+		<attribute name="refid" type="pa:refType"></attribute>
 	</complexType>
 
 	<complexType name="abstractInfrastructureType"></complexType>
 
-	<complexType name="hostPropertiesType">
+	<complexType name="hostsType">
 		<complexContent>
 			<extension base="pa:abstractInfrastructureType">
 				<sequence>
@@ -283,9 +262,9 @@
 	<element name="abstractInfrastructureElement"
 		type="pa:abstractInfrastructureType">
 	</element>
-	<element name="hostProperties"
+	<element name="hosts"
 		substitutionGroup="pa:abstractInfrastructureElement"
-		type="pa:hostPropertiesType">
+		type="pa:hostsType">
 	</element>
 
 	<element name="dispatchers" type="pa:deployersType"
