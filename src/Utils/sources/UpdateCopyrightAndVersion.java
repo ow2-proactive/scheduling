@@ -142,7 +142,11 @@ public class UpdateCopyrightAndVersion {
         if (packageStart == -1) {
             return;
         }
-
+        String copyright = program.substring(0, packageStart).toLowerCase();
+        if (copyright.contains("copyright") &&
+                !copyright.contains("proactive")) {
+            return;
+        }
         System.out.println("Processing " + file);
 
         String uncopyrightedProgram = program.substring(packageStart);
