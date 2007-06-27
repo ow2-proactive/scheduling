@@ -97,6 +97,7 @@ public class GarbageCollectorThread implements Runnable {
     }
 
     static void start() {
+        singleton.setDaemon(true);
         singleton.start();
     }
 }
