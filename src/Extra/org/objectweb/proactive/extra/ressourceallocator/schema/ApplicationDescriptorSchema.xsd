@@ -213,7 +213,7 @@
 		<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
 	</complexType>
 
-	<complexType name="applicationType">
+	<complexType name="executableType">
 		<sequence>
 			<element name="resourceProvider" maxOccurs="unbounded">
 				<complexType>
@@ -226,13 +226,13 @@
 
 	<complexType name="GCMApplicationType">
 		<sequence>
+			<element name="proactive" type="pa:proactiveType"
+				minOccurs="0">
+			</element>
 			<element name="resourceProvider"
 				type="pa:resourceProviderType" maxOccurs="unbounded">
 			</element>
-			<element name="application" type="pa:applicationType"
-				minOccurs="0">
-			</element>
-			<element name="proactive" type="pa:proactiveType"
+			<element name="executable" type="pa:executableType"
 				minOccurs="0">
 			</element>
 		</sequence>

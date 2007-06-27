@@ -9,7 +9,7 @@
 		<file path="deployment.xml" />
 	</resourceProvider>
 
-	<application>
+	<executable>
 		<resourceProvider refid="INRIA_LAN" />
 		<!-- 
 			<command refid="myscript">
@@ -26,6 +26,6 @@
 			</filetransfer>
 		</command>
 
-	</application>
+	</executable>
 
 </GCMApplication>

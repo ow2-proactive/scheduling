@@ -6,15 +6,6 @@
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ..//schema/ApplicationDescriptorSchema.xsd">
 
 
-	<resourceProvider id="INRIA_LAN">
-		<file path="deployment.xml" />
-
-		<fileTransfer>
-			<source path="/user/cmathieu/home/ProActive" />
-			<dest relpath="Scratch/ProActive" />
-		</fileTransfer>
-	</resourceProvider>
-
 	<proactive relpath="Scratch/ProActive/">
 
 		<configuration>
@@ -41,4 +32,15 @@
 			<resourceProvider refid="INRIA_LAN" />
 		</virtualNode>
 	</proactive>
+
+	<resourceProvider id="INRIA_LAN">
+		<file path="deployment.xml" />
+
+		<fileTransfer>
+			<source path="/user/cmathieu/home/ProActive" />
+			<dest relpath="Scratch/ProActive" />
+		</fileTransfer>
+	</resourceProvider>
+
+
 </GCMApplication>

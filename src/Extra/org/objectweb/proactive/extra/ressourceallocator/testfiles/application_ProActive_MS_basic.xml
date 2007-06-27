@@ -9,15 +9,6 @@
 		- un virtual node peut referencer plusieurs RA
 			Avant d'activer un RA
 	-->
-	<resourceProvider id="INRIA_CLUSTERS">
-		<file path="deployment2.xml" />
-		<file path="deployment3.xml" />
-	</resourceProvider>
-
-	<resourceProvider id="INRIA_LAN">
-		<file path="deployment.xml" />
-	</resourceProvider>
-
 
 	<proactive>
 		<virtualNode id="master" capacity="1">
@@ -35,5 +26,15 @@
 		</virtualNode>
 
 	</proactive>
+
+	<resourceProvider id="INRIA_CLUSTERS">
+		<file path="deployment2.xml" />
+		<file path="deployment3.xml" />
+	</resourceProvider>
+
+	<resourceProvider id="INRIA_LAN">
+		<file path="deployment.xml" />
+	</resourceProvider>
+
 
 </GCMApplication>
