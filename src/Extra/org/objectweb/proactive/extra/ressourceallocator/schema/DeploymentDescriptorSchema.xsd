@@ -160,11 +160,11 @@
 		</restriction>
 	</simpleType>
 
-	<complexType name="abstractLaunchType"></complexType>
+	<complexType name="abstractResourceType"></complexType>
 
-	<complexType name="dispatcherType">
+	<complexType name="groupType">
 		<complexContent>
-			<extension base="pa:abstractLaunchType">
+			<extension base="pa:abstractResourceType">
 				<sequence>
 					<element name="host" type="pa:hostRefType"></element>
 				</sequence>
@@ -175,9 +175,9 @@
 
 	<complexType name="bridgeType">
 		<complexContent>
-			<extension base="pa:abstractLaunchType">
+			<extension base="pa:abstractResourceType">
 				<sequence>
-					<element name="dispatcher" type="pa:dispatcherType"
+					<element name="group" type="pa:groupType"
 						minOccurs="0" maxOccurs="unbounded">
 					</element>
 					<element name="bridge" type="pa:bridgeType"
@@ -190,24 +190,24 @@
 		</complexContent>
 	</complexType>
 
-	<element name="abstractLaunchElement" abstract="true"
-		type="pa:abstractLaunchType">
+	<element name="abstractResourceElement" abstract="true"
+		type="pa:abstractResourceType">
 	</element>
 
-	<element name="dispatcher"
-		substitutionGroup="pa:abstractLaunchElement"
-		type="pa:dispatcherType">
+	<element name="group"
+		substitutionGroup="pa:abstractResourceElement"
+		type="pa:groupType">
 	</element>
 
-	<element name="bridge" substitutionGroup="pa:abstractLaunchElement"
+	<element name="bridge" substitutionGroup="pa:abstractResourceElement"
 		type="pa:bridgeType">
 	</element>
 
-	<complexType name="launchType">
+	<complexType name="resourceType">
 		<complexContent>
 			<extension base="pa:abstractGCMType">
 				<sequence>
-					<element ref="pa:abstractLaunchElement"
+					<element ref="pa:abstractResourceElement"
 						maxOccurs="unbounded">
 					</element>
 				</sequence>
@@ -267,7 +267,7 @@
 		type="pa:hostsType">
 	</element>
 
-	<element name="dispatchers" type="pa:deployersType"
+	<element name="groups" type="pa:deployersType"
 		substitutionGroup="pa:abstractInfrastructureElement">
 	</element>
 	<element name="bridges" type="pa:deployersType"
@@ -293,7 +293,7 @@
 	<element name="acquisition" type="pa:acquisitionType"
 		substitutionGroup="pa:abstractGCMElement">
 	</element>
-	<element name="launch" type="pa:launchType"
+	<element name="resource" type="pa:resourceType"
 		substitutionGroup="pa:abstractGCMElement">
 	</element>
 	<element name="infrastructure" type="pa:infrastructureType"

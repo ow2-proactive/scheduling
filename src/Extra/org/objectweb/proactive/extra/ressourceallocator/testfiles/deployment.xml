@@ -8,11 +8,11 @@
 		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
-	<launch>
-		<dispatcher refid="LAN_INRIA">
+	<resource>
+		<group refid="LAN_INRIA">
 			<host refid="INRIA_x86_64" />
-		</dispatcher>
-	</launch>
+		</group>
+	</resource>
 
 	<infrastructure>
 		<hosts>
@@ -24,11 +24,11 @@
 			</host>
 		</hosts>
 
-		<dispatchers>
+		<groups>
 			<sshGroup name="LAN_INRIA"
 				hostList="cheypa schubby petawawa naruto" domain="inria.fr"
 				username="${USERNAME}" commandPath="/usr/local/bin/ssh">
 			</sshGroup>
-		</dispatchers>
+		</groups>
 	</infrastructure>
 </GCMDeployment>
