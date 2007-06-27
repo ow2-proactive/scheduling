@@ -17,7 +17,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 public class FutureMonitoring implements Runnable {
 
     /** Ping one body every 21s */
-    private static final int TTM = 21000;
+    private static int TTM = 21000;
 
     /**
      * For each node, the list of futures to monitor. We ping a single body in
@@ -30,6 +30,13 @@ public class FutureMonitoring implements Runnable {
         new ConcurrentHashMap<String, ConcurrentLinkedQueue<FutureProxy>>();
 
     static {
+
+        /* Dynamically configurable to make shorter tests */
+        String ttm = ProActiveConfiguration.getInstance()
+                                           .getProperty("proactive.futuremonitoring.ttm");
+        if (ttm != null) {
+            TTM = Integer.parseInt(ttm);
+        }
         Thread t = new Thread(new FutureMonitoring(), "Monitoring the Futures");
         t.setDaemon(true);
         t.start();

@@ -32,13 +32,13 @@ package functionalTests.activeobject.futuremonitoring;
 
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
+
 
 /**
  * Test monitoring the futures
@@ -65,6 +65,9 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
+        /* This must be done before initializing ProActive, and the monitoring */
+        System.setProperty("proactive.futuremonitoring.ttm", "500");
+
         ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION);
         pad.activateMappings();
         VirtualNode vn = pad.getVirtualNode("VN");
