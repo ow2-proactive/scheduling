@@ -8,6 +8,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -167,6 +168,11 @@ public class FutureMonitoring implements Runnable {
      */
     @PublicAPI
     public static void monitorFuture(Object future) {
+        if (!MOP.isReifiedObject(future)) {
+            throw new IllegalArgumentException(
+                "Parameter is not a future object (actual type is " +
+                future.getClass().getName() + ")");
+        }
         FutureProxy fp = (FutureProxy) ((StubObject) future).getProxy();
         monitorFutureProxy(fp);
     }
