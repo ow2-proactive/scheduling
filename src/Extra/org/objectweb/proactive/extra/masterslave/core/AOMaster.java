@@ -274,7 +274,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
                 launchedTasks.remove(taskId);
                 if (pendingTasks.isEmpty()) {
                     // if the queue was empty before the task is rescheduled, we wake-up all sleeping slaves
-                    sleepingGroupStub.wakeup();
+                    if (sleepingGroup.size() > 0) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Waking up sleeping slaves...");
+                        }
+
+                        // We wake up the sleeping guys
+                        sleepingGroupStub.wakeup();
+                    }
                     pendingTasks.add(taskId);
                 } else {
                     pendingTasks.add(taskId);
@@ -378,13 +385,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
         if (emptyPending()) {
             pendingTasks.add(taskId);
+            if (sleepingGroup.size() > 0) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Waking up sleeping slaves...");
+                }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Waking up sleeping slaves...");
+                // We wake up the sleeping guys
+                sleepingGroupStub.wakeup();
             }
-
-            // We wake up the sleeping guys
-            sleepingGroupStub.wakeup();
         } else {
             pendingTasks.add(taskId);
         }
