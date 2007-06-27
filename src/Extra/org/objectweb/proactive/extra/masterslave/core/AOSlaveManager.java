@@ -75,21 +75,22 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvide
  */
 public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     NodeCreationEventListener, InitActive, Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVEMANAGER);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVEMANAGER);
 
     //	stub on this active object
     protected Object stubOnThis;
     protected long slaveCounter;
+
     //	holds the virtual nodes, only used to kill the nodes when the active object is closed
-    Vector<VirtualNode> vnlist;
+    protected Vector<VirtualNode> vnlist;
 
     // a thread pool used for slave creation
-    private ExecutorService threadPool;
-    private boolean isTerminated;
-    private TaskProvider provider;
+    protected ExecutorService threadPool;
+    protected boolean isTerminated;
+    protected TaskProvider provider;
 
     // memory of the slaves
-    private Map<String, Object> initialMemory;
+    protected Map<String, Object> initialMemory;
 
     public AOSlaveManager() {
     } //proactive no arg constructor
@@ -127,7 +128,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                     addResources(vn);
                 }
             } catch (ProActiveException e) {
-                logger.error("Couldnt add the specified resources.");
+                logger.error("Couldn't add the specified resources.");
                 e.printStackTrace();
             }
         }
@@ -142,7 +143,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
                 ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
                 addResources(pad.getVirtualNode(virtualNodeName));
             } catch (ProActiveException e) {
-                logger.error("Couldnt add the specified resources.");
+                logger.error("Couldn't add the specified resources.");
                 e.printStackTrace();
             }
         }
@@ -176,13 +177,14 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      * Creates a slave object inside the given node
      * @param node
      */
-    private void createSlave(Node node) {
+    protected void createSlave(Node node) {
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating slave on " +
                     node.getNodeInformation().getName());
             }
-            String slavename = "Slave" + slaveCounter++;
+            String slavename = node.getNodeInformation().getHostName() + "_" +
+                slaveCounter++;
 
             // Creates the slave which will automatically connect to the master
             ProActive.newActive(AOSlave.class.getName(),
@@ -299,7 +301,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      * @author fviale
      *
      */
-    private class SlaveCreationHandler implements Runnable {
+    protected class SlaveCreationHandler implements Runnable {
         private Node node = null;
 
         public SlaveCreationHandler(Node _node) {

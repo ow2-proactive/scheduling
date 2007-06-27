@@ -105,7 +105,7 @@ public class AOTaskRepository implements TaskRepository, Serializable {
      * @param id
      * @return
      */
-    private TaskIntern loadTask(long id) {
+    protected TaskIntern loadTask(long id) {
         TaskIntern task = null;
         if (!idToZippedTask.containsKey(id)) {
             throw new NoSuchElementException("task unknown");

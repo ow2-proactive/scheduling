@@ -63,19 +63,19 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     protected Object stubOnThis;
 
     // Name of the slave
-    private String name;
+    protected String name;
 
     // The entity which will provide tasks to the slave (i.e. the master)
-    private TaskProvider provider;
+    protected TaskProvider provider;
 
     // Tells if the slave is terminated
-    private boolean terminated;
+    protected boolean terminated;
 
     // Tells if the slave is currently sleeping (not asking new tasks)
-    private boolean isSleeping;
+    protected boolean isSleeping;
 
     // The memory of the slave (the slave can keep some data between different tasks executions (connection to a database, file descriptor, etc ...)
-    private Map<String, Object> memory;
+    protected Map<String, Object> memory;
 
     /**
      * Required for Active Objects
@@ -158,7 +158,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * gets the initial task to solve
      * @return task
      */
-    private TaskIntern initialGetTask() {
+    protected TaskIntern initialGetTask() {
         if (logger.isDebugEnabled()) {
             logger.debug(name + " asks a new task...");
         }
@@ -175,7 +175,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * @param task task to run
      * @return the same task, but containing the result
      */
-    private ResultIntern handleTask(TaskIntern task) {
+    protected ResultIntern handleTask(TaskIntern task) {
         Serializable resultObj = null;
         ResultInternImpl result = new ResultInternImpl(task);
 

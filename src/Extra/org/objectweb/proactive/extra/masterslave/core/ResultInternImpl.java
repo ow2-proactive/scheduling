@@ -15,16 +15,16 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  */
 public class ResultInternImpl implements ResultIntern {
     // The id of the task
-    private long id = -1;
+    protected long id = -1;
 
     // the result
-    private Serializable result = null;
+    protected Serializable result = null;
 
     // when this task has thrown an exception
-    private boolean isException = false;
+    protected boolean isException = false;
 
     // the exception thrown
-    private Throwable exception = null;
+    protected Throwable exception = null;
 
     public ResultInternImpl(TaskIntern task) {
         this.id = task.getId();

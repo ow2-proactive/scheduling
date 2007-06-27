@@ -116,7 +116,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     protected ResultQueue resultQueue;
 
     // the repository where to locate tasks
-    private TaskRepository repository;
+    protected TaskRepository repository;
+
+    // if there is a pending request from the client
+    protected Request pendingRequest;
 
     public AOMaster() {
         // proactive emty no arg constructor
@@ -129,6 +132,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     public AOMaster(TaskRepository repository, Map<String, Object> initialMemory) {
         this.initialMemory = initialMemory;
         this.repository = repository;
+        this.pendingRequest = null;
     }
 
     /* (non-Javadoc)
@@ -171,7 +175,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * Tells if the master has some activity
      * @return master activity
      */
-    private boolean emptyPending() {
+    protected boolean emptyPending() {
         return pendingTasks.isEmpty();
     }
 
@@ -255,8 +259,8 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public void isDead(Slave slave) {
         String slaveName = slavesByNameRev.get(slave);
-        if (logger.isDebugEnabled()) {
-            logger.debug(slaveName + " reported missing... removing it");
+        if (logger.isInfoEnabled()) {
+            logger.info(slaveName + " reported missing... removing it");
         }
 
         // we remove the slave from our lists
@@ -318,10 +322,29 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         Service service = new Service(body);
         while (!terminated) {
             service.waitForRequest();
+            // We detect a waitXXX request in the request queue
+            Request waitRequest = service.getOldest(new FindWaitFilter());
+            if (waitRequest != null) {
+                if (pendingRequest == null) {
+                    // if there is one and there was none previously found we remove it and store it for later
+                    pendingRequest = waitRequest;
+                    service.blockingRemoveOldest(new FindWaitFilter());
+                } else {
+                    // if there is one and there was another one pending, we serve it immediately (it's an error)
+                    service.serveOldest(new FindWaitFilter());
+                }
+            }
+            // we serve directly every methods from the slaves
             service.serveAll("getTask");
             service.serveAll("sendResultAndGetTask");
             service.serveAll("isDead");
-            service.serveAll(new MainFilter());
+
+            // we serve everything else which is not a waitXXX method
+            // Careful, the order is very important here, we need to serve the solve method before the waitXXX
+            service.serveAll(new FindNotWaitFilter());
+
+            // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
+            maybeServePending();
         }
         body.terminate();
     }
@@ -347,6 +370,39 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         TaskIntern newTask = getTask(slavesByName.get(originatorName),
                 originatorName);
         return newTask;
+    }
+
+    /**
+     * If there is a pending waitXXX method, we serve it if the necessary results are collected
+     */
+    protected void maybeServePending() {
+        if (pendingRequest != null) {
+            if (pendingRequest.getMethodName().equals("waitOneResult") &&
+                    resultQueue.isOneResultAvailable()) {
+                servePending();
+            } else if (pendingRequest.getMethodName().equals("waitAllResults") &&
+                    resultQueue.areAllResultsAvailable()) {
+                servePending();
+            } else if (pendingRequest.getMethodName().equals("waitKResults")) {
+                int k = (Integer) pendingRequest.getParameter(0);
+                if (((resultQueue.countPendingResults() +
+                        resultQueue.countAvailableResults()) < k) || (k <= 0)) {
+                    servePending();
+                } else if (resultQueue.countAvailableResults() >= k) {
+                    servePending();
+                }
+            }
+        }
+    }
+
+    /**
+     * Serve the pending waitXXX method
+     */
+    protected void servePending() {
+        Body body = ProActive.getBodyOnThis();
+        Request req = pendingRequest;
+        pendingRequest = null;
+        body.serve(req);
     }
 
     /* (non-Javadoc)
@@ -380,7 +436,7 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @param task
      * @throws IllegalArgumentException
      */
-    private void solve(Long taskId) {
+    protected void solve(Long taskId) {
         resultQueue.addPendingTask(taskId);
 
         if (emptyPending()) {
@@ -449,6 +505,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public List<ResultIntern> waitAllResults()
         throws IllegalStateException, TaskException {
+        if (pendingRequest != null) {
+            throw new IllegalStateException(
+                "Already waiting for a wait request");
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("All results received by the user.");
         }
@@ -460,6 +520,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public List<ResultIntern> waitKResults(int k)
         throws IllegalArgumentException, TaskException {
+        if (pendingRequest != null) {
+            throw new IllegalStateException(
+                "Already waiting for a wait request");
+        }
         if ((resultQueue.countPendingResults() +
                 resultQueue.countAvailableResults()) < k) {
             throw new IllegalArgumentException("" + k + " is too big");
@@ -477,10 +541,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      */
     public ResultIntern waitOneResult()
         throws IllegalStateException, TaskException {
+        if (pendingRequest != null) {
+            throw new IllegalStateException(
+                "Already waiting for a wait request");
+        }
         ResultIntern task = resultQueue.getNext();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Result of task" + task.getId() +
+            logger.debug("Result of task " + task.getId() +
                 " received by the user.");
         }
         return task;
@@ -490,28 +558,48 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * @author fviale
      * Internal class for filtering requests in the queue
      */
-    private class MainFilter implements RequestFilter {
-        public MainFilter() {
+    protected class FindWaitFilter implements RequestFilter {
+        public FindWaitFilter() {
         }
 
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
          */
         public boolean acceptRequest(Request request) {
-            // We filter the requests with the following strategy :
-            // If a request asks for the result of a(several) task(s), we don't serve it(them) until the result(s) is(are) available
-            if (request.getMethodName().equals("waitOneResult")) {
-                return resultQueue.isOneResultAvailable();
-            } else if (request.getMethodName().equals("waitAllResults")) {
-                return resultQueue.areAllResultsAvailable();
-            } else if (request.getMethodName().equals("waitKResults")) {
-                int k = (Integer) request.getParameter(0);
-                if (((resultQueue.countPendingResults() +
-                        resultQueue.countAvailableResults()) < k) || (k <= 0)) {
-                    return true; // error
-                } else {
-                    return resultQueue.countAvailableResults() >= (Integer) request.getParameter(0);
-                }
+            // We find all the requests that are not servable yet
+            String name = request.getMethodName();
+            if (name.equals("waitOneResult")) {
+                return true;
+            } else if (name.equals("waitAllResults")) {
+                return true;
+            } else if (name.equals("waitKResults")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @author fviale
+     * Internal class for filtering requests in the queue
+     */
+    protected class FindNotWaitFilter implements RequestFilter {
+        public FindNotWaitFilter() {
+        }
+
+        /* (non-Javadoc)
+         * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
+         */
+        public boolean acceptRequest(Request request) {
+            // We find all the requests that are not servable yet
+            String name = request.getMethodName();
+            if (name.equals("waitOneResult")) {
+                return false;
+            } else if (name.equals("waitAllResults")) {
+                return false;
+            } else if (name.equals("waitKResults")) {
+                return false;
             } else {
                 return true;
             }

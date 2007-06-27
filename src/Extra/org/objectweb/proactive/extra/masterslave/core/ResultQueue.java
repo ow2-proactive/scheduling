@@ -27,16 +27,16 @@ public class ResultQueue implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
 
     //	 current ordering mode
-    private Master.OrderingMode mode;
+    protected Master.OrderingMode mode;
 
     // submitted tasks ids (ordered)
-    private TreeSet<Long> idsubmitted = new TreeSet<Long>();
+    protected TreeSet<Long> idsubmitted = new TreeSet<Long>();
 
     // sorted set of results (for submission order)
-    private SortedSet<ResultIntern> orderedResults = new TreeSet<ResultIntern>();
+    protected SortedSet<ResultIntern> orderedResults = new TreeSet<ResultIntern>();
 
     // unordered list of results (for 
-    private LinkedList<ResultIntern> unorderedResults = new LinkedList<ResultIntern>();
+    protected LinkedList<ResultIntern> unorderedResults = new LinkedList<ResultIntern>();
 
     /**
      * Creates the result queue with the given ordering mode

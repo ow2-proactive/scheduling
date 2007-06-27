@@ -46,10 +46,10 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  */
 public class TaskWrapperImpl implements TaskIntern {
     // The id of the task
-    private long id = NULL_TASK_ID;
+    protected long id = NULL_TASK_ID;
 
     // The actual task object
-    private Task realTask = null;
+    protected Task realTask = null;
 
     /**
      *

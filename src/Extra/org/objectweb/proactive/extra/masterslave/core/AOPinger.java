@@ -37,18 +37,18 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
 
     // stub
-    AOPinger stubOnThis;
+    protected AOPinger stubOnThis;
 
     // terminated state
-    boolean terminated;
+    protected boolean terminated;
 
     // pinging period
-    long pingPeriod;
+    protected long pingPeriod;
 
     // Slaves to be watched
-    Slave slaveGroupStub;
-    private Group slaveGroup;
-    SlaveDeadListener listener;
+    protected Slave slaveGroupStub;
+    protected Group slaveGroup;
+    protected SlaveDeadListener listener;
 
     /**
      * ProActive empty constructor
