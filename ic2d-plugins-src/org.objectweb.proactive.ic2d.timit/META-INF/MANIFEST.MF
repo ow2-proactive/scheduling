@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Timit Plug-in
+Bundle-SymbolicName: org.objectweb.proactive.ic2d.timit; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.ic2d.timit.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.gef,
+ org.objectweb.proactive.ic2d.monitoring,
+ org.objectweb.proactive.ic2d.lib,
+ org.objectweb.proactive.ic2d.console,
+ org.eclipse.jface.text,
+ org.eclipse.emf,
+ org.eclipse.birt,
+ org.eclipse.birt.core.ui,
+ org.eclipse.birt.chart,
+ org.eclipse.birt.chart.ui,
+ org.eclipse.birt.chart.engine,
+ org.eclipse.birt.chart.device.swt,
+ org.eclipse.birt.chart.cshelp,
+ org.eclipse.birt.chart.device.extension,
+ org.eclipse.birt.chart.device.pdf,
+ org.eclipse.birt.chart.device.svg,
+ org.eclipse.birt.chart.engine.extension,
+ org.eclipse.birt.chart.examples,
+ org.eclipse.birt.chart.reportitem,
+ org.eclipse.birt.chart.reportitem.ui,
+ org.eclipse.birt.chart.runtime
+Eclipse-LazyStart: true
+Export-Package: org.objectweb.proactive.ic2d.timit.views

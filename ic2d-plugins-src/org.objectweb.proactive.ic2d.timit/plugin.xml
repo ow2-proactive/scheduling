@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         id="org.objectweb.proactive.ic2d.timit.views.TimItView"
+         name="TimIt View"
+         point="org.eclipse.ui.views">
+      <view
+            category="org.objectweb.proactive.ic2d.monitoring.category"
+            class="org.objectweb.proactive.ic2d.timit.views.TimItView"
+            icon="icons/sample.gif"
+            id="org.objectweb.proactive.ic2d.timit.views.TimItView"
+            name="TimIt View"/>
+      <view
+            allowMultiple="false"
+            category="org.objectweb.proactive.ic2d.monitoring.category"
+            class="org.objectweb.proactive.ic2d.timit.views.TreeView"
+            icon="icons/sample.gif"
+            id="org.objectweb.proactive.ic2d.timit.views.TreeView"
+            name="Tree View"/>
+   </extension>
+   <extension
+         point="org.objectweb.proactive.ic2d.monitoring.actions_extension">
+      <action_class class="org.objectweb.proactive.ic2d.timit.actions.GetTimerSnapshotAction"/>
+   </extension>
+   
+</plugin>
