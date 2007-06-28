@@ -59,11 +59,14 @@ public class BasicTimer implements java.io.Serializable {
     /** A boolean to know if the timer is started (true) or not (false) */
     private boolean isStarted;
 
+    /** A boolean to know if this timer was defined by the user */
+    private boolean isUserLevel;
+
     /**
-     * Creates an instance of a SimpleTimer.
-     * @param name The name of the timer
-     * @param parent A reference to the parent timer
-     */
+    * Creates an instance of a SimpleTimer.
+    * @param name The name of the timer
+    * @param parent A reference to the parent timer
+    */
     public BasicTimer(String name, BasicTimer parent) {
         this.name = name;
         this.startTime = 0L;
@@ -239,5 +242,13 @@ public class BasicTimer implements java.io.Serializable {
      */
     public void setStartStopCoupleCount(int startStopCoupleCount) {
         this.startStopCoupleCount = startStopCoupleCount;
+    }
+
+    public boolean isUserLevel() {
+        return isUserLevel;
+    }
+
+    public void setUserLevel(boolean isUserLevel) {
+        this.isUserLevel = isUserLevel;
     }
 }

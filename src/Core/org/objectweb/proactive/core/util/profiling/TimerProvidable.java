@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.util.profiling;
 
+import java.util.Collection;
+
+import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 
 
@@ -55,4 +58,8 @@ public interface TimerProvidable {
     public void stopXAndUnskipSendRequest(byte timerId);
 
     public void stopAll();
+
+    public Collection<BasicTimer> getSnapshot(String[] timersNames);
+
+    public BasicTimer attachTimer(String timerName);
 }

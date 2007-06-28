@@ -32,6 +32,7 @@ package org.objectweb.proactive.benchmarks.timit.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicReductor;
 import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
+import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -102,6 +104,9 @@ public class CoreTimersContainer implements TimerProvidable {
 
     /** Other information to send to the reductor */
     private String otherInformation;
+
+    /** The last user level timer id */
+    private byte lastUserTimerId = -1;
 
     /**
      * Constructs a container only if the timitActivation property was specified
@@ -275,13 +280,13 @@ public class CoreTimersContainer implements TimerProvidable {
         this.timitReductor = red;
     }
 
-    /**
-     * Dumps the debug output if debug is enabled
-     */
-    public void dump() {
-        System.out.println("CoreTimersContainer.dump() ----> " +
-            this.tempOutput);
-    }
+    //    /**
+    //     * Dumps the debug output if debug is enabled
+    //     */
+    //    public void dump() {
+    //        System.out.println("CoreTimersContainer.dump() ----> " +
+    //            this.tempOutput);
+    //    }
 
     /**
      * Sends results to the reductor object.
@@ -324,6 +329,34 @@ public class CoreTimersContainer implements TimerProvidable {
     }
 
     /**
+     * Returns a filtered copy of stopped timers list
+     */
+    public Collection<BasicTimer> getSnapshot(String[] timersNames) {
+        // Create a collection from the current timers map
+        final Iterator<BasicTimer> it = this.timersMap.values().iterator();
+        Collection<BasicTimer> col = new ArrayList<BasicTimer>();
+        while (it.hasNext()) {
+            BasicTimer t = it.next();
+            if (contains(timersNames, t.getName()) ||
+                    ((t.getTotalTime() != 0) && t.isUserLevel())) {
+                col.add(t);
+            }
+        }
+
+        // First make a copy of the collection    	
+        try {
+            col = (Collection<BasicTimer>) Utils.makeDeepCopy(col);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Stop all timers in a hierarchy preserved way
+        this.stopAll(col);
+
+        return col;
+    }
+
+    /**
      * Returns an instance of a timer from a given id.
      *
      * @param timerId
@@ -346,17 +379,26 @@ public class CoreTimersContainer implements TimerProvidable {
      * Stops automatically all timers, use this method before terminate a body.
      */
     public void stopAll() {
-        Iterator<BasicTimer> it = this.timersMap.values().iterator();
+        this.stopAll(this.timersMap.values());
+    }
+
+    /**
+     * Stops automatically all timers, use this method before terminate a body.
+     */
+    public void stopAll(Collection<BasicTimer> timersCollection) {
+        Iterator<BasicTimer> it = timersCollection.iterator();
         BasicTimer current = null;
         while (it.hasNext()) {
             current = it.next();
-            BasicTimer startedSonOfCurrent = getStartedSonOf(current);
+            BasicTimer startedSonOfCurrent = getStartedSonOf(current,
+                    timersCollection);
             BasicTimer lastStarted = startedSonOfCurrent;
 
             // Get the leaf for the current timer
             while (startedSonOfCurrent != null) {
                 lastStarted = startedSonOfCurrent;
-                startedSonOfCurrent = getStartedSonOf(startedSonOfCurrent);
+                startedSonOfCurrent = getStartedSonOf(startedSonOfCurrent,
+                        timersCollection);
             }
 
             // If lastStarted is null the current has no started sons
@@ -373,7 +415,7 @@ public class CoreTimersContainer implements TimerProvidable {
         }
 
         // Stop all roots only when cheldren are stopped
-        it = this.timersMap.values().iterator();
+        it = timersCollection.iterator();
         while (it.hasNext()) {
             current = it.next();
             // If parent is null then
@@ -426,12 +468,18 @@ public class CoreTimersContainer implements TimerProvidable {
             // Add it to the list
             this.timersMap.put(TimerWarehouse.TOTAL, total);
         }
+
         // Direct of indirect children of total
-        this.createOnDemand(TimerWarehouse.DEPLOYEMENT, "Deployement", total);
+        //this.createOnDemand(TimerWarehouse.DEPLOYEMENT, "Deployement", total);        
         final BasicTimer serve = this.createOnDemand(TimerWarehouse.SERVE,
                 "Serve", total);
+        this.createOnDemand(TimerWarehouse.SEND_REPLY, "SendReply", serve);
         final BasicTimer sendRequest = this.createOnDemand(TimerWarehouse.SEND_REQUEST,
                 "SendRequest", serve);
+        this.createOnDemand(TimerWarehouse.WAIT_BY_NECESSITY,
+            "WaitByNecessity", serve);
+        this.createOnDemand(TimerWarehouse.WAIT_FOR_REQUEST, "WaitForRequest",
+            total);
         this.createOnDemand(TimerWarehouse.LOCAL_COPY, "LocalCopy", sendRequest);
         this.createOnDemand(TimerWarehouse.BEFORE_SERIALIZATION,
             "BeforeSerialization", sendRequest);
@@ -439,15 +487,10 @@ public class CoreTimersContainer implements TimerProvidable {
             sendRequest);
         this.createOnDemand(TimerWarehouse.AFTER_SERIALIZATION,
             "AfterSerialization", sendRequest);
-        this.createOnDemand(TimerWarehouse.WAIT_BY_NECESSITY,
-            "WaitByNecessity", serve);
         this.createOnDemand(TimerWarehouse.GROUP_ONE_WAY_CALL,
             "GroupOneWayCall", serve);
         this.createOnDemand(TimerWarehouse.GROUP_ASYNC_CALL, "GroupAsyncCall",
             serve);
-        this.createOnDemand(TimerWarehouse.SEND_REPLY, "SendReply", serve);
-        this.createOnDemand(TimerWarehouse.WAIT_FOR_REQUEST, "WaitForRequest",
-            total);
     }
 
     /**
@@ -493,8 +536,9 @@ public class CoreTimersContainer implements TimerProvidable {
      *            The parent timer
      * @return The first started son of t
      */
-    private final BasicTimer getStartedSonOf(final BasicTimer t) {
-        Iterator<BasicTimer> it = this.timersMap.values().iterator();
+    private final BasicTimer getStartedSonOf(final BasicTimer t,
+        final Collection<BasicTimer> timersCollection) {
+        Iterator<BasicTimer> it = timersCollection.iterator();
         while (it.hasNext()) {
             BasicTimer current = it.next();
             if ((current.getParent() != null) && current.getParent().equals(t) &&
@@ -543,5 +587,45 @@ public class CoreTimersContainer implements TimerProvidable {
      */
     public void setOtherInformation(final String otherInformation) {
         this.otherInformation = otherInformation;
+    }
+
+    /**
+     * User level timer is always attached as a son of SERVE timer
+     */
+    public BasicTimer attachTimer(String timerName) {
+        // Find a unique id for this timer to fill the map
+        this.lastUserTimerId = ((this.lastUserTimerId == -1) ? Byte.MAX_VALUE
+                                                             : this.lastUserTimerId--);
+        // If this id is already used return null
+        if (this.timersMap.containsKey(this.lastUserTimerId)) {
+            return null;
+        }
+
+        // Get the instance of SERVE timer
+        BasicTimer serveTimer = this.timersMap.get(TimerWarehouse.SERVE);
+        if (serveTimer == null) {
+            return null;
+        }
+        BasicTimer userTimer = this.createOnDemand(this.lastUserTimerId,
+                timerName, serveTimer);
+        userTimer.setUserLevel(true);
+        return userTimer;
+    }
+
+    /**
+     * A predicate that returns true if the string val is contained
+     * in the array.
+     * @param arr An array of strings
+     * @param val A String
+     * @return True if val is contained in arr
+     */
+    private final static boolean contains(String[] arr, String val) {
+        boolean res = false;
+        for (String x : arr) {
+            if (val.equals(x)) {
+                res = true;
+            }
+        }
+        return res;
     }
 }

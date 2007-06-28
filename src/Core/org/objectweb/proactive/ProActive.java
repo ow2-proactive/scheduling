@@ -718,7 +718,8 @@ public class ProActive {
                     // active object and avoid StackOverflow
                     // we need to check the current activated object
                     // classname
-                    !TimItBasicManager.getReductorClassName().equals(classname)) {
+                    !TimItBasicManager.getReductorClassName().equals(classname) &&
+                        !classname.contains("Spy")) {
                     // The timit reductor will be passed to the factory
                     // and used when a body is created
                     clonedFactory.setTimItReductor(TimItBasicManager.getInstance()
