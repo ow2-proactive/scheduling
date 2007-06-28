@@ -49,6 +49,8 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -223,6 +225,9 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         pendingTasks = new HashSetQueue<Long>();
         launchedTasks = new HashSetQueue<Long>();
         resultQueue = new ResultQueue(Master.OrderingMode.CompletionOrder);
+
+        // Ignore NFEs occuring on ourself (send reply exceptions on dead slaves)
+        ProActive.getBodyOnThis().addNFEListener(new SelfNFEListener());
 
         // Slaves
         try {
@@ -603,6 +608,21 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             } else {
                 return true;
             }
+        }
+    }
+
+    /**
+     * Handles Non Functional Exceptions(NFE) detection
+     * @author fviale
+     */
+    public class SelfNFEListener implements NFEListener {
+
+        /* (non-Javadoc)
+         * @see org.objectweb.proactive.core.exceptions.manager.NFEListener#handleNFE(org.objectweb.proactive.core.exceptions.NonFunctionalException)
+         */
+        public boolean handleNFE(NonFunctionalException nfe) {
+            // do nothing : not harmful exceptions
+            return true;
         }
     }
 }
