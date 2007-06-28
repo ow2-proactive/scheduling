@@ -49,7 +49,6 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -227,14 +226,22 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         resultQueue = new ResultQueue(Master.OrderingMode.CompletionOrder);
 
         // Ignore NFEs occuring on ourself (send reply exceptions on dead slaves)
-        ProActive.getBodyOnThis().addNFEListener(new SelfNFEListener());
+        ProActive.getBodyOnThis().addNFEListener(NFEListener.NOOP_LISTENER);
 
         // Slaves
         try {
+            // Slave Group
             slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
             slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
+            // we ignore NFE on this group (the pinger is responsible for it)
+            ProActive.addNFEListenerOnGroup(slaveGroupStub,
+                NFEListener.NOOP_LISTENER);
+            // Group of sleeping slaves
             sleepingGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
             sleepingGroup = ProActiveGroup.getGroup(sleepingGroupStub);
+            // we ignore NFE on this group (the pinger is responsible for it)
+            ProActive.addNFEListenerOnGroup(sleepingGroupStub,
+                NFEListener.NOOP_LISTENER);
             slavesActivity = new HashMap<String, Long>();
             slavesByName = new HashMap<String, Slave>();
             slavesByNameRev = new HashMap<Slave, String>();
@@ -608,21 +615,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
             } else {
                 return true;
             }
-        }
-    }
-
-    /**
-     * Handles Non Functional Exceptions(NFE) detection
-     * @author fviale
-     */
-    public class SelfNFEListener implements NFEListener {
-
-        /* (non-Javadoc)
-         * @see org.objectweb.proactive.core.exceptions.manager.NFEListener#handleNFE(org.objectweb.proactive.core.exceptions.NonFunctionalException)
-         */
-        public boolean handleNFE(NonFunctionalException nfe) {
-            // do nothing : not harmful exceptions
-            return true;
         }
     }
 }
