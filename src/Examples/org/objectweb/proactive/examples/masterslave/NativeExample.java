@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.objectweb.proactive.examples.masterslave.BasicPrimeExample.FindPrimeTask;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
@@ -19,6 +18,7 @@ import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
  *
  */
 public class NativeExample extends AbstractExample {
+    ProActiveMaster<SimpleNativeTask, String[]> master;
 
     /**
      * @param args
@@ -32,8 +32,9 @@ public class NativeExample extends AbstractExample {
         instance.init(args);
 
         // Creating the Master
-        ProActiveMaster<SimpleNativeTask, String[]> master = new ProActiveMaster<SimpleNativeTask, String[]>();
-        master.addResources(instance.descriptor_url, instance.vn_name);
+        instance.master = new ProActiveMaster<SimpleNativeTask, String[]>();
+        instance.registerHook();
+        instance.master.addResources(instance.descriptor_url, instance.vn_name);
 
         // Creating the tasks to be solved
         List<SimpleNativeTask> tasks = new ArrayList<SimpleNativeTask>();
@@ -42,12 +43,12 @@ public class NativeExample extends AbstractExample {
         }
 
         // Submitting the tasks
-        master.solve(tasks);
+        instance.master.solve(tasks);
         Collection<String[]> results = null;
 
         // Collecting the results
         try {
-            results = master.waitAllResults();
+            results = instance.master.waitAllResults();
         } catch (TaskException e) {
             // We catch user exceptions
             e.printStackTrace();
@@ -57,9 +58,6 @@ public class NativeExample extends AbstractExample {
                 System.out.println(line);
             }
         }
-
-        // Terminating the Master
-        master.terminate(true);
 
         System.exit(0);
     }
@@ -78,5 +76,10 @@ public class NativeExample extends AbstractExample {
     @Override
     protected void init_specialized(String[] args) {
         // nothing to do
+    }
+
+    @Override
+    protected ProActiveMaster getMaster() {
+        return master;
     }
 }

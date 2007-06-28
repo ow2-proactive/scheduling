@@ -22,6 +22,7 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 public class BasicPrimeExample extends AbstractExample {
     public static int number_of_intervals;
     public static long prime_to_find;
+    ProActiveMaster<FindPrimeTask, Boolean> master;
 
     /**
      * Displays result of this test
@@ -85,22 +86,22 @@ public class BasicPrimeExample extends AbstractExample {
         instance.init(args, 2, " prime_to_find number_of_intervals");
 
         //      Creating the Master
-        ProActiveMaster<FindPrimeTask, Boolean> master = new ProActiveMaster<FindPrimeTask, Boolean>();
-        master.addResources(instance.descriptor_url, instance.vn_name);
+        instance.master = new ProActiveMaster<FindPrimeTask, Boolean>();
+        instance.registerHook();
+
+        instance.master.addResources(instance.descriptor_url, instance.vn_name);
 
         long startTime = System.currentTimeMillis();
         // Creating and Submitting the tasks
-        master.solve(instance.createTasks());
+        instance.master.solve(instance.createTasks());
 
         // Collecting the results
-        List<Boolean> results = master.waitAllResults();
+        List<Boolean> results = instance.master.waitAllResults();
         long endTime = System.currentTimeMillis();
 
         // Displaying result
-        displayResult(results, startTime, endTime, master.slavepoolSize());
-
-        // Terminating the Master
-        master.terminate(true);
+        displayResult(results, startTime, endTime,
+            instance.master.slavepoolSize());
 
         System.exit(0);
     }
@@ -115,15 +116,20 @@ public class BasicPrimeExample extends AbstractExample {
         }
     }
 
+    /**
+     * Task to find if any number in a specified interval divides the given candidate
+     * @author fviale
+     *
+     */
     public static class FindPrimeTask implements Task<Boolean> {
         private long begin;
         private long end;
-        private long prime;
+        private long candidate;
 
-        public FindPrimeTask(long prime, long begin, long end) {
+        public FindPrimeTask(long candidate, long begin, long end) {
             this.begin = begin;
             this.end = end;
-            this.prime = prime;
+            this.candidate = candidate;
         }
 
         /* (non-Javadoc)
@@ -131,11 +137,16 @@ public class BasicPrimeExample extends AbstractExample {
          */
         public Boolean run(SlaveMemory memory) {
             for (long divider = begin; divider < end; divider++) {
-                if ((prime % divider) == 0) {
+                if ((candidate % divider) == 0) {
                     return new Boolean(false);
                 }
             }
             return new Boolean(true);
         }
+    }
+
+    @Override
+    protected ProActiveMaster getMaster() {
+        return master;
     }
 }
