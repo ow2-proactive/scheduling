@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.actions;
 
+import java.util.Iterator;
+
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -45,7 +47,6 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
 		super(viewer);
 	}
 	
-
 	@Override
 	public void buildContextMenu(IMenuManager manager) {
 		GEFActionConstants.addStandardActionGroups(manager); // ???
@@ -53,71 +54,128 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
 		IAction action;
 		ActionRegistry registry = ((MonitoringViewer)this.getViewer()).getActionRegistry();
 		
-		// Monitor a new host
-		action = registry.getAction(NewHostAction.NEW_HOST);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Set depth control
-		action = registry.getAction(SetDepthAction.SET_DEPTH);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Refresh
-		action = registry.getAction(RefreshAction.REFRESH);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Set time to refresh
-		action = registry.getAction(SetTTRAction.SET_TTR);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Look for new JVM
-		action = registry.getAction(RefreshHostAction.REFRESH_HOST);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Look for new Nodes
-		action = registry.getAction(RefreshJVMAction.REFRESH_JVM);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Look for new Active Objects
-		action = registry.getAction(RefreshNodeAction.REFRESH_NODE);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Stop monitoring this ...
-		action = registry.getAction(StopMonitoringAction.STOP_MONITORING);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Set update frequence...
-		action = registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
-		// Kill this VM
-		action = registry.getAction(KillVMAction.KILLVM);
-		if (action.isEnabled())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		
+		Iterator<IAction> it = registry.getActions();
 		
 		MenuManager layoutMenu = new MenuManager("Layout");
 		
-		// Vertical Layout
-		action = registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT);
-		if(action.isEnabled())
-			layoutMenu.add(action);
+		while(it.hasNext()){
+			action = it.next();
+			
+			if ( !action.isEnabled() )
+				continue;
+			
+			// Monitor a new host
+			if ( NewHostAction.NEW_HOST.equals(action.getId()) )
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Set depth control
+			else if ( SetDepthAction.SET_DEPTH.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Refresh
+			else if ( RefreshAction.REFRESH.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Set time to refresh
+			else if ( SetTTRAction.SET_TTR.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Look for new JVM
+			else if ( RefreshHostAction.REFRESH_HOST.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Look for new Nodes
+			else if ( RefreshJVMAction.REFRESH_JVM.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Look for new Active Objects
+			else if ( RefreshNodeAction.REFRESH_NODE.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);					
+			// Stop monitoring this ...
+			else if ( StopMonitoringAction.STOP_MONITORING.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Set update frequence...
+			else if ( SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);			
+			// Kill this VM
+			else if ( KillVMAction.KILLVM.equals(action.getId()) )			
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);											
+			// Vertical Layout
+			else if ( VerticalLayoutAction.VERTICAL_LAYOUT.equals(action.getId()) )			
+				layoutMenu.add(action);			
+			// Horizontal Layout
+			else if ( HorizontalLayoutAction.HORIZONTAL_LAYOUT.equals(action.getId()) )			
+				layoutMenu.add(action);
+			///////////////////////////////////////////////////////////////////////
+			// HERE GOES ALL ACTIONS PROVIDED BY EXTENSIONS (from external plugins)
+			// THEY ARE APPENDED IN A STANDARD WAY
+			///////////////////////////////////////////////////////////////////////
+			else 
+				manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+		}		
 		
-		// Horizontal Layout
-		action = registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT);
-		if(action.isEnabled())
-			layoutMenu.add(action);
-		
+		// Once the layout menu is filled append it to the manager
 		if (!layoutMenu.isEmpty())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, layoutMenu);
+			manager.appendToGroup(GEFActionConstants.GROUP_REST, layoutMenu);				
+		
+//		// Monitor a new host
+//		action = registry.getAction(NewHostAction.NEW_HOST);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Set depth control
+//		action = registry.getAction(SetDepthAction.SET_DEPTH);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Refresh
+//		action = registry.getAction(RefreshAction.REFRESH);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Set time to refresh
+//		action = registry.getAction(SetTTRAction.SET_TTR);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Look for new JVM
+//		action = registry.getAction(RefreshHostAction.REFRESH_HOST);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Look for new Nodes
+//		action = registry.getAction(RefreshJVMAction.REFRESH_JVM);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Look for new Active Objects
+//		action = registry.getAction(RefreshNodeAction.REFRESH_NODE);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);		
+//		
+//		// Stop monitoring this ...
+//		action = registry.getAction(StopMonitoringAction.STOP_MONITORING);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Set update frequence...
+//		action = registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+//		
+//		// Kill this VM
+//		action = registry.getAction(KillVMAction.KILLVM);
+//		if (action.isEnabled())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);				
+//		
+//		MenuManager layoutMenu = new MenuManager("Layout");
+//		
+//		// Vertical Layout
+//		action = registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT);
+//		if(action.isEnabled())
+//			layoutMenu.add(action);
+//		
+//		// Horizontal Layout
+//		action = registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT);
+//		if(action.isEnabled())
+//			layoutMenu.add(action);
+//		
+//		if (!layoutMenu.isEmpty())
+//			manager.appendToGroup(GEFActionConstants.GROUP_REST, layoutMenu);
 	}
 
 }

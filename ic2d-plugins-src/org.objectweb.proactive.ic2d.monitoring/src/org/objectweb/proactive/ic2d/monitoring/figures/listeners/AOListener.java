@@ -35,6 +35,7 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
@@ -49,6 +50,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
+import org.objectweb.proactive.ic2d.monitoring.extpoints.IActionExtPoint;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.NodeFigure;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
@@ -111,6 +113,14 @@ public class AOListener implements MouseListener, MouseMotionListener{
 			
 			// Horizontal Layout
 			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
+			
+			// Manual handling of an action for timer snapshot ... needs improvement
+			IAction anAction = registry.getAction("Get timer snapshot");
+			if ( anAction != null ){
+				((IActionExtPoint)anAction).setAbstractDataObject(this.ao);
+				anAction.setText("Get Timers Snapshot");
+				anAction.setEnabled(true);
+			}			
 		}
 	}
 
@@ -122,6 +132,11 @@ public class AOListener implements MouseListener, MouseMotionListener{
 		parentFigure.handleMouseEntered(me);
 	}
 	public void mouseExited(MouseEvent me) {
+		// Disable Timer Snapshot		
+		IAction anAction = registry.getAction("Get timers snapshot");
+		if ( anAction != null ){			
+			anAction.setEnabled(false);
+		}			
 		parentFigure.handleMouseMoved(me);
 	}
 

@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.views;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.EditPartFactory;
@@ -61,6 +64,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.monitoring.Activator;
 import org.objectweb.proactive.ic2d.monitoring.actions.EnableDisableMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
@@ -80,6 +84,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.editparts.MonitoringEditPartFactory;
+import org.objectweb.proactive.ic2d.monitoring.extpoints.IActionExtPoint;
 import org.objectweb.proactive.ic2d.monitoring.figures.RoundedLine;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.DragHost;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
@@ -443,6 +448,27 @@ public class MonitoringView extends ViewPart {
 		registry.registerAction(new SetUpdateFrequenceAction(display));
 		registry.registerAction(new VerticalLayoutAction());
 		registry.registerAction(new HorizontalLayoutAction());
+		
+		// Get all available actions defined by possibly provided 
+		// extensions for the extension point monitoring_action	
+		try {
+			IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
+					.getExtensionPoint(
+							Activator.PLUGIN_ID + ".actions_extension");
+			if (extensionPoint == null) {
+				return;
+			}
+			IConfigurationElement[] configs = extensionPoint
+					.getConfigurationElements();
+
+			for (int x = 0; x < configs.length; x++) {
+				IActionExtPoint providedAction = (IActionExtPoint) configs[x]
+						.createExecutableExtension("class");
+				registry.registerAction(providedAction);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void initStateRadioButtons(){

@@ -36,6 +36,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.Migratable;
@@ -95,6 +96,15 @@ public class Spy implements RunActive, ProActiveInternalObject {
 	
     public String getDgcState(UniqueID bodyID) {
     	return GarbageCollector.getDgcState(bodyID);
+    }
+    
+    public Collection<BasicTimer> getTimersSnapshotFromBody(UniqueID bodyID, String[] timerNames) throws Exception{    	
+    	org.objectweb.proactive.core.util.profiling.TimerProvidable container = org.objectweb.proactive.core.util.profiling.TimerWarehouse
+				.getTimerProvidable(bodyID);
+		if (container == null) {
+			throw new NullPointerException("The timers container is null, the body is not timed.");
+		}
+		return container.getSnapshot(timerNames);    	
     }
 
 	public void migrateTo(UniqueID bodyId, String nodeDestination)

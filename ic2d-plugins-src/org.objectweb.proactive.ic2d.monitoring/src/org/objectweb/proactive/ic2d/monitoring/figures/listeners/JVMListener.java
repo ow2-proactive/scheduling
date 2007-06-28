@@ -34,6 +34,7 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.KillVMAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
@@ -48,6 +49,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
 import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
+import org.objectweb.proactive.ic2d.monitoring.extpoints.IActionExtPoint;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public class JVMListener implements MouseListener, MouseMotionListener {
@@ -111,6 +113,14 @@ public class JVMListener implements MouseListener, MouseMotionListener {
 			
 			// Horizontal Layout
 			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
+			
+			// Manual handling of an action for timer snapshot ... needs improvement
+			IAction anAction = registry.getAction("Get timer snapshot");
+			if ( anAction != null ){
+				((IActionExtPoint)anAction).setAbstractDataObject(this.jvm);
+				anAction.setText("Gather Stats from JVM");
+				anAction.setEnabled(true);
+			}
 		}
 	}
 
