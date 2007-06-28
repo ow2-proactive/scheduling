@@ -46,53 +46,52 @@ public class NQueensExample extends AbstractExample {
         long sumResults = 0;
         long sumTime = 0;
         long begin = System.currentTimeMillis();
-        for (int i = 0; i < 1; i++) {
-            // Generating the queries for the NQueens
-            Vector<Query> unresolvedqueries = QueryGenerator.generateQueries(nqueen_board_size,
-                    nqueen_algorithm_depth);
 
-            // Splitting Queries
-            Vector<QueryExtern> toSolve = new Vector<QueryExtern>();
-            while (!unresolvedqueries.isEmpty()) {
-                Query query = unresolvedqueries.remove(0);
-                Vector<Query> splitted = QueryGenerator.splitAQuery(query);
-                if (!splitted.isEmpty()) {
-                    for (Query splitquery : splitted) {
-                        toSolve.add(new QueryExtern(splitquery));
-                    }
-                } else {
-                    toSolve.add(new QueryExtern(query));
+        // Generating the queries for the NQueens
+        Vector<Query> unresolvedqueries = QueryGenerator.generateQueries(nqueen_board_size,
+                nqueen_algorithm_depth);
+
+        // Splitting Queries
+        Vector<QueryExtern> toSolve = new Vector<QueryExtern>();
+        while (!unresolvedqueries.isEmpty()) {
+            Query query = unresolvedqueries.remove(0);
+            Vector<Query> splitted = QueryGenerator.splitAQuery(query);
+            if (!splitted.isEmpty()) {
+                for (Query splitquery : splitted) {
+                    toSolve.add(new QueryExtern(splitquery));
                 }
+            } else {
+                toSolve.add(new QueryExtern(query));
             }
-            instance.master.solve(toSolve);
-
-            // Print results on the fly
-            while (!instance.master.isEmpty()) {
-                try {
-                    Pair<Long, Long> res = instance.master.waitOneResult();
-                    sumResults += res.getFirst();
-                    sumTime += res.getSecond();
-                    System.out.println("Current nb of results : " + sumResults);
-                } catch (TaskException e) {
-                    // Exception in the algorithm
-                    e.printStackTrace();
-                }
-            }
-
-            // Calculation finished, printing summary and total number of solutions
-            long end = System.currentTimeMillis();
-            int nbslaves = instance.master.slavepoolSize();
-
-            System.out.println("Total number of configurations found for n = " +
-                nqueen_board_size + " and with " + nbslaves + " slaves : " +
-                sumResults);
-            System.out.println("Time needed with " + nbslaves + " slaves : " +
-                ((end - begin) / 3600000) +
-                String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
-            System.out.println("Total slaves calculation time : " +
-                (sumTime / 3600000) +
-                String.format("h %1$tMm %1$tSs %1$tLms", sumTime));
         }
+        instance.master.solve(toSolve);
+
+        // Print results on the fly
+        while (!instance.master.isEmpty()) {
+            try {
+                Pair<Long, Long> res = instance.master.waitOneResult();
+                sumResults += res.getFirst();
+                sumTime += res.getSecond();
+                System.out.println("Current nb of results : " + sumResults);
+            } catch (TaskException e) {
+                // Exception in the algorithm
+                e.printStackTrace();
+            }
+        }
+
+        // Calculation finished, printing summary and total number of solutions
+        long end = System.currentTimeMillis();
+        int nbslaves = instance.master.slavepoolSize();
+
+        System.out.println("Total number of configurations found for n = " +
+            nqueen_board_size + " and with " + nbslaves + " slaves : " +
+            sumResults);
+        System.out.println("Time needed with " + nbslaves + " slaves : " +
+            ((end - begin) / 3600000) +
+            String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
+        System.out.println("Total slaves calculation time : " +
+            (sumTime / 3600000) +
+            String.format("h %1$tMm %1$tSs %1$tLms", sumTime));
 
         System.exit(0);
     }
