@@ -78,6 +78,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
     static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
     public static final String DESCRIPTOR_NAMESPACE = "urn:proactive:deployment:3.3";
+    public static final String SECURITY_NAMESPACE = "urn:proactive:security:1.0";
     public static final String RMI_DEFAULT_PORT = "1099";
     public static final String XMLNS_PREFIX = "pa:";
     public static final String MAIN_DEFINITIONS = "//pa:mainDefinition";
@@ -154,10 +155,16 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+
+        String deploymentSchema = getClass()
+                                      .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/deployment/3.3/deployment.xsd")
+                                      .toString();
+        String securitySchema = getClass()
+                                    .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd")
+                                    .toString();
+
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-            new String[] {
-                "http://www-sop.inria.fr/oasis/ProActive/schemas/DescriptorSchema.xsd"
-            });
+            new Object[] { deploymentSchema, securitySchema });
         this.xmlDescriptorUrl = xmlDescriptorUrl;
         this.variableContract = variableContract;
     }
@@ -2114,6 +2121,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 throw new NullPointerException("Null prefix");
             } else if ("pa".equals(prefix)) {
                 return DESCRIPTOR_NAMESPACE;
+            } else if ("pas".equals(prefix)) {
+                return SECURITY_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }
