@@ -11,13 +11,6 @@
             icon="icons/sample.gif"
             id="org.objectweb.proactive.ic2d.timit.views.TimItView"
             name="TimIt View"/>
-      <view
-            allowMultiple="false"
-            category="org.objectweb.proactive.ic2d.monitoring.category"
-            class="org.objectweb.proactive.ic2d.timit.views.TreeView"
-            icon="icons/sample.gif"
-            id="org.objectweb.proactive.ic2d.timit.views.TreeView"
-            name="Tree View"/>
    </extension>
    <extension
          point="org.objectweb.proactive.ic2d.monitoring.actions_extension">
