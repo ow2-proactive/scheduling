@@ -292,7 +292,7 @@
 	<!--                      Compile Examples                            -->
 	<!--  =============================================================== -->
 
-	<target name="examples" depends="extensions" description="Compile all the examples">
+	<target name="examples" depends="extensions, extra" description="Compile all the examples">
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
 		<javac srcdir="${src.examples.dir}:${src.utils.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
 			<classpath refid="examples.classpath" />
@@ -417,6 +417,11 @@
 				title="ProActive"
 				outfile="${clover.report.dir}">
 				<format type="html"/>
+				<fileset dir="${src.dir}">
+					<include name="Core/**/*.java"/>
+					<include name="Extensions/**/*.java"/>
+					<include name="Extra/**/*.java"/>
+				</fileset>
 				<sourcepath>
 					<dirset dir="${src.dir}">
 						<include name="Core"/>
