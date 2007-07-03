@@ -194,7 +194,7 @@ public class SSHClient {
                      */
                     int conditions = sess.waitForCondition(ChannelCondition.STDOUT_DATA |
                             ChannelCondition.STDERR_DATA |
-                            ChannelCondition.EOF, 2000);
+                            ChannelCondition.EOF, 0);
 
                     /* Wait no longer than 2 seconds (= 2000 milliseconds) */
                     if ((conditions & ChannelCondition.TIMEOUT) != 0) {
