@@ -144,6 +144,7 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
         if (logger.isDebugEnabled()) {
             logger.debug(command.toString());
         }
+        command.append(" -- ");
         return command.toString();
     }
 
