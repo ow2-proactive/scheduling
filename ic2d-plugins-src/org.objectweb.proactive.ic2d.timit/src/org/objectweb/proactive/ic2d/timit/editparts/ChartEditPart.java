@@ -2,6 +2,8 @@ package org.objectweb.proactive.ic2d.timit.editparts;
 
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.gef.AutoexposeHelper;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.timit.data.ChartObject;
@@ -41,7 +43,25 @@ public class ChartEditPart extends AbstractGraphicalEditPart implements Runnable
 
     public void asyncRefresh() {
         Display.getDefault().asyncExec(this);
+        
     }
+    
+    public void setSelection() {
+//        //Display.getDefault().asyncExec(this);
+//    	System.out.println("ChartEditPart.setSelection()");
+//    	//this.figure.getCursor().getDevice().getBounds().getBounds()
+//    	this.setFocus(true);
+//    	AutoexposeHelper.Search search = new AutoexposeHelper.Search(new Point(this.getViewer().getControl().getDisplay().getCursorLocation()));
+//    	search.evaluate(this);
+//    	this.setFocus(true);
+////        Display.getDefault().asyncExec(
+////        		new Runnable(){
+////        			public void run(){        		    	
+////        			}
+////        		}
+////        		);
+    }
+    
 
     public void run() {
         ChartFigure figure = (ChartFigure) getFigure();

@@ -116,6 +116,14 @@ public class ChartObject {
     public void setEp(ChartEditPart ep) {
         this.ep = ep;
     }
+    
+    /**
+     * A getter for the current editPart
+     * @return ep
+     */
+    public ChartEditPart getEp(){
+    	return this.ep;
+    }
 
     /**
      * Performs a snapshot on timers of a remote active object

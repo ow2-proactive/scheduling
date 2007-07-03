@@ -7,8 +7,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.extpoints.IActionExtPoint;
+import org.objectweb.proactive.ic2d.timit.data.ChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.ChartObject;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
@@ -22,8 +24,12 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  *
  */
 public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
+	
     public static final String GET_TIMER_SNAPSHOT = "Get timer snapshot";
+    
     private AbstractDataObject object;
+    
+    private ChartContainerObject container;
 
     public GetTimerSnapshotAction() {
         this.setId(GET_TIMER_SNAPSHOT);
@@ -51,8 +57,10 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
 
             // Pass the reference of the AbstractDataObject to the ChartContainerObject			
             if ((part != null) && part.getClass().equals(TimItView.class)) {
-                ((TimItView) part).getChartContainer()
-                 .recognizeAndCreateChart(this.object);
+            	if ( this.container == null ) {
+            		this.container = ((TimItView) part).getChartContainer(); 
+            	}
+                this.container.recognizeAndCreateChart(this.object);
             }
 
             this.object = null; // free the reference
@@ -67,4 +75,13 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
     public final void setAbstractDataObject(final AbstractDataObject object) {
         this.object = object;
     }
+
+	public final void setActiveSelect(final AOObject ref) {
+		if ( this.container != null ){
+			ChartObject chartObject = this.container.getChartObjectById(ref.getID());
+			if ( chartObject != null ){
+				chartObject.getEp().setSelection();
+			}
+		}		
+	}
 }

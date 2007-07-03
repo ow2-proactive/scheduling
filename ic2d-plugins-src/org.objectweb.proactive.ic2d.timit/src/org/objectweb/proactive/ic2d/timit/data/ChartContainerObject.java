@@ -98,6 +98,10 @@ public class ChartContainerObject {
             new ChartObject(this, timersCollection, aoObject);
         }
     }
+    
+    public ChartObject getChartObjectById(UniqueID id){
+    	return this.childrenMap.get(id);
+    }
 
     public List<ChartObject> getChildrenList() {
         return this.childrenList;

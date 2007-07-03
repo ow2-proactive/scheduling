@@ -1,6 +1,7 @@
 package org.objectweb.proactive.ic2d.monitoring.extpoints;
 
 import org.eclipse.jface.action.IAction;
+import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 
 /**
@@ -16,6 +17,12 @@ public interface IActionExtPoint extends IAction{
 	 * to the extension that plugs to an extension point. 
 	 * @param object The AbstractDataObject that will be provided to the extension
 	 */
-	public void setAbstractDataObject(AbstractDataObject object);	
+	public void setAbstractDataObject(AbstractDataObject object);
+	
+	/**
+	 * Sets the selected active object.
+	 * @param The reference on the active object 
+	 */
+	public void setActiveSelect(AOObject ref);
 	
 }
