@@ -318,7 +318,7 @@ public class MonitoringView extends ViewPart {
 
 		ZoomOutAction zoomOut = new ZoomOutAction(zoomManager);
 		zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(MonitoringView.class, "zoom-out-2.gif"));
-		graphicalViewer.getActionRegistry().registerAction(zoomIn);
+		graphicalViewer.getActionRegistry().registerAction(zoomOut);
 		toolBarManager.add(zoomOut);
 
 		toolBarManager.add(new Separator());

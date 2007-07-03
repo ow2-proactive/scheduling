@@ -17,7 +17,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class Application implements IPlatformRunnable {
 
-	private String fileName =".ic2d.java.policy";
+	private String fileName ="ic2d.java.policy";
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IPlatformRunnable#run(java.lang.Object)
