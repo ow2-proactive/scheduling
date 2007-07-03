@@ -11,8 +11,8 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 public class ChartListener extends EditPartListener.Stub
     implements MouseListener {
-    private static final int SELECTED_STATE = 1;
-    private static final int UNSELECTED_STATE = 0;
+    public static final int SELECTED_STATE = 1;
+    public static final int UNSELECTED_STATE = 0;
     public static ChartEditPart lastSelected;
     protected ChartEditPart chartEditPart;
 
@@ -20,19 +20,29 @@ public class ChartListener extends EditPartListener.Stub
         this.chartEditPart = chartEditPart;
     }
 
-    public final void mouseDoubleClicked(MouseEvent arg0) {
+    public final void mouseDoubleClicked(final MouseEvent arg0) {
+//		IWorkbench iworkbench = PlatformUI.getWorkbench();
+//		IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+//		IWorkbenchPage page = currentWindow.getActivePage();		
+//		try {
+//			IViewPart part = page.showView("org.objectweb.proactive.ic2d.timit.views.TimerTreeView");
+//			TimerTreeHolder.getInstance().addChartObject((ChartObject)this.chartEditPart.getModel());					
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
     }
 
-    public final void mousePressed(MouseEvent arg0) {
+    public final void mousePressed(final MouseEvent arg0) {
         // Left click selection
         this.chartEditPart.setSelected(SELECTED_STATE);
+        //TimerTreeHolder.getInstance().setSelectedIndex((ChartObject)this.chartEditPart.getModel());
     }
 
-    public final void mouseReleased(MouseEvent arg0) {
+    public final void mouseReleased(final MouseEvent arg0) {
     }
 
     @Override
-    public final void selectedStateChanged(EditPart editPart) {
+    public final void selectedStateChanged(final EditPart editPart) {
         if (this.chartEditPart.getSelected() == SELECTED_STATE) {
             if (lastSelected != null) {
                 // Set lastSelected Unselected

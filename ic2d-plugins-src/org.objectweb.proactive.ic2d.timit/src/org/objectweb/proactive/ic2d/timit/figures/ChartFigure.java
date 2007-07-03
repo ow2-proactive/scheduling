@@ -39,7 +39,7 @@ public class ChartFigure extends Figure {
     private boolean bDirty;
     private Bounds bo;
 
-    public ChartFigure(Chart chart) {
+    public ChartFigure(final Chart chart) {
         this.chart = chart;
 
         this.currentBorderColor = UNSELECTED_BORDER_COLOR;
@@ -61,7 +61,7 @@ public class ChartFigure extends Figure {
      *
      * @param chart
      */
-    public final void setChart(Chart chart) {
+    public final void setChart(final Chart chart) {
         this.chart = chart;
         this.bDirty = true;
         // Since the chart has changed we need to compute a new ChartState 
