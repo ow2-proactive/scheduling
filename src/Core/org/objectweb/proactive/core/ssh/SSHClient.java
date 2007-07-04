@@ -37,10 +37,9 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.apache.tools.ant.taskdefs.Get.VerboseProgress;
 
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
@@ -68,7 +67,6 @@ public class SSHClient {
 
     private static String buildCmdLine(List<String> args) {
         StringBuilder cmd = new StringBuilder();
-
         for (String s : args) {
             cmd.append(" ");
             cmd.append(s);
@@ -109,7 +107,7 @@ public class SSHClient {
         options.addOption(OPT_HELP, false, "Help");
         options.addOption(OPT_VERBOSE, false, "Verbose");
 
-        CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new GnuParser();
         CommandLine cmd = parser.parse(options, args);
 
         String username = System.getProperty("user.name");
