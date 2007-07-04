@@ -170,7 +170,7 @@ public class BarChartBuilder {
     /**
      * Creates chart instance.
      */
-    public Chart createChart(Collection<BasicTimer> col) {
+    public Chart createChart(Collection<BasicTimer> col, String[] timerLevel) {
         if (ChartObject.DEBUG) {
             this.series = new String[] {
                     "Total", "Serve", "SendRequest", "SendReply",
@@ -186,11 +186,11 @@ public class BarChartBuilder {
             int userTimersSize;
             int paLevelIndex = 0;
             int userLevelIndex = 0;
-            int paTimersSize = ChartObject.PROACTIVE_LEVEL_TIMERS_NAMES.length;
+            int paTimersSize = timerLevel.length;//ChartObject.PROACTIVE_BASIC_LEVEL_TIMERS_NAMES.length;
 
             // If the size of col is the same as the asked no user level timers was added
             if (paTimersSize == col.size()) {
-                if (this.series.length != col.size()) {
+                if (this.series.length != col.size() || this.values.length != col.size() ) {
                     this.series = new String[col.size()];
                     this.values = new double[col.size()];
                 }
@@ -230,7 +230,7 @@ public class BarChartBuilder {
         }
 
         this.cleanChart();
-
+        
         this.buildXSeries(series);
         this.buildYSeries(values);
         this.updateTitle(); // used to update the snapshot time

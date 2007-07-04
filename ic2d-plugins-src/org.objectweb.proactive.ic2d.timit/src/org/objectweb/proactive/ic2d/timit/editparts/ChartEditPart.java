@@ -11,7 +11,7 @@ import org.objectweb.proactive.ic2d.timit.figures.listeners.ChartListener;
 
 public class ChartEditPart extends AbstractGraphicalEditPart implements
 		Runnable {
-	public static final int CHART_HEIGHT = 200;
+	public static final int CHART_HEIGHT = 250;
 
 	protected ChartObject chartObject;
 

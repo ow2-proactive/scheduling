@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.timit.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.birt.chart.model.Chart;
@@ -21,16 +22,24 @@ import org.objectweb.proactive.ic2d.timit.editparts.ChartEditPart;
  */
 public class ChartObject {
     public static final boolean DEBUG = false;
-    public static final String[] PROACTIVE_LEVEL_TIMERS_NAMES = new String[] {
+    public static final String[] PROACTIVE_BASIC_LEVEL_TIMERS_NAMES = new String[] {
             "Total", "Serve", "SendRequest", "SendReply", "WaitByNecessity",
             "WaitForRequest"
         };
+    
+    public static final String[] PROACTIVE_DETAILED_LEVEL_TIMERS_NAMES = new String[] {
+        "Total", "Serve", "SendRequest", "SendReply", "WaitByNecessity",
+        "WaitForRequest", "LocalCopy", "BeforeSerialization", "Serialization", "AfterSerialization", "GroupOneWayCall", "GroupAsyncCall"
+    };
+    
     protected BarChartBuilder barChartBuilder;
     protected ChartContainerObject parent;
     protected Collection<BasicTimer> timersCollection;
     protected AOObject aoObject;
     protected ChartEditPart ep;
     protected boolean hasChanged;
+    protected String[] currentTimerLevel = PROACTIVE_BASIC_LEVEL_TIMERS_NAMES;
+    
 
     public ChartObject(ChartContainerObject parent,
         Collection<BasicTimer> timersCollection, AOObject aoObject) {
@@ -48,12 +57,34 @@ public class ChartObject {
      * Provides the cached or created chart.
      * @return The created or cached chart.
      */
-    public Chart provideChart() {
+    public final Chart provideChart() {
         if (this.hasChanged) {
             this.hasChanged = false;
-            return this.barChartBuilder.createChart(this.timersCollection);
+            // Filter by names
+            Collection<BasicTimer> newCol = new ArrayList<BasicTimer>();
+            for( BasicTimer b : this.timersCollection ){
+            	if ( contains(this.currentTimerLevel, b.getName() ) ){
+            		newCol.add(b);
+            		//System.out.println("ChartObject.provideChart() _____ " + b.getName());
+            	}
+            }
+            return this.barChartBuilder.createChart(newCol, this.currentTimerLevel);
         }
         return this.barChartBuilder.chart;
+    }      
+    
+    public String getTimerLevel(){
+    	return ( this.currentTimerLevel.equals(PROACTIVE_BASIC_LEVEL_TIMERS_NAMES) ? "Basic" : "Detailed" );
+    }
+    
+    public void switchTimerLevel(){
+    	if ( this.currentTimerLevel == PROACTIVE_BASIC_LEVEL_TIMERS_NAMES ){
+    		this.currentTimerLevel = PROACTIVE_DETAILED_LEVEL_TIMERS_NAMES;
+    	} else {
+    		this.currentTimerLevel = PROACTIVE_BASIC_LEVEL_TIMERS_NAMES;
+    	}    	    	
+    	this.performSnapshot();
+    	
     }
 
     /**
@@ -61,7 +92,7 @@ public class ChartObject {
      * the edit part.
      */
     public void performSnapshot() {
-        Collection<BasicTimer> availableTimersCollection = ChartObject.performSnapshotInternal(this.aoObject);
+        Collection<BasicTimer> availableTimersCollection = ChartObject.performSnapshotInternal(this.aoObject, this.currentTimerLevel);
         if (availableTimersCollection != null) {
             this.timersCollection = availableTimersCollection;
             this.hasChanged = true;
@@ -131,11 +162,11 @@ public class ChartObject {
      * @return A collection of BasicTimer
      */
     protected static final Collection<BasicTimer> performSnapshotInternal(
-        final AOObject aoObject) {
+        final AOObject aoObject, String[] timerLevel) {
         try {
             Spy spy = ((NodeObject) aoObject.getParent()).getSpy();
             Collection<BasicTimer> availableTimersCollection = spy.getTimersSnapshotFromBody(aoObject.getID(),
-                    ChartObject.PROACTIVE_LEVEL_TIMERS_NAMES);
+            		timerLevel);
             if ((availableTimersCollection == null) ||
                     (availableTimersCollection.size() == 0)) {
                 Console.getInstance(Activator.CONSOLE_NAME)
@@ -157,5 +188,22 @@ public class ChartObject {
             // e.printStackTrace();
         }
         return null;
+    }
+    
+    /**
+     * A predicate that returns true if the string val is contained
+     * in the array.
+     * @param arr An array of strings
+     * @param val A String
+     * @return True if val is contained in arr
+     */
+    private final static boolean contains(String[] arr, String val) {
+        boolean res = false;
+        for (String x : arr) {
+            if (val.equals(x)) {
+                res = true;
+            }
+        }
+        return res;
     }
 }

@@ -41,6 +41,7 @@ public class TimItView extends ViewPart {
     public static final String ID = "org.objectweb.proactive.ic2d.timit.views.TimItView";
     public static Button refreshSelectedButton;
     public static Button refreshAllButton;
+    public static Button timerLevelButton;
     private ScrollingGraphicalViewer timItViewer;
     private ChartContainerObject chartContainer;
 
@@ -120,6 +121,26 @@ public class TimItView extends ViewPart {
                                 }
                             }
                         });
+                }
+            });
+        TimItView.timerLevelButton = new Button(refreshGroup, SWT.PUSH);
+        timerLevelButton.setText("Switch to Detailed");
+        timerLevelButton.setToolTipText("Switch Timers Level");
+        timerLevelButton.setSelection(false);
+        timerLevelButton.setEnabled(false);
+        timerLevelButton.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                	if (ChartListener.lastSelected != null) {
+                        ((ChartObject) ChartListener.lastSelected.getModel()).switchTimerLevel();
+                        String lev = ((ChartObject) ChartListener.lastSelected.getModel()).getTimerLevel();
+                        if ( lev.equals("Basic") ){
+                        	timerLevelButton.setText("Switch To Detailed");
+                        } else {
+                        	timerLevelButton.setText("Switch To Basic   ");
+                        }
+                        
+                    }
                 }
             });
     }

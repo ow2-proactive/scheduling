@@ -4,6 +4,7 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartListener;
+import org.objectweb.proactive.ic2d.timit.data.ChartObject;
 import org.objectweb.proactive.ic2d.timit.editparts.ChartEditPart;
 import org.objectweb.proactive.ic2d.timit.figures.ChartFigure;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
@@ -52,6 +53,13 @@ public class ChartListener extends EditPartListener.Stub
             lastSelected = this.chartEditPart;
             // Perform button and figure selection
             TimItView.refreshSelectedButton.setEnabled(true);
+            ChartObject model = (ChartObject)this.chartEditPart.getModel();            
+            if ( model != null && model.getTimerLevel().equals("Basic") ){
+            	TimItView.timerLevelButton.setText("Switch to Detailed");
+            } else {
+            	TimItView.timerLevelButton.setText("Switch to Basic   ");
+            }
+            TimItView.timerLevelButton.setEnabled(true); 
             ((ChartFigure) this.chartEditPart.getFigure()).setSelected();
         } else {
             ((ChartFigure) this.chartEditPart.getFigure()).setUnselected();
