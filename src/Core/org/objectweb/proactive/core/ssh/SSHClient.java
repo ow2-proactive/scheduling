@@ -40,6 +40,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.tools.ant.taskdefs.Get.VerboseProgress;
 
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
@@ -49,19 +50,21 @@ import ch.ethz.ssh2.Session;
 /**
  * A minimalistic SSH Client
  *
- * Args: [-p password] [-l username] [-i identity_file] hostname "cmd"
+ * Args: [-p password | -i identity_file] [-d passphrase] [-l username] [-v] hostname "cmd"
  *
  * Pubkey and Password authentications are supported. By default 'id_dsa', 'id_rsa'
- * and 'identity' files are tried. If Pubkey authentication fails then password
- * authentication is used.
+ * and 'identity' files are tried.
  *
- *
+ * If a password is specified then pubkey authentication is disabled
  */
 public class SSHClient {
     static final private String OPT_PASSWORD = "p";
     static final private String OPT_USERNAME = "l";
     static final private String OPT_IDENTITY = "i";
+    static final private String OPT_IDENTITY_PASSWORD = "d";
     static final private String OPT_HELP = "h";
+    static final private String OPT_VERBOSE = "v";
+    static private boolean verbose = false;
 
     private static String buildCmdLine(List<String> args) {
         StringBuilder cmd = new StringBuilder();
@@ -74,12 +77,21 @@ public class SSHClient {
         return cmd.toString();
     }
 
+    private static void info(String str) {
+        if (verbose) {
+            System.out.println(str);
+        }
+    }
+
     public static void printHelp(boolean exit) {
         System.out.println("Options:");
         System.out.println("\t-" + OPT_USERNAME + "\tusername");
         System.out.println("\t-" + OPT_IDENTITY + "\tprivate key");
-        System.out.println("\t-" + OPT_PASSWORD +
+        System.out.println("\t-" + OPT_IDENTITY_PASSWORD +
             "\tpassword to decrypt the private key");
+        System.out.println("\t-" + OPT_PASSWORD +
+            "\tpassword to perform password authentication");
+        System.out.println("\t-" + OPT_VERBOSE + "\tverbose mode");
 
         if (exit) {
             System.exit(2);
@@ -92,7 +104,10 @@ public class SSHClient {
             "Password for password authentication");
         options.addOption(OPT_USERNAME, true, "Username");
         options.addOption(OPT_IDENTITY, true, "Identity file");
+        options.addOption(OPT_IDENTITY_PASSWORD, true,
+            "Password for identity file");
         options.addOption(OPT_HELP, false, "Help");
+        options.addOption(OPT_VERBOSE, false, "Verbose");
 
         CommandLineParser parser = new PosixParser();
         CommandLine cmd = parser.parse(options, args);
@@ -100,6 +115,7 @@ public class SSHClient {
         String username = System.getProperty("user.name");
         String password = null;
         File identity = null;
+        String identityPassword = null;
         String hostname = null;
 
         if (cmd.hasOption(OPT_HELP)) {
@@ -117,18 +133,28 @@ public class SSHClient {
         if (cmd.hasOption(OPT_IDENTITY)) {
             identity = new File(cmd.getOptionValue(OPT_IDENTITY));
             if (!identity.exists()) {
-                System.err.println("[E] " + identity + " does not exist");
-                printHelp(true);
+                System.err.println("[E] specified identity file," + identity +
+                    ", does not exist");
+                System.exit(3);
             }
             if (!identity.isFile()) {
-                System.err.println("[E] " + identity + " is not a file");
-                printHelp(true);
+                System.err.println("[E] specified identity file" + identity +
+                    " is not a file");
+                System.exit(3);
             }
             if (!identity.canRead()) {
-                System.err.println("[E] " + identity +
-                    " is not does not exist");
-                printHelp(true);
+                System.err.println("[E] specified identity file" + identity +
+                    " is not readable");
+                System.exit(3);
             }
+        }
+
+        if (cmd.hasOption(OPT_IDENTITY_PASSWORD)) {
+            identityPassword = cmd.getOptionValue(OPT_IDENTITY_PASSWORD);
+        }
+
+        if (cmd.hasOption(OPT_VERBOSE)) {
+            verbose = true;
         }
 
         List<String> remArgs = cmd.getArgList();
@@ -145,28 +171,44 @@ public class SSHClient {
 
             boolean isAuthenticated = false;
 
-            if (identity != null) {
-                isAuthenticated = conn.authenticateWithPublicKey(username,
-                        identity, null);
-            } else {
-                for (String id : SSHKeys.getKeys()) {
-                    File f = new File(id);
-                    if (!(f.exists() && f.isFile() && f.canRead())) {
-                        continue;
-                    }
-
-                    isAuthenticated = conn.authenticateWithPublicKey(username,
-                            f, null);
-                    System.out.println("Authentication succeeded with " + f);
-                    if (isAuthenticated) {
-                        break;
-                    }
-                }
-            }
-
-            if (!isAuthenticated) {
+            // 1. Password authentication requested
+            if (password != null) {
                 isAuthenticated = conn.authenticateWithPassword(username,
                         password);
+                if (isAuthenticated) {
+                    info("Password authentication succeeded");
+                } else {
+                    info("Password authentication failed");
+                }
+            } else {
+                // 2. Pubkey authentication
+
+                // 2.1 An identity file is specified use it 
+                if (identity != null) {
+                    isAuthenticated = conn.authenticateWithPublicKey(username,
+                            identity, identityPassword);
+                    if (isAuthenticated) {
+                        info("Pubkey authentication succeeded with " +
+                            identity);
+                    } else {
+                        info("Pubkey authentication failed with " + identity);
+                    }
+                } else {
+                    // 2.2 Try to find identity files automagically
+                    for (String id : SSHKeys.getKeys()) {
+                        File f = new File(id);
+                        if (!(f.exists() && f.isFile() && f.canRead())) {
+                            continue;
+                        }
+
+                        isAuthenticated = conn.authenticateWithPublicKey(username,
+                                f, identityPassword);
+                        info("Pubkey authentication succeeded with " + f);
+                        if (isAuthenticated) {
+                            break;
+                        }
+                    }
+                }
             }
 
             if (!isAuthenticated) {
