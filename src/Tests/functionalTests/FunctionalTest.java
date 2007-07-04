@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 
 public class FunctionalTest {
     static final protected Logger logger = Logger.getLogger("testsuite");
+    static final public String JVM_PARAMETERS = "-Dproactive.test=true";
 
     /** The amount of time given to a test to success or fail */
     static final private long TIMEOUT = 300000;

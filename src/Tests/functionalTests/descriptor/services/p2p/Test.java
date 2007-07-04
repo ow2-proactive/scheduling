@@ -75,11 +75,13 @@ public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         this.process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
+        this.process1.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
         this.process1.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
         this.process1.setParameters("-port 2900");
 
         this.process = new JVMProcessImpl(new StandardOutputMessageLogger());
+        this.process1.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
         this.process.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
         this.process.setParameters("-port 3000 -s //localhost:2900/");
