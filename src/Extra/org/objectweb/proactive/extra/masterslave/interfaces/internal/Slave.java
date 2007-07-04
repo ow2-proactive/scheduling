@@ -44,23 +44,23 @@ public interface Slave {
 
     /**
      * Returns the name of this slave
-     * @return name
+     * @return name of the slave
      */
-    public String getName();
+    String getName();
 
     /**
      * tells that this slave is alive
      */
-    public void heartBeat();
+    void heartBeat();
 
     /**
      * terminates this slave
      * @return true if the object terminated successfully
      */
-    public BooleanWrapper terminate();
+    BooleanWrapper terminate();
 
     /**
      * Asks the slave to wake up
      */
-    public void wakeup();
+    void wakeup();
 }

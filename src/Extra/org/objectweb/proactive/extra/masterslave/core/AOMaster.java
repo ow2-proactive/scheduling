@@ -78,95 +78,155 @@ import org.objectweb.proactive.extra.masterslave.util.HashSetQueue;
  */
 public class AOMaster implements Serializable, TaskProvider, InitActive,
     RunActive, Master, SlaveDeadListener {
+
+    /**
+     * log4j logger for the master
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
 
-    // stub on this active object
+    // Global variables
+
+    /**
+     * stub on this active object
+     */
     protected Object stubOnThis;
 
-    // global variables
+    /**
+     * is the master terminated
+     */
     protected boolean terminated; // is the master terminated
 
-    // Slave manager (deploy slaves)
+    // Active objects references
+    /**
+     * Slave manager entity (deploy slaves)
+     */
     protected SlaveManager smanager;
 
-    // Pinger (checks that slaves are alive)
+    /**
+     * Pinger (checks that slaves are alive)
+     */
     protected SlaveWatcher pinger;
 
-    // Slaves : effective resources
+    /**
+     * The repository where to locate tasks
+     */
+    protected TaskRepository repository;
+
+    // Slaves resources
+    /**
+     * stub to access group of slaves
+     */
     protected Slave slaveGroupStub;
+
+    /**
+     * Group of slaves
+     */
     protected Group slaveGroup;
 
-    // Slave memory
+    /**
+     * Initial memory of the slaves
+     */
     protected Map<String, Object> initialMemory;
 
     // Sleeping slaves (we might want to wake them up)
+    /**
+     * Stub to group of sleeping slaves
+     */
     protected Slave sleepingGroupStub;
+
+    /**
+     * Group of sleeping slaves
+     */
     protected Group sleepingGroup;
+
+    /**
+     * Associations of slaves and slaves names
+     */
     protected HashMap<String, Slave> slavesByName;
+
+    /**
+     * Reverse associations of slaves and slaves names
+     */
     protected HashMap<Slave, String> slavesByNameRev;
+
+    /**
+     * Activity of slaves, which slaves is doing which task
+     */
     protected HashMap<String, Long> slavesActivity;
 
     // Task Queues :
-    // tasks that wait for an available slave
+
+    /**
+     * tasks that wait for an available slave
+     */
     protected HashSetQueue<Long> pendingTasks;
 
-    // tasks that are currently processing
+    /**
+     * tasks that are currently processing
+     */
     protected HashSetQueue<Long> launchedTasks;
 
-    // tasks that are completed
+    /**
+     * tasks that are completed
+     */
     protected ResultQueue resultQueue;
 
-    // the repository where to locate tasks
-    protected TaskRepository repository;
-
-    // if there is a pending request from the client
+    /**
+     * if there is a pending request from the client
+     */
     protected Request pendingRequest;
 
+    /**
+     * Proactive empty no arg constructor
+     */
     public AOMaster() {
-        // proactive emty no arg constructor
+        // do nothing
     }
 
     /**
      * Creates the master with the initial memory of the slaves
-     * @param initialMemory
+     * @param repository repository where the tasks can be found
+     * @param initialMemory initial memory of the slaves
      */
-    public AOMaster(TaskRepository repository, Map<String, Object> initialMemory) {
+    public AOMaster(final TaskRepository repository,
+        final Map<String, Object> initialMemory) {
         this.initialMemory = initialMemory;
         this.repository = repository;
         this.pendingRequest = null;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.util.Collection)
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(Collection nodes) {
+    public void addResources(final Collection nodes) {
         ((SlaveManagerAdmin) smanager).addResources(nodes);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.net.URL)
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(URL descriptorURL) {
+    public void addResources(final URL descriptorURL) {
         ((SlaveManagerAdmin) smanager).addResources(descriptorURL);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.net.URL, java.lang.String[])
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(URL descriptorURL, String virtualNodeName) {
+    public void addResources(final URL descriptorURL,
+        final String virtualNodeName) {
         ((SlaveManagerAdmin) smanager).addResources(descriptorURL,
             virtualNodeName);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(org.objectweb.proactive.core.descriptor.data.VirtualNode)
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(VirtualNode virtualnode) {
+    public void addResources(final VirtualNode virtualnode) {
         ((SlaveManagerAdmin) smanager).addResources(virtualnode);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#countAvailableResults()
+    /**
+     * {@inheritDoc}
      */
     public int countAvailableResults() {
         return resultQueue.countAvailableResults();
@@ -180,10 +240,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         return pendingTasks.isEmpty();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider#getTask(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave, java.lang.String)
+    /**
+     * {@inheritDoc}
      */
-    public TaskIntern getTask(Slave slave, String slaveName) {
+    public TaskIntern getTask(final Slave slave, final String slaveName) {
         // if we don't know him, we record the slave in our system
         if (!slavesByName.containsKey(slaveName)) {
             recordSlave(slave, slaveName);
@@ -213,14 +273,14 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+    /**
+     * {@inheritDoc}
      */
-    public void initActivity(Body body) {
+    public void initActivity(final Body body) {
         stubOnThis = ProActive.getStubOnThis();
         // General initializations
         terminated = false;
-        // Queues 
+        // Queues
         pendingTasks = new HashSetQueue<Long>();
         launchedTasks = new HashSetQueue<Long>();
         resultQueue = new ResultQueue(Master.OrderingMode.CompletionOrder);
@@ -266,10 +326,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveDeadListener#isDead(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
+    /**
+     * {@inheritDoc}
      */
-    public void isDead(Slave slave) {
+    public void isDead(final Slave slave) {
         String slaveName = slavesByNameRev.get(slave);
         if (logger.isInfoEnabled()) {
             logger.info(slaveName + " reported missing... removing it");
@@ -306,17 +366,17 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isEmpty()
+    /**
+     * {@inheritDoc}
      */
     public boolean isEmpty() {
         return resultQueue.isEmpty();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer#receiveSlave(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
+    /**
+     * {@inheritDoc}
      */
-    public boolean recordSlave(Slave slave, String slaveName) {
+    public boolean recordSlave(final Slave slave, final String slaveName) {
         // We record the slave in our system
         slavesByName.put(slaveName, slave);
         slavesByNameRev.put(slave, slaveName);
@@ -327,10 +387,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
+    /**
+     * {@inheritDoc}
      */
-    public void runActivity(Body body) {
+    public void runActivity(final Body body) {
         Service service = new Service(body);
         while (!terminated) {
             service.waitForRequest();
@@ -361,11 +421,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         body.terminate();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider#sendResultAndGetTask(org.objectweb.proactive.extra.masterslave.interfaces.Task,java.lang.String)
+    /**
+     * {@inheritDoc}
      */
-    public TaskIntern sendResultAndGetTask(ResultIntern result,
-        String originatorName) {
+    public TaskIntern sendResultAndGetTask(final ResultIntern result,
+        final String originatorName) {
         long taskId = result.getId();
         if (launchedTasks.contains(taskId)) {
             if (logger.isDebugEnabled()) {
@@ -417,25 +477,24 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         body.serve(req);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#setResultReceptionOrder(org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode)
+    /**
+     * {@inheritDoc}
      */
-    public void setResultReceptionOrder(
-        org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode mode) {
+    public void setResultReceptionOrder(final Master.OrderingMode mode) {
         resultQueue.setMode(mode);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#slavepoolSize()
+    /**
+     * {@inheritDoc}
      */
     public int slavepoolSize() {
         return slaveGroup.size();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solve(java.util.List)
+    /**
+     * {@inheritDoc}
      */
-    public void solve(List tasks) {
+    public void solve(final List tasks) {
         logger.debug("Adding " + tasks.size() + " tasks...");
 
         for (Long taskId : (List<Long>) tasks) {
@@ -445,10 +504,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
 
     /**
      * Adds a task to solve
-     * @param task
+     * @param taskId id of the task to solve
      * @throws IllegalArgumentException
      */
-    protected void solve(Long taskId) {
+    protected void solve(final Long taskId) {
         resultQueue.addPendingTask(taskId);
 
         if (emptyPending()) {
@@ -466,19 +525,19 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#terminate(boolean)
+    /**
+     * {@inheritDoc}
      */
-    public void terminate(boolean freeResources) {
+    public void terminate(final boolean freeResources) {
         terminateIntern(freeResources);
     }
 
     /**
      * Synchronous version of terminate
-     * @param freeResources
+     * @param freeResources do we free as well deployed resources
      * @return true if completed successfully
      */
-    public boolean terminateIntern(boolean freeResources) {
+    public boolean terminateIntern(final boolean freeResources) {
         terminated = true;
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating Master...");
@@ -512,11 +571,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitAllResults()
+    /**
+     * {@inheritDoc}
      */
-    public List<ResultIntern> waitAllResults()
-        throws IllegalStateException, TaskException {
+    public List<ResultIntern> waitAllResults() throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException(
                 "Already waiting for a wait request");
@@ -527,11 +585,11 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         return resultQueue.getAll();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitKResults(int)
+    /**
+     * {@inheritDoc}
      */
-    public List<ResultIntern> waitKResults(int k)
-        throws IllegalArgumentException, TaskException {
+    public List<ResultIntern> waitKResults(final int k)
+        throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException(
                 "Already waiting for a wait request");
@@ -548,11 +606,10 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         return resultQueue.getNextK(k);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitOneResult()
+    /**
+     * {@inheritDoc}
      */
-    public ResultIntern waitOneResult()
-        throws IllegalStateException, TaskException {
+    public ResultIntern waitOneResult() throws TaskException {
         if (pendingRequest != null) {
             throw new IllegalStateException(
                 "Already waiting for a wait request");
@@ -571,23 +628,25 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * Internal class for filtering requests in the queue
      */
     protected class FindWaitFilter implements RequestFilter {
+
+        /**
+         * Creates a filter
+         */
         public FindWaitFilter() {
         }
 
-        /* (non-Javadoc)
-         * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
+        /**
+         * {@inheritDoc}
          */
-        public boolean acceptRequest(Request request) {
+        public boolean acceptRequest(final Request request) {
             // We find all the requests that are not servable yet
             String name = request.getMethodName();
             if (name.equals("waitOneResult")) {
                 return true;
             } else if (name.equals("waitAllResults")) {
                 return true;
-            } else if (name.equals("waitKResults")) {
-                return true;
             } else {
-                return false;
+                return name.equals("waitKResults");
             }
         }
     }
@@ -597,23 +656,25 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
      * Internal class for filtering requests in the queue
      */
     protected class FindNotWaitFilter implements RequestFilter {
+
+        /**
+         * Creates the filter
+         */
         public FindNotWaitFilter() {
         }
 
-        /* (non-Javadoc)
-         * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
+        /**
+         * {@inheritDoc}
          */
-        public boolean acceptRequest(Request request) {
+        public boolean acceptRequest(final Request request) {
             // We find all the requests that are not servable yet
             String name = request.getMethodName();
             if (name.equals("waitOneResult")) {
                 return false;
             } else if (name.equals("waitAllResults")) {
                 return false;
-            } else if (name.equals("waitKResults")) {
-                return false;
             } else {
-                return true;
+                return !(name.equals("waitKResults"));
             }
         }
     }

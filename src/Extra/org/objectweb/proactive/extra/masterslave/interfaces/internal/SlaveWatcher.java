@@ -42,19 +42,19 @@ public interface SlaveWatcher {
 
     /**
      * adds a slave to be watched
-     * @param slave
+     * @param slave slave which must be watched
      */
-    public void addSlaveToWatch(Slave slave);
+    void addSlaveToWatch(Slave slave);
 
     /**
      * stops watching a slave
-     * @param slave
+     * @param slave slaves which needn't be watched anymore
      */
-    public void removeSlaveToWatch(Slave slave);
+    void removeSlaveToWatch(Slave slave);
 
     /**
      * terminates the watcher's activity
      * @return true if the object terminated successfully
      */
-    public BooleanWrapper terminate();
+    BooleanWrapper terminate();
 }

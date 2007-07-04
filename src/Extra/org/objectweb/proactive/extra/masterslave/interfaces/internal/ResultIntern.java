@@ -49,30 +49,29 @@ public interface ResultIntern<R extends Serializable> extends Comparable,
      * get the result of the task
      * @return the result
      */
-    public R getResult();
+    R getResult();
 
     /**
      * sets the result of the task
      * @param res the result
      */
-    public void setResult(R res);
+    void setResult(R res);
 
     /**
      * tells if the task threw a functional exception
      * @return answer
      */
-    public boolean threwException();
+    boolean threwException();
 
     /**
      * returns the actual functional exception thrown by the task
      * @return the exception
-     * @throws an IllegalStateException is no Exception was thrown
      */
-    public Throwable getException() throws IllegalStateException;
+    Throwable getException();
 
     /**
      * sets the exception thrown by the task
      * @param e the exception
      */
-    public void setException(Throwable e);
+    void setException(Throwable e);
 }

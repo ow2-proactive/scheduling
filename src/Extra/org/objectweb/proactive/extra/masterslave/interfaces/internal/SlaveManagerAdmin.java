@@ -51,7 +51,7 @@ public interface SlaveManagerAdmin {
      * and use the generated nodes as resources
      * @param descriptorURL URL of a deployment descriptor
      */
-    public void addResources(URL descriptorURL);
+    void addResources(URL descriptorURL);
 
     /**
      * Asks the slave manager to activate the given virtual nodes inside the given descriptor
@@ -59,24 +59,24 @@ public interface SlaveManagerAdmin {
      * @param descriptorURL URL of a deployment descriptor
      * @param virtualNodeName names of the virtual node to activate
      */
-    public void addResources(URL descriptorURL, String virtualNodeName);
+    void addResources(URL descriptorURL, String virtualNodeName);
 
     /**
      * Adds the given Collection of nodes to the slave manager
-     * @param nodes
+     * @param nodes a collection of nodes
      */
-    public void addResources(Collection<Node> nodes);
+    void addResources(Collection<Node> nodes);
 
     /**
      * Adds the given virtual node to the slave manager
-     * @param virtualnode
+     * @param virtualnode a virtual node object
      */
-    public void addResources(VirtualNode virtualnode);
+    void addResources(VirtualNode virtualnode);
 
     /**
      * Terminates the slave manager and free every resources (if asked)
      * @param freeResources tells if the Slave Manager should as well free the node resources
      * @return success
      */
-    public BooleanWrapper terminate(boolean freeResources);
+    BooleanWrapper terminate(boolean freeResources);
 }

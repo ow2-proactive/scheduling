@@ -68,16 +68,16 @@ public interface Master<T extends Task<R>, R extends Serializable> {
 
     /**
      * Adds the given Collection of nodes to the master <br/>
-     * @param nodes
+     * @param nodes a collection of nodes
      */
-    public void addResources(Collection<Node> nodes);
+    void addResources(Collection<Node> nodes);
 
     /**
      * Adds the given descriptor to the master<br>
      * Every virtual nodes inside the given descriptor will be activated<br/>
      * @param descriptorURL URL of a deployment descriptor
      */
-    public void addResources(URL descriptorURL);
+    void addResources(URL descriptorURL);
 
     /**
     * Adds the given descriptor to the master<br>
@@ -85,51 +85,49 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     * @param descriptorURL URL of a deployment descriptor
     * @param virtualNodeName name of the virtual node to activate
     */
-    public void addResources(URL descriptorURL, String virtualNodeName);
+    void addResources(URL descriptorURL, String virtualNodeName);
 
     /**
      * Adds every resource inside the given virtual node to the master <br/>
-     * @param virtualnode
+     * @param virtualnode a virtual node object
      */
-    public void addResources(VirtualNode virtualnode);
+    void addResources(VirtualNode virtualnode);
 
     /**
      * This method returns the number of slaves currently in the slave pool
      * @return number of slaves
      */
-    public int slavepoolSize();
+    int slavepoolSize();
 
     /**
      * Terminates the slave manager and (eventually free every resources) <br/>
      * @param freeResources tells if the Slave Manager should as well free the node resources
      */
-    public void terminate(boolean freeResources);
+    void terminate(boolean freeResources);
 
     /**
      * Adds a list of tasks to be solved by the master <br/>
      * @param tasks list of tasks
      * @throws TaskAlreadySubmittedException if a task is submitted twice
      */
-    public void solve(List<T> tasks) throws TaskAlreadySubmittedException;
+    void solve(List<T> tasks) throws TaskAlreadySubmittedException;
 
     /**
      * Wait for all results, will block until all results are computed <br>
      * The ordering of the results depends on the result reception mode in use <br>
      * @return a collection of objects containing the result
-     * @throws IllegalStateException if no task have been submitted
      * @throws TaskException if a task threw an Exception
      */
-    public List<R> waitAllResults() throws IllegalStateException, TaskException;
+    List<R> waitAllResults() throws TaskException;
 
     /**
      * Wait for the first result available <br>
      * Will block until at least one Result is available. <br>
      * Note that in SubmittedOrder mode, the method will block until the next result in submission order is available<br>
      * @return an object containing the result
-     * @throws IllegalStateException if no task have been submitted
      * @throws TaskException if the task threw an Exception
      */
-    public R waitOneResult() throws IllegalStateException, TaskException;
+    R waitOneResult() throws TaskException;
 
     /**
      * Wait for a number of results<br>
@@ -137,23 +135,21 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * The ordering of the results depends on the result reception mode in use <br>
      * @param k the number of results to wait for
      * @return a collection of objects containing the results
-     * @throws IllegalStateException if no task have been submitted
      * @throws TaskException if the task threw an Exception
      */
-    public List<R> waitKResults(int k)
-        throws IllegalStateException, TaskException;
+    List<R> waitKResults(int k) throws TaskException;
 
     /**
      * Tells if the master is completely empty (i.e. has no result to provide and no tasks submitted)
      * @return the answer
      */
-    public boolean isEmpty();
+    boolean isEmpty();
 
     /**
      * Returns the number of available results <br/>
      * @return the answer
      */
-    public int countAvailableResults();
+    int countAvailableResults();
 
     /**
      * Sets the current ordering mode <br/>
@@ -161,5 +157,5 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
      * @param mode the new mode for result gathering
      */
-    public void setResultReceptionOrder(OrderingMode mode);
+    void setResultReceptionOrder(OrderingMode mode);
 }

@@ -57,88 +57,105 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvide
  */
 public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     SlaveMemory {
+
+    /**
+     * log4j logger of the slave
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
 
-    // stub on this active object
+    /**
+     * stub on this active object
+     */
     protected Object stubOnThis;
 
-    // Name of the slave
+    /**
+     * Name of the slave
+     */
     protected String name;
 
-    // The entity which will provide tasks to the slave (i.e. the master)
+    /**
+     * The entity which will provide tasks to the slave (i.e. the master)
+     */
     protected TaskProvider provider;
 
-    // Tells if the slave is terminated
+    /**
+     * Tells if the slave is terminated
+     */
     protected boolean terminated;
 
-    // Tells if the slave is currently sleeping (not asking new tasks)
+    /**
+     * Tells if the slave is currently sleeping (not asking new tasks)
+     */
     protected boolean isSleeping;
 
-    // The memory of the slave (the slave can keep some data between different tasks executions (connection to a database, file descriptor, etc ...)
+    /**
+     * The memory of the slave <br>
+     * the slave can keep some data between different tasks executions <br>
+     * e.g. connection to a database, file descriptor, etc ...
+     */
     protected Map<String, Object> memory;
 
     /**
-     * Required for Active Objects
-     *
+     * ProActive no arg contructor
      */
     public AOSlave() {
     }
 
     /**
      * Creates a slave with the given name
-     * @param name
+     * @param name name of the slave
      * @param provider the entity which will provide tasks to the slave
      * @param initialMemory initial memory of the slave
      */
-    public AOSlave(String name, TaskProvider provider,
-        Map<String, Object> initialMemory) {
+    public AOSlave(final String name, final TaskProvider provider,
+        final Map<String, Object> initialMemory) {
         this.name = name;
         this.provider = provider;
         this.memory = initialMemory;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof AOSlave) {
             return name.equals(((Slave) obj).getName());
         }
         return false;
     }
 
-    /* (non-Javadoc)
-         * @see org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory#erase(java.lang.String)
-         */
-    public void erase(String name) {
-        memory.remove(name);
+    /**
+     * {@inheritDoc}
+     */
+    public void erase(final String dataName) {
+        memory.remove(dataName);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave#getName()
+    /**
+     * {@inheritDoc}
      */
     public String getName() {
         return name;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
+    /**
+     * {@inheritDoc}
      */
     public int hashCode() {
         return name.hashCode();
     }
 
-    /* (non-Javadoc)
-         * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave#heartBeat()
-         */
+    /**
+     * {@inheritDoc}
+     */
     public void heartBeat() {
         // Do nothing, we simply want the rendez-vous to work
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+    /**
+     * {@inheritDoc}
      */
-    public void initActivity(Body body) {
+    public void initActivity(final Body body) {
         stubOnThis = ProActive.getStubOnThis();
         isSleeping = false;
         terminated = false;
@@ -147,16 +164,16 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         ProActive.setImmediateService("terminate");
     }
 
-    /* (non-Javadoc)
-         * @see org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory#load(java.lang.String)
-         */
-    public Object load(String name) {
-        return memory.get(name);
+    /**
+     * {@inheritDoc}
+     */
+    public Object load(final String dataName) {
+        return memory.get(dataName);
     }
 
     /**
      * gets the initial task to solve
-     * @return task
+     * @return initial task to solve
      */
     protected TaskIntern initialGetTask() {
         if (logger.isDebugEnabled()) {
@@ -175,7 +192,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * @param task task to run
      * @return the same task, but containing the result
      */
-    protected ResultIntern handleTask(TaskIntern task) {
+    protected ResultIntern handleTask(final TaskIntern task) {
         Serializable resultObj = null;
         ResultInternImpl result = new ResultInternImpl(task);
 
@@ -193,10 +210,10 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         return result;
     }
 
-    /* (non-Javadoc)
-    * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
-    */
-    public void runActivity(Body body) {
+    /**
+     * {@inheritDoc}
+     */
+    public void runActivity(final Body body) {
         Service service = new Service(body);
 
         while (!terminated) {
@@ -235,16 +252,16 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory#save(java.lang.String, java.io.Serializable)
+    /**
+     * {@inheritDoc}
      */
-    public void save(String name, Object data) {
-        memory.put(name, data);
+    public void save(final String dataName, final Object data) {
+        memory.put(name, dataName);
     }
 
-    /* (non-Javadoc)
-    * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave#terminate(boolean)
-    */
+    /**
+     * {@inheritDoc}
+     */
     public BooleanWrapper terminate() {
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating " + name + "...");
@@ -257,8 +274,8 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         return new BooleanWrapper(true);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave#wakeup()
+    /**
+     * {@inheritDoc}
      */
     public void wakeup() {
         isSleeping = false;

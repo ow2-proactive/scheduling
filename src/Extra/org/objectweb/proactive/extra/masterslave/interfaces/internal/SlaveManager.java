@@ -49,12 +49,12 @@ public interface SlaveManager {
      * @param slave slave to be returned
      * @return acceptation of the request (asynchronous)
      */
-    public BooleanWrapper freeSlave(Slave slave);
+    BooleanWrapper freeSlave(Slave slave);
 
     /**
      * Returns a collection of slaves to the slave manager
      * @param nodes Collection of slaves to be returned
      * @return acceptation of the request (asynchronous)
      */
-    public BooleanWrapper freeSlaves(Collection<Slave> nodes);
+    BooleanWrapper freeSlaves(Collection<Slave> nodes);
 }

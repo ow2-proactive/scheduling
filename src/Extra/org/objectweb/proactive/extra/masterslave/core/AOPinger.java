@@ -34,21 +34,41 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveWatche
  */
 public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     Serializable {
+
+    /**
+     * pinger log4j logger
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
 
-    // stub
+    /**
+     * Stub on the active object
+     */
     protected AOPinger stubOnThis;
 
-    // terminated state
+    /**
+     * is this active object terminated
+     */
     protected boolean terminated;
 
-    // pinging period
+    /**
+     * interval when slaves are pinged
+     */
     protected long pingPeriod;
 
-    // Slaves to be watched
-    protected Slave slaveGroupStub;
-    protected Group slaveGroup;
+    /**
+     * Who will be notified when slaves are dead (in general : the master)
+     */
     protected SlaveDeadListener listener;
+
+    /**
+     * Stub to slave group
+     */
+    protected Slave slaveGroupStub;
+
+    /**
+     * Slave group
+     */
+    protected Group slaveGroup;
 
     /**
      * ProActive empty constructor
@@ -58,26 +78,26 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
 
     /**
      * Creates a pinger with the given listenerr
-     * @param listener
+     * @param listener object which will be notified when a slave is dead
      */
-    public AOPinger(SlaveDeadListener listener) {
+    public AOPinger(final SlaveDeadListener listener) {
         this.listener = listener;
         terminated = false;
         pingPeriod = Long.parseLong(System.getProperty(
                     "proactive.masterslave.pingperiod"));
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlavePinger#addSlaveToPing(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
+    /**
+     * {@inheritDoc}
      */
-    public void addSlaveToWatch(Slave slave) {
+    public void addSlaveToWatch(final Slave slave) {
         slaveGroup.add(slave);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+    /**
+     * {@inheritDoc}
      */
-    public void initActivity(Body body) {
+    public void initActivity(final Body body) {
         try {
             slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
             slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
@@ -92,17 +112,17 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlavePinger#removeSlaveToPing(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
+    /**
+     * {@inheritDoc}
      */
-    public void removeSlaveToWatch(Slave slave) {
+    public void removeSlaveToWatch(final Slave slave) {
         slaveGroup.remove(slave);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
+    /**
+     * {@inheritDoc}
      */
-    public void runActivity(Body body) {
+    public void runActivity(final Body body) {
         Service service = new Service(body);
         while (!terminated) {
             // we serve everything
@@ -121,9 +141,9 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
 
     /**
      * Reports that a slave is missing
-     * @param slave
+     * @param slave the missing slave
      */
-    public void slaveMissing(Slave slave) {
+    public void slaveMissing(final Slave slave) {
         synchronized (slaveGroup) {
             if (logger.isDebugEnabled()) {
                 logger.debug(
@@ -136,8 +156,8 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveWatcher#terminate()
+    /**
+     * {@inheritDoc}
      */
     public BooleanWrapper terminate() {
         this.terminated = true;
@@ -153,10 +173,10 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
      */
     public class DetectMissingGroup implements NFEListener {
 
-        /* (non-Javadoc)
-         * @see org.objectweb.proactive.core.exceptions.manager.NFEListener#handleNFE(org.objectweb.proactive.core.exceptions.NonFunctionalException)
+        /**
+         * {@inheritDoc}
          */
-        public boolean handleNFE(NonFunctionalException nfe) {
+        public boolean handleNFE(final NonFunctionalException nfe) {
             Iterator exceptions;
             ExceptionListException exceptionList;
 

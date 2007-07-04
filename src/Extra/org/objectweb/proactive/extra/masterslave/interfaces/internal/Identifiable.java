@@ -1,5 +1,11 @@
 package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 
+
+/**
+ * A simple interface for objects which are identifiable by a numeric id
+ * @author fviale
+ *
+ */
 public interface Identifiable {
 
     /**
@@ -7,5 +13,5 @@ public interface Identifiable {
      * get the id of the task
      * @return the id
      */
-    public long getId();
+    long getId();
 }

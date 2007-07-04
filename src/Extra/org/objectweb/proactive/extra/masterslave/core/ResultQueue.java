@@ -24,25 +24,37 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultInter
  *
  */
 public class ResultQueue implements Serializable {
+
+    /**
+     * log4j logger of the master
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
 
-    //	 current ordering mode
+    /**
+     * current ordering mode
+     */
     protected Master.OrderingMode mode;
 
-    // submitted tasks ids (ordered)
+    /**
+     * submitted tasks ids (ordered)
+     */
     protected TreeSet<Long> idsubmitted = new TreeSet<Long>();
 
-    // sorted set of results (for submission order)
+    /**
+     * sorted set of results (for submission order)
+     */
     protected SortedSet<ResultIntern> orderedResults = new TreeSet<ResultIntern>();
 
-    // unordered list of results (for 
+    /**
+     * unordered list of results (for completion order)
+     */
     protected LinkedList<ResultIntern> unorderedResults = new LinkedList<ResultIntern>();
 
     /**
      * Creates the result queue with the given ordering mode
      * @param mode
      */
-    public ResultQueue(Master.OrderingMode mode) {
+    public ResultQueue(final Master.OrderingMode mode) {
         this.mode = mode;
     }
 
@@ -50,7 +62,7 @@ public class ResultQueue implements Serializable {
      * Adds a completed task to the queue
      * @param result result of the completed task
      */
-    public void addCompletedTask(ResultIntern result) {
+    public void addCompletedTask(final ResultIntern result) {
         if (mode == Master.OrderingMode.CompletionOrder) {
             unorderedResults.add(result);
         } else {
@@ -62,7 +74,7 @@ public class ResultQueue implements Serializable {
      * Specifies that a new tasks have been submitted
      * @param taskId id of the pending task
      */
-    public void addPendingTask(Long taskId) {
+    public void addPendingTask(final Long taskId) {
         idsubmitted.add(taskId);
     }
 
@@ -118,9 +130,8 @@ public class ResultQueue implements Serializable {
     /**
      * Returns the results of all completed tasks (if and only if there are no pending tasks)
      * @return a list containing all completed tasks, if all tasks are completed
-     * @throws NoSuchElementException if some tasks are not completed
      */
-    public List<ResultIntern> getAll() throws NoSuchElementException {
+    public List<ResultIntern> getAll() {
         if (areAllResultsAvailable()) {
             List<ResultIntern> answer = new ArrayList<ResultIntern>();
             Iterator<ResultIntern> it;
@@ -148,9 +159,8 @@ public class ResultQueue implements Serializable {
     /**
      * Returns the the result of the next completed task (depending of the current ResultReceptionOrder)
      * @return the result of the next completed task, if the next task in the current ResultReceptionOrder is available
-     * @throws NoSuchElementException if no task in the current ResultReceptionOrder are available
      */
-    public ResultIntern getNext() throws NoSuchElementException {
+    public ResultIntern getNext() {
         if (isOneResultAvailable()) {
             ResultIntern answer;
             if (mode == Master.OrderingMode.CompletionOrder) {
@@ -171,9 +181,8 @@ public class ResultQueue implements Serializable {
      * Returns the results of all k next completed task (depending of the current ResultReceptionOrder)
      * @param k number of compllocalJVMeted tasks to get
      * @return a list containing the results of the k next completed tasks, if the k next tasks in the current ResultReceptionOrder are available
-     * @throws NoSuchElementException if not enough tasks in the current ResultReceptionOrder are available
      */
-    public List<ResultIntern> getNextK(int k) {
+    public List<ResultIntern> getNextK(final int k) {
         if (countAvailableResults() >= k) {
             List<ResultIntern> answer = new ArrayList<ResultIntern>();
             Iterator<ResultIntern> it;
@@ -227,7 +236,7 @@ public class ResultQueue implements Serializable {
      * Changes the current result ordering mode
      * @param mode the new result ordering mode
      */
-    public void setMode(Master.OrderingMode mode) {
+    public void setMode(final Master.OrderingMode mode) {
         if ((mode == Master.OrderingMode.CompletionOrder) &&
                 (this.mode == Master.OrderingMode.SubmitionOrder)) {
             Iterator<ResultIntern> it = orderedResults.iterator();

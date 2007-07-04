@@ -49,7 +49,7 @@ public interface TaskIntern<R extends Serializable> extends Task<R>, Comparable,
     /**
      * The ID of the NullTask
      */
-    public static long NULL_TASK_ID = -1;
+    long NULL_TASK_ID = -1;
 
     /**
      * get the actual task
@@ -61,5 +61,5 @@ public interface TaskIntern<R extends Serializable> extends Task<R>, Comparable,
      * tells if the task is null (nothing to do)
      * @return true if the task is null, false otherwise
      */
-    public boolean isNull();
+    boolean isNull();
 }

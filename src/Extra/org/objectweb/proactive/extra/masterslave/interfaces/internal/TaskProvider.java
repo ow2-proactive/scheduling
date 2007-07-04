@@ -50,7 +50,7 @@ public interface TaskProvider<TI extends TaskIntern<R>, RI extends ResultIntern<
      * @param slaveName the name of the slave which asks the tasks
      * @return a new task to compute
      */
-    public TI getTask(Slave slave, String slaveName);
+    TI getTask(Slave slave, String slaveName);
 
     /**
      * Returns the result of a task to the provider
@@ -58,5 +58,5 @@ public interface TaskProvider<TI extends TaskIntern<R>, RI extends ResultIntern<
      * @param slaveName the name of the slave sending the result
      * @return a new task to compute
      */
-    public TI sendResultAndGetTask(RI result, String slaveName);
+    TI sendResultAndGetTask(RI result, String slaveName);
 }

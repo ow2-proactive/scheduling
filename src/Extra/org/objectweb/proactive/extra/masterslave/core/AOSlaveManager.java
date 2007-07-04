@@ -75,41 +75,68 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvide
  */
 public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     NodeCreationEventListener, InitActive, Serializable {
+
+    /**
+     * log4j logger for the slave manager
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVEMANAGER);
 
-    //	stub on this active object
+    /**
+     * stub on this active object
+     */
     protected Object stubOnThis;
+
+    /**
+     * how many slaves have been created
+     */
     protected long slaveCounter;
 
-    //	holds the virtual nodes, only used to kill the nodes when the active object is closed
+    /**
+     * holds the virtual nodes, only used to kill the nodes when the slave manager is terminated
+     */
     protected Vector<VirtualNode> vnlist;
 
-    // a thread pool used for slave creation
+    /**
+     * a thread pool used for slave creation
+     */
     protected ExecutorService threadPool;
+
+    /**
+     * true when the slave manager is terminated
+     */
     protected boolean isTerminated;
+
+    /**
+     * the entity which will provide tasks to the slaves
+     */
     protected TaskProvider provider;
 
-    // memory of the slaves
+    /**
+     * Initial memory of the slaves
+     */
     protected Map<String, Object> initialMemory;
 
+    /**
+     * ProActive no arg constructor
+     */
     public AOSlaveManager() {
-    } //proactive no arg constructor
+    }
 
     /**
      * Creates a task manager with the given task provider
      * @param provider the entity that will give tasks to the slaves created
      * @param initialMemory the initial memory of the slaves
      */
-    public AOSlaveManager(TaskProvider provider,
-        Map<String, Object> initialMemory) {
+    public AOSlaveManager(final TaskProvider provider,
+        final Map<String, Object> initialMemory) {
         this.provider = provider;
         this.initialMemory = initialMemory;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#addResources(java.util.Collection)
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(Collection<Node> nodes) {
+    public void addResources(final Collection<Node> nodes) {
         if (!isTerminated) {
             for (Node node : nodes) {
                 threadPool.execute(new SlaveCreationHandler(node));
@@ -117,10 +144,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#addResources(java.net.URL)
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(URL descriptorURL) {
+    public void addResources(final URL descriptorURL) {
         if (!isTerminated) {
             try {
                 ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
@@ -134,10 +161,11 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#addResources(java.net.URL, java.lang.String[])
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(URL descriptorURL, String virtualNodeName) {
+    public void addResources(final URL descriptorURL,
+        final String virtualNodeName) {
         if (!isTerminated) {
             try {
                 ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
@@ -149,10 +177,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#addResources(org.objectweb.proactive.core.descriptor.data.VirtualNode)
+    /**
+     * {@inheritDoc}
      */
-    public void addResources(VirtualNode virtualnode) {
+    public void addResources(final VirtualNode virtualnode) {
         if (!isTerminated) {
             if (!virtualnode.isActivated()) {
                 ((VirtualNodeImpl) virtualnode).addNodeCreationEventListener(this);
@@ -175,9 +203,9 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
 
     /**
      * Creates a slave object inside the given node
-     * @param node
+     * @param node the node on which a slave will be created
      */
-    protected void createSlave(Node node) {
+    protected void createSlave(final Node node) {
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating slave on " +
@@ -200,10 +228,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager#freeSlave(org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave)
+    /**
+     * {@inheritDoc}
      */
-    public BooleanWrapper freeSlave(Slave slave) {
+    public BooleanWrapper freeSlave(final Slave slave) {
         if (!isTerminated) {
             if (logger.isDebugEnabled()) {
                 logger.debug(slave.getName() + " freed.");
@@ -215,10 +243,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
         return new BooleanWrapper(false);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager#freeSlaves(java.util.Collection)
+    /**
+     * {@inheritDoc}
      */
-    public BooleanWrapper freeSlaves(Collection<Slave> slavesToFree) {
+    public BooleanWrapper freeSlaves(final Collection<Slave> slavesToFree) {
         if (!isTerminated) {
             for (Slave slave : slavesToFree) {
                 freeSlave(slave);
@@ -231,10 +259,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
         return new BooleanWrapper(false);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+    /**
+     * {@inheritDoc}
      */
-    public void initActivity(Body body) {
+    public void initActivity(final Body body) {
         stubOnThis = ProActive.getStubOnThis();
         slaveCounter = 0;
         vnlist = new Vector<VirtualNode>();
@@ -245,26 +273,26 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
         threadPool = Executors.newCachedThreadPool();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.event.NodeCreationEventListener#nodeCreated(org.objectweb.proactive.core.event.NodeCreationEvent)
+    /**
+     * {@inheritDoc}
      */
-    public void nodeCreated(NodeCreationEvent event) {
+    public void nodeCreated(final NodeCreationEvent event) {
         // get the node
         Node node = event.getNode();
         threadPool.execute(new SlaveCreationHandler(node));
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#setConsumer(org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveConsumer)
+    /**
+     * {@inheritDoc}
      */
-    public void setTaskProvider(TaskProvider provider) {
+    public void setTaskProvider(final TaskProvider provider) {
         this.provider = provider;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin#terminate(boolean)
+    /**
+     * {@inheritDoc}
      */
-    public BooleanWrapper terminate(boolean freeResources) {
+    public BooleanWrapper terminate(final boolean freeResources) {
         isTerminated = true;
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating SlaveManager...");
@@ -302,12 +330,23 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      *
      */
     protected class SlaveCreationHandler implements Runnable {
+
+        /**
+         * node on which slaves will be created
+         */
         private Node node = null;
 
-        public SlaveCreationHandler(Node _node) {
-            this.node = _node;
+        /**
+         * Creates a slave on a given node
+         * @param node
+         */
+        public SlaveCreationHandler(final Node node) {
+            this.node = node;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void run() {
             createSlave(node);
         }

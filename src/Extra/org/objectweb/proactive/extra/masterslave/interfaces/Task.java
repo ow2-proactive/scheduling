@@ -47,5 +47,5 @@ public interface Task<R extends Serializable> extends Serializable {
      * @return the result
      * @throws Exception any exception thrown by the task
      */
-    public R run(SlaveMemory memory) throws Exception;
+    R run(SlaveMemory memory) throws Exception;
 }

@@ -14,64 +14,77 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  *
  */
 public class ResultInternImpl implements ResultIntern {
-    // The id of the task
+
+    /**
+     * The id of the task
+     */
     protected long id = -1;
 
-    // the result
+    /**
+     * the result
+     */
     protected Serializable result = null;
 
-    // when this task has thrown an exception
+    /**
+     * when this task has thrown an exception
+     */
     protected boolean isException = false;
 
-    // the exception thrown
+    /**
+     *  the exception thrown
+     */
     protected Throwable exception = null;
 
+    /**
+     * Creates an empty result object for the given task
+     * @param task task associated with the result
+     */
     public ResultInternImpl(TaskIntern task) {
         this.id = task.getId();
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof Identifiable) {
             return id == ((Identifiable) obj).getId();
         }
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#getException()
+    /**
+     * {@inheritDoc}
      */
     public Throwable getException() {
         return exception;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.Identified#getId()
+    /**
+     * {@inheritDoc}
      */
     public long getId() {
         return id;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#getResult()
+    /**
+     * {@inheritDoc}
      */
     public Serializable getResult() {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
+    /**
+     * {@inheritDoc}
      */
     public int hashCode() {
         return (int) id;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#setException(java.lang.Throwable)
+    /**
+     * {@inheritDoc}
      */
-    public void setException(Throwable e) {
+    public void setException(final Throwable e) {
         if (e == null) {
             throw new IllegalArgumentException("Exception can't be null");
         }
@@ -79,24 +92,24 @@ public class ResultInternImpl implements ResultIntern {
         this.isException = true;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#setResult(java.io.Serializable)
+    /**
+     * {@inheritDoc}
      */
-    public void setResult(Serializable res) {
+    public void setResult(final Serializable res) {
         this.result = res;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#threwException()
+    /**
+     * {@inheritDoc}
      */
     public boolean threwException() {
         return isException;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
-    public int compareTo(Object o) {
+    public int compareTo(final Object o) {
         if (o == null) {
             throw new NullPointerException();
         } else if (o instanceof Identifiable) {

@@ -32,21 +32,52 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskReposit
  *
  */
 public class AOTaskRepository implements TaskRepository, Serializable {
+
+    /**
+     * logger of the task repository
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_REPOSITORY);
+
+    /**
+     * set whichs stores the hashcodes of all task objects from the client environment
+     */
     protected HashSet<Integer> hashCodes = new HashSet<Integer>();
+
+    /**
+     * associations of task ids to hashcodes
+     */
     protected HashMap<Long, Integer> idTohashCode = new HashMap<Long, Integer>();
+
+    /**
+     * associations of ids to actual tasks
+     */
     protected HashMap<Long, TaskIntern> idToTaskIntern = new HashMap<Long, TaskIntern>();
+
+    /**
+     * associations of ids to zipped versions of the tasks
+     */
     protected HashMap<Long, byte[]> idToZippedTask = new HashMap<Long, byte[]>();
+
+    /**
+     * counter of the last task id created
+     */
     protected long taskCounter = 0;
 
-    // ProActive no-args constructor
+    /**
+     * Size of compression buffers
+     */
+    private static final int COMPRESSION_BUFFER_SIZE = 1024;
+
+    /**
+     * ProActive empty constructor
+     */
     public AOTaskRepository() {
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository#addTask(org.objectweb.proactive.extra.masterslave.interfaces.Task, int)
+    /**
+     * {@inheritDoc}
      */
-    public long addTask(Task task, int hashCode)
+    public long addTask(final Task task, final int hashCode)
         throws TaskAlreadySubmittedException {
         if (hashCodes.contains(hashCode)) {
             throw new TaskAlreadySubmittedException();
@@ -59,10 +90,10 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         return ti.getId();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository#getTask(long)
+    /**
+     * {@inheritDoc}
      */
-    public TaskIntern getTask(long id) {
+    public TaskIntern getTask(final long id) {
         if (!idToTaskIntern.containsKey(id) && !idToZippedTask.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
@@ -73,10 +104,10 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository#removeTask(long)
+    /**
+     * {@inheritDoc}
      */
-    public void removeTask(long id) {
+    public void removeTask(final long id) {
         if (!idToTaskIntern.containsKey(id) &&
                 !(idToZippedTask.containsKey(id))) {
             throw new NoSuchElementException("task unknown");
@@ -89,10 +120,10 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository#removeId(long)
+    /**
+     * {@inheritDoc}
      */
-    public void removeId(long id) {
+    public void removeId(final long id) {
         if (!idTohashCode.containsKey(id)) {
             throw new NoSuchElementException("unknown id");
         }
@@ -102,10 +133,10 @@ public class AOTaskRepository implements TaskRepository, Serializable {
 
     /**
      * loads a task from a compressed version
-     * @param id
-     * @return
+     * @param id the task id
+     * @return the loaded task
      */
-    protected TaskIntern loadTask(long id) {
+    protected TaskIntern loadTask(final long id) {
         TaskIntern task = null;
         if (!idToZippedTask.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
@@ -120,17 +151,19 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
 
         // Decompress the data
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[COMPRESSION_BUFFER_SIZE];
         while (!decompressor.finished()) {
             try {
                 int count = decompressor.inflate(buf);
                 bos.write(buf, 0, count);
             } catch (DataFormatException e) {
+                logger.error("Error during task decompression", e);
             }
         }
         try {
             bos.close();
         } catch (IOException e) {
+            logger.error("Error during task decompression", e);
         }
 
         // Get the decompressed data
@@ -148,10 +181,10 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         return task;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository#saveTask(long)
+    /**
+     * {@inheritDoc}
      */
-    public void saveTask(long id) {
+    public void saveTask(final long id) {
         if (!idToTaskIntern.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
@@ -178,7 +211,7 @@ public class AOTaskRepository implements TaskRepository, Serializable {
             ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
 
             // Compress the data
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[COMPRESSION_BUFFER_SIZE];
             while (!compressor.finished()) {
                 int count = compressor.deflate(buf);
                 bos.write(buf, 0, count);
@@ -186,6 +219,7 @@ public class AOTaskRepository implements TaskRepository, Serializable {
             try {
                 bos.close();
             } catch (IOException e) {
+                logger.error("Error during task compression", e);
             }
 
             // Get the compressed data
@@ -196,8 +230,8 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskRepository#terminate()
+    /**
+     * {@inheritDoc}
      */
     public boolean terminate() {
         ProActive.terminateActiveObject(true);

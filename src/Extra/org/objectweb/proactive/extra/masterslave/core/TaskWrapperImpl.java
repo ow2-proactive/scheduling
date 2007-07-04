@@ -45,10 +45,15 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  *
  */
 public class TaskWrapperImpl implements TaskIntern {
-    // The id of the task
+
+    /**
+     * The id of the task
+     */
     protected long id = NULL_TASK_ID;
 
-    // The actual task object
+    /**
+     * The actual task object
+     */
     protected Task realTask = null;
 
     /**
@@ -59,63 +64,63 @@ public class TaskWrapperImpl implements TaskIntern {
 
     /**
      * Creates a wrapper with the given task and id
-     * @param id
+     * @param id id of the task
      * @param realTask the user task
      */
-    public TaskWrapperImpl(long id, Task realTask) {
+    public TaskWrapperImpl(final long id, final Task realTask) {
         this.id = id;
         this.realTask = realTask;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof Identifiable) {
             return id == ((Identifiable) obj).getId();
         }
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#getId()
+    /**
+     * {@inheritDoc}
      */
     public long getId() {
         return id;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#getTask()
+    /**
+     * {@inheritDoc}
      */
     public Task getTask() {
         return realTask;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
+    /**
+     * {@inheritDoc}
      */
     public int hashCode() {
         return (int) id;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern#isNull()
+    /**
+     * {@inheritDoc}
      */
     public boolean isNull() {
         return realTask == null;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Task#run(org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory)
+    /**
+     * {@inheritDoc}
      */
-    public Serializable run(SlaveMemory memory) throws Exception {
+    public Serializable run(final SlaveMemory memory) throws Exception {
         return this.realTask.run(memory);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
+    /**
+     * {@inheritDoc}
      */
-    public int compareTo(Object o) {
+    public int compareTo(final Object o) {
         if (o == null) {
             throw new NullPointerException();
         } else if (o instanceof Identifiable) {
