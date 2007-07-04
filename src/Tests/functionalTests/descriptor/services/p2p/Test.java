@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test service: P2P JVM acquisition in deployment descriptor
  *
@@ -81,7 +82,7 @@ public class Test extends FunctionalTest {
         this.process1.setParameters("-port 2900");
 
         this.process = new JVMProcessImpl(new StandardOutputMessageLogger());
-        this.process1.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
+        this.process.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
         this.process.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
         this.process.setParameters("-port 3000 -s //localhost:2900/");
