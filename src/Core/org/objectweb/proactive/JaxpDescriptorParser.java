@@ -1784,7 +1784,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     }
 
                     String nodeName = childNode.getNodeName();
-                    String nodeExpandedValue = getNodeExpandedValue(childNode);
 
                     if (nodeName.equals(MPI_LOCAL_PATH_TAG)) {
                         String path = getPath(childNode);
@@ -1793,6 +1792,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         String path = getPath(childNode);
                         mpiProcess.setRemotePath(path);
                     } else if (nodeName.equals(PROCESS_NUMBER_TAG)) {
+                        String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
                         mpiProcess.setHostsNumber(nodeExpandedValue);
                     }
                 }
