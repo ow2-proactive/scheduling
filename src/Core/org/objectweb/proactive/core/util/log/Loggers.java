@@ -172,4 +172,9 @@ public interface Loggers {
     // remote Objects
     static final public String REMOTEOBJECT = CORE + ".remoteobject";
     public static final String CLASS_SERVER = CORE + ".class_server";
+
+    // JMX
+    static final public String JMX = CORE + ".jmx";
+    static final public String JMX_MBEAN = JMX + ".mbean";
+    static final public String JMX_NOTIFICATION = JMX + ".notification";
 }
