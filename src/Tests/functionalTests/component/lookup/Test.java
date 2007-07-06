@@ -31,7 +31,6 @@
 package functionalTests.component.lookup;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -62,7 +61,6 @@ public class Test extends ComponentTest {
     }
 
     @org.junit.Test
-    @Ignore
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory typeFactory = Fractal.getTypeFactory(boot);
@@ -75,10 +73,9 @@ public class Test extends ComponentTest {
         componentA = componentFactory.newFcInstance(typeA,
                 new ControllerDescription("component-a", Constants.PRIMITIVE),
                 new ContentDescription(A.class.getName()));
-        Fractive.register(componentA,
-            UrlBuilder.buildUrlFromProperties("localhost", "componentA"));
-        Component retreived = Fractive.lookup(UrlBuilder.buildUrlFromProperties(
-                    "localhost", "componentA"));
+        String url = UrlBuilder.buildUrlFromProperties("localhost", "componentA");
+        Fractive.register(componentA, url);
+        Component retreived = Fractive.lookup(url);
         Assert.assertEquals(componentA, retreived);
     }
 }

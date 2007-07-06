@@ -48,14 +48,15 @@ public class A implements ComponentInitActive, I1 {
     public static final String COMPONENT_A_NAME = "componentA";
 
     public void initComponentActivity(Body body) {
-        try {
-            Component cmp = Fractive.getComponentRepresentativeOnThis();
-            ProActive.register(cmp,
-                UrlBuilder.buildUrlFromProperties(COMPONENT_A_LOCATION,
-                    COMPONENT_A_NAME));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //        try {
+        // getComponentRepresentativeOnThis bug here
+        //            Component cmp = Fractive.getComponentRepresentativeOnThis();
+        //            ProActive.register(cmp,
+        //                UrlBuilder.buildUrlFromProperties(COMPONENT_A_LOCATION,
+        //                    COMPONENT_A_NAME));
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
     }
 
     public Message processInputMessage(Message message) {
