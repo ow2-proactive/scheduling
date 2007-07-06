@@ -32,12 +32,15 @@ package org.objectweb.proactive.core.runtime;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.axis.NoEndPointException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.filter.DefaultFilter;
+import org.objectweb.proactive.core.filter.Filter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -165,8 +168,21 @@ public class LocalNode {
     public void terminateActiveObjects() {
     }
 
-    public ArrayList getActiveObjects() {
-        ArrayList localBodies = new ArrayList();
+    /**
+     * Returns all active objects.
+     * Returns All active objects.
+     */
+    public List<List<Object>> getActiveObjects() {
+        return this.getActiveObjects(new DefaultFilter());
+    }
+
+    /**
+     * Retuns all active objects filtered.
+     * @param filter The filter
+     * @return all active objects filtered.
+     */
+    public List<List<Object>> getActiveObjects(Filter filter) {
+        List<List<Object>> localBodies = new ArrayList<List<Object>>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
 
         if (activeObjectsId == null) {
@@ -187,17 +203,19 @@ public class LocalNode {
                     // unregister it from this ProActiveRuntime
                     activeObjectsId.remove(bodyID);
                 } else {
-                    //the body is on this runtime then return adapter and class name of the reified
-                    //object to enable the construction of stub-proxy couple.
-                    ArrayList bodyAndObjectClass = new ArrayList(2);
+                    if (filter.filter(body)) {
+                        //the body is on this runtime then return adapter and class name of the reified
+                        //object to enable the construction of stub-proxy couple.
+                        ArrayList bodyAndObjectClass = new ArrayList(2);
 
-                    //adapter
-                    bodyAndObjectClass.add(0, body.getRemoteAdapter());
+                        //adapter
+                        bodyAndObjectClass.add(0, body.getRemoteAdapter());
 
-                    //className
-                    bodyAndObjectClass.add(1,
-                        body.getReifiedObject().getClass().getName());
-                    localBodies.add(bodyAndObjectClass);
+                        //className
+                        bodyAndObjectClass.add(1,
+                            body.getReifiedObject().getClass().getName());
+                        localBodies.add(bodyAndObjectClass);
+                    }
                 }
             }
         }
