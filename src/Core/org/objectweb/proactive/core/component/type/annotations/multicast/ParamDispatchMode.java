@@ -203,7 +203,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
                 serverSideElementsType = (Class) sType;
             }
 
-            serverSideElementsType = ((Class) ((ParameterizedType) serverSideInputParameterType).getOwnerType());
+            //serverSideElementsType = ((Class) ((ParameterizedType) serverSideInputParameterType).getOwnerType());
         } else {
             if (serverSideInputParameterType instanceof Class) {
                 serverSideClass = (Class) serverSideInputParameterType;
@@ -231,10 +231,10 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
             break;
         case ONE_TO_ONE:
             if (clientSideParamTypeIsParameterizedType) {
-                if (clientSideElementsType.isAssignableFrom(serverSideClass)) {
-                    result = true;
-                } else if (serverSideParamTypeIsParameterizedType) {
+                if (serverSideParamTypeIsParameterizedType) {
                     result = clientSideElementsType.isAssignableFrom(serverSideRawType);
+                } else {
+                    result = clientSideElementsType.isAssignableFrom(serverSideClass);
                 }
             } else {
                 result = false; // maybe this constraint should be softened
