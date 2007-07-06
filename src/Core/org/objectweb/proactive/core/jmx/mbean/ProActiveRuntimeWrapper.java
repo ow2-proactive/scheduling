@@ -11,13 +11,17 @@ import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     implements ProActiveRuntimeWrapperMBean {
+    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private ProActiveRuntime runtime;
     private transient ObjectName objectName;
     private long counter = 0;
@@ -68,7 +72,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     }
 
     public void addProActiveEventListener() {
-        System.out.println("[Runtime : addProActiveEventListener]");
+        logger.debug("[Runtime : addProActiveEventListener]");
         // BodyEventListener
         // LocalBodyStore.getInstance().addBodyEventListener(this);
         // FutureEventListener
@@ -83,11 +87,10 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     }
 
     public void sendNotification(String type, Object userData) {
-        System.out.print("[" + type + "] ");
         ObjectName source = getObjectName();
+        logger.debug("[" + type +
+            "]\n[ProActiveRuntimeWrapper.sendNotification] source=" + source);
         //NotificationSource source = new NotificationSource(objectName, url);
-        System.out.println("[ProActiveRuntimeWrapper.sendNotification] source=" +
-            source);
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
         this.sendNotification(notification);

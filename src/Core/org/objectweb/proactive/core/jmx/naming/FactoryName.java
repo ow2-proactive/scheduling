@@ -3,8 +3,11 @@ package org.objectweb.proactive.core.jmx.naming;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -12,6 +15,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @author ProActiveRuntime
  */
 public class FactoryName {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
     public static final String OS = "java.lang:type=OperatingSystem";
     public static final String NODE_TYPE = "Node";
     public static final String NODE = "org.objectweb.proactive.core.node:type=" +
@@ -37,11 +41,9 @@ public class FactoryName {
             oname = new ObjectName(FactoryName.AO + ", id=" +
                     id.toString().replace(':', '-'));
         } catch (MalformedObjectNameException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the objectName of the active object", e);
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the objectName of the active object", e);
         }
         return oname;
     }
@@ -67,11 +69,9 @@ public class FactoryName {
                     runtimeUrl.replace(':', '-') + ", nodeName=" +
                     nodeName.replace(':', '-'));
         } catch (MalformedObjectNameException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the objectName of the node", e);
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the objectName of the node", e);
         }
         return oname;
     }
@@ -94,11 +94,9 @@ public class FactoryName {
             oname = new ObjectName(FactoryName.RUNTIME + ",url=" +
                     url.replace(':', '-'));
         } catch (MalformedObjectNameException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the objectName of the runtime", e);
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the objectName of the runtime", e);
         }
         return oname;
     }

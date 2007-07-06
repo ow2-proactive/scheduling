@@ -10,8 +10,11 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 
 
@@ -22,6 +25,8 @@ import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
  */
 public class JMXNotificationListener implements NotificationListener,
     ProActiveInternalObject, Serializable {
+    private Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
+
     public JMXNotificationListener() {
         // Empty Constructor
     }
@@ -40,11 +45,11 @@ public class JMXNotificationListener implements NotificationListener,
                 (NotificationListener) ProActive.getStubOnThis(), filter,
                 handback);
         } catch (InstanceNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Doesn't find the object name " + oname +
+                " during the registration", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Doesn't subscribe the JMX Notification listener to the Notifications",
+                e);
         }
     }
 
@@ -64,14 +69,13 @@ public class JMXNotificationListener implements NotificationListener,
                     handback);
             }
         } catch (InstanceNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Doesn't find the object name " + oname +
+                " during the registration", e);
         } catch (ListenerNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Doesn't find the Notification Listener", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't unsubscribe the JMX Notification listener to the Notifications",
+                e);
         }
     }
 

@@ -8,11 +8,14 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 import org.objectweb.proactive.extensions.jmx.client.ClientConnector;
 
@@ -29,6 +32,7 @@ import org.objectweb.proactive.extensions.jmx.client.ClientConnector;
  * @see org.objectweb.proactive.core.jmx.server.ServerConnector
  */
 public class JMXNotificationManager implements NotificationListener {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
 
     /**
      * To find the connection for a given server
@@ -63,11 +67,11 @@ public class JMXNotificationManager implements NotificationListener {
             this.notificationlitener = (JMXNotificationListener) ProActive.newActive(JMXNotificationListener.class.getName(),
                     new Object[] {  });
         } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the JMX notifications listener active object",
+                e);
         } catch (NodeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Can't create the JMX notifications listener active object",
+                e);
         }
     }
 
@@ -137,8 +141,8 @@ public class JMXNotificationManager implements NotificationListener {
 
         // No listener listen this objectName, so we display an error message.
         if (notificationListeners == null) {
-            System.err.println(
-                "JMXNotificationManager.unsubscribe() ObjectName non connu");
+            logger.warn(
+                "JMXNotificationManager.unsubscribe() ObjectName not known");
             return;
         }
         // We have to remove the listener.
@@ -147,8 +151,8 @@ public class JMXNotificationManager implements NotificationListener {
 
             // The listener didn't be listening this objectName, so we display an error message.
             if (!isRemoved) {
-                System.out.println(
-                    "JMXNotificationManager.unsubscribe() Listener non connu");
+                logger.warn(
+                    "JMXNotificationManager.unsubscribe() Listener not known");
             }
 
             // If there is no listeners which listen this objectName, we remove this one.
@@ -173,8 +177,8 @@ public class JMXNotificationManager implements NotificationListener {
         String type = notification.getType();
         ObjectName oname = (ObjectName) notification.getSource();
 
-        System.out.print("[" + type + "]  ");
-        System.out.println("[JMXNotificationManager] source=" + oname);
+        logger.debug("[" + type + "]\n[JMXNotificationManager] source=" +
+            oname);
 
         // The active object containing the MBean has migrated, so we have to connect to a new remote host.
         if (type.equals(NotificationType.migrationFinished)) {

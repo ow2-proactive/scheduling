@@ -30,7 +30,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class BodyWrapper extends NotificationBroadcasterSupport
     implements Serializable, BodyWrapperMBean {
-    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
+    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
 
     /** Timeout between updates */
     private long updateFrequence = 3000;
@@ -79,8 +79,8 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                         try {
                             Thread.sleep(updateFrequence);
                         } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            logger.error("The JMX notifications sender thread was interrupted",
+                                e);
                         }
                         sendNotifications();
                     }
@@ -138,7 +138,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
             this.notifications = new ConcurrentLinkedQueue<Notification>();
         }
 
-        System.out.print("[" + type + "]  ");
+        logger.debug("[" + type + "]  ");
         ObjectName source = getObjectName();
         //Object[] source = {this.objectName, this.nodeUrl};
         //NotificationSource source = new NotificationSource(objectName, nodeUrl);
@@ -147,7 +147,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                 logger.debug("Send a notification ["+ type +"] source: "+source);
         }
         */
-        System.out.println("[BodyWrapper.sendNotification] source=" + source);
+        logger.debug("[BodyWrapper.sendNotification] source=" + source);
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
 
@@ -164,7 +164,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
-        System.out.println("[Serialisation.writeObject]");
+        logger.debug("[Serialisation.writeObject]");
 
         // Send the notifications before migrates.
         if (!notifications.isEmpty()) {
@@ -177,17 +177,16 @@ public class BodyWrapper extends NotificationBroadcasterSupport
             try {
                 mbs.unregisterMBean(objectName);
             } catch (InstanceNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("The objectName " + objectName +
+                    " was not found during the serialization of the MBean", e);
             } catch (MBeanRegistrationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.error("The MBean " + objectName +
+                    " can't be unregistered from the MBean server during the serialization of the MBean",
+                    e);
             }
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Serialization of the MBean : " + objectName);
-        }
+        logger.debug("Serialization of the MBean : " + objectName);
 
         // Default Serialization
         out.defaultWriteObject();
@@ -195,7 +194,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
-        System.out.println("[Serialisation.readObject]");
+        logger.debug("[Serialisation.readObject]");
 
         in.defaultReadObject();
 
@@ -205,10 +204,8 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         }
 
         // Warning logger is transient
-        logger = ProActiveLogger.getLogger(Loggers.JMX);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Deserialization of the MBean : " + objectName);
-        }
+        logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+        logger.debug("Deserialization of the MBean : " + objectName);
 
         // Warning nodeUrl is transient
         if (nodeUrl == null) {
@@ -225,14 +222,15 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         try {
             mbs.registerMBean(this, objectName);
         } catch (InstanceAlreadyExistsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("A Mean is already registered with this objectName " +
+                objectName, e);
         } catch (MBeanRegistrationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("The MBean " + objectName +
+                " can't be registered on the MBean server during the deserialization of the MBean",
+                e);
         } catch (NotCompliantMBeanException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Execption throws during the deserialization of the MBean",
+                e);
         }
 
         new Thread() {
@@ -240,10 +238,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                     while (shouldNotify) {
                         try {
                             Thread.sleep(updateFrequence);
-                            //System.out.println("wake up");
                         } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                            logger.error("The JMX notifications sender thread was interrupted",
+                                e);
                         }
                         sendNotifications();
                     }

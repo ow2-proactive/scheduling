@@ -81,6 +81,10 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.configuration = DEBUG, CONSOLE
 #log4j.logger.proactive.remoteobject = DEBUG,CONSOLE
 
+#log4j.logger.proactive.jmx = DEBUG, CONSOLE
+#log4j.logger.proactive.jmx.mbean = DEBUG, CONSOLE
+#log4j.logger.proactive.jmx.notification = DEBUG, CONSOLE
+
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender
 log4j.appender.FILE.File=tests.log

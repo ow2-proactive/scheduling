@@ -12,6 +12,7 @@ import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -19,10 +20,14 @@ import org.objectweb.proactive.core.filter.ProActiveInternalObjectFilter;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class NodeWrapper extends NotificationBroadcasterSupport
     implements Serializable, NodeWrapperMBean {
+    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+
     //NEW
     private LocalNode localNode;
     private String runtimeUrl;
@@ -89,10 +94,10 @@ public class NodeWrapper extends NotificationBroadcasterSupport
     }
 
     public void sendNotification(String type, Object userData) {
-        System.out.println("[" + type + "]");
+        logger.debug("[" + type + "]");
         ObjectName source = getObjectName();
         //NotificationSource source = new NotificationSource(objectName, nodeUrl);
-        System.out.println("[NodeWrapper.sendNotification] source=" + source);
+        logger.debug("[NodeWrapper.sendNotification] source=" + source);
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
         sendNotification(notification);
