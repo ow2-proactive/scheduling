@@ -15,7 +15,6 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -25,35 +24,45 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- *
+ * Implementation of a BodyWrapperMBean
  * @author ProActive Team
  */
 public class BodyWrapper extends NotificationBroadcasterSupport
     implements Serializable, BodyWrapperMBean {
+
+    /** JMX Logger */
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
-
-    /** Timeout between updates */
-    private long updateFrequence = 3000;
-    private transient ConcurrentLinkedQueue<Notification> notifications;
-    private boolean shouldNotify = true;
-
-    /** Unique id of the active object */
-    private UniqueID id;
-
-    /** Body of the active object */
-    private transient Body body;
 
     /** ObjectName of this MBean */
     private transient ObjectName objectName;
 
-    /** */
-    private Boolean listening = false;
+    /** Unique id of the active object */
+    private UniqueID id;
 
-    /** The url of node containing this active object. */
+    /** The body wrapped in this MBean */
+    private AbstractBody body;
+
+    /** The url of node containing this active object */
     private transient String nodeUrl;
+
+    /** The name of the body of the active object */
+    private String bodyName;
+
+    // -- JMX Datas --
+
+    /** To know if we have to send the JMX notifications */
+    private boolean shouldNotify = true;
+
+    /** Timeout between updates */
+    private long updateFrequence = 3000;
 
     /** Used by the JMX notifications */
     private long counter = 1;
+
+    /** A list of jmx notifications.
+     * The current MBean sends a list of notifications in order to not overload the network
+     */
+    private transient ConcurrentLinkedQueue<Notification> notifications;
 
     public BodyWrapper() {
 
@@ -67,12 +76,65 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      */
     public BodyWrapper(ObjectName oname, AbstractBody body) {
         this.objectName = oname;
-        this.body = body;
         this.id = body.getID();
-
         this.nodeUrl = body.getNodeURL();
-        this.notifications = new ConcurrentLinkedQueue<Notification>();
+        this.body = body;
 
+        this.notifications = new ConcurrentLinkedQueue<Notification>();
+        // launchNotificationsThread();
+    }
+
+    public UniqueID getID() {
+        return this.id;
+    }
+
+    public String getName() {
+        if (this.bodyName == null) {
+            this.bodyName = this.body.getName();
+        }
+        return this.bodyName;
+    }
+
+    public ObjectName getObjectName() {
+        return this.objectName;
+    }
+
+    public String getNodeUrl() {
+        return this.nodeUrl;
+    }
+
+    public void sendNotification(String type) {
+        this.sendNotification(type, null);
+    }
+
+    public void sendNotification(String type, Object userData) {
+        ObjectName source = getObjectName();
+        if (logger.isDebugEnabled()) {
+            logger.debug("[" + type +
+                "]\n[BodyWrapper.sendNotification] source=" + source);
+        }
+
+        Notification notification = new Notification(type, source, counter++);
+        notification.setUserData(userData);
+
+        if (type.equals(NotificationType.migrationFinished)) {
+            sendNotifications();
+            sendNotification(notification);
+        } else {
+            notifications.add(notification);
+        }
+    }
+
+    //
+    // -- PRIVATE METHODS -----------------------------------------------------
+    //
+
+    /**
+     * Creates a new thread which sends JMX notifications.
+     * A BodyWrapperMBean keeps all the notifications,
+     * and the NotificationsThread sends every 'updateFrequence' a list of notifications.
+     */
+    private void launchNotificationsThread() {
         new Thread() {
                 public void run() {
                     while (shouldNotify) {
@@ -88,23 +150,10 @@ public class BodyWrapper extends NotificationBroadcasterSupport
             }.start();
     }
 
-    public UniqueID getID() {
-        return this.id;
-    }
-
-    public String getName() {
-        String name = "undefined";
-        if (body != null) {
-            name = this.body.getName();
-        }
-        return name;
-    }
-
-    public ObjectName getObjectName() {
-        //return this.objectName;
-        return FactoryName.createActiveObjectName(id);
-    }
-
+    /**
+     * Sends
+     *
+     */
     private void sendNotifications() {
         if (notifications == null) {
             this.notifications = new ConcurrentLinkedQueue<Notification>();
@@ -112,53 +161,12 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         synchronized (notifications) {
             if (!notifications.isEmpty()) {
                 ObjectName source = getObjectName();
-
-                //Object[] source = {this.objectName, this.nodeUrl};
-                //NotificationSource source = new NotificationSource(this.objectName, this.nodeUrl);
                 Notification n = new Notification(NotificationType.unknown,
                         source, counter++);
                 n.setUserData(notifications);
                 super.sendNotification(n);
                 notifications.clear();
             }
-        }
-    }
-
-    public void sendNotification(String type) {
-        sendNotification(type, null);
-    }
-
-    public void sendNotification() {
-        Notification notification = new Notification("TEST", this, 1);
-        super.sendNotification(notification);
-    }
-
-    public void sendNotification(String type, Object userData) {
-        if (notifications == null) {
-            this.notifications = new ConcurrentLinkedQueue<Notification>();
-        }
-
-        ObjectName source = getObjectName();
-        if (logger.isDebugEnabled()) {
-            logger.debug("[" + type +
-                "]\n[BodyWrapper.sendNotification] source=" + source);
-        }
-
-        //Object[] source = {this.objectName, this.nodeUrl};
-        //NotificationSource source = new NotificationSource(objectName, nodeUrl);
-        /*
-        if(logger.isDebugEnabled()){
-        logger.debug("Send a notification ["+ type +"] source: "+source);
-        }
-         */
-        Notification notification = new Notification(type, source, counter++);
-        notification.setUserData(userData);
-
-        if (type.equals(NotificationType.migrationFinished)) {
-            sendNotifications();
-            sendNotification(notification);
-        } else {
-            notifications.add(notification);
         }
     }
 
@@ -169,8 +177,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "[Serialisation.writeObject]\nSerialization of the MBean : " +
-                objectName);
+                "[Serialisation.writeObject]\nSerialization of the MBean");
         }
 
         // Send the notifications before migrates.
@@ -199,26 +206,23 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-
-        // Warning objectName is transient
-        if (objectName == null) {
-            objectName = FactoryName.createActiveObjectName(id);
-        }
-
         // Warning logger is transient
         logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
 
-        if (logger.isDebugEnabled()) {
+        if ((logger != null) && logger.isDebugEnabled()) {
             logger.debug(
-                "[Serialisation.readObject]\nDeserialization of the MBean : " +
-                objectName);
+                "[Serialisation.readObject]\nDeserialization of the MBean");
         }
 
+        in.defaultReadObject();
+
+        // Warning objectName is transient
+        this.objectName = FactoryName.createActiveObjectName(id);
+
         // Warning nodeUrl is transient
-        if (nodeUrl == null) {
-            nodeUrl = body.getNodeURL();
-        }
+        // We get the url of the new node.
+        this.nodeUrl = this.body.getNodeURL();
+        logger.debug("BodyWrapper.readObject() nodeUrl=" + nodeUrl);
 
         // Warning notifications is transient
         if (notifications == null) {
@@ -241,18 +245,6 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                 e);
         }
 
-        new Thread() {
-                public void run() {
-                    while (shouldNotify) {
-                        try {
-                            Thread.sleep(updateFrequence);
-                        } catch (InterruptedException e) {
-                            logger.error("The JMX notifications sender thread was interrupted",
-                                e);
-                        }
-                        sendNotifications();
-                    }
-                }
-            }.start();
+        // launchNotificationsThread();
     }
 }
