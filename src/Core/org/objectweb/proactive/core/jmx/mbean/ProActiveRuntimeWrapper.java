@@ -88,8 +88,12 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
 
     public void sendNotification(String type, Object userData) {
         ObjectName source = getObjectName();
-        logger.debug("[" + type +
-            "]\n[ProActiveRuntimeWrapper.sendNotification] source=" + source);
+        if (logger.isDebugEnabled()) {
+            logger.debug("[" + type +
+                "]\n[ProActiveRuntimeWrapper.sendNotification] source=" +
+                source);
+        }
+
         //NotificationSource source = new NotificationSource(objectName, url);
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);

@@ -138,16 +138,19 @@ public class BodyWrapper extends NotificationBroadcasterSupport
             this.notifications = new ConcurrentLinkedQueue<Notification>();
         }
 
-        logger.debug("[" + type + "]  ");
         ObjectName source = getObjectName();
+        if (logger.isDebugEnabled()) {
+            logger.debug("[" + type +
+                "]\n[BodyWrapper.sendNotification] source=" + source);
+        }
+
         //Object[] source = {this.objectName, this.nodeUrl};
         //NotificationSource source = new NotificationSource(objectName, nodeUrl);
         /*
         if(logger.isDebugEnabled()){
-                logger.debug("Send a notification ["+ type +"] source: "+source);
+        logger.debug("Send a notification ["+ type +"] source: "+source);
         }
-        */
-        logger.debug("[BodyWrapper.sendNotification] source=" + source);
+         */
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
 
@@ -164,7 +167,11 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
-        logger.debug("[Serialisation.writeObject]");
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "[Serialisation.writeObject]\nSerialization of the MBean : " +
+                objectName);
+        }
 
         // Send the notifications before migrates.
         if (!notifications.isEmpty()) {
@@ -186,16 +193,12 @@ public class BodyWrapper extends NotificationBroadcasterSupport
             }
         }
 
-        logger.debug("Serialization of the MBean : " + objectName);
-
         // Default Serialization
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
-        logger.debug("[Serialisation.readObject]");
-
         in.defaultReadObject();
 
         // Warning objectName is transient
@@ -205,7 +208,12 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
         // Warning logger is transient
         logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
-        logger.debug("Deserialization of the MBean : " + objectName);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                "[Serialisation.readObject]\nDeserialization of the MBean : " +
+                objectName);
+        }
 
         // Warning nodeUrl is transient
         if (nodeUrl == null) {

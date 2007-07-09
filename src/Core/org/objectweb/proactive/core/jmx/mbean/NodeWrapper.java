@@ -94,10 +94,13 @@ public class NodeWrapper extends NotificationBroadcasterSupport
     }
 
     public void sendNotification(String type, Object userData) {
-        logger.debug("[" + type + "]");
         ObjectName source = getObjectName();
+
         //NotificationSource source = new NotificationSource(objectName, nodeUrl);
-        logger.debug("[NodeWrapper.sendNotification] source=" + source);
+        if (logger.isDebugEnabled()) {
+            logger.debug("[" + type +
+                "]\n[NodeWrapper.sendNotification] source=" + source);
+        }
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
         sendNotification(notification);
