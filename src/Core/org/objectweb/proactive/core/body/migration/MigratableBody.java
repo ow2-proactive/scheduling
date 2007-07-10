@@ -31,7 +31,13 @@
 package org.objectweb.proactive.core.body.migration;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.ListenerNotFoundException;
+import javax.management.MBeanServer;
+import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
@@ -41,6 +47,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.event.MigrationEventListener;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
@@ -178,8 +185,19 @@ public class MigratableBody extends BodyImpl implements Migratable,
             throw new MigrationException("Attempt to migrate a non active body");
         }
 
-        // check node with Manager
-        node = migrationManager.checkNode(node);
+        try {
+            // check node with Manager
+            node = migrationManager.checkNode(node);
+        } catch (MigrationException me) {
+            // JMX Notification
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.migrationExceptionThrown,
+                    me);
+            }
+
+            // End JMX Notification
+            throw me;
+        }
 
         // get the name of the node
         String saveNodeURL = nodeURL;

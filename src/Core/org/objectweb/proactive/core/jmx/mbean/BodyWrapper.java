@@ -32,6 +32,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     /** JMX Logger */
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+    private transient Logger notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
 
     /** ObjectName of this MBean */
     private transient ObjectName objectName;
@@ -109,9 +110,10 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     public void sendNotification(String type, Object userData) {
         ObjectName source = getObjectName();
-        if (logger.isDebugEnabled()) {
-            logger.debug("[" + type +
-                "]\n[BodyWrapper.sendNotification] source=" + source);
+        if (notificationsLogger.isDebugEnabled()) {
+            notificationsLogger.debug("[" + type +
+                "]#[BodyWrapper.sendNotification] source=" + source +
+                ", userData=" + userData);
         }
 
         Notification notification = new Notification(type, source, counter++);
@@ -151,8 +153,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     }
 
     /**
-     * Sends
-     *
+     * Sends a notification containing all stored notifications.
      */
     private void sendNotifications() {
         if (notifications == null) {
@@ -206,8 +207,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
-        // Warning logger is transient
+        // Warning loggers is transient
         logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+        notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
 
         if ((logger != null) && logger.isDebugEnabled()) {
             logger.debug(

@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -438,5 +439,9 @@ public class EncryptedBody implements Body, Serializable {
      */
     public long getNextSequenceID() {
         return 0;
+    }
+
+    public BodyWrapperMBean getMBean() {
+        return null;
     }
 }

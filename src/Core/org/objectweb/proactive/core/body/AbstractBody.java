@@ -265,6 +265,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
+    public BodyWrapperMBean getMBean() {
+        return this.mbean;
+    }
+
     public Collection<UniqueID> getReferences() {
         return this.gc.getReferencesID();
     }
