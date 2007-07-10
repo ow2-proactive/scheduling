@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -38,8 +39,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -51,11 +61,15 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
@@ -136,6 +150,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     /** A container for timers not migratable for the moment */
     protected transient TimerProvidable timersContainer;
 
+    // JMX
+    /** The MBean representing this body */
+    protected BodyWrapperMBean mbean;
+
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -205,6 +223,38 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             isSecurityOn = securityManager.getCertificate() != null;
             internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
+
+        // JMX registration
+        String mbeanProperty = ProActiveConfiguration.getInstance()
+                                                     .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
+        System.out.println("AbstractBody.AbstractBody()  property" +
+            mbeanProperty);
+        if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
+            if (!(reifiedObject instanceof ProActiveInternalObject)) {
+                // If the node is not a HalfBody
+                if (!nodeURL.equals("LOCAL")) {
+                    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                    ObjectName oname = FactoryName.createActiveObjectName(getID());
+                    if (!mbs.isRegistered(oname)) {
+                        mbean = new BodyWrapper(oname, this);
+                        try {
+                            mbs.registerMBean(mbean, oname);
+                        } catch (InstanceAlreadyExistsException e) {
+                            logger.error("A MBean with the object name " +
+                                oname + " already exists", e);
+                        } catch (MBeanRegistrationException e) {
+                            logger.error("Can't register the MBean of the body",
+                                e);
+                        } catch (NotCompliantMBeanException e) {
+                            logger.error("The MBean of the body is not JMX compliant",
+                                e);
+                        }
+                    }
+                }
+            }
+        }
+
+        // END JMX registration
     }
 
     public void updateReference(UniversalBodyProxy ref) {
@@ -702,6 +752,26 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.remoteBody = null;
         // unblock is thread was block
         acceptCommunication();
+
+        // JMX unregistration
+        if (mbean != null) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = mbean.getObjectName();
+            if (mbs.isRegistered(objectName)) {
+                try {
+                    mbs.unregisterMBean(objectName);
+                } catch (InstanceNotFoundException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " was not found", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " can't be unregistered from the MBean server", e);
+                }
+            }
+            this.mbean = null;
+        }
+
+        // END JMX unregistration
     }
 
     public void blockCommunication() {
@@ -977,6 +1047,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         out.defaultWriteObject();
+
+        mbean = null;
     }
 
     private void readObject(java.io.ObjectInputStream in)

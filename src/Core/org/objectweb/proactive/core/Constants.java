@@ -135,4 +135,10 @@ public interface Constants {
 
     /** this property identifies the https protocol */
     public static final String HTTPSSH_PROTOCOL_IDENTIFIER = "httpssh";
+
+    /** this property indicates to create for each ProActive object a MBeans */
+    public static final String PROPERTY_PA_JMX_MBEAN = "proactive.jmx.mbean";
+
+    /** this property indicates to send JMX notifications */
+    public static final String PROPERTY_PA_JMX_NOTIFICATION = "proactive.jmx.notification";
 }

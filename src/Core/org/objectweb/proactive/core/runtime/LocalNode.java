@@ -30,20 +30,32 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.axis.NoEndPointException;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.filter.DefaultFilter;
 import org.objectweb.proactive.core.filter.Filter;
+import org.objectweb.proactive.core.jmx.mbean.NodeWrapper;
+import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -54,6 +66,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * and should not be used outside a runtime
  */
 public class LocalNode {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private String name;
     private ArrayList<UniqueID> activeObjectsId;
     private String jobId;
@@ -61,6 +74,9 @@ public class LocalNode {
     private String virtualNodeName;
     private Properties localProperties;
     private RemoteObjectExposer roe;
+
+    // JMX MBean
+    private NodeWrapperMBean mbean;
 
     public LocalNode(String nodeName, String jobId,
         ProActiveSecurityManager securityManager, String virtualNodeName) {
@@ -87,6 +103,34 @@ public class LocalNode {
 
         roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
                 ProActiveRuntimeImpl.getProActiveRuntime());
+
+        // JMX registration
+        String mbeanProperty = ProActiveConfiguration.getInstance()
+                                                     .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
+
+        if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
+            String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                    .getURL();
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName oname = FactoryName.createNodeObjectName(runtimeUrl,
+                    nodeName);
+            if (!mbs.isRegistered(oname)) {
+                mbean = new NodeWrapper(oname, this, runtimeUrl);
+                try {
+                    mbs.registerMBean(mbean, oname);
+                } catch (InstanceAlreadyExistsException e) {
+                    logger.error("A MBean with the object name " + oname +
+                        " already exists", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("Can't register the MBean of the LocalNode", e);
+                } catch (NotCompliantMBeanException e) {
+                    logger.error("The MBean of the LocalNode is not JMX compliant",
+                        e);
+                }
+            }
+        }
+
+        // END JMX registration
     }
 
     public void activateProtocol(URI nodeURL) {
@@ -257,6 +301,26 @@ public class LocalNode {
         }
 
         roe.unregisterAll();
+
+        // JMX unregistration
+        if (mbean != null) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = this.mbean.getObjectName();
+            if (mbs.isRegistered(objectName)) {
+                try {
+                    mbs.unregisterMBean(objectName);
+                } catch (InstanceNotFoundException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " was not found", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " can't be unregistered from the MBean server", e);
+                }
+            }
+            this.mbean = null;
+        }
+
+        // END JMX unregistration
     }
 
     /**

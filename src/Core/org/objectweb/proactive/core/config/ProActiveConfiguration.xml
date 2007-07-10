@@ -58,6 +58,10 @@
  	    <prop key="proactive.scheduler.time_before_test_alive" value="3000" />
 	    <prop key="proactive.scheduler.percentage_of_resources_to_return" value="0.5" />	
 		
+		<!-- JMX PROPERTIES VALUE -->
+		<prop key="proactive.jmx.mbean" value="false" />
+		<prop key="proactive.jmx.notification" value="false" />
+
 		<!-- ***************************************************** -->
 		<!-- P2P PROPERTIES VALUE -->
 		<!-- THESE ARE DEFAULT VALUES -->

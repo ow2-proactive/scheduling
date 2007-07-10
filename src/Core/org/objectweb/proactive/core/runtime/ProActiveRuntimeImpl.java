@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -73,6 +74,10 @@ import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
 import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.jmx.mbean.JMXClassLoader;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapper;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
@@ -123,11 +128,78 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     //the Unique instance of ProActiveRuntime
     private static ProActiveRuntime proActiveRuntime;
 
+    // JMX
+    /** The MBean representing this ProActive Runtime */
+    private static ProActiveRuntimeWrapperMBean mbean;
+
     static {
         if (ProActiveConfiguration.getInstance().isForwarder()) {
             proActiveRuntime = new ProActiveRuntimeForwarderImpl();
         } else {
             proActiveRuntime = new ProActiveRuntimeImpl();
+        }
+
+        // JMX registration
+        String mbeanProperty = ProActiveConfiguration.getInstance()
+                                                     .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
+        if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
+            ClassLoader classLoader = Thread.currentThread()
+                                            .getContextClassLoader();
+            JMXClassLoader jmxClassLoader = new JMXClassLoader(classLoader);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = null;
+            try {
+                objectName = new ObjectName(
+                        "org.objectweb.proactive:type=JMXClassLoader");
+            } catch (MalformedObjectNameException e) {
+                logger.error("Can't create the objectName of the JMX ClassLoader MBean",
+                    e);
+            } catch (NullPointerException e) {
+                logger.error("Can't create the objectName of the JMX ClassLoader MBean",
+                    e);
+            }
+            try {
+                mbs.registerMBean(jmxClassLoader, objectName);
+            } catch (InstanceAlreadyExistsException e) {
+                logger.error("A MBean with the object name " + objectName +
+                    " already exists", e);
+            } catch (MBeanRegistrationException e) {
+                logger.error("Can't register the MBean of the JMX ClassLoader",
+                    e);
+            } catch (NotCompliantMBeanException e) {
+                logger.error("The MBean of the JMX ClassLoader is not JMX compliant",
+                    e);
+            }
+
+            // TODO
+            /*
+            ServerConnector connector = new ServerConnector(UrlBuilder.getNameFromUrl(
+                    proActiveRuntime.getURL()));
+            try {
+                                connector.start();
+                        } catch (IOException e) {
+                logger.error("Can't start the JMX Connector in the ProActive Runtime",e);
+                        }
+                        */
+            String runtimeUrl = proActiveRuntime.getURL();
+            objectName = FactoryName.createRuntimeObjectName(runtimeUrl);
+            if (!mbs.isRegistered(objectName)) {
+                mbean = new ProActiveRuntimeWrapper(proActiveRuntime);
+                try {
+                    mbs.registerMBean(mbean, objectName);
+                } catch (InstanceAlreadyExistsException e) {
+                    logger.error("A MBean with the object name " + objectName +
+                        " already exists", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("Can't register the MBean of the ProActive Runtime",
+                        e);
+                } catch (NotCompliantMBeanException e) {
+                    logger.error("The MBean of the ProActive Runtime is not JMX compliant",
+                        e);
+                }
+            }
+
+            // End JMX registration
         }
     }
 
@@ -216,32 +288,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //      JMX registration
-        try {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = new ObjectName(
-                    "org.objectweb.proactive.runtime:type=" +
-                    this.getInternalURL());
-            mbs.registerMBean(this, name);
-        } catch (MalformedObjectNameException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InstanceAlreadyExistsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (MBeanRegistrationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NotCompliantMBeanException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        // End JMX registration
 
         // Remote Object exporter
         this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
@@ -528,6 +574,24 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         logger.info("terminating Runtime " + getInternalURL());
 
+        // JMX unregistration
+        if (mbean != null) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = mbean.getObjectName();
+            if (mbs.isRegistered(objectName)) {
+                try {
+                    mbs.unregisterMBean(objectName);
+                } catch (InstanceNotFoundException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " was not found", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " can't be unregistered from the MBean server", e);
+                }
+            }
+            mbean = null;
+        }
+        // END JMX unregistration
         System.exit(0);
     }
 
