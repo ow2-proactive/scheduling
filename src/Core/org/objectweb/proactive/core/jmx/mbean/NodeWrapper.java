@@ -24,17 +24,27 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * Implementation of a NodeWrapper MBean.
+ * @author ProActive Team
+ */
 public class NodeWrapper extends NotificationBroadcasterSupport
     implements Serializable, NodeWrapperMBean {
-    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
 
-    //NEW
-    private LocalNode localNode;
-    private String runtimeUrl;
-    private String nodeUrl;
+    /** JMX Logger */
+    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
 
     /** ObjectName of this MBean */
     private transient ObjectName objectName;
+
+    /** The Node wrapped in this MBean */
+    private LocalNode localNode;
+
+    /** The url of the LocalNode */
+    private String nodeUrl;
+
+    /** The url of the ProActive Runtime */
+    private String runtimeUrl;
 
     /** Used by the JMX notifications */
     private long counter = 1;
@@ -45,7 +55,7 @@ public class NodeWrapper extends NotificationBroadcasterSupport
     }
 
     /**
-     *
+     * Creates a new NodeWrapper MBean, representing a Local Node.
      * @param objectName
      * @param localNode
      * @param runtimeUrl
@@ -65,7 +75,7 @@ public class NodeWrapper extends NotificationBroadcasterSupport
     }
 
     public String getURL() {
-        return nodeUrl;
+        return this.nodeUrl;
     }
 
     public List<ObjectName> getActiveObjects()
@@ -85,18 +95,17 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         return onames;
     }
 
-    public void sendNotification(String type) {
-        sendNotification(type, null);
+    public ObjectName getObjectName() {
+        return this.objectName;
     }
 
-    public ObjectName getObjectName() {
-        return objectName;
+    public void sendNotification(String type) {
+        sendNotification(type, null);
     }
 
     public void sendNotification(String type, Object userData) {
         ObjectName source = getObjectName();
 
-        //NotificationSource source = new NotificationSource(objectName, nodeUrl);
         if (logger.isDebugEnabled()) {
             logger.debug("[" + type +
                 "]\n[NodeWrapper.sendNotification] source=" + source);

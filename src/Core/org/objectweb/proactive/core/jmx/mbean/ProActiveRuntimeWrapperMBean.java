@@ -12,7 +12,7 @@ import org.objectweb.proactive.core.ProActiveException;
 
 
 /**
- * MBean representing an ProActiveRuntime.
+ * MBean representing a ProActiveRuntime.
  * @author ProActiveRuntime
  */
 public interface ProActiveRuntimeWrapperMBean {
@@ -24,8 +24,7 @@ public interface ProActiveRuntimeWrapperMBean {
     public String getURL();
 
     /**
-     * For each node of this ProActiveRuntime a new NodeWrapperBMean is created.
-     * And returns the list of ObjectName of MBeans representing the nodes of this ProActiveRuntime.
+     * Returns a list of Object Name used by the MBeans of the nodes containing in the ProActive Runtime.
      * @return
      * @throws ProActiveException
      * @throws MalformedObjectNameException
@@ -40,14 +39,21 @@ public interface ProActiveRuntimeWrapperMBean {
             MBeanRegistrationException, NotCompliantMBeanException;
 
     /**
-     * Adds a BodyEventListener, a FuturEventListener,
-     * and a NodeCreationEventListener.
+     * Sends a new notification.
+     * @param type The type of the notification. See {@link NotificationType}
      */
-    public void addProActiveEventListener();
-
     public void sendNotification(String type);
 
+    /**
+     * Sends a new notification.
+     * @param type Type of the notification. See {@link NotificationType}
+     * @param userData The user data.
+     */
     public void sendNotification(String type, Object userData);
 
+    /**
+     * Returns the object name used for this MBean.
+     * @return The object name used for this MBean.
+     */
     public ObjectName getObjectName();
 }
