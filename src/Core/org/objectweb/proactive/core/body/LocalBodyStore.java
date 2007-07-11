@@ -249,9 +249,11 @@ public class LocalBodyStore {
         // JMX Notification
         if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
             ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
-            mbean.sendNotification(NotificationType.bodyCreated,
-                new BodyNotificationData(body.getID(), body.getJobID(),
-                    body.getNodeURL(), body.getName()));
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.bodyCreated,
+                    new BodyNotificationData(body.getID(), body.getJobID(),
+                        body.getNodeURL(), body.getName()));
+            }
         }
 
         // END JMX Notification
@@ -267,9 +269,11 @@ public class LocalBodyStore {
         // JMX Notification
         if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
             ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
-            mbean.sendNotification(NotificationType.bodyDestroyed,
-                new BodyNotificationData(body.getID(), body.getJobID(),
-                    body.getNodeURL(), body.getName()));
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.bodyDestroyed,
+                    new BodyNotificationData(body.getID(), body.getJobID(),
+                        body.getNodeURL(), body.getName()));
+            }
         }
 
         // END ProActiveEvent
