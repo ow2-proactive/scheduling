@@ -178,7 +178,8 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "[Serialisation.writeObject]\nSerialization of the MBean");
+                "[Serialisation.writeObject]#Serialization of the MBean :" +
+                objectName);
         }
 
         // Send the notifications before migrates.
@@ -213,7 +214,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
         if ((logger != null) && logger.isDebugEnabled()) {
             logger.debug(
-                "[Serialisation.readObject]\nDeserialization of the MBean");
+                "[Serialisation.readObject]#Deserialization of the MBean");
         }
 
         in.defaultReadObject();

@@ -27,7 +27,8 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     implements ProActiveRuntimeWrapperMBean {
 
     /** JMX Logger */
-    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+    // private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+    private transient Logger notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
 
     /** ObjectName of this MBean */
     private transient ObjectName objectName;
@@ -88,9 +89,9 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
 
     public void sendNotification(String type, Object userData) {
         ObjectName source = getObjectName();
-        if (logger.isDebugEnabled()) {
-            logger.debug("[" + type +
-                "]\n[ProActiveRuntimeWrapper.sendNotification] source=" +
+        if (notificationsLogger.isDebugEnabled()) {
+            notificationsLogger.debug("[" + type +
+                "]#[ProActiveRuntimeWrapper.sendNotification] source=" +
                 source);
         }
 

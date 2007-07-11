@@ -33,10 +33,15 @@ package org.objectweb.proactive.core.body;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.BodyEventProducerImpl;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -236,12 +241,38 @@ public class LocalBodyStore {
             logger.warn("Body already registered in the body map");
         }
         localBodyMap.putBody(body.bodyID, body);
+
+        // ProActiveEvent
         bodyEventProducer.fireBodyCreated(body);
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+            mbean.sendNotification(NotificationType.bodyCreated,
+                new BodyNotificationData(body.getID(), body.getJobID(),
+                    body.getNodeURL(), body.getName()));
+        }
+
+        // END JMX Notification
     }
 
     void unregisterBody(AbstractBody body) {
         localBodyMap.removeBody(body.bodyID);
+
+        // ProActiveEvent
         bodyEventProducer.fireBodyRemoved(body);
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+            mbean.sendNotification(NotificationType.bodyDestroyed,
+                new BodyNotificationData(body.getID(), body.getJobID(),
+                    body.getNodeURL(), body.getName()));
+        }
+
+        // END ProActiveEvent
         if ((this.localBodyMap.size() == 0) &&
                 "true".equals(ProActiveConfiguration.getInstance()
                                                         .getProperty("proactive.exit_on_empty"))) {

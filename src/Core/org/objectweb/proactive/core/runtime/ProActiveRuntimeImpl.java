@@ -319,6 +319,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return proActiveRuntime;
     }
 
+    public static ProActiveRuntimeWrapperMBean getMBean() {
+        return mbean;
+    }
+
     //
     // -- Implements LocalProActiveRuntime  -----------------------------------------------
     //
