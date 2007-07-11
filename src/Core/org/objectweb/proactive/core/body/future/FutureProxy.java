@@ -49,6 +49,9 @@ import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.exceptions.proxy.FutureTimeoutException;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -311,6 +314,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         UniqueID id = null;
 
+        // ProActiveEvent
         // send WAIT_BY_NECESSITY event to listeners if there are any
         if (futureEventProducer != null) {
             id = ProActive.getBodyOnThis().getID();
@@ -322,6 +326,24 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 id = null;
             }
         }
+
+        // END ProActiveEvent
+
+        // JMX Notification
+        BodyWrapperMBean mbean = null;
+        UniqueID bodyId = ProActive.getBodyOnThis().getID();
+        Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
+
+        // Send notification only if ActiveObject, not for HalfBodies
+        if (body != null) {
+            mbean = body.getMBean();
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.waitByNecessity,
+                    new FutureNotificationData(bodyId, getCreatorID()));
+            }
+        }
+
+        // END JMX Notification
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
             if (time.isTimeoutElapsed()) {
@@ -335,12 +357,22 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
 
+        // ProActiveEvent
         // send RECEIVED_FUTURE_RESULT event to listeners if there are any
         if (id != null) {
             futureEventProducer.notifyListeners(id, getCreatorID(),
                 FutureEvent.RECEIVED_FUTURE_RESULT);
         }
 
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (mbean != null) {
+            mbean.sendNotification(NotificationType.receivedFutureResult,
+                new FutureNotificationData(bodyId, getCreatorID()));
+        }
+
+        // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.stopTimer(ProActive.getBodyOnThis().getID(),
                 TimerWarehouse.WAIT_BY_NECESSITY);

@@ -29,7 +29,7 @@ public class NotificationType {
 
     // --- Corresponds to the FuturEvent ---------------------------
     public final static String receivedFutureResult = "receivedFutureResult";
-    public final static String waitingForFuture = "waitingForFuture";
+    public final static String waitByNecessity = "waitByNecessity";
 
     // --- Corresponds to the NodeCreationEvent --------------------
     public final static String nodeCreated = "nodeCreated";
