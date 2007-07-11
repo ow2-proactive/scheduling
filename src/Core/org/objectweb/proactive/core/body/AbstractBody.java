@@ -978,6 +978,26 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         isActive = false;
         //We are no longer an active body
         LocalBodyStore.getInstance().unregisterBody(this);
+
+        // JMX unregistration
+        if (this.mbean != null) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName objectName = this.mbean.getObjectName();
+            if (mbs.isRegistered(objectName)) {
+                try {
+                    mbs.unregisterMBean(objectName);
+                } catch (InstanceNotFoundException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " was not found", e);
+                } catch (MBeanRegistrationException e) {
+                    logger.error("The MBean with the objectName " + objectName +
+                        " can't be unregistered from the MBean server", e);
+                }
+            }
+            this.mbean = null;
+        }
+
+        // END JMX unregistration
     }
 
     /**
