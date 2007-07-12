@@ -115,10 +115,14 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         }
 
         Request r = (Request) requestQueue.remove(0);
+
+        // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.REMOVE_REQUEST));
         }
+
+        // END ProActiveEvent
         return r;
     }
 
@@ -158,10 +162,14 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
             return r;
         }
         Request r = (Request) requestQueue.remove(requestQueue.size() - 1);
+
+        // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.REMOVE_REQUEST));
         }
+
+        // END ProActiveEvent
         return r;
     }
 
@@ -195,11 +203,14 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         }
 
         requestQueue.add(request);
+
+        // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.ADD_REQUEST));
         }
 
+        // END ProActiveEvent
         return ftres;
     }
 
@@ -214,10 +225,14 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         }
 
         requestQueue.add(0, request);
+
+        // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.ADD_REQUEST));
         }
+
+        // END ProActiveEvent
         return ftres;
     }
 
@@ -242,10 +257,13 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
             case RequestProcessor.REMOVE_AND_SERVE:
                 requestQueue.remove(i);
                 i--;
+
+                // ProActiveEvent
                 if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
                     notifyAllListeners(new RequestQueueEvent(ownerID,
                             RequestQueueEvent.REMOVE_REQUEST));
                 }
+                // END ProActiveEvent
                 body.serve(r);
                 break;
             case RequestProcessor.REMOVE:
@@ -330,10 +348,14 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
             if (requestFilter.acceptRequest(r)) {
                 if (shouldRemove) {
                     iterator.remove();
+
+                    // ProActiveEvent
                     if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
                         notifyAllListeners(new RequestQueueEvent(ownerID,
                                 RequestQueueEvent.REMOVE_REQUEST));
                     }
+
+                    // END ProActiveEvent
                 }
                 return r;
             }
@@ -366,10 +388,14 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
             if (requestFilter.acceptRequest(r)) {
                 if (shouldRemove) {
                     iterator.remove();
+
+                    // ProActiveEvent
                     if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
                         notifyAllListeners(new RequestQueueEvent(ownerID,
                                 RequestQueueEvent.REMOVE_REQUEST));
                     }
+
+                    // END ProActiveEvent
                 }
                 return r;
             }
