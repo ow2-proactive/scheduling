@@ -96,13 +96,13 @@ public interface Future extends LocalFuture {
      * Used when creating a future to track its eventual updater
      */
     public void setUpdater(UniversalBody updater);
-    
+
     /**
      * Used for monitoring the future, we ping the body that should update
      * it when available.
      */
     public UniversalBody getUpdater();
-    
+
     /**
      * To set the senderID, ie the UniqueID of the body that will send this future,
      * in case of automatic continuation.

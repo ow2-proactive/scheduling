@@ -19,8 +19,8 @@ public class A {
             }
         }
     }
-    
+
     public A wrapFuture(A a) {
-    	return a;
+        return a;
     }
 }
