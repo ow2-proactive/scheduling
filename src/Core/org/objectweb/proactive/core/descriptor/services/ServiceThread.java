@@ -42,6 +42,9 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -175,9 +178,24 @@ public class ServiceThread extends Thread {
         for (int i = 0; i < part.length; i++) {
             String url = part[i].getURL();
             String protocol = UrlBuilder.getProtocol(url);
+
+            // ProActiveEvent
             RuntimeRegistrationEvent event = new RuntimeRegistrationEvent(localRuntime,
                     RuntimeRegistrationEvent.RUNTIME_ACQUIRED, part[i],
                     vn.getName(), protocol, vm.getName());
+
+            // END ProActiveEvent
+
+            // JMX Notification
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+            if (mbean != null) {
+                RuntimeNotificationData notificationData = new RuntimeNotificationData(vn.getName(),
+                        url, protocol, vm.getName());
+                mbean.sendNotification(NotificationType.runtimeAcquired,
+                    notificationData);
+            }
+
+            // END JMX Notification
             ((RuntimeRegistrationEventListener) vn).runtimeRegistered(event);
         }
     }

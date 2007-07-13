@@ -45,4 +45,5 @@ public class NotificationType {
     public final static String runtimeUnregistered = "runtimeUnregistered";
     public final static String runtimeAcquired = "runtimeAcquired";
     public final static String forwarderRuntimeRegistered = "forwarderRuntimeRegistered";
+    public final static String runtimeDestroyed = "runtimeDestroyed";
 }

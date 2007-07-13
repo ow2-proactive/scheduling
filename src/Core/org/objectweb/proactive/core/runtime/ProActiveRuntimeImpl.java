@@ -78,6 +78,8 @@ import org.objectweb.proactive.core.jmx.mbean.JMXClassLoader;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapper;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
@@ -496,8 +498,21 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //System.out.println("thread"+Thread.currentThread().getName());
         //System.out.println(vmInformation.getVMID().toString());
         this.proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
+
+        // ProActiveEvent
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
             proActiveRuntimeDist, creatorID, creationProtocol, vmName);
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (mbean != null) {
+            RuntimeNotificationData notificationData = new RuntimeNotificationData(creatorID,
+                    proActiveRuntimeDist.getURL(), creationProtocol, vmName);
+            mbean.sendNotification(NotificationType.runtimeRegistered,
+                notificationData);
+        }
+
+        // END JMX Notification
     }
 
     /**
@@ -507,8 +522,21 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName) {
         this.proActiveRuntimeMap.remove(proActiveRuntimeUrl);
+
+        // ProActiveEvent
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_UNREGISTERED,
             proActiveRuntimeDist, creatorID, creationProtocol, vmName);
+        // END ProActiveEvent
+
+        // JMX Notification
+        if (mbean != null) {
+            RuntimeNotificationData notificationData = new RuntimeNotificationData(creatorID,
+                    proActiveRuntimeDist.getURL(), creationProtocol, vmName);
+            mbean.sendNotification(NotificationType.runtimeUnregistered,
+                notificationData);
+        }
+
+        // END JMX Notification
     }
 
     /**
@@ -577,6 +605,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         killAllNodes();
 
         logger.info("terminating Runtime " + getInternalURL());
+
+        // JMX Notification
+        if (mbean != null) {
+            mbean.sendNotification(NotificationType.runtimeDestroyed);
+        }
+
+        // END JMX Notification
 
         // JMX unregistration
         if (mbean != null) {
@@ -1238,10 +1273,21 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             return null;
         }
 
+        // ProActiveEvent
         notifyListeners(this,
             RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED,
             proActiveRuntimeDist, creatorID, null, vmName);
+        // END ProActiveEvent
 
+        // JMX Notification
+        if (mbean != null) {
+            RuntimeNotificationData notificationData = new RuntimeNotificationData(creatorID,
+                    proActiveRuntimeDist.getURL(), null, vmName);
+            mbean.sendNotification(NotificationType.forwarderRuntimeRegistered,
+                notificationData);
+        }
+
+        // END JMX Notification
         return pad.getHierarchicalProcess(vmName);
     }
 
