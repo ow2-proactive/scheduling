@@ -134,9 +134,12 @@ public class ServiceThread extends Thread {
                     for (int i = 0; i < nodes.size(); i++) {
                         Node node = (Node) nodes.get(i);
                         nodeCount++;
+
+                        // ProActiveEvent
                         ((VirtualNodeImpl) vn).nodeCreated(new NodeCreationEvent(
                                 vn, NodeCreationEvent.NODE_CREATED, node,
                                 nodeCount));
+                        // END ProActiveEvent
                         if (loggerDeployment.isInfoEnabled()) {
                             loggerDeployment.info(
                                 "Service thread just created event for node: " +

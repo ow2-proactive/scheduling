@@ -92,7 +92,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
         if (notificationsLogger.isDebugEnabled()) {
             notificationsLogger.debug("[" + type +
                 "]#[ProActiveRuntimeWrapper.sendNotification] source=" +
-                source);
+                source + ", userData=" + userData);
         }
 
         Notification notification = new Notification(type, source, counter++);

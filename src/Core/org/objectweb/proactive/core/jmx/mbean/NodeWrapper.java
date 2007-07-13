@@ -108,7 +108,8 @@ public class NodeWrapper extends NotificationBroadcasterSupport
 
         if (logger.isDebugEnabled()) {
             logger.debug("[" + type +
-                "]\n[NodeWrapper.sendNotification] source=" + source);
+                "]#[NodeWrapper.sendNotification] source=" + source +
+                ", userData=" + userData);
         }
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);

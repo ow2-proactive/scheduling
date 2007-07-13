@@ -53,7 +53,9 @@ import org.objectweb.proactive.core.filter.DefaultFilter;
 import org.objectweb.proactive.core.filter.Filter;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapper;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -301,6 +303,14 @@ public class LocalNode {
         }
 
         roe.unregisterAll();
+
+        // JMX Notification
+        ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getMBean();
+        if (runtimeMBean != null) {
+            runtimeMBean.sendNotification(NotificationType.nodeDestroyed);
+        }
+
+        // END JMX Notification
 
         // JMX unregistration
         if (mbean != null) {
