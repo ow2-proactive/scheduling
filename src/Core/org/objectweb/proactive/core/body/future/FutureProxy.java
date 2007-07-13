@@ -96,9 +96,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     protected transient boolean copyMode;
 
     /**
-     * The "evaluator" of the future. Used for its ID and for pinging it.
+     * The ID of the "evaluator" of the future.
      */
-    private UniversalBody creator;
+    private UniqueID creatorID;
 
     /**
      * ID of the future
@@ -110,6 +110,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * Unique ID of the sender (in case of automatic continuation).
      */
     protected UniqueID senderID;
+
+    /**
+     * To monitor this future, this body will be pinged.
+     * transient to explicitely document that the serialisation of
+     * this attribute is custom: in case of automatic continuation,
+     * it references the previous element in the chain
+     */
+    private transient UniversalBody updater;
 
     /**
      * The exception level in the stack in which this future is
@@ -387,16 +395,24 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         ID = l;
     }
 
-    public UniversalBody getCreator() {
-        return this.creator;
-    }
-
-    public void setCreator(UniversalBody creator) {
-        this.creator = creator;
+    public void setCreatorID(UniqueID creatorID) {
+        this.creatorID = creatorID;
     }
 
     public UniqueID getCreatorID() {
-        return this.creator.getID();
+        return this.creatorID;
+    }
+
+    public void setUpdater(UniversalBody updater) {
+        if (this.updater != null) {
+            new IllegalStateException("Updater already set to: " +
+                this.updater).printStackTrace();
+        }
+        this.updater = updater;
+    }
+
+    public UniversalBody getUpdater() {
+        return this.updater;
     }
 
     public void setSenderID(UniqueID i) {
@@ -460,6 +476,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     private synchronized void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
+        UniversalBody writtenUpdater = this.updater;
+
         if (!FuturePool.isInsideABodyForwarder()) {
             // if copy mode, no need for registering AC
             if (this.isAwaited() && !this.copyMode) {
@@ -479,6 +497,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 }
                 if (sender != null) { // else we are in a migration forwarder
                     if (continuation) {
+                        /* The written future will be updated by the writing body */
+                        writtenUpdater = ProActive.getBodyOnThis();
                         for (UniversalBody dest : FuturePool.getBodiesDestination()) {
                             sender.getFuturePool()
                                   .addAutomaticContinuation(ID, getCreatorID(),
@@ -512,7 +532,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         // Pass the id
         out.writeLong(ID);
         //Pass the creator
-        out.writeObject(creator.getRemoteAdapter());
+        out.writeObject(this.creatorID);
+        // Pass a reference to the updater
+        out.writeObject(writtenUpdater.getRemoteAdapter());
     }
 
     private synchronized void readObject(java.io.ObjectInputStream in)
@@ -520,7 +542,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         senderID = (UniqueID) in.readObject();
         target = (FutureResult) in.readObject();
         ID = (long) in.readLong();
-        creator = (UniversalBody) in.readObject();
+        creatorID = (UniqueID) in.readObject();
+        updater = (UniversalBody) in.readObject();
         // register all incoming futures, even for migration or checkpoiting
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);

@@ -23,8 +23,8 @@ public class FutureMonitoring implements Runnable {
      * For each node, the list of futures to monitor. We ping a single body in
      * each node for all of the futures from the node. This implies that the
      * outcome of the ping for a single body will be replicated on the other
-     * bodies. We only ping the creator, so we will not detect a broken
-     * automatic continuations chain.
+     * bodies. We ping the updater, so we should detect a broken automatic
+     * continuations chain.
      */
     private static final ConcurrentHashMap<String, ConcurrentLinkedQueue<FutureProxy>> futuresToMonitor =
         new ConcurrentHashMap<String, ConcurrentLinkedQueue<FutureProxy>>();
@@ -93,7 +93,7 @@ public class FutureMonitoring implements Runnable {
 
                 synchronized (fp) {
                     if (fp.isAwaited()) {
-                        body = fp.getCreator();
+                        body = fp.getUpdater();
                     }
                 }
                 if (body != null) {
@@ -145,7 +145,7 @@ public class FutureMonitoring implements Runnable {
         if (isFTEnabled()) {
             return;
         }
-        UniversalBody body = fp.getCreator();
+        UniversalBody body = fp.getUpdater();
         if (body == null) {
             new Exception("Cannot monitor this future, unknown updater body").printStackTrace();
             return;

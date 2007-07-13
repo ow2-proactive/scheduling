@@ -1387,14 +1387,6 @@ if(result_from_method == null){
       
       <itemizedlist>
         <listitem>
-          <para>Automatic continuations are not supported. If an active object
-          in an automatic continuation chain fails to propagate the update of
-          the future, potential recipients will successfully ping the original
-          creator of the future, so they will not detect the failure and will
-          stay blocked.</para>
-        </listitem>
-
-        <listitem>
           <para>The mechanism is implemented by pinging every 21 seconds an
           active object among the monitored ones. Only one active object per
           node is ever pinged, implying that the outcome for this active object

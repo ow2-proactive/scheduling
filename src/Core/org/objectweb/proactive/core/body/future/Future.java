@@ -83,9 +83,9 @@ public interface Future extends LocalFuture {
     public long getID();
 
     /**
-     * To set the creator, ie the body which created this future
+     * To set the ID of the creator, ie the body which created this future
      */
-    public void setCreator(UniversalBody creator);
+    public void setCreatorID(UniqueID creator);
 
     /**
      * To get the creatorID.
@@ -93,10 +93,16 @@ public interface Future extends LocalFuture {
     public UniqueID getCreatorID();
 
     /**
-     * To get the creator.
+     * Used when creating a future to track its eventual updater
      */
-    public UniversalBody getCreator();
-
+    public void setUpdater(UniversalBody updater);
+    
+    /**
+     * Used for monitoring the future, we ping the body that should update
+     * it when available.
+     */
+    public UniversalBody getUpdater();
+    
     /**
      * To set the senderID, ie the UniqueID of the body that will send this future,
      * in case of automatic continuation.
