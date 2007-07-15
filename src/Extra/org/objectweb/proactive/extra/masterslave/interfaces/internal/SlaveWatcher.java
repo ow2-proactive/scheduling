@@ -53,6 +53,12 @@ public interface SlaveWatcher {
     void removeSlaveToWatch(Slave slave);
 
     /**
+     * Sets the period at which ping messages are sent to the slaves <br/>
+     * @param periodMillis the new ping period
+     */
+    void setPingPeriod(long periodMillis);
+
+    /**
      * terminates the watcher's activity
      * @return true if the object terminated successfully
      */

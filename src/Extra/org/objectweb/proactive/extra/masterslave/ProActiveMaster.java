@@ -100,13 +100,15 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * Creates a remote master that will be created on top of the given Node <br>
      * Resources can be added to the master afterwards
+     * @param remoteNodeToUse this Node will be used to create the remote master
      */
     public ProActiveMaster(Node remoteNodeToUse) {
         this(remoteNodeToUse, new HashMap<String, Object>());
     }
 
     /**
-     * Creates an empty local master with an initial slave memory
+     * Creates an empty remote master that will be created on top of the given Node with an initial slave memory
+     * @param remoteNodeToUse this Node will be used to create the remote master
      * @param initialMemory initial memory that every slaves deployed by the master will have
      */
     public ProActiveMaster(Node remoteNodeToUse,
@@ -144,7 +146,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /**
-     * Creates a remote master with the URL of a descriptor and the name of a virtual node
+     * Creates an empty remote master with the URL of a descriptor and the name of a virtual node
      * The master will be created on top of a single resource deployed by this virtual node
      * @param descriptorURL url of the ProActive descriptor
      * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
@@ -154,7 +156,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /**
-     * Creates a remote master with the URL of a descriptor and the name of a virtual node
+     * Creates an empty remote master with the URL of a descriptor and the name of a virtual node
      * The master will be created on top of a single resource deployed by this virtual node
      * @param descriptorURL url of the ProActive descriptor
      * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
@@ -182,36 +184,36 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.util.Collection)
+    /**
+     * {@inheritDoc}
      */
     public void addResources(Collection<Node> nodes) {
         aomaster.addResources(nodes);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.net.URL)
+    /**
+     * {@inheritDoc}
      */
     public void addResources(URL descriptorURL) {
         aomaster.addResources(descriptorURL);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(java.net.URL, java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     public void addResources(URL descriptorURL, String virtualNodeName) {
         aomaster.addResources(descriptorURL, virtualNodeName);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#addResources(org.objectweb.proactive.core.descriptor.data.VirtualNode)
+    /**
+     * {@inheritDoc}
      */
     public void addResources(VirtualNode virtualnode) {
         aomaster.addResources(virtualnode);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#countAvailableResults()
+    /**
+     * {@inheritDoc}
      */
     public int countAvailableResults() {
         return aomaster.countAvailableResults();
@@ -244,38 +246,45 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return wrappings;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#isEmpty()
+    /**
+     * {@inheritDoc}
      */
     public boolean isEmpty() {
         return aomaster.isEmpty();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#setResultReceptionOrder(org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode)
+    /**
+     * {@inheritDoc}
+     */
+    public void setPingPeriod(long periodMillis) {
+        aomaster.setPingPeriod(periodMillis);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public void setResultReceptionOrder(
         org.objectweb.proactive.extra.masterslave.interfaces.Master.OrderingMode mode) {
         aomaster.setResultReceptionOrder(mode);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#slavepoolSize()
+    /**
+     * {@inheritDoc}
      */
     public int slavepoolSize() {
         return aomaster.slavepoolSize();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#solveAll(java.util.Collection, boolean)
+    /**
+     * {@inheritDoc}
      */
     public void solve(List<T> tasks) throws TaskAlreadySubmittedException {
         List<Long> wrappers = createIds(tasks);
         aomaster.solve(wrappers);
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#terminate(boolean)
+    /**
+     * {@inheritDoc}
      */
     public void terminate(boolean freeResources) {
         // we use here the synchronous version
@@ -283,8 +292,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         aorepository.terminate();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitAllResults()
+    /**
+     * {@inheritDoc}
      */
     public List<R> waitAllResults() throws TaskException {
         List<ResultIntern> completed = (List<ResultIntern>) ProActive.getFutureValue(aomaster.waitAllResults());
@@ -304,8 +313,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return results;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitKResults(int)
+    /**
+     * {@inheritDoc}
      */
     public List<R> waitKResults(int k)
         throws IllegalStateException, IllegalArgumentException, TaskException {
@@ -327,8 +336,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         return results;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterslave.interfaces.Master#waitOneResult()
+    /**
+     * {@inheritDoc}
      */
     public R waitOneResult() throws TaskException {
         ResultIntern completed = (ResultIntern) ProActive.getFutureValue(aomaster.waitOneResult());

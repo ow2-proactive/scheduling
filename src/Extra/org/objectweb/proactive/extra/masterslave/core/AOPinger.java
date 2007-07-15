@@ -51,7 +51,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     protected boolean terminated;
 
     /**
-     * interval when slaves are pinged
+     * interval when slaves are sent a ping message
      */
     protected long pingPeriod;
 
@@ -77,7 +77,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     }
 
     /**
-     * Creates a pinger with the given listenerr
+     * Creates a pinger with the given listener
      * @param listener object which will be notified when a slave is dead
      */
     public AOPinger(final SlaveDeadListener listener) {
@@ -137,6 +137,13 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
             }
         }
         body.terminate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setPingPeriod(long periodMillis) {
+        this.pingPeriod = periodMillis;
     }
 
     /**

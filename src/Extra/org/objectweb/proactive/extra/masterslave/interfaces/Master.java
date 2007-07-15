@@ -158,4 +158,10 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * @param mode the new mode for result gathering
      */
     void setResultReceptionOrder(OrderingMode mode);
+
+    /**
+     * Sets the period at which ping messages are sent to the slaves <br/>
+     * @param periodMillis the new ping period
+     */
+    void setPingPeriod(long periodMillis);
 }
