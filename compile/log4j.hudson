@@ -1,0 +1,14 @@
+log4j.rootLogger= INFO, CONSOLE
+log4j.logger.testsuite=INFO, CONSOLE
+log4j.logger.proactive = INFO, CONSOLE
+
+#CONSOLE uses PatternLayout
+#and displays the associated message (%m)
+#using the platform dependant separator (%n)
+#Use %M for method names, 
+#%X{hostname} for hostname and %X{runtime} for runtime url
+#see log4j documentation for details
+
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{runtime} - [%20.20c{2}] %m

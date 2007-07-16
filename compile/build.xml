@@ -399,7 +399,10 @@
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
 
-
+	<target name="junit.hudson" description="Run junit in log4j console and verbose output for hudson"> 
+		<copyfile dest="${base.dir}/compile/proactive-log4j" src="${base.dir}/compile/log4j.hudson"/>
+		<antcall target="junit"/>
+	</target>
 	<!-- clover -->
 	
 	<target name="with.clover">
