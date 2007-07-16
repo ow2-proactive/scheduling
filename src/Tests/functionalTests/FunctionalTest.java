@@ -30,8 +30,12 @@
  */
 package functionalTests;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -80,9 +84,43 @@ public class FunctionalTest {
             TimerTask timerTask = new TimerTask() {
                     @Override
                     public void run() {
+                        // 1- Advertise the failure
                         logger.warn("FunctionalTest timeout reached !");
-                        killProActive();
-                        System.err.println("Timeout reached, aborting !");
+
+                        // 2- Display jstack output
+                        // It can be useful to debug (live|dead)lock
+                        Map<String, String> pids = getPids();
+
+                        for (String pid : pids.keySet()) {
+                            System.out.println("PID: " + pid + " Command: " +
+                                pids.get(pid));
+                            System.out.println();
+
+                            try {
+                                Process p = Runtime.getRuntime()
+                                                   .exec(getJSTACKCommand() +
+                                        " " + pid);
+                                BufferedReader br = new BufferedReader(new InputStreamReader(
+                                            p.getInputStream()));
+
+                                for (String line = br.readLine(); line != null;
+                                        line = br.readLine()) {
+                                    System.out.println("\t" + line);
+                                }
+
+                                System.out.println();
+                                System.out.println(
+                                    "---------------------------------------------------------------");
+                                System.out.println();
+                                System.out.println();
+                            } catch (IOException e) {
+                                // Should not happen
+                                e.printStackTrace();
+                            }
+                        }
+
+                        // 3- That's all
+                        // Shutdown hook will be triggered to kill all remaining ProActive Runtimes
                         System.exit(12);
                     }
                 };
@@ -140,5 +178,67 @@ public class FunctionalTest {
         } else {
             System.err.println(cmd + "does not exist");
         }
+    }
+
+    /**
+     * Returns a map<PID, CommandLine> of ProActive JVMs
+     * @return
+     */
+    static public Map<String, String> getPids() {
+        HashMap<String, String> pids = new HashMap<String, String>();
+
+        try {
+            // Run JPS to list all JVMs on this machine
+            Process p = Runtime.getRuntime().exec(getJPSCommand() + " -ml");
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                        p.getInputStream()));
+
+            for (String line = br.readLine(); line != null;
+                    line = br.readLine()) {
+                // Discard all non ProActive JVM
+                if (line.contains("org.objectweb.proactive")) {
+                    String[] fields = line.split(" ", 2);
+                    pids.put(fields[0], fields[1]);
+                }
+            }
+        } catch (IOException e) {
+            // Should not happen
+            e.printStackTrace();
+        }
+        return pids;
+    }
+
+    /**
+     * Returns the command to start the jps util
+     *
+     * @return command to start jps
+     */
+    static public String getJPSCommand() {
+        return getJavaBinDir() + "jps";
+    }
+
+    /**
+     * Returns the command to start the jstack util
+     *
+     * @return command to start jstack
+     */
+    static public String getJSTACKCommand() {
+        return getJavaBinDir() + "jstack";
+    }
+
+    /**
+     * Returns the Java bin dir
+     *
+     * @return Java bin/ dir
+     */
+    static public String getJavaBinDir() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(System.getProperty("java.home"));
+        sb.append(File.separatorChar);
+        sb.append("..");
+        sb.append(File.separatorChar);
+        sb.append("bin");
+        sb.append(File.separatorChar);
+        return sb.toString();
     }
 }
