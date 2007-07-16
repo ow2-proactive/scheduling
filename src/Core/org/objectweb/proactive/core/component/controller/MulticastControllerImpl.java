@@ -384,8 +384,8 @@ public class MulticastControllerImpl extends AbstractProActiveController
                 result.put(new MethodCall(matchingMethodInServerInterface,
                         mc.getGenericTypesMapping(),
                         individualEffectiveArguments, mc.getExceptionContext()),
-                      generatedMethodCallIndex );
-//                      generatedMethodCallIndex % delegatee.size());
+                    generatedMethodCallIndex);
+                //                      generatedMethodCallIndex % delegatee.size());
                 // default is to do some round robin when nbGeneratedMethodCalls > nbReceivers
             }
         } catch (SecurityException e) {
