@@ -31,6 +31,7 @@
 package org.objectweb.proactive;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
@@ -90,6 +91,10 @@ public class Service {
     protected LifeCycleController lifeCycleController = null;
 
     //protected RequestFilterOnMethodName requestFilterOnMethodName = null;
+
+    // already checked methods
+    private HashSet<String> checkedMethodNames;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -101,6 +106,7 @@ public class Service {
     public Service(Body body) {
         this.body = body;
         this.requestQueue = body.getRequestQueue();
+        this.checkedMethodNames = new HashSet<String>();
         if (((ComponentBody) body).isComponent()) {
             try {
                 lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
@@ -753,14 +759,21 @@ public class Service {
      * @return true if the method is declared
      */
     private boolean checkMethodName(String methodName) {
-        Class reifiedClass = this.body.getReifiedObject().getClass();
-        Method[] methods = reifiedClass.getMethods();
-        for (Method m : methods) {
-            if (m.getName().equals(methodName)) {
-                return true;
+        if (this.checkedMethodNames.contains(methodName)) {
+            // the method name has already been checked
+            return true;
+        } else {
+            // check if the method is defined as public
+            Class reifiedClass = this.body.getReifiedObject().getClass();
+            Method[] methods = reifiedClass.getMethods();
+            for (Method m : methods) {
+                if (m.getName().equals(methodName)) {
+                    this.checkedMethodNames.add(methodName);
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
 
     //
