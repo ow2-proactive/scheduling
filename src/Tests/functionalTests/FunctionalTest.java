@@ -92,9 +92,9 @@ public class FunctionalTest {
                         Map<String, String> pids = getPids();
 
                         for (String pid : pids.keySet()) {
-                            System.out.println("PID: " + pid + " Command: " +
+                            System.err.println("PID: " + pid + " Command: " +
                                 pids.get(pid));
-                            System.out.println();
+                            System.err.println();
 
                             try {
                                 Process p = Runtime.getRuntime()
@@ -105,14 +105,15 @@ public class FunctionalTest {
 
                                 for (String line = br.readLine(); line != null;
                                         line = br.readLine()) {
-                                    System.out.println("\t" + line);
+                                    System.err.println("\t" + line);
                                 }
 
-                                System.out.println();
-                                System.out.println(
+                                System.err.println();
+                                System.err.println(
                                     "---------------------------------------------------------------");
-                                System.out.println();
-                                System.out.println();
+                                System.err.println();
+                                System.err.println();
+                                System.err.flush();
                             } catch (IOException e) {
                                 // Should not happen
                                 e.printStackTrace();
@@ -121,7 +122,7 @@ public class FunctionalTest {
 
                         // 3- That's all
                         // Shutdown hook will be triggered to kill all remaining ProActive Runtimes
-                        System.exit(12);
+                        System.exit(0);
                     }
                 };
 
