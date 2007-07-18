@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive;
 
-import ibis.rmi.RemoteException;
-
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
@@ -111,6 +109,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.xml.VariableContract;
+
+import ibis.rmi.RemoteException;
 
 
 /**
