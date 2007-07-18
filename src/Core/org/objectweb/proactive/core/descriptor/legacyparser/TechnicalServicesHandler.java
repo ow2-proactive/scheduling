@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.descriptor.xml;
+package org.objectweb.proactive.core.descriptor.legacyparser;
 
 import java.util.Hashtable;
 import java.util.Map;

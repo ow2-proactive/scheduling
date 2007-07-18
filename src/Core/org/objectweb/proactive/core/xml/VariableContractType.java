@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.xml;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
+import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
 
 
 /**

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive;
 
+import ibis.rmi.RemoteException;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
@@ -78,7 +80,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
-import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.descriptor.parser.JaxpDescriptorParser;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
@@ -108,8 +111,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.xml.VariableContract;
-
-import ibis.rmi.RemoteException;
 
 
 /**

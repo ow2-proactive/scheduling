@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.descriptor.xml;
+package org.objectweb.proactive.core.descriptor.legacyparser;
 
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.io.Attributes;

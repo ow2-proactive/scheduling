@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.descriptor.xml;
+package org.objectweb.proactive.core.descriptor.legacyparser;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
