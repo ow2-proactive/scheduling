@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.event.MigrationEvent;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -169,10 +171,22 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
     public UniversalBody migrateTo(Node node, Body body)
         throws MigrationException {
+        // ProActiveEvent
         if (hasListeners()) {
             notifyAllListeners(new MigrationEvent(body,
                     MigrationEvent.BEFORE_MIGRATION));
         }
+
+        // END ProActiveEvent
+
+        // JMX Notification
+        BodyWrapperMBean mbean = body.getMBean();
+        if (mbean != null) {
+            mbean.sendNotification(NotificationType.migrationAboutToStart,
+                node.getProActiveRuntime().getURL());
+        }
+
+        // End JMX Notification
         try {
             long l1 = 0;
             if (logger.isDebugEnabled()) {
@@ -199,10 +213,22 @@ public class MigrationManagerImpl extends AbstractEventProducer
                 l2 = System.currentTimeMillis();
                 logger.debug("Migration took " + (l2 - l1));
             }
+
+            // ProActiveEvent
             if (hasListeners()) {
                 notifyAllListeners(new MigrationEvent(body,
                         MigrationEvent.AFTER_MIGRATION));
             }
+
+            // END ProActiveEvent
+
+            // JMX Notification
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.migrationFinished,
+                    node.getProActiveRuntime().getURL());
+            }
+
+            // End JMX Notification
 
             // we are not on this site anymore,
             // so there is no need to send this
@@ -216,9 +242,21 @@ public class MigrationManagerImpl extends AbstractEventProducer
         } catch (Exception e) {
             MigrationException me = new MigrationException("Exception while sending the Object",
                     e.getCause());
+
+            // ProActiveEvent
             if (hasListeners()) {
                 notifyAllListeners(new MigrationEvent(me));
             }
+
+            // END ProActiveEvent
+
+            // JMX Notification
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.migrationExceptionThrown,
+                    me);
+            }
+
+            // END JMX Notification
             throw me;
         }
     }
@@ -252,11 +290,20 @@ public class MigrationManagerImpl extends AbstractEventProducer
     }
 
     public void startingAfterMigration(Body body) {
+        // ProActiveEvent
         if (hasListeners()) {
             notifyAllListeners(new MigrationEvent(body,
                     MigrationEvent.RESTARTING_AFTER_MIGRATING));
         }
 
+        // END ProActiveEvent
+
+        // JMX Notification
+        BodyWrapperMBean mbean = body.getMBean();
+        if (mbean != null) {
+            mbean.sendNotification(NotificationType.migratedBodyRestarted);
+        }
+        // END JMX Notification
         this.nbOfMigrationWithoutUpdate++;
         this.migrationCounter++;
         if (logger.isDebugEnabled()) {

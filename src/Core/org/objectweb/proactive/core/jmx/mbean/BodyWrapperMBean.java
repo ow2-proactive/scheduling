@@ -20,10 +20,16 @@ public interface BodyWrapperMBean extends Serializable {
     public UniqueID getID();
 
     /**
-     * Retuns the name of the active object.
-     * @return The name of the active object.
+     * Returns the name of the body of the active object that can be used for displaying information
+     * @return the name of the body of the active object
      */
     public String getName();
+
+    /**
+     * Returns the url of the node containing the active object.
+     * @return Returns the url of the node containing the active object
+     */
+    public String getNodeUrl();
 
     /**
      * Send a new notification.

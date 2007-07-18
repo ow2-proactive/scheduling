@@ -229,7 +229,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             result = this.asynchronousCallOnGroup(mc);
         }
 
-        /* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
+        /* A barrier of synchronisation to be sure that all calls are done before continuing the execution */
         this.threadpool.complete();
 
         if (Profiling.TIMERS_COMPILED) {

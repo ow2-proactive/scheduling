@@ -32,6 +32,7 @@ package functionalTests.activeobject.futuremonitoring;
 
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.future.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -45,18 +46,32 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private String XML_LOCATION = Test.class.getResource(
             "/functionalTests/loadbalancing/LoadBalancing.xml").getPath();
-    Node node;
+    Node node1;
+    Node node2;
 
     @org.junit.Test
     public void action() throws Exception {
+        // With AC
         boolean exception = false;
-        A a = (A) ProActive.newActive(A.class.getName(), null, this.node);
-        A future = a.crash();
+        A a1 = (A) ProActive.newActive(A.class.getName(), null, this.node1);
+        A future = a1.sleepForever();
+        A a2 = (A) ProActive.newActive(A.class.getName(), null, this.node2);
+        A ac = a2.wrapFuture(future);
+        a2.crash();
+        try {
+            System.out.println(ac);
+        } catch (FutureMonitoringPingFailureException fmpfe) {
+            exception = true;
+        }
+        assertTrue(exception);
 
-        //FutureMonitoring.monitorFuture(future);
+        // Without AC
+        exception = false;
+        A a1bis = (A) ProActive.newActive(A.class.getName(), null, this.node1);
+        a1bis.crash();
         try {
             System.out.println(future);
-        } catch (Exception e) {
+        } catch (FutureMonitoringPingFailureException fmpfe) {
             exception = true;
         }
         assertTrue(exception);
@@ -71,6 +86,7 @@ public class Test extends FunctionalTest {
         pad.activateMappings();
         VirtualNode vn = pad.getVirtualNode("VN");
         assertTrue(vn.getMinNumberOfNodes() <= vn.getNumberOfCreatedNodesAfterDeployment());
-        this.node = vn.getNode();
+        this.node1 = vn.getNode();
+        this.node2 = vn.getNode();
     }
 }

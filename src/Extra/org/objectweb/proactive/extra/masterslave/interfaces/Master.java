@@ -107,6 +107,8 @@ public interface Master<T extends Task<R>, R extends Serializable> {
 
     /**
      * Adds a list of tasks to be solved by the master <br/>
+     * <b>Warning</b>: the master keeps a track of task objects that have been submitted to it and which are currently computing.<br>
+     * Submitting two times the same task object without waiting for the result of the first computation is not allowed.
      * @param tasks list of tasks
      * @throws TaskAlreadySubmittedException if a task is submitted twice
      */
@@ -158,4 +160,10 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * @param mode the new mode for result gathering
      */
     void setResultReceptionOrder(OrderingMode mode);
+
+    /**
+     * Sets the period at which ping messages are sent to the slaves <br/>
+     * @param periodMillis the new ping period
+     */
+    void setPingPeriod(long periodMillis);
 }

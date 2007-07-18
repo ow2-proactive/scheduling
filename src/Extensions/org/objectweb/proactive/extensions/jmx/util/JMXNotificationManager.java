@@ -177,8 +177,10 @@ public class JMXNotificationManager implements NotificationListener {
         String type = notification.getType();
         ObjectName oname = (ObjectName) notification.getSource();
 
-        logger.debug("[" + type + "]\n[JMXNotificationManager] source=" +
-            oname);
+        if (logger.isDebugEnabled()) {
+            logger.debug("[" + type + "]\n[JMXNotificationManager] source=" +
+                oname);
+        }
 
         // The active object containing the MBean has migrated, so we have to connect to a new remote host.
         if (type.equals(NotificationType.migrationFinished)) {

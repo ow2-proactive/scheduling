@@ -339,7 +339,7 @@
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
 
-			<junit printsummary="yes" forkmode="perTest" showoutput="yes">
+			<junit printsummary="yes" forkmode="perTest" showoutput="no">
 				<jvmarg value="-Dproactive.dir=${base.dir}"/>
 
 
@@ -398,7 +398,6 @@
 	<target name="junit" depends="proActiveJar" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
-
 
 	<!-- clover -->
 	

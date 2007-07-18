@@ -59,10 +59,14 @@ import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NodeNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
+import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentProcess;
@@ -1604,9 +1608,23 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // wakes up Thread that are waiting for the node creation
         notifyAll();
 
+        // ProActiveEvent
         //notify all listeners that a node has been created
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, node,
             this.nbCreatedNodes);
+        // END ProActiveEvent
+
+        // JMX Notification
+        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+        if (mbean != null) {
+            NodeNotificationData notificationData = new NodeNotificationData(url,
+                    protocol, node.getNodeInformation().getHostName(),
+                    part.getURL(), this.jobID);
+            mbean.sendNotification(NotificationType.nodeCreated,
+                notificationData);
+        }
+
+        // END JMX Notification
     }
 
     private void register() {
@@ -1729,8 +1747,25 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         //notify all listeners that a node has been created
         notifyAll();
+
+        // ProActiveEvent
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, newNode,
             this.nbCreatedNodes);
+        // END ProActiveEvent
+
+        // JMX Notification
+        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+        if (mbean != null) {
+            NodeInformation nodeInfo = newNode.getNodeInformation();
+            NodeNotificationData notificationData = new NodeNotificationData(nodeInfo.getURL(),
+                    nodeInfo.getProtocol(), nodeInfo.getHostName(),
+                    ProActiveRuntimeImpl.getProActiveRuntime().getURL(),
+                    nodeInfo.getJobID());
+            mbean.sendNotification(NotificationType.nodeCreated,
+                notificationData);
+        }
+
+        // END JMX Notification
     }
 
     /**

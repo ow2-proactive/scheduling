@@ -90,9 +90,12 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         }
         idToBodyMap.put(id, b);
 
+        // ProActiveEvent
         if (hasListeners()) {
             notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
         }
+
+        // END ProActiveEvent
     }
 
     /**
@@ -108,18 +111,24 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         //add new reference
         idToBodyMap.put(id, b);
 
+        // ProActiveEvent
         if (hasListeners()) {
             notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
         }
+
+        // END ProActiveEvent
     }
 
     public synchronized void removeBody(UniqueID id) {
         UniversalBody b = idToBodyMap.remove(id);
         notifyAll();
 
+        // ProActiveEvent
         if ((b != null) && hasListeners()) {
             notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
         }
+
+        // END ProActiveEvent
     }
 
     public synchronized int size() {

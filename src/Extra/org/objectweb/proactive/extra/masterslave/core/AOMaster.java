@@ -480,6 +480,13 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
     /**
      * {@inheritDoc}
      */
+    public void setPingPeriod(long periodMillis) {
+        pinger.setPingPeriod(periodMillis);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void setResultReceptionOrder(final Master.OrderingMode mode) {
         resultQueue.setMode(mode);
     }

@@ -100,7 +100,7 @@ public class LoadBalancer implements ProActiveInternalObject {
         if (this.metric == null) {
             return;
         }
-        if (this.metric.getRanking() < (remoteRanking * LoadBalancingConstants.STEAL_FACTOR)) { // it's better than me!
+        if ((this.metric.getRanking() * LoadBalancingConstants.STEAL_FACTOR) < remoteRanking) { // it's better than me!
             sendActiveObjectsTo(remoteNode);
         }
     }
@@ -117,7 +117,7 @@ public class LoadBalancer implements ProActiveInternalObject {
 
     /**
      * This method sends an active object to a destiny, choosing the active objects
-     * whom don't implement <code>ProActiveInternalObject</code> and having the shortest queue.
+     * which don't implement <code>ProActiveInternalObject</code> and having the shortest queue.
      * @param <code>destNode</code> Node destiny to send the active abject.
      * If this node is local, this method does nothing.
      * @return none

@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
 import org.objectweb.proactive.core.component.representative.ItfID;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.security.PolicyServer;
 
 
@@ -114,6 +115,12 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @return the last known version of the body of id uniqueID or null if not known
      */
     public UniversalBody checkNewLocation(UniqueID uniqueID);
+
+    /**
+     * Returns the MBean associated to this active object.
+     * @return the MBean associated to this active object.
+     */
+    public BodyWrapperMBean getMBean();
 
     /**
      * Returns the body that is the target of this shortcut for this component interface

@@ -12,7 +12,7 @@ import org.objectweb.proactive.core.ProActiveException;
 
 
 /**
- * MBean representing an node.
+ * MBean representing a Node.
  * @author ProActive Team
  */
 public interface NodeWrapperMBean {
@@ -24,8 +24,7 @@ public interface NodeWrapperMBean {
     public String getURL();
 
     /**
-     * For each active object of this node a new BodyWrapperMBean is created.
-     * And returns the list of ObjectName of MBeans representing the active objects of this node.
+     * Returns a list of Object Name used by the MBeans of the active objects containing in the Node.
      * @return The list of ObjectName of MBeans representing the active objects of this node.
      * @throws ProActiveException
      * @throws MalformedObjectNameException
@@ -40,15 +39,21 @@ public interface NodeWrapperMBean {
             MBeanRegistrationException, NotCompliantMBeanException;
 
     /**
-     * Send a new notification.
+     * Sends a new notification.
      * @param type The type of the notification. See {@link NotificationType}
      */
     public void sendNotification(String type);
 
     /**
-     * Send a new notification.
+     * Sends a new notification.
      * @param type Type of the notification. See {@link NotificationType}
      * @param userData The user data.
      */
     public void sendNotification(String type, Object userData);
+
+    /**
+     * Returns the object name used for this MBean.
+     * @return The object name used for this MBean.
+     */
+    public ObjectName getObjectName();
 }

@@ -65,7 +65,7 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
     }
 
     public void run() {
-        Object object = this.memberList.get(this.index);
+        Object object = this.memberList.get(this.index % getMemberListSize());
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
         boolean objectIsLocal = false;
 

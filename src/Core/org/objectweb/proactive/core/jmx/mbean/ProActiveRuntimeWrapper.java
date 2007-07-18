@@ -19,19 +19,38 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * Implementation of a ProActiveRuntimeWrapper MBean
+ * @author ProActive Team
+ */
 public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     implements ProActiveRuntimeWrapperMBean {
-    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
-    private ProActiveRuntime runtime;
+
+    /** JMX Logger */
+    // private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
+    private transient Logger notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
+
+    /** ObjectName of this MBean */
     private transient ObjectName objectName;
-    private long counter = 0;
+
+    /** The ProActiveRuntime wrapped in this MBean */
+    private ProActiveRuntime runtime;
+
+    /** The url of the ProActiveRuntime */
     private String url;
+
+    /** Used by the JMX notifications */
+    private long counter = 0;
 
     public ProActiveRuntimeWrapper() {
 
         /* Empty Constructor required by JMX */
     }
 
+    /**
+     * Creates a new ProActiveRuntimeWrapper MBean, representing a ProActive Runtime.
+     * @param runtime
+     */
     public ProActiveRuntimeWrapper(ProActiveRuntime runtime) {
         this.runtime = runtime;
         this.url = this.runtime.getURL();
@@ -39,7 +58,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     }
 
     public String getURL() {
-        return /*this.runtime.getURL();*/ url;
+        return this.url;
     }
 
     public ObjectName getObjectName() {
@@ -53,16 +72,9 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
         String[] nodeNames = null;
         nodeNames = this.runtime.getLocalNodeNames();
 
-        //String runtimeUrl = this.runtime.getURL();
         List<ObjectName> onames = new ArrayList<ObjectName>();
         for (int i = 0; i < nodeNames.length; i++) {
             String nodeName = nodeNames[i];
-
-            /* String host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
-            String protocol = UrlBuilder.getProtocol(runtimeUrl);
-            int port = UrlBuilder.getPortFromUrl(runtimeUrl);
-            String nodeUrl = UrlBuilder.buildUrl(host, nodeName, protocol, port);
-            */
             ObjectName oname = FactoryName.createNodeObjectName(getURL(),
                     nodeName);
 
@@ -71,29 +83,20 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
         return onames;
     }
 
-    public void addProActiveEventListener() {
-        logger.debug("[Runtime : addProActiveEventListener]");
-        // BodyEventListener
-        // LocalBodyStore.getInstance().addBodyEventListener(this);
-        // FutureEventListener
-        // FutureProxy.getFutureEventProducer().addFutureEventListener(this);
-        // NodeCreationEventListener
-        //NodeCreationEventProducer node = new NodeCreationEventProducerImpl();
-        //node.addNodeCreationEventListener(this);   	
-    }
-
     public void sendNotification(String type) {
         this.sendNotification(type, null);
     }
 
     public void sendNotification(String type, Object userData) {
         ObjectName source = getObjectName();
-        logger.debug("[" + type +
-            "]\n[ProActiveRuntimeWrapper.sendNotification] source=" + source);
-        //NotificationSource source = new NotificationSource(objectName, url);
+        if (notificationsLogger.isDebugEnabled()) {
+            notificationsLogger.debug("[" + type +
+                "]#[ProActiveRuntimeWrapper.sendNotification] source=" +
+                source + ", userData=" + userData);
+        }
+
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
         this.sendNotification(notification);
-        //notifications.add(notification);
     }
 }

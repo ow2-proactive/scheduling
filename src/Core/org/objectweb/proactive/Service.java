@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
+
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
@@ -88,6 +91,10 @@ public class Service {
     protected LifeCycleController lifeCycleController = null;
 
     //protected RequestFilterOnMethodName requestFilterOnMethodName = null;
+
+    // already checked methods
+    private HashSet<String> checkedMethodNames;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -99,6 +106,7 @@ public class Service {
     public Service(Body body) {
         this.body = body;
         this.requestQueue = body.getRequestQueue();
+        this.checkedMethodNames = new HashSet<String>();
         if (((ComponentBody) body).isComponent()) {
             try {
                 lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
@@ -197,8 +205,13 @@ public class Service {
      * The method blocks if there is no matching request until one
      * matching request is received or until the body terminates.
      * @param methodName The name of the request to serve
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void blockingServeOldest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         blockingServeOldest(new RequestFilterOnMethodName(methodName));
     }
 
@@ -224,8 +237,13 @@ public class Service {
      * Serves the oldest request for a method of name methodName.
      * If no matching request is found, the method returns with no effect.
      * @param methodName The name of the request to serve
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void serveOldest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         body.serve(requestQueue.removeOldest(methodName));
     }
 
@@ -265,8 +283,13 @@ public class Service {
      * The method blocks if there is no matching request until one
      * matching request is received or until the body terminates.
      * @param methodName The name of the request to serve
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void blockingServeYoungest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         blockingServeYoungest(new RequestFilterOnMethodName(methodName));
     }
 
@@ -304,8 +327,13 @@ public class Service {
      * Serves the youngest request for a method of name methodName.
      * If no matching request is found, the method returns with no effect.
      * @param methodName The name of the request to serve
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void serveYoungest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         body.serve(requestQueue.removeYoungest(methodName));
     }
 
@@ -326,8 +354,13 @@ public class Service {
      * no request is served.
      * All served requests are removed from the RequestQueue.
      * @param methodName The name of the request to serve
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void serveAll(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         serveAll(new RequestFilterOnMethodName(methodName));
     }
 
@@ -362,8 +395,13 @@ public class Service {
      * All requests of method name <code>methodName</code> are removed from the
      * request queue.
      * @param methodName The name of the request to serve and flush
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void flushingServeYoungest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         flushingServeYoungest(new RequestFilterOnMethodName(methodName));
     }
 
@@ -401,8 +439,13 @@ public class Service {
      * All requests of method name <code>methodName</code> are removed from the
      * request queue.
      * @param methodName The name of the request to serve and flush
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void flushingServeOldest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         flushingServeOldest(new RequestFilterOnMethodName(methodName));
     }
 
@@ -439,8 +482,13 @@ public class Service {
     /**
      * true if and only if at least one request with the given name is available
      * @return true if a request with the given name is available, false else.
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public boolean hasRequestToServe(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         return requestQueue.hasRequest(methodName);
     }
 
@@ -477,8 +525,13 @@ public class Service {
      * The request queue is unchanged by this call
      * @param methodName the name of the method to look for
      * @return the oldest matching request or null
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request getOldest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         return requestQueue.getOldest(methodName);
     }
 
@@ -525,8 +578,13 @@ public class Service {
      * The request queue is unchanged by this call
      * @param methodName the name of the method to look for
      * @return the youngest matching request or null
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request getYoungest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         return requestQueue.getYoungest(methodName);
     }
 
@@ -591,8 +649,13 @@ public class Service {
      * null unless the thread has been asked not to wait anymore.
      * @param methodName the name of the method to wait for
      * @return the oldest request of name methodName found in the queue.
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request blockingRemoveOldest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         return blockingRemoveOldest(new RequestFilterOnMethodName(methodName), 0);
     }
 
@@ -655,8 +718,13 @@ public class Service {
      * null unless the thread has been asked not to wait anymore.
      * @param methodName the name of the method to wait for
      * @return the youngest request of name methodName found in the queue.
+     * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request blockingRemoveYoungest(String methodName) {
+        if (!checkMethodName(methodName)) {
+            throw new NoSuchMethodError(methodName + " is not defined in " +
+                this.body.getReifiedObject().getClass().getName());
+        }
         return blockingRemoveYoungest(new RequestFilterOnMethodName(methodName),
             0);
     }
@@ -681,6 +749,31 @@ public class Service {
      */
     public Request blockingRemoveYoungest(long timeout) {
         return blockingRemoveYoungest(null, timeout);
+    }
+
+    /**
+     * Check if the method methodName is declared by the reified object.
+     * Note that the called method should be <i>public</i>, since only the public methods
+     * can be called on an active object.
+     * @param methodName the checked method
+     * @return true if the method is declared
+     */
+    private boolean checkMethodName(String methodName) {
+        if (this.checkedMethodNames.contains(methodName)) {
+            // the method name has already been checked
+            return true;
+        } else {
+            // check if the method is defined as public
+            Class reifiedClass = this.body.getReifiedObject().getClass();
+            Method[] methods = reifiedClass.getMethods();
+            for (Method m : methods) {
+                if (m.getName().equals(methodName)) {
+                    this.checkedMethodNames.add(methodName);
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     //
