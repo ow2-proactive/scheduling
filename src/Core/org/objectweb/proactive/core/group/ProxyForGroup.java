@@ -336,8 +336,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             }
         }
 
-        LocalBodyStore.getInstance().setCurrentThreadBody(body);
-
+        //        LocalBodyStore.getInstance().setCurrentThreadBody(body);
         return result;
     }
 
@@ -414,7 +413,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             }
         }
 
-        LocalBodyStore.getInstance().setCurrentThreadBody(body);
+        //        LocalBodyStore.getInstance().setCurrentThreadBody(body);
     }
 
     /* ------------------- java.util.List methods------------------ */

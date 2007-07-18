@@ -118,7 +118,7 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
         // check shortcut by asking source body (LocalBodyStore.currentThreadBody)
         // if shortcut : change ref on Body
         UniversalBody newDestinationBody = LocalBodyStore.getInstance()
-                                                         .getCurrentThreadBody()
+                                                         .getContext().getBody()
                                                          .getShortcutTargetBody(new ItfID(
                     c.getComponentMetadata().getComponentInterfaceName(),
                     ((UniversalBodyProxy) bodyProxyDelegatee).getBody().getID()));

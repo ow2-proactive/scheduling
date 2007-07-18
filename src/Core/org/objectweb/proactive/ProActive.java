@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
@@ -1871,7 +1872,18 @@ public class ProActive {
      *     this method.
      */
     public static Body getBodyOnThis() {
-        return LocalBodyStore.getInstance().getCurrentThreadBody();
+        return LocalBodyStore.getInstance().getContext().getBody();
+    }
+
+    /**
+     * Return the current execution context for the calling thread. The execution context
+     * contains a reference to the body associated to this thread, and some informations about
+     * the currently served request if any.
+     * @return the current execution context associated to the calling thread.
+     * @see org.objectweb.proactive.core.body.Context
+     */
+    public static Context getContext() {
+        return LocalBodyStore.getInstance().getContext();
     }
 
     /**

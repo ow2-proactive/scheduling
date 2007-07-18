@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -838,12 +839,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
 
+        // push the initial context for the current thread.
         // need to register as thread of the corresponding active object: this thread
         // may send looged requests or logged replies
-        LocalBodyStore.getInstance().setCurrentThreadBody(ret);
+        LocalBodyStore.getInstance().pushContext(new Context(ret, null));
         ((AbstractBody) ret).getFTManager()
          .beforeRestartAfterRecovery(ckpt.getCheckpointInfo(), inc);
-        LocalBodyStore.getInstance().setCurrentThreadBody(null);
+        // remove context for the current thread
+        LocalBodyStore.getInstance().popContext();
 
         // register the body
         this.registerBody(nodeName, ret);

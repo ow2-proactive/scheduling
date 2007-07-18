@@ -68,6 +68,7 @@ import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
@@ -393,7 +394,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 TimerWarehouse.startTimer(bodyID, TimerWarehouse.SERVE);
                 // TimerWarehouse.startTimerWithInfos(bodyID, TimerWarehouse.SERVE, request.getMethodName());        	
             }
+            // push the new context
+            LocalBodyStore.getInstance()
+                          .pushContext(new Context(BodyImpl.this, request));
             serveInternal(request);
+            LocalBodyStore.getInstance().popContext();
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.stopTimer(bodyID, TimerWarehouse.SERVE);
                 //TimerWarehouse.stopTimerWithInfos(bodyID, TimerWarehouse.SERVE, request.getMethodName());        		

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.group;
 import java.util.Vector;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -66,7 +67,8 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
 
     public void run() {
         Object object = this.memberList.get(this.index % getMemberListSize());
-        LocalBodyStore.getInstance().setCurrentThreadBody(body);
+        // push an initial context for this thread
+        LocalBodyStore.getInstance().pushContext(new Context(body, null));
         boolean objectIsLocal = false;
 
         /* only do the communication (reify) if the object is not an error nor an exception */

@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -546,16 +547,16 @@ public class FuturePool extends Object implements java.io.Serializable {
 
         @Override
         public void run() {
-            // associate this thread to the owner body
+            // push an initial context for this thread : associate this thread to the owner body
             LocalBodyStore.getInstance()
-                          .setCurrentThreadBody(FuturePool.this.getOwnerBody());
+                          .pushContext(new Context(
+                    FuturePool.this.getOwnerBody(), null));
 
             while (true) {
                 // if there is no AC to do, wait...
                 waitForAC();
                 // if body is dead, kill the thread
                 if (status == KillStatus.KILL_NOW) {
-                    LocalBodyStore.getInstance().removeCurrentThreadBody();
                     break;
                 }
 
@@ -566,7 +567,6 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                     // if body has migrated, kill the thread
                     if (status == KillStatus.KILL_NOW) {
-                        LocalBodyStore.getInstance().removeCurrentThreadBody();
                         break;
                     }
 
@@ -595,7 +595,6 @@ public class FuturePool extends Object implements java.io.Serializable {
                     }
                     // else the ACthread has been killed by a call to disableAC().
                     // no need to terminate the body.
-                    LocalBodyStore.getInstance().removeCurrentThreadBody();
                     status = KillStatus.KILL_NOW;
                     break;
                 }

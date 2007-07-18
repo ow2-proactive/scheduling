@@ -231,7 +231,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                             generatedMethodCalls.get(currentMc), currentMc, body));
                 }
 
-                LocalBodyStore.getInstance().setCurrentThreadBody(body);
+                //                LocalBodyStore.getInstance().setCurrentThreadBody(body);
                 return result;
             } else {
                 Thread.dumpStack();
@@ -275,7 +275,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                         exceptionList));
             }
 
-            LocalBodyStore.getInstance().setCurrentThreadBody(body);
+            //            LocalBodyStore.getInstance().setCurrentThreadBody(body);
         }
 
         // TODO Auto-generated method stub

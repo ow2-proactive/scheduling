@@ -264,7 +264,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         ExceptionHandler.addRequest(methodCall, (FutureProxy) future);
         try {
             sendRequest(methodCall, future,
-                LocalBodyStore.getInstance().getCurrentThreadBody());
+                LocalBodyStore.getInstance().getContext().getBody());
         } catch (java.io.IOException ioe) {
             if (future != null) {
                 /* (future == null) happens on one-way calls */

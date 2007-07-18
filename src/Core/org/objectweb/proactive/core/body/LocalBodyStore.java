@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -100,8 +102,12 @@ public class LocalBodyStore {
      * events
      */
     private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
-    private ThreadLocal<Body> bodyPerThread = new ThreadLocal<Body>();
     private MetaObjectFactory halfBodyMetaObjectFactory = null;
+
+    /**
+     * Executions context associated to the calling thread.
+     */
+    private ThreadLocal<Stack<Context>> contexts = new ThreadLocal<Stack<Context>>();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -137,37 +143,57 @@ public class LocalBodyStore {
     }
 
     /**
-     * Returns the body associated with the thread calling the method. If no body is associated with the
-     * calling thread, an HalfBody is created to manage the futures.
-     * @return the body associated to the active object whose active thread is calling this method.
+     * Push a new context for the calling thread.
+     * @param c the new context
+     * @see org.objectweb.proactive.core.body.Context
      */
-    public Body getCurrentThreadBody() {
-        AbstractBody body = (AbstractBody) bodyPerThread.get();
-        if (body == null) {
-            // If we cannot find the body from the current thread we assume that the current thread
-            // is not the one from an active object. Therefore in this case we create an HalfBody
-            // that handle the futures
-            body = HalfBody.getHalfBody(this.getHalfBodyMetaObjectFactory());
-            bodyPerThread.set(body);
-            registerHalfBody(body);
+    public void pushContext(Context c) {
+        Stack<Context> s = this.contexts.get();
+        if (s == null) {
+            // cannot use initValue method
+            // see getContext()
+            s = new Stack<Context>();
+            s.push(c);
+            this.contexts.set(s);
+        } else {
+            s.push(c);
         }
-
-        return body;
     }
 
     /**
-     * Associates the body with the thread calling the method.
-     * @param body the body to associate to the active thread that calls this method.
+     * Pop the current context. The current context is popped from the stack
+     * associated to the calling thread and returned.
+     * @return the current context associated to the calling thread.
+     * @see org.objectweb.proactive.core.body.Context
      */
-    public void setCurrentThreadBody(Body body) {
-        bodyPerThread.set(body);
+    public Context popContext() {
+        return this.contexts.get().pop();
     }
 
     /**
-     * Remove the association between the body and the thread calling the method.
+     * Get the current context. The current context is not removed from the stack
+     * associated to the calling thread. If no context is associated with the
+     * calling thread, a HalfBody is created for the calling thread, and a new context
+     * is pushed for this HalfBody.
+     * @return the current context associated to the calling thread.
+     * @see org.objectweb.proactive.core.body.Context
      */
-    public void removeCurrentThreadBody() {
-        bodyPerThread.remove();
+    public Context getContext() {
+        Stack<Context> s = this.contexts.get();
+        if (s == null) {
+            // If we cannot find a context for the current thread we assume that the current thread
+            // is not the one from an active object. Therefore in this case we create an HalfBody
+            // that handle the futures, and push a new context for this HalfBody.
+            AbstractBody body = HalfBody.getHalfBody(this.getHalfBodyMetaObjectFactory());
+            s = new Stack<Context>();
+            Context c = new Context(body, null);
+            s.push(c);
+            this.contexts.set(s);
+            registerHalfBody(body);
+            return c;
+        } else {
+            return s.peek();
+        }
     }
 
     /**

@@ -1008,8 +1008,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             return;
         }
         isActive = true;
-        // we associated this body to the thread running it
-        LocalBodyStore.getInstance().setCurrentThreadBody(this);
+        // Set the initial context : we associated this body to the thread running it
+        LocalBodyStore.getInstance().pushContext(new Context(this, null));
+
         // we register in this JVM
         LocalBodyStore.getInstance().registerBody(this);
     }

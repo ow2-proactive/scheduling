@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.group;
 import java.util.Vector;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -66,7 +67,8 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
     }
 
     public void run() {
-        LocalBodyStore.getInstance().setCurrentThreadBody(body);
+        // push an initial context for this thread
+        LocalBodyStore.getInstance().pushContext(new Context(body, null));
         Object object = null;
 
         // try-catch block added by AdC for P2P

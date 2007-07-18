@@ -109,8 +109,8 @@ public class ReceptionHistory implements Serializable {
      */
     public void goToNextBase(long nextBase) {
         if (nextBase < this.base) {
-            throw new ProtocolErrorException(
-                "nextBase is lower than current base !");
+            // TODO: nextbase could be less than base ?
+            return;
         }
         int shift = (int) (nextBase - this.base);
 
