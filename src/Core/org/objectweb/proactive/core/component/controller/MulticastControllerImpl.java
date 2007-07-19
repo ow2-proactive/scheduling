@@ -310,7 +310,12 @@ public class MulticastControllerImpl extends AbstractProActiveController
                     clientSideEffectiveArguments[i], delegatee.size()));
         }
 
-        int max = dispatchSizes.get(0);
+        // -1 mean there are no suggested max dispatch size 
+        int max = -1;
+        if (dispatchSizes.size() > 0) {
+            max = dispatchSizes.get(0);
+        }
+
         for (int i = 1; i < dispatchSizes.size(); i++) {
             if (dispatchSizes.get(i) > max) {
                 max = dispatchSizes.get(i);
