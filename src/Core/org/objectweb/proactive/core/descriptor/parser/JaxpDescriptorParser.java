@@ -360,9 +360,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             String varName = varNameItem.getNodeValue();
 
-            Node varValueItem = node.getAttributes().getNamedItem("value");
-            String varValue = checkNonEmptyNode(varValueItem)
-                ? varValueItem.getNodeValue() : "";
+            String varValue = getNodeExpandedValue(node.getAttributes().getNamedItem("value"));
 
             variableContract.setDescriptorVariable(varName, varValue,
                 varContractType);
