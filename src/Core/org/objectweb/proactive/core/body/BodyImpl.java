@@ -33,6 +33,10 @@ package org.objectweb.proactive.core.body;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
@@ -68,7 +72,6 @@ import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
@@ -117,6 +120,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected RequestReceiver requestReceiver;
     protected MessageEventProducerImpl messageEventProducer;
 
+    // already checked methods
+    private HashMap<String, HashSet<List<Class>>> checkedMethodNames;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -150,6 +156,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 TimerWarehouse.startTimer(super.bodyID, TimerWarehouse.TOTAL);
             }
         }
+
+        this.checkedMethodNames = new HashMap<String, HashSet<List<Class>>>();
 
         this.requestReceiver = factory.newRequestReceiverFactory()
                                       .newRequestReceiver();
@@ -306,11 +314,30 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
     }
 
+    public boolean checkMethod(String methodName) {
+        return checkMethod(methodName, null);
+    }
+
     public void setImmediateService(String methodName) {
+        // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved 
+        //    	if (!checkMethod(methodName)) {
+        //            throw new NoSuchMethodError(methodName + " is not defined in " +
+        //                getReifiedObject().getClass().getName());
+        //        }
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
     }
 
     public void setImmediateService(String methodName, Class[] parametersTypes) {
+        // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved 
+        //    	if (!checkMethod(methodName, parametersTypes)) {
+        //    		String signature = methodName+"(";
+        //    		for (int i = 0 ; i < parametersTypes.length; i++) {
+        //    			signature+=parametersTypes[i] + ((i < parametersTypes.length - 1)?",":"");  
+        //    		}
+        //    		signature += " is not defined in " +
+        //            getReifiedObject().getClass().getName();
+        //            throw new NoSuchMethodError(signature);
+        //        }
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName,
             parametersTypes);
     }
@@ -332,6 +359,59 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     @Override
     public boolean isInImmediateService() throws IOException {
         return this.requestReceiver.isInImmediateService();
+    }
+
+    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+        if (this.checkedMethodNames.containsKey(methodName)) {
+            if (parametersTypes != null) {
+                // the method name with the right signature has already been checked
+                List<Class> parameterTlist = Arrays.asList(parametersTypes);
+                HashSet<List<Class>> signatures = this.checkedMethodNames.get(methodName);
+                if (signatures.contains(parameterTlist)) {
+                    return true;
+                }
+            } else {
+                // the method name has already been checked
+                return true;
+            }
+        }
+
+        // check if the method is defined as public
+        Class reifiedClass = getReifiedObject().getClass();
+        boolean exists = org.objectweb.proactive.core.mop.Utils.checkMethodExistence(reifiedClass,
+                methodName, parametersTypes);
+        if (exists) {
+            storeInMethodCache(methodName, parametersTypes);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Stores the given method name with the given parameters types inside our method signature cache to avoid re-testing them
+     * @param methodName name of the method
+     * @param parametersTypes parameter type list
+     */
+    private void storeInMethodCache(String methodName, Class[] parametersTypes) {
+        List<Class> parameterTlist = null;
+        if (parametersTypes != null) {
+            parameterTlist = Arrays.asList(parametersTypes);
+        }
+
+        // if we already know a version of this method, we store the new version in the existing set
+        if (this.checkedMethodNames.containsKey(methodName) &&
+                (parameterTlist != null)) {
+            HashSet<List<Class>> signatures = this.checkedMethodNames.get(methodName);
+            signatures.add(parameterTlist);
+        }
+        // otherwise, we create a set containing a single element
+        else {
+            HashSet<List<Class>> signatures = new HashSet<List<Class>>();
+            if (parameterTlist != null) {
+                signatures.add(parameterTlist);
+            }
+            checkedMethodNames.put(methodName, signatures);
+        }
     }
 
     //

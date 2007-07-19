@@ -444,4 +444,12 @@ public class EncryptedBody implements Body, Serializable {
     public BodyWrapperMBean getMBean() {
         return null;
     }
+
+    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+        return false;
+    }
+
+    public boolean checkMethod(String methodName) {
+        return false;
+    }
 }

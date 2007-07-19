@@ -324,4 +324,12 @@ public class HalfBody extends AbstractBody {
     public long getNextSequenceID() {
         return localBodyStrategy.getNextSequenceID();
     }
+
+    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
+    public boolean checkMethod(String methodName) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
 }
