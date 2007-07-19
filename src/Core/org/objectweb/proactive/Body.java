@@ -187,4 +187,26 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * the ACThread is killed even if some ACs remain in the futurepool.
      */
     public void terminate(boolean completeACs);
+
+    /**
+     * Checks if a method methodName is declared by the reified object AND the method has the same parameters as parametersTypes
+     * Note that the called method should be <i>public</i>, since only the public methods
+     * can be called on an active object.
+     * Note also that a call to checkMethod(methodName, null) is different to a call to checkMethod(methodName, new Class[0])
+     * The former means that no checking is done on the parameters, whereas the latter means that we look for a method with no parameters.
+     * @param methodName the name of the method
+     * @param parametersTypes an array of parameter types
+     * @return true if the method exists, false otherwise
+     */
+    public boolean checkMethod(String methodName, Class[] parametersTypes);
+
+    /**
+     * Checks if a method methodName is declared by the reified object
+     * Note that the called method should be <i>public</i>, since only the public methods
+     * can be called on an active object.
+     * Note that this call is strictly equivalent to checkMethod(methodName, null);
+     * @param methodName the name of the method
+     * @return true if the method exists, false otherwise
+     */
+    public boolean checkMethod(String methodName);
 }

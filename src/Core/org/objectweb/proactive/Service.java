@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
-
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
@@ -92,9 +89,6 @@ public class Service {
 
     //protected RequestFilterOnMethodName requestFilterOnMethodName = null;
 
-    // already checked methods
-    private HashSet<String> checkedMethodNames;
-
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -106,7 +100,6 @@ public class Service {
     public Service(Body body) {
         this.body = body;
         this.requestQueue = body.getRequestQueue();
-        this.checkedMethodNames = new HashSet<String>();
         if (((ComponentBody) body).isComponent()) {
             try {
                 lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
@@ -208,7 +201,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void blockingServeOldest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -240,7 +233,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void serveOldest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -286,7 +279,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void blockingServeYoungest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -330,7 +323,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void serveYoungest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -357,7 +350,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void serveAll(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -398,7 +391,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void flushingServeYoungest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -442,7 +435,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public void flushingServeOldest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -485,7 +478,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public boolean hasRequestToServe(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -528,7 +521,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request getOldest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -581,7 +574,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request getYoungest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -652,7 +645,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request blockingRemoveOldest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -721,7 +714,7 @@ public class Service {
      * @throws NoSuchMethodError if methodName is not a public method of the reified object.
      */
     public Request blockingRemoveYoungest(String methodName) {
-        if (!checkMethodName(methodName)) {
+        if (!this.body.checkMethod(methodName)) {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
@@ -749,31 +742,6 @@ public class Service {
      */
     public Request blockingRemoveYoungest(long timeout) {
         return blockingRemoveYoungest(null, timeout);
-    }
-
-    /**
-     * Check if the method methodName is declared by the reified object.
-     * Note that the called method should be <i>public</i>, since only the public methods
-     * can be called on an active object.
-     * @param methodName the checked method
-     * @return true if the method is declared
-     */
-    private boolean checkMethodName(String methodName) {
-        if (this.checkedMethodNames.contains(methodName)) {
-            // the method name has already been checked
-            return true;
-        } else {
-            // check if the method is defined as public
-            Class reifiedClass = this.body.getReifiedObject().getClass();
-            Method[] methods = reifiedClass.getMethods();
-            for (Method m : methods) {
-                if (m.getName().equals(methodName)) {
-                    this.checkedMethodNames.add(methodName);
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 
     //
