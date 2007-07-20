@@ -107,7 +107,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     //  
     // -- STATIC MEMBERS -----------------------------------------------
     //
-    private static final String INACTIVE_BODY_EXCEPTION_MESSAGE = "Cannot perform this call because this body is inactive";
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -757,15 +756,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         public BlockingRequestQueue getRequestQueue() {
-            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+            throw new InactiveBodyException();
         }
 
         public RequestQueue getHighPriorityRequestQueue() {
-            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+            throw new InactiveBodyException();
         }
 
         public Object getReifiedObject() {
-            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+            throw new InactiveBodyException();
         }
 
         public String getName() {
@@ -773,12 +772,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         public void serve(Request request) {
-            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+            throw new InactiveBodyException(request.getMethodName());
         }
 
         public void sendRequest(MethodCall methodCall, Future future,
             UniversalBody destinationBody) throws java.io.IOException {
-            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+            throw new InactiveBodyException(destinationBody.getNodeURL(),
+                destinationBody.getID(), methodCall.getName());
         }
 
         /*
@@ -790,4 +790,27 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     // end inner class LocalInactiveBody
+    private class InactiveBodyException extends ProActiveRuntimeException {
+        public InactiveBodyException() {
+            super("Cannot perform this call because body of " +
+                getReifiedObject().getClass() + "is inactive");
+        }
+
+        public InactiveBodyException(String nodeURL, UniqueID id,
+            String remoteMethodCallName) {
+            // TODO when the class of the remote reified object will be available through UniversalBody, add this info. 
+            super("Cannot send request \"" + remoteMethodCallName +
+                "\" to Body \"" + id + "\" located at " + nodeURL +
+                " because body of " + getReifiedObject().getClass() +
+                " is inactive");
+        }
+
+        public InactiveBodyException(String localMethodName) {
+            super("Cannot serve method \"" + localMethodName +
+                "\" because this body of " + getReifiedObject().getClass() +
+                " is inactive");
+        }
+    }
+
+    // end inner class InactiveBodyException
 }
