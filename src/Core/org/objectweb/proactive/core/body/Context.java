@@ -53,8 +53,8 @@ public class Context implements Serializable {
 
     /**
      * Create a new context.
-     * @param owner
-     * @param currentRequest
+     * @param owner the body associated to this context.
+     * @param currentRequest the currently served request, null if any.
      */
     public Context(Body owner, Request currentRequest) {
         this.body = owner;
@@ -62,16 +62,31 @@ public class Context implements Serializable {
     }
 
     /**
-     * @return the body associated to this context
+     * @return the body associated to this context.
      */
     public Body getBody() {
         return body;
     }
 
     /**
-     * @return the currently served request, null if any
+     * @return the currently served request, null if any.
      */
     public Request getCurrentRequest() {
         return currentRequest;
+    }
+
+    /**
+     * Pretty printing.
+     */
+    public String toString() {
+        StringBuffer res = new StringBuffer("Execution context for body " +
+                this.body.getID() + " : ");
+        if (this.currentRequest == null) {
+            res.append("no current service.");
+        } else {
+            res.append("service of " + this.currentRequest.getMethodName() +
+                " from " + this.currentRequest.getSourceBodyID());
+        }
+        return res.toString();
     }
 }

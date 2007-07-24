@@ -75,13 +75,9 @@ public class RequestReceiverImpl implements RequestReceiver,
                         request.getMethodName());
                 }
                 this.inImmediateService.incrementAndGet();
-                // push a new context for the calling/executing thread owned by the called body
-                LocalBodyStore.getInstance()
-                              .pushContext(new Context(bodyReceiver, request));
                 try {
                     bodyReceiver.serve(request);
                 } finally {
-                    LocalBodyStore.getInstance().popContext();
                     this.inImmediateService.decrementAndGet();
                 }
                 if (logger.isDebugEnabled()) {
