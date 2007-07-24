@@ -75,6 +75,9 @@ public class FileLoginModule implements LoginModule {
         String username = null;
         String password = null;
         String filePath = null;
+        String reqGroup = null;
+        String groupsFilePath = null;
+        GroupHierarchy groupsHierarchy = null;
         try {
             callbackHandler.handle(callbacks);
 
@@ -84,6 +87,10 @@ public class FileLoginModule implements LoginModule {
             username = (String) params.get("username");
             password = (String) params.get("pw");
             filePath = (String) params.get("path");
+            reqGroup = (String) params.get("group");
+            groupsFilePath = (String) params.get("groupsFilePath");
+            groupsHierarchy = new GroupHierarchy((String[]) params.get(
+                        "groupsHierarchy"));
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -113,40 +120,44 @@ public class FileLoginModule implements LoginModule {
         }
 
         // verify the username and password
-        boolean usernameExists = false;
-        boolean passwordMatch = false;
+        if (!props.containsKey(username)) {
+            throw new FailedLoginException("User Name Doesn't exists");
+        }
 
-        if (props.containsKey(username)) {
-            usernameExists = true;
+        if (!props.get(username).equals(password)) {
+            throw new FailedLoginException("Incorrect Password");
+        }
 
-            if (props.get(username).equals(password)) {
-                passwordMatch = true;
+        if (reqGroup != null) {
+            Properties groups = new Properties();
+            try {
+                groups.load(new FileInputStream(new File(groupsFilePath)));
+            } catch (FileNotFoundException e) {
+                throw new LoginException(e.toString());
+            } catch (IOException e) {
+                throw new LoginException(e.toString());
+            }
+
+            String group = (String) groups.get(username);
+            if (group == null) {
+                throw new FailedLoginException("User doesn't belong to a group");
+            }
+            if (groupsHierarchy == null) {
+                throw new FailedLoginException("Groups hierarchy not found");
+            }
+
+            if (!groupsHierarchy.isAbove(group, reqGroup)) {
+                throw new FailedLoginException("User group not matching");
             }
         }
 
-        if (usernameExists && passwordMatch) {
-            // authentication succeeded!!!
-            if (debug) {
-                System.out.println("\t\t[LDAPLoginModule] " +
-                    "authentication succeeded");
-            }
-
-            succeeded = true;
-            return true;
-        } else {
-            // authentication failed -- clean out state
-            if (debug) {
-                System.out.println("\t\t[LDAPLoginModule] " +
-                    "authentication failed");
-            }
-            succeeded = false;
-            username = null;
-            if (!usernameExists) {
-                throw new FailedLoginException("User Name Doesn't exists");
-            } else {
-                throw new FailedLoginException("Password Incorrect");
-            }
+        if (debug) {
+            System.out.println("\t\t[FileLoginModule] " +
+                "authentication succeeded");
         }
+
+        succeeded = true;
+        return true;
     }
 
     public boolean commit() throws LoginException {
@@ -162,5 +173,37 @@ public class FileLoginModule implements LoginModule {
     public boolean logout() throws LoginException {
         succeeded = false;
         return true;
+    }
+
+    private class GroupHierarchy {
+        private String[] hierarchy;
+
+        public GroupHierarchy(String[] hierarchy) {
+            this.hierarchy = hierarchy;
+        }
+
+        public boolean isAbove(String trueGroup, String reqGroup)
+            throws FailedLoginException {
+            int trueGroupLevel = groupLevel(trueGroup);
+            if (trueGroupLevel == -1) {
+                throw new FailedLoginException(
+                    "User group is not in groups hierarchy");
+            }
+            int reqGroupLevel = groupLevel(reqGroup);
+            if (reqGroupLevel == -1) {
+                throw new FailedLoginException(
+                    "Required group is not in groups hierarchy");
+            }
+            return trueGroupLevel >= reqGroupLevel;
+        }
+
+        private int groupLevel(String group) {
+            for (int i = hierarchy.length - 1; i > -1; i--) {
+                if (hierarchy[i].equals(group)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
     }
 }
