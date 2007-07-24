@@ -43,8 +43,6 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
-
-
 public class Test extends FunctionalTest {
     private String XML_LOCATION = Test.class.getResource(
             "/functionalTests/loadbalancing/LoadBalancing.xml").getPath();
