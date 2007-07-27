@@ -64,7 +64,7 @@
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
 
-	<target name="compile" depends="core, extensions, extra, util, examples" description="build the class files" />
+	<target name="compile" depends="core, extensions, extra, util, examples, tests" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -81,7 +81,23 @@
 		<delete dir="${junit.dir}" />
 	</target>
 
-
+	<target name="tests"  depends="core, extra, extensions" description="Compiles functional and unit tests">
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+		<copy toDir="${cl.test.dir}">
+			<fileset dir="${src.test.dir}">
+				<include name="functionalTests/**/*.xml" />
+				<include name="functionalTests/**/*.fractal" />
+				<include name="functionalTests/**/*.properties" />
+				<include name="functionalTests/**/*.xsd" />
+			</fileset>
+		</copy>
+	</target>
+	
 	<target name="check" depends="-init,util">
 		<macrodef name="checkDir">
 			<attribute name="dir" />
@@ -321,21 +337,7 @@
 		<element name="jvmargs" optional="yes" />
 		<element name="additionalClasspath" optional="yes" />
 		<sequential>
-			<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
-				<classpath refid="project.classpath" />
-			</javac>
-			<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
-				<classpath refid="test.classpath" />
-			</javac>
-			<copy toDir="${cl.test.dir}">
-				<fileset dir="${src.test.dir}">
-					<include name="functionalTests/**/*.xml" />
-					<include name="functionalTests/**/*.fractal" />
-					<include name="functionalTests/**/*.properties" />
-					<include name="functionalTests/**/*.xsd" />
-				</fileset>
-			</copy>
-
+			
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
 
@@ -395,7 +397,7 @@
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
 	</target>
 
-	<target name="junit" depends="proActiveJar" description="Run all non regression tests on the current host only">
+	<target name="junit" depends="tests, proActiveJar" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml"/>
 	</target>
 
