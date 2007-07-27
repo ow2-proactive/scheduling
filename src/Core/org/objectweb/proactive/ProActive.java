@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
@@ -207,6 +208,7 @@ import ibis.rmi.RemoteException;
 public class ProActive {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);
+    private final static Heartbeat hb = new Heartbeat();
 
     static {
         ProActiveConfiguration.load();
@@ -2275,6 +2277,30 @@ public class ProActive {
      */
     public static void terminateActiveObject(boolean immediate) {
         terminateActiveObject(ProActive.getStubOnThis(), immediate);
+    }
+
+    /**
+     * Ping the target active object. Note that this method does not take into account the
+     * state of the target object : pinging an inactive but reachable active object actually
+     * returns true.
+     * @param target the pinged active object.
+     * @return true if the active object is reachable, false otherwise.
+     */
+    public static boolean pingActiveObject(Object target) {
+        BodyAdapter targetedBody = null;
+        try {
+            // reified object is checked in getRemoteBody
+            targetedBody = getRemoteBody(target);
+            targetedBody.receiveFTMessage(ProActive.hb);
+            return true;
+        } catch (IOException e) {
+            if (logger.isDebugEnabled()) {
+                // id should be cached locally
+                logger.debug("Active object " + targetedBody.getID() +
+                    " is unreachable.", e);
+            }
+            return false;
+        }
     }
 
     /**
