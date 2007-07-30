@@ -64,7 +64,6 @@ import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
 import org.objectweb.proactive.core.body.rmi.RmiBodyAdapter;
 import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.GathercastController;
 import org.objectweb.proactive.core.component.controller.MembraneController;
@@ -426,15 +425,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                     controllerDesc, contentDesc, node);
             return fComponent(type, container);
         } catch (ActiveObjectCreationException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Active object creation error while creating component: ",
-                    e);
-            } else {
-                logger.info(
-                    "Active object creation error while creating component; throws exception with the following message: " +
-                    e.getMessage() +
-                    " Activate debug logger level for more information.");
-            }
+            logger.error(
+                "Active object creation error while creating component; throws exception with the following message: " +
+                e.getMessage() + ".", e);
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
             throw new InstantiationException(e.getMessage());
@@ -1027,9 +1020,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                                 System.getProperty(
                                     "components.creation.timeout")),
                             TimeUnit.SECONDS);
-                    } catch (InterruptedException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
+                    } catch (InterruptedException e) {
+                        logger.info("Interruption when waiting for thread pool termination.",
+                            e);
                     }
                     if (!exceptions.isEmpty()) {
                         InstantiationException e = new InstantiationException(
@@ -1133,17 +1126,14 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     private static class MockComponent implements Component, Serializable {
         public Object getFcInterface(String interfaceName)
             throws NoSuchInterfaceException {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Object[] getFcInterfaces() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         public Type getFcType() {
-            // TODO Auto-generated method stub
             return null;
         }
     }
