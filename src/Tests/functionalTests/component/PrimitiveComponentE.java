@@ -31,67 +31,99 @@
 package functionalTests.component;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class PrimitiveComponentE implements I1, BindingController {
     protected final static Logger logger = ProActiveLogger.getLogger(
             "functionalTestss.components");
-    I2List multicastServerItf = null;
+    public final static String I2_ITF_NAME = "i2";
+
+    // typed collective interface
+    I2 i2 = (I2) Fractive.createMulticastClientInterface(I2_ITF_NAME,
+            I2.class.getName());
+
+    // ref on the Group
+    Group i2Group = ProActiveGroup.getGroup(i2);
 
     public void bindFc(String clientItfName, Object serverItf)
         throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
-        if ("i2Multicast".equals(clientItfName) &&
-                (serverItf instanceof I2List)) {
-            multicastServerItf = (I2List) serverItf;
+        if (clientItfName.equals(I2_ITF_NAME)) {
+            i2Group.add(serverItf);
+        } else if (clientItfName.startsWith(I2_ITF_NAME)) {
+            // conformance to the Fractal API
+            i2Group.addNamedElement(clientItfName, serverItf);
         } else {
-            logger.error(
-                "Binding impossible : wrong client interface name (expected i2Multicast)");
+            throw new IllegalBindingException(
+                "Binding impossible : wrong client interface name (" +
+                serverItf + ")");
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.fractal.api.control.BindingController#listFc()
+     */
     public String[] listFc() {
-        return new String[] { "i2Multicast" };
+        Set itf_names = i2Group.keySet();
+        return (String[]) itf_names.toArray(new String[itf_names.size()]);
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
+     */
     public Object lookupFc(String clientItfName)
         throws NoSuchInterfaceException {
-        if ("i2Multicast".equals(clientItfName)) {
-            return multicastServerItf;
+        if (clientItfName.equals(I2_ITF_NAME)) {
+            return i2;
+        } else if (i2Group.containsKey(clientItfName)) {
+            return i2Group.getNamedElement(clientItfName);
         } else {
-            throw new NoSuchInterfaceException(clientItfName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("cannot find " + I2_ITF_NAME + " interface");
+            }
+            return null;
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
+     */
     public void unbindFc(String clientItfName)
         throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
-        if ("i2Multicast".equals(clientItfName)) {
-            multicastServerItf = null;
+        if (clientItfName.equals(I2_ITF_NAME)) {
+            i2Group.clear();
+            if (logger.isDebugEnabled()) {
+                logger.debug(I2_ITF_NAME + " interface unbound");
+            }
+        } else if (clientItfName.startsWith(I2_ITF_NAME)) {
+            i2Group.removeNamedElement(clientItfName);
+            if (logger.isDebugEnabled()) {
+                logger.debug(clientItfName + " interface unbound");
+            }
+        } else {
+            logger.error("client interface not found");
         }
     }
 
     public Message processInputMessage(Message message) {
-        if (multicastServerItf != null) {
-            List<Message> msgs = multicastServerItf.processOutputMessage(message.append(
-                        MESSAGE));
-
-            Message result = new Message();
-
-            for (Message msg : msgs) {
-                result.append(msg);
-            }
-
-            return result.append(MESSAGE);
+        if (i2 != null) {
+            Message msg = i2.processOutputMessage(message.append(MESSAGE));
+            return msg.append(MESSAGE);
         } else {
-            logger.error("cannot forward message (binding missing)");
+            Assert.fail("cannot forward message (binding missing)");
             message.setInvalid();
             return message;
         }
