@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx;
+package org.objectweb.proactive.core.jmx;
 
 import java.util.HashMap;
 

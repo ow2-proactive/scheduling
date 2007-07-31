@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.server;
+package org.objectweb.proactive.core.jmx.server;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -39,11 +39,11 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
-import org.objectweb.proactive.extensions.jmx.ProActiveJMXConstants;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 
 
 /**
- *  Creates and register a ProActive JMX Connector Server
+ * Creates and register a ProActive JMX Connector Server
  * @author ProActive Team
  *
  */
@@ -86,6 +86,8 @@ public class ServerConnector {
      * @throws IOException
      */
     public void start() throws IOException {
+        System.out.println("ServerConnector.start() " +
+            cs.getClass().getName());
         this.cs.start();
     }
 }

@@ -52,7 +52,9 @@ import javax.management.remote.JMXConnector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 import org.objectweb.proactive.extensions.jmx.client.ClientConnector;
 
@@ -98,7 +100,13 @@ public class TestClient implements NotificationListener, Serializable {
 
     private void connect() {
         System.out.println("Connecting to : " + this.url);
-        this.cc = new ClientConnector(this.url, "serverName");
+        String serverName = UrlBuilder.getNameFromUrl(url)
+                                      .replace(ProActiveJMXConstants.SERVER_REGISTERED_NAME +
+                "_", "");
+        if ((serverName == null) || serverName.equals("")) {
+            serverName = "serverName";
+        }
+        this.cc = new ClientConnector(this.url, serverName);
         this.cc.connect();
         this.connection = cc.getConnection();
         this.connector = cc.getConnector();

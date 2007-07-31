@@ -36,9 +36,9 @@ import javax.management.MBeanServer;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
-import org.objectweb.proactive.extensions.jmx.ProActiveJMXConstants;
 
 
 /**

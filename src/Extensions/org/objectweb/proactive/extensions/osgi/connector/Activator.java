@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.osgi.connector;
 
-import org.objectweb.proactive.extensions.jmx.server.ServerConnector;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 

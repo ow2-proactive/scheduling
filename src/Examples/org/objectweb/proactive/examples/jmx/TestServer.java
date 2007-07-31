@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.jmx;
 
 import java.io.IOException;
 
-import org.objectweb.proactive.extensions.jmx.server.ServerConnector;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 
 
 /**

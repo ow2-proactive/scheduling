@@ -42,8 +42,8 @@ import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.jmx.ProActiveJMXConstants;
 
 import com.sun.jmx.remote.util.EnvHelp;
 
