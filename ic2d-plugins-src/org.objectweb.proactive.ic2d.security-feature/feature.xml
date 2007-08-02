@@ -35,7 +35,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.objecweb.proactive.ic2d.security"
+         id="org.objectweb.proactive.ic2d.security"
          download-size="0"
          install-size="0"
          version="0.0.0"
