@@ -1,4 +1,4 @@
-package org.objecweb.proactive.ic2d.security.form;
+package org.objectweb.proactive.ic2d.security.form;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Display;

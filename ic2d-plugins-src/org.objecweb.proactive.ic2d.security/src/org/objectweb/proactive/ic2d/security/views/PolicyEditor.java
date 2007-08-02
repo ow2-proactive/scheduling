@@ -1,4 +1,4 @@
-package org.objecweb.proactive.ic2d.security.views;
+package org.objectweb.proactive.ic2d.security.views;
 
 
 import org.eclipse.jface.action.Action;

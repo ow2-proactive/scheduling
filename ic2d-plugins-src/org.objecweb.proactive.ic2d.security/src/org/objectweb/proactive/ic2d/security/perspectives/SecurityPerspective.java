@@ -28,12 +28,12 @@
  *
  * ################################################################
  */
-package org.objecweb.proactive.ic2d.security.perspectives;
+package org.objectweb.proactive.ic2d.security.perspectives;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.objecweb.proactive.ic2d.security.views.PolicyEditor;
+import org.objectweb.proactive.ic2d.security.views.PolicyEditor;
 
 
 public class SecurityPerspective implements IPerspectiveFactory {

@@ -41,6 +41,10 @@
         <property
               name="startupProgressRect"
               value="0,280,455,69"/>
+        <property
+              name="preferenceCustomization"
+              value="plugin_customization.ini">
+        </property>
      </product>
   </extension>
   

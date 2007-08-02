@@ -6,21 +6,21 @@
          point="org.eclipse.ui.views">
       <category
             name="Security"
-            id="org.objecweb.proactive.ic2d.security">
+            id="org.objectweb.proactive.ic2d.security">
       </category>
       <view
             name="Policy Editor"
             icon="icons/sample.gif"
-            category="org.objecweb.proactive.ic2d.security"
-            class="org.objecweb.proactive.ic2d.security.views.PolicyEditor"
-            id="org.objecweb.proactive.ic2d.security.views.PolicyEditor">
+            category="org.objectweb.proactive.ic2d.security"
+            class="org.objectweb.proactive.ic2d.security.views.PolicyEditor"
+            id="org.objectweb.proactive.ic2d.security.views.PolicyEditor">
       </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.objecweb.proactive.ic2d.security.form.SecurityEditorForm"
-            id="org.objecweb.proactive.ic2d.security.form.SecurityEditorForm"
+            class="org.objectweb.proactive.ic2d.security.form.SecurityEditorForm"
+            id="org.objectweb.proactive.ic2d.security.form.SecurityEditorForm"
             name="Security Editor">
       </editor>
    </extension>
@@ -59,8 +59,8 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.objecweb.proactive.ic2d.security.perspectives.SecurityPerspective"
-            id="org.objecweb.proactive.ic2d.security.perspectives.SecurityPerspective"
+            class="org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective"
+            id="org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective"
             name="ProActive Security">
       </perspective>
    </extension>
