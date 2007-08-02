@@ -57,32 +57,33 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
- /** 
-	
-    @org.junit.Test
-    public void action() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        Component comp = cf.newFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {
-                        type_factory.createFcItfType("itf",
-                            Itf.class.getName(), false, false, false)
-                    }),
-                new ControllerDescription("component", Constants.PRIMITIVE),
-                new ContentDescription(A.class.getName(), new Object[] {  }));
+    /**
 
-        Fractal.getLifeCycleController(comp).startFc();
-        // first execute an infinite loop in the component activity
-        ((Itf) comp.getFcInterface("itf")).loopQueueMethod();
-        // call an immediate service: it is executed concurrently with the activity 
-        System.err.println("MAIN: result is '" +
-            ((Itf) comp.getFcInterface("itf")).immediateMethod("a ") + "'");
-        //Fractal.getLifeCycleController(comp).startFc();
-        // call an immediate service to set the condition false and thus terminate the loopQueueMethod
-        ((Itf) comp.getFcInterface("itf")).immediateStopLoopMethod();
-        Fractal.getLifeCycleController(comp).stopFc();
-    }
-*/
+       @org.junit.Test
+       public void action() throws Exception {
+           Component boot = Fractal.getBootstrapComponent();
+           TypeFactory type_factory = Fractal.getTypeFactory(boot);
+           GenericFactory cf = Fractal.getGenericFactory(boot);
+
+           Component comp = cf.newFcInstance(type_factory.createFcType(
+                       new InterfaceType[] {
+                           type_factory.createFcItfType("itf",
+                               Itf.class.getName(), false, false, false)
+                       }),
+                   new ControllerDescription("component", Constants.PRIMITIVE),
+                   new ContentDescription(A.class.getName(), new Object[] {  }));
+
+           Fractal.getLifeCycleController(comp).startFc();
+           // first execute an infinite loop in the component activity
+           ((Itf) comp.getFcInterface("itf")).loopQueueMethod();
+           // call an immediate service: it is executed concurrently with the activity
+           System.err.println("MAIN: result is '" +
+               ((Itf) comp.getFcInterface("itf")).immediateMethod("a ") + "'");
+           //Fractal.getLifeCycleController(comp).startFc();
+           // call an immediate service to set the condition false and thus terminate the loopQueueMethod
+           ((Itf) comp.getFcInterface("itf")).immediateStopLoopMethod();
+           Fractal.getLifeCycleController(comp).stopFc();
+       }
+    */
 }
