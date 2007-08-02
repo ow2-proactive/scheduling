@@ -57,6 +57,8 @@ public class Test extends ComponentTest {
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
+ /** 
+	
     @org.junit.Test
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
@@ -82,4 +84,5 @@ public class Test extends ComponentTest {
         ((Itf) comp.getFcInterface("itf")).immediateStopLoopMethod();
         Fractal.getLifeCycleController(comp).stopFc();
     }
+*/
 }
