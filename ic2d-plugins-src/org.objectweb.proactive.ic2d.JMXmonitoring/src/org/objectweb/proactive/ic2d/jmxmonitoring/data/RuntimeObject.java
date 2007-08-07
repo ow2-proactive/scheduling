@@ -1,0 +1,167 @@
+package org.objectweb.proactive.ic2d.jmxmonitoring.data;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+
+import org.objectweb.proactive.core.util.UrlBuilder;
+
+/**
+ * Represents a Runtime in the IC2D model.
+ * @author ProActive Team
+ */
+public class RuntimeObject extends AbstractData{
+
+	private HostObject parent;
+	private String url;
+	//private ProActiveConnection connection;
+	private String hostUrlServer;
+	private String serverName;
+	
+	public RuntimeObject(HostObject parent, String url, ObjectName objectName, String hostUrl, String serverName) {
+		super(objectName);
+		this.parent = parent;
+		
+		String host = UrlBuilder.getHostNameFromUrl(url);
+		String name = UrlBuilder.getNameFromUrl(url);
+		String protocol = UrlBuilder.getProtocol(url);
+		int port = UrlBuilder.getPortFromUrl(url);
+		
+		this.url = UrlBuilder.buildUrl(host, name, protocol, port);
+		
+		this.hostUrlServer = hostUrl;
+		this.serverName = serverName;
+	}
+	
+	@Override
+	public HostObject getParent() {
+		return this.parent;
+	}
+
+	@Override
+	public void explore() {
+		//System.out.println(this);
+		findNodes();
+	}
+
+	@Override
+	public String getKey() {
+		return this.url;
+	}
+	
+	@Override
+	public String getType() {
+		return "runtime object";
+	}
+	
+	/*@Override
+	public ProActiveConnection getConnection(){
+		return this.connection;
+	}*/
+	
+	@Override
+	protected String getHostUrlServer(){
+		return this.hostUrlServer;
+	}
+	
+	@Override
+	protected String getServerName(){
+		return this.serverName;
+	}
+	
+	/**
+	 * Returns the url of this object.
+	 * @return An url.
+	 */
+	public String getUrl(){
+		return this.url;
+	}
+	
+	public void killRuntime(){
+		try {
+			invoke("killRT", null, null);
+		} catch (InstanceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MBeanException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ReflectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Finds all nodes of this Runtime.
+	 */
+	@SuppressWarnings("unchecked")
+	private void findNodes(){
+		List<ObjectName> nodeNames = null;
+		try {
+			if(!(getConnection().isRegistered(getObjectName()))){
+				return;
+			}
+			nodeNames = (List<ObjectName>) getConnection().getAttribute(getObjectName(), "Nodes");
+		} catch (AttributeNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstanceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		} catch (MBeanException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ReflectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
+		for (ObjectName name : nodeNames) {
+			String url = null;
+			try {
+				url = (String) getConnection().getAttribute(name, "URL");
+			} catch (AttributeNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstanceNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MBeanException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ReflectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// We need to have a complete url protocol://host:port/name
+        	String hostInUrl = UrlBuilder.getHostNameFromUrl(url);
+        	String nameInUrl = UrlBuilder.getNameFromUrl(url);
+        	String protocolInUrl = UrlBuilder.getProtocol(url);
+        	int portInUrl = UrlBuilder.getPortFromUrl(url);
+			addChild(new NodeObject(this,UrlBuilder.buildUrl(hostInUrl, nameInUrl, protocolInUrl, portInUrl), name));
+		}
+	}
+	
+	public String getName(){
+		return UrlBuilder.getNameFromUrl(getUrl());
+	}
+	
+	public String toString(){
+		return "Runtime: "+getUrl();
+	}
+}

@@ -1,0 +1,299 @@
+package org.objectweb.proactive.ic2d.jmxmonitoring.data;
+
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
+
+/**
+ * Class for the active object representation in the IC2D model.
+ */
+public class ActiveObject extends AbstractData{
+
+	//TODO
+	/**
+	 * All the method names used to notify the observers
+	 */
+	public enum methodName { SET_STATE, ADD_COMMUNICATION, RESET_COMMUNICATION, SET_REQUEST_QUEUE_LENGTH };
+
+	/**
+	 * The parent object.
+	 */
+	private NodeObject parent;
+
+	/**
+	 * 
+	 */
+	private UniqueID id;
+
+	/**
+	 * 
+	 */
+	private String name;
+
+	/**
+	 * 
+	 */
+	private String className;
+
+	private NotificationListener listener;
+
+	/** State of the object (ex: WAITING_BY_NECESSITY) */
+	private State currentState = State.UNKNOWN;
+
+	/** request queue length */
+	private int requestQueueLength = -1; // -1 = not known		
+
+	// -------------------------------------------
+	// --- Constructor ---------------------------
+	// -------------------------------------------
+
+	public ActiveObject(NodeObject parent, UniqueID id, String className, ObjectName objectName) {
+		super(objectName);
+		this.parent = parent;
+		this.id = id;
+		this.name = NamesFactory.getInstance().associateName(id, className);
+		this.className = className;
+
+		// Used to have good performances.
+		getWorldObject().addActiveObject(this);
+
+		this.listener = new ActiveObjectListener(this);
+	}
+
+	/**
+	 * Returns the unique id of the active object.
+	 * @return An unique id.
+	 */
+	public UniqueID getUniqueID(){
+		return this.id;
+	}
+
+	/**
+	 * Returns the name of this active object.
+	 * (Example: ao#3)
+	 * @return The name of this active object.
+	 */
+	public String getName(){
+		return this.name;
+	}
+
+	/**
+	 * Returns the name of the class given in parameter to the constructor.
+	 * @return The class name
+	 */
+	public String getClassName(){
+		return this.className;
+	}
+
+	/**
+	 * Change the current state
+	 * @param newState
+	 */
+	public void setState(State newState) {
+		if(newState.equals(currentState))
+			return;
+		
+		// If there is a waitFoFutur, we wait the correct state.
+		switch (currentState) {
+		case WAITING_BY_NECESSITY_WHILE_ACTIVE:
+			if(newState==State.ACTIVE){
+				this.currentState = newState;
+				setChanged();
+				notifyObservers(newState);
+			}
+			break;
+		case WAITING_BY_NECESSITY_WHILE_SERVING:
+			if(newState==State.SERVING_REQUEST){
+				this.currentState = newState;
+				setChanged();
+				notifyObservers(newState);
+			}
+			break;
+		default:
+			this.currentState = newState;
+		setChanged();
+		notifyObservers(newState);
+		break;
+		}
+	}
+
+	/**
+	 * Returns the current state of this active object.
+	 * @return The current state.
+	 */
+	public State getState() {
+		return this.currentState;
+	}
+
+	public NotificationListener getListener(){
+		return this.listener;
+	}
+
+	/**
+	 * Migrates this object to another node.
+	 * @param nodeTargetURL
+	 * @return true if it has successfully migrated, false otherwise.
+	 */
+	public boolean migrateTo(String nodeTargetURL) {
+		Console console = Console.getInstance(Activator.CONSOLE_NAME);
+		State oldState = getState();
+		setState(State.MIGRATING);
+		Object[] params = { nodeTargetURL };
+		String[] signature = { "java.lang.String" };
+		try {
+			invoke("migrateTo", params, signature);
+		} catch (InstanceNotFoundException e) {
+			console
+			.err("Couldn't migrate " + this + " to "
+					+ nodeTargetURL);
+			setState(oldState);
+			console.logException(e);
+			return false;
+		} catch (MBeanException e) {
+			console
+			.err("Couldn't migrate " + this + " to "
+					+ nodeTargetURL);
+			setState(oldState);
+			console.logException(e);
+			return false;
+		} catch (ReflectionException e) {
+			console
+			.err("Couldn't migrate " + this + " to "
+					+ nodeTargetURL);
+			setState(oldState);
+			console.logException(e);
+			return false;
+		}
+		 catch (IOException e) {
+			 console
+				.err("Couldn't migrate " + this + " to "
+						+ nodeTargetURL);
+				setState(oldState);
+				console.logException(e);
+				return false;
+		}
+		console.log("Successfully migrated " + this + " to "
+				+ nodeTargetURL);
+		return true;
+	}
+	
+	/**
+	 * Say to the model that a MigrationException occured during a migration of this active object.
+	 * @param migrationException
+	 */
+	public void migrationFailed(MigrationException migrationException){
+		System.err.println("ActiveObject.migrationFailed() the active object "+this+" didn't migrate!");
+	}
+
+	@Override
+	public NodeObject getParent() {
+		return this.parent;
+	}
+
+	@Override
+	public String getKey() {
+		return this.id.toString();
+	}
+	
+	@Override
+	public String getType() {
+		return "active object";
+	}
+
+	@Override
+	public void explore() {
+		//System.out.println(this);
+	}
+
+	@Override
+	public void destroy(){
+		getWorldObject().removeActiveObject(getUniqueID());
+	}
+
+	public String toString(){
+		return name;
+	}
+
+	/**
+	 * Adds a communication to this object.
+	 * Warning: This active object is the destination of the communication.
+	 * @param communication
+	 */
+	public void addCommunication(UniqueID sourceID){
+		ActiveObject source = getWorldObject().findActiveObject(sourceID);
+		if(source==null){
+			//TODO A faire Traiter l'erreur
+			System.err.println("Don't find the id: "+sourceID);
+			return;
+		}
+		setChanged();
+		Set<ActiveObject> comm = new HashSet<ActiveObject>();
+		comm.add(source);
+		notifyObservers(comm);	
+		/*synchronized (communications) {
+			communications.add(source);
+		}*/
+	}
+
+	public void resetCommunications() {
+		setChanged();
+		notifyObservers(new HashSet<ActiveObject>());	
+	}
+
+	public void addRequest(){
+		this.requestQueueLength++;
+		setChanged();
+		notifyObservers(requestQueueLength);
+	}
+
+	public void removeRequest(){
+		this.requestQueueLength--;
+		setChanged();
+		notifyObservers(requestQueueLength);
+	}
+
+	public void setRequestQueueLength(int requestQueueLength){
+		if(this.requestQueueLength!=requestQueueLength){
+			this.requestQueueLength = requestQueueLength;
+			setChanged();
+			notifyObservers(requestQueueLength);
+		}
+
+	}
+
+
+
+	//
+	// -- INNER CLASS -----------------------------------------------
+	//
+
+	public static class ActiveObjectComparator implements Comparator<String> {
+
+		/**
+		 * Compare two active objects. (For Example: ao#3 and ao#5 give -1
+		 * because ao#3 has been discovered before ao#5.)
+		 * 
+		 * @return -1, 0, or 1 as the first argument is less than, equal to, or
+		 *         greater than the second.
+		 */
+		public int compare(String ao1, String ao2) {
+			String ao1Name = ao1;
+			String ao2Name = ao2;
+			return -(ao1Name.compareTo(ao2Name));
+		}
+	}
+}
