@@ -1356,7 +1356,7 @@ public class ProActive {
             }
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
-            throw new IOException(e);
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -1420,7 +1420,7 @@ public class ProActive {
                     (UniversalBody) rmo.getObjectProxy());
             }
         } catch (ProActiveException e) {
-            throw new IOException(e);
+            throw new IOException(e.getMessage());
         } catch (MOPException e) {
             Throwable t = e;
 

@@ -78,7 +78,7 @@ public class RemoteObjectAdapter implements RemoteObject {
                 message.getMethodName());
             return new SynchronousReplyImpl();
         } catch (ProActiveException e) {
-            throw new IOException(e);
+            throw new IOException(e.getMessage());
         } catch (IOException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to contact remote object at " +
