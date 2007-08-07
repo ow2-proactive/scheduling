@@ -116,7 +116,6 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         Object[] parameters) throws ProActiveException {
         if (parameters.length > 0) {
             Object p0 = parameters[0];
-            System.out.println("----> p0 : " + p0);
             // Determines whether the body is local or remote
             if (p0 instanceof UniversalBody) {
                 // This is simple connection to an existant local body
