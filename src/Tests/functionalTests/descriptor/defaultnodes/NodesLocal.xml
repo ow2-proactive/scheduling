@@ -67,7 +67,7 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>	
-						<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
+					<!-- 	<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/> -->
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -75,7 +75,7 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
-							<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"/>
+					<!-- 		<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"/> -->
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -84,7 +84,7 @@
 					<jvmParameters>
 						<parameter value="-Dproactive.future.ac=enable"/>
 						<parameter value="-Dproactive.test=true"/>
-						<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"/>
+					<!-- 	<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"/> -->
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -93,7 +93,7 @@
 					<jvmParameters>
 						<parameter value="-Dproactive.future.ac=enable"/>
 						<parameter value="-Dproactive.test=true"/>		
-						<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8003,server=y,suspend=n"/>
+					<!-- 	<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8003,server=y,suspend=n"/> -->
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

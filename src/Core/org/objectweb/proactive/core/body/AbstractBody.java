@@ -296,8 +296,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     public String toString() {
         // get the incarnation number if ft is enable
         String inc = (this.ftmanager != null) ? ("" + this.ftmanager) : ("");
-        return "Body for " + this.localBodyStrategy.getName() + " node=" +
-        this.nodeURL + " id=" + this.bodyID + inc;
+
+        if (this.localBodyStrategy != null) {
+            return "Body for " + this.localBodyStrategy.getName() + " node=" +
+            this.nodeURL + " id=" + this.bodyID + inc;
+        }
+
+        return "Method call called during Body construction -- the body is not yet initialized ";
     }
 
     //

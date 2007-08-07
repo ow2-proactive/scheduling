@@ -54,7 +54,7 @@ public class Test extends FunctionalTest {
     private int result = 0;
     private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = Test.class.getResource(
-            "/functionalTests/ft/testFT_PML2.xml").getPath();
+            "/functionalTests/ft/testFT_PML.xml").getPath();
     private static int AWAITED_RESULT = 1771014405;
 
     @org.junit.Test

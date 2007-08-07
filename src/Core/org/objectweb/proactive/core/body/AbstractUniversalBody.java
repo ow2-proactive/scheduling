@@ -122,8 +122,8 @@ public abstract class AbstractUniversalBody implements UniversalBody,
             RemoteRemoteObject rro = register(uri);
 
             this.remoteBody = (UniversalBody) rro.getObjectProxy();
-            /// Initialiaze cache -- Gchazara won't touch it, ok ?
-            this.remoteBody.getID();
+            //            /// Initialiaze cache -- Gchazara won't touch it, ok ?
+            //            this.remoteBody.getID();
         } catch (Exception e) {
             e.printStackTrace();
             throw new ActiveObjectCreationException(e);
