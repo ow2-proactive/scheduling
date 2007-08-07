@@ -86,5 +86,7 @@ public interface ProActiveInterface extends Interface, StubObject {
      */
     public abstract void setFcItfImpl(final Object impl);
 
-    public boolean isFcCollective();
+    //    this method comes from the merge with the java5 branch but does not seem useful,
+    //    uncommenting this method will break some components tests, not sure what to do with
+    //    public abstract boolean isFcCollective();
 }

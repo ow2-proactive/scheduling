@@ -210,6 +210,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private TechnicalService technicalService;
     private String descriptorURL;
 
+    //    protected RemoteObjectExposer roe = null;
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
@@ -217,13 +218,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * Contructs a new intance of VirtualNode
      */
-    VirtualNodeImpl() {
+    public VirtualNodeImpl() {
     }
 
     /**
      * Contructs a new intance of VirtualNode
      */
-    VirtualNodeImpl(String name,
+    public VirtualNodeImpl(String name,
         ProActiveSecurityManager proactiveSecurityManager, String padURL,
         boolean isMainVN, ProActiveDescriptorInternal descriptor) {
         // if we launch several times the same application
@@ -247,7 +248,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         this.fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
         this.overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
-
+        //        this.roe = new RemoteObjectExposer(VirtualNode.class.getName(),this);
         if (logger.isDebugEnabled()) {
             logger.debug("vn " + this.name + " registered on " +
                 this.proActiveRuntimeImpl.getVMInformation().getVMID().toString());

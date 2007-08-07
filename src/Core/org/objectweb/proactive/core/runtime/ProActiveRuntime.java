@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
+import org.objectweb.proactive.annotation.Cache;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -126,6 +127,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * retrieve all JVM information in one call to optimize performance.
      * @return the JVM information as one object
      */
+    @Cache
     public VMInformation getVMInformation();
 
     /**
@@ -206,7 +208,9 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
 
     /**
      * Returns the url of this ProActiveRuntime on the local or remote VM
+     * This information is cached
      */
+    @Cache
     public String getURL();
 
     /**

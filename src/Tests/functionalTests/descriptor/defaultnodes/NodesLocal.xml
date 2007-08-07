@@ -41,40 +41,59 @@
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="linuxJVM1"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="linuxJVM2"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3-AC">
 				<creation>
-					<processReference refid="linuxJVM-AC"/>
+					<processReference refid="linuxJVM1-AC"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4-AC">
 				<creation>
-					<processReference refid="linuxJVM-AC"/>
+					<processReference refid="linuxJVM2-AC"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="linuxJVM">
+			<processDefinition id="linuxJVM1">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Dproactive.test=true"/>	
+						<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
-			<processDefinition id="linuxJVM-AC">
+			<processDefinition id="linuxJVM2">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<jvmParameters>
+						<parameter value="-Dproactive.test=true"/>
+							<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n"/>
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="linuxJVM1-AC">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.future.ac=enable"/>
 						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"/>
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="linuxJVM2-AC">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<jvmParameters>
+						<parameter value="-Dproactive.future.ac=enable"/>
+						<parameter value="-Dproactive.test=true"/>		
+						<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8003,server=y,suspend=n"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

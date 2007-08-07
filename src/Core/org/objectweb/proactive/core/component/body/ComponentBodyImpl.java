@@ -38,6 +38,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Active;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.migration.MigratableBody;
@@ -79,7 +80,8 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     public ComponentBodyImpl(Object reifiedObject, String nodeURL,
         Active activity, MetaObjectFactory factory, String jobID)
         throws java.lang.reflect.InvocationTargetException,
-            ConstructorCallExecutionFailedException {
+            ConstructorCallExecutionFailedException,
+            ActiveObjectCreationException {
         super(reifiedObject, nodeURL, factory, jobID);
         //        filterOnNFRequests = new RequestFilterOnPrioritizedNFRequests();
         // create the component metaobject if necessary
@@ -93,8 +95,8 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                     if (logger.isDebugEnabled()) {
                         logger.debug("creating metaobject component identity");
                     }
-                    componentIdentity = factory.newComponentFactory()
-                                               .newProActiveComponent(this);
+                    this.componentIdentity = factory.newComponentFactory()
+                                                    .newProActiveComponent(this);
 
                     // change activity into a component activity
                     // activity = new ComponentActivity(activity, reifiedObject);
@@ -111,7 +113,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * @return the ProActiveComponent meta-object
      */
     public ProActiveComponentImpl getProActiveComponentImpl() {
-        return (ProActiveComponentImpl) componentIdentity;
+        return (ProActiveComponentImpl) this.componentIdentity;
     }
 
     /**
@@ -125,7 +127,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      */
     @Override
     public boolean isActive() {
-        if (insideFunctionalActivity) {
+        if (this.insideFunctionalActivity) {
             try {
                 return LifeCycleController.STARTED.equals(Fractal.getLifeCycleController(
                         getProActiveComponentImpl()).getFcState());
@@ -150,20 +152,21 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * @see org.objectweb.proactive.core.component.body.ComponentBody#finishedFunctionalActivity()
      */
     public void finishedFunctionalActivity() {
-        insideFunctionalActivity = false;
+        this.insideFunctionalActivity = false;
     }
 
     /*
      * @see org.objectweb.proactive.core.component.body.ComponentBody#startingFunctionalActivity()
      */
     public void startingFunctionalActivity() {
-        insideFunctionalActivity = true;
+        this.insideFunctionalActivity = true;
     }
 
     public void keepShortcut(Shortcut shortcut) {
-        if (shortcutsOnThis == null) {
-            shortcutsOnThis = new HashMap<String, Shortcut>();
+        if (this.shortcutsOnThis == null) {
+            this.shortcutsOnThis = new HashMap<String, Shortcut>();
         }
-        shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
+        this.shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(),
+            shortcut);
     }
 }

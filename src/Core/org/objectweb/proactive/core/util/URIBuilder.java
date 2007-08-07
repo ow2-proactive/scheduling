@@ -38,7 +38,8 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -82,11 +83,13 @@ public class URIBuilder {
      * @param host Url's hostname
      * @param name Url's Path
      * @param protocol Url's protocol
+     * @throws UnknownProtocolException
      * @returnan url under the form [protocol:][//host][[/]name]
      */
-    public static URI buildURI(String host, String name, String protocol) {
+    public static URI buildURI(String host, String name, String protocol)
+        throws UnknownProtocolException {
         return buildURI(host, name, protocol,
-            RemoteObjectFactory.getDefaultPortForProtocol(protocol));
+            RemoteObjectHelper.getDefaultPortForProtocol(protocol));
     }
 
     /**
@@ -94,9 +97,11 @@ public class URIBuilder {
      * loopback address is replaced by a non-loopback address localhost -> [DNS/IP] Address
      * @param host Url's hostname
      * @param name Url's Path
+     * @throws UnknownProtocolException
      * @returnan url under the form [//host][[/]name]
      */
-    public static URI buildURI(String host, String name) {
+    public static URI buildURI(String host, String name)
+        throws UnknownProtocolException {
         return buildURI(host, name, null);
     }
 
@@ -185,7 +190,13 @@ public class URIBuilder {
                                          .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         }
         if (port == null) {
-            return buildURI(host, name, protocol);
+            try {
+                return buildURI(host, name, protocol);
+            } catch (UnknownProtocolException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return null;
+            }
         } else {
             return buildURI(host, name, protocol, new Integer(port).intValue());
         }
@@ -341,17 +352,16 @@ public class URIBuilder {
      * @param port the new port number
      * @return the url with the new port
      */
-    public static String setPort(String url, int port) {
-        URI u = URI.create(url);
+    public static URI setPort(URI u, int port) {
         URI u2;
         try {
             u2 = new URI(u.getScheme(), u.getUserInfo(), u.getHost(), port,
                     u.getPath(), u.getQuery(), u.getFragment());
-            return u2.toString();
+            return u2;
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
-        return url;
+        return u;
     }
 }

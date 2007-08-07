@@ -136,8 +136,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * transform the effectiveArguments into a byte[]
      * */
     public void transformEffectiveArgumentsIntoByteArray() {
-        if ((serializedEffectiveArguments == null) &&
-                (effectiveArguments != null)) {
+        if ((this.serializedEffectiveArguments == null) &&
+                (this.effectiveArguments != null)) {
             try {
                 //                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 //
@@ -148,11 +148,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 //                objectOutputStream.close();
                 //                byteArrayOutputStream.close();
                 //                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
-                serializedEffectiveArguments = ObjectToByteConverter.convert(effectiveArguments);
+                this.serializedEffectiveArguments = ObjectToByteConverter.convert(this.effectiveArguments);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            effectiveArguments = null;
+            this.effectiveArguments = null;
         }
     }
 
@@ -337,19 +337,20 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             this.componentMetaData = mc.componentMetaData;
             this.reifiedMethod = mc.getReifiedMethod();
             if (mc.serializedEffectiveArguments == null) {
-                serializedEffectiveArguments = null;
+                this.serializedEffectiveArguments = null;
             } else {
                 // array copy
                 byte[] source = mc.serializedEffectiveArguments;
-                serializedEffectiveArguments = new byte[source.length];
-                for (int i = 0; i < serializedEffectiveArguments.length; i++) {
-                    serializedEffectiveArguments[i] = source[i];
+                this.serializedEffectiveArguments = new byte[source.length];
+                for (int i = 0; i < this.serializedEffectiveArguments.length;
+                        i++) {
+                    this.serializedEffectiveArguments[i] = source[i];
                 }
             }
             if (mc.effectiveArguments == null) {
-                effectiveArguments = null;
+                this.effectiveArguments = null;
             } else {
-                effectiveArguments = (Object[]) Utils.makeDeepCopy(mc.effectiveArguments);
+                this.effectiveArguments = Utils.makeDeepCopy(mc.effectiveArguments);
             }
             this.genericTypesMapping = mc.getGenericTypesMapping();
             this.key = MethodCall.buildKey(mc.getReifiedMethod(),
@@ -389,36 +390,37 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     public Object execute(Object targetObject)
         throws InvocationTargetException, MethodCallExecutionFailedException {
         // A test at how non-public methods can be reflected
-        if ((serializedEffectiveArguments != null) &&
-                (effectiveArguments == null)) {
+        if ((this.serializedEffectiveArguments != null) &&
+                (this.effectiveArguments == null)) {
             try {
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedEffectiveArguments);
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.serializedEffectiveArguments);
 
                 //ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
                 MarshalInputStream objectInputStream = new MarshalInputStream(byteArrayInputStream);
-                effectiveArguments = (Object[]) objectInputStream.readObject();
+                this.effectiveArguments = (Object[]) objectInputStream.readObject();
                 objectInputStream.close();
                 byteArrayInputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            serializedEffectiveArguments = null;
+            this.serializedEffectiveArguments = null;
         }
         if (logger.isDebugEnabled()) {
             logger.debug("MethodCall.execute() name = " + this.getName());
             logger.debug("MethodCall.execute() reifiedMethod = " +
-                reifiedMethod);
+                this.reifiedMethod);
             logger.debug(
                 "MethodCall.execute() reifiedMethod.getDeclaringClass() = " +
-                reifiedMethod.getDeclaringClass());
+                this.reifiedMethod.getDeclaringClass());
             logger.debug("MethodCall.execute() targetObject " + targetObject);
         }
-        if (reifiedMethod.getParameterTypes().length > 0) {
-            reifiedMethod.setAccessible(true);
+        if (this.reifiedMethod.getParameterTypes().length > 0) {
+            this.reifiedMethod.setAccessible(true);
         }
         try {
             targetObject = ProActive.getFutureValue(targetObject);
-            return reifiedMethod.invoke(targetObject, effectiveArguments);
+            return this.reifiedMethod.invoke(targetObject,
+                this.effectiveArguments);
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException(
                 "Access rights to the method denied: " + e);
@@ -426,7 +428,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             e.printStackTrace();
             throw new MethodCallExecutionFailedException(
                 "Arguments for the method " + this.getName() +
-                " are invalids: " + e);
+                " are invalids: " + e + "for the object " + targetObject + "(" +
+                targetObject.getClass().getName() + ")");
         } /*catch (InvocationTargetException e) {
         throw new MethodCallExecutionFailedException(
         "Target for invocation of " + this.getName() +
@@ -439,7 +442,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     public Method getReifiedMethod() {
-        return reifiedMethod;
+        return this.reifiedMethod;
     }
 
     /**
@@ -447,7 +450,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return the name of the method
      */
     public String getName() {
-        return reifiedMethod.getName();
+        return this.reifiedMethod.getName();
     }
 
     public int getNumberOfParameter() {
@@ -463,18 +466,18 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     public void setEffectiveArguments(Object[] o) {
-        effectiveArguments = o;
+        this.effectiveArguments = o;
     }
 
     public Object[] getEffectiveArguments() {
-        return effectiveArguments;
+        return this.effectiveArguments;
     }
 
     /**
      * Make a deep copy of all arguments of the constructor
      */
     public void makeDeepCopyOfArguments() throws java.io.IOException {
-        effectiveArguments = (Object[]) Utils.makeDeepCopy(effectiveArguments);
+        this.effectiveArguments = Utils.makeDeepCopy(this.effectiveArguments);
     }
 
     //
@@ -492,7 +495,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private FixWrapper[] fixBugWrite(Class[] para) {
         FixWrapper[] tmp = new FixWrapper[para.length];
         for (int i = 0; i < para.length; i++) {
-            //	System.out.println("fixBugWrite for " + i + " out of " + para.length + " value is " +para[i] );	
+            //	System.out.println("fixBugWrite for " + i + " out of " + para.length + " value is " +para[i] );
             tmp[i] = new FixWrapper(para[i]);
         }
         return tmp;
@@ -535,9 +538,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         throws java.io.IOException {
         out.defaultWriteObject();
         // The Method object needs to be converted
-        out.writeObject(reifiedMethod.getDeclaringClass());
-        out.writeObject(reifiedMethod.getName());
-        out.writeObject(fixBugWrite(reifiedMethod.getParameterTypes()));
+        out.writeObject(this.reifiedMethod.getDeclaringClass());
+        out.writeObject(this.reifiedMethod.getName());
+        out.writeObject(fixBugWrite(this.reifiedMethod.getParameterTypes()));
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -548,8 +551,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     protected void readTheObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        reifiedMethod = (Method) reifiedMethodsTable.get(key);
-        if (reifiedMethod == null) {
+        this.reifiedMethod = reifiedMethodsTable.get(this.key);
+        if (this.reifiedMethod == null) {
             // Reads several pieces of data that we need for looking up the method
             Class declaringClass = (Class) in.readObject();
             String simpleName = (String) in.readObject();
@@ -557,8 +560,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
             // Looks up the method
             try {
-                reifiedMethod = declaringClass.getMethod(simpleName, parameters);
-                reifiedMethodsTable.put(key, reifiedMethod);
+                this.reifiedMethod = declaringClass.getMethod(simpleName,
+                        parameters);
+                reifiedMethodsTable.put(this.key, this.reifiedMethod);
             } catch (NoSuchMethodException e) {
                 throw new InternalException("Lookup for method failed: " + e +
                     ". This may be caused by having different versions of the same class on different VMs. Check your CLASSPATH settings.");
@@ -568,20 +572,20 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             in.readObject();
             in.readObject();
         }
-        if ((serializedEffectiveArguments != null) &&
-                (effectiveArguments == null)) {
+        if ((this.serializedEffectiveArguments != null) &&
+                (this.effectiveArguments == null)) {
             try {
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedEffectiveArguments);
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.serializedEffectiveArguments);
 
                 //	    ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
                 MarshalInputStream objectInputStream = new MarshalInputStream(byteArrayInputStream);
-                effectiveArguments = (Object[]) objectInputStream.readObject();
+                this.effectiveArguments = (Object[]) objectInputStream.readObject();
                 objectInputStream.close();
                 byteArrayInputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            serializedEffectiveArguments = null;
+            this.serializedEffectiveArguments = null;
         }
     }
 
@@ -609,7 +613,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
     public String getSynchronousReason() {
         Method m = this.getReifiedMethod();
-        ReifiableAndExceptions cached = (ReifiableAndExceptions) REIF_AND_EXCEP.get(key);
+        ReifiableAndExceptions cached = REIF_AND_EXCEP.get(this.key);
         if (cached == null) {
             cached = new ReifiableAndExceptions();
             /* void is reifiable even though the check by the MOP would tell otherwise */
@@ -635,7 +639,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             if (cached.exceptions) {
                 cached.reason = "The method can throw a checked exception";
             }
-            REIF_AND_EXCEP.put(key, cached);
+            REIF_AND_EXCEP.put(this.key, cached);
         }
 
         if (cached.reifiable && cached.exceptions &&
@@ -684,19 +688,19 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     public MethodCallExceptionContext getExceptionContext() {
-        if (exceptioncontext == null) {
+        if (this.exceptioncontext == null) {
             return MethodCallExceptionContext.DEFAULT;
         }
 
-        return exceptioncontext;
+        return this.exceptioncontext;
     }
 
     public ComponentMethodCallMetadata getComponentMetadata() {
-        return componentMetaData;
+        return this.componentMetaData;
     }
 
     public Map<TypeVariable, Class> getGenericTypesMapping() {
-        return genericTypesMapping;
+        return this.genericTypesMapping;
     }
 
     //
@@ -714,26 +718,26 @@ public class MethodCall implements java.io.Serializable, Cloneable {
          */
         public FixWrapper(Class c) {
             if (!c.isPrimitive()) {
-                encapsulated = c;
+                this.encapsulated = c;
                 return;
             }
-            isPrimitive = true;
+            this.isPrimitive = true;
             if (c.equals(Boolean.TYPE)) {
-                encapsulated = Boolean.class;
+                this.encapsulated = Boolean.class;
             } else if (c.equals(Byte.TYPE)) {
-                encapsulated = Byte.class;
+                this.encapsulated = Byte.class;
             } else if (c.equals(Character.TYPE)) {
-                encapsulated = Character.class;
+                this.encapsulated = Character.class;
             } else if (c.equals(Double.TYPE)) {
-                encapsulated = Double.class;
+                this.encapsulated = Double.class;
             } else if (c.equals(Float.TYPE)) {
-                encapsulated = Float.class;
+                this.encapsulated = Float.class;
             } else if (c.equals(Integer.TYPE)) {
-                encapsulated = Integer.class;
+                this.encapsulated = Integer.class;
             } else if (c.equals(Long.TYPE)) {
-                encapsulated = Long.class;
+                this.encapsulated = Long.class;
             } else if (c.equals(Short.TYPE)) {
-                encapsulated = Short.class;
+                this.encapsulated = Short.class;
             }
         }
 
@@ -741,40 +745,40 @@ public class MethodCall implements java.io.Serializable, Cloneable {
          * Give back the original class
          */
         public Class getWrapped() {
-            if (!isPrimitive) {
-                return encapsulated;
+            if (!this.isPrimitive) {
+                return this.encapsulated;
             }
-            if (encapsulated.equals(Boolean.class)) {
+            if (this.encapsulated.equals(Boolean.class)) {
                 return Boolean.TYPE;
             }
-            if (encapsulated.equals(Byte.class)) {
+            if (this.encapsulated.equals(Byte.class)) {
                 return Byte.TYPE;
             }
-            if (encapsulated.equals(Character.class)) {
+            if (this.encapsulated.equals(Character.class)) {
                 return Character.TYPE;
             }
-            if (encapsulated.equals(Double.class)) {
+            if (this.encapsulated.equals(Double.class)) {
                 return Double.TYPE;
             }
-            if (encapsulated.equals(Float.class)) {
+            if (this.encapsulated.equals(Float.class)) {
                 return Float.TYPE;
             }
-            if (encapsulated.equals(Integer.class)) {
+            if (this.encapsulated.equals(Integer.class)) {
                 return Integer.TYPE;
             }
-            if (encapsulated.equals(Long.class)) {
+            if (this.encapsulated.equals(Long.class)) {
                 return Long.TYPE;
             }
-            if (encapsulated.equals(Short.class)) {
+            if (this.encapsulated.equals(Short.class)) {
                 return Short.TYPE;
             }
             throw new InternalException("FixWrapper encapsulated class unkown " +
-                encapsulated);
+                this.encapsulated);
         }
 
         @Override
         public String toString() {
-            return "FixWrapper: " + encapsulated.toString();
+            return "FixWrapper: " + this.encapsulated.toString();
         }
     }
 

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.UniversalBodyForwarder;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -101,73 +100,74 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
     //
     public int receiveRequest(UniqueID id, Request r)
         throws java.io.IOException, RenegotiateSessionException {
-        return body.receiveRequest(id, r);
+        return this.body.receiveRequest(id, r);
     }
 
     public int receiveReply(UniqueID id, Reply r) throws java.io.IOException {
-        return body.receiveReply(id, r);
+        return this.body.receiveReply(id, r);
     }
 
     public String getNodeURL(UniqueID id) {
-        return body.getNodeURL(id);
+        return this.body.getNodeURL(id);
     }
 
     public UniqueID getID(UniqueID id) {
-        return body.getID(id);
+        return this.body.getID(id);
     }
 
     public void updateLocation(UniqueID id, UniqueID uid,
         UniversalBody remoteBody) throws java.io.IOException {
-        body.updateLocation(id, uid, remoteBody);
+        this.body.updateLocation(id, uid, remoteBody);
     }
 
     public void unreferenced(UniqueID id) {
-        // System.out.println("RmiRemoteBodyImpl: unreferenced()");      
+        // System.out.println("RmiRemoteBodyImpl: unreferenced()");
         // System.gc();
     }
 
     public void enableAC(UniqueID id) throws java.io.IOException {
-        body.enableAC(id);
+        this.body.enableAC(id);
     }
 
     public void disableAC(UniqueID id) throws java.io.IOException {
-        body.disableAC(id);
+        this.body.disableAC(id);
     }
 
     // SECURITY
     public void terminateSession(UniqueID id, long sessionID)
         throws IOException, SecurityNotAvailableException {
-        body.terminateSession(id, sessionID);
+        this.body.terminateSession(id, sessionID);
     }
 
     public X509Certificate getCertificate(UniqueID id)
         throws SecurityNotAvailableException, IOException {
-        X509Certificate cert = body.getCertificate(id);
+        X509Certificate cert = this.body.getCertificate(id);
         return cert;
     }
 
     public long startNewSession(UniqueID id, Communication policy)
         throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
-        return body.startNewSession(id, policy);
+        return this.body.startNewSession(id, policy);
     }
 
     public PublicKey getPublicKey(UniqueID id)
         throws SecurityNotAvailableException, IOException {
-        return body.getPublicKey(id);
+        return this.body.getPublicKey(id);
     }
 
     public byte[] randomValue(UniqueID id, long sessionID, byte[] cl_rand)
         throws RenegotiateSessionException, IOException,
             SecurityNotAvailableException {
-        return body.randomValue(id, sessionID, cl_rand);
+        return this.body.randomValue(id, sessionID, cl_rand);
     }
 
     public byte[][] publicKeyExchange(UniqueID id, long sessionID,
         byte[] my_pub, byte[] my_cert, byte[] sig_code)
         throws IOException, RenegotiateSessionException,
             SecurityNotAvailableException, KeyExchangeException {
-        return body.publicKeyExchange(id, sessionID, my_pub, my_cert, sig_code);
+        return this.body.publicKeyExchange(id, sessionID, my_pub, my_cert,
+            sig_code);
     }
 
     /* (non-Javadoc)
@@ -175,7 +175,7 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
      */
     public byte[] getCertificateEncoded(UniqueID id)
         throws IOException, SecurityNotAvailableException {
-        return body.getCertificateEncoded(id);
+        return this.body.getCertificateEncoded(id);
     }
 
     /* (non-Javadoc)
@@ -184,12 +184,12 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
     public SecurityContext getPolicy(UniqueID id,
         SecurityContext securityContext)
         throws IOException, SecurityNotAvailableException {
-        return body.getPolicy(id, securityContext);
+        return this.body.getPolicy(id, securityContext);
     }
 
     public ArrayList getEntities(UniqueID id)
         throws SecurityNotAvailableException, IOException {
-        return body.getEntities(id);
+        return this.body.getEntities(id);
     }
 
     /* (non-Javadoc)
@@ -202,17 +202,17 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
 
     public GCResponse receiveGCMessage(UniqueID id, GCMessage msg)
         throws IOException {
-        return body.receiveGCMessage(id, msg);
+        return this.body.receiveGCMessage(id, msg);
     }
 
     public void setRegistered(UniqueID id, boolean registered)
         throws IOException {
-        body.setRegistered(id, registered);
+        this.body.setRegistered(id, registered);
     }
 
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws IOException {
-        body.changeProxiedBody(id, newBody);
+        this.body.changeProxiedBody(id, newBody);
     }
 
     //-------------------------------
@@ -220,17 +220,17 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
     //-------------------------------
     public void addNFEListener(UniqueID id, NFEListener listener)
         throws IOException {
-        body.addNFEListener(id, listener);
+        this.body.addNFEListener(id, listener);
     }
 
     public void removeNFEListener(UniqueID id, NFEListener listener)
         throws IOException {
-        body.removeNFEListener(id, listener);
+        this.body.removeNFEListener(id, listener);
     }
 
     public int fireNFE(UniqueID id, NonFunctionalException e)
         throws IOException {
-        return body.fireNFE(id, e);
+        return this.body.fireNFE(id, e);
     }
 
     //
@@ -250,24 +250,24 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
     }
 
     public String getJobID(UniqueID id) throws IOException {
-        return body.getJobID(id);
+        return this.body.getJobID(id);
     }
 
     public UniversalBody lookup(UniqueID id, String url)
         throws IOException {
-        return body.lookup(id, url);
+        return this.body.lookup(id, url);
     }
 
     public void register(UniqueID id, String url) throws IOException {
-        body.register(id, url);
+        this.body.register(id, url);
     }
 
     public void unregister(UniqueID id, String url) throws IOException {
-        body.unregister(id, url);
+        this.body.unregister(id, url);
     }
 
-    public BodyAdapter getRemoteAdapter(UniqueID id) {
-        return body.getRemoteAdapter(id);
+    public UniversalBody getRemoteAdapter(UniqueID id) {
+        return this.body.getRemoteAdapter(id);
     }
 
     public byte[][] secretKeyExchange(UniqueID id, long sessionID,
@@ -276,7 +276,7 @@ public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObj
         byte[] parametersSignature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return body.secretKeyExchange(id, sessionID, encodedAESKey,
+        return this.body.secretKeyExchange(id, sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,
             parametersSignature);
     }

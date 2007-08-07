@@ -9,12 +9,18 @@ import java.util.Hashtable;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RemoteObjectExposer implements Serializable {
-    protected Hashtable<String, RemoteObjectFactory> activatedRemoteObjectFactories;
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -4162510983888994949L;
     protected Hashtable<URI, RemoteRemoteObject> activatedProtocols;
     private String className;
     private RemoteObjectImpl remoteObject;
@@ -23,50 +29,55 @@ public class RemoteObjectExposer implements Serializable {
     }
 
     public RemoteObjectExposer(String className, Object target) {
+        this(className, target, null);
+    }
+
+    public RemoteObjectExposer(String className, Object target,
+        Adapter targetRemoteObjectAdapter) {
         this.className = className;
-        this.remoteObject = new RemoteObjectImpl(className, target);
-        this.activatedRemoteObjectFactories = new Hashtable<String, RemoteObjectFactory>();
+        this.remoteObject = new RemoteObjectImpl(className, target,
+                targetRemoteObjectAdapter);
         this.activatedProtocols = new Hashtable<URI, RemoteRemoteObject>();
     }
 
-    public synchronized void activateProtocol(URI url) {
-        String protocol = url.getScheme();
-        RemoteObjectFactory rof = RemoteObjectFactory.getRemoteObjectFactory(protocol);
+    public synchronized RemoteRemoteObject activateProtocol(URI url)
+        throws UnknownProtocolException {
+        String protocol = null;
 
-        if ((protocol == null) || (rof == null)) {
-            throw new RuntimeException("unknown protocol : " + protocol);
-        } else {
-            if (this.activatedRemoteObjectFactories.get(protocol) == null) {
+        if (!url.isAbsolute()) {
+            url = RemoteObjectHelper.expandURI(url);
+        }
+
+        protocol = url.getScheme();
+
+        RemoteObjectFactory rof = RemoteObjectHelper.getRemoteObjectFactory(protocol);
+
+        try {
+            int port = url.getPort();
+            if (port == -1) {
                 try {
-                    int port = url.getPort();
-                    if (port == -1) {
-                        try {
-                            url = new URI(url.getScheme(), url.getUserInfo(),
-                                    url.getHost(),
-                                    RemoteObjectFactory.getDefaultPortForProtocol(
-                                        protocol), url.getPath(),
-                                    url.getQuery(), url.getFragment());
-                        } catch (URISyntaxException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    RemoteRemoteObject rmo = rof.register(this.remoteObject,
-                            url, true);
-
-                    this.activatedProtocols.put(url, rmo);
-                } catch (ProActiveException e) {
-                    ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                                   .warn("unable to activate a remote object at endpoint " +
-                        url.toString());
-
+                    url = new URI(url.getScheme(), url.getUserInfo(),
+                            url.getHost(),
+                            RemoteObjectHelper.getDefaultPortForProtocol(
+                                protocol), url.getPath(), url.getQuery(),
+                            url.getFragment());
+                } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-            } else {
-                ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                               .info("protocol " + protocol +
-                    "was already activated for this remote object");
             }
+
+            RemoteRemoteObject rmo = rof.register(this.remoteObject, url, true);
+
+            this.activatedProtocols.put(url, rmo);
+
+            return rmo;
+        } catch (ProActiveException e) {
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
+                           .warn("unable to activate a remote object at endpoint " +
+                url.toString());
+
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -122,11 +133,15 @@ public class RemoteObjectExposer implements Serializable {
             uri = uris.nextElement();
             RemoteRemoteObject rro = this.activatedProtocols.get(uri);
             try {
-                RemoteObjectFactory.getRemoteObjectFactory(uri.getScheme())
-                                   .unregister(uri);
+                RemoteObjectHelper.getRemoteObjectFactory(uri.getScheme())
+                                  .unregister(uri);
             } catch (ProActiveException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public RemoteObjectImpl getRemoteObject() {
+        return this.remoteObject;
     }
 }

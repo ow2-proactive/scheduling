@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
@@ -80,11 +79,12 @@ public class ClassServer implements Runnable {
     }
 
     protected ClassServer(int port_) throws java.io.IOException {
-        if (port == 0) {
+        if (port_ == 0) {
             port = boundServerSocket(Integer.parseInt(
                         ProActiveConfiguration.getInstance()
                                               .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT)),
                     MAX_RETRY);
+            //            Thread.dumpStack();
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);

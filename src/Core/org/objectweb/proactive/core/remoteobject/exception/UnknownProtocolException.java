@@ -33,20 +33,26 @@ package org.objectweb.proactive.core.remoteobject.exception;
 import org.objectweb.proactive.core.ProActiveException;
 
 
-public class RemoteObjectConnection extends ProActiveException {
-    public RemoteObjectConnection() {
+public class UnknownProtocolException extends ProActiveException {
+
+    /**
+    *
+    */
+    private static final long serialVersionUID = 2157668587034907154L;
+
+    public UnknownProtocolException() {
         super();
     }
 
-    public RemoteObjectConnection(String message) {
+    public UnknownProtocolException(String message) {
         super(message);
     }
 
-    public RemoteObjectConnection(String message, Throwable cause) {
+    public UnknownProtocolException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public RemoteObjectConnection(Throwable cause) {
+    public UnknownProtocolException(Throwable cause) {
         super(cause);
     }
 }

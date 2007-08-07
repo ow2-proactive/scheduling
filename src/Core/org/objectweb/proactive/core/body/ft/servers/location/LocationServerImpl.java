@@ -74,6 +74,8 @@ public class LocationServerImpl implements LocationServer {
                 //throw new RuntimeException("TEST");
                 return null;
             } else if (currentLocation.equals(oldLocation)) {
+                System.out.println(
+                    "LocationServerImpl.searchObject() : SEARCHING FOR " + id);
                 this.server.forceDetection();
                 return null;
             } else {

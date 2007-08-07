@@ -184,5 +184,6 @@ public interface RemoteBodyForwarder {
 
     public void register(UniqueID id, String url) throws java.io.IOException;
 
-    public BodyAdapter getRemoteAdapter(UniqueID id) throws java.io.IOException;
+    public UniversalBody getRemoteAdapter(UniqueID id)
+        throws java.io.IOException;
 }

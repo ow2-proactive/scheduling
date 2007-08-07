@@ -62,20 +62,27 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         String serverUrl = ProActiveConfiguration.getInstance()
                                                  .getLocationServerRmi();
-        server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
+
+        this.server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
-        Thread.sleep(3000);
-        a = (A) ProActive.newActive(A.class.getName(), null,
-                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                LocationServerMetaObjectFactory.newInstance());
-        migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
-                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                LocationServerMetaObjectFactory.newInstance());
-        idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
-        migratableA.moveTo(TestNodes.getLocalVMNode());
+
         Thread.sleep(3000);
 
-        assertTrue(server.searchObject(idA) != null);
-        assertTrue(a.getName(migratableA).equals("toto"));
+        this.a = (A) ProActive.newActive(A.class.getName(), null,
+                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                LocationServerMetaObjectFactory.newInstance());
+
+        this.migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
+                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
+                LocationServerMetaObjectFactory.newInstance());
+
+        this.idA = ((BodyProxy) ((StubObject) this.a).getProxy()).getBodyID();
+
+        this.migratableA.moveTo(TestNodes.getLocalVMNode());
+
+        Thread.sleep(3000);
+
+        assertTrue(this.server.searchObject(this.idA) != null);
+        assertTrue(this.a.getName(this.migratableA).equals("toto"));
     }
 }

@@ -156,7 +156,7 @@ public abstract class FTManager implements java.io.Serializable {
                 }
             }
 
-            // the additional codebase is added to normal codebase 
+            // the additional codebase is added to normal codebase
             // ONLY during serialization for checkpoint !
             this.additionalCodebase = this.storage.getServerCodebase();
 
@@ -228,6 +228,7 @@ public abstract class FTManager implements java.io.Serializable {
             // send an adapter to suspectLocation: the suspected body could be local
             UniversalBody newLocation = this.location.searchObject(suspect,
                     suspectLocation.getRemoteAdapter(), this.ownerID);
+
             if (newLocation == null) {
                 while (newLocation == null) {
                     try {
@@ -245,6 +246,9 @@ public abstract class FTManager implements java.io.Serializable {
                 }
                 return newLocation;
             } else {
+                System.out.println(
+                    "FTManager.communicationFailed() : new location is not null ");
+
                 // newLocation is the new location of suspect
                 return newLocation;
             }

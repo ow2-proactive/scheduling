@@ -67,7 +67,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
      */
     public void updateLocation(UniqueID i, UniversalBody s) {
         //       System.out.println("Server: updateLocation() " + i + " object = " + s);
-        table.updateBody(i, s);
+        this.table.updateBody(i, s);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
      * Return null otherwise
      */
     public UniversalBody searchObject(UniqueID id) {
-        return (UniversalBody) table.getBody(id);
+        return this.table.getBody(id);
     }
 
     /**
@@ -103,11 +103,11 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
 
     protected void register() {
         try {
-            logger.info("Attempt at binding : " + url);
-            ProActive.register(ProActive.getStubOnThis(), url);
-            logger.info("Location Server bound in registry : " + url);
+            logger.info("Attempt at binding : " + this.url);
+            ProActive.register(ProActive.getStubOnThis(), this.url);
+            logger.info("Location Server bound in registry : " + this.url);
         } catch (Exception e) {
-            logger.fatal("Cannot bind in registry - aborting " + url);
+            logger.fatal("Cannot bind in registry - aborting " + this.url);
             e.printStackTrace();
             return;
         }

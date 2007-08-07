@@ -57,6 +57,7 @@ import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -103,7 +104,7 @@ public class LocalNode {
                 this.virtualNodeName);
         }
 
-        roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
+        this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
                 ProActiveRuntimeImpl.getProActiveRuntime());
 
         // JMX registration
@@ -135,15 +136,15 @@ public class LocalNode {
         // END JMX registration
     }
 
-    public void activateProtocol(URI nodeURL) {
-        roe.activateProtocol(nodeURL);
+    public void activateProtocol(URI nodeURL) throws UnknownProtocolException {
+        this.roe.activateProtocol(nodeURL);
     }
 
     /**
      * @return Returns the active objects located inside the node.
      */
     public ArrayList<UniqueID> getActiveObjectsId() {
-        return activeObjectsId;
+        return this.activeObjectsId;
     }
 
     /**
@@ -158,7 +159,7 @@ public class LocalNode {
      * @return Returns the jobId.
      */
     public String getJobId() {
-        return jobId;
+        return this.jobId;
     }
 
     /**
@@ -172,7 +173,7 @@ public class LocalNode {
      * @return Returns the node name.
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -186,7 +187,7 @@ public class LocalNode {
      * @return Returns the node' security manager.
      */
     public ProActiveSecurityManager getSecurityManager() {
-        return securityManager;
+        return this.securityManager;
     }
 
     /**
@@ -201,7 +202,7 @@ public class LocalNode {
      * has been instancied if any.
      */
     public String getVirtualNodeName() {
-        return virtualNodeName;
+        return this.virtualNodeName;
     }
 
     /**
@@ -231,14 +232,14 @@ public class LocalNode {
         List<List<Object>> localBodies = new ArrayList<List<Object>>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
 
-        if (activeObjectsId == null) {
+        if (this.activeObjectsId == null) {
             // Probably the node is killed
             return localBodies;
         }
 
-        synchronized (activeObjectsId) {
-            for (int i = 0; i < activeObjectsId.size(); i++) {
-                UniqueID bodyID = (UniqueID) activeObjectsId.get(i);
+        synchronized (this.activeObjectsId) {
+            for (int i = 0; i < this.activeObjectsId.size(); i++) {
+                UniqueID bodyID = this.activeObjectsId.get(i);
 
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
@@ -247,7 +248,7 @@ public class LocalNode {
                     //runtimeLogger.warn("body null");
                     // the body with the given ID is not any more on this ProActiveRuntime
                     // unregister it from this ProActiveRuntime
-                    activeObjectsId.remove(bodyID);
+                    this.activeObjectsId.remove(bodyID);
                 } else {
                     if (filter.filter(body)) {
                         //the body is on this runtime then return adapter and class name of the reified
@@ -273,7 +274,7 @@ public class LocalNode {
      * @param bodyID The <code>UniqueID</code> to remove
      */
     public void unregisterBody(UniqueID bodyID) {
-        activeObjectsId.remove(bodyID);
+        this.activeObjectsId.remove(bodyID);
     }
 
     /**
@@ -282,7 +283,7 @@ public class LocalNode {
      * @param bodyID The body to register
      */
     public void registerBody(UniqueID bodyID) {
-        activeObjectsId.add(bodyID);
+        this.activeObjectsId.add(bodyID);
     }
 
     public void terminate() {
@@ -302,7 +303,7 @@ public class LocalNode {
             }
         }
 
-        roe.unregisterAll();
+        this.roe.unregisterAll();
 
         // JMX Notification
         ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getMBean();

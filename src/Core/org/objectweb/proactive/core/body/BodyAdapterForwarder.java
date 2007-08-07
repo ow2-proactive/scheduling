@@ -83,7 +83,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public BodyAdapterForwarder(RemoteBodyForwarder remoteBodyForwarder) {
         this.proxiedRemoteBody = remoteBodyForwarder;
-        bodyID = null; // never used for the local adapter
+        this.bodyID = null; // never used for the local adapter
     }
 
     /**
@@ -99,7 +99,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
             this.bodyID = id;
             this.jobID = remoteBodyForwarder.getJobID(id);
         } catch (IOException e) {
-            jobID = null;
+            this.jobID = null;
             System.err.println("Connexion to RemoteBodyForwarder(id=" + id +
                 "failled, this BodyAdapterForwarder will be unusable");
             System.err.println(
@@ -153,22 +153,22 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     //------------------------------------------
     @Override
     public void changeProxiedBody(Body newBody) throws IOException {
-        this.proxiedRemoteBody.changeProxiedBody(bodyID, newBody);
+        this.proxiedRemoteBody.changeProxiedBody(this.bodyID, newBody);
     }
 
     @Override
     public UniversalBody lookup(String url) throws java.io.IOException {
-        return this.proxiedRemoteBody.lookup(bodyID, url);
+        return this.proxiedRemoteBody.lookup(this.bodyID, url);
     }
 
     @Override
     public void register(String url) throws java.io.IOException {
-        this.proxiedRemoteBody.register(bodyID, url);
+        this.proxiedRemoteBody.register(this.bodyID, url);
     }
 
     @Override
     public void unregister(String url) throws java.io.IOException {
-        this.proxiedRemoteBody.unregister(bodyID, url);
+        this.proxiedRemoteBody.unregister(this.bodyID, url);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
 
     @Override
     public int hashCode() {
-        return bodyID.hashCode();
+        return this.bodyID.hashCode();
     }
 
     protected void construct(BodyAdapterForwarder localBody,
@@ -193,7 +193,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
         this.proxiedRemoteBody = localBody.proxiedRemoteBody;
 
         if (UniversalBody.bodyLogger.isDebugEnabled()) {
-            UniversalBody.bodyLogger.debug(proxiedRemoteBody.getClass());
+            UniversalBody.bodyLogger.debug(this.proxiedRemoteBody.getClass());
         }
 
         this.bodyID = remoteBody.getID();
@@ -204,7 +204,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     // implements Job
     //--------------------------------------------
     public String getJobID() {
-        return jobID;
+        return this.jobID;
     }
 
     //--------------------------------------------
@@ -212,14 +212,14 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     //--------------------------------------------
     public int receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
-        return proxiedRemoteBody.receiveRequest(bodyID, request);
+        return this.proxiedRemoteBody.receiveRequest(this.bodyID, request);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveReply(org.objectweb.proactive.core.body.reply.Reply)
      */
     public int receiveReply(Reply r) throws IOException {
-        return proxiedRemoteBody.receiveReply(bodyID, r);
+        return this.proxiedRemoteBody.receiveReply(this.bodyID, r);
     }
 
     /**
@@ -227,7 +227,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public String getNodeURL() {
         try {
-            return proxiedRemoteBody.getNodeURL(bodyID);
+            return this.proxiedRemoteBody.getNodeURL(this.bodyID);
         } catch (IOException e) {
             return "cannot contact the body to get the nodeURL";
         }
@@ -237,7 +237,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      * @see org.objectweb.proactive.core.body.UniversalBody#getID()
      */
     public UniqueID getID() {
-        return bodyID;
+        return this.bodyID;
     }
 
     /**
@@ -245,7 +245,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public void updateLocation(UniqueID uid, UniversalBody body)
         throws IOException {
-        proxiedRemoteBody.updateLocation(bodyID, uid, body);
+        this.proxiedRemoteBody.updateLocation(this.bodyID, uid, body);
     }
 
     /**
@@ -260,9 +260,9 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#getRemoteAdapter()
      */
-    public BodyAdapter getRemoteAdapter() {
+    public UniversalBody getRemoteAdapter() {
         try {
-            return proxiedRemoteBody.getRemoteAdapter(bodyID);
+            return this.proxiedRemoteBody.getRemoteAdapter(this.bodyID);
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -274,14 +274,14 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      * @see org.objectweb.proactive.core.body.UniversalBody#enableAC()
      */
     public void enableAC() throws IOException {
-        proxiedRemoteBody.enableAC(bodyID);
+        this.proxiedRemoteBody.enableAC(this.bodyID);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#disableAC()
      */
     public void disableAC() throws IOException {
-        proxiedRemoteBody.disableAC(bodyID);
+        this.proxiedRemoteBody.disableAC(this.bodyID);
     }
 
     /**
@@ -289,7 +289,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public void terminateSession(long sessionID)
         throws IOException, SecurityNotAvailableException {
-        proxiedRemoteBody.terminateSession(bodyID, sessionID);
+        this.proxiedRemoteBody.terminateSession(this.bodyID, sessionID);
     }
 
     /**
@@ -297,7 +297,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getCertificate(bodyID);
+        return this.proxiedRemoteBody.getCertificate(this.bodyID);
     }
 
     /**
@@ -306,7 +306,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
-        return proxiedRemoteBody.startNewSession(bodyID, policy);
+        return this.proxiedRemoteBody.startNewSession(this.bodyID, policy);
     }
 
     /**
@@ -314,7 +314,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getPublicKey(bodyID);
+        return this.proxiedRemoteBody.getPublicKey(this.bodyID);
     }
 
     /**
@@ -323,7 +323,8 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     public byte[] randomValue(long sessionID, byte[] cl_rand)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return proxiedRemoteBody.randomValue(bodyID, sessionID, cl_rand);
+        return this.proxiedRemoteBody.randomValue(this.bodyID, sessionID,
+            cl_rand);
     }
 
     /**
@@ -334,7 +335,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
         byte[] encodedLockData, byte[] parametersSignature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return proxiedRemoteBody.secretKeyExchange(bodyID, sessionID,
+        return this.proxiedRemoteBody.secretKeyExchange(this.bodyID, sessionID,
             encodedAESKey, encodedIVParameters, encodedClientMacKey,
             encodedLockData, parametersSignature);
     }
@@ -344,7 +345,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getPolicy(bodyID, securityContext);
+        return this.proxiedRemoteBody.getPolicy(this.bodyID, securityContext);
     }
 
     /**
@@ -352,7 +353,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getCertificateEncoded(bodyID);
+        return this.proxiedRemoteBody.getCertificateEncoded(this.bodyID);
     }
 
     /**
@@ -360,22 +361,22 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      */
     public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getEntities(bodyID);
+        return this.proxiedRemoteBody.getEntities(this.bodyID);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException {
-        return this.proxiedRemoteBody.receiveFTMessage(bodyID, ev);
+        return this.proxiedRemoteBody.receiveFTMessage(this.bodyID, ev);
     }
 
     public GCResponse receiveGCMessage(GCMessage msg) throws IOException {
-        return proxiedRemoteBody.receiveGCMessage(bodyID, msg);
+        return this.proxiedRemoteBody.receiveGCMessage(this.bodyID, msg);
     }
 
     public void setRegistered(boolean registered) throws IOException {
-        proxiedRemoteBody.setRegistered(bodyID, registered);
+        this.proxiedRemoteBody.setRegistered(this.bodyID, registered);
     }
 
     //--------------------------------
@@ -383,7 +384,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     //--------------------------------
     public void addNFEListener(NFEListener listener) {
         try {
-            proxiedRemoteBody.addNFEListener(bodyID, listener);
+            this.proxiedRemoteBody.addNFEListener(this.bodyID, listener);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -392,7 +393,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
 
     public void removeNFEListener(NFEListener listener) {
         try {
-            proxiedRemoteBody.removeNFEListener(bodyID, listener);
+            this.proxiedRemoteBody.removeNFEListener(this.bodyID, listener);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -401,7 +402,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
 
     public int fireNFE(NonFunctionalException e) {
         try {
-            return proxiedRemoteBody.fireNFE(bodyID, e);
+            return this.proxiedRemoteBody.fireNFE(this.bodyID, e);
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -415,8 +416,8 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         try {
-            return proxiedRemoteBody.publicKeyExchange(bodyID, sessionID,
-                myPublicKey, myCertificate, signature);
+            return this.proxiedRemoteBody.publicKeyExchange(this.bodyID,
+                sessionID, myPublicKey, myCertificate, signature);
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();

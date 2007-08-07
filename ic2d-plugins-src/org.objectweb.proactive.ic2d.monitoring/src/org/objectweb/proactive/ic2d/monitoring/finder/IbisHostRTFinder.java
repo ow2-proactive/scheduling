@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
@@ -47,9 +47,9 @@ import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
 public class IbisHostRTFinder implements HostRTFinder {
 
 	public List<ProActiveRuntime> findPARuntime(HostObject host) {
-		
+
 		Console console = Console.getInstance(Activator.CONSOLE_NAME);
-		
+
 		console.log("Exploring "+host+" with Ibis on port "+host.getPort());
 		/* List of ProActive runtime */
 		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
@@ -66,21 +66,21 @@ public class IbisHostRTFinder implements HostRTFinder {
 //					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
 //					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
 //					runtimes.add(proActiveRuntime);
-					
+
 					URI url = new URI(host.getProtocol(),null,host.getHostName(),host.getPort(),"/"+name,null,null);
 					System.out.println("RMIHostRTFinder.findPARuntime()  "  + url);
-					RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);  
-					
+					RemoteObject ro = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).lookup(url);
+
 					System.out.println("RMIHostRTFinder.findPARuntime()  "  + ro);
-					
+
 					Object stub = ro.getObjectProxy();
-					
+
 					System.out.println("RMIHostRTFinder.findPARuntime()  "  + stub);
 					if (stub instanceof ProActiveRuntime) {
 						runtimes.add((ProActiveRuntime ) stub);
 					}
-					
-					
+
+
 				}
 			}
 		}

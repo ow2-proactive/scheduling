@@ -127,7 +127,7 @@ public class RmiRemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public void unreferenced() {
-        // System.out.println("RmiRemoteBodyImpl: unreferenced()");      
+        // System.out.println("RmiRemoteBodyImpl: unreferenced()");
         // System.gc();
     }
 

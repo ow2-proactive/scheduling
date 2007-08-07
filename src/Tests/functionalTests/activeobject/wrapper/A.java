@@ -77,7 +77,8 @@ public class A implements RunActive, Serializable {
     }
 
     public StringMutableWrapper testStringMutableWrapper() {
-        return new StringMutableWrapper("Alexandre dC is a famous coder");
+        return new StringMutableWrapper(
+            "Alexandre dC is a famous coder <-- do you mean that ? really ?");
     }
 
     public FloatMutableWrapper testFloatMutableWrapper() {
@@ -101,7 +102,8 @@ public class A implements RunActive, Serializable {
     }
 
     public StringWrapper testStringWrapper() {
-        return new StringWrapper("Alexandre dC is a famous coder");
+        return new StringWrapper(
+            "Alexandre dC is a famous coder <-- do you mean that ? really ?");
     }
 
     public FloatWrapper testFloatWrapper() {

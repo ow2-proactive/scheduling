@@ -94,7 +94,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * @return the VMID part of this UniqueID
      */
     public java.rmi.dgc.VMID getVMID() {
-        return vmID;
+        return this.vmID;
     }
 
     /**
@@ -102,7 +102,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * @return the UID part of this UniqueID
      */
     public java.rmi.server.UID getUID() {
-        return id;
+        return this.id;
     }
 
     /**
@@ -129,7 +129,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
 
     public String getCanonString() {
         if (this.cachedCanonString == null) {
-            this.cachedCanonString = "" + id + " " + vmID;
+            this.cachedCanonString = "" + this.id + "--" + this.vmID;
         }
 
         return this.cachedCanonString;
@@ -146,7 +146,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      */
     @Override
     public int hashCode() {
-        return id.hashCode() + vmID.hashCode();
+        return this.id.hashCode() + this.vmID.hashCode();
     }
 
     /**
@@ -157,8 +157,8 @@ public class UniqueID implements java.io.Serializable, Comparable {
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof UniqueID) {
-            return ((id.equals(((UniqueID) o).id)) &&
-            (vmID.equals(((UniqueID) o).vmID)));
+            return ((this.id.equals(((UniqueID) o).id)) &&
+            (this.vmID.equals(((UniqueID) o).vmID)));
         } else {
             return false;
         }
@@ -168,6 +168,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * for debug purpose
      */
     public void echo() {
-        logger.info("UniqueID The Id is " + id + " and the address is " + vmID);
+        logger.info("UniqueID The Id is " + this.id + " and the address is " +
+            this.vmID);
     }
 }

@@ -35,11 +35,16 @@ import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 
 import javax.management.InstanceNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.ListenerNotFoundException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServer;
+import javax.management.MBeanServer;
+import javax.management.NotificationListener;
 import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
@@ -80,7 +85,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
     }
 
     public MigratableBody(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory, String jobID) {
+        MetaObjectFactory factory, String jobID)
+        throws ActiveObjectCreationException {
         super(reifiedObject, nodeURL, factory, jobID);
         this.migrationManager = factory.newMigrationManagerFactory()
                                        .newMigrationManager();
@@ -106,19 +112,19 @@ public class MigratableBody extends BodyImpl implements Migratable,
     }
 
     public void addMigrationEventListener(MigrationEventListener listener) {
-        if (migrationManager != null) {
-            migrationManager.addMigrationEventListener(listener);
+        if (this.migrationManager != null) {
+            this.migrationManager.addMigrationEventListener(listener);
         }
     }
 
     public void removeMigrationEventListener(MigrationEventListener listener) {
-        if (migrationManager != null) {
-            migrationManager.removeMigrationEventListener(listener);
+        if (this.migrationManager != null) {
+            this.migrationManager.removeMigrationEventListener(listener);
         }
     }
 
     public MigrationManager getMigrationManager() {
-        return migrationManager;
+        return this.migrationManager;
     }
 
     //
@@ -133,18 +139,18 @@ public class MigratableBody extends BodyImpl implements Migratable,
         super.activityStarted();
 
         if (migrationLogger.isDebugEnabled()) {
-            migrationLogger.debug("Body run on node " + nodeURL +
-                " migration=" + hasJustMigrated);
+            migrationLogger.debug("Body run on node " + this.nodeURL +
+                " migration=" + this.hasJustMigrated);
         }
         if (bodyLogger.isDebugEnabled()) {
-            bodyLogger.debug("Body run on node " + nodeURL + " migration=" +
-                hasJustMigrated);
+            bodyLogger.debug("Body run on node " + this.nodeURL +
+                " migration=" + this.hasJustMigrated);
         }
-        if (hasJustMigrated) {
-            if (migrationManager != null) {
-                migrationManager.startingAfterMigration(this);
+        if (this.hasJustMigrated) {
+            if (this.migrationManager != null) {
+                this.migrationManager.startingAfterMigration(this);
             }
-            hasJustMigrated = false;
+            this.hasJustMigrated = false;
         }
     }
 
@@ -200,8 +206,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
         }
 
         // get the name of the node
-        String saveNodeURL = nodeURL;
-        nodeURL = node.getNodeInformation().getURL();
+        String saveNodeURL = this.nodeURL;
+        this.nodeURL = node.getNodeInformation().getURL();
 
         try {
             if (this.isSecurityOn) {
@@ -220,8 +226,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
 
                     SecurityContext result = null;
 
-                    if (isSecurityOn) {
-                        result = securityManager.getPolicy(sc);
+                    if (this.isSecurityOn) {
+                        result = this.securityManager.getPolicy(sc);
 
                         if (!result.isMigration()) {
                             ProActiveLogger.getLogger(Loggers.SECURITY)
@@ -245,23 +251,23 @@ public class MigratableBody extends BodyImpl implements Migratable,
                     e.printStackTrace();
                 }
             }
-            nodeURL = node.getNodeInformation().getURL();
+            this.nodeURL = node.getNodeInformation().getURL();
 
             // stop accepting communication
             blockCommunication();
 
             // save the id
-            savedID = bodyID;
+            savedID = this.bodyID;
             if (byCopy) {
                 // if moving by copy we have to create a new unique ID
                 // the bodyID will be automatically recreate when deserialized
-                bodyID = null;
+                this.bodyID = null;
             }
 
             // security
             // save opened sessions
             if (this.isSecurityOn) {
-                openedSessions = securityManager.getOpenedConnexion();
+                this.openedSessions = this.securityManager.getOpenedConnexion();
             }
 
             // Set copyMode tag in all futures
@@ -269,9 +275,9 @@ public class MigratableBody extends BodyImpl implements Migratable,
             this.getFuturePool().setCopyMode(true);
 
             // try to migrate
-            migratedBody = migrationManager.migrateTo(node, this);
+            migratedBody = this.migrationManager.migrateTo(node, this);
 
-            if (isSecurityOn) {
+            if (this.isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(migratedBody);
             }
 
@@ -282,10 +288,10 @@ public class MigratableBody extends BodyImpl implements Migratable,
                 this.ftmanager.updateLocationAtServer(savedID, migratedBody);
             }
         } catch (MigrationException e) {
-            openedSessions = null;
-            nodeURL = saveNodeURL;
-            bodyID = savedID;
-            localBodyStrategy.getFuturePool().setCopyMode(false);
+            this.openedSessions = null;
+            this.nodeURL = saveNodeURL;
+            this.bodyID = savedID;
+            this.localBodyStrategy.getFuturePool().setCopyMode(false);
             if (this.isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(null);
             }
@@ -297,8 +303,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
             this.migrationManager.changeBodyAfterMigration(this, migratedBody);
             activityStopped(false);
         } else {
-            bodyID = savedID;
-            nodeURL = saveNodeURL;
+            this.bodyID = savedID;
+            this.nodeURL = saveNodeURL;
         }
         acceptCommunication();
 
@@ -322,10 +328,10 @@ public class MigratableBody extends BodyImpl implements Migratable,
             migrationLogger.debug("stream =  " + in);
         }
         in.defaultReadObject();
-        hasJustMigrated = true;
+        this.hasJustMigrated = true;
         if (this.isSecurityOn) {
-            internalBodySecurity = new InternalBodySecurity(null);
-            securityManager.setBody(this);
+            this.internalBodySecurity = new InternalBodySecurity(null);
+            this.securityManager.setBody(this);
         }
     }
 
@@ -333,6 +339,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
      * @see org.objectweb.proactive.core.body.LocalBodyStrategy#getNextSequenceID()
      */
     public long getNextSequenceID() {
-        return localBodyStrategy.getNextSequenceID();
+        return this.localBodyStrategy.getNextSequenceID();
     }
 }

@@ -39,6 +39,9 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -49,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since 2.2
  */
 public abstract class CheckpointServerImpl implements CheckpointServer {
-    //logger
+    // logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // used memory
@@ -73,7 +76,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
 
         this.checkpointStorage = new Hashtable();
 
-        //classloader
+        // classloader
         try {
             CheckpointServerImpl.classServerHelper.setShouldCreateClassServer(true);
             this.codebase = CheckpointServerImpl.classServerHelper.initializeClassServer();
@@ -82,6 +85,13 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
         } catch (IOException e) {
             this.codebase = "NO CODEBASE";
             System.err.println("** ERROR ** Unable to launch FT server : ");
+            e.printStackTrace();
+        }
+
+        try {
+            Node n = NodeFactory.getDefaultNode();
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -110,8 +120,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
     }
 
     /*
-     * Return the memory actually used
-     * For debugging stuff.
+     * Return the memory actually used For debugging stuff.
      */
     protected long getUsedMem() {
         return (CheckpointServerImpl.runtime.totalMemory() -

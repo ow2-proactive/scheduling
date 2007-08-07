@@ -78,13 +78,13 @@ public interface UniversalBodyForwarder {
     public void createShortcut(UniqueID id, Shortcut shortcut)
         throws java.io.IOException;
 
-    public BodyAdapter getRemoteAdapter(UniqueID id);
+    public UniversalBody getRemoteAdapter(UniqueID id);
 
     public void enableAC(UniqueID id) throws java.io.IOException;
 
     public void disableAC(UniqueID id) throws java.io.IOException;
 
-    // 
+    //
     // -- SECURITY
     //
     public X509Certificate getCertificate(UniqueID id)
@@ -149,8 +149,8 @@ public interface UniversalBodyForwarder {
     public int fireNFE(UniqueID id, NonFunctionalException e)
         throws java.io.IOException;
 
-    // These four ones are needed because call is tramsited to the 
-    // original body *adapter* on the forwarder    
+    // These four ones are needed because call is tramsited to the
+    // original body *adapter* on the forwarder
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws IOException;
 

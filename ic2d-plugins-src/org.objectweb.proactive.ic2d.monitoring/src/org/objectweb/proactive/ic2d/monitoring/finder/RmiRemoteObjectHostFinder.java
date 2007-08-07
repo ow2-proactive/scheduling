@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
@@ -85,21 +85,21 @@ public class RmiRemoteObjectHostFinder implements HostRTFinder{
 				try {
 //					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
 //					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
-					
+
 					URI url = new URI(host.getProtocol(),null,host.getHostName(),host.getPort(),"/"+name,null,null);
-			
-					RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);  
-					
-			
-					
+
+					RemoteObject ro = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).lookup(url);
+
+
+
 					Object stub = ro.getObjectProxy();
-					
+
 
 					if (stub instanceof ProActiveRuntime) {
 						runtimes.add((ProActiveRuntime ) stub);
 					}
-					
-					
+
+
 				} catch(Exception e) {
 					//System.out.println("RMIHostRTFinder.findPARuntime() ***"+host.getFullName());
 					console.debug(e);

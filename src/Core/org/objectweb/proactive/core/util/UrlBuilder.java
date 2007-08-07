@@ -38,7 +38,8 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -68,11 +69,16 @@ public class UrlBuilder {
         try {
             hostname = fromLocalhostToHostname(u.getHost());
 
-            URI u2 = new URI(u.getScheme(), null, hostname, u.getPort(),
-                    u.getPath(), u.getQuery(), u.getFragment());
+            String path = u.getPath();
+            if ((path != null) && !path.startsWith("/")) {
+                path = "/" + path;
+            }
+
+            URI u2 = new URI(u.getScheme(), null, hostname, u.getPort(), path,
+                    u.getQuery(), u.getFragment());
             return u2.toString();
         } catch (UnknownHostException e) {
-            throw new URISyntaxException(url, "host unknow");
+            throw new URISyntaxException(url, "host unknown");
         }
     }
 
@@ -85,8 +91,14 @@ public class UrlBuilder {
      * @returnan url under the form [protocol:][//host][[/]name]
      */
     public static String buildUrl(String host, String name, String protocol) {
-        return buildUrl(host, name, protocol,
-            RemoteObjectFactory.getDefaultPortForProtocol(protocol));
+        try {
+            return buildUrl(host, name, protocol,
+                RemoteObjectHelper.getDefaultPortForProtocol(protocol));
+        } catch (UnknownProtocolException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -171,6 +183,12 @@ public class UrlBuilder {
                                          .getProperty(Constants.PROPERTY_PA_RMI_PORT);
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
+            try {
+                RemoteObjectHelper.getRemoteObjectFactory(protocol);
+            } catch (UnknownProtocolException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             port = ProActiveConfiguration.getInstance()
                                          .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         }

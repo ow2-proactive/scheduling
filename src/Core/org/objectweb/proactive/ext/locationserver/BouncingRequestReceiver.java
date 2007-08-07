@@ -39,13 +39,14 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 
 
 public class BouncingRequestReceiver implements RequestReceiver {
-    protected static java.io.IOException REUSABLE_EXCEPTION = new java.io.IOException(
+    private static ObjectHasMigratedException REUSABLE_EXCEPTION = new ObjectHasMigratedException(
             "Object has migrated");
 
     public int receiveRequest(Request r, Body bodyReceiver)
         throws java.io.IOException {
         //System.out.println("BouncingRequestReceiver: receiveRequest()");
-        throw REUSABLE_EXCEPTION;
+        //        throw REUSABLE_EXCEPTION;
+        throw new ObjectHasMigratedException("Object has migrated");
     }
 
     public void addMessageEventListener(MessageEventListener listener) {

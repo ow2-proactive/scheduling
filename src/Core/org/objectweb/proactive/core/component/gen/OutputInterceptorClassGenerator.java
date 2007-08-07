@@ -238,8 +238,7 @@ public class OutputInterceptorClassGenerator
                 //                    representativeClassName);
                 byte[] bytecode = generatedCtClass.toBytecode();
                 ClassDataCache.instance()
-                              .addClassData(representativeClassName,
-                    generatedCtClass.toBytecode());
+                              .addClassData(representativeClassName, bytecode);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + representativeClassName +
                         " to cache");

@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -180,7 +180,7 @@ public abstract class RuntimeFactory {
                                                  .getRemoteObject(protocol);
 
         if (rro == null) {
-            URI url = RemoteObjectFactory.generateUrl(protocol,
+            URI url = RemoteObjectHelper.generateUrl(protocol,
                     URIBuilder.getNameFromURI(URI.create(
                             proActiveRuntime.getURL())));
             proActiveRuntime.getRemoteObjectExposer().activateProtocol(url);
@@ -209,8 +209,7 @@ public abstract class RuntimeFactory {
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
         //        RuntimeFactory factory = getFactory(protocol);
-        RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(protocol)
-                                             .lookup(URI.create(
+        RemoteObject ro = RemoteObjectHelper.lookup(URI.create(
                     proActiveRuntimeURL));
 
         //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
@@ -319,8 +318,8 @@ public abstract class RuntimeFactory {
         throws ProActiveException {
         if (runtimeLogger.isDebugEnabled()) {
             runtimeLogger.debug("protocol1 = " + protocol);
-            //            
-            //            if (protocol.endsWith(":")) 
+            //
+            //            if (protocol.endsWith(":"))
             //            throw new RuntimeException();
         }
 

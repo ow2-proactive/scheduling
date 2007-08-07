@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -121,7 +122,7 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
      * Returns the remote friendly version of this body
      * @return the remote friendly version of this body
      */
-    public BodyAdapter getRemoteAdapter();
+    public UniversalBody getRemoteAdapter();
 
     /**
      * Enables automatic continuation mechanism for this body
@@ -164,4 +165,7 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
      * @throws IOException if a pb occurs during this method call
      */
     public void setRegistered(boolean registered) throws IOException;
+
+    public void register(String url)
+        throws IOException, UnknownProtocolException;
 }

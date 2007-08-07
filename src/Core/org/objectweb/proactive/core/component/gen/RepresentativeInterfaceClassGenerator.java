@@ -105,6 +105,7 @@ public class RepresentativeInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
+            //        	e.printStackTrace();
             throw new InterfaceGenerationFailedException(
                 "Cannot generate representative on interface [" +
                 interfaceName + "] with signature [" +
@@ -229,7 +230,7 @@ public class RepresentativeInterfaceClassGenerator
                     bodyForImplGetterAndSetter, generatedCtClass);
             generatedCtClass.addMethod(implGetter);
             CtMethod implSetter = CtNewMethod.make(
-                    "public Object setFcItfImpl() " +
+                    "public void setFcItfImpl(Object o) " +
                     bodyForImplGetterAndSetter, generatedCtClass);
             generatedCtClass.addMethod(implSetter);
 
@@ -301,8 +302,7 @@ public class RepresentativeInterfaceClassGenerator
             //                                        representativeClassName);
             byte[] bytecode = generatedCtClass.toBytecode();
             ClassDataCache.instance()
-                          .addClassData(representativeClassName,
-                generatedCtClass.toBytecode());
+                          .addClassData(representativeClassName, bytecode);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("added " + representativeClassName + " to cache");
@@ -311,6 +311,7 @@ public class RepresentativeInterfaceClassGenerator
             return bytecode;
         } catch (Exception e) {
             e.printStackTrace();
+
             logger.error("Cannot generate class : " + representativeClassName);
             return null;
         }
@@ -394,9 +395,9 @@ public class RepresentativeInterfaceClassGenerator
                 }
             }
 
-            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
+            body += (" myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
             "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            ", parameters, null, getFcItfName(), senderItfID))");
+            ", parameters, null, getFcItfName(), senderItfID))  ");
 
             if (postWrap != null) {
                 body += postWrap;

@@ -77,7 +77,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-// TODO JAVADOC SHOULD BE REWRITTEN 
+// TODO JAVADOC SHOULD BE REWRITTEN
 /**
  * <p>
  * This class provides singleton instances of all default factories
@@ -148,15 +148,15 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     // -- CONSTRUCTORS -----------------------------------------------
     //
     protected ProActiveMetaObjectFactory() {
-        requestFactoryInstance = newRequestFactorySingleton();
-        replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
-        requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
-        requestQueueFactoryInstance = newRequestQueueFactorySingleton();
-        migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
-        remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
-        threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-        proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
-        ftmanagerFactoryInstance = newFTManagerFactorySingleton();
+        this.requestFactoryInstance = newRequestFactorySingleton();
+        this.replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
+        this.requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
+        this.requestQueueFactoryInstance = newRequestQueueFactorySingleton();
+        this.migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
+        this.remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
+        this.threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+        this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
+        this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
     }
 
     /**
@@ -168,16 +168,16 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         this.parameters = parameters;
         if (parameters.containsKey(COMPONENT_PARAMETERS_KEY)) {
             ComponentParameters initialComponentParameters = (ComponentParameters) parameters.get(COMPONENT_PARAMETERS_KEY);
-            componentFactoryInstance = newComponentFactorySingleton(initialComponentParameters);
-            requestFactoryInstance = newRequestFactorySingleton();
-            replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
-            requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
-            requestQueueFactoryInstance = newRequestQueueFactorySingleton();
-            migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
-            remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
-            threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-            proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
-            ftmanagerFactoryInstance = newFTManagerFactorySingleton();
+            this.componentFactoryInstance = newComponentFactorySingleton(initialComponentParameters);
+            this.requestFactoryInstance = newRequestFactorySingleton();
+            this.replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
+            this.requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
+            this.requestQueueFactoryInstance = newRequestQueueFactorySingleton();
+            this.migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
+            this.remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
+            this.threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+            this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
+            this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
         }
     }
 
@@ -197,50 +197,50 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
      * @return the parameters of the factory
      */
     public Map getParameters() {
-        return parameters;
+        return this.parameters;
     }
 
     //
     // -- implements MetaObjectFactory -----------------------------------------------
     //
     public RequestFactory newRequestFactory() {
-        return requestFactoryInstance;
+        return this.requestFactoryInstance;
     }
 
     public ReplyReceiverFactory newReplyReceiverFactory() {
-        return replyReceiverFactoryInstance;
+        return this.replyReceiverFactoryInstance;
     }
 
     public RequestReceiverFactory newRequestReceiverFactory() {
-        return requestReceiverFactoryInstance;
+        return this.requestReceiverFactoryInstance;
     }
 
     public RequestQueueFactory newRequestQueueFactory() {
-        return requestQueueFactoryInstance;
+        return this.requestQueueFactoryInstance;
     }
 
     public MigrationManagerFactory newMigrationManagerFactory() {
-        return migrationManagerFactoryInstance;
+        return this.migrationManagerFactoryInstance;
     }
 
     public RemoteBodyFactory newRemoteBodyFactory() {
-        return remoteBodyFactoryInstance;
+        return this.remoteBodyFactoryInstance;
     }
 
     public ThreadStoreFactory newThreadStoreFactory() {
-        return threadStoreFactoryInstance;
+        return this.threadStoreFactoryInstance;
     }
 
     public ProActiveSPMDGroupManagerFactory newProActiveSPMDGroupManagerFactory() {
-        return proActiveSPMDGroupManagerFactoryInstance;
+        return this.proActiveSPMDGroupManagerFactoryInstance;
     }
 
     public ProActiveComponentFactory newComponentFactory() {
-        return componentFactoryInstance;
+        return this.componentFactoryInstance;
     }
 
     public FTManagerFactory newFTManagerFactory() {
-        return ftmanagerFactoryInstance;
+        return this.ftmanagerFactoryInstance;
     }
 
     //
@@ -317,8 +317,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected class RequestReceiverFactoryImpl implements RequestReceiverFactory,
         java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
-            if (parameters.containsKey(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
-                    ((Boolean) parameters.get(
+            if (ProActiveMetaObjectFactory.this.parameters.containsKey(
+                        SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
+                    ((Boolean) ProActiveMetaObjectFactory.this.parameters.get(
                         ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
                 return new SynchronousComponentRequestReceiver();
             }
@@ -330,7 +331,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected class RequestQueueFactoryImpl implements RequestQueueFactory,
         java.io.Serializable {
         public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
-            if ("true".equals(parameters.get(
+            if ("true".equals(ProActiveMetaObjectFactory.this.parameters.get(
                             SYNCHRONOUS_COMPOSITE_COMPONENT_KEY))) {
                 return null;
             }
@@ -430,7 +431,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         }
 
         public ProActiveComponent newProActiveComponent(Body myBody) {
-            return new ProActiveComponentImpl(componentParameters, myBody);
+            return new ProActiveComponentImpl(this.componentParameters, myBody);
         }
     }
 
@@ -472,7 +473,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager() {
-        return proActiveSecurityManager;
+        return this.proActiveSecurityManager;
     }
 
     @Override
@@ -487,7 +488,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             out.flush();
             bout.close();
 
-            bout.close();
+            out.close();
 
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
                         bout.toByteArray()));

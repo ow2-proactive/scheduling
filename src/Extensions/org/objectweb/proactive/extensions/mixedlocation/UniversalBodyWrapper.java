@@ -37,7 +37,6 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -47,6 +46,7 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -119,11 +119,11 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     public String getJobID() {
-        if (jobID == null) {
-            jobID = wrappedBody.getJobID();
+        if (this.jobID == null) {
+            this.jobID = this.wrappedBody.getJobID();
         }
 
-        return jobID;
+        return this.jobID;
     }
 
     public void updateLocation(UniqueID id, UniversalBody body)
@@ -131,7 +131,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody.updateLocation(id, body);
     }
 
-    public BodyAdapter getRemoteAdapter() {
+    public UniversalBody getRemoteAdapter() {
         return this.wrappedBody.getRemoteAdapter();
     }
 
@@ -155,19 +155,19 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     //protected synchronized void stop() {
-    // this.stop=true;	
+    // this.stop=true;
     // this.notifyAll();
     //}
     //
     //protected synchronized void waitForStop(long time) {
     //	if (!this.stop) {
     //	 try {
-    //		 wait(time);	
+    //		 wait(time);
     //	} catch (InterruptedException e) {
     //		e.printStackTrace();
     //	}
     //	}
-    //	
+    //
     //}
     public void run() {
         //        System.out.println("UniversalBodyWrapper.run life expectancy " + time);
@@ -186,50 +186,50 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     //  NFEProducer implementation
     public void addNFEListener(NFEListener listener) {
-        wrappedBody.addNFEListener(listener);
+        this.wrappedBody.addNFEListener(listener);
     }
 
     public void removeNFEListener(NFEListener listener) {
-        wrappedBody.removeNFEListener(listener);
+        this.wrappedBody.removeNFEListener(listener);
     }
 
     public int fireNFE(NonFunctionalException e) {
-        return wrappedBody.fireNFE(e);
+        return this.wrappedBody.fireNFE(e);
     }
 
     // SECURITY
     public void terminateSession(long sessionID)
         throws java.io.IOException, SecurityNotAvailableException {
-        wrappedBody.terminateSession(sessionID);
+        this.wrappedBody.terminateSession(sessionID);
     }
 
     public X509Certificate getCertificate()
         throws java.io.IOException, SecurityNotAvailableException {
-        return wrappedBody.getCertificate();
+        return this.wrappedBody.getCertificate();
     }
 
     public long startNewSession(Communication policy)
         throws java.io.IOException, RenegotiateSessionException,
             SecurityNotAvailableException {
-        return wrappedBody.startNewSession(policy);
+        return this.wrappedBody.startNewSession(policy);
     }
 
     public PublicKey getPublicKey()
         throws java.io.IOException, SecurityNotAvailableException {
-        return wrappedBody.getPublicKey();
+        return this.wrappedBody.getPublicKey();
     }
 
     public byte[] randomValue(long sessionID, byte[] cl_rand)
         throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException {
-        return wrappedBody.randomValue(sessionID, cl_rand);
+        return this.wrappedBody.randomValue(sessionID, cl_rand);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] my_pub,
         byte[] my_cert, byte[] sig_code)
         throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException, KeyExchangeException {
-        return wrappedBody.publicKeyExchange(sessionID, my_pub, my_cert,
+        return this.wrappedBody.publicKeyExchange(sessionID, my_pub, my_cert,
             sig_code);
     }
 
@@ -237,8 +237,8 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
         throws IOException, SecurityNotAvailableException,
             RenegotiateSessionException {
-        return wrappedBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
-            tmp4);
+        return this.wrappedBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2,
+            tmp3, tmp4);
     }
 
     /* (non-Javadoc)
@@ -246,7 +246,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
      */
     public byte[] getCertificateEncoded()
         throws IOException, SecurityNotAvailableException {
-        return wrappedBody.getCertificateEncoded();
+        return this.wrappedBody.getCertificateEncoded();
     }
 
     /* (non-Javadoc)
@@ -254,12 +254,12 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-        return wrappedBody.getPolicy(securityContext);
+        return this.wrappedBody.getPolicy(securityContext);
     }
 
     public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
-        return wrappedBody.getEntities();
+        return this.wrappedBody.getEntities();
     }
 
     /**
@@ -281,5 +281,10 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         // TODO implement
         throw new ProActiveRuntimeException(
             "create shortcut method not implemented yet");
+    }
+
+    public void register(String url)
+        throws IOException, UnknownProtocolException {
+        this.wrappedBody.register(url);
     }
 }

@@ -54,7 +54,7 @@ public class Test extends FunctionalTest {
     private int result = 0;
     private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = Test.class.getResource(
-            "/functionalTests/ft/testFT_PML.xml").getPath();
+            "/functionalTests/ft/testFT_PML2.xml").getPath();
     private static int AWAITED_RESULT = 1771014405;
 
     @org.junit.Test
@@ -115,11 +115,13 @@ public class Test extends FunctionalTest {
         ReInt r = c.getResult();
         this.result = r.getValue();
 
+        System.out.println("Test.action() : LAAAAAAAAAAAAAA");
+
         //cleaning
         this.server.stopProcess();
         pad.killall(false);
 
-        //System.out.println(" ---------> RES = " + r.getValue()); 
+        //System.out.println(" ---------> RES = " + r.getValue());
         assertTrue(this.result == Test.AWAITED_RESULT);
     }
 }

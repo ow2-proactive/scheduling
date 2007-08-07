@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -31,6 +29,10 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  */
 public class RmiRemoteObjectImpl extends UnicastRemoteObject
     implements RmiRemoteObject {
+
+    /**
+         *
+         */
     protected RemoteObject remoteObject;
     protected Object stub;
     protected URI uri;
@@ -50,52 +52,53 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
     }
 
     public Reply receiveMessage(Request message)
-        throws RemoteException, RenegotiateSessionException, ProActiveException {
+        throws RemoteException, RenegotiateSessionException, ProActiveException,
+            IOException {
         if (message.isOneWay()) {
-            remoteObject.receiveMessage(message);
+            this.remoteObject.receiveMessage(message);
             return null;
         }
 
-        return remoteObject.receiveMessage(message);
+        return this.remoteObject.receiveMessage(message);
     }
 
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        return remoteObject.getCertificate();
+        return this.remoteObject.getCertificate();
     }
 
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-        return remoteObject.getCertificateEncoded();
+        return this.remoteObject.getCertificateEncoded();
     }
 
     public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
-        return remoteObject.getEntities();
+        return this.remoteObject.getEntities();
     }
 
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-        return remoteObject.getPolicy(securityContext);
+        return this.remoteObject.getPolicy(securityContext);
     }
 
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
-        return remoteObject.getPublicKey();
+        return this.remoteObject.getPublicKey();
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return remoteObject.publicKeyExchange(sessionID, myPublicKey,
+        return this.remoteObject.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return remoteObject.randomValue(sessionID, clientRandomValue);
+        return this.remoteObject.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
@@ -103,7 +106,7 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         byte[] encodedLockData, byte[] parametersSignature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return remoteObject.secretKeyExchange(sessionID, encodedAESKey,
+        return this.remoteObject.secretKeyExchange(sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,
             parametersSignature);
     }
@@ -111,18 +114,23 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return remoteObject.startNewSession(policy);
+        return this.remoteObject.startNewSession(policy);
     }
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
-        remoteObject.terminateSession(sessionID);
+        this.remoteObject.terminateSession(sessionID);
     }
 
     public Object getObjectProxy() throws ProActiveException, IOException {
         if (this.stub == null) {
-            this.stub = this.remoteObject.getObjectProxy();
-            ((SynchronousProxy) ((StubObject) this.stub).getProxy()).setRemoteObject(this);
+            this.stub = this.remoteObject.getObjectProxy(this);
+
+            //            if (stub instanceof Adapter) {
+            //            	 ((StubObject) ((Adapter)this.stub).getAdapter()).setProxy(new SynchronousProxy(null, new Object[] { this } ));
+            //            } else {
+            //            ((StubObject) this.stub).setProxy(new SynchronousProxy(null, new Object[] { this } ));
+            //            }
         }
         return this.stub;
     }
@@ -132,7 +140,8 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         this.stub = stub;
     }
 
-    public RemoteObject getRemoteObject() throws ProActiveException {
+    public RemoteObject getRemoteObject()
+        throws ProActiveException, IOException {
         return this.remoteObject;
     }
 
@@ -142,5 +151,13 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
 
     public void setURI(java.net.URI uri) throws ProActiveException, IOException {
         this.uri = uri;
+    }
+
+    public String getClassName() throws ProActiveException, IOException {
+        return this.remoteObject.getClassName();
+    }
+
+    public String getProxyName() throws ProActiveException, IOException {
+        return this.remoteObject.getProxyName();
     }
 }

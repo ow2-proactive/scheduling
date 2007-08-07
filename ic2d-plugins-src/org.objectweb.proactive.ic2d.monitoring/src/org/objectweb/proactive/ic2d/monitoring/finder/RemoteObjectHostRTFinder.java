@@ -38,7 +38,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
@@ -59,34 +59,34 @@ public class RemoteObjectHostRTFinder implements HostRTFinder{
 		/* List of ProActive runtime */
 		List<ProActiveRuntime> runtimes = new ArrayList<ProActiveRuntime>();
 
-		
+
 		URI [] uris = null;
 		try {
-			
+
 			 URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
-			 uris = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).list(target);
+			 uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).list(target);
 
 			if (uris != null ) {
 			 /* Searchs all ProActive Runtimes */
 				for (int i = 0; i < uris.length; ++i) {
-			
+
 					URI url = uris[i];
-			
+
 					try {
-					    RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);
+					    RemoteObject ro = RemoteObjectHelper.lookup(url);
 					    Object stub = ro.getObjectProxy();
-                        
+
 	                    if (stub instanceof ProActiveRuntime) {
 	                        runtimes.add((ProActiveRuntime ) stub);
 	                    }
 					} catch (ProActiveException pae) {
-					    // the lookup returned an active object, and an active object is 
+					    // the lookup returned an active object, and an active object is
 					    // not a remote object (for now...)
 					    // TODO : Arnaud, Active objects should become Remote Objects...
 					    console.log("Found active object in registry at " + url);
 					}
-				}	
-					
+
+				}
 			}
 		} catch (Exception e) {
 			if(e instanceof ConnectException || e instanceof ConnectIOException) {
@@ -97,7 +97,7 @@ public class RemoteObjectHostRTFinder implements HostRTFinder{
 			return runtimes;
 		}
 
-		
+
 		return runtimes;
 	}
 }

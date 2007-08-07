@@ -68,7 +68,7 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
      * update our location on the Location Server
      */
     public void updateLocation(Body body) {
-        if (locationServer == null) {
+        if (this.locationServer == null) {
             this.locationServer = LocationServerFactory.getLocationServer();
         }
 
@@ -77,7 +77,20 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
             logger.debug("Updating location with this stub " +
                 body.getRemoteAdapter());
         }
-        locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
+
+        System.out.println(
+            "MigrationManagerWithLocationServer.updateLocation() location server" +
+            this.locationServer);
+
+        System.out.println(
+            "MigrationManagerWithLocationServer.updateLocation() body.getID()" +
+            body.getID());
+
+        System.out.println(
+            "MigrationManagerWithLocationServer.updateLocation() body.getremoteadapter() " +
+            body.getRemoteAdapter());
+
+        this.locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
         //   }
     }
 
@@ -87,8 +100,8 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     @Override
     public UniversalBody migrateTo(Node node, Body body)
         throws MigrationException {
-        locationServer = null;
-        if (myBody == null) {
+        this.locationServer = null;
+        if (this.myBody == null) {
             this.myBody = body;
         }
 
@@ -119,7 +132,7 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.updateLocation(myBody);
+        this.updateLocation(this.myBody);
         //	this.updateLocation();
     }
 }

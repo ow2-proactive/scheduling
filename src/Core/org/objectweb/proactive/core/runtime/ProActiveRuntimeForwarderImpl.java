@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
@@ -99,11 +100,11 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     private BodyAdapterForwarder bodyAdapterForwarder = null;
     private RemoteBodyForwarder remoteBodyForwarder = null;
 
-    protected ProActiveRuntimeForwarderImpl() {
+    protected ProActiveRuntimeForwarderImpl() throws UnknownProtocolException {
         super();
-        registeredRuntimes = new ConcurrentHashMap<UniqueRuntimeID, ProActiveRuntime>();
-        hierarchicalProcesses = new HashMap<Object, ExternalProcess>();
-        bodyForwarder = new BodyForwarderImpl();
+        this.registeredRuntimes = new ConcurrentHashMap<UniqueRuntimeID, ProActiveRuntime>();
+        this.hierarchicalProcesses = new HashMap<Object, ExternalProcess>();
+        this.bodyForwarder = new BodyForwarderImpl();
 
         // Create the BodyForwarder, protocol specific
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
@@ -136,7 +137,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             }
 
             try {
-                remoteBodyForwarder = new RmiRemoteBodyForwarderImpl(bodyForwarder,
+                this.remoteBodyForwarder = new RmiRemoteBodyForwarderImpl(this.bodyForwarder,
                         new SshRMIServerSocketFactory(),
                         new SshRMIClientSocketFactory());
             } catch (RemoteException e) {
@@ -148,28 +149,28 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             }
 
             try {
-                remoteBodyForwarder = new RmiRemoteBodyForwarderImpl(bodyForwarder);
+                this.remoteBodyForwarder = new RmiRemoteBodyForwarderImpl(this.bodyForwarder);
             } catch (RemoteException e) {
                 logger.info("Local forwarder cannot be created.");
             }
         }
 
-        bodyAdapterForwarder = new BodyAdapterForwarder(remoteBodyForwarder);
+        this.bodyAdapterForwarder = new BodyAdapterForwarder(this.remoteBodyForwarder);
     }
 
     /* Some methods in proactive.core.body package need to get acces to the BodyForwarder
      * currently running, so the three following methods are public
      */
     public BodyAdapterForwarder getBodyAdapterForwarder() {
-        return bodyAdapterForwarder;
+        return this.bodyAdapterForwarder;
     }
 
     public BodyForwarderImpl getBodyForwarder() {
-        return bodyForwarder;
+        return this.bodyForwarder;
     }
 
     public RemoteBodyForwarder getRemoteBodyForwarder() {
-        return remoteBodyForwarder;
+        return this.remoteBodyForwarder;
     }
 
     public boolean isRoot() {
@@ -198,12 +199,12 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
          * in the chain by intercepting register calls of deployed process
          */
         try {
-            // erk ! 
+            // erk !
             ProActiveRuntimeAdapterForwarderImpl adapter = new ProActiveRuntimeAdapterForwarderImpl((ProActiveRuntimeAdapterForwarderImpl) RuntimeFactory.getDefaultRuntime(),
                     proActiveRuntimeDist);
 
-            if (parentRuntime != null) {
-                parentRuntime.register(adapter, proActiveRuntimeName,
+            if (this.parentRuntime != null) {
+                this.parentRuntime.register(adapter, proActiveRuntimeName,
                     creatorID, creationProtocol, vmName);
             } else {
                 if (isRoot()) {
@@ -235,7 +236,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         } else {
 
             /* Used only in multi-heriarchical deployment. */
-            HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
+            HierarchicalProcess hp = (HierarchicalProcess) this.hierarchicalProcesses.get(buildKey(
                         padURL, vmName));
 
             if (hp != null) {
@@ -257,7 +258,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         ExternalProcess process) {
         JVMProcess jvmProcess = (JVMProcess) process.getFinalProcess();
         jvmProcess.resetParameters();
-        hierarchicalProcesses.put(buildKey(padURL, vmName), process);
+        this.hierarchicalProcesses.put(buildKey(padURL, vmName), process);
     }
 
     public UniversalBody createBody(UniqueRuntimeID urid, String nodeName,
@@ -268,7 +269,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             return this.createBody(nodeName, bodyConstructorCall, isNodeLocal);
         }
 
-        ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+        ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
         if (part == null) {
             logErrorAndDumpTable(urid);
@@ -279,7 +280,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         UniversalBody rBody = part.createBody(nodeName, bodyConstructorCall,
                 isNodeLocal);
 
-        bodyForwarder.addcreatedBody(rBody.getID());
+        this.bodyForwarder.addcreatedBody(rBody.getID());
 
         return rBody;
     }
@@ -295,7 +296,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             return this.createLocalNode(nodeName, replacePreviousBinding, psm,
                 vnName, jobId);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.createLocalNode(nodeName, replacePreviousBinding,
@@ -312,7 +313,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.killAllNodes();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.killAllNodes();
@@ -327,7 +328,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.killNode(nodeName);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.killNode(nodeName);
@@ -342,7 +343,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.createVM(remoteProcess);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.createVM(remoteProcess);
@@ -357,7 +358,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getLocalNodeNames();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getLocalNodeNames();
@@ -373,7 +374,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getVMInformation();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getVMInformation();
@@ -393,7 +394,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             this.register(proActiveRuntimeDist, proActiveRuntimeUrl, creatorID,
                 creationProtocol, rurid);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.register(proActiveRuntimeDist, proActiveRuntimeUrl,
@@ -412,7 +413,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             this.unregister(proActiveRuntimeDist, proActiveRuntimeUrl,
                 creatorID, creationProtocol, rurid);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.unregister(proActiveRuntimeDist, proActiveRuntimeUrl,
@@ -428,7 +429,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getProActiveRuntimes();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getProActiveRuntimes();
@@ -445,7 +446,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getProActiveRuntime(proActiveRuntimeName);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getProActiveRuntime(proActiveRuntimeName);
@@ -462,7 +463,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.addAcquaintance(proActiveRuntimeName);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.addAcquaintance(proActiveRuntimeName);
@@ -477,7 +478,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getAcquaintances();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getAcquaintances();
@@ -494,7 +495,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.rmAcquaintance(proActiveRuntimeName);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.rmAcquaintance(proActiveRuntimeName);
@@ -509,7 +510,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.killRT(softly);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.killRT(softly);
@@ -523,7 +524,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getURL();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getURL();
@@ -540,7 +541,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getActiveObjects(nodeName);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getActiveObjects(nodeName);
@@ -557,7 +558,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getActiveObjects(nodeName, className);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getActiveObjects(nodeName, className);
@@ -574,7 +575,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getVirtualNode(virtualNodeName);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getVirtualNode(virtualNodeName);
@@ -592,7 +593,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.registerVirtualNode(virtualNodeName, replacePreviousBinding);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.registerVirtualNode(virtualNodeName, replacePreviousBinding);
@@ -607,7 +608,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.unregisterVirtualNode(virtualNodeName);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.unregisterVirtualNode(virtualNodeName);
@@ -622,7 +623,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.unregisterAllVirtualNodes();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.unregisterAllVirtualNodes();
@@ -637,7 +638,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getJobID(nodeUrl);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getJobID(nodeUrl);
@@ -654,7 +655,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.receiveBody(nodeName, body);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.receiveBody(nodeName, body);
@@ -671,7 +672,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.receiveCheckpoint(nodeURL, ckpt, inc);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.receiveCheckpoint(nodeURL, ckpt, inc);
@@ -690,7 +691,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             return this.getProcessToDeploy(proActiveRuntimeDist, creatorID,
                 vmName, padURL);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getProcessToDeploy(proActiveRuntimeDist, creatorID,
@@ -708,7 +709,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getVNName(Nodename);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getVNName(Nodename);
@@ -725,7 +726,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getEntities();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getEntities();
@@ -742,7 +743,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getPolicy(sc);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getPolicy(sc);
@@ -759,7 +760,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getClassDataFromThisRuntime(className);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getClassDataFromThisRuntime(className);
@@ -776,7 +777,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getClassDataFromParentRuntime(className);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getClassDataFromParentRuntime(className);
@@ -793,7 +794,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getCertificate();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getCertificate();
@@ -810,7 +811,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getCertificateEncoded();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getCertificateEncoded();
@@ -827,7 +828,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getPublicKey();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getPublicKey();
@@ -847,7 +848,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             return this.publicKeyExchange(sessionID, myPublicKey,
                 myCertificate, signature);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.publicKeyExchange(sessionID, myPublicKey,
@@ -867,7 +868,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.randomValue(sessionID, clientRandomValue);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.randomValue(sessionID, clientRandomValue);
@@ -890,7 +891,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 encodedIVParameters, encodedClientMacKey, encodedLockData,
                 parametersSignature);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.secretKeyExchange(sessionID, encodedAESKey,
@@ -910,7 +911,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.startNewSession(policy);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.startNewSession(policy);
@@ -927,7 +928,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.terminateSession(sessionID);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.terminateSession(sessionID);
@@ -943,7 +944,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getDescriptor(url, isHierarchicalSearch);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getDescriptor(url, isHierarchicalSearch);
@@ -959,7 +960,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             return this.getJobID();
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 return part.getJobID();
@@ -977,7 +978,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.launchMain(className, parameters);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.launchMain(className, parameters);
@@ -992,7 +993,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (urid == null) {
             this.newRemote(className);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+            ProActiveRuntime part = this.registeredRuntimes.get(urid);
 
             if (part != null) {
                 part.newRemote(className);
@@ -1008,7 +1009,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (runtimeID == null) {
             return this.setLocalNodeProperty(nodeName, key, value);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(runtimeID);
+            ProActiveRuntime part = this.registeredRuntimes.get(runtimeID);
 
             if (part != null) {
                 return part.setLocalNodeProperty(nodeName, key, value);
@@ -1021,7 +1022,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     public void logErrorAndDumpTable(UniqueRuntimeID runtimeID) {
         logger.warn("No runtime associated to this urid :" + runtimeID);
         logger.warn("Registered runtimes are:");
-        for (UniqueRuntimeID urid : registeredRuntimes.keySet()) {
+        for (UniqueRuntimeID urid : this.registeredRuntimes.keySet()) {
             logger.warn("\t" + urid);
         }
         logger.warn("Associated StackTrace");
@@ -1035,7 +1036,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         if (runtimeID == null) {
             return this.getLocalNodeProperty(nodeName, key);
         } else {
-            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(runtimeID);
+            ProActiveRuntime part = this.registeredRuntimes.get(runtimeID);
 
             if (part != null) {
                 return part.getLocalNodeProperty(nodeName, key);

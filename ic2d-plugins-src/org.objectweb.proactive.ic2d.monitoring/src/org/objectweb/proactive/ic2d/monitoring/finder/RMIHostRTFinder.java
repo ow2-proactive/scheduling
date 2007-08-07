@@ -40,7 +40,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
@@ -86,21 +86,21 @@ public class RMIHostRTFinder implements HostRTFinder{
 				try {
 //					RemoteProActiveRuntime remote = (RemoteProActiveRuntime) registry.lookup(name);
 //					ProActiveRuntime proActiveRuntime = new ProActiveRuntimeAdapterImpl(remote);
-					
+
 					URI url = new URI(Constants.RMI_PROTOCOL_IDENTIFIER,null,host.getHostName(),host.getPort(),"/"+name,null,null);
 					System.out.println("RMIHostRTFinder.findPARuntime()  "  + url);
-					RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(Constants.RMI_PROTOCOL_IDENTIFIER).lookup(url);  
-					
+					RemoteObject ro = RemoteObjectHelper.getRemoteObjectFactory(Constants.RMI_PROTOCOL_IDENTIFIER).lookup(url);
+
 					System.out.println("RMIHostRTFinder.findPARuntime()  "  + ro);
-					
+
 					Object stub = ro.getObjectProxy();
-					
+
 					System.out.println("RMIHostRTFinder.findPARuntime()  "  + stub);
 					if (stub instanceof ProActiveRuntime) {
 						runtimes.add((ProActiveRuntime ) stub);
 					}
-					
-					
+
+
 				} catch(Exception e) {
 					//System.out.println("RMIHostRTFinder.findPARuntime() ***"+host.getFullName());
 					console.debug(e);

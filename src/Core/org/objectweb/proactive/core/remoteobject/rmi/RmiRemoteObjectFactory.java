@@ -1,12 +1,45 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.remoteobject.rmi;
 
 import java.io.IOException;
 import java.net.URI;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
@@ -18,7 +51,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class RmiRemoteObjectFactory extends RemoteObjectFactory {
+public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
+    implements RemoteObjectFactory {
     protected static RegistryHelper registryHelper;
 
     static {
@@ -43,7 +77,6 @@ public class RmiRemoteObjectFactory extends RemoteObjectFactory {
         }
     }
 
-    @Override
     public RemoteRemoteObject newRemoteObject(RemoteObject target)
         throws ProActiveException {
         try {
@@ -53,7 +86,6 @@ public class RmiRemoteObjectFactory extends RemoteObjectFactory {
         }
     }
 
-    @Override
     public URI[] list(URI url) throws ProActiveException {
         try {
             String[] names = java.rmi.Naming.list(URIBuilder.removeProtocol(url)
@@ -73,15 +105,31 @@ public class RmiRemoteObjectFactory extends RemoteObjectFactory {
         return null;
     }
 
-    @Override
     public RemoteRemoteObject register(RemoteObject target, URI url,
         boolean replacePreviousBinding) throws ProActiveException {
         RmiRemoteObject rro = null;
+
         try {
             rro = new RmiRemoteObjectImpl(target);
         } catch (RemoteException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
+        }
+
+        try {
+            Registry reg = LocateRegistry.getRegistry(url.getPort());
+        } catch (Exception e) {
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
+                           .debug("creating new rmiregistry on port : " +
+                url.getPort());
+            try {
+                LocateRegistry.createRegistry(url.getPort());
+            } catch (RemoteException e1) {
+                ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
+                               .warn("damn cannot start a rmiregistry on port " +
+                    url.getPort());
+                throw new ProActiveException(e1);
+            }
         }
 
         try {
@@ -96,10 +144,12 @@ public class RmiRemoteObjectFactory extends RemoteObjectFactory {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .debug(" successfully bound in registry at " + url);
         } catch (java.rmi.AlreadyBoundException e) {
+            e.printStackTrace();
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn(url + " already bound in registry", e);
             throw new ProActiveException(e);
         } catch (java.net.MalformedURLException e) {
+            e.printStackTrace();
             throw new ProActiveException("cannot bind in registry at " + url, e);
         } catch (RemoteException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
@@ -114,7 +164,6 @@ public class RmiRemoteObjectFactory extends RemoteObjectFactory {
         return rro;
     }
 
-    @Override
     public void unregister(URI url) throws ProActiveException {
         try {
             java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url.toString()));
@@ -130,7 +179,6 @@ public class RmiRemoteObjectFactory extends RemoteObjectFactory {
         }
     }
 
-    @Override
     public RemoteObject lookup(URI url1) throws ProActiveException {
         Object o = null;
         String url = url1.toString();
@@ -160,5 +208,10 @@ public class RmiRemoteObjectFactory extends RemoteObjectFactory {
         throw new ProActiveException(
             "The given url does exist but doesn't point to a remote object  url=" +
             url + " class found is " + o.getClass().getName());
+    }
+
+    public int getPort() {
+        return Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                      .getProperty(Constants.PROPERTY_PA_RMI_PORT));
     }
 }

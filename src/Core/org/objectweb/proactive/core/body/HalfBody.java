@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.body;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -40,7 +41,6 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -68,29 +68,36 @@ public class HalfBody extends AbstractBody {
     private ReplyReceiver replyReceiver;
 
     public synchronized static HalfBody getHalfBody(MetaObjectFactory factory) {
-        return new HalfBody(factory);
+        try {
+            return new HalfBody(factory);
+        } catch (ActiveObjectCreationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    private HalfBody(MetaObjectFactory factory) {
-        super(new Object(), "LOCAL", factory, getRuntimeJobID());
+    private HalfBody(MetaObjectFactory factory)
+        throws ActiveObjectCreationException {
+        super(null, "LOCAL", factory, getRuntimeJobID());
 
-        //SECURITY 
-        if (securityManager == null) {
-            securityManager = factory.getProActiveSecurityManager();
+        //SECURITY
+        if (this.securityManager == null) {
+            this.securityManager = factory.getProActiveSecurityManager();
         }
 
-        if (securityManager != null) {
-            securityManager = securityManager.generateSiblingCertificate(
+        if (this.securityManager != null) {
+            this.securityManager = this.securityManager.generateSiblingCertificate(
                     "HalfBody");
-            securityManager.setBody(this);
-            isSecurityOn = securityManager.getCertificate() != null;
-            internalBodySecurity = new InternalBodySecurity(null); // SECURITY
+            this.securityManager.setBody(this);
+            this.isSecurityOn = this.securityManager.getCertificate() != null;
+            this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
                            .debug("  ------> HalfBody Security is " +
-                isSecurityOn);
+                this.isSecurityOn);
         }
 
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
@@ -160,13 +167,13 @@ public class HalfBody extends AbstractBody {
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         try {
             if (reply.isCiphered()) {
-                reply.decrypt(securityManager);
+                reply.decrypt(this.securityManager);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return replyReceiver.receiveReply(reply, this, getFuturePool());
+        return this.replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
     public void setImmediateService(String methodName) {
@@ -233,7 +240,7 @@ public class HalfBody extends AbstractBody {
         // -- implements LocalBody -----------------------------------------------
         //
         public FuturePool getFuturePool() {
-            return futures;
+            return this.futures;
         }
 
         public BlockingRequestQueue getRequestQueue() {
@@ -260,16 +267,16 @@ public class HalfBody extends AbstractBody {
             UniversalBody destinationBody)
             throws java.io.IOException, RenegotiateSessionException {
             long sequenceID = getNextSequenceID();
-            Request request = internalRequestFactory.newRequest(methodCall,
+            Request request = this.internalRequestFactory.newRequest(methodCall,
                     HalfBody.this, future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
             if (methodCall.getComponentMetadata() != null) {
-                request = new ComponentRequestImpl((RequestImpl) request);
+                request = new ComponentRequestImpl(request);
             }
             if (future != null) {
                 future.setID(sequenceID);
-                futures.receiveFuture(future);
+                this.futures.receiveFuture(future);
             }
 
             // FAULT TOLERANCE
@@ -290,7 +297,8 @@ public class HalfBody extends AbstractBody {
          * @return a unique identifier that can be used to tag a future, a request.
          */
         public synchronized long getNextSequenceID() {
-            return bodyID.toString().hashCode() + ++absoluteSequenceID;
+            return HalfBody.this.bodyID.toString().hashCode() +
+            ++this.absoluteSequenceID;
         }
     }
 
@@ -300,29 +308,29 @@ public class HalfBody extends AbstractBody {
 
     @Override
     public void addNFEListener(NFEListener listener) {
-        if (nfeListeners == null) {
-            nfeListeners = new NFEListenerList();
+        if (this.nfeListeners == null) {
+            this.nfeListeners = new NFEListenerList();
         }
-        nfeListeners.addNFEListener(listener);
+        this.nfeListeners.addNFEListener(listener);
     }
 
     @Override
     public void removeNFEListener(NFEListener listener) {
-        if (nfeListeners != null) {
-            nfeListeners.removeNFEListener(listener);
+        if (this.nfeListeners != null) {
+            this.nfeListeners.removeNFEListener(listener);
         }
     }
 
     @Override
     public int fireNFE(NonFunctionalException e) {
-        if (nfeListeners != null) {
-            return nfeListeners.fireNFE(e);
+        if (this.nfeListeners != null) {
+            return this.nfeListeners.fireNFE(e);
         }
         return 0;
     }
 
     public long getNextSequenceID() {
-        return localBodyStrategy.getNextSequenceID();
+        return this.localBodyStrategy.getNextSequenceID();
     }
 
     public boolean checkMethod(String methodName, Class[] parametersTypes) {
@@ -332,4 +340,17 @@ public class HalfBody extends AbstractBody {
     public boolean checkMethod(String methodName) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
+
+    //    @Override
+    //    protected RemoteRemoteObject register(URI uri)
+    //        throws UnknownProtocolException {
+    //        try {
+    //            return RemoteObjectHelper.getFactoryFromURL(uri)
+    //                                     .newRemoteObject(this.roe.getRemoteObject());
+    //        } catch (ProActiveException e) {
+    //            // TODO Auto-generated catch block
+    //            e.printStackTrace();
+    //        }
+    //        return null;
+    //    }
 }

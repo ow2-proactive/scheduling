@@ -209,4 +209,6 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @return true if the method exists, false otherwise
      */
     public boolean checkMethod(String methodName);
+
+    public void registerIncomingFutures();
 }

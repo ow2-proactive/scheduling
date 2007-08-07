@@ -161,6 +161,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         params[1] = this.acquaintanceManager;
         params[2] = this.stubOnThis;
         try {
+            System.out.println("<<<<<<<<<<<<< p2pServiceMode " +
+                this.p2pServiceNode.getNodeInformation().getURL());
+
             ProActive.newActive(P2PFirstContact.class.getName(), params,
                 this.p2pServiceNode);
         } catch (ActiveObjectCreationException e) {
@@ -617,7 +620,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     private void wakeUpEveryBody() {
         for (int i = 0; i < this.waitingNodesLookup.size(); i++) {
-            ((P2PNodeLookup) this.waitingNodesLookup.get(i)).wakeUp();
+            (this.waitingNodesLookup.get(i)).wakeUp();
         }
     }
 

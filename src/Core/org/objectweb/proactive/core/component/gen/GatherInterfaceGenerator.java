@@ -166,14 +166,12 @@ public class GatherInterfaceGenerator {
             //        System.out.println("[JAVASSIST] generated gather interface : " +
             //        		gatherProxyItfName);
             byte[] bytecode = repGatherItfClass.toBytecode();
-            ClassDataCache.instance()
-                          .addClassData(gatherProxyItfName,
-                repGatherItfClass.toBytecode());
+            ClassDataCache.instance().addClassData(gatherProxyItfName, bytecode);
 
             //            System.out.println("added " + gatherProxyItfName + " to cache");
             //            System.out.println("cache is now " + ClassDataCache.instance().toString());
 
-            //        
+            //
             return bytecode;
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.remoteobject;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
@@ -15,7 +17,14 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  */
 public interface RemoteObject extends SecurityEntity {
     public Reply receiveMessage(Request message)
-        throws ProActiveException, RenegotiateSessionException;
+        throws ProActiveException, RenegotiateSessionException, IOException;
 
     public Object getObjectProxy() throws ProActiveException;
+
+    public Object getObjectProxy(RemoteRemoteObject rro)
+        throws ProActiveException;
+
+    public String getClassName();
+
+    public String getProxyName();
 }

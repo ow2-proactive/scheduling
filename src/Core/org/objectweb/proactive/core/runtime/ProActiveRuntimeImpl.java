@@ -61,7 +61,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ActiveBody;
-import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -90,7 +89,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.FileProcess;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
@@ -136,73 +136,77 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntimeWrapperMBean mbean;
 
     static {
-        if (ProActiveConfiguration.getInstance().isForwarder()) {
-            proActiveRuntime = new ProActiveRuntimeForwarderImpl();
-        } else {
-            proActiveRuntime = new ProActiveRuntimeImpl();
-        }
-
-        // JMX registration
-        String mbeanProperty = ProActiveConfiguration.getInstance()
-                                                     .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
-        if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
-            ClassLoader classLoader = Thread.currentThread()
-                                            .getContextClassLoader();
-            JMXClassLoader jmxClassLoader = new JMXClassLoader(classLoader);
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName objectName = null;
-            try {
-                objectName = new ObjectName(
-                        "org.objectweb.proactive:type=JMXClassLoader");
-            } catch (MalformedObjectNameException e) {
-                logger.error("Can't create the objectName of the JMX ClassLoader MBean",
-                    e);
-            } catch (NullPointerException e) {
-                logger.error("Can't create the objectName of the JMX ClassLoader MBean",
-                    e);
-            }
-            try {
-                mbs.registerMBean(jmxClassLoader, objectName);
-            } catch (InstanceAlreadyExistsException e) {
-                logger.error("A MBean with the object name " + objectName +
-                    " already exists", e);
-            } catch (MBeanRegistrationException e) {
-                logger.error("Can't register the MBean of the JMX ClassLoader",
-                    e);
-            } catch (NotCompliantMBeanException e) {
-                logger.error("The MBean of the JMX ClassLoader is not JMX compliant",
-                    e);
+        try {
+            if (ProActiveConfiguration.getInstance().isForwarder()) {
+                proActiveRuntime = new ProActiveRuntimeForwarderImpl();
+            } else {
+                proActiveRuntime = new ProActiveRuntimeImpl();
             }
 
-            // TODO
-            /*
-            ServerConnector connector = new ServerConnector(UrlBuilder.getNameFromUrl(
-                    proActiveRuntime.getURL()));
-            try {
-                                connector.start();
-                        } catch (IOException e) {
-                logger.error("Can't start the JMX Connector in the ProActive Runtime",e);
-                        }
-                        */
-            String runtimeUrl = proActiveRuntime.getURL();
-            objectName = FactoryName.createRuntimeObjectName(runtimeUrl);
-            if (!mbs.isRegistered(objectName)) {
-                mbean = new ProActiveRuntimeWrapper(proActiveRuntime);
+            // JMX registration
+            String mbeanProperty = ProActiveConfiguration.getInstance()
+                                                         .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
+            if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
+                ClassLoader classLoader = Thread.currentThread()
+                                                .getContextClassLoader();
+                JMXClassLoader jmxClassLoader = new JMXClassLoader(classLoader);
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                ObjectName objectName = null;
                 try {
-                    mbs.registerMBean(mbean, objectName);
+                    objectName = new ObjectName(
+                            "org.objectweb.proactive:type=JMXClassLoader");
+                } catch (MalformedObjectNameException e) {
+                    logger.error("Can't create the objectName of the JMX ClassLoader MBean",
+                        e);
+                } catch (NullPointerException e) {
+                    logger.error("Can't create the objectName of the JMX ClassLoader MBean",
+                        e);
+                }
+                try {
+                    mbs.registerMBean(jmxClassLoader, objectName);
                 } catch (InstanceAlreadyExistsException e) {
                     logger.error("A MBean with the object name " + objectName +
                         " already exists", e);
                 } catch (MBeanRegistrationException e) {
-                    logger.error("Can't register the MBean of the ProActive Runtime",
+                    logger.error("Can't register the MBean of the JMX ClassLoader",
                         e);
                 } catch (NotCompliantMBeanException e) {
-                    logger.error("The MBean of the ProActive Runtime is not JMX compliant",
+                    logger.error("The MBean of the JMX ClassLoader is not JMX compliant",
                         e);
                 }
-            }
 
-            // End JMX registration
+                // TODO
+                /*
+                ServerConnector connector = new ServerConnector(UrlBuilder.getNameFromUrl(
+                        proActiveRuntime.getURL()));
+                try {
+                                    connector.start();
+                            } catch (IOException e) {
+                    logger.error("Can't start the JMX Connector in the ProActive Runtime",e);
+                            }
+                            */
+                String runtimeUrl = proActiveRuntime.getURL();
+                objectName = FactoryName.createRuntimeObjectName(runtimeUrl);
+                if (!mbs.isRegistered(objectName)) {
+                    mbean = new ProActiveRuntimeWrapper(proActiveRuntime);
+                    try {
+                        mbs.registerMBean(mbean, objectName);
+                    } catch (InstanceAlreadyExistsException e) {
+                        logger.error("A MBean with the object name " +
+                            objectName + " already exists", e);
+                    } catch (MBeanRegistrationException e) {
+                        logger.error("Can't register the MBean of the ProActive Runtime",
+                            e);
+                    } catch (NotCompliantMBeanException e) {
+                        logger.error("The MBean of the ProActive Runtime is not JMX compliant",
+                            e);
+                    }
+                }
+
+                // End JMX registration
+            }
+        } catch (UnknownProtocolException e) {
+            e.printStackTrace();
         }
     }
 
@@ -239,7 +243,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     // -- CONSTRUCTORS -----------------------------------------------------------
     //
     // singleton
-    protected ProActiveRuntimeImpl() {
+    protected ProActiveRuntimeImpl() throws UnknownProtocolException {
         try {
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
@@ -412,11 +416,19 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         URI realnodeURL = URI.create(nodeURL);
         if (!realnodeURL.isAbsolute()) {
-            realnodeURL = RemoteObjectFactory.generateUrl(ProActiveConfiguration.getInstance()
-                                                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
-                    nodeName);
+            try {
+                realnodeURL = RemoteObjectHelper.generateUrl(ProActiveConfiguration.getInstance()
+                                                                                   .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
+                        nodeName);
+            } catch (UnknownProtocolException e) {
+                e.printStackTrace();
+            }
         }
-        newNode.activateProtocol(realnodeURL);
+        try {
+            newNode.activateProtocol(realnodeURL);
+        } catch (UnknownProtocolException e) {
+            throw new NodeException(e);
+        }
 
         if (replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
             newNode.setActiveObjects(this.nodeMap.get(nodeName)
@@ -700,10 +712,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) {
-        String url = UrlBuilder.buildUrlFromProperties(UrlBuilder.getHostNameFromUrl(
+        boolean replacePreviousBinding) throws UnknownProtocolException {
+        String url;
+        url = UrlBuilder.buildUrlFromProperties(UrlBuilder.getHostNameFromUrl(
                     getInternalURL()), virtualNodeName);
-
         this.roe.activateProtocol(URI.create(url));
     }
 
@@ -726,10 +738,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return localNode.getJobId();
     }
 
-    public ArrayList<BodyAdapter> getActiveObjects(String nodeName,
+    public ArrayList<UniversalBody> getActiveObjects(String nodeName,
         String className) {
         //the array to return
-        ArrayList<BodyAdapter> localBodies = new ArrayList<BodyAdapter>();
+        ArrayList<UniversalBody> localBodies = new ArrayList<UniversalBody>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
         ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
                                                    .getActiveObjectsId();
@@ -810,7 +822,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String, Body)
      */
-    public UniversalBody receiveBody(String nodeName, Body body) {
+    public UniversalBody receiveBody(String nodeName, Body body)
+        throws ProActiveException {
         ProActiveSecurityManager psm = ((AbstractBody) body).getProActiveSecurityManager();
         if (psm != null) {
             psm.setParent(this.nodeMap.get(nodeName).getSecurityManager());
@@ -828,7 +841,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(String, Checkpoint, int)
      */
     public UniversalBody receiveCheckpoint(String nodeURL, Checkpoint ckpt,
-        int inc) {
+        int inc) throws ProActiveException {
         runtimeLogger.debug("Receive a checkpoint for recovery");
 
         // the recovered body
@@ -1113,6 +1126,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public void launchMain(String className, String[] parameters)
         throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
+        System.out.println("ProActiveRuntimeImpl.launchMain() -" + className +
+            "-");
+
         Class mainClass = Class.forName(className);
         Method mainMethod = mainClass.getMethod("main",
                 new Class[] { String[].class });

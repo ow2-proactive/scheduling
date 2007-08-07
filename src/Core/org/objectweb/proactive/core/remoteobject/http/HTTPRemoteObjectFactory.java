@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.remoteobject.http;
 
 import java.net.MalformedURLException;
@@ -8,14 +38,13 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.http.message.HttpRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.core.remoteobject.http.message.HttpRemoteObjectLookupMessage;
-import org.objectweb.proactive.core.remoteobject.http.message.RemoteObjectRequest;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.rmi.ClassServer;
@@ -25,7 +54,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class HTTPRemoteObjectFactory extends RemoteObjectFactory {
+public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
+    implements RemoteObjectFactory {
 
     static {
         createClassServer();
@@ -56,7 +86,7 @@ public class HTTPRemoteObjectFactory extends RemoteObjectFactory {
     public RemoteRemoteObject newRemoteObject(RemoteObject target)
         throws ProActiveException {
         try {
-            return new HttpRemoteObjectImpl(target);
+            return new HttpRemoteObjectImpl(target, null);
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
@@ -70,8 +100,6 @@ public class HTTPRemoteObjectFactory extends RemoteObjectFactory {
     public RemoteRemoteObject register(RemoteObject ro, URI url,
         boolean replacePrevious) throws ProActiveException {
         URL u = null;
-
-        HttpRemoteObjectImpl rro = new HttpRemoteObjectImpl(ro);
 
         int port = ClassServer.getServerSocketPort();
         try {
@@ -88,7 +116,8 @@ public class HTTPRemoteObjectFactory extends RemoteObjectFactory {
         }
 
         HTTPRegistry.getInstance().bind(url.toString(), ro);
-        rro.setURI(url);
+
+        HttpRemoteObjectImpl rro = new HttpRemoteObjectImpl(ro, url);
 
         ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                        .info("registering remote object  at endpoint " + url);
@@ -108,7 +137,6 @@ public class HTTPRemoteObjectFactory extends RemoteObjectFactory {
      * @param urn the urn (in fact its url + name)  the remote Body is registered to
      * @return a UniversalBody
      */
-    @Override
     public RemoteObject lookup(URI url) throws ProActiveException {
         int port = url.getPort();
 
@@ -185,5 +213,10 @@ public class HTTPRemoteObjectFactory extends RemoteObjectFactory {
         }
 
         return null;
+    }
+
+    public int getPort() {
+        return Integer.parseInt(ProActiveConfiguration.getInstance()
+                                                      .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT));
     }
 }

@@ -132,14 +132,14 @@ public class LocalBodyStore {
     //
     public synchronized MetaObjectFactory getHalfBodyMetaObjectFactory() {
         if (this.halfBodyMetaObjectFactory == null) {
-            halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
+            this.halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
         }
-        return halfBodyMetaObjectFactory;
+        return this.halfBodyMetaObjectFactory;
     }
 
     public synchronized void setHalfBodyMetaObjectFactory(
         MetaObjectFactory factory) {
-        halfBodyMetaObjectFactory = factory;
+        this.halfBodyMetaObjectFactory = factory;
     }
 
     /**
@@ -203,7 +203,7 @@ public class LocalBodyStore {
      * @return the body with matching id or null
      */
     public Body getLocalBody(UniqueID bodyID) {
-        return (Body) localBodyMap.getBody(bodyID);
+        return (Body) this.localBodyMap.getBody(bodyID);
     }
 
     /**
@@ -213,7 +213,7 @@ public class LocalBodyStore {
      * @return the halfbody with matching id or null
      */
     public Body getLocalHalfBody(UniqueID bodyID) {
-        return (Body) localHalfBodyMap.getBody(bodyID);
+        return (Body) this.localHalfBodyMap.getBody(bodyID);
     }
 
     /**
@@ -223,7 +223,7 @@ public class LocalBodyStore {
      * @return the halfbody with matching id or null
      */
     public Body getForwarder(UniqueID bodyID) {
-        return (Body) localForwarderMap.getBody(bodyID);
+        return (Body) this.localForwarderMap.getBody(bodyID);
     }
 
     /**
@@ -231,7 +231,7 @@ public class LocalBodyStore {
      * @return all local Bodies in a new BodyMap
      */
     public BodyMap getLocalBodies() {
-        return (BodyMap) localBodyMap.clone();
+        return (BodyMap) this.localBodyMap.clone();
     }
 
     /**
@@ -239,7 +239,7 @@ public class LocalBodyStore {
      * @return all local HalfBodies in a new BodyMap
      */
     public BodyMap getLocalHalfBodies() {
-        return (BodyMap) localHalfBodyMap.clone();
+        return (BodyMap) this.localHalfBodyMap.clone();
     }
 
     /**
@@ -248,7 +248,7 @@ public class LocalBodyStore {
      * @param listener the listener of body events to add
      */
     public void addBodyEventListener(BodyEventListener listener) {
-        bodyEventProducer.addBodyEventListener(listener);
+        this.bodyEventProducer.addBodyEventListener(listener);
     }
 
     /**
@@ -256,14 +256,14 @@ public class LocalBodyStore {
      * @param listener the listener of body events to remove
      */
     public void removeBodyEventListener(BodyEventListener listener) {
-        bodyEventProducer.removeBodyEventListener(listener);
+        this.bodyEventProducer.removeBodyEventListener(listener);
     }
 
     //
     // -- FRIENDLY METHODS -----------------------------------------------
     //
     void registerBody(AbstractBody body) {
-        if (localBodyMap.getBody(body.getID()) != null) {
+        if (this.localBodyMap.getBody(body.getID()) != null) {
             logger.warn("Body already registered in the body map");
         }
         localBodyMap.putBody(body.bodyID, body);
@@ -311,25 +311,25 @@ public class LocalBodyStore {
     }
 
     void registerHalfBody(AbstractBody body) {
-        localHalfBodyMap.putBody(body.bodyID, body);
+        this.localHalfBodyMap.putBody(body.bodyID, body);
 
         //bodyEventProducer.fireBodyCreated(body);
     }
 
     void unregisterHalfBody(AbstractBody body) {
-        localHalfBodyMap.removeBody(body.bodyID);
+        this.localHalfBodyMap.removeBody(body.bodyID);
         //bodyEventProducer.fireBodyRemoved(body);
     }
 
     public void registerForwarder(AbstractBody body) {
-        if (localForwarderMap.getBody(body.bodyID) != null) {
+        if (this.localForwarderMap.getBody(body.bodyID) != null) {
             logger.debug("Forwarder already registered in the body map");
-            localForwarderMap.removeBody(body.bodyID);
+            this.localForwarderMap.removeBody(body.bodyID);
         }
-        localForwarderMap.putBody(body.bodyID, body);
+        this.localForwarderMap.putBody(body.bodyID, body);
     }
 
     public void unregisterForwarder(AbstractBody body) {
-        localForwarderMap.removeBody(body.bodyID);
+        this.localForwarderMap.removeBody(body.bodyID);
     }
 }

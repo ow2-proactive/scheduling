@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 
@@ -42,5 +41,6 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
  */
 public interface CollectiveInterfaceController {
     public void ensureCompatibility(ProActiveInterfaceType itfType,
-        ProActiveInterface itf) throws IllegalBindingException;
+        ProActiveInterface itf)
+        throws org.objectweb.fractal.api.control.IllegalBindingException;
 }

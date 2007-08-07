@@ -215,7 +215,6 @@ public class NodeFactory {
         //do we have any association for this node?
         String protocol = UrlBuilder.getProtocol(nodeURL);
         if (protocol == null) {
-            System.out.println("NodeFactory.getNode() NONO");
             protocol = ProActiveConfiguration.getInstance()
                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         }

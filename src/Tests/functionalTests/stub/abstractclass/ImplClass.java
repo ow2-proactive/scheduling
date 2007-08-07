@@ -31,6 +31,9 @@
 package functionalTests.stub.abstractclass;
 
 public class ImplClass extends AbstractClass {
+    public ImplClass() {
+    }
+
     public void foo() {
         //		System.out.println("GreenWidget : foo");
     }

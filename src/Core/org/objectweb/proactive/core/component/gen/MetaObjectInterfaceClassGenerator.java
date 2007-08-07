@@ -141,6 +141,7 @@ public class MetaObjectInterfaceClassGenerator
                 //interfacesToImplement.add(pool.get(StubObject.class.getName()));
                 List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
                 addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
+
                 generatedCtClass.setSuperclass(pool.get(
                         ProActiveInterfaceImpl.class.getName()));
                 JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
@@ -235,8 +236,7 @@ public class MetaObjectInterfaceClassGenerator
                 //                                    generatedClassFullName);
                 byte[] bytecode = generatedCtClass.toBytecode();
                 ClassDataCache.instance()
-                              .addClassData(generatedClassFullName,
-                    generatedCtClass.toBytecode());
+                              .addClassData(generatedClassFullName, bytecode);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassFullName +
                         " to cache");
@@ -259,6 +259,7 @@ public class MetaObjectInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new InterfaceGenerationFailedException(
                 "Cannot generate meta object representative on interface [" +
                 interfaceName + "] with signature [" +
@@ -285,7 +286,7 @@ public class MetaObjectInterfaceClassGenerator
             body += ")";
 
             body += ";";
-            body += "\n}";
+
             //            System.out.println("method : " + reifiedMethods[i].getName() +
             //                " : \n" + body);
             CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),

@@ -108,10 +108,10 @@ public class PolicyServer implements Serializable, Cloneable {
         ArrayList<Entity> entitiesFrom = securityContext.getEntitiesFrom();
         ArrayList<Entity> entitiesTo = securityContext.getEntitiesTo();
 
-        if (policyRules == null) {
+        if (this.policyRules == null) {
             ProActiveLogger.getLogger(Loggers.SECURITY_POLICY)
                            .debug("trying to find a policy whereas none has been set" +
-                this + "    " + policyRules);
+                this + "    " + this.policyRules);
             throw new SecurityNotAvailableException();
         }
 
@@ -134,16 +134,16 @@ public class PolicyServer implements Serializable, Cloneable {
         boolean matchingFromDefault;
         boolean matchingToDefault;
         matchingFrom = matchingTo = matchingFromDefault = matchingToDefault = false;
-        int length = policyRules.size();
+        int length = this.policyRules.size();
 
         if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
                                .isDebugEnabled()) {
             String s = "================================\nFrom :";
             for (int i = 0; i < entitiesFrom.size(); i++)
-                s += (((Entity) entitiesFrom.get(i)) + " ");
+                s += ((entitiesFrom.get(i)) + " ");
             s += "\nTo :";
             for (int i = 0; i < entitiesTo.size(); i++)
-                s += (((Entity) entitiesTo.get(i)) + " ");
+                s += ((entitiesTo.get(i)) + " ");
             ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
                            .debug(s + "\n=================================\n");
         }
@@ -151,7 +151,7 @@ public class PolicyServer implements Serializable, Cloneable {
         // iterate on all rules
         for (int i = 0; i < length; i++) {
             // retreiving a rule
-            policy = (PolicyRule) policyRules.get(i);
+            policy = this.policyRules.get(i);
 
             ArrayList policyEntitiesFrom = policy.getEntitiesFrom();
 
@@ -164,7 +164,7 @@ public class PolicyServer implements Serializable, Cloneable {
                 // System.out.println("testing from" + policyEntityFrom);
                 for (int z = 0; !matchingFrom && (z < entitiesFrom.size());
                         z++) {
-                    Entity entity = (Entity) entitiesFrom.get(z);
+                    Entity entity = entitiesFrom.get(z);
 
                     // System.out.println("testing from -------------" +
                     // entity);
@@ -188,7 +188,7 @@ public class PolicyServer implements Serializable, Cloneable {
 
                 // System.out.println("testing to" + policyEntityTo );
                 for (int z = 0; !matchingTo && (z < entitiesTo.size()); z++) {
-                    Entity entity = (Entity) entitiesTo.get(z);
+                    Entity entity = entitiesTo.get(z);
 
                     // System.out.println("testing to -------------" + entity);
                     if (policyEntityTo instanceof DefaultEntity) {
@@ -318,10 +318,10 @@ public class PolicyServer implements Serializable, Cloneable {
     @Override
     public String toString() {
         String s = null;
-        s = "ApplicationName : " + applicationName + "\nfile: " +
-            policyRulesFileLocation + "\n";
-        for (int i = 0; i < policyRules.size(); i++) {
-            s += policyRules.get(i);
+        s = "ApplicationName : " + this.applicationName + "\nfile: " +
+            this.policyRulesFileLocation + "\n";
+        for (int i = 0; i < this.policyRules.size(); i++) {
+            s += this.policyRules.get(i);
         }
 
         return s;
@@ -330,7 +330,7 @@ public class PolicyServer implements Serializable, Cloneable {
     // implements Serializable
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
-        if (keyStore != null) {
+        if (this.keyStore != null) {
             ByteArrayOutputStream bout = null;
             try {
                 // keyStore = KeyStore.getInstance("PKCS12", "BC");
@@ -349,10 +349,10 @@ public class PolicyServer implements Serializable, Cloneable {
                  */
                 bout = new ByteArrayOutputStream();
 
-                keyStore.store(bout, "ha".toCharArray());
+                this.keyStore.store(bout, "ha".toCharArray());
 
-                encodedKeyStore = bout.toByteArray();
-                keyStore = null;
+                this.encodedKeyStore = bout.toByteArray();
+                this.keyStore = null;
                 bout.close();
             } catch (CertificateEncodingException e) {
                 e.printStackTrace();
@@ -375,12 +375,12 @@ public class PolicyServer implements Serializable, Cloneable {
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        if (encodedKeyStore != null) {
+        if (this.encodedKeyStore != null) {
             try {
-                keyStore = KeyStore.getInstance("PKCS12", "BC");
-                keyStore.load(new ByteArrayInputStream(encodedKeyStore),
-                    "ha".toCharArray());
-                encodedKeyStore = null;
+                this.keyStore = KeyStore.getInstance("PKCS12", "BC");
+                this.keyStore.load(new ByteArrayInputStream(
+                        this.encodedKeyStore), "ha".toCharArray());
+                this.encodedKeyStore = null;
             } catch (KeyStoreException e) {
                 e.printStackTrace();
             } catch (NoSuchProviderException e) {
@@ -410,7 +410,7 @@ public class PolicyServer implements Serializable, Cloneable {
     public void setPolicyRulesFileLocation(String uri) {
         // for debug only
         // set security file path
-        policyRulesFileLocation = uri;
+        this.policyRulesFileLocation = uri;
     }
 
     /**
@@ -437,7 +437,7 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     public String getApplicationName() {
-        return applicationName;
+        return this.applicationName;
     }
 
     @Override
@@ -468,7 +468,7 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     public KeyStore getKeyStore() {
-        return keyStore;
+        return this.keyStore;
     }
 
     public void setKeyStore(KeyStore keyStore) {
@@ -477,8 +477,8 @@ public class PolicyServer implements Serializable, Cloneable {
 
     public void setPKCS12Keystore(String pkcs12Keystore) {
         try {
-            keyStore = KeyStore.getInstance("PKCS12", "BC");
-            keyStore.load(new FileInputStream(pkcs12Keystore),
+            this.keyStore = KeyStore.getInstance("PKCS12", "BC");
+            this.keyStore.load(new FileInputStream(pkcs12Keystore),
                 "ha".toCharArray());
         } catch (KeyStoreException e) {
             e.printStackTrace();

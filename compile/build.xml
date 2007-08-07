@@ -204,7 +204,8 @@
 			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class"/>
 			<include name="org/objectweb/proactive/core/runtime/rmi/RmiProActiveRuntimeImpl.class"/>
 			<include name="org/objectweb/proactive/core/runtime/rmi/RmiProActiveRuntimeForwarderImpl.class"/>
-			<include name="org/objectweb/proactive/core/runtime/jini/JiniRuntimeImpl.class"/>
+			<include name="org/objectweb/proactive/core/runtime/jini/JiniRuntimeImpl.class"/>		
+			<include name="org/objectweb/proactive/core/remoteobject/rmi/RmiRemoteObjectImpl.class"/>
 		</rmic>
 
 		<echo message="Java primitive type wrapper stubs generating..." />

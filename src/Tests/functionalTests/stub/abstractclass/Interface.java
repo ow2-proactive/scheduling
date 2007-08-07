@@ -30,6 +30,9 @@
  */
 package functionalTests.stub.abstractclass;
 
-public interface Interface {
+import java.io.Serializable;
+
+
+public interface Interface extends Serializable {
     public void foo();
 }

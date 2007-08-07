@@ -67,6 +67,7 @@ public class LocationServerFactory {
                                                                                    .getLocationServerClass(),
                     ProActiveConfiguration.getInstance().getLocationServerRmi());
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
         return server;
@@ -78,7 +79,7 @@ public class LocationServerFactory {
         //		e.printStackTrace();
         //			System.out.println("-----------------------");
         //	}
-        //	
+        //
         //	return null;
     }
 

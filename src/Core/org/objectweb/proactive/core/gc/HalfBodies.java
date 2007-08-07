@@ -38,6 +38,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Level;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.HalfBody;
@@ -70,6 +71,7 @@ public class HalfBodies extends GarbageCollector {
 
     /**
      * Build the singleton with a dummy half body
+     * @throws ActiveObjectCreationException
      */
     private HalfBodies() {
         super(HalfBody.getHalfBody(LocalBodyStore.getInstance()
@@ -89,7 +91,7 @@ public class HalfBodies extends GarbageCollector {
     private Set<Referenced> getReferenced() {
         Set<Referenced> refs = new TreeSet<Referenced>();
         synchronized (this.references) {
-            for (ConcurrentLinkedQueue<Referenced> c : references.values()) {
+            for (ConcurrentLinkedQueue<Referenced> c : this.references.values()) {
                 for (Referenced r : c) {
                     if (r.hasTerminated() || !r.isReferenced()) {
                         c.remove(r);
@@ -115,7 +117,7 @@ public class HalfBodies extends GarbageCollector {
         Vector<GCSimpleMessage> messages = new Vector<GCSimpleMessage>(refs.size());
         for (Referenced r : refs) {
             messages.add(new GCSimpleMessage(r, this.body.getID(), false,
-                    dummyActivity));
+                    this.dummyActivity));
         }
 
         return messages;

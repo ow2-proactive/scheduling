@@ -94,6 +94,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     public UniversalBodyProxy() {
     }
 
+    public UniversalBodyProxy(UniversalBody body) {
+        this.universalBody = body;
+        System.out.println(
+            "UniversalBodyProxy.UniversalBodyProxy(UniversalBody body)");
+        //        this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
+    }
+
     /**
      * Instantiates an object of class BodyProxy, creates a body object
      * (referenced either via the instance variable <code>localBody</code>
@@ -107,63 +114,67 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
      */
     public UniversalBodyProxy(ConstructorCall constructorCall,
         Object[] parameters) throws ProActiveException {
-        Object p0 = parameters[0];
-
-        // Determines whether the body is local or remote
-        if (p0 instanceof UniversalBody) {
-            // This is simple connection to an existant local body
-            this.universalBody = (UniversalBody) p0;
-            isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
-            if (logger.isDebugEnabled()) {
-                //logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+" isLocal="+isLocal);
-            }
-        } else {
-            // instantiate the body locally or remotely
-            Class bodyClass = Constants.DEFAULT_BODY_CLASS;
-            Node node = (Node) p0;
-
-            //added lines--------------------------
-            //ProActiveRuntime part = node.getProActiveRuntime();
-            //added lines----------------------------
-            Active activity = (Active) parameters[1];
-            MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
-            String jobID = (String) parameters[3];
-            Class[] argsClass = new Class[] {
-                    ConstructorCall.class, String.class, Active.class,
-                    MetaObjectFactory.class, String.class
-                };
-            Object[] args = new Object[] {
-                    constructorCall, node.getNodeInformation().getURL(),
-                    activity, factory, jobID
-                };
-
-            //added lines--------------------------
-            //Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };
-            //added lines--------------------------
-            ConstructorCall bodyConstructorCall = buildBodyConstructorCall(bodyClass,
-                    argsClass, args);
-            if (NodeFactory.isNodeLocal(node)) {
-                // the node is local
-                //added line -------------------------
-                //if (RuntimeFactory.isRuntimeLocal(part)){
-                //added line -------------------------
-                this.universalBody = createLocalBody(bodyConstructorCall,
-                        constructorCall, node);
-                isLocal = true;
+        if (parameters.length > 0) {
+            Object p0 = parameters[0];
+            System.out.println("----> p0 : " + p0);
+            // Determines whether the body is local or remote
+            if (p0 instanceof UniversalBody) {
+                // This is simple connection to an existant local body
+                this.universalBody = (UniversalBody) p0;
+                this.isLocal = LocalBodyStore.getInstance()
+                                             .getLocalBody(getBodyID()) != null;
+                if (logger.isDebugEnabled()) {
+                    //logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+" isLocal="+isLocal);
+                }
             } else {
-                this.universalBody = createRemoteBody(bodyConstructorCall, node);
-                //added line -------------------------
-                //this.universalBody = createRemoteBody(bodyConstructorCall, part , node);
-                //added line -------------------------
-                isLocal = false;
-            }
-            if (logger.isDebugEnabled()) {
-                //logger.debug("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
-            }
-        }
+                // instantiate the body locally or remotely
+                Class bodyClass = Constants.DEFAULT_BODY_CLASS;
+                Node node = (Node) p0;
 
-        if (GarbageCollector.dgcIsEnabled()) {
-            ((AbstractBody) ProActive.getBodyOnThis()).updateReference(this);
+                //added lines--------------------------
+                //ProActiveRuntime part = node.getProActiveRuntime();
+                //added lines----------------------------
+                Active activity = (Active) parameters[1];
+                MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
+                String jobID = (String) parameters[3];
+                Class[] argsClass = new Class[] {
+                        ConstructorCall.class, String.class, Active.class,
+                        MetaObjectFactory.class, String.class
+                    };
+                Object[] args = new Object[] {
+                        constructorCall, node.getNodeInformation().getURL(),
+                        activity, factory, jobID
+                    };
+
+                //added lines--------------------------
+                //Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };
+                //added lines--------------------------
+                ConstructorCall bodyConstructorCall = buildBodyConstructorCall(bodyClass,
+                        argsClass, args);
+                if (NodeFactory.isNodeLocal(node)) {
+                    // the node is local
+                    //added line -------------------------
+                    //if (RuntimeFactory.isRuntimeLocal(part)){
+                    //added line -------------------------
+                    this.universalBody = createLocalBody(bodyConstructorCall,
+                            constructorCall, node);
+                    this.isLocal = true;
+                } else {
+                    this.universalBody = createRemoteBody(bodyConstructorCall,
+                            node);
+                    //added line -------------------------
+                    //this.universalBody = createRemoteBody(bodyConstructorCall, part , node);
+                    //added line -------------------------
+                    this.isLocal = false;
+                }
+                if (logger.isDebugEnabled()) {
+                    //logger.debug("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
+                }
+            }
+
+            if (GarbageCollector.dgcIsEnabled()) {
+                ((AbstractBody) ProActive.getBodyOnThis()).updateReference(this);
+            }
         }
     }
 
@@ -177,19 +188,19 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
 
         UniversalBodyProxy proxy = (UniversalBodyProxy) o;
-        return universalBody.equals(proxy.universalBody);
+        return this.universalBody.equals(proxy.universalBody);
     }
 
     @Override
     public int hashCode() {
-        return universalBody.hashCode();
+        return this.universalBody.hashCode();
     }
 
     //
     // -- implements BodyProxy interface -----------------------------------------------
     //
     public UniversalBody getBody() {
-        return universalBody;
+        return this.universalBody;
     }
 
     //
@@ -235,10 +246,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             //}
             //return node.createBody(bodyConstructorCall);
             //--------------added lines
-            if (logger.isDebugEnabled()) {
-                logger.debug("RemoteBodyProxy created bodyID=" + getBodyID() +
-                    " from ConstructorCall");
-            }
+            //            if (logger.isDebugEnabled()) {
+            //                logger.debug("RemoteBodyProxy created bodyID=" + getBodyID() +
+            //                    " from ConstructorCall");
+            //            }
             return part.createBody(node.getNodeInformation().getName(),
                 bodyConstructorCall, false);
             //--------------added lines
@@ -289,13 +300,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         //UniqueID id = universalBody.getID();
         UniversalBody newBody = sourceBody.checkNewLocation(getBodyID());
         if (newBody != null) {
-            universalBody = newBody;
-            isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
+            this.universalBody = newBody;
+            this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
         }
         ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
-        destinations.add(universalBody.getRemoteAdapter());
+        destinations.add(this.universalBody.getRemoteAdapter());
         sourceBody.getFuturePool().registerDestinations(destinations);
-        if (isLocal) {
+        if (this.isLocal) {
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.startTimer(sourceBody.getID(),
                     TimerWarehouse.LOCAL_COPY);
@@ -340,7 +351,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     protected void sendRequestInternal(MethodCall methodCall, Future future,
         Body sourceBody)
         throws java.io.IOException, RenegotiateSessionException {
-        sourceBody.sendRequest(methodCall, future, universalBody);
+        sourceBody.sendRequest(methodCall, future, this.universalBody);
     }
 
     //
@@ -376,7 +387,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         if (this.universalBody == null) {
             out.writeObject(null);
         } else {
-            out.writeObject(universalBody.getRemoteAdapter());
+            out.writeObject(this.universalBody.getRemoteAdapter());
         }
     }
 
@@ -388,7 +399,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-        universalBody = (UniversalBody) in.readObject();
+        this.universalBody = (UniversalBody) in.readObject();
         Body localBody = LocalBodyStore.getInstance().getLocalBody(getBodyID());
 
         // Thread.dumpStack();
@@ -397,14 +408,14 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
         if (localBody != null) {
             // the body is local
-            universalBody = localBody;
-            isLocal = true;
+            this.universalBody = localBody;
+            this.isLocal = true;
         } else {
             // the body is not local
-            isLocal = false;
+            this.isLocal = false;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("universalBody is " + universalBody);
+            logger.debug("universalBody is " + this.universalBody);
         }
 
         if (GarbageCollector.dgcIsEnabled()) {

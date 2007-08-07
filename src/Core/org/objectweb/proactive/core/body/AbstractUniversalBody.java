@@ -31,14 +31,21 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 
 
 /**
@@ -76,6 +83,7 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     protected RemoteBodyFactory remoteBodyFactory;
     protected String jobID;
     protected Map shortcuts = null; // key = functionalItfID, value=shortcut
+    protected transient RemoteObjectExposer roe;
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -98,13 +106,33 @@ public abstract class AbstractUniversalBody implements UniversalBody,
      *                needed by this body
      */
     public AbstractUniversalBody(String nodeURL,
-        RemoteBodyFactory remoteBodyFactory, String jobID) {
+        RemoteBodyFactory remoteBodyFactory, String jobID)
+        throws ActiveObjectCreationException {
         this.nodeURL = nodeURL;
         this.bodyID = new UniqueID();
         this.location = new BodyMap();
         this.jobID = jobID;
-        this.remoteBodyFactory = remoteBodyFactory;
-        this.remoteBody = remoteBodyFactory.newRemoteBody(this);
+
+        this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this,
+                new UniversalBodyRemoteObjectAdapter());
+
+        URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());
+
+        try {
+            RemoteRemoteObject rro = register(uri);
+
+            this.remoteBody = (UniversalBody) rro.getObjectProxy();
+            /// Initialiaze cache -- Gchazara won't touch it, ok ?
+            this.remoteBody.getID();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ActiveObjectCreationException(e);
+        }
+    }
+
+    protected RemoteRemoteObject register(URI uri)
+        throws UnknownProtocolException {
+        return this.roe.activateProtocol(uri);
     }
 
     //
@@ -114,23 +142,23 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     // -- implements UniversalBody -----------------------------------------------
     //
     public String getJobID() {
-        return jobID;
+        return this.jobID;
     }
 
     public String getNodeURL() {
-        return nodeURL;
+        return this.nodeURL;
     }
 
-    public BodyAdapter getRemoteAdapter() {
-        return (BodyAdapter) remoteBody;
+    public UniversalBody getRemoteAdapter() {
+        return this.remoteBody;
     }
 
     public UniqueID getID() {
-        return bodyID;
+        return this.bodyID;
     }
 
     public void updateLocation(UniqueID bodyID, UniversalBody body) {
-        location.updateBody(bodyID, body);
+        this.location.updateBody(bodyID, body);
     }
 
     //
@@ -148,14 +176,31 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         //System.out.println("@@@@@@@@@@@@@@@@@@" + this.jobID);
-        if (bodyID == null) {
+        if (this.bodyID == null) {
             // it may happen that the bodyID is set to null before serialization if we want to
             // create a copy of the Body that is distinct from the original
-            bodyID = new UniqueID();
+            this.bodyID = new UniqueID();
         }
 
         // remoteBody is transient so we recreate it here
-        this.remoteBody = remoteBodyFactory.newRemoteBody(this);
+        //        this.remoteBody = this.remoteBodyFactory.newRemoteBody(this);
+        this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this);
+
+        URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());
+
+        try {
+            RemoteRemoteObject rro = this.roe.activateProtocol(uri);
+            this.remoteBody = (UniversalBody) rro.getObjectProxy();
+            /// Initialiaze cache -- Gchazara won't touch it, ok ?
+            this.remoteBody.getID();
+            //			this.remoteBody =(UniversalBody) rro.getObjectProxy();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -163,32 +208,41 @@ public abstract class AbstractUniversalBody implements UniversalBody,
      * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
      */
     public void createShortcut(Shortcut shortcut) throws IOException {
-        if (shortcuts == null) {
-            shortcuts = new HashMap();
+        if (this.shortcuts == null) {
+            this.shortcuts = new HashMap();
         }
-        shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
+        this.shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
     }
 
     // NFEProducer implementation
     private NFEListenerList nfeListeners = null;
 
     public void addNFEListener(NFEListener listener) {
-        if (nfeListeners == null) {
-            nfeListeners = new NFEListenerList();
+        if (this.nfeListeners == null) {
+            this.nfeListeners = new NFEListenerList();
         }
-        nfeListeners.addNFEListener(listener);
+        this.nfeListeners.addNFEListener(listener);
     }
 
     public void removeNFEListener(NFEListener listener) {
-        if (nfeListeners != null) {
-            nfeListeners.removeNFEListener(listener);
+        if (this.nfeListeners != null) {
+            this.nfeListeners.removeNFEListener(listener);
         }
     }
 
     public int fireNFE(NonFunctionalException e) {
-        if (nfeListeners != null) {
-            return nfeListeners.fireNFE(e);
+        if (this.nfeListeners != null) {
+            return this.nfeListeners.fireNFE(e);
         }
         return 0;
+    }
+
+    public void register(String url)
+        throws IOException, UnknownProtocolException {
+        this.roe.activateProtocol(URI.create(url));
+    }
+
+    public RemoteObjectExposer getRemoteObjectExposer() {
+        return this.roe;
     }
 }
