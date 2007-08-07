@@ -792,8 +792,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // end inner class LocalInactiveBody
     private class InactiveBodyException extends ProActiveRuntimeException {
         public InactiveBodyException() {
-            super("Cannot perform this call because body of " +
-                getReifiedObject().getClass() + "is inactive");
+            super("Cannot perform this call because body " +
+                BodyImpl.this.getID() + "is inactive");
         }
 
         public InactiveBodyException(String nodeURL, UniqueID id,
@@ -801,14 +801,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // TODO when the class of the remote reified object will be available through UniversalBody, add this info. 
             super("Cannot send request \"" + remoteMethodCallName +
                 "\" to Body \"" + id + "\" located at " + nodeURL +
-                " because body of " + getReifiedObject().getClass() +
-                " is inactive");
+                " because body " + BodyImpl.this.getID() + " is inactive");
         }
 
         public InactiveBodyException(String localMethodName) {
             super("Cannot serve method \"" + localMethodName +
-                "\" because this body of " + getReifiedObject().getClass() +
-                " is inactive");
+                "\" because body " + BodyImpl.this.getID() + " is inactive");
         }
     }
 
