@@ -192,7 +192,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return randomValue(sessionID, clientRandomValue);
+        return target.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
@@ -200,8 +200,9 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         byte[] encodedLockData, byte[] parametersSignature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters,
-            encodedClientMacKey, encodedLockData, parametersSignature);
+        return target.secretKeyExchange(sessionID, encodedAESKey,
+            encodedIVParameters, encodedClientMacKey, encodedLockData,
+            parametersSignature);
     }
 
     public long startNewSession(Communication policy)
@@ -212,6 +213,6 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
 
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
-        terminateSession(sessionID);
+        target.terminateSession(sessionID);
     }
 }
