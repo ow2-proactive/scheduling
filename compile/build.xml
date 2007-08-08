@@ -88,12 +88,16 @@
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="functionalTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
+		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="performanceTests/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
 		<copy toDir="${cl.test.dir}">
 			<fileset dir="${src.test.dir}">
 				<include name="functionalTests/**/*.xml" />
 				<include name="functionalTests/**/*.fractal" />
 				<include name="functionalTests/**/*.properties" />
 				<include name="functionalTests/**/*.xsd" />
+                                <include name="performanceTests/**/*.xml" />
 			</fileset>
 		</copy>
 	</target>
@@ -862,7 +866,7 @@
 	<!--                          Performance test                        -->
 	<!-- ================================================================ -->
 
-	<target name="runPerformanceTest" depends="" description="Run performance test on the current host.">
+	<target name="runPerformanceTest" depends="tests" description="Run performance test on the current host.">
 		<property name="n" value="" />
 		<property name="o" value="" />
 		<property name="p" value="" />
