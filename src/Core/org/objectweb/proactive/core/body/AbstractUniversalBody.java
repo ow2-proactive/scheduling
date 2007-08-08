@@ -175,7 +175,6 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        //System.out.println("@@@@@@@@@@@@@@@@@@" + this.jobID);
         if (this.bodyID == null) {
             // it may happen that the bodyID is set to null before serialization if we want to
             // create a copy of the Body that is distinct from the original
@@ -183,8 +182,8 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         }
 
         // remoteBody is transient so we recreate it here
-        //        this.remoteBody = this.remoteBodyFactory.newRemoteBody(this);
-        this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this);
+        this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this,
+                new UniversalBodyRemoteObjectAdapter());
 
         URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());
 
