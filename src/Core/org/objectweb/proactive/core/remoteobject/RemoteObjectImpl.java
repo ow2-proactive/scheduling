@@ -97,11 +97,8 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
             e.printStackTrace();
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            throw new ProActiveException(e);
+            return new SynchronousReplyImpl(e.getCause());
         }
-
-        //		return null;
     }
 
     // implements SecurityEntity ----------------------------------------------
