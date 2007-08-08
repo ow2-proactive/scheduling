@@ -52,6 +52,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
@@ -315,7 +316,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
             if (this.isDead) {
-                throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+                throw new BodyTerminatedException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             } else {
                 ftres = this.ftmanager.onReceiveRequest(request);
                 if (request.ignoreIt()) {
@@ -326,7 +327,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             this.enterInThreadStore();
             if (this.isDead) {
-                throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+                throw new BodyTerminatedException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             }
             if (this.isSecurityOn) {
 
@@ -366,7 +367,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             // if the futurepool is not null while body is dead,
             // this AO still has ACs to do.
             if (this.isDead && (this.getFuturePool() == null)) {
-                throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+                throw new BodyTerminatedException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             } else {
                 ftres = this.ftmanager.onReceiveReply(reply);
                 if (reply.ignoreIt()) {
@@ -378,7 +379,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             enterInThreadStore();
             if (this.isDead && (this.getFuturePool() == null)) {
-                throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+                throw new BodyTerminatedException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             }
 
             //System.out.println("Body receives Reply on NODE : " + this.nodeURL);
@@ -1096,10 +1097,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 if (toKill != null) {
                     //this body is still alive
                     toKill.blockCommunication();
-
-                    //                    UniversalBody ba = toKill.getRemoteAdapter();
-                    //                    ba.changeProxiedBody(this);
-                    //                    this.remoteBody = ba;
                     RemoteObjectExposer toKillRoe = ((AbstractBody) toKill).getRemoteObjectExposer();
                     toKillRoe.getRemoteObject().setTarget(this);
 

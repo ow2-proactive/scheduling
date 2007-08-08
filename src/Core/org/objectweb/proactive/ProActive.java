@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
@@ -2267,6 +2268,11 @@ public class ProActive {
                     NonFunctionalServices.terminateAOImmediately(proxy);
                 } else {
                     NonFunctionalServices.terminateAO(proxy);
+                }
+            } catch (BodyTerminatedException e) {
+                // the terminated body is already terminated
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Terminating already terminated body : " + e);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
