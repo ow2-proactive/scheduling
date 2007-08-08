@@ -21,6 +21,11 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
     implements IbisRemoteObject {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 1L;
     protected RemoteObject remoteObject;
     protected URI uri;
     protected Object stub;
@@ -130,5 +135,13 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
 
     public String getProxyName() throws ProActiveException, IOException {
         return this.remoteObject.getProxyName();
+    }
+
+    public Class getTargetClass() throws ProActiveException, IOException {
+        return this.remoteObject.getTargetClass();
+    }
+
+    public Class getAdapterClass() throws ProActiveException, IOException {
+        return this.remoteObject.getAdapterClass();
     }
 }

@@ -26,5 +26,9 @@ public interface RemoteObject extends SecurityEntity {
 
     public String getClassName();
 
+    public Class getTargetClass();
+
     public String getProxyName();
+
+    public Class getAdapterClass();
 }

@@ -218,6 +218,17 @@
 			<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
 		</java>
 
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
+			<arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/runtime/ProActiveRuntime" />
+		</java>
+		
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+		<classpath refid="project.classpath" />
+		    <arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/body/UniversalBody" />
+	    </java>
+	
+		
 		<!-- XXX: MPI should be in Extensions -->
 
 		<if>

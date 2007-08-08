@@ -35,6 +35,11 @@ import java.net.URI;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.ReifiedCastException;
+import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -151,5 +156,46 @@ public class RemoteObjectHelper {
 
     public static RemoteObject lookup(URI url) throws ProActiveException {
         return getFactoryFromURL(url).lookup(expandURI(url));
+    }
+
+    public static Object generatedObjectStub(RemoteObject rro)
+        throws ProActiveException {
+        try {
+            Object reifiedObjectStub = MOP.createStubObject(rro.getClassName(),
+                    rro.getTargetClass(), new Class[] {  });
+            ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(
+                    null, new Object[] { rro }));
+
+            Class adapter = rro.getAdapterClass();
+
+            if (adapter != null) {
+                //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
+                //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
+                Adapter ad = (Adapter) adapter.newInstance();
+                ad.setAdapter(reifiedObjectStub);
+                return ad;
+            } else {
+                return reifiedObjectStub;
+            }
+        } catch (ClassNotReifiableException e) {
+            e.printStackTrace();
+        } catch (ReifiedCastException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -84,7 +84,6 @@ public class RemoteObjectAdapter implements RemoteObject {
                            .warn("unable to contact remote object at " +
                 this.uri.toString() + " when calling " +
                 message.getMethodName());
-
             return new SynchronousReplyImpl(e);
         }
 
@@ -207,5 +206,31 @@ public class RemoteObjectAdapter implements RemoteObject {
             return remoteObject.equals(((RemoteObjectAdapter) o).remoteObject);
         }
         return false;
+    }
+
+    public Class getTargetClass() {
+        try {
+            return remoteObject.getTargetClass();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Class getAdapterClass() {
+        try {
+            return this.remoteObject.getAdapterClass();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 }

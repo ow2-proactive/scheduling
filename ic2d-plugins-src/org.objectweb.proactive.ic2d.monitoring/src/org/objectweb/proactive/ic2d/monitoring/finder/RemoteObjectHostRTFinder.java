@@ -74,15 +74,21 @@ public class RemoteObjectHostRTFinder implements HostRTFinder{
 
 					try {
 					    RemoteObject ro = RemoteObjectHelper.lookup(url);
-					    Object stub = ro.getObjectProxy();
+
+
+//					    Object stub = ro.getObjectProxy();
+					    Object stub = RemoteObjectHelper.generatedObjectStub(ro);
+
 
 	                    if (stub instanceof ProActiveRuntime) {
+	                    	console.log("Found ProActive Runtime in registry at endpoint " + url);
 	                        runtimes.add((ProActiveRuntime ) stub);
 	                    }
 					} catch (ProActiveException pae) {
 					    // the lookup returned an active object, and an active object is
 					    // not a remote object (for now...)
 					    // TODO : Arnaud, Active objects should become Remote Objects...
+						pae.printStackTrace();
 					    console.log("Found active object in registry at " + url);
 					}
 

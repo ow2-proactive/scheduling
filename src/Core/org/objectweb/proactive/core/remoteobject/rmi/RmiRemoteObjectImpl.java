@@ -31,8 +31,8 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
     implements RmiRemoteObject {
 
     /**
-         *
-         */
+    *
+    */
     protected RemoteObject remoteObject;
     protected Object stub;
     protected URI uri;
@@ -159,5 +159,13 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
 
     public String getProxyName() throws ProActiveException, IOException {
         return this.remoteObject.getProxyName();
+    }
+
+    public Class getTargetClass() throws ProActiveException, IOException {
+        return this.remoteObject.getTargetClass();
+    }
+
+    public Class getAdapterClass() throws ProActiveException, IOException {
+        return this.remoteObject.getAdapterClass();
     }
 }

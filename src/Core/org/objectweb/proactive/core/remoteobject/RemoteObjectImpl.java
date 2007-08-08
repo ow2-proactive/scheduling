@@ -94,7 +94,6 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
             o = (message).getMethodCall().execute(this.target);
             return new SynchronousReplyImpl(o);
         } catch (MethodCallExecutionFailedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
@@ -284,5 +283,22 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
 
     public void setTarget(Object target) {
         this.target = target;
+    }
+
+    public Class getTargetClass() {
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Class getAdapterClass() {
+        if (adapter != null) {
+            return adapter.getClass();
+        }
+        return null;
     }
 }

@@ -187,4 +187,12 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
     public String getProxyName() throws ProActiveException, IOException {
         return this.remoteObject.getProxyName();
     }
+
+    public Class getTargetClass() throws ProActiveException, IOException {
+        return this.remoteObject.getTargetClass();
+    }
+
+    public Class getAdapterClass() throws ProActiveException, IOException {
+        return this.remoteObject.getAdapterClass();
+    }
 }

@@ -80,6 +80,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public interface ProActiveRuntime extends Job, SecurityEntity {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
+    public static final long serialVersionUID = 104088081090593038L;
 
     /**
      * Creates a new Node in the same VM as this ProActiveRuntime
