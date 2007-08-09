@@ -146,7 +146,8 @@ public class ProActiveServicesImpl implements ProActiveService {
     private void createNode() {
         //    	System.out.println("url du class server = ");
         try {
-        	Thread.currentThread().setContextClassLoader(ProActiveServicesImpl.class.getClassLoader());
+            Thread.currentThread()
+                  .setContextClassLoader(ProActiveServicesImpl.class.getClassLoader());
             this.node = NodeFactory.createNode(OSGI_NODE_NAME);
         } catch (NodeException e) {
             e.printStackTrace();
