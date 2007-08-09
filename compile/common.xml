@@ -31,7 +31,6 @@
 	<property name="cl.examples.dir"    value="${classes.dir}/Examples" />
 	<property name="cl.test.dir"        value="${classes.dir}/Tests" />
 	<property name="cl.utils.dir"       value="${classes.dir}/Utils" />
-
 	<property name="proactive.path" 	value="org/objectweb/proactive" />
 	<property name="proactive.core.path" value="${proactive.path}/core" />
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
@@ -53,6 +52,15 @@
 	<property name="clover.historypoint.dir"  value="${base.dir}/clover_db" />
 
 
+	<!-- Osgi properties -->
+		<property name="manifest.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/Manifest/" />
+		<property name="manifest.example.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
+		<property name="bundle.dir" value="${base.dir}/dist/bundle" />
+		<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
+		<property name="manifest.connector.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/connector/Manifest/"/>
+		<property name="manifest.example.management.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/jmx/remote/management/osgi/Manifest/"/>
+		<property name="example.management.classes.dir" value="${classes.dir}/Examples/org/objectweb/proactive/examples/jmx/remote/management/"/>	
+	
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 	
 	<!-- ================================================================ -->
@@ -83,6 +91,7 @@
 		<pathelement location="${cl.extra.dir}" />
 		<pathelement location="${cl.utils.dir}" />
 		<pathelement location="${cl.test.dir}"/>
+		<pathelement location="${cl.ic2d.dir}"/>
 		<path refid="project.libs"/>
 	</path>
 	

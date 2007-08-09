@@ -5,16 +5,10 @@
 	<import file="common.xml" />
 	<import file="doc.xml" />
 
-	<!-- Osgi properties -->
-	<property name="manifest.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/Manifest/" />
-	<property name="manifest.example.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
-	<property name="bundle.dir" value="${base.dir}/dist/bundle" />
-	<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
-	<property name="manifest.connector.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/connector/Manifest/"/>
-
+	
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest"/>
-
+	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
 	<!-- emma -->
 	<path id="emma.lib" >
 		<pathelement location="${base.dir}/compile/lib/emma_ant.jar" />
@@ -31,7 +25,7 @@
 	<tstamp>
 		<format property="TODAY" pattern="yyyy-MM-dd" />
 	</tstamp>
-
+ 
 	<if name="version">
 		<property name="version_" value="${version}"/>
 		<else>
@@ -222,7 +216,12 @@
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
 		</java>
-
+	
+		
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+					<classpath refid="project.classpath" />
+					<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
+				</java>
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/runtime/ProActiveRuntime" />
@@ -587,13 +586,21 @@
 			<fileset dir="${cl.extensions.dir}" includes="**"/>
 			<fileset dir="${cl.extra.dir}" includes="**"/>
 
+			<fileset dir="${config.dir}">
+					<include name="ProActiveConfiguration.xml" />
+			</fileset>
 			<fileset dir="${osgi.res.dir}" >
 				<include name="metadata.xml" />
 			</fileset>
 		</jar>
+		<copy toDir="/user/vlegrand/home/work/Projets/PISE dev/PISEDeploiement/lib/">
+					<fileset dir="${dist.dir}/ProActive">
+						<include name="ProActive.jar" />
+					</fileset>		
+				</copy>
+
 	</target>
-
-
+	
 	<!-- ================================================================ -->
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
@@ -878,11 +885,25 @@
 		<copy file="${PAdist.dir}/ProActive.jar" todir="${ic2d-plugin.dir}/${plugin.lib}" />
 	</target>
 
+
+	<!-- ================================================================ -->
+	<!--                      Compile JMX Connector                       -->
+	<!--  =============================================================== -->
+			<target name="proActiveConnectorBundle" >
+				<mkdir dir="${bundle.dir}"/>
+				<jar 
+					manifest="${manifest.connector.dir}/Manifest.mf" 
+					jarfile="${bundle.dir}/proactiveConnectorBundle.jar">				
+				</jar>			
+			</target> 
+
 	<!-- ================================================================ -->
 	<!--                          Performance test                        -->
 	<!-- ================================================================ -->
 
+
 	<target name="runPerformanceTest" depends="tests" description="Run performance test on the current host.">
+
 		<property name="n" value="" />
 		<property name="o" value="" />
 		<property name="p" value="" />
@@ -905,5 +926,23 @@
 			<arg value="${x}" />
 		</java>
 	</target>
-
+		<!-- ================================================================ -->
+		<!--                      Compile JMX Connector                       -->
+		<!--  =============================================================== -->
+		
+		
+		<target name="OSGiBundles" depends="proActiveJar, librariesBundle, proActiveConnectorBundle, osgiMgt">
+		</target>
+	
+	<!-- ================================================================ -->
+	<!--                    Create OSGi  Management Bundle                -->
+	<!--  =============================================================== -->
+	<target name="osgiMgt" depends="compile"   >
+		<mkdir dir="${dist.dir}"/>
+		<jar jarfile="${bundle.dir}/OSGiManagement.jar" manifest="${manifest.example.management.dir}/Manifest.mf">
+			<fileset dir="${cl.examples.dir}/">
+			<include name="org/objectweb/proactive/examples/jmx/remote/**" />
+			</fileset>
+		</jar>		
+	</target>
 </project>
