@@ -100,9 +100,8 @@ public class TestClient implements NotificationListener, Serializable {
 
     private void connect() {
         System.out.println("Connecting to : " + this.url);
-        String serverName = UrlBuilder.getNameFromUrl(url)
-                                      .replace(ProActiveJMXConstants.SERVER_REGISTERED_NAME +
-                "_", "");
+        String serverName = UrlBuilder.getNameFromUrl(url);
+
         if ((serverName == null) || serverName.equals("")) {
             serverName = "serverName";
         }
