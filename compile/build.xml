@@ -66,6 +66,11 @@
 
 	<target name="compile" depends="core, extensions, extra, util, examples, tests" description="build the class files" />
 
+	<!-- ================================================================ -->
+	<!--                          Build all  (compile + docs              -->
+	<!--  =============================================================== -->
+
+	<target name="all" depends="compile,docs" description="build the class files and the documentation" />
 
 	<!-- ================================================================ -->
 	<!--                  Clean up generated files                        -->
@@ -357,7 +362,7 @@
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
 
-			<junit printsummary="yes" forkmode="perTest" showoutput="no">
+			<junit printsummary="yes" forkmode="perTest" showoutput="yes">
 				<jvmarg value="-Dproactive.dir=${base.dir}"/>
 
 
