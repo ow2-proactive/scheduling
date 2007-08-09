@@ -1414,7 +1414,7 @@ public class ProActive {
         try {
             rmo = RemoteObjectHelper.lookup(uri);
 
-            Object o = rmo.getObjectProxy();
+            Object o = RemoteObjectHelper.generatedObjectStub(rmo);
 
             if (o instanceof UniversalBody) {
                 return createStubObject(classname,
@@ -1447,21 +1447,6 @@ public class ProActive {
      */
     public static String[] listActive(String url) throws java.io.IOException {
         String[] activeNames = null;
-
-        //        String protocol = UrlBuilder.getProtocol(url);
-
-        // First step towards Body factory, will be introduced after the release
-        //        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
-        //            activeNames = new RmiBodyAdapter().list(url);
-        //        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
-        //            activeNames = new SshRmiBodyAdapter().list(url);
-        //        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-        //            activeNames = new HttpBodyAdapter().list(url);
-        //        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-        //            activeNames = new IbisBodyAdapter().list(url);
-        //        } else {
-        //            throw new IOException("Protocol " + protocol + " not defined");
-        //        }
         try {
             URI[] uris = RemoteObjectHelper.list(URI.create(url));
             activeNames = new String[uris.length];

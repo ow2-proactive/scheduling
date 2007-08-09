@@ -802,7 +802,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         try {
             rmo = RemoteObjectHelper.lookup(uri);
 
-            b = (UniversalBody) rmo.getObjectProxy();
+            b = (UniversalBody) RemoteObjectHelper.generatedObjectStub(rmo);
 
             StubObject stub = (StubObject) ProActive.createStubObject(ProActiveComponentRepresentative.class.getName(),
                     b);
