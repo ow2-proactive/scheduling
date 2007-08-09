@@ -163,13 +163,16 @@ public class CoreTimersContainer implements TimerProvidable {
         // Check the activated timers from the node properties
         String result = null;
         try {
-            Node currentNode = NodeFactory.getNode(nodeURL);
-            result = currentNode.getProperty("timitActivation");
-            if ((result != null) && !"".equals(result)) {
-                TimItTechnicalService.setGenerateOutputFile(currentNode.getProperty(
-                        "generateOutputFile"));
-                TimItTechnicalService.setPrintOutput(currentNode.getProperty(
-                        "printOutput"));
+            if (!nodeURL.contains("Spy")) {
+                Node currentNode = NodeFactory.getNode(nodeURL);
+                result = currentNode.getProperty("timitActivation");
+                if ((result != null) && !"".equals(result) &&
+                        !result.contains("Spy")) {
+                    TimItTechnicalService.setGenerateOutputFile(currentNode.getProperty(
+                            "generateOutputFile"));
+                    TimItTechnicalService.setPrintOutput(currentNode.getProperty(
+                            "printOutput"));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

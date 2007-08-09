@@ -139,7 +139,6 @@ public class RemoteObjectHelper {
                         ProActiveConfiguration.getInstance()
                                               .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             }
-            System.out.println("rmo url expanded to " + uri.toString());
         }
         return uri;
     }

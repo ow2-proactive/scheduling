@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 
 public class ClassServerServlet extends HttpServlet {
     //	public static final String WEB_ROOT = "/proactive";
-    public static final String SERVLET_NAME = "/ProActiveHTTP";
+    public static final String SERVLET_NAME = "ProActiveHTTP";
     private String url;
     private ClassServer classServer;
     private HttpServletRequest request;
@@ -53,7 +53,6 @@ public class ClassServerServlet extends HttpServlet {
     private static int port;
 
     public ClassServerServlet(int newport) {
-        System.out.println("New Class Server Servlet");
         ClassServerServlet.port = newport;
         ClassServerHelper helper = new ClassServerHelper();
         System.setProperty("proactive.http.port", ClassServerServlet.port + "");
@@ -109,15 +108,17 @@ public class ClassServerServlet extends HttpServlet {
         try {
             //            int port = Integer.parseInt(System.getProperty(
             //                        "proactive.http.port"));
-            String url = UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
-                        java.net.InetAddress.getLocalHost()), "",
-                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+
-            "/" + SERVLET_NAME ;*/
+            String url = Constants.XMLHTTP_PROTOCOL_IDENTIFIER + "://" +
+                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
+                ':' + port + '/' + SERVLET_NAME;
 
-            if (url.charAt(url.length() - 1) == '/') {
-                url = url.substring(0, url.length() - 1);
-            }
-            url += SERVLET_NAME;
+            //                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+
+            //            "/" + SERVLET_NAME ;*/
+
+            //            if (url.charAt(url.length() - 1) == '/') {
+            //                url = url.substring(0, url.length() - 1);
+            //            }
+            //            url += SERVLET_NAME + '/';
             return url;
         } catch (UnknownHostException e) {
             e.printStackTrace();

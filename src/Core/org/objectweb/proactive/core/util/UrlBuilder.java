@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.rmi.ClassServerServlet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -157,6 +158,7 @@ public class UrlBuilder {
                  */
                 name = "/" + name;
             }
+
             return new URI(protocol, null, host, port, name, null, null).toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -192,6 +194,7 @@ public class UrlBuilder {
             port = ProActiveConfiguration.getInstance()
                                          .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
         }
+
         if (port == null) {
             return buildUrl(host, name, protocol);
         } else {
@@ -233,11 +236,16 @@ public class UrlBuilder {
      * @return the name included in the url
      */
     public static String getNameFromUrl(String url) {
-        URI u = URI.create(url);
+        URI u = URI.create(url.trim());
+
         String path = u.getPath();
         if ((path != null) && (path.startsWith("/"))) {
             // remove the intial '/'
-            return path.substring(1);
+            path = path.substring(1);
+        }
+
+        if (path.contains(ClassServerServlet.SERVLET_NAME)) {
+            path = path.substring(ClassServerServlet.SERVLET_NAME.length() + 1);
         }
         return path;
     }
@@ -249,7 +257,8 @@ public class UrlBuilder {
     public static String getProtocol(String nodeURL) {
         String protocol = URI.create(nodeURL).getScheme();
         if (protocol == null) {
-            return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
+            return ProActiveConfiguration.getInstance()
+                                         .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         }
         return protocol;
     }
@@ -358,6 +367,7 @@ public class UrlBuilder {
         }
 
         java.net.InetAddress hostInetAddress = java.net.InetAddress.getLocalHost();
+
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {
                 return UrlBuilder.getHostNameorIP(hostInetAddress);
