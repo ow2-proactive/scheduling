@@ -190,7 +190,8 @@ public abstract class RuntimeFactory {
             //            throw new ProActiveException("Cannot create a ProActiveRuntime based on " + protocol);
         }
 
-        return (ProActiveRuntime) new RemoteObjectAdapter(rro).getObjectProxy();
+        return (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(new RemoteObjectAdapter(
+                rro));
     }
 
     /**
@@ -213,7 +214,7 @@ public abstract class RuntimeFactory {
                     proActiveRuntimeURL));
 
         //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
-        return (ProActiveRuntime) ro.getObjectProxy();
+        return (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro);
     }
 
     //

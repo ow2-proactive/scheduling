@@ -56,9 +56,9 @@ public abstract class ReflectRequest extends HttpMessage {
      * @return an HasMap containing methods and parameters
      */
     protected static HashMap<String, Object> getHashMapReflect(Class theclass) {
-        // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl 
-        // in 'Object' (value) and the name of funtions in key 
-        // (Warning two functions can t have the same name (for now)) 
+        // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl
+        // in 'Object' (value) and the name of funtions in key
+        // (Warning two functions can t have the same name (for now))
         Method[] allmethods = theclass.getMethods();
         int numberOfMethods = allmethods.length;
         HashMap<String, Object> hMapMethods = new HashMap<String, Object>(numberOfMethods);
@@ -76,7 +76,7 @@ public abstract class ReflectRequest extends HttpMessage {
                     hMapMethods.put(methodname, array);
                 } else {
                     ((ArrayList<Method>) obj).add(allmethods[i]);
-                    hMapMethods.put(methodname, (ArrayList<Method>) obj);
+                    hMapMethods.put(methodname, obj);
                 }
             } else {
                 hMapMethods.put(methodname, allmethods[i]);
@@ -93,8 +93,8 @@ public abstract class ReflectRequest extends HttpMessage {
      * @param hashobjet  ???
      * @return a Method representing the method in the ProActiveRuntime
      */
-    protected Method getProActiveRuntimeMethod(String methodsearch,
-        ArrayList paramsearch, Object hashobjet) {
+    protected Method getMethod(String methodsearch, ArrayList paramsearch,
+        Object hashobjet) {
         Object mret = hashobjet;
 
         if (mret instanceof ArrayList) {

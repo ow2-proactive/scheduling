@@ -42,12 +42,20 @@ public class SynchronousProxy implements Proxy, Serializable {
             return reply.getSynchResult();
         }
 
-        //        System.out.println("SynchronousProxy.reify()  " + c.getName() +
-        //            " void reply :" + reply);
-        //        if (reply != null) {
-        //            System.out.println("SynchronousProxy.reify()  " + c.getName() +
-        //                " void reply result :" + reply.getSynchResult());
-        //        }
+        return null;
+    }
+
+    public Object receiveMessage(Request m) throws Throwable {
+        SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(m);
+
+        if (reply != null) {
+            if (reply.getSynchResult() instanceof Throwable) {
+                throw (Throwable) reply.getSynchResult();
+            }
+
+            return reply.getSynchResult();
+        }
+
         return null;
     }
 

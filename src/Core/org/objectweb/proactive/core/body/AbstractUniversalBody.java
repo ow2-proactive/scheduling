@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
@@ -121,9 +122,8 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         try {
             RemoteRemoteObject rro = register(uri);
 
-            this.remoteBody = (UniversalBody) rro.getObjectProxy();
-            //            /// Initialiaze cache -- Gchazara won't touch it, ok ?
-            //            this.remoteBody.getID();
+            this.remoteBody = (UniversalBody) RemoteObjectHelper.generatedObjectStub(new RemoteObjectAdapter(
+                        rro));
         } catch (Exception e) {
             e.printStackTrace();
             throw new ActiveObjectCreationException(e);

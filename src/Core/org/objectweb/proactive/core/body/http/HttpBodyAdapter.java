@@ -36,7 +36,6 @@ import java.net.URL;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapterImpl;
-import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPUnexpectedException;
@@ -60,8 +59,8 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
     }
 
     public HttpBodyAdapter(UniversalBody body) throws ProActiveException {
-        RemoteBody remoteBody = new HttpRemoteBodyImpl(body);
-        construct(remoteBody);
+        //        RemoteBody remoteBody = new HttpRemoteBodyImpl(body);
+        //        construct(remoteBody);
     }
 
     //
@@ -145,7 +144,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
             return result;
         }
 
-        //        	
+        //
         //        	String url;
         ////            int port = ClassServer.getServerSocketPort();
         //            url = urn;
@@ -153,7 +152,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
         //            urn = urn.substring(urn.lastIndexOf('/') + 1);
         //
         //
-        //       
+        //
         //
         //            //            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
         //            //                    port, message, ProActiveXMLUtils.MESSAGE);
@@ -161,7 +160,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
         //
         //
         //            //System.out.println("result = " + result );
-        //          
+        //
         //        } catch (Exception e) {
         //            throw new HTTPUnexpectedException("Unexpected exception", e);
         //        }

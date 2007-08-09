@@ -1417,8 +1417,7 @@ public class ProActive {
             Object o = RemoteObjectHelper.generatedObjectStub(rmo);
 
             if (o instanceof UniversalBody) {
-                return createStubObject(classname,
-                    (UniversalBody) rmo.getObjectProxy());
+                return createStubObject(classname, (UniversalBody) o);
             }
         } catch (ProActiveException e) {
             throw new IOException(e.getMessage());

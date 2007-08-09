@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.remoteobject.http.util;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -65,6 +67,8 @@ public class HTTPRegistry {
      * @param body the body to be binded
      */
     public void bind(String name, RemoteObject body) {
+        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
+                       .debug("registering remote object at " + name);
         rRemteObjectMap.put(name, body);
     }
 

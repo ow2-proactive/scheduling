@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.http.message.RemoteObjectRequest;
+import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
+import org.objectweb.proactive.core.remoteobject.http.util.messages.HttpRemoteObjectRequest;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -75,11 +77,11 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         //
         this.remoteObjectURL = remoteObjectURL;
 
-        try {
-            this.stub = remoteObject.getObjectProxy(this);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
+        //        try {
+        //            this.stub = remoteObject.getObjectProxy(this);
+        //        } catch (ProActiveException e) {
+        //            e.printStackTrace();
+        //        }
     }
 
     public Reply receiveMessage(Request message)
@@ -98,12 +100,34 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getCertificate();
+        if (isLocal) {
+            return remoteObject.getCertificate();
+        } else {
+            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getCertificate",
+                    new ArrayList<Object>(), this.remoteObjectURL.toString());
+            br.send();
+            try {
+                return (X509Certificate) br.getReturnedObject();
+            } catch (Exception e) {
+                throw new HTTPRemoteException("Unexpected exception", e);
+            }
+        }
     }
 
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getCertificateEncoded();
+        if (isLocal) {
+            return this.remoteObject.getCertificateEncoded();
+        } else {
+            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getCertificateEncoded",
+                    new ArrayList<Object>(), this.remoteObjectURL.toString());
+            br.send();
+            try {
+                return (byte[]) br.getReturnedObject();
+            } catch (Exception e) {
+                throw new HTTPRemoteException("Unexpected exception", e);
+            }
+        }
     }
 
     public ArrayList<Entity> getEntities()
@@ -181,18 +205,62 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
     }
 
     public String getClassName() throws ProActiveException, IOException {
-        return this.remoteObject.getClassName();
+        if (isLocal) {
+            return this.remoteObject.getClassName();
+        } else {
+            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getClassName",
+                    new ArrayList<Object>(), this.remoteObjectURL.toString());
+            br.send();
+            try {
+                return (String) br.getReturnedObject();
+            } catch (Exception e) {
+                throw new HTTPRemoteException("Unexpected exception", e);
+            }
+        }
     }
 
     public String getProxyName() throws ProActiveException, IOException {
-        return this.remoteObject.getProxyName();
+        if (isLocal) {
+            return this.remoteObject.getProxyName();
+        } else {
+            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getProxyName",
+                    new ArrayList<Object>(), this.remoteObjectURL.toString());
+            br.send();
+            try {
+                return (String) br.getReturnedObject();
+            } catch (Exception e) {
+                throw new HTTPRemoteException("Unexpected exception", e);
+            }
+        }
     }
 
     public Class getTargetClass() throws ProActiveException, IOException {
-        return this.remoteObject.getTargetClass();
+        if (isLocal) {
+            return this.remoteObject.getTargetClass();
+        } else {
+            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getTargetClass",
+                    new ArrayList<Object>(), this.remoteObjectURL.toString());
+            br.send();
+            try {
+                return (Class) br.getReturnedObject();
+            } catch (Exception e) {
+                throw new HTTPRemoteException("Unexpected exception", e);
+            }
+        }
     }
 
     public Class getAdapterClass() throws ProActiveException, IOException {
-        return this.remoteObject.getAdapterClass();
+        if (isLocal) {
+            return this.remoteObject.getAdapterClass();
+        } else {
+            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getAdapterClass",
+                    new ArrayList<Object>(), this.remoteObjectURL.toString());
+            br.send();
+            try {
+                return (Class) br.getReturnedObject();
+            } catch (Exception e) {
+                throw new HTTPRemoteException("Unexpected exception", e);
+            }
+        }
     }
 }
