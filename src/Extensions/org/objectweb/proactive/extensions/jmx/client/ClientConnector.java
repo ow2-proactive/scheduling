@@ -88,7 +88,6 @@ public class ClientConnector implements Serializable {
                         "service:jmx:proactive",
                         UrlBuilder.getPortFromUrl(this.url));
             }
-
             JMXServiceURL jmxUrl = new JMXServiceURL(url);
             /* connect to the connector server  */
             this.connector = JMXConnectorFactory.connect(jmxUrl,

@@ -41,7 +41,8 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator implements BundleActivator {
     public void start(BundleContext arg0) throws Exception {
-        new ServerConnector();
+        ServerConnector serverConnector = new ServerConnector();
+        serverConnector.start();
     }
 
     public void stop(BundleContext arg0) throws Exception {

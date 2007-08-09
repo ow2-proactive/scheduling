@@ -128,6 +128,7 @@ public class ProActiveConnector implements JMXConnector, Serializable,
                                                     .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
             String lookupUrl = UrlBuilder.buildUrl(hostname, serverName,
                     protocol, port);
+            System.out.println("ProActiveConnector.connect() lookup url = " + lookupUrl);
             ProActiveServerImpl paServer = (ProActiveServerImpl) ProActive.lookupActive(ProActiveServerImpl.class.getName(),
                     lookupUrl);
 

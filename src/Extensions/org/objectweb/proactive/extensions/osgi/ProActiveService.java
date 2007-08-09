@@ -63,4 +63,6 @@ public interface ProActiveService {
     public void register(Object obj, String url) throws java.io.IOException;
 
     public void terminate();
+
+    public Object lookupActive(String className, String url);
 }
