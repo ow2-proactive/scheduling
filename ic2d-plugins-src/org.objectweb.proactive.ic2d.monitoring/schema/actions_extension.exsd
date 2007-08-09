@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.objectweb.proactive.ic2d.jmxmonitoring">
+<schema targetNamespace="org.objectweb.proactive.ic2d.monitoring">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.objectweb.proactive.ic2d.jmxmonitoring" id="actions_extension" name="Actions extension"/>
+         <meta.schema plugin="org.objectweb.proactive.ic2d.monitoring" id="actions_extension" name="Actions extension"/>
       </appInfo>
       <documentation>
          Defines an extension point for actions that may be provided by external optional plugin.
