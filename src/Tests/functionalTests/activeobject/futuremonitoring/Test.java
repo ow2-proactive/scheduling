@@ -59,7 +59,8 @@ public class Test extends FunctionalTest {
         A ac = a2.wrapFuture(future);
         a2.crash();
         try {
-            System.out.println(ac);
+            //System.out.println(ac);
+            ac.toString();
         } catch (FutureMonitoringPingFailureException fmpfe) {
             exception = true;
         }
@@ -70,7 +71,8 @@ public class Test extends FunctionalTest {
         A a1bis = (A) ProActive.newActive(A.class.getName(), null, this.node1);
         a1bis.crash();
         try {
-            System.out.println(future);
+            //System.out.println(future);
+            future.toString();
         } catch (FutureMonitoringPingFailureException fmpfe) {
             exception = true;
         }
