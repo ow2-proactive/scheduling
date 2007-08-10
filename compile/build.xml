@@ -593,11 +593,7 @@
 				<include name="metadata.xml" />
 			</fileset>
 		</jar>
-		<copy toDir="/user/vlegrand/home/work/Projets/PISE dev/PISEDeploiement/lib/">
-					<fileset dir="${dist.dir}/ProActive">
-						<include name="ProActive.jar" />
-					</fileset>		
-				</copy>
+
 
 	</target>
 	
