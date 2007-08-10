@@ -19,7 +19,7 @@
              For this example you should have a directory named results at your project path.                 
                 -->
                 
-	<serie descriptorBase="descriptors/TimIt.xml"
+	<series descriptorBase="descriptors/TimIt.xml"
 		result="results/serie1/example1.4-8.xml"
 		class="${CLASS_PREFIX}.example1.Launcher">
 		<charts>
@@ -47,10 +47,10 @@
 				<descriptorVariable name="NODES" value="${NP}" />
 			</benchmark>
 		</benchmarks>
-	</serie>
+	</series>
 
 	<!-- Running example2 suite and generate a hierarchical bar chart -->	
-	<serie descriptorBase="descriptors/TimIt.xml"
+	<series descriptorBase="descriptors/TimIt.xml"
 		result="results/serie2/example2.4-8.xml"
 		class="${CLASS_PREFIX}.example2.Launcher">
 		<charts>
@@ -73,11 +73,11 @@
 					value="total,init,work,end,foo"/>
 			</benchmark>
 		</benchmarks>
-	</serie>
+	</series>
 	
 	<!-- Running jacobi suite -->
 	<!--
-	<serie descriptorBase="descriptors/TimIt.xml"
+	<series descriptorBase="descriptors/TimIt.xml"
 		result="results/jacobi.1.xml"
 		class="${CLASS_PREFIX}.jacobi.Launcher">
 		<charts>
@@ -93,6 +93,6 @@
 				<descriptorVariable name="NODES" value="1" />
 			</benchmark>
 		</benchmarks>
-	</serie>
+	</series>
 	-->
 </timit>
