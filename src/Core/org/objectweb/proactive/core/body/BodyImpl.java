@@ -477,8 +477,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // push the new context
             LocalBodyStore.getInstance()
                           .pushContext(new Context(BodyImpl.this, request));
-            serveInternal(request);
-            LocalBodyStore.getInstance().popContext();
+            try {
+                serveInternal(request);
+            } finally {
+                LocalBodyStore.getInstance().popContext();
+            }
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
                     TimerWarehouse.SERVE);

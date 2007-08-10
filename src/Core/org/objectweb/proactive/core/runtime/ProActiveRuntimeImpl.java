@@ -856,10 +856,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // need to register as thread of the corresponding active object: this thread
         // may send looged requests or logged replies
         LocalBodyStore.getInstance().pushContext(new Context(ret, null));
-        ((AbstractBody) ret).getFTManager()
-         .beforeRestartAfterRecovery(ckpt.getCheckpointInfo(), inc);
-        // remove context for the current thread
-        LocalBodyStore.getInstance().popContext();
+        try {
+            ((AbstractBody) ret).getFTManager()
+             .beforeRestartAfterRecovery(ckpt.getCheckpointInfo(), inc);
+        } finally {
+            // remove context for the current thread
+            LocalBodyStore.getInstance().popContext();
+        }
 
         // register the body
         this.registerBody(nodeName, ret);
