@@ -69,7 +69,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     // Active queue of AC services
     private transient ActiveACQueue queueAC;
 
-    // toggles for enabling or disabling automatic continuation 
+    // toggles for enabling or disabling automatic continuation
     // outgoing ACs has to be registred if true
     private boolean registerACs;
 
@@ -127,7 +127,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     // So, futures to add in the local futurePool could be retreived
     static private java.util.Hashtable<Thread, ArrayList<Future>> incomingFutures;
 
-    // to register an incoming future in the table      
+    // to register an incoming future in the table
     public static void registerIncomingFuture(Future f) {
         ArrayList<Future> listOfFutures = incomingFutures.get(Thread.currentThread());
         if (listOfFutures != null) {
@@ -151,7 +151,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     // body forwarders
 
-    // map of threads that are running a body forwarder 
+    // map of threads that are running a body forwarder
     static private Map<Thread, Object> forwarderThreads;
 
     // Add the current thread as a body forwarder
@@ -164,7 +164,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         forwarderThreads.remove(Thread.currentThread());
     }
 
-    // Return true if the current thread is executing a body forwarder 
+    // Return true if the current thread is executing a body forwarder
     static public boolean isInsideABodyForwarder() {
         return forwarderThreads.containsKey(Thread.currentThread());
     }
@@ -265,20 +265,20 @@ public class FuturePool extends Object implements java.io.Serializable {
                 ftres = reply.getFTManager().onDeliverReply(reply);
             }
 
-            Future future = (Future) (futuresToUpdate.get(0));
+            Future future = (futuresToUpdate.get(0));
             if (future != null) {
                 future.receiveReply(result);
             }
 
             // if there are more than one future to update, we "give" deep copy
             // of the result to the other futures to respect ProActive model
-            // We use here the migration tag to perform a simple serialization (ie 
+            // We use here the migration tag to perform a simple serialization (ie
             // without continuation side-effects)
             int numOfFuturesToUpdate = futuresToUpdate.size();
             if (numOfFuturesToUpdate > 1) {
                 setCopyMode(true);
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
-                    Future otherFuture = (Future) (futuresToUpdate.get(i));
+                    Future otherFuture = (futuresToUpdate.get(i));
                     otherFuture.receiveReply((FutureResult) Utils.makeDeepCopy(
                             result));
                 }
@@ -561,7 +561,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                 // there are ACs to do !
                 try {
-                    // enter in the threadStore 
+                    // enter in the threadStore
                     FuturePool.this.getOwnerBody().enterInThreadStore();
 
                     // if body has migrated, kill the thread
@@ -578,6 +578,10 @@ public class FuturePool extends Object implements java.io.Serializable {
                     FuturePool.this.getOwnerBody().exitFromThreadStore();
                 } catch (Exception e2) {
                     // to unblock active object
+                    System.out.println(
+                        "ActiveACQueue.run() BOOOOOOOOOOOOOMMMMM");
+
+                    e2.printStackTrace();
                     FuturePool.this.getOwnerBody().exitFromThreadStore();
                     throw new ProActiveRuntimeException("Error while sending reply for AC ",
                         e2);
@@ -617,7 +621,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @see ActiveACQueue
      */
     private class ACService implements java.io.Serializable {
-        // bodies that have to be updated	
+        // bodies that have to be updated
         private ArrayList<UniversalBody> dests;
 
         // reply to send
@@ -637,7 +641,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         public void doAutomaticContinuation() throws java.io.IOException {
             if (dests != null) {
                 // for several *local* destinations, the deepcopy of the result in the reply object
-                // would unset copymode for the future contained inside this result. A new reply is 
+                // would unset copymode for the future contained inside this result. A new reply is
                 // created to avoid the alteration of the original result.
                 int remainingSends = dests.size();
                 Reply toSend = null;
@@ -646,7 +650,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     : null;
 
                 for (int i = 0; i < dests.size(); i++) {
-                    UniversalBody dest = (UniversalBody) (dests.get(i));
+                    UniversalBody dest = (dests.get(i));
 
                     // FAULT-TOLERANCE
                     FTManager ftm = ((AbstractBody) FuturePool.this.getOwnerBody()).getFTManager();

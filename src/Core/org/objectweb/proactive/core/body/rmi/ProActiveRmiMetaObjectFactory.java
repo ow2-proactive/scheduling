@@ -31,11 +31,7 @@
 package org.objectweb.proactive.core.body.rmi;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
-import org.objectweb.proactive.core.body.RemoteBodyFactory;
-import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -47,23 +43,23 @@ public class ProActiveRmiMetaObjectFactory extends ProActiveMetaObjectFactory
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-    @Override
-    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        return new RemoteRmiBodyFactoryImpl();
-    }
+    //    @Override
+    //    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+    //        return new RemoteRmiBodyFactoryImpl();
+    //    }
 
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected static class RemoteRmiBodyFactoryImpl implements RemoteBodyFactory,
-        java.io.Serializable {
-        public UniversalBody newRemoteBody(UniversalBody body) {
-            try {
-                return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
-            } catch (ProActiveException e) {
-                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
-                    e);
-            }
-        }
-    } // end inner class RemoteBodyFactoryImpl
+    //    protected static class RemoteRmiBodyFactoryImpl implements RemoteBodyFactory,
+    //        java.io.Serializable {
+    //        public UniversalBody newRemoteBody(UniversalBody body) {
+    //            try {
+    //                return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
+    //            } catch (ProActiveException e) {
+    //                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
+    //                    e);
+    //            }
+    //        }
+    //    } // end inner class RemoteBodyFactoryImpl
 }

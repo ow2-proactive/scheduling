@@ -267,6 +267,7 @@ public class LocalBodyStore {
     //
     void registerBody(AbstractBody body) {
         if (this.localBodyMap.getBody(body.getID()) != null) {
+            Thread.dumpStack();
             logger.warn("Body already registered in the body map");
         }
         localBodyMap.putBody(body.bodyID, body);

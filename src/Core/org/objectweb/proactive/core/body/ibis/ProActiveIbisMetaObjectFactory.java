@@ -30,11 +30,7 @@
  */
 package org.objectweb.proactive.core.body.ibis;
 
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
-import org.objectweb.proactive.core.body.RemoteBodyFactory;
-import org.objectweb.proactive.core.body.UniversalBody;
 
 
 /**
@@ -91,24 +87,24 @@ public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    @Override
-    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        return new RemoteIbisBodyFactoryImpl();
-    }
+    //    @Override
+    //    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+    //        return new RemoteIbisBodyFactoryImpl();
+    //    }
 
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected static class RemoteIbisBodyFactoryImpl
-        implements RemoteBodyFactory, java.io.Serializable {
-        public UniversalBody newRemoteBody(UniversalBody body) {
-            try {
-                // 	System.out.println("Creating ibis remote body adapter");
-                return new IbisBodyAdapter(body);
-            } catch (ProActiveException e) {
-                throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
-                    e);
-            }
-        }
-    } // end inner class RemoteBodyFactoryImpl
+    //    protected static class RemoteIbisBodyFactoryImpl
+    //        implements RemoteBodyFactory, java.io.Serializable {
+    //        public UniversalBody newRemoteBody(UniversalBody body) {
+    //            try {
+    //                // 	System.out.println("Creating ibis remote body adapter");
+    //                return new IbisBodyAdapter(body);
+    //            } catch (ProActiveException e) {
+    //                throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
+    //                    e);
+    //            }
+    //        }
+    //    } // end inner class RemoteBodyFactoryImpl
 }

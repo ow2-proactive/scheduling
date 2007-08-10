@@ -37,7 +37,6 @@ import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.rmi.ProActiveRmiMetaObjectFactory;
-//import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 

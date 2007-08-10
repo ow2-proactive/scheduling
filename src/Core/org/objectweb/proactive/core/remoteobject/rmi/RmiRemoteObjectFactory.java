@@ -170,7 +170,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
 
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .debug(url + " unbound in registry");
-        } catch (java.rmi.NotBoundException e) {
+        } catch (IOException e) {
             //No need to throw an exception if an object is already unregistered
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn(url + " is not bound in the registry ");

@@ -201,13 +201,7 @@
 
 		<rmic base="${cl.proactive.dir}" sourcebase="${cl.proactive.dir}" stubversion="1.2">
 			<classpath refid="project.classpath" />
-			<include name="org/objectweb/proactive/core/body/jini/JiniRemoteBodyImpl.class"/>
-			<include name="org/objectweb/proactive/core/body/rmi/RmiRemoteBodyImpl.class"/>
-			<include name="org/objectweb/proactive/core/body/rmi/RmiRemoteBodyForwarderImp.class"/>
-			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class"/>
-			<include name="org/objectweb/proactive/core/runtime/rmi/RmiProActiveRuntimeImpl.class"/>
-			<include name="org/objectweb/proactive/core/runtime/rmi/RmiProActiveRuntimeForwarderImpl.class"/>
-			<include name="org/objectweb/proactive/core/runtime/jini/JiniRuntimeImpl.class"/>		
+			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class"/>	
 			<include name="org/objectweb/proactive/core/remoteobject/rmi/RmiRemoteObjectImpl.class"/>
 		</rmic>
 
@@ -790,18 +784,6 @@
 		<delete>
 			<fileset dir="${classes.dir}" includes="**/rmi*.java" />
 		</delete>
-		<java classname="ibis.frontend.rmi.Rmic"
-			  fork="true"
-			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/body/ibis/">
-			<classpath refid="project.classpath" />
-			<arg value="org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl" />
-		</java>
-		<java classname="ibis.frontend.rmi.Rmic"
-			  fork="true"
-			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/runtime/ibis/">
-			<classpath refid="project.classpath" />
-			<arg value="org.objectweb.proactive.core.runtime.ibis.IbisProActiveRuntimeImpl" />
-		</java>
 		<java classname="ibis.frontend.rmi.Rmic"
 			  fork="true"
 			  dir="${cl.proactive.dir}/org/objectweb/proactive/core/remoteobject/ibis/">

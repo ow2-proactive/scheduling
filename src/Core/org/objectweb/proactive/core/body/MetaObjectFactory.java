@@ -91,12 +91,12 @@ public interface MetaObjectFactory {
      */
     public MigrationManagerFactory newMigrationManagerFactory();
 
-    /**
-     * Creates or reuses a RemoteBodyFactory
-     * @return a new or existing RemoteBodyFactory
-     * @see RemoteBodyFactory
-     */
-    public RemoteBodyFactory newRemoteBodyFactory();
+    //    /**
+    //     * Creates or reuses a RemoteBodyFactory
+    //     * @return a new or existing RemoteBodyFactory
+    //     * @see RemoteBodyFactory
+    //     */
+    //    public RemoteBodyFactory newRemoteBodyFactory();
 
     /**
      * Creates or reuses a ThreadStoreFactory

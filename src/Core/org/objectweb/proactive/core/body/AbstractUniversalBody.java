@@ -81,7 +81,8 @@ public abstract class AbstractUniversalBody implements UniversalBody,
 
     /** A remote version of this body that is used to send to remote peer */
     protected transient UniversalBody remoteBody;
-    protected RemoteBodyFactory remoteBodyFactory;
+
+    //    protected RemoteBodyFactory remoteBodyFactory;
     protected String jobID;
     protected Map shortcuts = null; // key = functionalItfID, value=shortcut
     protected transient RemoteObjectExposer roe;
@@ -106,8 +107,7 @@ public abstract class AbstractUniversalBody implements UniversalBody,
      * @param remoteBodyFactory the factory able to construct new factories for each type of meta objects
      *                needed by this body
      */
-    public AbstractUniversalBody(String nodeURL,
-        RemoteBodyFactory remoteBodyFactory, String jobID)
+    public AbstractUniversalBody(String nodeURL, String jobID)
         throws ActiveObjectCreationException {
         this.nodeURL = nodeURL;
         this.bodyID = new UniqueID();

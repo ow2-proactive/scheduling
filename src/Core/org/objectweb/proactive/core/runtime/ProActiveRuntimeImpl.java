@@ -137,11 +137,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     static {
         try {
-            if (ProActiveConfiguration.getInstance().isForwarder()) {
-                proActiveRuntime = new ProActiveRuntimeForwarderImpl();
-            } else {
-                proActiveRuntime = new ProActiveRuntimeImpl();
-            }
+            //            if (ProActiveConfiguration.getInstance().isForwarder()) {
+            //                proActiveRuntime = new ProActiveRuntimeForwarderImpl();
+            //            } else {
+            proActiveRuntime = new ProActiveRuntimeImpl();
+            //            }
 
             // JMX registration
             String mbeanProperty = ProActiveConfiguration.getInstance()

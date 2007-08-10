@@ -54,7 +54,6 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
@@ -65,15 +64,11 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
-import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
-import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
-import org.objectweb.proactive.core.body.rmi.RmiBodyAdapter;
-import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -1369,24 +1364,21 @@ public class ProActive {
     public static void unregister(String url) throws java.io.IOException {
         String protocol = UrlBuilder.getProtocol(url);
 
-        // First step towards Body factory, will be introduced after the release
-        BodyAdapter ba;
-        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
-            ba = new RmiBodyAdapter();
-        } else if (protocol.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
-            ba = new SshRmiBodyAdapter();
-        } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            ba = new HttpBodyAdapter();
-        } else if (protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            ba = new IbisBodyAdapter();
-        } else {
-            throw new IOException("Protocol " + protocol + " not defined");
-        }
-        UniversalBody ub = ba.lookup(url);
-        ba.unregister(url);
-        ub.setRegistered(false);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Success at unbinding url " + url);
+        RemoteObject rmo;
+        try {
+            rmo = RemoteObjectHelper.lookup(URI.create(url));
+            Object o = RemoteObjectHelper.generatedObjectStub(rmo);
+
+            if (o instanceof UniversalBody) {
+                UniversalBody ub = (UniversalBody) o;
+                ub.setRegistered(false);
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Success at unbinding url " + url);
+            }
+        } catch (ProActiveException e) {
+            throw new IOException(e.getMessage());
         }
     }
 

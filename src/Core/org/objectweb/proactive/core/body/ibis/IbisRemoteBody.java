@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ibis;
 
-import org.objectweb.proactive.core.body.RemoteBody;
-
-
 /**
  * An object implementing this interface provides the minimum service a body offers
  * remotely through IBIS.
@@ -43,5 +40,6 @@ import org.objectweb.proactive.core.body.RemoteBody;
  * @see org.objectweb.proactive.core.body.UniversalBody
  * * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public interface IbisRemoteBody extends ibis.rmi.Remote, RemoteBody {
-}
+
+//public interface IbisRemoteBody extends ibis.rmi.Remote, RemoteBody {
+//}

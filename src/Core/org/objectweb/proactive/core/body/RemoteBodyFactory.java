@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body;
 
-
 /**
  * <p>
  * A class implementing this interface is a factory of RequestReceiver objects.
@@ -42,12 +41,13 @@ package org.objectweb.proactive.core.body;
  * @since   ProActive 0.9.2
  *
  */
-public interface RemoteBodyFactory {
 
-    /**
-     * Creates or reuses a RequestReceiver object
-     * @param body the body that remote body is mode for.
-     * @return the newly created or already existing RequestReceiver object.
-     */
-    public UniversalBody newRemoteBody(UniversalBody body);
-}
+//public interface RemoteBodyFactory {
+//
+//    /**
+//     * Creates or reuses a RequestReceiver object
+//     * @param body the body that remote body is mode for.
+//     * @return the newly created or already existing RequestReceiver object.
+//     */
+//    public UniversalBody newRemoteBody(UniversalBody body);
+//}

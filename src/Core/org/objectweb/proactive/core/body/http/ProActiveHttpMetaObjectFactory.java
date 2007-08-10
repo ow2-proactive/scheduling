@@ -31,11 +31,7 @@
 package org.objectweb.proactive.core.body.http;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
-import org.objectweb.proactive.core.body.RemoteBodyFactory;
-import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -47,23 +43,23 @@ public class ProActiveHttpMetaObjectFactory extends ProActiveMetaObjectFactory
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-    @Override
-    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        return new RemoteHttpBodyFactoryImpl();
-    }
+    //    @Override
+    //    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+    //        return new RemoteHttpBodyFactoryImpl();
+    //    }
 
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected static class RemoteHttpBodyFactoryImpl
-        implements RemoteBodyFactory, java.io.Serializable {
-        public UniversalBody newRemoteBody(UniversalBody body) {
-            try {
-                return new HttpBodyAdapter(body);
-            } catch (ProActiveException e) {
-                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
-                    e);
-            }
-        }
-    } // end inner class RemoteBodyFactoryImpl
+    //    protected static class RemoteHttpBodyFactoryImpl
+    //        implements RemoteBodyFactory, java.io.Serializable {
+    //        public UniversalBody newRemoteBody(UniversalBody body) {
+    //            try {
+    //                return new HttpBodyAdapter(body);
+    //            } catch (ProActiveException e) {
+    //                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
+    //                    e);
+    //            }
+    //        }
+    //    } // end inner class RemoteBodyFactoryImpl
 }

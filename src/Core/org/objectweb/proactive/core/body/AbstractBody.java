@@ -193,7 +193,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     public AbstractBody(Object reifiedObject, String nodeURL,
         MetaObjectFactory factory, String jobId)
         throws ActiveObjectCreationException {
-        super(nodeURL, factory.newRemoteBodyFactory(), jobId);
+        super(nodeURL, jobId);
 
         this.threadStore = factory.newThreadStoreFactory().newThreadStore();
 

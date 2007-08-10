@@ -30,19 +30,13 @@
  */
 package org.objectweb.proactive.extensions.mixedlocation;
 
-import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
-import org.objectweb.proactive.core.body.RemoteBodyFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
@@ -120,48 +114,48 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
         }
     }
 
-    @Override
-    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
-                    ProActiveConfiguration.getInstance()
-                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Factory is ibis");
-            }
-            return new RemoteIbisBodyFactoryImpl();
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Factory is rmi");
-            }
-            return new RemoteRmiBodyFactoryImpl();
-        }
-    }
+    //    @Override
+    //    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+    //        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(
+    //                    ProActiveConfiguration.getInstance()
+    //                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+    //            if (logger.isDebugEnabled()) {
+    //                logger.debug("Factory is ibis");
+    //            }
+    //            return new RemoteIbisBodyFactoryImpl();
+    //        } else {
+    //            if (logger.isDebugEnabled()) {
+    //                logger.debug("Factory is rmi");
+    //            }
+    //            return new RemoteRmiBodyFactoryImpl();
+    //        }
+    //    }
 
-    protected static class RemoteIbisBodyFactoryImpl
-        implements RemoteBodyFactory, java.io.Serializable {
-        public UniversalBody newRemoteBody(UniversalBody body) {
-            try {
-                // 	System.out.println("Creating ibis remote body adapter");
-                return new IbisBodyAdapter(body);
-            } catch (ProActiveException e) {
-                throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
-                    e);
-            }
-        }
-    }
-
-    // end
-    protected static class RemoteRmiBodyFactoryImpl implements RemoteBodyFactory,
-        java.io.Serializable {
-        public UniversalBody newRemoteBody(UniversalBody body) {
-            try {
-                return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
-            } catch (ProActiveException e) {
-                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
-                    e);
-            }
-        }
-    }
-
-    // end inner class RemoteBodyFactoryImpl
+    //    protected static class RemoteIbisBodyFactoryImpl
+    //        implements RemoteBodyFactory, java.io.Serializable {
+    //        public UniversalBody newRemoteBody(UniversalBody body) {
+    //            try {
+    //                // 	System.out.println("Creating ibis remote body adapter");
+    //                return new IbisBodyAdapter(body);
+    //            } catch (ProActiveException e) {
+    //                throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
+    //                    e);
+    //            }
+    //        }
+    //    }
+    //
+    //    // end
+    //    protected static class RemoteRmiBodyFactoryImpl implements RemoteBodyFactory,
+    //        java.io.Serializable {
+    //        public UniversalBody newRemoteBody(UniversalBody body) {
+    //            try {
+    //                return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
+    //            } catch (ProActiveException e) {
+    //                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
+    //                    e);
+    //            }
+    //        }
+    //    }
+    //
+    //    // end inner class RemoteBodyFactoryImpl
 }

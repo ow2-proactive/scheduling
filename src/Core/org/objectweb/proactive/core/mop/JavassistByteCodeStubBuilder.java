@@ -51,6 +51,7 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 
 import org.objectweb.proactive.annotation.Cache;
+import org.objectweb.proactive.annotation.NoReify;
 import org.objectweb.proactive.annotation.Self;
 
 
@@ -277,8 +278,8 @@ public class JavassistByteCodeStubBuilder {
             createReifiedMethods(generatedCtClass,
                 reifiedMethodsWithoutGenerics, superCtClass.isInterface());
 
-            //            generatedCtClass.debugWriteFile();
-            //            System.out.println("[JAVASSIST] generated class : " +
+            //                        generatedCtClass.debugWriteFile();
+            //                        System.out.println("[JAVASSIST] generated class : " +
             //                generatedCtClass.getName());
 
             // detach to fix  "frozen class" errors encountered in some large scale deployments
@@ -289,7 +290,7 @@ public class JavassistByteCodeStubBuilder {
         } catch (Exception e) {
             e.printStackTrace();
 
-            //            generatedCtClass.debugWriteFile();
+            //                        generatedCtClass.debugWriteFile();
             throw new NoClassDefFoundError("Cannot generated stub for class " +
                 className + " with javassist : " + e.getMessage());
         }
@@ -345,6 +346,10 @@ public class JavassistByteCodeStubBuilder {
                 String postWrap = null;
                 String preWrap = null;
 
+                if (hasNoReifyAnnotation(reifiedMethods[i])) {
+                    body += "if (myproxy instanceof org.objectweb.proactive.core.remoteobject.SynchronousProxy) { return ($r) myproxy.receiveMessage($$); }  \n";
+                }
+
                 if (returnType != CtClass.voidType) {
                     if (!returnType.isPrimitive()) {
                         preWrap = "(" + returnType.getName() + ")";
@@ -399,9 +404,6 @@ public class JavassistByteCodeStubBuilder {
                 "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
                 ", parameters, genericTypesMapping))");
 
-                //    	            body += ("myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getMethodCall(" +
-                //    	            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-                //    	            ", parameters))");
                 if (postWrap != null) {
                     body += postWrap;
                 }
@@ -438,9 +440,8 @@ public class JavassistByteCodeStubBuilder {
 
             CtMethod methodToGenerate = null;
 
-            //
-            //            System.out
-            //					.println("JavassistByteCodeStubBuilder.createReifiedMethods() body " + reifiedMethods[i].getName() + " = " + body);
+            //                        System.out
+            //            					.println("JavassistByteCodeStubBuilder.createReifiedMethods() body " + reifiedMethods[i].getName() + " = " + body);
             try {
                 methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
                         reifiedMethods[i].getName(),
@@ -684,6 +685,23 @@ public class JavassistByteCodeStubBuilder {
             if (o != null) {
                 for (Object object : o) {
                     if (object instanceof Self) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean hasNoReifyAnnotation(CtMethod method) {
+        try {
+            Object[] o = method.getAnnotations();
+            if (o != null) {
+                for (Object object : o) {
+                    if (object instanceof NoReify) {
                         return true;
                     }
                 }

@@ -84,7 +84,7 @@ public class StartHierarchical {
     }
 
     public static void main(String[] args) {
-        // It's hard to know if we are on a forwarder or not in some spots 
+        // It's hard to know if we are on a forwarder or not in some spots
         // (serialization for example), so we set property to help us.
         System.setProperty("proactive.hierarchicalRuntime", "true");
 
@@ -149,9 +149,8 @@ public class StartHierarchical {
                 System.exit(0);
             }
 
-            ((ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime()).setProcessesToDeploy(padURL,
-                vmName, process);
-
+            //            ((ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime()).setProcessesToDeploy(padURL,
+            //                vmName, process);
             try {
                 setParameters(process);
                 process.startProcess();

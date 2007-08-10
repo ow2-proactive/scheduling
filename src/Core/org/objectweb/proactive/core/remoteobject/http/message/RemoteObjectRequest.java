@@ -30,17 +30,12 @@
  */
 package org.objectweb.proactive.core.remoteobject.http.message;
 
-import java.io.IOException;
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
-import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RemoteObjectRequest extends HttpMessage implements Serializable {
@@ -68,27 +63,24 @@ public class RemoteObjectRequest extends HttpMessage implements Serializable {
      */
     @Override
     public Object processMessage() {
-        if (this.request != null) {
-            try {
-                RemoteObject ro = HTTPRegistry.getInstance().lookup(url);
-
-                if (ro == null) {
-                    try {
-                        Thread.sleep(1000);
-                        ro = HTTPRegistry.getInstance().lookup(url);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
+        try {
+            RemoteObject ro = HTTPRegistry.getInstance().lookup(url);
+            int max_retry = 10;
+            while ((ro == null) && (max_retry > 0)) {
+                try {
+                    Thread.sleep(1000);
+                    ro = HTTPRegistry.getInstance().lookup(url);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
-
-                Object o = ro.receiveMessage(this.request);
-
-                return o;
-            } catch (Exception e) {
-                return e;
+                max_retry--;
             }
-        }
 
-        return null;
+            Object o = ro.receiveMessage(this.request);
+
+            return o;
+        } catch (Exception e) {
+            return e;
+        }
     }
 }
