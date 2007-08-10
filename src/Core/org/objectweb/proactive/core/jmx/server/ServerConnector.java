@@ -71,7 +71,8 @@ public class ServerConnector {
         JMXServiceURL jmxUrl;
         try {
             jmxUrl = new JMXServiceURL(url);
-            Thread.currentThread().setContextClassLoader(ServerConnector.class.getClassLoader());
+            Thread.currentThread()
+                  .setContextClassLoader(ServerConnector.class.getClassLoader());
             cs = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl,
                     ProActiveJMXConstants.PROACTIVE_JMX_ENV, this.mbs);
         } catch (MalformedURLException e) {
@@ -85,7 +86,8 @@ public class ServerConnector {
      * Starts the JMX Connector
      * @throws IOException
      */
-    public void start() throws IOException {;
+    public void start() throws IOException {
+        ;
         this.cs.start();
     }
 }

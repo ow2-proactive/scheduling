@@ -30,14 +30,17 @@
  */
 package org.objectweb.proactive.benchmarks.timit;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
 import org.jdom.Element;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.config.Benchmark;
@@ -53,12 +56,6 @@ import org.objectweb.proactive.benchmarks.timit.util.TimItReductor;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 import org.objectweb.proactive.benchmarks.timit.util.charts.Utilities;
 import org.objectweb.proactive.core.node.NodeException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 
 
 /**
@@ -417,19 +414,13 @@ public class TimIt {
         switch (level) {
         case 1:
             System.out.println("\n\n**** " + msg + " ****\n");
-
             break;
-
         case 2:
             System.out.println("\n**** " + msg + " ****\n");
-
             break;
-
         case 3:
             System.out.println("\n**** " + msg + " ****");
-
             break;
-
         default:
             System.out.println("**** " + msg + " ****");
         }

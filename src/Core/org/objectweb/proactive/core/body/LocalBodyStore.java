@@ -180,12 +180,15 @@ public class LocalBodyStore {
      */
     public Context getContext() {
         Stack<Context> s = this.contexts.get();
-        if (s == null) {
+
+        // Note that the stack could have been created while being empty for RMI thread that have
+        // performed immediate services.
+        if ((s == null) || (s.isEmpty())) {
             // If we cannot find a context for the current thread we assume that the current thread
             // is not the one from an active object. Therefore in this case we create an HalfBody
             // that handle the futures, and push a new context for this HalfBody.
             AbstractBody body = HalfBody.getHalfBody(this.getHalfBodyMetaObjectFactory());
-            s = new Stack<Context>();
+            s = ((s == null) ? new Stack<Context>() : s);
             Context c = new Context(body, null);
             s.push(c);
             this.contexts.set(s);
