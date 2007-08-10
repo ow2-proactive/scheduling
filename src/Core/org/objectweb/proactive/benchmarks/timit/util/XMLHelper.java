@@ -243,10 +243,10 @@ public class XMLHelper {
         Iterator it = serieList.iterator();
         while (it.hasNext()) {
             Element serie = (Element) it.next();
-            // Look for variables in Serie attributes
+            // Look for variables in Series attributes
             replaceVariablesAttributes(serie, p, vars);
 
-            // Look for variables in all descendants of Serie
+            // Look for variables in all descendants of Series
             Iterator itSerie = serie.getDescendants();
             while (itSerie.hasNext()) {
                 Object elt = itSerie.next();

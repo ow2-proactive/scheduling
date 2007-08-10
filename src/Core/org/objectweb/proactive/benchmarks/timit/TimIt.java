@@ -30,23 +30,20 @@
  */
 package org.objectweb.proactive.benchmarks.timit;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
 import org.jdom.Element;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.config.Benchmark;
 import org.objectweb.proactive.benchmarks.timit.config.ConfigChart;
 import org.objectweb.proactive.benchmarks.timit.config.ConfigReader;
-import org.objectweb.proactive.benchmarks.timit.config.Serie;
+import org.objectweb.proactive.benchmarks.timit.config.Series;
 import org.objectweb.proactive.benchmarks.timit.result.BenchmarkResultWriter;
 import org.objectweb.proactive.benchmarks.timit.result.SerieResultWriter;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
@@ -56,6 +53,12 @@ import org.objectweb.proactive.benchmarks.timit.util.TimItReductor;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 import org.objectweb.proactive.benchmarks.timit.util.charts.Utilities;
 import org.objectweb.proactive.core.node.NodeException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 
 /**
@@ -128,6 +131,7 @@ public class TimIt {
             e.printStackTrace();
             System.exit(1);
         }
+
         System.exit(0);
     }
 
@@ -142,9 +146,9 @@ public class TimIt {
      */
     private static void generateCharts(String configFile, String finalFile) {
         ConfigReader config = new ConfigReader(configFile);
-        Serie[] serie = config.getSeries();
+        Series[] serie = config.getSeries();
 
-        for (Serie element : serie) {
+        for (Series element : serie) {
             ConfigChart[] chart = element.getCharts();
             Utilities.generatingCharts(XMLHelper.readFile(finalFile)
                                                 .getRootElement(), null, chart);
@@ -162,9 +166,9 @@ public class TimIt {
      */
     private static void mergeResults(String configFile, String[] resultFiles) {
         ConfigReader config = new ConfigReader(configFile);
-        Serie[] serie = config.getSeries();
+        Series[] serie = config.getSeries();
 
-        for (Serie element : serie) {
+        for (Series element : serie) {
             ConfigChart[] chart = element.getCharts();
             SerieResultWriter serieResults = new SerieResultWriter(element.get(
                         "result"));
@@ -179,6 +183,7 @@ public class TimIt {
                 serieResults.addResult(eResult, benchmark.get("name"), nbRuns,
                     TimIt.totalTimeoutErrors);
             }
+
             Utilities.generatingCharts(serieResults.getRoot(), null, chart);
         }
     }
@@ -208,10 +213,10 @@ public class TimIt {
     private static void runBenchmarkSuite(String configfile) {
         try {
             ConfigReader config = new ConfigReader(configfile);
-            Serie[] serie = config.getSeries();
+            Series[] serie = config.getSeries();
             int timeoutErrorCount = TimIt.MAX_TIMEOUT_ERRORS;
 
-            for (Serie element : serie) {
+            for (Series element : serie) {
                 //
                 // ** Series **
                 //
@@ -220,7 +225,7 @@ public class TimIt {
                 Class runClass = Class.forName(element.get("class"));
                 Startable startable = (Startable) runClass.newInstance();
                 message(1,
-                    "RUN SERIE " + runClass.getSimpleName() + " [" +
+                    "RUN SERIES " + runClass.getSimpleName() + " [" +
                     element.get("result") + "]");
 
                 SerieResultWriter serieResults = new SerieResultWriter(element.get(
@@ -237,12 +242,15 @@ public class TimIt {
                     String outDesc = b.get("descriptorGenerated");
                     message(2,
                         "RUN BENCHMARK " + name + " [" + b.get("output") + "]");
+
                     BenchmarkResultWriter benchResults = new BenchmarkResultWriter(b.get("output"));
+
                     if (outDesc.length() > 0) {
                         XMLHelper.generateDescriptor(element.get(
                                 "descriptorBase"), config.getGlobalVariables(),
                             b.getVariables(), outDesc);
                     }
+
                     int warmup = Integer.valueOf(b.get("warmup"));
                     int nbRuns = Integer.valueOf(b.get("run")) + warmup;
                     TimIt.timeoutThread.setNewBenchmark(Long.valueOf(b.get("timeout")) * 1000,
@@ -263,12 +271,15 @@ public class TimIt {
                                 "RUN " + run + " ON " + nbRuns +
                                 ((run <= warmup) ? " [WARMUP]" : ""));
                         }
+
                         TimIt.timeoutError = false;
                         TimIt.timeoutThread.newRun();
+
                         try {
                             startable.start(b.get("parameters").split(" "));
                         } catch (Exception e) {
                             e.printStackTrace();
+
                             if (--timeoutErrorCount <= 0) {
                                 System.err.println(
                                     "Too many exceptions for this benchmark, skip it");
@@ -280,6 +291,7 @@ public class TimIt {
                                     "\n  Skip it.");
                                 TimIt.timeoutError = true;
                                 TimIt.sleep(WAIT_AFTER_ERROR);
+
                                 break;
                             } else {
                                 System.err.println(
@@ -289,9 +301,11 @@ public class TimIt {
                                     "... retrying...");
                                 TimIt.sleep(WAIT_AFTER_ERROR);
                                 run--;
+
                                 continue;
                             }
                         }
+
                         bstats = TimIt.timitReductor.getStatistics();
                         TimIt.timitReductor.clean();
                         TimItReductor.ready();
@@ -303,6 +317,7 @@ public class TimIt {
                                 "Timeout for benchmark '" + b.get("name") +
                                 "'" + " args=[" + b.get("parameters") + "]" +
                                 " on run " + run);
+
                             if (--timeoutErrorCount <= 0) {
                                 System.err.println(
                                     "Too many timeout errors for this benchmark, skip it");
@@ -312,31 +327,41 @@ public class TimIt {
                                     ") for this benchmark " + " (" +
                                     b.get("name") + "), skip it.");
                                 TimIt.sleep(WAIT_AFTER_ERROR);
+
                                 break; // then continue if timeoutError=true
                             }
+
                             run--;
+
                             continue;
                         }
+
                         TimIt.timeoutThread.ok();
 
                         if (run > warmup) {
                             benchResults.addResult(bstats,
                                 name + " [" + run + "/" + nbRuns + "]");
+
                             if (b.get("writeEveryRun").equalsIgnoreCase("true")) {
                                 benchResults.writeResult();
                             }
                         }
+
                         startable.kill();
                     }
+
                     if (TimIt.timeoutError) {
                         continue; // from previous break
                     }
+
                     startable.masterKill();
                     threadsCleaning();
                     benchResults.writeResult();
+
                     if (b.get("removeExtremums").equalsIgnoreCase("true")) {
                         benchResults.removeExtremums();
                     }
+
                     serieResults.addResult(benchResults.getRoot(),
                         b.get("name"), nbRuns, TimIt.totalTimeoutErrors);
                 }
@@ -352,6 +377,7 @@ public class TimIt {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+
         message(1, "Done.");
     }
 
@@ -364,14 +390,17 @@ public class TimIt {
         Thread[] threads = new Thread[200];
         int len = tg.enumerate(threads, true);
         int nbKilled = 0;
+
         for (int i = 0; i < len; i++) {
             Thread ct = threads[i];
+
             if ((ct.getName().indexOf("RMI RenewClean") >= 0) ||
                     (ct.getName().indexOf("ThreadInThePool") >= 0)) {
                 nbKilled++;
                 ct.stop();
             }
         }
+
         System.err.println(nbKilled + " thread(s) stopped on " + len);
     }
 
@@ -388,13 +417,19 @@ public class TimIt {
         switch (level) {
         case 1:
             System.out.println("\n\n**** " + msg + " ****\n");
+
             break;
+
         case 2:
             System.out.println("\n**** " + msg + " ****\n");
+
             break;
+
         case 3:
             System.out.println("\n**** " + msg + " ****");
+
             break;
+
         default:
             System.out.println("**** " + msg + " ****");
         }
@@ -411,17 +446,21 @@ public class TimIt {
         if (object == null) {
             return 0;
         }
+
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(object);
+
             byte[] bytes = baos.toByteArray();
             oos.close();
             baos.close();
+
             return bytes.length;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return -1;
     }
 
@@ -473,6 +512,7 @@ public class TimIt {
                     this.newRun = true;
                     this.notifyAll();
                 }
+
                 this.error = true;
             }
         }
@@ -503,6 +543,7 @@ public class TimIt {
                             this.wait(this.timeout);
                         } else {
                             this.wait();
+
                             continue;
                         }
 
@@ -512,6 +553,7 @@ public class TimIt {
                             this.startableObject.kill();
                             TimItReductor.stop();
                         }
+
                         this.ok = false;
                     }
                 }

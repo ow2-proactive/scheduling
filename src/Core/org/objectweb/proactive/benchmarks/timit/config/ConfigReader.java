@@ -55,7 +55,7 @@ public class ConfigReader {
     private Document document;
     private Element eTimit;
     private HashMap<String, String> globalVariables; // <variable name,value>
-    private Serie[] series;
+    private Series[] series;
 
     public ConfigReader(String filename) {
         // Get the <timit> root tag from configuration file
@@ -76,16 +76,16 @@ public class ConfigReader {
         }
 
         // Read and parse all <serie> tags
-        List serieList = this.eTimit.getChildren("serie");
+        List serieList = this.eTimit.getChildren("series");
         XMLHelper.replaceVariables(serieList, this.globalVariables);
-        this.series = Serie.toArray(serieList);
+        this.series = Series.toArray(serieList);
     }
 
     /**
      * Retrieve the serie of benchmarks generated from configuration file
-     * @return the Serie array
+     * @return the Series array
      */
-    public Serie[] getSeries() {
+    public Series[] getSeries() {
         return this.series.clone();
     }
 
