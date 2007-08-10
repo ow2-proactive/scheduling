@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.request;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -203,10 +204,12 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         // END ProActiveEvent
 
         // JMX Notification
-        BodyWrapperMBean mbean = LocalBodyStore.getInstance()
-                                               .getLocalBody(ownerID).getMBean();
-        if (mbean != null) {
-            mbean.sendNotification(NotificationType.waitForRequest);
+        Body body = LocalBodyStore.getInstance().getLocalBody(ownerID);
+        if (body != null) {
+            BodyWrapperMBean mbean = body.getMBean();
+            if (mbean != null) {
+                mbean.sendNotification(NotificationType.waitForRequest);
+            }
         }
 
         // END JMX Notification
