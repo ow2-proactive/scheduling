@@ -93,6 +93,11 @@ public interface Future extends LocalFuture {
     public UniqueID getCreatorID();
 
     /**
+     * Get the unique tuple <creatorID,ID>
+     */
+    public FutureID getFutureID();
+
+    /**
      * Used when creating a future to track its eventual updater
      */
     public void setUpdater(UniversalBody updater);

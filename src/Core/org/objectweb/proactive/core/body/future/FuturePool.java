@@ -360,9 +360,8 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the body which creates futureObject
      * @param bodyDest body destination of this continuation
      */
-    public void addAutomaticContinuation(long id, UniqueID creatorID,
-        UniversalBody bodyDest) {
-        futures.addAutomaticContinuation(id, creatorID, bodyDest);
+    public void addAutomaticContinuation(FutureID id, UniversalBody bodyDest) {
+        futures.addAutomaticContinuation(id.getID(), id.getCreatorID(), bodyDest);
     }
 
     public synchronized void waitForReply(long timeout)

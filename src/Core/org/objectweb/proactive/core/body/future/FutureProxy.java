@@ -96,15 +96,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     protected transient boolean copyMode;
 
     /**
-     * The ID of the "evaluator" of the future.
+     * Unique ID (not a UniqueID) of the future
      */
-    private UniqueID creatorID;
-
-    /**
-     * ID of the future
-     * In fact, the sequence number of the request that generate this future
-     */
-    protected long ID;
+    private FutureID id;
 
     /**
      * Unique ID of the sender (in case of automatic continuation).
@@ -388,19 +382,29 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     }
 
     public long getID() {
-        return ID;
+        return id.getID();
     }
 
     public void setID(long l) {
-        ID = l;
+        if (id == null) {
+            id = new FutureID();
+        }
+        id.setID(l);
+    }
+
+    public FutureID getFutureID() {
+        return this.id;
     }
 
     public void setCreatorID(UniqueID creatorID) {
-        this.creatorID = creatorID;
+        if (id == null) {
+            id = new FutureID();
+        }
+        id.setCreatorID(creatorID);
     }
 
     public UniqueID getCreatorID() {
-        return this.creatorID;
+        return id.getCreatorID();
     }
 
     public void setUpdater(UniversalBody updater) {
@@ -501,8 +505,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                         writtenUpdater = ProActive.getBodyOnThis();
                         for (UniversalBody dest : FuturePool.getBodiesDestination()) {
                             sender.getFuturePool()
-                                  .addAutomaticContinuation(ID, getCreatorID(),
-                                dest);
+                                  .addAutomaticContinuation(id, dest);
                         }
                     } else {
                         // its not a copy and not a continuation: wait for the result
@@ -517,8 +520,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             if (futures != null) {
                 for (int i = 0; i < futures.size(); i++) {
                     Future fp = futures.get(i);
-                    if (fp.getCreatorID().equals(getCreatorID()) &&
-                            (fp.getID() == ID)) {
+                    if (fp.getFutureID().equals(this.getFutureID())) {
                         FuturePool.removeIncomingFutures();
                     }
                 }
@@ -530,9 +532,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         // Pass the result
         out.writeObject(target);
         // Pass the id
-        out.writeLong(ID);
-        //Pass the creator
-        out.writeObject(this.creatorID);
+        out.writeObject(id);
         // Pass a reference to the updater
         out.writeObject(writtenUpdater.getRemoteAdapter());
     }
@@ -541,8 +541,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         throws java.io.IOException, ClassNotFoundException {
         senderID = (UniqueID) in.readObject();
         target = (FutureResult) in.readObject();
-        ID = (long) in.readLong();
-        creatorID = (UniqueID) in.readObject();
+        id = (FutureID) in.readObject();
         updater = (UniversalBody) in.readObject();
         // register all incoming futures, even for migration or checkpoiting
         if (this.isAwaited()) {
