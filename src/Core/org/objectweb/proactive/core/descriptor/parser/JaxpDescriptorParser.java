@@ -1128,8 +1128,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     } else if (nodeName.equals(PROCESSOR_TAG)) {
                         String nodeValue = getNodeExpandedValue(childNode.getFirstChild());
                         bSubProcess.setProcessorNumber(nodeValue);
-                    } else if (nodeName.equals(RES_REQ_TAG)) {                        
-                        String nodeValue = getNodeExpandedValue(childNode.getAttributes().getNamedItem("value"));
+                    } else if (nodeName.equals(RES_REQ_TAG)) {
+                        String nodeValue = getNodeExpandedValue(childNode.getAttributes()
+                                                                         .getNamedItem("value"));
                         bSubProcess.setRes_requirement(nodeValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
