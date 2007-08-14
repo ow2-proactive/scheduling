@@ -1555,7 +1555,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     }
 
                     String nodeName = childNode.getNodeName();
-                    String nodeExpandedValue = getNodeExpandedValue(childNode);
+                    String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
                     if (nodeName.equals(HOST_LIST_TAG)) {
                         pbsSubProcess.setHostList(nodeExpandedValue);
                     } else if (nodeName.equals(HOSTS_NUMBER_TAG)) {
