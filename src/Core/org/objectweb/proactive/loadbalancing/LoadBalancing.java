@@ -66,7 +66,9 @@ public class LoadBalancing {
             Iterator<LoadBalancer> it = loadBalancers.iterator();
             while (it.hasNext()) {
                 lb = it.next();
-                lb.init(loadBalancers, ir);
+                ArrayList<LoadBalancer> individualLB = new ArrayList<LoadBalancer>(loadBalancers);
+                individualLB.remove(lb);
+                lb.init(individualLB, ir);
                 lb = null;
             }
         } catch (ActiveObjectCreationException e) {
