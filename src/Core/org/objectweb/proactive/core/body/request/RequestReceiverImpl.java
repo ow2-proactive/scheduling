@@ -40,8 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.body.Context;
-import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.InactiveBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -66,8 +65,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         this.inImmediateService = new AtomicInteger(0);
     }
 
-    public int receiveRequest(Request request, Body bodyReceiver)
-        throws java.io.IOException {
+    public int receiveRequest(Request request, Body bodyReceiver) {
         try {
             if (immediateExecution(request)) {
                 if (logger.isDebugEnabled()) {
@@ -89,7 +87,15 @@ public class RequestReceiverImpl implements RequestReceiver,
                 return FTManager.IMMEDIATE_SERVICE;
             } else {
                 request.notifyReception(bodyReceiver);
-                return bodyReceiver.getRequestQueue().add(request);
+                RequestQueue queue = null;
+                try {
+                    queue = bodyReceiver.getRequestQueue();
+                } catch (InactiveBodyException e) {
+                    throw new InactiveBodyException("Cannot add request \"" +
+                        request.getMethodName() +
+                        "\" because this body is inactive", e);
+                }
+                return queue.add(request);
             }
         } catch (Exception e) {
             e.printStackTrace();

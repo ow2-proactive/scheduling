@@ -493,9 +493,13 @@ public abstract class Utils extends Object {
         try {
             return MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(source);
         } catch (ProActiveException e) {
-            throw new IOException(e);
+            IOException exp = new IOException();
+            exp.initCause(e);
+            throw exp;
         } catch (ClassNotFoundException e) {
-            throw new IOException(e);
+            IOException exp = new IOException();
+            exp.initCause(e);
+            throw exp;
         }
     }
 

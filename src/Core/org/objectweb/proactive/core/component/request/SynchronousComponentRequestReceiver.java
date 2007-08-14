@@ -63,8 +63,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
     }
 
     @Override
-    public int receiveRequest(Request r, Body bodyReceiver)
-        throws IOException {
+    public int receiveRequest(Request r, Body bodyReceiver) {
         if (r instanceof ComponentRequest) {
             if (!((ComponentRequest) r).isControllerRequest()) {
                 if ("true".equals(ProActiveConfiguration.getInstance()
