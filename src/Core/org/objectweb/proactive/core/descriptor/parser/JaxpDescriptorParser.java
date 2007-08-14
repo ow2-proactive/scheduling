@@ -1667,7 +1667,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                     String nodeName = childNode.getNodeName();
                     if (nodeName.equals(OAR_RESOURCE_TAG)) {
-                        String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
+                        // String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
+                        String nodeExpandedValue = getNodeExpandedValue(childNode);
                         oarSubProcess.setResources(nodeExpandedValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
