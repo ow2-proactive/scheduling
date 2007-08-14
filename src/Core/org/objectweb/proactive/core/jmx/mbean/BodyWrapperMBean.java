@@ -1,10 +1,13 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 
 
 /**
@@ -49,4 +52,18 @@ public interface BodyWrapperMBean extends Serializable {
      * @return The object name used for this MBean.
      */
     public ObjectName getObjectName();
+
+    /**
+     * Returns a collection of BasicTimer.
+     * @param timerNames
+     * @return a collection of BasicTimer
+     */
+    public Collection<BasicTimer> getTimersSnapshot(String[] timerNames);
+
+    /**
+     * Migrate the body to the given node.
+     * @param nodeUrl
+     * @throws MigrationException
+     */
+    public void migrateTo(String nodeUrl) throws MigrationException;
 }

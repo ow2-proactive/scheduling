@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -15,7 +16,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * MBean representing a Node.
  * @author ProActive Team
  */
-public interface NodeWrapperMBean {
+public interface NodeWrapperMBean extends Serializable {
 
     /**
      * Returns the url of the node.

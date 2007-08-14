@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -15,7 +16,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * MBean representing a ProActiveRuntime.
  * @author ProActiveRuntime
  */
-public interface ProActiveRuntimeWrapperMBean {
+public interface ProActiveRuntimeWrapperMBean extends Serializable {
 
     /**
      * Returns the url of the ProActiveRuntime associated.
@@ -56,4 +57,10 @@ public interface ProActiveRuntimeWrapperMBean {
      * @return The object name used for this MBean.
      */
     public ObjectName getObjectName();
+
+    /**
+     * Kills this ProActiveRuntime.
+     * @exception Exception if a problem occurs when killing this ProActiveRuntime
+     */
+    public void killRuntime() throws Exception;
 }

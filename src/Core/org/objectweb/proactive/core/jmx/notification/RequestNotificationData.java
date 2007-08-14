@@ -10,6 +10,8 @@ public class RequestNotificationData implements Serializable {
     private UniqueID destination;
     private String methodName;
     private int requestQueueLength;
+    private String sourceNode;
+    private String destinationNode;
 
     /**
      * Creates a new requestData used by the JMX user data.
@@ -18,10 +20,13 @@ public class RequestNotificationData implements Serializable {
      * @param methodName The name of the method called
      * @param requestQueueLength The request queue length of the destination active object
      */
-    public RequestNotificationData(UniqueID source, UniqueID destination,
-        String methodName, int requestQueueLength) {
+    public RequestNotificationData(UniqueID source, String sourceNode,
+        UniqueID destination, String destinationNode, String methodName,
+        int requestQueueLength) {
         this.source = source;
+        this.sourceNode = sourceNode;
         this.destination = destination;
+        this.destinationNode = destinationNode;
         this.methodName = methodName;
         this.requestQueueLength = requestQueueLength;
     }
@@ -40,6 +45,22 @@ public class RequestNotificationData implements Serializable {
      */
     public UniqueID getDestination() {
         return this.destination;
+    }
+
+    /**
+     * Returns the URL of the source node object.
+     * @return the URL of the source node object.
+     */
+    public String getSourceNode() {
+        return this.sourceNode;
+    }
+
+    /**
+     * Returns the URL of the destination node object.
+     * @return the URL of the destination node object.
+     */
+    public String getDestinationNode() {
+        return this.destinationNode;
     }
 
     /**

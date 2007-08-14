@@ -249,9 +249,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // END ProActiveEvent
 
         // JMX Notification
-        if (this.mbean != null) {
+        if (!isProActiveInternalObject && (this.mbean != null)) {
             RequestNotificationData requestNotificationData = new RequestNotificationData(request.getSourceBodyID(),
-                    this.bodyID, request.getMethodName(),
+                    request.getSender().getNodeURL(), this.bodyID,
+                    this.nodeURL, request.getMethodName(),
                     getRequestQueue().size() + 1);
             this.mbean.sendNotification(NotificationType.requestReceived,
                 requestNotificationData);
@@ -280,7 +281,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // END ProActiveEvent
 
         // JMX Notification
-        if (this.mbean != null) {
+        if (!isProActiveInternalObject && (this.mbean != null)) {
             this.mbean.sendNotification(NotificationType.replyReceived);
         }
 
@@ -501,7 +502,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 // END ProActiveEvent
 
                 // JMX Notification
-                if (mbean != null) {
+                if (!isProActiveInternalObject && (mbean != null)) {
                     mbean.sendNotification(NotificationType.servingStarted,
                         new Integer(getRequestQueue().size()));
                 }
@@ -545,7 +546,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         // END ProActiveEvent
 
                         // JMX Notification
-                        if (mbean != null) {
+                        if (!isProActiveInternalObject && (mbean != null)) {
                             mbean.sendNotification(NotificationType.voidRequestServed,
                                 new Integer(getRequestQueue().size()));
                         }
@@ -571,7 +572,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     // END ProActiveEvent
 
                     // JMX Notification
-                    if (mbean != null) {
+                    if (!isProActiveInternalObject && (mbean != null)) {
                         mbean.sendNotification(NotificationType.replySent,
                             new Integer(getRequestQueue().size()));
                     }
@@ -613,7 +614,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     // END ProActiveEvent
 
                     // JMX Notification
-                    if (mbean != null) {
+                    if (!isProActiveInternalObject && (mbean != null)) {
                         mbean.sendNotification(NotificationType.voidRequestServed,
                             new Integer(getRequestQueue().size()));
                     }
@@ -639,7 +640,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 // END ProActiveEvent
 
                 // JMX Notification
-                if (mbean != null) {
+                if (!isProActiveInternalObject && (mbean != null)) {
                     mbean.sendNotification(NotificationType.replySent,
                         new Integer(getRequestQueue().size()));
                 }
@@ -692,9 +693,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // END ProActiveEvent
 
             // JMX Notification
-            if (mbean != null) {
-                mbean.sendNotification(NotificationType.requestSent);
-            }
+            // TODO Write this section, after the commit of Arnaud
+            // TODO Send a notification only if the destination doesn't implement ProActiveInternalObject
+
+            /*if (!isProActiveInternalObject && (mbean != null)) {
+                           mbean.sendNotification(NotificationType.requestSent, request.getSequenceNumber());
+            }*/
 
             // END JMX Notification
 

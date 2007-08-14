@@ -87,7 +87,6 @@ public class ServerConnector {
      * @throws IOException
      */
     public void start() throws IOException {
-        ;
         this.cs.start();
     }
 }

@@ -125,10 +125,10 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
     /**
      * Activates the connector server, that is starts listening for client connections.
      * Calling this method when the connector server is already active has no effect.
-     *  Calling this method when the connector server has been stopped will generate an IOException.
-     *  The behaviour of this method when called for the first time depends on the parameters that were supplied at construction, as described below.
-       * First, an object of a subclass of ProActiveServerImpl is required, to export the connector server through ProActive:
-        * If an ProActiveServerImpl was supplied to the constructor, it is used.
+     * Calling this method when the connector server has been stopped will generate an IOException.
+     * The behaviour of this method when called for the first time depends on the parameters that were supplied at construction, as described below.
+     * First, an object of a subclass of ProActiveServerImpl is required, to export the connector server through ProActive:
+     * If an ProActiveServerImpl was supplied to the constructor, it is used.
      */
 
     //exposes the active object

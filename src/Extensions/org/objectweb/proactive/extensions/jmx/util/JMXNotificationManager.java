@@ -11,6 +11,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -107,6 +108,16 @@ public class JMXNotificationManager implements NotificationListener {
             ClientConnector cc = new ClientConnector(completeUrl, serverName);
             cc.connect();
             connection = cc.getConnection();
+            if (server == null) {
+                System.err.println(
+                    "JMXNotificationManager.subscribe() server is null");
+                return;
+            }
+            if (connection == null) {
+                System.err.println(
+                    "JMXNotificationManager.subscribe() connection is null");
+                return;
+            }
             // Updates our maps
             connections.put(server, connection);
             servers.put(objectName, server);

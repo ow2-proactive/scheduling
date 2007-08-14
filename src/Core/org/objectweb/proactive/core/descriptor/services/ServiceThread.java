@@ -190,7 +190,8 @@ public class ServiceThread extends Thread {
             // END ProActiveEvent
 
             // JMX Notification
-            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                     .getMBean();
             if (mbean != null) {
                 RuntimeNotificationData notificationData = new RuntimeNotificationData(vn.getName(),
                         url, protocol, vm.getName());

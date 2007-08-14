@@ -306,7 +306,8 @@ public class LocalNode {
         this.roe.unregisterAll();
 
         // JMX Notification
-        ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getMBean();
+        ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                        .getMBean();
         if (runtimeMBean != null) {
             runtimeMBean.sendNotification(NotificationType.nodeDestroyed);
         }

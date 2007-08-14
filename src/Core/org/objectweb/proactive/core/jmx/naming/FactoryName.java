@@ -26,6 +26,9 @@ public class FactoryName {
     public static final String RUNTIME_TYPE = "Runtime";
     public static final String RUNTIME = "org.objectweb.proactive.core.runtimes:type=" +
         RUNTIME_TYPE;
+    public static final String VIRTUAL_NODE_TYPE = "VirtualNode";
+    public static final String VIRTUAL_NODE = "org.objectweb.proactive.core.virtualnode:type=" +
+        VIRTUAL_NODE_TYPE;
     public static final String AO_TYPE = "AO";
     public static final String AO = "org.objectweb.proactive.core.body:type=" +
         AO_TYPE;
@@ -97,6 +100,27 @@ public class FactoryName {
             logger.error("Can't create the objectName of the runtime", e);
         } catch (NullPointerException e) {
             logger.error("Can't create the objectName of the runtime", e);
+        }
+        return oname;
+    }
+
+    /**
+     * Creates a ObjectName corresponding to a Virutal Node.
+     * @param name The name of the Virutal Node.
+     * @param jobID The jobID of the Virutal Node.
+     * @return The ObjectName corresponding to the Virutal Node.
+     */
+    public static ObjectName createVirtualNodeObjectName(String name,
+        String jobID) {
+        ObjectName oname = null;
+        try {
+            oname = new ObjectName(FactoryName.VIRTUAL_NODE + ",name=" +
+                    name.replace(':', '-') + ", jobID=" +
+                    jobID.replace(':', '-'));
+        } catch (MalformedObjectNameException e) {
+            logger.error("Can't create the objectName of the virtual node", e);
+        } catch (NullPointerException e) {
+            logger.error("Can't create the objectName of the virtual node", e);
         }
         return oname;
     }

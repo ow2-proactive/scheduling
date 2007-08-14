@@ -56,6 +56,7 @@ import javax.management.ObjectName;
 import javax.management.QueryExp;
 import javax.management.ReflectionException;
 
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.extensions.jmx.listeners.ListenerAdapter;
 
@@ -65,12 +66,8 @@ import org.objectweb.proactive.extensions.jmx.listeners.ListenerAdapter;
  * @author ProActive Team
  *
  */
-
-/**
- * @author vlegrand
- *
- */
-public class ProActiveConnection implements Serializable, MBeanServerConnection {
+public class ProActiveConnection implements Serializable, MBeanServerConnection,
+    ProActiveInternalObject {
 
     /**
      * the serial version UID

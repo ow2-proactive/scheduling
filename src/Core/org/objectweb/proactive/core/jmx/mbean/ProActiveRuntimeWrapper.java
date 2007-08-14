@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author ProActive Team
  */
 public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
-    implements ProActiveRuntimeWrapperMBean {
+    implements ProActiveRuntimeWrapperMBean, Serializable {
 
     /** JMX Logger */
     // private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
@@ -63,6 +64,10 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
 
     public ObjectName getObjectName() {
         return this.objectName;
+    }
+
+    public void killRuntime() throws Exception {
+        runtime.killRT(false);
     }
 
     public List<ObjectName> getNodes()

@@ -620,4 +620,20 @@ package org.objectweb.proactive.core.runtime;
 //            throw new ProActiveException(e);
 //        }
 //    }
+//
+//public void startJMXServerConnector() {
+//}
+//
+//public void createMBean() {
+//}
+//
+//public ProActiveRuntimeWrapperMBean getMBean() {
+//    return null;
+//}
+//
+//public String getMBeanServerName() {
+//    return null;
+//}
+//
+//}
 //}

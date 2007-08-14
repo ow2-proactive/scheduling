@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -682,5 +684,19 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
         } catch (IOException e) {
             throw new ProActiveException(e);
         }
+    }
+
+    public void startJMXServerConnector() {
+    }
+
+    public void createMBean() {
+    }
+
+    public ProActiveRuntimeWrapperMBean getMBean() {
+        return null;
+    }
+
+    public String getMBeanServerName() {
+        return null;
     }
 }

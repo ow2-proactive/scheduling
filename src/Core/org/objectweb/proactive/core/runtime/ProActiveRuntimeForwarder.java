@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -330,4 +331,28 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
 
     public String getLocalNodeProperty(UniqueRuntimeID runtimeID,
         String nodeName, String key) throws IOException, ProActiveException;
+
+    //
+    // --- JMX
+    //
+
+    /**
+     * @see ProActiveRuntime#startJMXServerConnector()
+     */
+    public void startJMXServerConnector(UniqueRuntimeID urid);
+
+    /**
+     * @see ProActiveRuntime#createMBean()
+     */
+    public void createMBean(UniqueRuntimeID urid);
+
+    /**
+     * @see ProActiveRuntime#getMBean()
+     */
+    public ProActiveRuntimeWrapperMBean getMBean(UniqueRuntimeID urid);
+
+    /**
+     * @see ProActiveRuntime#getMBeanServerName()
+     */
+    public String getMBeanServerName(UniqueRuntimeID urid);
 }

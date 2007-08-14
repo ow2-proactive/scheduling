@@ -25,8 +25,7 @@ import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
  */
 public class JMXNotificationListener implements NotificationListener,
     ProActiveInternalObject, Serializable {
-    private Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
-
+    //private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
     public JMXNotificationListener() {
         // Empty Constructor
     }
@@ -41,15 +40,23 @@ public class JMXNotificationListener implements NotificationListener,
     public void subscribe(ProActiveConnection connection, ObjectName oname,
         NotificationFilter filter, Object handback) {
         try {
+            if (!connection.isRegistered(oname)) {
+                System.err.println(
+                    "JMXNotificationListener.subscribe() Oooops oname not known:" +
+                    oname);
+                return;
+            }
             connection.addNotificationListener(oname,
                 (NotificationListener) ProActive.getStubOnThis(), filter,
                 handback);
         } catch (InstanceNotFoundException e) {
-            logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);
+
+            /*logger.error("Doesn't find the object name " + oname +
+                " during the registration", e);*/
         } catch (IOException e) {
-            logger.error("Doesn't subscribe the JMX Notification listener to the Notifications",
-                e);
+
+            /*logger.error("Doesn't subscribe the JMX Notification listener to the Notifications",
+                e);*/
         }
     }
 
@@ -69,18 +76,29 @@ public class JMXNotificationListener implements NotificationListener,
                     handback);
             }
         } catch (InstanceNotFoundException e) {
-            logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);
+
+            /*logger.error("Doesn't find the object name " + oname +
+                " during the registration", e);*/
         } catch (ListenerNotFoundException e) {
-            logger.error("Doesn't find the Notification Listener", e);
+
+            /*logger.error("Doesn't find the Notification Listener", e);*/
         } catch (IOException e) {
-            logger.error("Can't unsubscribe the JMX Notification listener to the Notifications",
-                e);
+
+            /*logger.error("Can't unsubscribe the JMX Notification listener to the Notifications",
+                e);*/
         }
     }
 
     public void handleNotification(Notification notification, Object handback) {
         JMXNotificationManager.getInstance()
                               .handleNotification(notification, handback);
+    }
+
+    private void readObject(java.io.ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+
+        // Warning loggers is transient
+        //logger = ProActiveLogger.getLogger(Loggers.JMX);
     }
 }

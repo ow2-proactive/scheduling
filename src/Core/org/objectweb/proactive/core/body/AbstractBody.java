@@ -156,6 +156,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // JMX
     /** The MBean representing this body */
     protected BodyWrapperMBean mbean;
+    protected boolean isProActiveInternalObject = false;
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -231,8 +232,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // JMX registration
         String mbeanProperty = ProActiveConfiguration.getInstance()
                                                      .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
+        isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
+
         if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
-            if (!(reifiedObject instanceof ProActiveInternalObject)) {
+            if (!isProActiveInternalObject) {
                 // If the node is not a HalfBody
                 if (!nodeURL.equals("LOCAL")) {
                     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();

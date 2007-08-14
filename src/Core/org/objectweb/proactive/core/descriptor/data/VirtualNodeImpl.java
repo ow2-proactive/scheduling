@@ -1616,7 +1616,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // END ProActiveEvent
 
         // JMX Notification
-        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getMBean();
         if (mbean != null) {
             NodeNotificationData notificationData = new NodeNotificationData(url,
                     protocol, node.getNodeInformation().getHostName(),
@@ -1755,7 +1756,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // END ProActiveEvent
 
         // JMX Notification
-        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getMBean();
+        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getMBean();
         if (mbean != null) {
             NodeInformation nodeInfo = newNode.getNodeInformation();
             NodeNotificationData notificationData = new NodeNotificationData(nodeInfo.getURL(),
