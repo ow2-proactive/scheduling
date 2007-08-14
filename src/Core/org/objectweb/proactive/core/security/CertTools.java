@@ -479,7 +479,7 @@ public class CertTools {
             CertificateFactory cf = CertTools.getCertificateFactory();
             X509Certificate x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
                         certbuf));
-            String dn = x509cert.getSubjectDN().toString();
+            //            String dn = x509cert.getSubjectDN().toString();
             ret.add(x509cert);
         }
 

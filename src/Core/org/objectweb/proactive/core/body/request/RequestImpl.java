@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.security.cert.X509Certificate;
@@ -53,12 +52,11 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
-
-import sun.rmi.server.MarshalInputStream;
 
 
 public class RequestImpl extends MessageImpl implements Request,
@@ -355,12 +353,7 @@ public class RequestImpl extends MessageImpl implements Request,
                         this.methodCallCiphered, Session.ACT_AS_SERVER);
 
                 //ProActiveLogger.getLogger("security.request").debug("ReceiveRequest :method call apres decryption : " +  ProActiveSecurityManager.displayByte(decryptedMethodCall));
-                ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
-                MarshalInputStream in = new MarshalInputStream(bin);
-
-                // ObjectInputStream in = new ObjectInputStream(bin);
-                this.methodCall = (MethodCall) in.readObject();
-                in.close();
+                this.methodCall = (MethodCall) ByteToObjectConverter.MarshallStream.convert(decryptedMethodCall);
                 this.ciphered = false;
 
                 //  logger.info("After decoding method call  seq id " +sequenceNumber + ":" + ciphered + ":" + sessionID + "  "+ methodCall + ":" +methodCallCiphered);

@@ -30,9 +30,7 @@
  */
 package org.objectweb.proactive.core.body.reply;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -47,6 +45,7 @@ import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
 
 public class ReplyImpl extends MessageImpl implements Reply,
@@ -158,10 +157,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
             byte[] decryptedMethodCall = psm.decrypt(sessionID,
                     encryptedResult, Session.ACT_AS_CLIENT);
             try {
-                ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
-                ObjectInputStream in = new ObjectInputStream(bin);
-                result = (FutureResult) in.readObject();
-                in.close();
+                result = (FutureResult) ByteToObjectConverter.ObjectStream.convert(decryptedMethodCall);
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();

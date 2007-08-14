@@ -30,20 +30,15 @@
  */
 package functionalTests.security.applicationlifecycle;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 import functionalTests.FunctionalTest;
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * Test the generation of entity certificate from an application one
@@ -58,22 +53,7 @@ public class SecurityTestApplicationLifeCycle extends FunctionalTest {
     @Test
     public void action() throws Exception {
         psm = psm.generateSiblingCertificate("subcert");
-
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutput out = new ObjectOutputStream(bout);
-
-        out.writeObject(psm);
-        out.close();
-
-        // Get the bytes of the serialized object
-        byte[] buf = bout.toByteArray();
-
-        // retrieve policyserver
-        ByteArrayInputStream bis = new ByteArrayInputStream(buf);
-        ObjectInputStream is = new ObjectInputStream(bis);
-
-        psm2 = (ProActiveSecurityManager) is.readObject();
-
+        psm2 = (ProActiveSecurityManager) MakeDeepCopy.WithObjectStream.makeDeepCopy(psm);
         assertNotNull(psm2);
     }
 

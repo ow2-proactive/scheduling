@@ -202,7 +202,8 @@ public class ProActiveSecurity {
 
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
-        X509Certificate certif = null;
+
+        //        X509Certificate certif = null;
         Object[] o = null;
         try {
             o = genCert(dnName, 365, null, privateKey, publicKey, true,

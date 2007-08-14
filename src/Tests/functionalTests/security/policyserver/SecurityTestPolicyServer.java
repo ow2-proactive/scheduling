@@ -30,16 +30,11 @@
  */
 package functionalTests.security.policyserver;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
@@ -57,20 +52,8 @@ public class SecurityTestPolicyServer extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutput out = new ObjectOutputStream(bout);
-
-        out.writeObject(policyServer);
-        out.close();
-
-        // Get the bytes of the serialized object
-        byte[] buf = bout.toByteArray();
-
         // retrieve policyserver
-        ByteArrayInputStream bis = new ByteArrayInputStream(buf);
-        ObjectInputStream is = new ObjectInputStream(bis);
-
-        ps = (PolicyServer) is.readObject();
+        ps = (PolicyServer) MakeDeepCopy.WithObjectStream.makeDeepCopy(policyServer);
         assertNotNull(ps);
     }
 

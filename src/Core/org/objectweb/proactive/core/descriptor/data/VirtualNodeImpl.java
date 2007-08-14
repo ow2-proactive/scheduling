@@ -83,6 +83,9 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileTransfer;
@@ -1535,26 +1538,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return ExternalProcess, the copy version of the process
      */
     private Object makeDeepCopy(Object process) {
-        //deepCopyTag = true;
-        Object result = null;
-
         try {
-            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
-            oos.writeObject(process);
-            oos.flush();
-            oos.close();
-
-            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
-            java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
-            result = ois.readObject();
-            ois.close();
+            return MakeDeepCopy.WithObjectStream.makeDeepCopy(process);
         } catch (Exception e) {
+            //TODO dangerous code as the deep copy didn't occurs.
             e.printStackTrace();
         }
 
-        //deepCopyTag = false;
-        return result;
+        return null;
     }
 
     private String buildURL(String host, String name, String protocol, int port) {

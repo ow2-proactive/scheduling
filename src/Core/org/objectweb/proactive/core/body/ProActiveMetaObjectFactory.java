@@ -30,17 +30,14 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
@@ -69,6 +66,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -476,22 +474,12 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         ProActiveMetaObjectFactory clone = null;
 
         try {
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(bout);
-
-            out.writeObject(this);
-            out.flush();
-            bout.close();
-
-            out.close();
-
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
-                        bout.toByteArray()));
-
-            clone = (ProActiveMetaObjectFactory) ois.readObject();
+            return MakeDeepCopy.WithObjectStream.makeDeepCopy(this);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (ProActiveException e) {
             e.printStackTrace();
         }
 

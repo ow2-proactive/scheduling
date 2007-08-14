@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ft.checkpointing;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -41,8 +40,7 @@ import java.rmi.server.RemoteStub;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-
-import sun.rmi.server.MarshalInputStream;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
 
 /**
@@ -114,12 +112,7 @@ public class Checkpoint implements java.io.Serializable {
      */
     public Body recover() {
         try {
-            //System.out.println("[FT] Recovering body " + this.bodyID);
-            ByteArrayInputStream bais = new ByteArrayInputStream(this.checkpointedBody);
-            MarshalInputStream mis = new MarshalInputStream(bais);
-            Body recoveredBody = (Body) (mis.readObject());
-            mis.close();
-            bais.close();
+            Body recoveredBody = (Body) ByteToObjectConverter.MarshallStream.convert(this.checkpointedBody);
             // Communcations are blocked until the activity is restarted
             recoveredBody.blockCommunication();
             return recoveredBody;

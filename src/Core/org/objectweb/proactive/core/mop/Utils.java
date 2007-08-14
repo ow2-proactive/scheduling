@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.mop;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -38,6 +39,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 
 /**
@@ -476,24 +480,22 @@ public abstract class Utils extends Object {
         return ret;
     }
 
+    /**
+     * Make a deep copy of source object using a ProActiveObjectStream.
+     * @param source The object to copy.
+     * @return the copy.
+     * @throws java.io.IOException
+     */
     public static Object makeDeepCopy(Object source) throws java.io.IOException {
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-
-        //java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
-        java.io.ObjectOutputStream oos = new PAObjectOutputStream(baos);
-        oos.writeObject(source);
-        oos.flush();
-        oos.close();
-        java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
-
-        //    java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
-        java.io.ObjectInputStream ois = new PAObjectInputStream(bais);
+        if (source == null) {
+            return null;
+        }
         try {
-            Object result = ois.readObject();
-            ois.close();
-            return result;
+            return MakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(source);
+        } catch (ProActiveException e) {
+            throw new IOException(e);
         } catch (ClassNotFoundException e) {
-            throw new java.io.IOException("ClassNotFoundException e=" + e);
+            throw new IOException(e);
         }
     }
 

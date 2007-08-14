@@ -52,7 +52,6 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.SignedObject;
-//import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -89,10 +88,9 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.security.securityentity.EntityVirtualNode;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import sun.rmi.server.MarshalOutputStream;
 
 
 /**
@@ -223,8 +221,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         Communication localPolicy = null;
         Communication distantBodyPolicy = null;
 
-        PolicyServer runtimePolicyServer = null;
-
+        //        PolicyServer runtimePolicyServer = null;
         X509Certificate distantBodyCertificate = null;
         try {
             distantBodyCertificate = ProActiveSecurity.decodeCertificate(distantSecurityEntity.getCertificateEncoded());
@@ -234,10 +231,11 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             e.printStackTrace();
         }
 
-        Communication runtimePolicy;
-        Communication VNPolicy;
+        //        Communication runtimePolicy;
+        //        Communication VNPolicy;
         Communication distantPolicy;
-        runtimePolicy = VNPolicy = distantBodyPolicy = null;
+
+        //        runtimePolicy = VNPolicy = distantBodyPolicy = null;
         ArrayList<Entity> arrayFrom = new ArrayList<Entity>();
         ArrayList<Entity> arrayTo = new ArrayList<Entity>();
 
@@ -383,7 +381,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      */
     public synchronized long startNewSession(Communication communicationPolicy) {
         long id = 0;
-        PolicyRule defaultPolicy = new PolicyRule();
+
+        //        PolicyRule defaultPolicy = new PolicyRule();
 
         //if (!defaultPolicy.equals(po)) {
         try {
@@ -431,15 +430,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                 ProActiveLogger.getLogger(Loggers.SECURITY)
                                .debug("Ciphering object, session is " +
                     sessionID);
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                MarshalOutputStream out = new MarshalOutputStream(bout);
-                out.writeObject(object);
-                out.flush();
-                out.close();
 
-                byte[] byteArray = bout.toByteArray();
-
-                bout.close();
+                byte[] byteArray = ObjectToByteConverter.MarshallStream.convert(object);
 
                 return session.writePDU(byteArray, type);
             } catch (Exception e) {
@@ -521,8 +513,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         }
 
         //     logger.info("Retrieving DistantOA Domain Server");
-        String domainLocation = distantBodyCertificate.getIssuerDN().getName();
-
+        //        String domainLocation = distantBodyCertificate.getIssuerDN().getName();
         return true;
     }
 
@@ -541,7 +532,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
         // Emitter Certificate Checking
         X509Certificate emitterCertificate = authenticationTicket.certificate;
-        String A = emitterCertificate.getIssuerDN().getName();
+        //        String A = emitterCertificate.getIssuerDN().getName();
 
         // A is the sessionInitializer
         checkCertificate(emitterCertificate);

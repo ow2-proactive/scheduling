@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.mop;
 
-import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -45,11 +44,10 @@ import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
-import org.objectweb.proactive.core.util.ObjectToByteConverter;
+import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import sun.rmi.server.MarshalInputStream;
 
 
 /**
@@ -139,16 +137,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         if ((this.serializedEffectiveArguments == null) &&
                 (this.effectiveArguments != null)) {
             try {
-                //                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                //
-                //                //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-                //                MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
-                //                objectOutputStream.writeObject(effectiveArguments);
-                //                objectOutputStream.flush();
-                //                objectOutputStream.close();
-                //                byteArrayOutputStream.close();
-                //                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
-                this.serializedEffectiveArguments = ObjectToByteConverter.convert(this.effectiveArguments);
+                this.serializedEffectiveArguments = ObjectToByteConverter.MarshallStream.convert(this.effectiveArguments);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -393,13 +382,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         if ((this.serializedEffectiveArguments != null) &&
                 (this.effectiveArguments == null)) {
             try {
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.serializedEffectiveArguments);
-
-                //ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-                MarshalInputStream objectInputStream = new MarshalInputStream(byteArrayInputStream);
-                this.effectiveArguments = (Object[]) objectInputStream.readObject();
-                objectInputStream.close();
-                byteArrayInputStream.close();
+                this.effectiveArguments = (Object[]) ByteToObjectConverter.MarshallStream.convert(this.serializedEffectiveArguments);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -575,13 +558,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         if ((this.serializedEffectiveArguments != null) &&
                 (this.effectiveArguments == null)) {
             try {
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.serializedEffectiveArguments);
-
-                //	    ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-                MarshalInputStream objectInputStream = new MarshalInputStream(byteArrayInputStream);
-                this.effectiveArguments = (Object[]) objectInputStream.readObject();
-                objectInputStream.close();
-                byteArrayInputStream.close();
+                this.effectiveArguments = (Object[]) ByteToObjectConverter.MarshallStream.convert(this.serializedEffectiveArguments);
             } catch (Exception e) {
                 e.printStackTrace();
             }
