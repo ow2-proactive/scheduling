@@ -31,5 +31,5 @@
 package org.objectweb.proactive.core.body.future;
 
 public interface LocalFuture {
-    public void receiveReply(FutureResult obj) throws java.io.IOException;
+    public void receiveReply(FutureResult obj);
 }
