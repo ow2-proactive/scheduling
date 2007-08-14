@@ -66,7 +66,6 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 public class MonitorNewHostDialog extends Dialog {
@@ -227,7 +226,7 @@ public class MonitorNewHostDialog extends Dialog {
 
 		// text depth
 		this.depthText = new Text(shell, SWT.BORDER);
-		depthText.setText(world.getMonitorThread().getDepth() + "");
+		depthText.setText(Integer.toString(world.getDepth()));
 		FormData depthFormData2 = new FormData();
 		depthFormData2.top = new FormAttachment(hostGroup, 17);
 		depthFormData2.left = new FormAttachment(depthLabel, 5);
@@ -387,9 +386,7 @@ public class MonitorNewHostDialog extends Dialog {
 				protocol = protocolCombo.getText();
 				final String url = UrlBuilder.buildUrl(hostname, "", protocol, port);
 				recordUrl(url);
-				//TODO A faire
-				/*world.getMonitorThread().setDepth(
-						Integer.parseInt(depthText.getText()));*/
+				world.setDepth(Integer.parseInt(depthText.getText()));
 				new Thread() {
 					public void run() {
 						world.addHost(url);

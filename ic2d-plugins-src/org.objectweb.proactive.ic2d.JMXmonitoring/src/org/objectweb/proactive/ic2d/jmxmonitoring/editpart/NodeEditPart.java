@@ -40,9 +40,12 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.NodeListener;
 
 public class NodeEditPart extends AbstractMonitoringEditPart{
 
+	private NodeObject castedModel;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -61,7 +64,10 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 * @return the casted model
 	 */
 	public NodeObject getCastedModel(){
-		return (NodeObject)getModel();
+		if(castedModel==null){
+			castedModel = (NodeObject)getModel();
+		}
+		return castedModel;
 	}
 
 	/**
@@ -105,10 +111,10 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 		//TODO A faire
 		NodeObject model = getCastedModel();
 		NodeFigure figure = new NodeFigure("Node "+model.getName(), UrlBuilder.getProtocol(model.getUrl())/*getCastedModel().getFullName(),getCastedModel().getParentProtocol()*/);
-		//TODO A faire
-		/*NodeListener listener = new NodeListener(getCastedModel(), figure, getMonitoringView());
+
+		NodeListener listener = new NodeListener(getCastedModel(), figure, getMonitoringView());
 		figure.addMouseListener(listener);
-		figure.addMouseMotionListener(listener);*/
+		figure.addMouseMotionListener(listener);
 		return figure;
 	}
 

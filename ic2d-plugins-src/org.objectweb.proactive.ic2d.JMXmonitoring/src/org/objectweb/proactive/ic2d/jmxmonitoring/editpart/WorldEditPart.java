@@ -80,7 +80,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 						e.printStackTrace();
 					}
 
-					Display.getDefault().asyncExec(new Runnable() {
+						Display.getDefault().asyncExec(new Runnable() {
 						public void run () {
 							for (GraphicalCommunication communication : communicationsToDraw) {
 								communication.draw();

@@ -35,13 +35,19 @@ import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject.methodName;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.JVMListener;
 
 public class VMEditPart extends AbstractMonitoringEditPart {
 
+	private RuntimeObject castedModel;
+	private VMFigure castedFigure;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -54,27 +60,29 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 
-
-	/**
-	 * Convert the result of EditPart.getModel()
-	 * to VMObject (the real type of the model).
-	 * @return the casted model
-	 */
-	public RuntimeObject getCastedModel(){
-		return (RuntimeObject)getModel();
-	}
-
 	@Override
 	public void update(Observable o, Object arg) {
 		final Object param = arg;
 		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
+				if(param instanceof methodName){
+					methodName method = (methodName) param;
+					switch (method) {
+					case RUNTIME_KILLED:
+						Console.getInstance(Activator.CONSOLE_NAME).log(getModel()+" killed!");
+						getCastedFigure().notResponding();
+						break;
+					default:
+						break;
+					}
+				}
+				/*
 				if(param instanceof State && (State)param == State.NOT_RESPONDING)
 					((VMFigure)getFigure()).notResponding();
 				else if(param instanceof State && (State)param == State.NOT_MONITORED) {
 					deactivate();
-				}
+				}*/
 				refresh();
 			}
 		});
@@ -92,9 +100,9 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	 */
 	protected IFigure createFigure() {
 		VMFigure figure = new VMFigure(getCastedModel().getName()/*FullName()*/);
-		/*JVMListener listener = new JVMListener(getCastedModel(), getMonitoringView());
+		JVMListener listener = new JVMListener(getCastedModel(), getMonitoringView());
 		figure.addMouseListener(listener);
-		figure.addMouseMotionListener(listener);*/
+		figure.addMouseMotionListener(listener);
 		return figure;
 	}
 
@@ -111,5 +119,28 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
 	protected void createEditPolicies() {/* Do nothing */}
+	
+	/**
+	 * Convert the result of EditPart.getModel()
+	 * to VMObject (the real type of the model).
+	 * @return the casted model
+	 */
+	public RuntimeObject getCastedModel(){
+		if(castedModel==null){
+			castedModel = (RuntimeObject)getModel();
+		}
+		return castedModel;
+	}
+	
+	 /**
+	  * Convert the result of EditPart.getFigure()
+	  * to VMFigure (the real type of the figure).
+	  * @return the casted figure
+	  */
+	public VMFigure getCastedFigure(){
+		if(castedFigure == null)
+			castedFigure = (VMFigure)getFigure();
+		return castedFigure;
+	}
 }
 

@@ -42,7 +42,7 @@ import javax.management.ObjectName;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
@@ -74,17 +74,20 @@ public class RMIRuntimeFinder implements RuntimeFinder{
 		URI [] uris = null;
 		try {
 
-			URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
-			uris = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).list(target);
+			 URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
+			 uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).list(target);
 
 			if (uris != null ) {
 				/* Searchs all ProActive Runtimes */
 				for (int i = 0; i < uris.length; ++i) {					
 					URI url = uris[i];
 					try {
-						RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);
-						Object stub = ro.getObjectProxy();
-
+						/*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
+						RemoteObject ro = RemoteObjectHelper.lookup(url);
+						
+						/*Object stub = ro.getObjectProxy();*/
+						Object stub = RemoteObjectHelper.generatedObjectStub(ro);
+												
 						if (stub instanceof ProActiveRuntime) {
 							ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
 														
@@ -104,7 +107,7 @@ public class RMIRuntimeFinder implements RuntimeFinder{
 								// This runtime is not yet monitored
 								runtime = new RuntimeObject(host, runtimeUrl, oname, hostUrl, mbeanServerName);
 								proActiveRuntime.startJMXServerConnector();
-								proActiveRuntime.getMBean();
+								//proActiveRuntime.getMBean();
 							}
 							runtimeObjects.put(runtimeUrl,runtime);
 						}

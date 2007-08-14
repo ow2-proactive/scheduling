@@ -13,7 +13,6 @@ import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
@@ -249,6 +248,7 @@ public class ActiveObject extends AbstractData{
 		}*/
 	}
 
+	@Override
 	public void resetCommunications() {
 		setChanged();
 		notifyObservers(new HashSet<ActiveObject>());	

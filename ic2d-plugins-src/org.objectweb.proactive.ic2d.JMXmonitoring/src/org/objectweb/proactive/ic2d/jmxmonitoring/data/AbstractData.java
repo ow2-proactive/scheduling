@@ -110,12 +110,31 @@ public abstract class AbstractData extends Observable {
 	}
 	
 	/**
-	 * 
+	 * Returns a monitored Child
 	 * @param key
 	 * @return
 	 */
 	public AbstractData getChild(String key){
 		return this.monitoredChildren.get(key);
+	}
+	
+	/**
+	 * Returns true if this object has associated a child with this key.
+	 * @param keyChild
+	 * @return
+	 */
+	public boolean containsChild(String keyChild){
+		return this.monitoredChildren.containsKey(keyChild);
+	}
+	
+	/**
+	 * Remove all the communications of this object.
+	 */
+	public void resetCommunications() {
+		List<AbstractData> children = getMonitoredChildrenAsList();
+		for(AbstractData child : children){
+			child.resetCommunications();
+		}
 	}
 	
 	/**
@@ -244,5 +263,21 @@ public abstract class AbstractData extends Observable {
 	 */
 	public void destroy(){
 		getParent().removeChild(this);
+	}
+	
+	/**
+	 * Returns the host rank.
+	 * @return the host rank.
+	 */
+	public int getHostRank(){
+		return getParent().getHostRank();
+	}
+	
+	/**
+	 * Return the max depth.
+	 * @return the max depth.
+	 */
+	public int getDepth(){
+		return getParent().getDepth();
 	}
 }

@@ -40,7 +40,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 public class MonitoringPerspective implements IPerspectiveFactory {
 	
-	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.perspectives.MonitoringPerspective";
+	public static final String ID = "org.objectweb.proactive.ic2d.jmxmonitoring.perspective.MonitoringPerspective";
 	
 	 /** Top folder's id. */
     public static final String FI_TOP = ID + ".topFolder";

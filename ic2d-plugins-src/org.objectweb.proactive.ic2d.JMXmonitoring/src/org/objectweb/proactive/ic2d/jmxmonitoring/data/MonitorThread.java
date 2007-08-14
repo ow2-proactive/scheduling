@@ -36,12 +36,11 @@ import java.util.Observer;
 
 public class MonitorThread implements Observer {
 
-	private final static int DEFAULT_DEPTH = 3;
 	private final static int DEFAULT_TTR = 30;
 
 
-	/** Hosts will be recursively searched up to this depth */
-	private int depth;
+//	/** Hosts will be recursively searched up to this depth */
+//	private int depth;
 
 	/** Thread which refresh the objects */
 	private Thread refresher;
@@ -59,7 +58,6 @@ public class MonitorThread implements Observer {
 	 * @param worl A world object
 	 */
 	public MonitorThread(WorldObject world){
-		this.depth = DEFAULT_DEPTH;
 		this.ttr = DEFAULT_TTR;
 
 		this.refresh = false;
@@ -70,22 +68,22 @@ public class MonitorThread implements Observer {
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 
-	/**
-	 * Hosts will be recursively searched up to 
-	 * the depth returned by this method.
-	 * @return depth depth used to searched up hosts
-	 */
-	public int getDepth(){
-		return this.depth;
-	}
-
-	/**
-	 * Sets the depth used to searched up hosts.
-	 * @param depth the news depth
-	 */
-	public void setDepth(int depth){
-		this.depth = depth;
-	}
+//	/**
+//	 * Hosts will be recursively searched up to 
+//	 * the depth returned by this method.
+//	 * @return depth depth used to searched up hosts
+//	 */
+//	public int getDepth(){
+//		return this.depth;
+//	}
+//
+//	/**
+//	 * Sets the depth used to searched up hosts.
+//	 * @param depth the news depth
+//	 */
+//	public void setDepth(int depth){
+//		this.depth = depth;
+//	}
 
 	/**
 	 * Returns the Time To Refresh (in seconds). 
@@ -106,10 +104,12 @@ public class MonitorThread implements Observer {
 	public void update(Observable o, Object arg) {
 		if (arg != null && o instanceof WorldObject && arg instanceof WorldObject.methodName) {
 			WorldObject.methodName method = (WorldObject.methodName)arg;
-			if(method == WorldObject.methodName.PUT_CHILD)
+			if(method == WorldObject.methodName.ADD_CHILD){
 				startRefreshing((WorldObject)o);
-			else if (method == WorldObject.methodName.REMOVE_CHILD)
+			}
+			else if (method == WorldObject.methodName.REMOVE_CHILD){
 				stopRefreshing();
+			}
 		}
 	}
 
@@ -127,7 +127,7 @@ public class MonitorThread implements Observer {
 			refresher = new Thread(new MonitorThreadRefresher(world));
 		}
 		
-		//refresher.start();
+		refresher.start();
 	}
 
 

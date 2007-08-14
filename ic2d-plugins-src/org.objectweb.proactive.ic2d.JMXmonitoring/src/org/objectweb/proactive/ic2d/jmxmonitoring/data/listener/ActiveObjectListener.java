@@ -9,6 +9,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NamesFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
@@ -53,14 +54,32 @@ public class ActiveObjectListener implements NotificationListener{
 				String sourceName = NamesFactory.getInstance().getName(sourceID);
 				if(sourceName==null){
 					System.out.println(sourceID +" -- " +methodName+ " --> "+ao.getName());
+					String sourceHost = UrlBuilder.getHostNameFromUrl(request.getSourceNode());
+					String destinationHost = UrlBuilder.getHostNameFromUrl(request.getDestinationNode());
+					if(sourceHost == null || destinationHost == null){
+						System.err
+								.println("ActiveObjectListener.handleNotification() source="+request.getSourceNode()+", destination="+request.getDestinationNode());
+						return;
+					}
+					if(sourceHost.equals(destinationHost)){
+						// TODO A faire
+						;// Rafraichir le model sur le host, car des objets existe et ne sont pas monitoré
+					}
+					else{
+						String protocol = UrlBuilder.getProtocol(request.getSourceNode());
+						int port = UrlBuilder.getPortFromUrl(request.getSourceNode());
+						if((ao.getDepth() - ao.getHostRank())>0){
+							ao.getWorldObject().addHost(UrlBuilder.buildUrl(sourceHost, "", protocol, port), ao.getHostRank()+1);	
+						}						
+					}
 				}
-				else{
+//				else{
 					// Update the request queue length
 					ao.setRequestQueueLength(request.getRequestQueueLength());
 
 					// Add a communication
 					ao.addCommunication(sourceID);
-				}
+//				}
 			}
 			// --- RequestQueueEvent ----------------
 			else if(type.equals(NotificationType.addRequest)){

@@ -135,6 +135,9 @@ public class RuntimeObjectListener implements NotificationListener{
 			System.out.println("...............................Runtime Unregistered "+notification.getSource());
 			RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
 		}
+		else if(type.equals(NotificationType.runtimeDestroyed)){
+			runtimeObject.runtimeKilled();
+		}
 		// --- NodeEvent ----------------
 		else if(type.equals(NotificationType.nodeCreated)){
 			System.out.println("...............................Node Created");

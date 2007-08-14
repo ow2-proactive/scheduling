@@ -17,6 +17,11 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  */
 public class RuntimeObject extends AbstractData{
 
+	/**
+	 * All the method names used to notify the observers
+	 */
+	public enum methodName { RUNTIME_KILLED, RUNTIME_NOT_RESPONDING, RUNTIME_NOT_MONITORED };
+	
 	private HostObject parent;
 	private String url;
 	//private ProActiveConnection connection;
@@ -45,7 +50,6 @@ public class RuntimeObject extends AbstractData{
 
 	@Override
 	public void explore() {
-		//System.out.println(this);
 		findNodes();
 	}
 
@@ -83,21 +87,40 @@ public class RuntimeObject extends AbstractData{
 	}
 	
 	public void killRuntime(){
-		try {
-			invoke("killRT", null, null);
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		new Thread(){
+			public void run(){
+				try {
+					Object[] params = {};
+					String[] signature = {};
+					invoke("killRuntime", params, signature);
+				} catch (InstanceNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (MBeanException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ReflectionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				runtimeKilled();
+			}
+		}.start();
+	}
+	
+	public void runtimeKilled(){
+		setChanged();
+		notifyObservers(methodName.RUNTIME_KILLED);
+		/*try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		destroy();*/
 	}
 	
 	/**

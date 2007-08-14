@@ -43,6 +43,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.AOListener;
 
 public class AOEditPart extends AbstractMonitoringEditPart{
 
@@ -54,6 +55,7 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	private boolean shouldRepaint = true;*/
 
 	private AOFigure castedFigure;
+	private ActiveObject castedModel;
 	private NodeEditPart castedParentEditPart;
 	private NodeFigure castedParentFigure;
 	private IFigure globalPanel;
@@ -223,9 +225,9 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 */
 	protected IFigure createFigure() {
 		AOFigure figure = new AOFigure(getCastedModel().getName()/*getFullName()*/);
-		/*AOListener listener = new AOListener(getCastedModel(), figure,  getMonitoringView(), getCastedParentFigure());
+		AOListener listener = new AOListener(getCastedModel(), figure,  getMonitoringView(), getCastedParentFigure());
 		figure.addMouseListener(listener);
-		figure.addMouseMotionListener(listener);*/
+		figure.addMouseMotionListener(listener);
 		return figure;
 	}
 
@@ -249,17 +251,20 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	//
 
 	/**
-	 * Convert the result of EditPart.getModel() to AOObject (the real type of
-	 * the model).
+	 * Convert the result of EditPart.getModel()
+	 * to AOObject (the real type of the model).
 	 * @return the casted model
 	 */
 	public ActiveObject getCastedModel(){
-		return (ActiveObject)getModel();
+		if(castedModel==null){
+			castedModel = (ActiveObject)getModel();
+		}
+		return castedModel;
 	}
 
 	/**
-	 * Convert the result of EditPart.getFigure() to AOFigure (the real type of
-	 * the figure).
+	 * Convert the result of EditPart.getFigure()
+	 * to AOFigure (the real type of the figure).
 	 * @return the casted figure
 	 */
 	public AOFigure getCastedFigure(){

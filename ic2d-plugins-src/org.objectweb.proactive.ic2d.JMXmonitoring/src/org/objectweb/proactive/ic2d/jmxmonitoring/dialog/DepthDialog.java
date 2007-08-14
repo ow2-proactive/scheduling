@@ -78,7 +78,7 @@ public class DepthDialog extends Dialog {
 		titleLabel.setLayoutData(titleLabelFormData);
 		
 		this.text = new Text(shell, SWT.BORDER);
-		text.setText(world.getMonitorThread().getDepth()+"");
+		text.setText(Integer.toString(world.getDepth()));
 		FormData textFormData = new FormData();
 		textFormData.top = new FormAttachment(0, -3);
 		textFormData.left = new FormAttachment(titleLabel, 10);
@@ -124,7 +124,7 @@ public class DepthDialog extends Dialog {
 		
 		public void widgetSelected(SelectionEvent e) {
 			if(e.widget == okButton) {
-				world.getMonitorThread().setDepth(Integer.parseInt(text.getText()));
+				world.setDepth(Integer.parseInt(text.getText()));
 			}
 			shell.close();
 		}

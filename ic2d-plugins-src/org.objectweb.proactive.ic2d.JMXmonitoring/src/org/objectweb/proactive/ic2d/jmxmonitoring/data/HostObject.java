@@ -30,6 +30,7 @@ public class HostObject extends AbstractData{
 	private String hostName;
 	private int port;
 	private String protocol;
+	private int rank;
 
 	private final static String DEFAULT_NAME = "undefined"; 
 	
@@ -45,7 +46,7 @@ public class HostObject extends AbstractData{
 	 * @throws NullPointerException 
 	 * @throws MalformedObjectNameException 
 	 */
-	protected HostObject(WorldObject parent, String url) throws MalformedObjectNameException, NullPointerException{
+	protected HostObject(WorldObject parent, String url, int rank) throws MalformedObjectNameException, NullPointerException{
 		super(new ObjectName(FactoryName.HOST));
 		
 		this.hostName = UrlBuilder.getHostNameFromUrl(url);
@@ -54,6 +55,8 @@ public class HostObject extends AbstractData{
 		this.port = UrlBuilder.getPortFromUrl(url);
 		
 		this.url = UrlBuilder.buildUrl(hostName, name, protocol, port);
+		
+		this.rank = rank;
 		
 		this.parent = parent;
 	}
@@ -120,9 +123,21 @@ public class HostObject extends AbstractData{
 		System.out.println(this);
 		findRuntimes();
 	}
+	
+	@Override
+	public int getHostRank(){
+		return this.rank;
+	}
 
 	public String toString(){
-		return this.hostName+":"+this.port+":"+getOSName()+"(OS version: "+getOSVersion()+")";
+		String result = this.hostName+":"+this.port;
+		if(!getOSName().equals(DEFAULT_NAME)){
+			result+=":"+getOSName();
+		}
+		if(!getOSVersion().equals(DEFAULT_NAME)){
+			result+="(OS version: "+getOSVersion()+")";
+		}
+		return result;
 	}
 
 	/**
@@ -143,14 +158,13 @@ public class HostObject extends AbstractData{
 		Iterator<RuntimeObject> it = runtimeObjects.iterator();
 		while(it.hasNext()){			
 			RuntimeObject runtimeObject = it.next();
-			
-			ObjectName oname = runtimeObject.getObjectName();
-			
-			JMXNotificationManager.getInstance().subscribe(oname, new RuntimeObjectListener(runtimeObject), this.getUrl(), runtimeObject.getServerName());
-			
-			addChild(runtimeObject);
-			
-			updateOSNameAndVersion(runtimeObject.getConnection());
+			// If this child is not yet monitored.
+			if(!(this.containsChild(runtimeObject.getKey()))){
+				ObjectName oname = runtimeObject.getObjectName();		
+				JMXNotificationManager.getInstance().subscribe(oname, new RuntimeObjectListener(runtimeObject), this.getUrl(), runtimeObject.getServerName());
+				addChild(runtimeObject);
+				updateOSNameAndVersion(runtimeObject.getConnection());
+			}
 		}
 	}
 	

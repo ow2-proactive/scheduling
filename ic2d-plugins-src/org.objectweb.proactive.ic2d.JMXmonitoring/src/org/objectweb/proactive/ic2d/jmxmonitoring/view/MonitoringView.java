@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.view;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.EditPartFactory;
@@ -61,15 +64,27 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.EnableDisableMonitoringAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.HorizontalLayoutAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.KillVMAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.NewViewAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.P2PAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshHostAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshJVMAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshNodeAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetDepthAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetTTRAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetUpdateFrequenceAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.MonitoringEditPartFactory;
+import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.RoundedLine;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.DragHost;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.WorldListener;
@@ -100,27 +115,13 @@ public class MonitoringView extends ViewPart {
 
 	/** The graphical set of virtual nodes */
 	private VirtualNodesGroup virtualNodesGroup;
-
-	
-	// New data
-	private ProActiveConnection connection;
-	
 	
 	//
 	// -- CONSTRUCTOR ----------------------------------------------
 	//
 
 	public MonitoringView () {
-		super();
-		
-		//--- Test ---
-		/* Connection */
-		//ClientConnector cc = new ClientConnector("//puravida", "Philo");
-		//cc.connect();
-		//ProActiveConnection connection = cc.getConnection();
-		//world = new WorldObject(connection);
-		//------------
-		
+		super();	
 		world = new WorldObject();
 		title = world.getName();
 	}
@@ -288,20 +289,17 @@ public class MonitoringView extends ViewPart {
 
 		toolBarManager.add(new Separator());
 
-		//TODO A faire
 		// Adds "Set Time to refresh" action to the view's toolbar
-		/*SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(), world.getMonitorThread());
-		toolBarManager.add(toolBarTTR);*/
+		SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(), world.getMonitorThread());
+		toolBarManager.add(toolBarTTR);
 
-		//TODO A faire
 		// Adds refresh action to the view's toolbar
 		RefreshAction toolBarRefresh = new RefreshAction(world.getMonitorThread());
 		toolBarManager.add(toolBarRefresh);
 
-		//TODO A faire
 		// Adds enable/disable monitoring action to the view's toolbar
-		/*EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(world);
-		toolBarManager.add(toolBarEnableDisableMonitoring);*/
+		EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(world);
+		toolBarManager.add(toolBarEnableDisableMonitoring);
 		
 		// Adds enable/disable monitoring action to the view's toolbar
 		P2PAction toolBarP2P = new P2PAction(world);
@@ -320,15 +318,14 @@ public class MonitoringView extends ViewPart {
 
 		ZoomOutAction zoomOut = new ZoomOutAction(zoomManager);
 		zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(MonitoringView.class, "zoom-out-2.gif"));
-		graphicalViewer.getActionRegistry().registerAction(zoomIn);
+		graphicalViewer.getActionRegistry().registerAction(zoomOut);
 		toolBarManager.add(zoomOut);
 
 		toolBarManager.add(new Separator());
 
-		//TODO A faire
 		// Adds "New Monitoring view" action to the view's toolbar
-		/*NewViewAction toolBarNewView = new NewViewAction();
-		toolBarManager.add(toolBarNewView);*/
+		NewViewAction toolBarNewView = new NewViewAction();
+		toolBarManager.add(toolBarNewView);
 	}
 
 
@@ -442,19 +439,38 @@ public class MonitoringView extends ViewPart {
 
 		registry.registerAction(new NewHostAction(display, world));
 		registry.registerAction(new SetDepthAction(display, world));
-
 		registry.registerAction(new RefreshAction(world.getMonitorThread()));
-		
-		//TODO A faire
-		/*registry.registerAction(new SetTTRAction(display, world.getMonitorThread()));*/
-		/*registry.registerAction(new RefreshHostAction());
+		registry.registerAction(new SetTTRAction(display, world.getMonitorThread()));
+		registry.registerAction(new RefreshHostAction());
 		registry.registerAction(new RefreshJVMAction());
 		registry.registerAction(new RefreshNodeAction());
 		registry.registerAction(new StopMonitoringAction());
 		registry.registerAction(new KillVMAction());
 		registry.registerAction(new SetUpdateFrequenceAction(display));
 		registry.registerAction(new VerticalLayoutAction());
-		registry.registerAction(new HorizontalLayoutAction());*/
+		registry.registerAction(new HorizontalLayoutAction());
+		
+
+		// Get all available actions defined by possibly provided 
+		// extensions for the extension point monitoring_action	
+		try {
+			IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
+					.getExtensionPoint(
+							Activator.PLUGIN_ID + ".actions_extension");
+			if (extensionPoint == null) {
+				return;
+			}
+			IConfigurationElement[] configs = extensionPoint
+					.getConfigurationElements();
+
+			for (int x = 0; x < configs.length; x++) {
+				IActionExtPoint providedAction = (IActionExtPoint) configs[x]
+						.createExecutableExtension("class");
+				registry.registerAction(providedAction);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void initStateRadioButtons(){
@@ -542,8 +558,7 @@ public class MonitoringView extends ViewPart {
 	private class ResetTopologyListener extends SelectionAdapter {
 
 		public void widgetSelected(SelectionEvent e) {
-			//TODO A faire
-			//world.resetCommunications();
+			world.resetCommunications();
 		}
 	}
 }

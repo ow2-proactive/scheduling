@@ -33,7 +33,9 @@ public class WorldObject extends AbstractData{
 	// 7 s
 	public static int DEFAULT_AUTO_RESET_TIME = 7;
 	
-	public enum methodName { PUT_CHILD, REMOVE_CHILD, RESET_COMMUNICATIONS };
+	private static int DEFAULT_MAX_DEPTH = 3;
+	
+	public enum methodName { ADD_CHILD, REMOVE_CHILD, RESET_COMMUNICATIONS };
 
 	// -------------------------------------------
 	// --- Variables -----------------------------
@@ -56,6 +58,8 @@ public class WorldObject extends AbstractData{
 	private Map<UniqueID, ActiveObject> activeObjects;
 	
 	private Map<UniqueID, ActiveObject> migrations;
+	
+	private int maxDepth = DEFAULT_MAX_DEPTH;
 	
 	/**
 	 * Thread
@@ -100,10 +104,13 @@ public class WorldObject extends AbstractData{
 	/**
 	 * Add a host to the WorldObject
 	 * @param url The url of the host.
+	 * @param rank The rank of the depth.(0 if the user want ot monitor this host,
+	 * 1,2,3...if this host was discovered.)
 	 */
-	public void addHost(String url){
+	public void addHost(String url, int rank){
 		try {
-			addChild(new HostObject(this, url));
+			addChild(new HostObject(this, url, rank));
+			notifyObservers();
 		} catch (MalformedObjectNameException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,10 +120,26 @@ public class WorldObject extends AbstractData{
 		}
 		setChanged();
 		if(getMonitoresChildrenSize() == 1)
-			notifyObservers(methodName.PUT_CHILD);
+			notifyObservers(methodName.ADD_CHILD);
 		notifyObservers();
 	}
-
+	
+	/**
+	 * Add a host to the WorldObject
+	 * @param url The url of the host.
+	 */
+	public void addHost(String url){
+		this.addHost(url, 0);
+	}
+	
+	@Override
+	public void removeChild(AbstractData child){
+		super.removeChild(child);
+		setChanged();
+		if(getMonitoresChildrenSize() == 0)
+			notifyObservers(methodName.REMOVE_CHILD);
+		notifyObservers();
+	}
 	
 	/**
 	 * Find an active object in the map of the known active objects.
@@ -202,6 +225,24 @@ public class WorldObject extends AbstractData{
 	@Override
 	public String getType() {
 		return "world object";
+	}
+	
+	@Override
+	public int getHostRank(){
+		return 0;
+	}
+	
+	@Override
+	public int getDepth(){
+		return this.maxDepth;
+	}
+	
+	/**
+	 * Changes the max depth.
+	 * @param depth The new max depth.
+	 */
+	public void setDepth(int depth){
+		this.maxDepth = depth;
 	}
 	
 	public MonitorThread getMonitorThread(){

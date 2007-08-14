@@ -39,9 +39,12 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.HostFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.HostListener;
 
 public class HostEditPart extends AbstractMonitoringEditPart {
 
+	private HostObject castedModel;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -60,9 +63,11 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 	 * @return the casted model
 	 */
 	public HostObject getCastedModel(){
-		return (HostObject)getModel();
+		if(castedModel==null){
+			castedModel =  (HostObject)getModel();
+		}
+		return castedModel;
 	}
-
 
 	@Override
 	public void update(Observable o, Object arg) {
@@ -95,10 +100,9 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 	 */
 	protected IFigure createFigure() {
 		HostFigure figure = new HostFigure(getCastedModel().toString());
-		//TODO A faire
-		/*HostListener listener = new HostListener(getCastedModel(), figure, getMonitoringView());
+		HostListener listener = new HostListener(getCastedModel(), figure, getMonitoringView());
 		figure.addMouseListener(listener);
-		figure.addMouseMotionListener(listener);*/
+		figure.addMouseMotionListener(listener);
 		return figure;
 	}
 
