@@ -754,8 +754,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                 String[] peerList = new String[peerNodes.getLength()];
                 for (int pp = 0; pp < peerNodes.getLength(); ++pp) {
-                    peerList[pp] = peerNodes.item(pp).getFirstChild()
-                                            .getNodeValue();
+                    peerList[pp] = peerNodes.item(pp).getTextContent().trim();
                 }
                 p2pDescriptorService.setPeerList(peerList);
             } else if (serviceType.equals(FT_CONFIG_TAG)) {
@@ -1123,10 +1122,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                     String nodeName = childNode.getNodeName();
                     if (nodeName.equals(HOST_LIST_TAG)) {
-                        String nodeValue = getNodeExpandedValue(childNode.getFirstChild());
+                        String nodeValue = getNodeExpandedValue(childNode);
                         bSubProcess.setHostList(nodeValue);
                     } else if (nodeName.equals(PROCESSOR_TAG)) {
-                        String nodeValue = getNodeExpandedValue(childNode.getFirstChild());
+                        String nodeValue = getNodeExpandedValue(childNode);
                         bSubProcess.setProcessorNumber(nodeValue);
                     } else if (nodeName.equals(RES_REQ_TAG)) {
                         String nodeValue = getNodeExpandedValue(childNode.getAttributes()
@@ -1555,7 +1554,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     }
 
                     String nodeName = childNode.getNodeName();
-                    String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
+                    String nodeExpandedValue = getNodeExpandedValue(childNode);
                     if (nodeName.equals(HOST_LIST_TAG)) {
                         pbsSubProcess.setHostList(nodeExpandedValue);
                     } else if (nodeName.equals(HOSTS_NUMBER_TAG)) {
@@ -1667,7 +1666,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                     String nodeName = childNode.getNodeName();
                     if (nodeName.equals(OAR_RESOURCE_TAG)) {
-                        String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
+                        String nodeExpandedValue = getNodeExpandedValue(childNode);
                         oarSubProcess.setResources(nodeExpandedValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
@@ -1798,7 +1797,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         String path = getPath(childNode);
                         mpiProcess.setRemotePath(path);
                     } else if (nodeName.equals(PROCESS_NUMBER_TAG)) {
-                        String nodeExpandedValue = getNodeExpandedValue(childNode.getFirstChild());
+                        String nodeExpandedValue = getNodeExpandedValue(childNode);
                         mpiProcess.setHostsNumber(nodeExpandedValue);
                     }
                 }
@@ -2109,15 +2108,25 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     protected String interpolateVariables(String value)
         throws SAXException {
         if (org.objectweb.proactive.core.xml.VariableContract.xmlproperties != null) {
-            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value);
+            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value.trim());
         }
         return value;
     }
 
     protected String getNodeExpandedValue(Node n) throws SAXException {
-        if (checkNonEmptyNode(n)) {
+        if (n == null) {
+            return null;
+        }
+
+        if ((n.getNodeType() == Node.ATTRIBUTE_NODE) && checkNonEmptyNode(n)) {
             return interpolateVariables(n.getNodeValue());
         }
+
+        if ((n.getNodeType() == Node.ELEMENT_NODE) &&
+                checkNonEmptyString(n.getTextContent())) {
+            return interpolateVariables(n.getTextContent().trim());
+        }
+
         return null;
     }
 
