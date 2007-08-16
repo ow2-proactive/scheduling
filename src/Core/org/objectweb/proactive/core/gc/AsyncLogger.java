@@ -83,6 +83,7 @@ public class AsyncLogger implements Runnable {
             "GC Logging Thread");
 
     static {
+        loggingThread.setDaemon(true);
         loggingThread.start();
     }
 
