@@ -1718,7 +1718,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     if (nodeName.equals(OAR_RESOURCE_TAG)) {
                         oarGridSubProcess.setResources(nodeExpandedValue);
                     } else if (nodeName.equals(OARGRID_WALLTIME_TAG)) {
-                        oarGridSubProcess.setScriptLocation(nodeExpandedValue);
+                        oarGridSubProcess.setWallTime(nodeExpandedValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
                         oarGridSubProcess.setScriptLocation(path);
