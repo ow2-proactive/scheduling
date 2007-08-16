@@ -37,6 +37,7 @@ public class NodeObject extends AbstractData{
 		this.monitoredChildren = new TreeMap<String, AbstractData>(comparator); 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public RuntimeObject getParent() {
 		return this.parent;
@@ -118,6 +119,7 @@ public class NodeObject extends AbstractData{
 		}
 	}
 
+	@Override
 	public String getName(){
 		return UrlBuilder.getNameFromUrl(getUrl());
 	}

@@ -61,8 +61,6 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
 		MenuManager layoutMenu = new MenuManager("Layout");
 		
 		if (actions == null ){
-			System.out
-					.println("MonitoringContextMenuProvider.buildContextMenu()");
 			actions = new ArrayList<IAction>();
 			// Monitor a new host			
 			actions.add( registry.getAction(NewHostAction.NEW_HOST) ); 

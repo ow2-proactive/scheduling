@@ -71,6 +71,7 @@ public class VNObject extends AbstractData {
 	@Override
 	public void explore() {/* Do nothing */}
 
+	@Override
 	public String getName(){
 		return this.name;
 	}
@@ -84,12 +85,7 @@ public class VNObject extends AbstractData {
 	public String getType() {
 		return "virtual node";
 	}
-	
-	/*@Override
-	public String getType() {
-		return "vn";
-	}*/
-	
+		
 	/**
 	 * Returns the job id
 	 * @return The job id
@@ -106,7 +102,7 @@ public class VNObject extends AbstractData {
 		}
 	}
 
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public WorldObject getParent() {
 		return parent;

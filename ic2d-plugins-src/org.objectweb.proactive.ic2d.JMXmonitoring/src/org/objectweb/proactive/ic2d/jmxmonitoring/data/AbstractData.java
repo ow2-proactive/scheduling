@@ -3,6 +3,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -15,6 +16,8 @@ import javax.management.ReflectionException;
 
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 
 /**
  * Holder class for the data representation.
@@ -56,7 +59,7 @@ public abstract class AbstractData extends Observable {
 
 		return this.objectName;
 	}
-
+	
 	/**
 	 * Adds a child to this object, and explore this one.
 	 * @param <T>
@@ -156,6 +159,25 @@ public abstract class AbstractData extends Observable {
 			child.explore();
 		}
 	}
+	
+	/**
+	 * Stop monitoring this object
+	 * @param log Indicates if you want to log a message in the console.
+	 */
+	public void stopMonitoring(boolean log) {
+		if(log){
+			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getName());
+		}
+		List<AbstractData> children = getMonitoredChildrenAsList();
+		for (Iterator iter = children.iterator(); iter.hasNext();) {
+			AbstractData child = (AbstractData) iter.next();
+			child.stopMonitoring(false);
+		}
+		getParent().removeChild(this);
+		//getWorld().removeFromMonitoredObjects(this);
+		setChanged();
+		notifyObservers(/*State.NOT_MONITORED*/);
+	}
 		
 	/**
 	 * Returns an unique identifer,
@@ -170,6 +192,12 @@ public abstract class AbstractData extends Observable {
 	 * @return the type of the object.
 	 */
 	public abstract String getType();
+	
+	/**
+	 * Returns the name of the object.
+	 * @return the name of the object.
+	 */
+	public abstract String getName();
 	
 	/**
 	 * Returns the ProActive Connection

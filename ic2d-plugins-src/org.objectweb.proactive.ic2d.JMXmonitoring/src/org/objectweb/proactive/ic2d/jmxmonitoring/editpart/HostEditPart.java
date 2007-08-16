@@ -80,7 +80,7 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 		else if((param instanceof String) && (o instanceof HostObject)){
 			((HostFigure)getFigure()).changeTitle((String)param);
 		}
-		Display.getDefault().asyncExec(this);
+		getViewer().getControl().getDisplay().asyncExec(this);
 	}
 
 	@Override

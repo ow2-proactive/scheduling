@@ -63,8 +63,7 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	@Override
 	public void update(Observable o, Object arg) {
 		final Object param = arg;
-		
-		Display.getDefault().asyncExec(new Runnable() {
+		getViewer().getControl().getDisplay().asyncExec(new Runnable() {
 			public void run () {
 				if(param instanceof methodName){
 					methodName method = (methodName) param;

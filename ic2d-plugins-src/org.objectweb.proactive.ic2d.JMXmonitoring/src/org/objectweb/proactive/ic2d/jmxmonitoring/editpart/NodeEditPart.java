@@ -79,8 +79,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	@Override
 	public void update(Observable o, Object arg) {
 		final Object param = arg;
-
-		Display.getDefault().asyncExec(new Runnable() {
+		getViewer().getControl().getDisplay().asyncExec(new Runnable() {
 			public void run () {
 				if(param instanceof State && (State)param == State.NOT_MONITORED) {
 					deactivate();

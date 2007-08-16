@@ -16,8 +16,8 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RemoteObjectHostRTFinder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder;
-import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinderFactory;
 
 
 /**
@@ -61,6 +61,7 @@ public class HostObject extends AbstractData{
 		this.parent = parent;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public WorldObject getParent() {
 		return this.parent;
@@ -74,6 +75,11 @@ public class HostObject extends AbstractData{
 	@Override
 	public String getType() {
 		return "host";
+	}
+	
+	@Override
+	public String getName() {
+		return getHostName();
 	}
 	
 	/**
@@ -152,7 +158,7 @@ public class HostObject extends AbstractData{
 	 */
 	@SuppressWarnings("unchecked")
 	private void findRuntimes(){
-		RuntimeFinder rfinder = RuntimeFinderFactory.createRuntimeFinder(protocol);
+		RuntimeFinder rfinder = new RemoteObjectHostRTFinder();
 		Collection<RuntimeObject> runtimeObjects = rfinder.getRuntimeObjects(this);
 		
 		Iterator<RuntimeObject> it = runtimeObjects.iterator();

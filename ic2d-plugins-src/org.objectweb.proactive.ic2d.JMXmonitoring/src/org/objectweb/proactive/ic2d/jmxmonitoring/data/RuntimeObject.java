@@ -43,6 +43,7 @@ public class RuntimeObject extends AbstractData{
 		this.serverName = serverName;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public HostObject getParent() {
 		return this.parent;
@@ -62,11 +63,6 @@ public class RuntimeObject extends AbstractData{
 	public String getType() {
 		return "runtime object";
 	}
-	
-	/*@Override
-	public ProActiveConnection getConnection(){
-		return this.connection;
-	}*/
 	
 	@Override
 	protected String getHostUrlServer(){
@@ -180,6 +176,7 @@ public class RuntimeObject extends AbstractData{
 		}
 	}
 	
+	@Override
 	public String getName(){
 		return UrlBuilder.getNameFromUrl(getUrl());
 	}

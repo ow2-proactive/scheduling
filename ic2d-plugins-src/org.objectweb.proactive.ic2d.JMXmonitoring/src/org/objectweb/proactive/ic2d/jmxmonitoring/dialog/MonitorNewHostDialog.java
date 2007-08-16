@@ -37,6 +37,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +67,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 public class MonitorNewHostDialog extends Dialog {
@@ -234,20 +236,20 @@ public class MonitorNewHostDialog extends Dialog {
 		depthText.setLayoutData(depthFormData2);
 
 		// label set depth control
-		Label depthLabel2 = new Label(shell, SWT.CENTER);
+		/*Label depthLabel2 = new Label(shell, SWT.CENTER);
 		depthLabel2.setText("You can change it there or from menu \"Control -> Set depth control\"");
 		FormData depthFormData3 = new FormData();
 		depthFormData3.top = new FormAttachment(depthLabel, 5);
 		depthFormData3.left = new FormAttachment(8, 0);
 		//depthFormData3.right = new FormAttachment(85, 0);
-		depthLabel2.setLayoutData(depthFormData3);
+		depthLabel2.setLayoutData(depthFormData3);*/
 
 		// button "OK"
 		this.okButton = new Button(shell, SWT.NONE);
 		okButton.setText("OK");
 		okButton.addSelectionListener(new MonitorNewHostListener());
 		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(depthLabel2, 20);
+		okFormData.top = new FormAttachment(/*depthLabel2*/depthLabel, 20);
 		okFormData.left = new FormAttachment(25, 20);
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
@@ -258,7 +260,7 @@ public class MonitorNewHostDialog extends Dialog {
 		cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new MonitorNewHostListener());
 		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(depthLabel2, 20);
+		cancelFormData.top = new FormAttachment(/*depthLabel2*/depthLabel, 20);
 		cancelFormData.left = new FormAttachment(50, 10);
 		cancelFormData.right = new FormAttachment(75, -20);
 		cancelButton.setLayoutData(cancelFormData);
@@ -312,6 +314,9 @@ public class MonitorNewHostDialog extends Dialog {
 				String lastProtocolUsed = null;
 
 				while ((url = reader.readLine()) != null){
+					if(url==null || url.equals("")){
+						url = UrlBuilder.buildUrlFromProperties(initialHostValue, "");
+					}
 					lastNameUsed = UrlBuilder.getHostNameFromUrl(url);
 					lastPortUsed = UrlBuilder.getPortFromUrl(url);
 					lastProtocolUsed = UrlBuilder.getProtocol(url);
@@ -320,17 +325,30 @@ public class MonitorNewHostDialog extends Dialog {
 				}
 
 				String[] t = {""};
-				String[] hosts = (new ArrayList<String>(hostNames)).toArray(t);
+				String[] hosts = null;
+				if(hostNames.isEmpty()){
+					url = UrlBuilder.buildUrlFromProperties(initialHostValue, "");
+					lastNameUsed = UrlBuilder.getHostNameFromUrl(url);
+					lastPortUsed = UrlBuilder.getPortFromUrl(url);
+					lastProtocolUsed = UrlBuilder.getProtocol(url);
+					hostNames.add(lastNameUsed);
+				}
+				hosts = (new ArrayList<String>(hostNames)).toArray(t);
 				Arrays.sort(hosts);
 				hostCombo.setItems(hosts);
 				hostCombo.setText(lastNameUsed);
 				portText.setText(lastPortUsed.toString());
 				protocolCombo.setText(lastProtocolUsed);
-			} catch (IOException e) { /* Do-nothing */	}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			finally{
 				try {
 					reader.close();
-				} catch (IOException e) { /* Do-Nothing */	}
+				} catch (IOException e) {
+					e.printStackTrace();
+					Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+				}
 			}
 		} catch (FileNotFoundException e) {
 			hostCombo.add(initialHostValue);
@@ -362,11 +380,16 @@ public class MonitorNewHostDialog extends Dialog {
 			// in order to find it easily for the next time
 			pw.println(url);
 		}
-		catch(IOException e) {/* Do-Nothing */}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
 		finally{
 			try {
 				bw.close();
-			} catch(IOException e){/* Do-Nothing */}
+			} catch(IOException e){
+				e.printStackTrace();
+				Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+			}
 		}
 	}
 

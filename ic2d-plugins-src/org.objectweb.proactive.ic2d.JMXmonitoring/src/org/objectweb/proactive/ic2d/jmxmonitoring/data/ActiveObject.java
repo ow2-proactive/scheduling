@@ -23,31 +23,22 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectList
 public class ActiveObject extends AbstractData{
 
 	//TODO
-	/**
-	 * All the method names used to notify the observers
-	 */
+	/** All the method names used to notify the observers */
 	public enum methodName { SET_STATE, ADD_COMMUNICATION, RESET_COMMUNICATION, SET_REQUEST_QUEUE_LENGTH };
 
-	/**
-	 * The parent object.
-	 */
+	/** The parent object. */
 	private NodeObject parent;
 
-	/**
-	 * 
-	 */
+	/** ID used to identify the active object globally, even in case of migration. */
 	private UniqueID id;
 
-	/**
-	 * 
-	 */
+	/** The object's name (ex: ao#2) */
 	private String name;
 
-	/**
-	 * 
-	 */
+	/** Name of the class used to created the active object. */
 	private String className;
 
+	/** JMX Notification listener */
 	private NotificationListener listener;
 
 	/** State of the object (ex: WAITING_BY_NECESSITY) */
@@ -60,6 +51,13 @@ public class ActiveObject extends AbstractData{
 	// --- Constructor ---------------------------
 	// -------------------------------------------
 
+	/**
+	 * Creates a new AOObject.
+	 * @param parent The NodeObject containing the active object
+	 * @param id The active object's id
+	 * @param className The active object's name
+	 * @param objectName The object name associated to this active object.
+	 */
 	public ActiveObject(NodeObject parent, UniqueID id, String className, ObjectName objectName) {
 		super(objectName);
 		this.parent = parent;
@@ -86,6 +84,7 @@ public class ActiveObject extends AbstractData{
 	 * (Example: ao#3)
 	 * @return The name of this active object.
 	 */
+	@Override
 	public String getName(){
 		return this.name;
 	}
@@ -138,6 +137,10 @@ public class ActiveObject extends AbstractData{
 		return this.currentState;
 	}
 
+	/**
+	 * Returns a JMX notification listener.
+	 * @return a JMX notification listener.
+	 */
 	public NotificationListener getListener(){
 		return this.listener;
 	}
@@ -198,6 +201,7 @@ public class ActiveObject extends AbstractData{
 		System.err.println("ActiveObject.migrationFailed() the active object "+this+" didn't migrate!");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public NodeObject getParent() {
 		return this.parent;
@@ -223,6 +227,7 @@ public class ActiveObject extends AbstractData{
 		getWorldObject().removeActiveObject(getUniqueID());
 	}
 
+	@Override
 	public String toString(){
 		return name;
 	}

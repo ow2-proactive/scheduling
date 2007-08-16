@@ -39,7 +39,7 @@ import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Control;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.WorldListener;
@@ -78,9 +78,13 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
-
-						Display.getDefault().asyncExec(new Runnable() {
+					}	
+						Control control = getViewer().getControl();
+						if(control==null){
+							return;
+						}
+						control.getDisplay().asyncExec(new Runnable() {
+						
 						public void run () {
 							for (GraphicalCommunication communication : communicationsToDraw) {
 								communication.draw();

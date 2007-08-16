@@ -64,7 +64,7 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
-		Display.getDefault().asyncExec(this);
+		getViewer().getControl().getDisplay().asyncExec(this);
 	}
 	
 	@Override
