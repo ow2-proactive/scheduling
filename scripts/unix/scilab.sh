@@ -10,7 +10,7 @@ workingDir=`dirname $0`
 PROACTIVE=$workingDir/../..
 
 
-$JAVACMD org.objectweb.proactive.ext.scilab.gui.SciFrame
+$JAVACMD org.objectweb.proactive.extensions.scilab.gui.SciFrame
 
 echo
 echo ------------------------------------------------------------
