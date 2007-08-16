@@ -1,7 +1,8 @@
-package org.objectweb.proactive.core.body;
+package org.objectweb.proactive.core.body.exceptions;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.UniversalBody;
 
 
 // end inner class LocalInactiveBody

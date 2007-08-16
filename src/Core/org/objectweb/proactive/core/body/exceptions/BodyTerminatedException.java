@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.body.exceptions;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
