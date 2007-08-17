@@ -1259,22 +1259,17 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 }
 
                 String nodeName = child.getNodeName();
-                if (nodeName.equals(GLITE_CONFIG_TAG)) {
-                    String path = getPath(child);
-                    gliteProcess.setJobEnvironment(path);
-                } else {
-                    String nodeValue = getNodeExpandedValue(child);
-                    if (nodeName.equals(GLITE_ENVIRONMENT_TAG)) {
-                        gliteProcess.setJobEnvironment(nodeValue);
-                    } else if (nodeName.equals(GLITE_REQUIREMENTS_TAG)) {
-                        gliteProcess.setJobRequirements(nodeValue);
-                    } else if (nodeName.equals(GLITE_RANK_TAG)) {
-                        gliteProcess.setJobRank(nodeValue);
-                    } else if (nodeName.equals(GLITE_INPUTDATA_TAG)) {
-                        new GliteInputExtractor(gliteProcess, child);
-                    } else if (nodeName.equals(GLITE_PROCESS_OPTIONS_TAG)) {
-                        new GliteOptionsExtractor(gliteProcess, child);
-                    }
+                String nodeValue = getNodeExpandedValue(child);
+                if (nodeName.equals(GLITE_ENVIRONMENT_TAG)) {
+                    gliteProcess.setJobEnvironment(nodeValue);
+                } else if (nodeName.equals(GLITE_REQUIREMENTS_TAG)) {
+                    gliteProcess.setJobRequirements(nodeValue);
+                } else if (nodeName.equals(GLITE_RANK_TAG)) {
+                    gliteProcess.setJobRank(nodeValue);
+                } else if (nodeName.equals(GLITE_INPUTDATA_TAG)) {
+                    new GliteInputExtractor(gliteProcess, child);
+                } else if (nodeName.equals(GLITE_PROCESS_OPTIONS_TAG)) {
+                    new GliteOptionsExtractor(gliteProcess, child);
                 }
             }
         }
