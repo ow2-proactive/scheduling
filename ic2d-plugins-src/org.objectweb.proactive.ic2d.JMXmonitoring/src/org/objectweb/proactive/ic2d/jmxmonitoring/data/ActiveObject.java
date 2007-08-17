@@ -104,29 +104,29 @@ public class ActiveObject extends AbstractData{
 	public void setState(State newState) {
 		if(newState.equals(currentState))
 			return;
-		
-		// If there is a waitFoFutur, we wait the correct state.
-		switch (currentState) {
-		case WAITING_BY_NECESSITY_WHILE_ACTIVE:
-			if(newState==State.ACTIVE){
-				this.currentState = newState;
-				setChanged();
-				notifyObservers(newState);
+		switch (newState) {
+		case WAITING_BY_NECESSITY:
+			if(currentState == State.SERVING_REQUEST){
+				currentState = State.WAITING_BY_NECESSITY_WHILE_SERVING;
+			}
+			else{
+				currentState = State.WAITING_BY_NECESSITY_WHILE_ACTIVE;
 			}
 			break;
-		case WAITING_BY_NECESSITY_WHILE_SERVING:
-			if(newState==State.SERVING_REQUEST){
-				this.currentState = newState;
-				setChanged();
-				notifyObservers(newState);
+		case RECEIVED_FUTURE_RESULT:
+			if(currentState == State.WAITING_BY_NECESSITY_WHILE_SERVING){
+				currentState = State.SERVING_REQUEST;
+			}
+			else{
+				currentState = State.ACTIVE;
 			}
 			break;
 		default:
-			this.currentState = newState;
-		setChanged();
-		notifyObservers(newState);
-		break;
+			currentState = newState;
+			break;
 		}
+		setChanged();
+		notifyObservers(this.currentState);
 	}
 
 	/**

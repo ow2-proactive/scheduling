@@ -225,24 +225,25 @@ public class AOFigure extends AbstractFigure{
 		case SERVING_REQUEST:
 			this.backgroundColor = AOFigure.COLOR_WHEN_SERVING_REQUEST;
 			break;
-			// waiting by necessity
+		// waiting by necessity
+		case WAITING_BY_NECESSITY:
 		case WAITING_BY_NECESSITY_WHILE_ACTIVE:
 		case WAITING_BY_NECESSITY_WHILE_SERVING:
 			this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY;
 			break;
-			// waiting for request
+		// waiting for request
 		case WAITING_FOR_REQUEST:
 			this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST;
 			break;	
-			// active
+		// active
 		case ACTIVE:
 			this.backgroundColor = AOFigure.COLOR_WHEN_ACTIVE;
 			break;
-			// not responding
+		// not responding
 		case NOT_RESPONDING:
 			this.backgroundColor = AOFigure.COLOR_WHEN_NOT_RESPONDING;
 			break;
-			// migrate
+		// migrate
 		case MIGRATING:
 			this.backgroundColor = AOFigure.COLOR_WHEN_MIGRATING;
 			if(mouseListener!=null){

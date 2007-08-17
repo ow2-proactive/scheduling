@@ -141,6 +141,16 @@ public class ActiveObjectListener implements NotificationListener{
 			else if(type.equals(NotificationType.migrationFinished)){
 				System.out.println("...............................Migration finished : "+ao.getName());
 			}
+			
+			// --- FuturEvent -------------------
+			else if(type.equals(NotificationType.waitByNecessity)){
+				System.out.println("...............................Wait By Necessity : "+ao.getName());
+				ao.setState(State.WAITING_BY_NECESSITY);
+			}
+			else if(type.equals(NotificationType.receivedFutureResult)){
+				System.out.println("...............................Received Future Result : "+ao.getName());
+				ao.setState(State.RECEIVED_FUTURE_RESULT);
+			}			
 			else		
 				System.out.println(ao.getName()+" => "+type);
 		}		

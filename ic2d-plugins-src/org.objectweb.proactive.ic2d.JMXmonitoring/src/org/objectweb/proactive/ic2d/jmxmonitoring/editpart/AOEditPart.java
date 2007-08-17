@@ -126,7 +126,12 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 					/*this.figuresToUpdate.add(getGlobalPanel());*/addFigureToUpdtate(getGlobalPanel());
 				}
 				else{
-					getCastedFigure().setState(state);
+					getViewer().getControl().getDisplay().syncExec(new Runnable(){
+						public void run(){
+							getCastedFigure().setState(state);
+							getCastedFigure().refresh();
+						}
+					});
 					/*this.figuresToUpdate.add(getCastedFigure());*/addFigureToUpdtate(getCastedFigure());
 				}
 				/*Display.getDefault().asyncExec(new Runnable() {
