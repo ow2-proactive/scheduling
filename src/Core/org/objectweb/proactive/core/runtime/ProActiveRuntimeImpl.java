@@ -141,11 +141,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     static {
         try {
-            //            if (ProActiveConfiguration.getInstance().isForwarder()) {
-            //                proActiveRuntime = new ProActiveRuntimeForwarderImpl();
-            //            } else {
             proActiveRuntime = new ProActiveRuntimeImpl();
-            //            }
 
             // JMX
             String mbeanProperty = ProActiveConfiguration.getInstance()
@@ -182,7 +178,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     // map proActiveRuntime registered on this VM and their names
     private java.util.Hashtable<String, ProActiveRuntime> proActiveRuntimeMap;
-    private java.util.Hashtable proActiveRuntimeForwarderMap;
 
     // synchronized set of URL to runtimes in which we are registered
     private java.util.Set<String> runtimeAcquaintancesURL;
@@ -202,7 +197,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         try {
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
-            this.proActiveRuntimeForwarderMap = new java.util.Hashtable();
             this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet<String>());
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
@@ -1330,36 +1324,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
         return runtimeSecurityManager.getCertificateEncoded();
-    }
-
-    public ExternalProcess getProcessToDeploy(
-        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
-        String padURL) throws ProActiveException {
-        ProActiveDescriptorInternal pad = this.descriptorMap.get(padURL);
-
-        if (pad == null) {
-            logger.info("Cannot find descriptor, " + padURL);
-
-            return null;
-        }
-
-        // ProActiveEvent
-        notifyListeners(this,
-            RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED,
-            proActiveRuntimeDist, creatorID, null, vmName);
-        // END ProActiveEvent
-
-        // JMX Notification
-        if (getMBean() != null) {
-            RuntimeNotificationData notificationData = new RuntimeNotificationData(creatorID,
-                    proActiveRuntimeDist.getURL(), null, vmName);
-            getMBean()
-                .sendNotification(NotificationType.forwarderRuntimeRegistered,
-                notificationData);
-        }
-
-        // END JMX Notification
-        return pad.getHierarchicalProcess(vmName);
     }
 
     public String getVNName(String nodename) throws ProActiveException {

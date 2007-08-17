@@ -327,20 +327,6 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws ProActiveException;
 
-    /**
-     * Ask proActiveRuntimeDist for the process with given ids: padURL, creatorID, vmName.
-     * Used for hierarchical deployment.
-     * @param proActiveRuntimeDist
-     * @param creatorID
-     * @param vmName
-     * @param padURL
-     * @return the process with given ids: padURL, creatorID, vmName
-     * @throws ProActiveException
-     */
-    public ExternalProcess getProcessToDeploy(
-        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
-        String padURL) throws ProActiveException;
-
     // SECURITY
     public String getVNName(String Nodename) throws ProActiveException;
 

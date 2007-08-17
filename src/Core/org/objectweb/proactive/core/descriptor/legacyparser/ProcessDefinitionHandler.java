@@ -38,7 +38,6 @@ import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
-import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.IndependentListProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcess.PriorityLevel;
@@ -55,7 +54,6 @@ import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
-import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
@@ -105,8 +103,6 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             new GLiteProcessHandler(proActiveDescriptor));
         this.addHandler(OARGRID_PROCESS_TAG,
             new OARGRIDProcessHandler(proActiveDescriptor));
-        this.addHandler(HIERARCHICAL_PROCESS_TAG,
-            new HierarchicalProcessHandler(proActiveDescriptor));
         this.addHandler(MPI_PROCESS_TAG,
             new MPIProcessHandler(proActiveDescriptor));
         this.addHandler(DEPENDENT_PROCESS_SEQUENCE_TAG,
@@ -848,46 +844,6 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
             }
-        }
-    }
-
-    protected class HierarchicalProcessHandler extends ProcessHandler {
-        public HierarchicalProcessHandler(
-            ProActiveDescriptorInternal proActiveDescriptor) {
-            super(proActiveDescriptor);
-            addHandler(HIERARCHICIAL_REFERENCE_TAG,
-                new ProcessReferenceHandler());
-        }
-
-        @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws SAXException {
-            if (name.equals(HIERARCHICIAL_REFERENCE_TAG)) {
-                if (!(targetProcess instanceof HierarchicalProcess)) {
-                    throw new org.xml.sax.SAXException(
-                        "found a hierarchical reference inside a non hierarchical process");
-                }
-
-                HierarchicalProcess hp = (HierarchicalProcess) targetProcess;
-                Object result = activeHandler.getResultObject();
-                proActiveDescriptor.registerHierarchicalProcess(hp,
-                    (String) result);
-            } else {
-                super.notifyEndActiveHandler(name, activeHandler);
-            }
-        }
-
-        @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
-            String hostname = attributes.getValue("hostname");
-            String internal_ip = attributes.getValue("internal_ip");
-
-            if (checkNonEmpty(internal_ip) && checkNonEmpty(hostname)) {
-                HostsInfos.setSecondaryName(internal_ip, hostname);
-            }
-
-            super.startContextElement(name, attributes);
         }
     }
 

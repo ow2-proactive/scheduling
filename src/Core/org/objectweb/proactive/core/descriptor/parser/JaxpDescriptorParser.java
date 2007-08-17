@@ -42,7 +42,6 @@ import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
-import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcess.PriorityLevel;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
@@ -58,7 +57,6 @@ import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
-import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -647,8 +645,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new GliteProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(OARGRID_PROCESS_TAG)) {
                 new OARGridProcessExtractor(node, infrastructureContext);
-            } else if (processType.equals(HIERARCHICAL_PROCESS_TAG)) {
-                new HierarchicalProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(MPI_PROCESS_TAG)) {
                 new MPIProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(DEPENDENT_PROCESS_SEQUENCE_TAG)) {
@@ -1719,30 +1715,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         oarGridSubProcess.setScriptLocation(path);
                     }
                 }
-            }
-        }
-    }
-
-    protected class HierarchicalProcessExtractor extends ProcessExtractor {
-        public HierarchicalProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
-            super(node, context);
-            String hostName = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("hostname"));
-            String internalIP = getNodeExpandedValue(node.getAttributes()
-                                                         .getNamedItem("internal_ip"));
-
-            if ((hostName != null) && (internalIP != null)) {
-                HostsInfos.setSecondaryName(hostName, internalIP);
-            }
-
-            NodeList subProcessesRefIds = (NodeList) xpath.evaluate(XMLNS_PREFIX +
-                    HIERARCHICIAL_REFERENCE_TAG + "/@refid", node,
-                    XPathConstants.NODESET);
-            for (int i = 0; i < subProcessesRefIds.getLength(); ++i) {
-                Node refIdNode = subProcessesRefIds.item(i);
-                proActiveDescriptor.registerHierarchicalProcess((HierarchicalProcess) targetProcess,
-                    getNodeExpandedValue(refIdNode));
             }
         }
     }
