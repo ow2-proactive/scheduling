@@ -20,6 +20,7 @@ import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 public class NodeObject extends AbstractData{
 
 	private RuntimeObject parent;
+	private VNObject vnParent;
 	private String url;
 
 	public NodeObject(RuntimeObject parent, String url, ObjectName objectName){
@@ -42,10 +43,31 @@ public class NodeObject extends AbstractData{
 	public RuntimeObject getParent() {
 		return this.parent;
 	}
+	
+	/**
+	 * Sets the virtual node.
+	 * @param vn the virtual node.
+	 */
+	public void setVirtualNode(VNObject vn){
+		this.vnParent = vn;
+	}
+	
+	/**
+	 * Returns the virtual node.
+	 * @return the virtual node.
+	 */
+	public VNObject getVirtualNode(){
+		return this.vnParent;
+	}
+	
+	@Override
+	public void destroy(){
+		this.vnParent.removeChild(this);
+		super.destroy();
+	}
 
 	@Override
 	public void explore() {
-		//System.out.println(this);
 		findActiveObjects();
 	}
 
@@ -124,6 +146,7 @@ public class NodeObject extends AbstractData{
 		return UrlBuilder.getNameFromUrl(getUrl());
 	}
 
+	@Override
 	public String toString(){
 		return "Node: "+getUrl();
 	}
@@ -139,5 +162,69 @@ public class NodeObject extends AbstractData{
 			JMXNotificationManager.getInstance().subscribe(oname, child.getListener(), this.getHostUrlServer(), this.getServerName());
 			//subscribe(new NotificationSource(oname,getUrl()), child.getListener());
 		}
+	}
+
+	/**
+	 * Returns the virtual node name.
+	 * @return the virtual node name.
+	 */
+	public String getVirtualNodeName() {
+		try {
+			return (String) getAttribute("VirtualNodeName");
+		} catch (AttributeNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstanceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MBeanException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ReflectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns the Job Id.
+	 * @return the Job Id.
+	 */
+	public String getJobId() {
+		try {
+			return (String) getAttribute("JobId");
+		} catch (AttributeNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstanceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MBeanException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ReflectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Used to highlight this node, in a virtual node.
+	 * @param highlighted true, or false
+	 */
+	public void setHighlight(boolean highlighted) {
+		this.setChanged();
+		if (highlighted)
+			this.notifyObservers(State.HIGHLIGHTED);
+		else
+			this.notifyObservers(State.NOT_HIGHLIGHTED);
 	}
 }

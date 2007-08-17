@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.NotificationListener;
@@ -246,6 +247,14 @@ public abstract class AbstractData extends Observable {
 	 */
 	public Object invokeAsynchronous(String operationName, Object[] params, String[] signature){
 		return getConnection().invokeAsynchronous(getObjectName(), operationName, params, signature);
+	}
+	
+	public Object getAttribute(String attribute) throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, IOException{
+		return getConnection().getAttribute(getObjectName(), attribute);
+	}
+	
+	public Object getAttributeAsynchronous(String attribute){
+		return getConnection().getAttributeAsynchronous(getObjectName(), attribute);
 	}
 	
 	protected String getHostUrlServer(){

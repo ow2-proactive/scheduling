@@ -80,6 +80,7 @@ public class WorldObject extends AbstractData{
 		super(null);
 		this.activeObjects = new ConcurrentHashMap<UniqueID, ActiveObject>();
 		this.migrations = new ConcurrentHashMap<UniqueID, ActiveObject>();
+		this.vnChildren = new ConcurrentHashMap<String, VNObject>();
 		
 		// Record the model
 		this.name = ModelRecorder.getInstance().addModel(this);
@@ -300,14 +301,30 @@ public class WorldObject extends AbstractData{
 	}
 	
 	/**
+	 * Add a virtual node to this object
+	 * @param vn
+	 */
+	protected void addVirtualNode(VNObject vn) {
+		vnChildren.put(vn.getKey(), vn);
+		setChanged();
+		Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
+		data.put(ADD_VN_MESSAGE, vn);
+		notifyObservers(data);
+	}
+	
+	/**
 	 * Remove a virtual node to this object
 	 * @param vn
 	 */
-	protected void removeVNChild(VNObject vn){
+	protected void removeVirtualNode(VNObject vn){
 		vnChildren.remove(vn.getKey());
 		setChanged();
 		Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
 		data.put(REMOVE_VN_MESSAGE, vn);
 		notifyObservers(data);
+	}
+
+	public VNObject getVirtualNode(String virtualNodeName) {
+		return vnChildren.get(virtualNodeName);
 	}
 }

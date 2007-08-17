@@ -122,8 +122,7 @@ public class VirtualNodesGroup implements Observer {
 			List<AbstractData> nodes = vn.getMonitoredChildrenAsList();
 			for(int i=0, size=nodes.size() ; i<size ; i++) {
 				NodeObject node = (NodeObject)nodes.get(i);
-				// TODO A faire
-				/*node.setHighlight(((Button)e.widget).getSelection());*/
+				node.setHighlight(((Button)e.widget).getSelection());
 			}
 		}
 

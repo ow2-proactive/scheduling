@@ -58,9 +58,6 @@ public class VNObject extends AbstractData {
 		this.parent = world;
 		this.name = name;
 		this.jobID = jobID;
-		
-		//world.putVNChild(this);
-		world.addChild(this);
 	}
 
 	
@@ -98,7 +95,7 @@ public class VNObject extends AbstractData {
 	public void removeChild(AbstractData child) {
 		super.removeChild(child);
 		if(monitoredChildren.isEmpty()){
-			parent.removeVNChild(this);
+			parent.removeVirtualNode(this);
 		}
 	}
 

@@ -172,7 +172,18 @@ public class RuntimeObject extends AbstractData{
         	String nameInUrl = UrlBuilder.getNameFromUrl(url);
         	String protocolInUrl = UrlBuilder.getProtocol(url);
         	int portInUrl = UrlBuilder.getPortFromUrl(url);
-			addChild(new NodeObject(this,UrlBuilder.buildUrl(hostInUrl, nameInUrl, protocolInUrl, portInUrl), name));
+        	NodeObject child = new NodeObject(this,UrlBuilder.buildUrl(hostInUrl, nameInUrl, protocolInUrl, portInUrl), name);
+        	String virtualNodeName = child.getVirtualNodeName();
+        	VNObject vn = getWorldObject().getVirtualNode(virtualNodeName);
+        	// this virtual node is not monitored
+        	if(vn==null){
+        		vn = new VNObject(virtualNodeName, child.getJobId(), getWorldObject());
+        		getWorldObject().addVirtualNode(vn);
+        	}
+        	// Set to the node the parent virtual node.
+        	child.setVirtualNode(vn);
+        	
+			addChild(child);
 		}
 	}
 	
