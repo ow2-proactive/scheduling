@@ -61,7 +61,7 @@ public class UpdateCopyrightAndVersion {
         " * USA\n" + 
 	" *\n" +
         " *  Initial developer(s):               The ProActive Team\n" +
-        " *                        http://www.inria.fr/oasis/ProActive/contacts.html\n" +
+        " *                        http://proactive.inria.fr/team_members.htm\n" +
         " *  Contributor(s):\n" + 
         " *\n" +
         " * ################################################################\n" +
@@ -142,9 +142,10 @@ public class UpdateCopyrightAndVersion {
         if (packageStart == -1) {
             return;
         }
-        String copyright = program.substring(0, packageStart).toLowerCase();
-        if (copyright.contains("copyright") &&
-                !copyright.contains("proactive")) {
+        //String copyright = program.substring(0, packageStart).toLowerCase();
+        if (copyright.contains("Copyright") &&
+                !copyright.contains("ProActive")) {
+        	System.out.println("Skipping " + file + ", other copyright exists.");
             return;
         }
         System.out.println("Processing " + file);
@@ -177,11 +178,10 @@ public class UpdateCopyrightAndVersion {
             java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
                         file));
 
-            System.out.println("Replacing patterns in " + file);
-
             String currentText = filetext;
             filetext = null;
             int indexoffirstword = -1;
+            boolean anyReplacement = false;
 
             do {
                 indexoffirstword = -1;
@@ -198,6 +198,7 @@ public class UpdateCopyrightAndVersion {
                     	// we save the pattern which happens first
                         indexoffirstword = i;
                         lowestindex = indexfound;
+                        anyReplacement = true;
                     }
                 }
 
@@ -222,6 +223,9 @@ public class UpdateCopyrightAndVersion {
             } while (indexoffirstword != -1);
 
             out.close();
+            if (anyReplacement) {
+            System.out.println("Patterns replaced in " + file);
+            }
         }
     }
 
