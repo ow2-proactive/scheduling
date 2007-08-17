@@ -584,7 +584,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             VirtualMachine currentVM = proActiveDescriptor.createVirtualMachine(jvmName);
             String ts = getNodeExpandedValue(t);
             if (ts != null) {
-                currentVM.setNbNodes(ts);
+                currentVM.setNbNodes(new Integer(ts));
             }
             proActiveDescriptor.registerProcess(currentVM,
                 getNodeExpandedValue(node.getAttributes().getNamedItem("refid")));
@@ -601,7 +601,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             VirtualMachine currentVM = proActiveDescriptor.createVirtualMachine(jvmName);
             String ts = getNodeExpandedValue(t);
             if (ts != null) {
-                currentVM.setNbNodes(ts);
+                currentVM.setNbNodes(new Integer(ts));
             }
             proActiveDescriptor.registerService(currentVM,
                 getNodeExpandedValue(node.getAttributes().getNamedItem("refid")));

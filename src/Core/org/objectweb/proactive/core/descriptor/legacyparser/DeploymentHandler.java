@@ -312,7 +312,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
 
             try {
                 if (checkNonEmpty(nodeNumber)) {
-                    currentVM.setNbNodes(nodeNumber);
+                    currentVM.setNbNodes(new Integer(nodeNumber));
                 }
             } catch (java.io.IOException e) {
                 throw new org.xml.sax.SAXException(e);

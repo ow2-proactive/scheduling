@@ -1454,12 +1454,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         //jobID = ProActive.getJobId();
         String protocolId = "";
-        int nodeNumber = new Integer(vm.getNbNodesOnCreatedVMs()).intValue();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("asked for " + nodeNumber + " nodes");
-        }
-
         protocolId = process.getProcessId();
 
         int cnt = process.getNodeNumber();
@@ -1467,7 +1461,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (cnt == UniversalProcess.UNKNOWN_NODE_NUMBER) {
             this.waitForTimeout = true;
         } else {
-            increaseNumberOfNodes(cnt * nodeNumber);
+            increaseNumberOfNodes(cnt * vm.getNbNodesOnCreatedVMs());
         }
 
         //When the virtualNode will be activated, it has to launch the process
@@ -1507,7 +1501,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
-                nodeNumber + " " + protocolId + " " + vm.getName());
+                protocolId + " " + vm.getName());
 
             // FAULT TOLERANCE settings
             if (this.ftService != null) {
