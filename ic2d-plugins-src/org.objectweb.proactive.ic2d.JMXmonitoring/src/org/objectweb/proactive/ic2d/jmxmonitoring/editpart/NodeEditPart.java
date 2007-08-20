@@ -45,6 +45,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.NodeListener;
 public class NodeEditPart extends AbstractMonitoringEditPart{
 
 	private NodeObject castedModel;
+	private NodeFigure castedFigure;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -69,6 +70,18 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 		}
 		return castedModel;
 	}
+	
+	/**
+	 * Convert the result of EditPart.getFigure()
+	 * to NodeFigure (the real type of the figure).
+	 * @return the casted figure
+	 */
+	public NodeFigure getCastedFigure(){
+		if(castedFigure==null){
+			castedFigure = (NodeFigure)getFigure();
+		}
+		return castedFigure;
+	}
 
 	/**
 	 * This method is called whenever the observed object is changed.
@@ -85,8 +98,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 					deactivate();
 				}
 				else if(param instanceof State) {
-					//TODO A faire
-					//((NodeFigure)getFigure()).setHighlight(getMonitoringView().getVirtualNodesGroup().getColor(((NodeObject)getModel()).getVNParent()));
+					getCastedFigure().setHighlight(getMonitoringView().getVirtualNodesGroup().getColor(getCastedModel().getVirtualNode()));
 					refresh();
 				}
 				else {

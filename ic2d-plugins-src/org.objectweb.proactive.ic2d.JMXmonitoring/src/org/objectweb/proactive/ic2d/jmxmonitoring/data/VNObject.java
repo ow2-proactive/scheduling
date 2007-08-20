@@ -92,8 +92,15 @@ public class VNObject extends AbstractData {
 	}
 	
 	@Override
+	public void addChild(AbstractData child){
+		if(!monitoredChildren.containsKey(child.getKey())){
+			monitoredChildren.put(child.getKey(), child);
+		}
+	}
+	
+	@Override
 	public void removeChild(AbstractData child) {
-		super.removeChild(child);
+		monitoredChildren.remove(child.getKey());
 		if(monitoredChildren.isEmpty()){
 			parent.removeVirtualNode(this);
 		}

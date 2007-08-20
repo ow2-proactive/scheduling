@@ -76,11 +76,7 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	 * or if its parent isn't an instance of AbstractMonitoringEditPart.
 	 */
 	public MonitoringView getMonitoringView(){
-		EditPart parent = getParent();
-		if(parent == null || !(parent instanceof AbstractMonitoringEditPart))
-			return null;
-		else
-			return ((AbstractMonitoringEditPart) parent).getMonitoringView();
+		return getWorldEditPart().getMonitoringView();
 	}
 	
 	/**

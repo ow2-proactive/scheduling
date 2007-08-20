@@ -182,6 +182,7 @@ public class RuntimeObject extends AbstractData{
         	}
         	// Set to the node the parent virtual node.
         	child.setVirtualNode(vn);
+        	vn.addChild(child);
         	
 			addChild(child);
 		}
