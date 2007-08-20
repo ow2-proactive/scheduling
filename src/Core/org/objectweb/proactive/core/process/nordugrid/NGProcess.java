@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -258,10 +259,10 @@ public class NGProcess extends AbstractExternalProcessDecorator {
 
     private void buildExecutable() {
         File tmp_executableFile;
-        Random random = new Random();
         int index = executable_path.lastIndexOf("/");
         String executable = executable_path.substring(index + 1);
-        this.tmp_executable = "tmp_" + executable + random.nextInt();
+        this.tmp_executable = "tmp_" + executable +
+            ProActiveRandom.nextPosInt();
         String tmp_executable_path = executable_path.replace(executable,
                 tmp_executable);
 

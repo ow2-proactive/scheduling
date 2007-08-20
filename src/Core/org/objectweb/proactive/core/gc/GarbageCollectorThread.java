@@ -33,12 +33,12 @@ package org.objectweb.proactive.core.gc;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 
 
 /**
@@ -53,7 +53,7 @@ public class GarbageCollectorThread implements Runnable {
             /*
              * Avoid the rush of all threads starting at the same time
              */
-            Thread.sleep(new Random().nextInt(GarbageCollector.TTB));
+            Thread.sleep(ProActiveRandom.nextInt(GarbageCollector.TTB));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

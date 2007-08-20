@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -107,8 +108,8 @@ public class NodeFactory {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
-                        Integer.toString(ProActiveRuntimeImpl.getNextInt()),
-                        false, securityManager, "DefaultVN", jobID);
+                        Integer.toString(ProActiveRandom.nextPosInt()), false,
+                        securityManager, "DefaultVN", jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             } catch (AlreadyBoundException e) { //if this exception is risen, we generate an othe random name for the node

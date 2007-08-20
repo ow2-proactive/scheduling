@@ -33,14 +33,13 @@ package org.objectweb.proactive.core.ssh;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
-import java.util.Random;
 import static org.objectweb.proactive.core.ssh.SSH.logger;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 
 import ch.ethz.ssh2.LocalPortForwarder;
 
 
 /**
- * @author mlacage
  *
  * This class represent a SSH Tunnel.
  *
@@ -90,7 +89,7 @@ public class SshTunnel {
             throw e;
         }
 
-        int initialPort = new Random().nextInt(65536 - 1024) + 1024;
+        int initialPort = ProActiveRandom.nextInt(65536 - 1024) + 1024;
 
         for (localPort = (initialPort == 65535) ? 1024 : (initialPort + 1);
                 localPort != initialPort;

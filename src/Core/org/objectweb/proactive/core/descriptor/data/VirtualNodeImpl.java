@@ -82,6 +82,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
@@ -1139,7 +1140,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                                // random node's name and
                                                // try to register it again
                     String nodeName = this.name +
-                        Integer.toString(ProActiveRuntimeImpl.getNextInt());
+                        Integer.toString(ProActiveRandom.nextPosInt());
                     url = buildURL(nodeHost, nodeName, protocol, port);
 
                     // nodes are created from the registered runtime, since
@@ -1272,7 +1273,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             while (registrationAttempts > 0) { //If there is an AlreadyBoundException, we generate an other random node name
                 String nodeName = this.name +
-                    Integer.toString(ProActiveRuntimeImpl.getNextInt());
+                    Integer.toString(ProActiveRandom.nextPosInt());
 
                 try {
                     url = defaultRuntime.createLocalNode(nodeName, false,

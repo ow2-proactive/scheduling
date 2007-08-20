@@ -35,6 +35,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -45,7 +46,6 @@ public class ClassServer implements Runnable {
     public static final int DEFAULT_SERVER_BASE_PORT = 2010;
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 2;
     protected static int MAX_RETRY = 500;
-    private static java.util.Random random = new java.util.Random();
     protected static int port;
     private boolean active = true;
 
@@ -236,7 +236,7 @@ public class ClassServer implements Runnable {
                 server = new java.net.ServerSocket(basePortNumber);
                 return basePortNumber;
             } catch (java.io.IOException e) {
-                basePortNumber += random.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
+                basePortNumber += ProActiveRandom.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
             }
         }
 
