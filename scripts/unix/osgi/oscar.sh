@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#
+# 
 # The following variable should be automatically
 # assigned during install, if not, edit it to reflect
 # your Java installation.
