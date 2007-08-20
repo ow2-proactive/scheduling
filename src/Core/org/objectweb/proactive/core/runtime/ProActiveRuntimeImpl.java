@@ -173,6 +173,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     //map descriptor and their url
     private java.util.Hashtable<String, ProActiveDescriptorInternal> descriptorMap;
 
+    // map proActiveRuntime registered on this VM and their names
+    private java.util.Hashtable<String, ProActiveRuntime> proActiveRuntimeMap;
+
     // synchronized set of URL to runtimes in which we are registered
     private java.util.Set<String> runtimeAcquaintancesURL;
     private ProActiveRuntime parentRuntime;
@@ -190,6 +193,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     protected ProActiveRuntimeImpl() throws UnknownProtocolException {
         try {
             this.vmInformation = new VMInformationImpl();
+            this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
             this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet<String>());
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
@@ -534,6 +538,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //System.out.println("register in Impl");
         //System.out.println("thread"+Thread.currentThread().getName());
         //System.out.println(vmInformation.getVMID().toString());
+        this.proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
 
         // ProActiveEvent
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
@@ -558,6 +563,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName) {
+        this.proActiveRuntimeMap.remove(proActiveRuntimeUrl);
+
         // ProActiveEvent
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_UNREGISTERED,
             proActiveRuntimeDist, creatorID, creationProtocol, vmName);
@@ -573,6 +580,33 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         // END JMX Notification
+    }
+
+    /**
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveRuntimes()
+     */
+    public ProActiveRuntime[] getProActiveRuntimes() {
+        int i = 0;
+        ProActiveRuntime[] runtimeArray;
+
+        synchronized (this.proActiveRuntimeMap) {
+            runtimeArray = new ProActiveRuntime[this.proActiveRuntimeMap.size()];
+
+            for (java.util.Enumeration<ProActiveRuntime> e = this.proActiveRuntimeMap.elements();
+                    e.hasMoreElements();) {
+                runtimeArray[i] = e.nextElement();
+                i++;
+            }
+        }
+
+        return runtimeArray;
+    }
+
+    /**
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveRuntime(String)
+     */
+    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) {
+        return this.proActiveRuntimeMap.get(proActiveRuntimeName);
     }
 
     /**
