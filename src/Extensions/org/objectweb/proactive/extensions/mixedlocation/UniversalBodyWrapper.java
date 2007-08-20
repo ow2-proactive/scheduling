@@ -135,6 +135,10 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.getRemoteAdapter();
     }
 
+    public String getReifiedClassName() {
+        return this.wrappedBody.getReifiedClassName();
+    }
+
     public void enableAC() throws java.io.IOException {
         this.wrappedBody.enableAC();
     }

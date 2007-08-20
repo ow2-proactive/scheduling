@@ -33,7 +33,10 @@ package org.objectweb.proactive.core.body;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.mop.MOPException;
 
 
 /**
@@ -73,6 +76,26 @@ public class Context implements Serializable {
      */
     public Request getCurrentRequest() {
         return currentRequest;
+    }
+
+    /**
+     * Returns a stub on the active object that sent the currently served request.
+     * @return a stub on the active object that sent the currently served request.
+     */
+    public Object getStubOnCaller() {
+        if (this.currentRequest != null) {
+            try {
+                UniversalBody caller = currentRequest.getSender();
+                return ProActive.createStubObject(caller.getReifiedClassName(),
+                    caller);
+            } catch (MOPException e) {
+                throw new ProActiveRuntimeException(
+                    "Cannot create stub on caller : " + e);
+            }
+        } else {
+            throw new ProActiveRuntimeException(
+                "No request is currently served by " + this.body);
+        }
     }
 
     /**

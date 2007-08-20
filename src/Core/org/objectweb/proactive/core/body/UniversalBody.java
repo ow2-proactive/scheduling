@@ -125,6 +125,12 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
     public UniversalBody getRemoteAdapter();
 
     /**
+     * Returns the name of the class of the reified object
+     * @return the name of the class of the reified object
+     */
+    public String getReifiedClassName();
+
+    /**
      * Enables automatic continuation mechanism for this body
      * @exception java.io.IOException if a pb occurs during this method call
      */

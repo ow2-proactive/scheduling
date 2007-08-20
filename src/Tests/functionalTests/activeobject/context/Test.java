@@ -84,8 +84,8 @@ public class Test extends FunctionalTest {
         A a1 = (A) ProActive.newActive(A.class.getName(), null, this.node1);
         A a2 = (A) ProActive.newActive(A.class.getName(), null, this.node2);
 
-        a1.init();
-        a2.init();
+        a1.init("A1");
+        a2.init("A2");
 
         // test between two active objects
         BooleanWrapper res1 = a1.test(a2);
@@ -97,5 +97,12 @@ public class Test extends FunctionalTest {
         BooleanWrapper res22 = a1.immediateService(myId);
         assertTrue(res21.booleanValue());
         assertTrue(res22.booleanValue());
+
+        // test stub on caller
+        a1.initTestStubOnCaller(a2);
+        assertTrue(a2.getCallerName().equals(a1.getName()));
+
+        // test exception for halfbody caller
+        assertTrue(a1.testHalfBodyCaller().booleanValue());
     }
 }

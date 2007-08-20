@@ -34,14 +34,14 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
 /**
- * Exception thrown by inactive objects when receiving a message.
+ * Exception thrown by non active objects (e.g. main threads) when receiving a message.
  * @author cdelbe
  * @since 3.2.1
  */
-public class BodyTerminatedException extends ProActiveRuntimeException {
-    private static final String TERMINATED_BODY_EXCEPTION_MESSAGE = "The body has been Terminated";
+public class HalfBodyException extends ProActiveRuntimeException {
+    private static final String HALF_BODY_EXCEPTION_MESSAGE = "This method is not implemented in class HalfBody";
 
-    public BodyTerminatedException() {
-        super(TERMINATED_BODY_EXCEPTION_MESSAGE);
+    public HalfBodyException() {
+        super(HALF_BODY_EXCEPTION_MESSAGE);
     }
 }

@@ -88,6 +88,13 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return this;
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getReifiedClassName()
+     */
+    public String getReifiedClassName() {
+        return this.target.getReifiedClassName();
+    }
+
     @Override
     public int hashCode() {
         return target.hashCode();

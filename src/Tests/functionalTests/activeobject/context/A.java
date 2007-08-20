@@ -31,24 +31,29 @@
 package functionalTests.activeobject.context;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.Context;
+import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class A implements java.io.Serializable {
     private UniqueID myID;
+    private StringWrapper name;
+    private A stubOnCaller;
 
-    public boolean init() {
+    public boolean init(String name) {
         this.myID = ProActive.getBodyOnThis().getID();
         ProActive.setImmediateService("immediateService");
+        this.name = new StringWrapper(name);
         return (this.myID != null);
     }
 
     public BooleanWrapper standardService(UniqueID caller) {
         Context current = ProActive.getContext();
-        System.out.println("" + current);
         Request r = current.getCurrentRequest();
         return new BooleanWrapper((r != null) &&
             (current.getBody().getID().equals(myID)) &&
@@ -58,7 +63,6 @@ public class A implements java.io.Serializable {
 
     public BooleanWrapper immediateService(UniqueID caller) {
         Context current = ProActive.getContext();
-        System.out.println("" + current);
         Request r = current.getCurrentRequest();
         return new BooleanWrapper((r != null) &&
             (current.getBody().getID().equals(myID)) &&
@@ -69,5 +73,35 @@ public class A implements java.io.Serializable {
     public BooleanWrapper test(A a) {
         return new BooleanWrapper((a.standardService(this.myID).booleanValue()) &&
             (a.immediateService(this.myID)).booleanValue());
+    }
+
+    // test stub on caller
+    public int initTestStubOnCaller(A a) {
+        a.setStubOnCaller();
+        return 0;
+    }
+
+    public void setStubOnCaller() {
+        this.stubOnCaller = (A) ProActive.getContext().getStubOnCaller();
+    }
+
+    public StringWrapper getCallerName() {
+        return this.stubOnCaller.getName();
+    }
+
+    public StringWrapper getName() {
+        return this.name;
+    }
+
+    public BooleanWrapper testHalfBodyCaller() {
+        Context c = ProActive.getContext();
+        try {
+            // caller is a halfbody
+            Object o = c.getStubOnCaller();
+            o.toString();
+        } catch (HalfBodyException e) {
+            return new BooleanWrapper(true);
+        }
+        return new BooleanWrapper(false);
     }
 }

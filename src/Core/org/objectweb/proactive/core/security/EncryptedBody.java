@@ -425,6 +425,10 @@ public class EncryptedBody implements Body, Serializable {
         return null;
     }
 
+    public String getReifiedClassName() {
+        return null;
+    }
+
     public void addNFEListener(NFEListener listener) {
     }
 

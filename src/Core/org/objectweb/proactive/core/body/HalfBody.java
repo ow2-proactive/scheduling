@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
@@ -61,7 +62,6 @@ public class HalfBody extends AbstractBody {
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
-    private static final String HALF_BODY_EXCEPTION_MESSAGE = "This method is not implemented in class HalfBody.";
     private static final String NAME = "Other thread";
 
     /** The component in charge of receiving reply */
@@ -177,25 +177,25 @@ public class HalfBody extends AbstractBody {
     }
 
     public void setImmediateService(String methodName) {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     public void removeImmediateService(String methodName) {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     public void setImmediateService(String methodName, Class[] parametersTypes) {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     public void removeImmediateService(String methodName,
         Class[] parametersTypes) {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     @Override
     public boolean isInImmediateService() {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     /**
@@ -211,7 +211,7 @@ public class HalfBody extends AbstractBody {
     }
 
     public void updateNodeURL(String newNodeURL) {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     //
@@ -244,15 +244,15 @@ public class HalfBody extends AbstractBody {
         }
 
         public BlockingRequestQueue getRequestQueue() {
-            throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+            throw new HalfBodyException();
         }
 
         public RequestQueue getHighPriorityRequestQueue() {
-            throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+            throw new HalfBodyException();
         }
 
         public Object getReifiedObject() {
-            throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+            throw new HalfBodyException();
         }
 
         public String getName() {
@@ -260,7 +260,7 @@ public class HalfBody extends AbstractBody {
         }
 
         public void serve(Request request) {
-            throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+            throw new HalfBodyException();
         }
 
         public void sendRequest(MethodCall methodCall, Future future,
@@ -334,11 +334,11 @@ public class HalfBody extends AbstractBody {
     }
 
     public boolean checkMethod(String methodName, Class[] parametersTypes) {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     public boolean checkMethod(String methodName) {
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+        throw new HalfBodyException();
     }
 
     //    @Override
