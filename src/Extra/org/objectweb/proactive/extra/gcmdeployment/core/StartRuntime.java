@@ -182,11 +182,11 @@ public class StartRuntime {
                 parentRuntime = RuntimeFactory.getRuntime(parentURL,
                         UrlBuilder.getProtocol(parentURL));
 
-                localRuntime = parentRuntime.register(localRuntime,
-                        localRuntime.getURL(), creationProtocolId,
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
-                        this.vmName);
+                parentRuntime.register(localRuntime, localRuntime.getURL(),
+                    creationProtocolId,
+                    ProActiveConfiguration.getInstance()
+                                          .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
+                    /*this.vmName*/ "MKrisIlEstSympa");
 
                 ProActiveRuntimeImpl.getProActiveRuntime()
                                     .setParent(parentRuntime);
