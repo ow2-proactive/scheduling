@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	elementFormDefault="qualified">
+
+	<complexType name="variableType">
+		<attribute name="name">
+			<simpleType>
+				<restriction base="string"></restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="value">
+			<simpleType>
+				<restriction base="string"></restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+
+	<element name="abstractVariable" abstract="true"
+		type="pa:variableType">
+	</element>
+	<element name="descriptorVariable"
+		substitutionGroup="pa:abstractVariable" type="pa:variableType">
+	</element>
+	<element name="javaPropertyVariable"
+		substitutionGroup="pa:abstractVariable" type="pa:variableType">
+	</element>
+
+	<complexType name="abstractGCMType" abstract="true"></complexType>
+
+	<complexType name="environmentType">
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element ref="pa:abstractVariable"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<simpleType name="osType">
+		<restriction base="string">
+			<enumeration value="unix"></enumeration>
+			<enumeration value="windows"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="idType">
+		<restriction base="string">
+			<pattern value="[a-zA-Z0-9_]+" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="hostnameType">
+		<restriction base="string">
+			<!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
+			<!-- 			<pattern value="([a-z0-9.]*($\{[a-zA-Z0-9]+\})?)+" /> -->
+			<pattern value="[a-z0-9.${}A-Z]+" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="usernameType">
+		<restriction base="string">
+			<!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
+			<!--  			<pattern value="([a-z0-9]*($\{[a-zA-Z0-9]+\})?)+" /> -->
+			<pattern value="[a-z0-9${}A-Z]+" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="pathElementType">
+		<annotation>
+			<documentation>
+				A path to a jar or a directory
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<complexType name="shType" abstract="true">
+		<sequence>
+			<element name="environment" type="pa:environmentType"
+				maxOccurs="1" minOccurs="0">
+			</element>
+		</sequence>
+		<attribute name="id" type="pa:idType" use="required" />
+		<attribute name="domain" type="pa:hostnameType" />
+		<attribute name="username" type="pa:usernameType" />
+		<attribute name="commandPath" type="pa:pathElementType" />
+	</complexType>
+
+	<complexType name="groupTypeSSH">
+		<complexContent>
+			<extension base="pa:shType">
+				<sequence>
+					<element name="privateKey" type="pa:pathElementType"
+						minOccurs="0">
+					</element>
+				</sequence>
+				<attribute name="commandOptions" type="string"></attribute>
+				<attribute name="hostList" type="string"
+					use="required">
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="rshType">
+		<complexContent>
+			<extension base="pa:shType">
+				<attribute name="hostname" type="pa:hostnameType" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="abstractShElement" type="pa:shType"></element>
+	<element name="sshGroup" substitutionGroup="pa:abstractShElement"
+		type="pa:groupTypeSSH">
+	</element>
+	<element name="rsh" substitutionGroup="pa:abstractShElement"
+		type="pa:rshType">
+	</element>
+
+	<complexType name="peerSetType"></complexType>
+	<complexType name="abstractAcquisitionType" abstract="true"></complexType>
+
+	<complexType name="p2pType">
+		<complexContent>
+			<extension base="pa:abstractAcquisitionType">
+				<sequence>
+					<element name="peerSet" type="pa:peerSetType"></element>
+				</sequence>
+				<attribute name="nodesAsked" type="positiveInteger"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="lookupType">
+		<complexContent>
+			<extension base="pa:abstractAcquisitionType">
+				<attribute name="type">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="RMI"></enumeration>
+							<enumeration value="HTTP"></enumeration>
+							<enumeration value="IBIS"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="hostlist" type="string"></attribute>
+				<attribute name="port" type="positiveInteger"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="abstractAcquisitionElement"
+		type="pa:abstractAcquisitionType">
+	</element>
+	<element name="lookup" type="pa:lookupType"
+		substitutionGroup="pa:abstractAcquisitionElement">
+	</element>
+	<element name="p2p" type="pa:p2pType"
+		substitutionGroup="pa:abstractAcquisitionElement">
+	</element>
+
+	<complexType name="acquisitionType">
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element ref="pa:abstractAcquisitionElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<simpleType name="refType">
+		<restriction base="string">
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<complexType name="abstractResourceType"></complexType>
+
+	<complexType name="groupRefType">
+		<complexContent>
+			<extension base="pa:abstractResourceType">
+				<sequence>
+					<element name="host" type="pa:hostRefType"></element>
+				</sequence>
+				<attribute name="refid" type="pa:refType"
+					use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="bridgeRefType">
+		<complexContent>
+			<extension base="pa:abstractResourceType">
+				<!-- FIXME: At least one of these elements mustbe present - but this can't be done
+					because there must be at most one host, so either we turn this into a sequence of elements
+					of an abstract common type, and then we have to check in the parser that there is at most one host,
+					or we keep it as it is and check in the parser that at least one element is present -->
+				<sequence>
+					<element name="group" type="pa:groupRefType"
+						minOccurs="0" maxOccurs="unbounded">
+					</element>
+					<element name="bridge" type="pa:bridgeRefType"
+						minOccurs="0" maxOccurs="unbounded">
+					</element>
+					<element name="host" type="pa:hostRefType"
+						minOccurs="0" maxOccurs="1" />
+				</sequence>
+				<attribute name="refid" type="pa:refType"
+					use="required" />
+				<attribute name="relay" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="abstractResourceElement" abstract="true"
+		type="pa:abstractResourceType">
+	</element>
+
+	<element name="group" substitutionGroup="pa:abstractResourceElement"
+		type="pa:groupRefType">
+	</element>
+
+	<element name="bridge"
+		substitutionGroup="pa:abstractResourceElement"
+		type="pa:bridgeRefType">
+	</element>
+
+	<complexType name="resourceType">
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element name="host" type="pa:hostRefType"
+						minOccurs="0" maxOccurs="1">
+					</element>
+					<element ref="pa:abstractResourceElement"
+						minOccurs="0" maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="toolType">
+		<attribute name="id" type="string"></attribute>
+		<attribute name="path" type="pa:pathElementType"></attribute>
+		<attribute name="version" type="string"></attribute>
+	</complexType>
+
+	<complexType name="hostType">
+		<sequence>
+			<element name="homeDirectory" type="pa:pathElementType"></element>
+			<element name="tool" type="pa:toolType" minOccurs="0"
+				maxOccurs="unbounded">
+			</element>
+		</sequence>
+		<attribute name="id" type="pa:idType" use="required"></attribute>
+		<attribute name="os" type="pa:osType" use="required"></attribute>
+		<attribute name="username" type="string"></attribute>
+		<attribute name="hostCapacity" type="int"></attribute>
+		<attribute name="vmCapacity" type="int"></attribute>
+	</complexType>
+
+	<complexType name="hostRefType">
+		<attribute name="refid" type="pa:refType" use="required" />
+	</complexType>
+
+	<complexType name="abstractInfrastructureType"></complexType>
+
+	<complexType name="hostsType">
+		<complexContent>
+			<extension base="pa:abstractInfrastructureType">
+				<sequence>
+					<element name="host" type="pa:hostType"></element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="groupsType">
+		<complexContent>
+			<extension base="pa:abstractInfrastructureType">
+				<sequence>
+					<element ref="pa:abstractShElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="abstractBridgeElementType">
+		<attribute name="id" type="pa:idType" use="required" />
+	</complexType>
+	
+	<element name="abstractBridgeElement"
+		type="pa:abstractBridgeElementType">
+	</element>
+
+	<complexType name="bridgeTypeSSH">
+		<complexContent>
+			<extension base="pa:abstractBridgeElementType">
+				<attribute name="hostname" type="pa:hostnameType"
+					use="required" />
+				<attribute name="username" type="pa:usernameType"></attribute>
+				<attribute name="commandPath" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="sshBridge" type="pa:bridgeTypeSSH"
+		substitutionGroup="pa:abstractBridgeElement">
+	</element>
+
+	<complexType name="bridgesType">
+		<complexContent>
+			<extension base="pa:abstractInfrastructureType">
+				<sequence>
+					<element ref="pa:abstractBridgeElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="abstractInfrastructureElement"
+		type="pa:abstractInfrastructureType">
+	</element>
+	<element name="hosts"
+		substitutionGroup="pa:abstractInfrastructureElement"
+		type="pa:hostsType">
+	</element>
+
+	<element name="groups" type="pa:groupsType"
+		substitutionGroup="pa:abstractInfrastructureElement">
+	</element>
+	<element name="bridges" type="pa:bridgesType"
+		substitutionGroup="pa:abstractInfrastructureElement">
+	</element>
+
+	<complexType name="infrastructureType">
+		<complexContent>
+			<extension base="pa:abstractGCMType">
+				<sequence>
+					<element ref="pa:abstractInfrastructureElement"
+						maxOccurs="unbounded">
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="abstractGCMElement" type="pa:abstractGCMType"></element>
+
+	<element name="GCMDeployment">
+		<complexType>
+			<all>
+				<element name="environment" type="pa:environmentType"
+					minOccurs="0">
+				</element>
+				<element name="acquisition" type="pa:acquisitionType"
+					minOccurs="0">
+				</element>
+				<element name="resources" type="pa:resourceType">
+				</element>
+				<element name="infrastructure"
+					type="pa:infrastructureType">
+				</element>
+			</all>
+		</complexType>
+
+		<!-- Groups refid/id key correctness -->
+		<!--  -->
+		<key name="idKeyGroups">
+			<selector xpath="pa:infrastructure/pa:groups/*" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyGroups" refer="pa:idKeyGroups">
+			<selector xpath="pa:resources/pa:group"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+
+		<!-- Bridges refid/id key correctness -->
+		<!--  -->
+		<key name="idKeyBridges">
+			<selector xpath="pa:infrastructure/pa:bridges/*" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyBridge" refer="pa:idKeyBridges">
+			<selector xpath="pa:resources/pa:bridge"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+
+		<!-- Hosts refid/id key correctness -->
+		<!--  -->
+		<key name="idKeyHosts">
+			<selector xpath="pa:infrastructure/pa:hosts/*" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyHost" refer="pa:idKeyHosts">
+			<selector xpath="pa:resources/pa:host"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
+
+	</element>
+
+</schema>
+
+
+

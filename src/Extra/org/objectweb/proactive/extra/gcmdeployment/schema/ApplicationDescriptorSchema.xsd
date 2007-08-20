@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	elementFormDefault="qualified">
+
+	<simpleType name="pathElementBaseType">
+		<restriction base="string">
+			<enumeration value="proactive" />
+			<enumeration value="home" />
+			<enumeration value="root" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="idType">
+		<annotation>
+			<documentation>
+				An id, used in several elements
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="[1-9a-zA-Z_]+"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="capacityType">
+		<restriction base="string">
+			<pattern value="([1-9]+)|max"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="pathElementGeneralType">
+		<annotation>
+			<documentation>
+				A path to a jar or a directory
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<complexType name="pathElementType">
+		<attribute name="base" type="pa:pathElementBaseType"></attribute>
+		<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
+	</complexType>
+
+	<complexType name="pathType">
+		<sequence>
+			<element name="pathElement" type="pa:pathElementType"
+				maxOccurs="unbounded">
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="classpathType">
+		<complexContent>
+			<extension base="pa:pathType">
+				<attribute name="type">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="append"></enumeration>
+							<enumeration value="overwrite"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="fileTransferType">
+		<all>
+			<element name="source">
+				<complexType>
+					<attribute name="path"
+						type="pa:pathElementGeneralType">
+					</attribute>
+				</complexType>
+			</element>
+			<element name="dest">
+				<complexType>
+					<attribute name="relpath"
+						type="pa:pathElementGeneralType">
+					</attribute>
+				</complexType>
+			</element>
+		</all>
+	</complexType>
+
+	<attribute name="OSAttr">
+		<simpleType>
+			<restriction base="string">
+				<enumeration value="Unix"></enumeration>
+				<enumeration value="Windows"></enumeration>
+			</restriction>
+		</simpleType>
+	</attribute>
+
+	<attribute name="PriorityAttr">
+		<simpleType>
+			<restriction base="string">
+				<enumeration value="Low"></enumeration>
+				<enumeration value="Normal"></enumeration>
+				<enumeration value="High"></enumeration>
+			</restriction>
+		</simpleType>
+	</attribute>
+
+
+	<complexType name="jreType">
+		<sequence>
+			<element name="parameter" type="pa:parameterType" />
+		</sequence>
+		<attribute name="path" type="string"></attribute>
+	</complexType>
+
+	<simpleType name="parameterType">
+		<restriction base="string"></restriction>
+	</simpleType>
+
+
+	<complexType name="resourceProviderType">
+		<sequence>
+			<element name="file" maxOccurs="unbounded">
+				<complexType>
+					<attribute name="path"
+						type="pa:pathElementGeneralType">
+					</attribute>
+				</complexType>
+			</element>
+			<element name="fileTransfer" type="pa:fileTransferType"
+				minOccurs="0" maxOccurs="unbounded">
+			</element>
+			<element name="executable" minOccurs="0">
+				<complexType>
+					<attribute name="relpath"
+						type="pa:pathElementGeneralType">
+					</attribute>
+				</complexType>
+			</element>
+		</sequence>
+		<attribute name="id" type="pa:idType"></attribute>
+	</complexType>
+
+	<complexType name="virtualNodeType">
+		<sequence>
+			<element name="fileTranfer" type="pa:fileTransferType"
+				minOccurs="0" maxOccurs="unbounded">
+			</element>
+			<element name="resourceProvider" minOccurs="0"
+				maxOccurs="unbounded">
+				<complexType>
+					<attribute name="refid" type="pa:idType">
+					</attribute>
+				</complexType>
+			</element>
+		</sequence>
+		<attribute name="id" type="string" use="required"></attribute>
+		<attribute name="raref" type="string"></attribute>
+		<attribute name="capacity" type="pa:capacityType"></attribute>
+	</complexType>
+
+	<complexType name="commandType">
+		<sequence>
+			<element name="path" type="pa:pathElementType"
+				minOccurs="0" />
+			<element name="arg" type="string" minOccurs="0"
+				maxOccurs="unbounded" />
+			<element name="filetransfer" type="pa:fileTransferType"
+				minOccurs="0" />
+		</sequence>
+		<attribute name="name" type="pa:parameterType"></attribute>
+	</complexType>
+
+	<complexType name="applicationNodeType" abstract="true"></complexType>
+
+	<complexType name="proactiveType">
+		<complexContent>
+			<extension base="pa:applicationNodeType">
+				<sequence>
+					<element name="configuration" minOccurs="0">
+						<complexType>
+							<all>
+								<element name="bootclasspath"
+									type="pa:pathType" minOccurs="0">
+								</element>
+								<element name="java" minOccurs="0">
+									<complexType>
+										<attribute name="relpath"
+											type="pa:pathElementGeneralType">
+										</attribute>
+									</complexType>
+								</element>
+								<element name="applicationClasspath"
+									type="pa:classpathType" minOccurs="0">
+								</element>
+								<element name="proactiveClasspath"
+									type="pa:classpathType" minOccurs="0">
+								</element>
+								<element name="securityPolicy"
+									type="pa:pathElementType" minOccurs="0">
+								</element>
+								<element name="log4jProperties"
+									type="pa:pathElementType" minOccurs="0">
+								</element>
+								<element name="userProperties"
+									type="pa:pathElementType" minOccurs="0">
+								</element>
+							</all>
+						</complexType>
+					</element>
+
+					<element name="virtualNode"
+						type="pa:virtualNodeType" maxOccurs="unbounded">
+					</element>
+
+				</sequence>
+				<attribute name="closeStream" type="boolean"></attribute>
+				<attribute name="name" type="string"></attribute>
+				<attribute ref="pa:PriorityAttr"></attribute>
+				<attribute ref="pa:OSAttr"></attribute>
+				<attribute name="relpath"
+					type="pa:pathElementGeneralType" use="optional">
+				</attribute>
+				<attribute name="javarelpath"
+					type="pa:pathElementGeneralType" use="optional">
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="executableType">
+		<complexContent>
+			<extension base="pa:applicationNodeType">
+				<sequence>
+					<element name="resourceProvider"
+						maxOccurs="unbounded">
+						<complexType>
+							<attribute name="refid" type="string"></attribute>
+						</complexType>
+					</element>
+					<element name="command" type="pa:commandType"></element>
+				</sequence>
+				<attribute name="instances">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="onePerHost"></enumeration>
+							<enumeration value="onePerVM"></enumeration>
+							<enumeration value="onePerCapacity"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="abstractApplicationElement"
+		type="pa:applicationNodeType" />
+
+	<element name="executable" type="pa:executableType"
+		substitutionGroup="pa:abstractApplicationElement" />
+	<element name="proactive" type="pa:proactiveType"
+		substitutionGroup="pa:abstractApplicationElement" />
+
+
+	<complexType name="applicationType">
+		<sequence>
+			<element ref="pa:abstractApplicationElement" maxOccurs="1"
+				minOccurs="1">
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="ressourcesType">
+		<sequence>
+			<element name="resourceProvider"
+				type="pa:resourceProviderType" minOccurs="0"
+				maxOccurs="unbounded">
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="GCMApplicationType">
+		<sequence>
+			<element name="application" type="pa:applicationType"
+				minOccurs="1" maxOccurs="1">
+			</element>
+			<element name="resources" type="pa:ressourcesType"
+				minOccurs="1" maxOccurs="1">
+			</element>
+		</sequence>
+	</complexType>
+
+	<element name="GCMApplication" type="pa:GCMApplicationType">
+		<!-- resource providers refid/id key correctness -->
+		<!--  -->
+		<key name="idResourceProviders">
+			<selector xpath="pa:resources/pa:resourceProvider" />
+			<field xpath="@id" />
+		</key>
+		<keyref name="refIdKeyResourceProvider"
+			refer="pa:idResourceProviders">
+			<selector
+				xpath="pa:application/pa:executable/pa:resourceProvider">
+			</selector>
+			<field xpath="@refid"></field>
+		</keyref>
+		<keyref name="refIdKeyResourceProvider2"
+			refer="pa:idResourceProviders">
+			<selector
+				xpath="pa:application/pa:proactive/pa:virtualNode/pa:resourceProvider">
+			</selector>
+			<field xpath="@refid"></field>
+		</keyref>
+	</element>
+
+</schema>
