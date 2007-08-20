@@ -249,7 +249,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.fileTransferDeploy = new ArrayList<FileTransferDefinition>();
         this.fileTransferDeployedStatus = new HashMap<String, FileVector>();
         this.fileTransferRetrieve = new ArrayList<FileTransferDefinition>();
-        this.proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        this.proActiveRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         this.fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
         this.overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
         //        this.roe = new RemoteObjectExposer(VirtualNode.class.getName(),this);
@@ -1710,7 +1710,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        this.proActiveRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         this.rrThreadpool = Executors.newCachedThreadPool();
     }
 

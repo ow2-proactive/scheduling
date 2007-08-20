@@ -131,7 +131,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     // -- STATIC MEMBERS -----------------------------------------------------------
     //
     //the Unique instance of ProActiveRuntime
-    private static ProActiveRuntime proActiveRuntime;
+    private static ProActiveRuntimeImpl proActiveRuntime;
 
     // JMX
     /** The MBean representing this ProActive Runtime */
@@ -260,7 +260,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     //
     // -- PUBLIC METHODS -----------------------------------------------------------
     //
-    public static ProActiveRuntime getProActiveRuntime() {
+    public static ProActiveRuntimeImpl getProActiveRuntime() {
         return proActiveRuntime;
     }
 

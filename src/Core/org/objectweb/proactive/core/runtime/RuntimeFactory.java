@@ -174,7 +174,7 @@ public abstract class RuntimeFactory {
      */
     public static ProActiveRuntime getProtocolSpecificRuntime(String protocol)
         throws ProActiveException {
-        ProActiveRuntimeImpl proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
 
         RemoteRemoteObject rro = proActiveRuntime.getRemoteObjectExposer()
                                                  .getRemoteObject(protocol);

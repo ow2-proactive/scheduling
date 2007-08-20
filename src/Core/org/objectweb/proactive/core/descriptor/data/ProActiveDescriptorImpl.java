@@ -544,7 +544,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     }
 
     public void killall(boolean softly) throws ProActiveException {
-        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
 
         part.removeDescriptor(this.url);
 

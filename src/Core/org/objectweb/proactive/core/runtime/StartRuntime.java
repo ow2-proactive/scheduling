@@ -136,7 +136,7 @@ public class StartRuntime {
      * node once the creation is completed.
      */
     private void run() {
-        ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl impl = ProActiveRuntimeImpl.getProActiveRuntime();
         impl.getVMInformation().setCreationProtocolID(this.protocolId);
 
         if (this.defaultRuntimeURL != null) {

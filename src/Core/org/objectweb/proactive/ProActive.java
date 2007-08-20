@@ -1656,7 +1656,7 @@ public class ProActive {
         if (xmlDescriptorUrl.indexOf(':') == -1) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
-        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveDescriptorInternal pad;
         try {
             if (!hierarchicalSearch) {
@@ -1720,7 +1720,7 @@ public class ProActive {
         if (xmlDescriptorUrl.indexOf(':') == -1) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
-        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveDescriptorInternal pad;
         try {
             if (!hierarchicalSearch) {

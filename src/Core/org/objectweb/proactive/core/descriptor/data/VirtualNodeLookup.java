@@ -76,7 +76,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
 
     public VirtualNodeLookup(String name) {
         this.name = name;
-        ProActiveRuntimeImpl proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl proActiveRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
         fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
         overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;

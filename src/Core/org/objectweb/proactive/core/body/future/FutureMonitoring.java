@@ -194,7 +194,8 @@ public class FutureMonitoring implements Runnable {
 
     private static boolean isFTEnabled() {
         if (!FTEnabled) {
-            Collection<LocalNode> nodes = ((ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime()).getLocalNodes();
+            Collection<LocalNode> nodes = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                              .getLocalNodes();
             if (nodes.size() != lastNumberOfNodes) {
                 lastNumberOfNodes = nodes.size();
                 for (LocalNode node : nodes) {
