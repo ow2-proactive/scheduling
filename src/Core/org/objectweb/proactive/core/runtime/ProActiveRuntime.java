@@ -160,22 +160,6 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
         String vmName) throws ProActiveException;
 
     /**
-     * Returns all the ProActiveRuntime registered on this ProActiveRuntime on this VM
-     * @return all the ProActiveRuntime registered on this ProActiveRuntime on this VM
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-     */
-    public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException;
-
-    /**
-     * Returns the ProActiveRuntime of specified name
-     * @param proActiveRuntimeName the name of the ProActiveruntime to return
-     * @return the ProActiveRuntime of specified name
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-     */
-    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
-        throws ProActiveException;
-
-    /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
      * Tells this runtime that it's registered in another one
      * @param proActiveRuntimeName the name of the remote ProActiveRuntime in which this runtime is registered
