@@ -53,7 +53,7 @@ public class Test extends ComponentTest {
     private static final long serialVersionUID = 4191411789650566643L;
 
     /**
-     * @see testsuite.test.FunctionalTest#action()
+     * Use immediate service while the loopQueueMethod is serving.
      */
     @org.junit.Test
     public void action() throws Exception {
@@ -78,6 +78,6 @@ public class Test extends ComponentTest {
         //Fractal.getLifeCycleController(comp).startFc();
         // call an immediate service to set the condition false and thus terminate the loopQueueMethod
         ((Itf) comp.getFcInterface("itf")).immediateStopLoopMethod();
-        Fractal.getLifeCycleController(comp).stopFc();
+        //Fractal.getLifeCycleController(comp).stopFc();
     }
 }

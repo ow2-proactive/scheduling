@@ -39,6 +39,9 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 public class A implements Itf, ComponentInitActive {
     private boolean condition = true;
 
+    /**
+     * Initialize the immediate service method in the initComponentActivity
+     */
     public void initComponentActivity(Body body) {
         ProActive.setImmediateService("immediateMethod",
             new Class[] { String.class });
@@ -53,6 +56,9 @@ public class A implements Itf, ComponentInitActive {
         return res;
     }
 
+    /**
+     * This method never terminate, unless that the immediateStopLoopMethod (an immediate service) is called.
+     */
     public void loopQueueMethod() {
         System.err.println("COMPONENT: loopQueueMethod: BEGINNING");
         while (condition)
@@ -61,7 +67,7 @@ public class A implements Itf, ComponentInitActive {
     }
 
     public void immediateStopLoopMethod() {
-        System.err.println("COMPONENT: immediateStopLoopMethod:");
+        System.err.println("COMPONENT: immediateStopLoopMethod");
         condition = false;
     }
 }
