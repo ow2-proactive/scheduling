@@ -15,8 +15,6 @@ public class TestNodeInformation {
             NodeInformation nodeInfo = nodeIM.getNodeInformation();
             String mes = "## NodeInformation : \n";
             mes += "+--------------------------------------------------------------------\n";
-            mes += ("+--> getCreationProtocolID : " +
-            nodeInfo.getCreationProtocolID() + "\n");
             mes += ("+--> getDescriptorVMName   : " +
             nodeInfo.getDescriptorVMName() + "\n");
             mes += ("+--> getHostName           : " + nodeInfo.getHostName() +

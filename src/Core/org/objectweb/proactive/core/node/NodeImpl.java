@@ -283,18 +283,6 @@ public class NodeImpl implements Node, Serializable {
             return hostInetAddress;
         }
 
-        public String getCreationProtocolID() {
-            return proActiveRuntime.getVMInformation().getCreationProtocolID();
-        }
-
-        /**
-         * @see org.objectweb.proactive.core.runtime.VMInformation#setCreationProtocolID(java.lang.String)
-         * This method has no effect.
-         */
-        public void setCreationProtocolID(String protocolId) {
-            //Do nothing since we do not want to be able to set vm infos from Node
-        }
-
         /**
          * Returns the name specified in the url
          * @param url. The url of the node

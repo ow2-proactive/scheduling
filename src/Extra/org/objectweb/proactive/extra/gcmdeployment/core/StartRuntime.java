@@ -64,9 +64,6 @@ public class StartRuntime {
     /** The URL of the parent ProActive Runtime */
     protected String parentURL;
 
-    /** The protocol to be used to start this Runtime */
-    protected String creationProtocolId;
-
     /** Command Line arguments */
     private String[] args;
 
@@ -133,15 +130,12 @@ public class StartRuntime {
         Options options = new Options();
         options.addOption(Params.parent.toString(), Params.parent.sOpt, true,
             Params.parent.desc);
-        options.addOption(Params.creationProtocol.toString(),
-            Params.creationProtocol.sOpt, true, Params.creationProtocol.desc);
 
         CommandLine line;
 
         try {
             line = parser.parse(options, args);
             parentURL = line.getOptionValue(Params.parent.toString());
-            creationProtocolId = line.getOptionValue(Params.creationProtocol.toString());
         } catch (ParseException e) {
             logger.warn("Cannot parse command line arguments", e);
             abort();
@@ -167,12 +161,13 @@ public class StartRuntime {
 
         // Creation & Setup of the local ProActive Runtime
         ProActiveRuntimeImpl localRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        ProActiveRuntime localRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
-                                                                                                        .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
-
-        if (creationProtocolId != null) {
-            localRuntime.getVMInformation()
-                        .setCreationProtocolID(creationProtocolId);
+        ProActiveRuntime localRuntime;
+        try {
+            localRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
+                                                                                           .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+        } catch (ProActiveException e1) {
+            logger.warn("Cannot get the local ProActive Runtime", e1);
+            abort();
         }
 
         // Say hello to our parent if needed
@@ -182,12 +177,13 @@ public class StartRuntime {
                 parentRuntime = RuntimeFactory.getRuntime(parentURL,
                         UrlBuilder.getProtocol(parentURL));
 
+                /*
                 parentRuntime.register(localRuntime, localRuntime.getURL(),
-                    creationProtocolId,
+                    "",
                     ProActiveConfiguration.getInstance()
                                           .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
-                    /*this.vmName*/ "MKrisIlEstSympa");
-
+                    "MKrisIlEstSympa");
+                                */
                 ProActiveRuntimeImpl.getProActiveRuntime()
                                     .setParent(parentRuntime);
                 waitUntilInterupted();
@@ -219,17 +215,8 @@ public class StartRuntime {
             }
         }
     }
-
-    /**
-         * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-         * Performs the registration of a ProActiveRuntime on the runtime that
-         * initiated the creation of ProActiveDescriptor.
-         */
-    private void register(ProActiveRuntime PART) {
-    }
-    private enum Params {parent("p", "URL of the parent ProActive Runtime"),
-        creationProtocol("c",
-            "Communication protocol to be used by this Runtime");protected String sOpt;
+    private enum Params {parent("p", "URL of the parent ProActive Runtime");
+        protected String sOpt;
         protected String desc;
 
         private Params(String sOpt, String desc) {

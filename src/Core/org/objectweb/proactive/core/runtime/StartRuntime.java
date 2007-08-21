@@ -67,9 +67,6 @@ public class StartRuntime {
     /** The URL of the parent ProActive Runtime */
     protected String defaultRuntimeURL;
 
-    /** The protocol to be used by this Runtime */
-    protected String protocolId;
-
     /** Name of the associated VirtualMachine */
     protected String vmName;
 
@@ -80,8 +77,7 @@ public class StartRuntime {
         if (args.length != 0) {
             this.creatorID = args[0].trim();
             this.defaultRuntimeURL = UrlBuilder.removeUsername(args[1]);
-            this.protocolId = args[2];
-            this.vmName = args[3];
+            this.vmName = args[2];
         }
     }
 
@@ -137,7 +133,6 @@ public class StartRuntime {
      */
     private void run() {
         ProActiveRuntimeImpl impl = ProActiveRuntimeImpl.getProActiveRuntime();
-        impl.getVMInformation().setCreationProtocolID(this.protocolId);
 
         if (this.defaultRuntimeURL != null) {
             ProActiveRuntime PART;

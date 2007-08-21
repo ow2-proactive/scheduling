@@ -15,8 +15,6 @@ public class SimpleTestIMUser {
             NodeInformation nodeInfo = node.getNodeInformation();
             String mes = "#[SimpleTestIMUser] NodeInformation : \n";
             mes += "+--------------------------------------------------------------------\n";
-            mes += ("+--> getCreationProtocolID : " +
-            nodeInfo.getCreationProtocolID() + "\n");
             mes += ("+--> getDescriptorVMName   : " +
             nodeInfo.getDescriptorVMName() + "\n");
             mes += ("+--> getHostName           : " + nodeInfo.getHostName() +

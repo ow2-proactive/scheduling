@@ -84,9 +84,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
-import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileTransfer;
@@ -1454,9 +1452,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         JVMProcess jvmProcess;
 
         //jobID = ProActive.getJobId();
-        String protocolId = "";
-        protocolId = process.getProcessId();
-
         int cnt = process.getNodeNumber();
 
         if (cnt == UniversalProcess.UNKNOWN_NODE_NUMBER) {
@@ -1502,7 +1497,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
-                protocolId + " " + vm.getName());
+                vm.getName());
 
             // FAULT TOLERANCE settings
             if (this.ftService != null) {

@@ -67,16 +67,6 @@ public interface VMInformation extends java.io.Serializable, Job {
     public String getName();
 
     /**
-     * Returns an Identifier for the process that originates this VM creation
-     */
-    public String getCreationProtocolID();
-
-    /**
-     * Sets an Identifier for the process that originates this VM creation
-     */
-    public void setCreationProtocolID(String protocolId);
-
-    /**
      * Returns the host where the vm is located
      * @return the host where the vm is located
      */

@@ -38,7 +38,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1330,7 +1329,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //the Unique ID of the JVM
         private final java.rmi.dgc.VMID uniqueVMID;
         private String name;
-        private String processCreatorId;
         private String jobId;
         private final String hostName;
         private final DeployerTag deployerTag;
@@ -1339,11 +1337,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.uniqueVMID = UniqueID.getCurrentVMID();
             this.hostInetAddress = java.net.InetAddress.getLocalHost();
             this.hostName = UrlBuilder.getHostNameorIP(this.hostInetAddress);
-            this.processCreatorId = "jvm";
-
-            //            this.name = "PA_JVM" +
-            //                Integer.toString(new java.security.SecureRandom().nextInt()) +
-            //                "_" + hostName;
             String random = Integer.toString(ProActiveRandom.nextPosInt());
 
             if (ProActiveConfiguration.getInstance()
@@ -1388,14 +1381,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         public java.net.InetAddress getInetAddress() {
             return this.hostInetAddress;
-        }
-
-        public String getCreationProtocolID() {
-            return this.processCreatorId;
-        }
-
-        public void setCreationProtocolID(String protocolId) {
-            this.processCreatorId = protocolId;
         }
 
         /**
