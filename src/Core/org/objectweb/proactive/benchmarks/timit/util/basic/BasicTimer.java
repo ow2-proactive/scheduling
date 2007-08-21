@@ -32,7 +32,7 @@ package org.objectweb.proactive.benchmarks.timit.util.basic;
 
 
 /**
- * A simple timer in nano seconds.
+ * A Basic timer in nano seconds.
  *
  * @author vbodnart
  */
@@ -63,7 +63,7 @@ public class BasicTimer implements java.io.Serializable {
     private boolean isUserLevel;
 
     /**
-    * Creates an instance of a SimpleTimer.
+    * Creates an instance of a BasicTimer.
     * @param name The name of the timer
     * @param parent A reference to the parent timer
     */
@@ -82,19 +82,19 @@ public class BasicTimer implements java.io.Serializable {
      * it throws a RuntimeException. If the current timer is already started
      * it throws also a RuntimeException.
      */
-    public void start() {
+    public final void start() {
         if (DEBUG) {
             // Check if the parent timer is started		
             if ((this.parent != null) && !this.parent.isStarted) {
                 throw new RuntimeException(
-                    "** _____ TimIt [SimpleTimer.start()] : The parent timer of " +
+                    "** _____ TimIt [BasicTimer.start()] : The parent timer of " +
                     this.name + " timer is not started. Hierarchy is broken.");
             }
 
             // Check if this timer is not started twice
             if (isStarted) {
                 throw new RuntimeException(
-                    "** _____ TimIt [SimpleTimer.start()] : The timer " +
+                    "** _____ TimIt [BasicTimer.start()] : The timer " +
                     this.name +
                     " is already started. You cannot start it twice.");
             }
@@ -105,22 +105,31 @@ public class BasicTimer implements java.io.Serializable {
 
     /**
      * Stop the current timer.
+     * Just calls the stop method with System.nanotime()
+     */
+    public final void stop() {
+        this.stop(System.nanoTime());
+    }
+
+    /**
+     * Stop the current timer.
      * In DEBUG mode this method checks if the parent timer is not started if not
      * it throws a RuntimeException. If the current timer is not started
      * it throws also a RuntimeException.
+     * @param nanoTimeStamp The current nano time stamp
      */
-    public void stop() {
+    public final void stop(final long nanoTimeStamp) {
         if (DEBUG) {
             if ((this.parent != null) && !this.parent.isStarted) {
                 throw new RuntimeException(
-                    "** _____ TimIt [SimpleTimer.stop()] : The parent timer of " +
+                    "** _____ TimIt [BasicTimer.stop()] : The parent timer of " +
                     this.name + " timer is not started. Hierarchy is broken");
             }
 
             // Check if this timer is started
             if (!isStarted) {
                 throw new RuntimeException(
-                    "** _____ TimIt [SimpleTimer.stop()] : The timer " +
+                    "** _____ TimIt [BasicTimer.stop()] : The timer " +
                     this.name +
                     " is not started. You cannot stop an unstarted timer.");
             }
@@ -128,7 +137,7 @@ public class BasicTimer implements java.io.Serializable {
         this.isStarted = false;
         // Count the number of start stop couples
         this.startStopCoupleCount++;
-        this.totalTime += (System.nanoTime() - this.startTime);
+        this.totalTime += (nanoTimeStamp - this.startTime);
     }
 
     /**
@@ -136,11 +145,11 @@ public class BasicTimer implements java.io.Serializable {
      * Checks if the timer was stopped, if not throws a RuntimeException.
      * @return The total time in nanoseconds.
      */
-    public long getTotalTime() {
+    public final long getTotalTime() {
         if (DEBUG) {
             if (isStarted) {
                 throw new RuntimeException(
-                    "** _____ TimIt [SimpleTimer.stop()] : The timer " +
+                    "** _____ TimIt [BasicTimer.stop()] : The timer " +
                     this.name + " was not stopped.");
             }
         }
@@ -151,18 +160,18 @@ public class BasicTimer implements java.io.Serializable {
      * Checks if the current timer is started of not.
      * @return True if this timer is started.
      */
-    public boolean isStarted() {
+    public final boolean isStarted() {
         return this.isStarted;
     }
 
     /**
      * Cancels the last start performed on this timer (erases the start time only).
      */
-    public void undoStart() {
+    public final void undoStart() {
         if (DEBUG) {
             if (isStarted) {
                 throw new RuntimeException(
-                    "** _____ TimIt [SimpleTimer.undoStart()] : The timer " +
+                    "** _____ TimIt [BasicTimer.undoStart()] : The timer " +
                     this.name + " was not stopped.");
             }
         }
@@ -173,11 +182,11 @@ public class BasicTimer implements java.io.Serializable {
     /**
      * Completely resets the timer. (erases the total time and the start stop couple count)
      */
-    public void reset() {
+    public final void reset() {
         if (DEBUG) {
             if (isStarted) {
                 throw new RuntimeException(
-                    "** _____ TimIt [SimpleTimer.reset()] : The timer " +
+                    "** _____ TimIt [BasicTimer.reset()] : The timer " +
                     this.name + " was not stopped.");
             }
         }
@@ -189,7 +198,7 @@ public class BasicTimer implements java.io.Serializable {
      * Sets the total time for this timer.
      * @param totalTime The new total time value
      */
-    public void setTotal(long totalTime) {
+    public final void setTotal(long totalTime) {
         this.totalTime = totalTime;
     }
 
@@ -197,7 +206,7 @@ public class BasicTimer implements java.io.Serializable {
      * Sets a new parent to the current timer.
      * @param parentTimer
      */
-    public void setParent(BasicTimer parentTimer) {
+    public final void setParent(BasicTimer parentTimer) {
         this.parent = parentTimer;
     }
 
@@ -205,7 +214,7 @@ public class BasicTimer implements java.io.Serializable {
      * Method to know the parent of the current timer.
      * @return The parent timer of this timer.
      */
-    public BasicTimer getParent() {
+    public final BasicTimer getParent() {
         return this.parent;
     }
 
@@ -213,7 +222,7 @@ public class BasicTimer implements java.io.Serializable {
      * The name of the current timer.
      * @return The name of the current timer
      */
-    public String getName() {
+    public final String getName() {
         return this.name;
     }
 
@@ -221,7 +230,7 @@ public class BasicTimer implements java.io.Serializable {
      * The toString method of this timer.
      * @return A description of the current timer.
      */
-    public String toString() {
+    public final String toString() {
         return "" + this.name + " " + "\t totalTime in milliseconds : " +
         (this.totalTime / 1000000L) + " " + "\t in nanoseconds : " +
         this.totalTime + " " +
@@ -232,7 +241,7 @@ public class BasicTimer implements java.io.Serializable {
      * Returns the number of start stop couples of this timer.
      * @return The number of start stop
      */
-    public int getStartStopCoupleCount() {
+    public final int getStartStopCoupleCount() {
         return startStopCoupleCount;
     }
 
@@ -240,15 +249,15 @@ public class BasicTimer implements java.io.Serializable {
      * Sets the number of start stop couples of this timer.
      * @param startStopCoupleCount
      */
-    public void setStartStopCoupleCount(int startStopCoupleCount) {
+    public final void setStartStopCoupleCount(int startStopCoupleCount) {
         this.startStopCoupleCount = startStopCoupleCount;
     }
 
-    public boolean isUserLevel() {
+    public final boolean isUserLevel() {
         return isUserLevel;
     }
 
-    public void setUserLevel(boolean isUserLevel) {
+    public final void setUserLevel(boolean isUserLevel) {
         this.isUserLevel = isUserLevel;
     }
 }

@@ -43,19 +43,19 @@ import org.objectweb.proactive.core.UniqueID;
  * @author vbodnart
  */
 public interface TimerProvidable {
-    public void startTimer(byte timerId, String infos);
+    public void startTimer(int timerId, String infos);
 
-    public void stopTimer(byte timerId, String infos);
+    public void stopTimer(int timerId, String infos);
 
-    public void setTimerValue(byte timerId, long value);
+    public void setTimerValue(int timerId, long value);
 
     public UniqueID getTimerProvidableID();
 
     public void sendResults(String className, String shortUniqueID);
 
-    public void startXAndSkipSendRequest(byte timerId);
+    public void startXAndSkipSendRequest(int timerId);
 
-    public void stopXAndUnskipSendRequest(byte timerId);
+    public void stopXAndUnskipSendRequest(int timerId);
 
     public void stopAll();
 

@@ -37,25 +37,25 @@ import org.objectweb.proactive.core.UniqueID;
 
 
 /**
- * Timers indexes are typed with byte.
+ * Timers indexes are typed with int.
  * We suppose that the number of timers will not be more than 255
  */
 public class TimerWarehouse {
-    public static final byte TOTAL = 1;
+    public static final int TOTAL = 0;
 
     /** not used currently */
-    public static final byte DEPLOYEMENT = 2;
-    public static final byte SERVE = 3;
-    public static final byte SEND_REQUEST = 4;
-    public static final byte LOCAL_COPY = 5;
-    public static final byte BEFORE_SERIALIZATION = 6;
-    public static final byte SERIALIZATION = 7;
-    public static final byte AFTER_SERIALIZATION = 8;
-    public static final byte SEND_REPLY = 9;
-    public static final byte WAIT_BY_NECESSITY = 10;
-    public static final byte WAIT_FOR_REQUEST = 11;
-    public static final byte GROUP_ONE_WAY_CALL = 12;
-    public static final byte GROUP_ASYNC_CALL = 13;
+    //public static final int DEPLOYEMENT = ;
+    public static final int SERVE = 1;
+    public static final int SEND_REQUEST = 2;
+    public static final int SEND_REPLY = 3;
+    public static final int LOCAL_COPY = 4;
+    public static final int BEFORE_SERIALIZATION = 5;
+    public static final int SERIALIZATION = 6;
+    public static final int AFTER_SERIALIZATION = 7;
+    public static final int WAIT_BY_NECESSITY = 8;
+    public static final int WAIT_FOR_REQUEST = 9;
+    public static final int GROUP_ONE_WAY_CALL = 10;
+    public static final int GROUP_ASYNC_CALL = 11;
 
     /** HashMap to store TimerProvidable objects */
     public static final ConcurrentHashMap<UniqueID, TimerProvidable> timerProvidableStore =
@@ -97,7 +97,7 @@ public class TimerWarehouse {
      * @param timerId The id of the timer to start
      */
     public static final void startTimer(final UniqueID uniqueID,
-        final byte timerId) {
+        final int timerId) {
         startTimerWithInfos(uniqueID, timerId, null);
     }
 
@@ -107,7 +107,7 @@ public class TimerWarehouse {
      * @param timerId The id of the timer to stop
      */
     public static final void stopTimer(final UniqueID uniqueID,
-        final byte timerId) {
+        final int timerId) {
         stopTimerWithInfos(uniqueID, timerId, null);
     }
 
@@ -118,7 +118,7 @@ public class TimerWarehouse {
      * @param infos Some extra information
      */
     public static final void startTimerWithInfos(final UniqueID uniqueID,
-        final byte timerId, String infos) {
+        final int timerId, String infos) {
         TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
@@ -133,7 +133,7 @@ public class TimerWarehouse {
      * @param infos Some extra information
      */
     public static final void stopTimerWithInfos(final UniqueID uniqueID,
-        final byte timerId, String infos) {
+        final int timerId, String infos) {
         TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
@@ -147,7 +147,7 @@ public class TimerWarehouse {
      * @param timerId The id of timer to stop
      */
     public static final void startXAndSkipSendRequest(final UniqueID uniqueID,
-        byte timerId) {
+        int timerId) {
         TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
@@ -161,7 +161,7 @@ public class TimerWarehouse {
      * @param timerId The id of timer to stop
      */
     public static final void stopXAndUnskipSendRequest(
-        final UniqueID uniqueID, byte timerId) {
+        final UniqueID uniqueID, int timerId) {
         TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
