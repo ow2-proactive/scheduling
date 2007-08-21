@@ -2074,14 +2074,32 @@
   </sect1>
 
   <sect1>
-    <title>Killing the application</title>
+    <title>How to terminate a ProActive application</title>
 
     <indexterm>
       <primary>Kill</primary>
 
       <secondary>Nodes</secondary>
     </indexterm>
+	<sect2>
+		<title>Destroying active objects</title>
+		<para>In the master slave paradigm, the master should wait for all of
+		its slaves to be known. Then all active objects can be destroyed by
+		letting the master terminate all the slaves and then itself.</para>
 
+		<para>In a more complex topology, a distributed termination algorithm
+		must be designed.</para>
+
+		<para>The simplest alternative is to enable the DGC by setting the
+		"proactive.dgc" property to "true" and let it destroy unreferenced
+		active objects and cycles of idle active objects.</para>
+	</sect2>
+	<sect2>
+		<title>Killing JVMs</title>
+		<para>Once active objects are destroyed, JVMs must be killed in order
+		to complete the cleanup. Alternatively, one can focus on killing the
+		JVMs, that will get rid of the active objects too.</para>
+		
     <para>ProActive gives the ability to kill all JVMs and Nodes deployed with
     an XML descriptor with the method: killall(boolean softly) in class
     ProActiveDescriptor (this class's code is in <xref
@@ -2102,6 +2120,11 @@ pad.killall(false);
     that originates the creation of a rmi registry waits until registry is
     empty before dying. To be more precise a thread is created to ask
     periodically the registry if objects are still registered.</para>
+    
+    <para>An alternative is to set the "proactive.exit_on_empty" property to "true",
+    this way, when the last active object running in a JVM is destroyed, the latter
+    JVM is destroyed too.</para>
+    </sect2>
   </sect1>
 
   <sect1>
