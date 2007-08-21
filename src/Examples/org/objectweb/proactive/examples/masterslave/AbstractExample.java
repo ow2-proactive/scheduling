@@ -4,14 +4,25 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.cli.*;
+import org.objectweb.proactive.examples.masterslave.BasicPrimeExample.FindPrimeTask;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 
 
 public abstract class AbstractExample {
+    protected Options command_options;
     protected URL descriptor_url;
     protected String vn_name;
     protected String usage_message = "Usage: <java_command> descriptor_path virtual_node_name";
-    protected int number_of_parameters = 2;
+    protected ProActiveMaster master;
+    protected CommandLine cmd = null;
+    public static final String DEFAULT_DESCRIPTOR = "/org/objectweb/proactive/examples/masterslave/WorkersLocal.xml";
+
+    public AbstractExample() {
+        command_options = new Options();
+        command_options.addOption("d", true, "descriptor in use");
+        command_options.addOption("n", true, "virtual node name");
+    }
 
     /**
      * Returns the url of the descriptor which defines the slaves
@@ -50,21 +61,31 @@ public abstract class AbstractExample {
      * @param args command line arguments
      * @throws MalformedURLException
      */
-    public void init(String[] args) throws MalformedURLException {
-        this.init(args, 0, "");
-    }
+    protected void init(String[] args) throws MalformedURLException {
+        before_init();
 
-    /**
-     * Initializing the example with command line arguments
-     * @param args command line arguments
-     * @param number_of_extra_parameters number of extra parameters used by the example (except from descriptor and virtual node name)
-     * @param text text to add in error message
-     * @throws MalformedURLException
-     */
-    protected void init(String[] args, int number_of_extra_parameters,
-        String text) throws MalformedURLException {
-        if (args.length == (number_of_parameters + number_of_extra_parameters)) {
-            File descriptorFile = new File(args[0]);
+        CommandLineParser parser = new PosixParser();
+
+        try {
+            cmd = parser.parse(command_options, args);
+        } catch (ParseException e) {
+            System.err.println("Parsing failed, reason, " + e.getMessage());
+            System.exit(1);
+        }
+
+        // get descriptor option value
+        String descPath = cmd.getOptionValue("d");
+
+        if (descPath == null) {
+            descriptor_url = AbstractExample.class.getResource(DEFAULT_DESCRIPTOR);
+            if (descriptor_url == null) {
+                System.err.println("Couldn't find internal ressource: " +
+                    DEFAULT_DESCRIPTOR);
+                System.exit(1);
+            }
+        } else {
+            // check provided descriptor
+            File descriptorFile = new File(descPath);
             if (!descriptorFile.exists()) {
                 System.err.println("" + descriptorFile + " does not exist");
                 System.exit(1);
@@ -77,32 +98,41 @@ public abstract class AbstractExample {
                 System.exit(1);
             }
             descriptor_url = descriptorFile.toURI().toURL();
-            vn_name = args[1];
-            init_specialized(args);
-        } else {
-            System.err.println(usage_message + text);
-            System.exit(1);
         }
+
+        // get vn option value
+        String vn_name = cmd.getOptionValue("n");
+
+        //      Creating the Master
+        master = new ProActiveMaster();
+
+        registerShutdownHook();
+
+        if (vn_name == null) {
+            master.addResources(descriptor_url);
+        } else {
+            master.addResources(descriptor_url, vn_name);
+        }
+
+        after_init();
     }
 
     /**
      * Register a shutdown hook on this example which will terminate the master
      */
-    protected void registerHook() {
+    protected void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownThread()));
     }
 
     /**
-     * Initializing the example with command line arguments, needs to be overriden
-     * @param args
+     * A method to be launched before the init method
      */
-    protected abstract void init_specialized(String[] args);
+    protected abstract void before_init();
 
     /**
-     * Returns the actual master of the example
-     * @return
+     * A method to be launched after the init method
      */
-    protected abstract ProActiveMaster getMaster();
+    protected abstract void after_init();
 
     /**
      * Internal class which handles shutdown of Master/Slave applications
@@ -114,7 +144,7 @@ public abstract class AbstractExample {
         }
 
         public void run() {
-            getMaster().terminate(true);
+            master.terminate(true);
         }
     }
 }

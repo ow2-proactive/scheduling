@@ -43,6 +43,8 @@
 						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/ibis/ibis-1.4.jar"/>
+                      <!-- <absolutePath value="${PROACTIVE_HOME}/lib/ibis/ibis-1.4.jar"/>-->
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/bin/java"/>

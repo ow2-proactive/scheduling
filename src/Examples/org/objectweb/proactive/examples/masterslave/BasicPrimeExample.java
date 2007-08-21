@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
+import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
@@ -20,9 +20,10 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
  *
  */
 public class BasicPrimeExample extends AbstractExample {
-    public static int number_of_intervals;
-    public static long prime_to_find;
-    ProActiveMaster<FindPrimeTask, Boolean> master;
+    private static final long DEFAULT_PRIME_NUMBER = 1397812341;
+    private static final int DEFAULT_NUMBER_OF_INTERVALS = 15;
+    public int number_of_intervals;
+    public long prime_to_find;
 
     /**
      * Displays result of this test
@@ -31,8 +32,8 @@ public class BasicPrimeExample extends AbstractExample {
      * @param endTime ending time of the test
      * @param nbSlaves number of slaves used during the test
      */
-    public static void displayResult(Collection<Boolean> results,
-        long startTime, long endTime, int nbSlaves) {
+    public void displayResult(Collection<Boolean> results, long startTime,
+        long endTime, int nbSlaves) {
         // Post processing, calculates the statistics
         boolean prime = true;
 
@@ -82,14 +83,12 @@ public class BasicPrimeExample extends AbstractExample {
         throws TaskException, MalformedURLException,
             TaskAlreadySubmittedException {
         BasicPrimeExample instance = new BasicPrimeExample();
-        //   Getting command line parameters
-        instance.init(args, 2, " prime_to_find number_of_intervals");
+        //   Getting command line parameters and creating the master (see AbstractExample)
+        instance.init(args);
 
-        //      Creating the Master
-        instance.master = new ProActiveMaster<FindPrimeTask, Boolean>();
-        instance.registerHook();
-
-        instance.master.addResources(instance.descriptor_url, instance.vn_name);
+        System.out.println("Primality test launched for n=" +
+            instance.prime_to_find + " with " + instance.number_of_intervals +
+            " intervals, using descriptor " + instance.descriptor_url);
 
         long startTime = System.currentTimeMillis();
         // Creating and Submitting the tasks
@@ -99,20 +98,37 @@ public class BasicPrimeExample extends AbstractExample {
         List<Boolean> results = instance.master.waitAllResults();
         long endTime = System.currentTimeMillis();
 
-        // Displaying result
-        displayResult(results, startTime, endTime,
+        // Displaying results, the slavepoolSize method displays the number of slaves used by the master
+        instance.displayResult(results, startTime, endTime,
             instance.master.slavepoolSize());
 
         System.exit(0);
     }
 
     @Override
-    protected void init_specialized(String[] args) {
-        prime_to_find = Long.parseLong(args[2]);
-        number_of_intervals = Integer.parseInt(args[3]);
-        if (number_of_intervals <= 2) {
-            System.out.println("Wrong number of intervals : " +
-                number_of_intervals);
+    protected void before_init() {
+        command_options.addOption("p", true, "number to check for primality");
+        command_options.addOption("i", true, "number of dividing intervals");
+
+        // automatically generate the help statement
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("BasicPrimeExample", command_options);
+    }
+
+    @Override
+    protected void after_init() {
+        String primeString = cmd.getOptionValue("p");
+        if (primeString == null) {
+            prime_to_find = DEFAULT_PRIME_NUMBER;
+        } else {
+            prime_to_find = Long.parseLong(primeString);
+        }
+
+        String intervalString = cmd.getOptionValue("i");
+        if (intervalString == null) {
+            number_of_intervals = DEFAULT_NUMBER_OF_INTERVALS;
+        } else {
+            number_of_intervals = Integer.parseInt(intervalString);
         }
     }
 
@@ -143,10 +159,5 @@ public class BasicPrimeExample extends AbstractExample {
             }
             return new Boolean(true);
         }
-    }
-
-    @Override
-    protected ProActiveMaster getMaster() {
-        return master;
     }
 }

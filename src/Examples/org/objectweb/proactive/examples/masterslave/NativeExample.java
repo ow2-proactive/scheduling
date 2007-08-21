@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
+import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
@@ -18,7 +18,6 @@ import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
  *
  */
 public class NativeExample extends AbstractExample {
-    ProActiveMaster<SimpleNativeTask, String[]> master;
 
     /**
      * @param args
@@ -28,13 +27,8 @@ public class NativeExample extends AbstractExample {
         throws MalformedURLException, TaskAlreadySubmittedException {
         NativeExample instance = new NativeExample();
 
-        // Getting command line parameters
+        //   Getting command line parameters and creating the master (see AbstractExample)
         instance.init(args);
-
-        // Creating the Master
-        instance.master = new ProActiveMaster<SimpleNativeTask, String[]>();
-        instance.registerHook();
-        instance.master.addResources(instance.descriptor_url, instance.vn_name);
 
         // Creating the tasks to be solved
         List<SimpleNativeTask> tasks = new ArrayList<SimpleNativeTask>();
@@ -74,12 +68,14 @@ public class NativeExample extends AbstractExample {
     }
 
     @Override
-    protected void init_specialized(String[] args) {
-        // nothing to do
+    protected void before_init() {
+        // automatically generate the help statement
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("NativeExample", command_options);
     }
 
     @Override
-    protected ProActiveMaster getMaster() {
-        return master;
+    protected void after_init() {
+        // nothing to do
     }
 }
