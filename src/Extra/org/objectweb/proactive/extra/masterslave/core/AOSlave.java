@@ -216,7 +216,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     public void runActivity(final Body body) {
         Service service = new Service(body);
 
-        while (!terminated) {
+        while (body.isActive()) {
             while (!isSleeping) {
                 TaskIntern newTask = initialGetTask();
                 while (!isSleeping) {
@@ -246,7 +246,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
             service.waitForRequest();
 
             // We serve any outstanding request
-            if (!terminated) {
+            if (body.isActive()) {
                 service.serveOldest();
             }
         }
@@ -267,10 +267,10 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
             logger.debug("Terminating " + name + "...");
         }
         this.terminated = true;
+        ProActive.terminateActiveObject(true);
         if (logger.isDebugEnabled()) {
             logger.debug(name + " terminated...");
         }
-        ProActive.terminateActiveObject(true);
         return new BooleanWrapper(true);
     }
 

@@ -71,6 +71,11 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     protected Group slaveGroup;
 
     /**
+     * for internal use
+     */
+    private Thread localThread;
+
+    /**
      * ProActive empty constructor
      */
     public AOPinger() {
@@ -102,6 +107,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
             slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
             slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
             stubOnThis = (AOPinger) ProActive.getStubOnThis();
+            body.setImmediateService("terminate");
 
             ProActive.addNFEListenerOnGroup(slaveGroupStub,
                 new DetectMissingGroup());
@@ -123,6 +129,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
      * {@inheritDoc}
      */
     public void runActivity(final Body body) {
+        localThread = Thread.currentThread();
         Service service = new Service(body);
         while (!terminated) {
             // we serve everything
@@ -133,7 +140,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
             try {
                 Thread.sleep(pingPeriod);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                // do not print message, pinger is terminating
             }
         }
         body.terminate();
@@ -168,6 +175,8 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
      */
     public BooleanWrapper terminate() {
         this.terminated = true;
+        localThread.interrupt();
+
         if (logger.isDebugEnabled()) {
             logger.debug("Pinger terminated...");
         }

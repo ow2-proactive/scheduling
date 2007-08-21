@@ -34,10 +34,13 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -57,7 +60,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.Slave;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManager;
-import org.objectweb.proactive.extra.masterslave.interfaces.internal.SlaveManagerAdmin;
 import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvider;
 
 
@@ -66,15 +68,15 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskProvide
  * The Slave Manager Active Object is responsible for the deployment of Slaves :<br>
  * <ul>
  * <li> Through a ProActive deployment descriptor</li>
- * <li> Using an existing VirtualNode objectcollection of Nodes</li>
+ * <li> Using an existing VirtualNode object</li>
  * <li> Using a collection of Nodes</li>
  * </ul>
  *
  * @author fviale
  *
  */
-public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
-    NodeCreationEventListener, InitActive, Serializable {
+public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
+    InitActive, Serializable {
 
     /**
      * log4j logger for the slave manager
@@ -89,7 +91,7 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     /**
      * how many slaves have been created
      */
-    protected long slaveCounter;
+    protected long slaveNameCounter;
 
     /**
      * holds the virtual nodes, only used to kill the nodes when the slave manager is terminated
@@ -115,6 +117,11 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      * Initial memory of the slaves
      */
     protected Map<String, Object> initialMemory;
+
+    /**
+     * slaves deployed so far
+     */
+    protected Map<String, Slave> slaves;
 
     /**
      * ProActive no arg constructor
@@ -206,57 +213,30 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      * @param node the node on which a slave will be created
      */
     protected void createSlave(final Node node) {
-        try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Creating slave on " +
-                    node.getNodeInformation().getName());
-            }
-            String slavename = node.getNodeInformation().getHostName() + "_" +
-                slaveCounter++;
-
-            // Creates the slave which will automatically connect to the master
-            ProActive.newActive(AOSlave.class.getName(),
-                new Object[] { slavename, provider, initialMemory }, node);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Slave " + slavename + " created on " +
-                    node.getNodeInformation().getName());
-            }
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace(); // bad node
-        } catch (NodeException e) {
-            e.printStackTrace(); // bad node
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public BooleanWrapper freeSlave(final Slave slave) {
         if (!isTerminated) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(slave.getName() + " freed.");
-            }
-            BooleanWrapper term = slave.terminate();
-            ProActive.waitFor(term);
-            return new BooleanWrapper(true);
-        }
-        return new BooleanWrapper(false);
-    }
+            try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Creating slave on " +
+                        node.getNodeInformation().getName());
+                }
+                String slavename = node.getNodeInformation().getHostName() +
+                    "_" + slaveNameCounter++;
 
-    /**
-     * {@inheritDoc}
-     */
-    public BooleanWrapper freeSlaves(final Collection<Slave> slavesToFree) {
-        if (!isTerminated) {
-            for (Slave slave : slavesToFree) {
-                freeSlave(slave);
+                // Creates the slave which will automatically connect to the master
+                slaves.put(slavename,
+                    (Slave) ProActive.newActive(AOSlave.class.getName(),
+                        new Object[] { slavename, provider, initialMemory },
+                        node));
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Slave " + slavename + " created on " +
+                        node.getNodeInformation().getName());
+                }
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace(); // bad node
+            } catch (NodeException e) {
+                e.printStackTrace(); // bad node
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug(slavesToFree.size() + " slaves Freed.");
-            }
-            return new BooleanWrapper(true);
         }
-        return new BooleanWrapper(false);
     }
 
     /**
@@ -264,7 +244,8 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      */
     public void initActivity(final Body body) {
         stubOnThis = ProActive.getStubOnThis();
-        slaveCounter = 0;
+        slaveNameCounter = 0;
+        slaves = new HashMap<String, Slave>();
         vnlist = new Vector<VirtualNode>();
         isTerminated = false;
         if (logger.isDebugEnabled()) {
@@ -279,14 +260,10 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
     public void nodeCreated(final NodeCreationEvent event) {
         // get the node
         Node node = event.getNode();
-        threadPool.execute(new SlaveCreationHandler(node));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setTaskProvider(final TaskProvider provider) {
-        this.provider = provider;
+        try {
+            threadPool.execute(new SlaveCreationHandler(node));
+        } catch (java.util.concurrent.RejectedExecutionException e) {
+        }
     }
 
     /**
@@ -294,32 +271,49 @@ public class AOSlaveManager implements SlaveManager, SlaveManagerAdmin,
      */
     public BooleanWrapper terminate(final boolean freeResources) {
         isTerminated = true;
+
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating SlaveManager...");
         }
         try {
+            threadPool.shutdown();
+
             for (int i = 0; i < vnlist.size(); i++) {
-                // ((VirtualNodeImpl) vnlist.get(i)).waitForAllNodesCreation();
-                ((VirtualNodeImpl) vnlist.get(i)).removeNodeCreationEventListener(this);
+                try {
+                    ((VirtualNodeImpl) vnlist.get(i)).waitForAllNodesCreation();
+                } catch (org.objectweb.proactive.core.node.NodeException e) {
+                    // do nothing
+                }
+            }
+
+            threadPool.awaitTermination(120, TimeUnit.SECONDS);
+
+            for (Entry<String, Slave> slave : slaves.entrySet()) {
+                BooleanWrapper term = slave.getValue().terminate();
+                ProActive.waitFor(term);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(slave.getKey() + " freed.");
+                }
+            }
+
+            for (int i = 0; i < vnlist.size(); i++) {
                 if (freeResources) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Killing all active objects...");
+                    }
                     ((VirtualNodeImpl) vnlist.get(i)).killAll(false);
                 }
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "finished deactivating nodes, will terminate Resource Manager");
-            }
             ProActive.terminateActiveObject(true);
-            //sucess
+            // success
             if (logger.isDebugEnabled()) {
                 logger.debug("SlaveManager terminated...");
             }
             return new BooleanWrapper(true);
         } catch (Exception e) {
-            logger.error("Couldnt Terminate the Resource manager");
+            logger.error("Couldn't Terminate the Resource manager");
             e.printStackTrace();
-
             return new BooleanWrapper(false);
         }
     }

@@ -30,31 +30,53 @@
  */
 package org.objectweb.proactive.extra.masterslave.interfaces.internal;
 
+import java.net.URL;
 import java.util.Collection;
 
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * A SlaveManager keeps a pool of Slaves in the Master/Slave API <br/>
- * A SlaveManager is connected to a SlaveConsumer (i.e. the Master in the M/S API) which needs slaves.<br/>
+ * Admin interface of the Slave Manager in the Master/Slave API (allows to extend the pool of slaves, or terminate the manager)<br/>
  * @author fviale
  *
  */
 public interface SlaveManager {
 
     /**
-     * Returns a slave to the slave manager
-     * @param slave slave to be returned
-     * @return acceptation of the request (asynchronous)
+     * Asks the slave manager to activate every virtual nodes inside the given descriptor
+     * and use the generated nodes as resources
+     * @param descriptorURL URL of a deployment descriptor
      */
-    BooleanWrapper freeSlave(Slave slave);
+    void addResources(URL descriptorURL);
 
     /**
-     * Returns a collection of slaves to the slave manager
-     * @param nodes Collection of slaves to be returned
-     * @return acceptation of the request (asynchronous)
+     * Asks the slave manager to activate the given virtual nodes inside the given descriptor
+     * and use the generated nodes as resources
+     * @param descriptorURL URL of a deployment descriptor
+     * @param virtualNodeName names of the virtual node to activate
      */
-    BooleanWrapper freeSlaves(Collection<Slave> nodes);
+    void addResources(URL descriptorURL, String virtualNodeName);
+
+    /**
+     * Adds the given Collection of nodes to the slave manager
+     * @param nodes a collection of nodes
+     */
+    void addResources(Collection<Node> nodes);
+
+    /**
+     * Adds the given virtual node to the slave manager
+     * @param virtualnode a virtual node object
+     */
+    void addResources(VirtualNode virtualnode);
+
+    /**
+     * Terminates the slave manager and free every resources (if asked)
+     * @param freeResources tells if the Slave Manager should as well free the node resources
+     * @return success
+     */
+    BooleanWrapper terminate(boolean freeResources);
 }
