@@ -276,18 +276,22 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             logger.debug("Terminating SlaveManager...");
         }
         try {
+            // we shutdown the thread pool, no new thread will be accepted
             threadPool.shutdown();
 
             for (int i = 0; i < vnlist.size(); i++) {
+                // we wait for every node creation, in case some nodes were not already deployed
                 try {
                     ((VirtualNodeImpl) vnlist.get(i)).waitForAllNodesCreation();
                 } catch (org.objectweb.proactive.core.node.NodeException e) {
-                    // do nothing
+                    // do nothing, we ignore node creation exceptions
                 }
             }
 
+            // we wait that all threads creating active objects finish
             threadPool.awaitTermination(120, TimeUnit.SECONDS);
 
+            // we send the terminate message to every thread
             for (Entry<String, Slave> slave : slaves.entrySet()) {
                 BooleanWrapper term = slave.getValue().terminate();
                 ProActive.waitFor(term);
@@ -297,6 +301,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             }
 
             for (int i = 0; i < vnlist.size(); i++) {
+                // if the user asked it, we also release the resources, by killing all JVMs
                 if (freeResources) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Killing all active objects...");
@@ -305,6 +310,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
                 }
             }
 
+            // finally we terminate this active object
             ProActive.terminateActiveObject(true);
             // success
             if (logger.isDebugEnabled()) {

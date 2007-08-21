@@ -32,7 +32,6 @@ package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,11 +48,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -556,11 +551,6 @@ public class AOMaster implements Serializable, TaskProvider, InitActive,
         // We empty pending queues
         pendingTasks.clear();
 
-        // getTask becomes an immediate service until the master is really terminated
-
-        //ProActive.getBodyOnThis().blockCommunication();
-        //ProActive.getBodyOnThis().setImmediateService("getTask");
-        //ProActive.getBodyOnThis().setImmediateService("sendResultAndGetTask");
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating Master...");
         }
