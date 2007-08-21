@@ -65,7 +65,7 @@
 			<exclude name="**/*$*.class"/>
 		</fileset>
 		<else>
-			<fileset dir="${cl.test.dir}" id="testsuite1">
+			<fileset dir="${cl.test.dir}" id="testsuite">
 				<include name="unitTests/**/*.class"/>
 				<exclude name="**/*$*.class"/>
 				<include name="functionalTests/**/*Test*.class"/>
