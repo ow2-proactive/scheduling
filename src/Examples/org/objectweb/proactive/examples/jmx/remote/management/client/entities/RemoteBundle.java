@@ -91,7 +91,7 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
     }
 
     public void setParent(RemoteGateway gateway) {
-        this.parent = parent;
+        this.parent = gateway;
     }
 
     @Override
