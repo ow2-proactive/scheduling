@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ProActive" default="compile" basedir=".">
+	<!--
+		Available properties are:
+			-Dtest='unitTests/**/*.class'		Override the default testsuite for junit* targets
+			-Dversion="3.2.1"					Tag a build with this version
+	-->
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
 
 	<import file="common.xml" />
@@ -53,6 +58,34 @@
 		<pathelement location="${lib.dir}/examples/jai_imageio.jar" />
 	</path>
 
+	<!-- Default testsuite can be overriden by using the -Dtest property -->
+	<if name="test">
+		<fileset dir="${cl.test.dir}" id="testsuite">
+			<include name="${test}"/>
+			<exclude name="**/*$*.class"/>
+		</fileset>
+		<else>
+			<fileset dir="${cl.test.dir}" id="testsuite1">
+				<include name="unitTests/**/*.class"/>
+				<exclude name="**/*$*.class"/>
+				<include name="functionalTests/**/*Test*.class"/>
+				<exclude name="functionalTests/security/*/*.class"/>
+				<exclude name="functionalTests/*.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/MulticastTestItf.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/ServerItfTestItf.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/ServerParameterAnnotationTester.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/ServerTestItf.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/ServerItfTestItf.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/TestItf.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class"/>
+				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class"/>
+			</fileset>
+		</else>
+	</if>
+	
 
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
@@ -354,10 +387,8 @@
 			
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
-
 			<junit printsummary="yes" forkmode="perTest" showoutput="no">
 				<jvmarg value="-Dproactive.dir=${base.dir}"/>
-
 
 				<classpath>
 					<additionalClasspath/>
@@ -379,35 +410,16 @@
 					<jvmarg value="-agentlib:yjpagent" />
 				-->	
 
-
-
 				<formatter type="xml"/>
+				
 				<batchtest fork="yes" todir="${junit.dir}">
-					<fileset dir="${cl.test.dir}">
-						<include name="unitTests/**/*.class"/>
-						<exclude name="**/*$*.class"/>
-						<include name="functionalTests/**/*Test*.class"/>
-						<exclude name="functionalTests/security/*/*.class"/>
-						<exclude name="functionalTests/*.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/MulticastTestItf.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/ServerItfTestItf.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/ServerParameterAnnotationTester.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/ServerTestItf.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/ServerItfTestItf.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/TestItf.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class"/>
-						<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class"/>
-					</fileset>
+					<fileset refid="testsuite"/>
 				</batchtest>
 			</junit>
 		</sequential>
 	</macrodef>
-
-
-	<target name="junitDistributed" depends="proActiveJar" description="Run all non regression tests">
+	
+	<target name="junitDistributed" depends="tests, proActiveJar" description="Run all non regression tests">
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
 	</target>
 
