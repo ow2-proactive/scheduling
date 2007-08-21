@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 
 
 public class RemoteService extends ManageableEntity implements Serializable {

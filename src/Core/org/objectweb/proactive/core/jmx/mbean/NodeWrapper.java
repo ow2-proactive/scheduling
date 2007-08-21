@@ -99,6 +99,14 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         return this.objectName;
     }
 
+    public String getVirtualNodeName() {
+        return localNode.getVirtualNodeName();
+    }
+
+    public String getJobId() {
+        return localNode.getJobId();
+    }
+
     public void sendNotification(String type) {
         sendNotification(type, null);
     }

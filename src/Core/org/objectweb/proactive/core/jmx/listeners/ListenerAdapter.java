@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.listeners;
+package org.objectweb.proactive.core.jmx.listeners;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;

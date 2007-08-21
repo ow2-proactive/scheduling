@@ -38,7 +38,7 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerProvider;
 import javax.management.remote.JMXServiceURL;
 
-import org.objectweb.proactive.extensions.jmx.server.ProActiveConnectorServer;
+import org.objectweb.proactive.core.jmx.server.ProActiveConnectorServer;
 
 
 /**

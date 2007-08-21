@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -237,4 +238,7 @@ public interface RemoteProActiveRuntime extends Serializable {
         throws IOException, ProActiveException;
 
     public String getMBeanServerName() throws IOException, ProActiveException;
+
+    public ServerConnector getJMXServerConnector()
+        throws IOException, ProActiveException;
 }

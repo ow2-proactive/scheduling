@@ -134,8 +134,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntimeImpl proActiveRuntime;
 
     // JMX
-    /** The MBean representing this ProActive Runtime */
-    private ProActiveRuntimeWrapperMBean mbean;
     private static boolean createMBean;
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
 
@@ -185,6 +183,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /** The Server Connector to connect remotly to the JMX server */
     private ServerConnector serverConnector;
     private Object mutex = new Object();
+
+    /** The MBean representing this ProActive Runtime */
+    private ProActiveRuntimeWrapperMBean mbean;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------------------
@@ -265,7 +266,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     * Return the ServerConnector associated to this ProActiveRuntime.
      * If no ServerConnector has been created, a new one is created and started.
      * Any ProActive JMX Connector Client can connect to it remotely and manage the MBeans.
      * @return the ServerConnector associated to this ProActiveRuntime
@@ -288,8 +288,18 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return mbean;
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getMBeanServerName()
+     */
     public String getMBeanServerName() {
         return UrlBuilder.getNameFromUrl(proActiveRuntime.getURL());
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getJMXServerConnector()
+     */
+    public ServerConnector getJMXServerConnector() {
+        return serverConnector;
     }
 
     //

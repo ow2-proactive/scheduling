@@ -308,8 +308,9 @@ public class LocalNode {
         // JMX Notification
         ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getProActiveRuntime()
                                                                         .getMBean();
-        if (runtimeMBean != null) {
-            runtimeMBean.sendNotification(NotificationType.nodeDestroyed);
+        if ((runtimeMBean != null) && (this.mbean != null)) {
+            runtimeMBean.sendNotification(NotificationType.nodeDestroyed,
+                this.mbean.getURL());
         }
 
         // END JMX Notification

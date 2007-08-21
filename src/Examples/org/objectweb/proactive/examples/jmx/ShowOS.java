@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import javax.management.MBeanAttributeInfo;
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.extensions.jmx.client.ClientConnector;
 
 

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.server;
+package org.objectweb.proactive.core.jmx.server;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -42,6 +42,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
 
@@ -63,6 +64,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
     private static final int STARTED = 1;
     private static final int STOPPED = 2;
     private int state = CREATED;
+    private UniqueID id;
 
     /**
      * Creates a ProActiveConnectorServer
@@ -149,6 +151,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
             paServer = new ProActiveServerImpl();
             paServer.setMBeanServer(mbs);
             paServer = (ProActiveServerImpl) ProActive.turnActive(paServer);
+            id = paServer.getUniqueID();
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -204,5 +207,9 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      */
     public Map<String, Object> getAttributes() {
         return this.attributes;
+    }
+
+    public UniqueID getUniqueID() {
+        return this.id;
     }
 }

@@ -36,9 +36,9 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.examples.jmx.remote.management.events.EntitiesEventManager;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 
 
 public class RemoteTransactionGroup extends ManageableEntity

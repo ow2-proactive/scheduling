@@ -39,6 +39,7 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 
 
@@ -88,5 +89,9 @@ public class ServerConnector {
      */
     public void start() throws IOException {
         this.cs.start();
+    }
+
+    public UniqueID getUniqueID() {
+        return ((ProActiveConnectorServer) cs).getUniqueID();
     }
 }

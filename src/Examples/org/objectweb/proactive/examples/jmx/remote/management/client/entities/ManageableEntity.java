@@ -35,8 +35,8 @@ import java.util.Vector;
 
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.examples.jmx.remote.management.status.Status;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 
 
 /**

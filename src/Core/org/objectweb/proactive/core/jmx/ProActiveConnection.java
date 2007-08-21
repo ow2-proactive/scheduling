@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx;
+package org.objectweb.proactive.core.jmx;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -56,9 +56,11 @@ import javax.management.ObjectName;
 import javax.management.QueryExp;
 import javax.management.ReflectionException;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.jmx.listeners.ListenerAdapter;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
-import org.objectweb.proactive.extensions.jmx.listeners.ListenerAdapter;
 
 
 /**
@@ -144,9 +146,6 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     /**
      * @see javax.management.MBeanServerConnection#queryMBeans(javax.management.ObjectName, javax.management.QueryExp)
      */
-    @SuppressWarnings({"unused",
-        "unchecked"
-    })
     public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query)
         throws IOException {
         return this.mbs.queryMBeans(name, query);
@@ -543,5 +542,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
+    }
+
+    public UniqueID getUniqueID() {
+        return ProActive.getBodyOnThis().getID();
     }
 }

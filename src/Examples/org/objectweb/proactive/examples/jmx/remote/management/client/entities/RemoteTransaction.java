@@ -36,8 +36,8 @@ import java.util.ArrayList;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.examples.jmx.remote.management.events.EntitiesEventManager;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 
 
 public class RemoteTransaction extends ManageableEntity implements Serializable {

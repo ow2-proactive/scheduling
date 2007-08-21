@@ -57,4 +57,17 @@ public interface NodeWrapperMBean extends Serializable {
      * @return The object name used for this MBean.
      */
     public ObjectName getObjectName();
+
+    /**
+     * Returns the name of the virtual node by which the node
+     * has been instancied if any.
+     * @return the name of the virtual node.
+     */
+    public String getVirtualNodeName();
+
+    /**
+     * Returns the jobId.
+     * @return The jobId.
+     */
+    public String getJobId();
 }

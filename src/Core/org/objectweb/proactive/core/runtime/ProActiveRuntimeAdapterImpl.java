@@ -699,4 +699,8 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     public String getMBeanServerName() {
         return null;
     }
+
+    public ServerConnector getJMXServerConnector() {
+        return null;
+    }
 }

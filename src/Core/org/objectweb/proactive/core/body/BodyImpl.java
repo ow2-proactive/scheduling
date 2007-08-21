@@ -72,7 +72,9 @@ import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
@@ -251,12 +253,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
-            RequestNotificationData requestNotificationData = new RequestNotificationData(request.getSourceBodyID(),
-                    request.getSender().getNodeURL(), this.bodyID,
-                    this.nodeURL, request.getMethodName(),
-                    getRequestQueue().size() + 1);
-            this.mbean.sendNotification(NotificationType.requestReceived,
-                requestNotificationData);
+            // If the node is not a HalfBody
+            if (!(request.getSender().getNodeURL().equals("LOCAL"))) {
+                RequestNotificationData requestNotificationData = new RequestNotificationData(request.getSourceBodyID(),
+                        request.getSender().getNodeURL(), this.bodyID,
+                        this.nodeURL, request.getMethodName(),
+                        getRequestQueue().size() + 1);
+                this.mbean.sendNotification(NotificationType.requestReceived,
+                    requestNotificationData);
+            }
         }
 
         // END JMX Notification
@@ -696,10 +701,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // JMX Notification
             // TODO Write this section, after the commit of Arnaud
             // TODO Send a notification only if the destination doesn't implement ProActiveInternalObject
-
-            /*if (!isProActiveInternalObject && (mbean != null)) {
-                           mbean.sendNotification(NotificationType.requestSent, request.getSequenceNumber());
-            }*/
+            if (!isProActiveInternalObject && (mbean != null)) {
+                ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                      .getJMXServerConnector();
+                if (serverConnector != null) {
+                    UniqueID connectorID = serverConnector.getUniqueID();
+                    if (!connectorID.equals(destinationBody.getID())) {
+                        mbean.sendNotification(NotificationType.requestSent,
+                            request.getSequenceNumber());
+                    }
+                }
+            }
 
             // END JMX Notification
 

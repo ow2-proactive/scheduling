@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -430,4 +431,10 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * @return the MBeans Server Name
      */
     public String getMBeanServerName();
+
+    /**
+     * Returns the JMX Server connector
+     * @return the JMX Server connector
+     */
+    public ServerConnector getJMXServerConnector();
 }

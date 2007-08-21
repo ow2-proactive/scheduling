@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.server;
+package org.objectweb.proactive.core.jmx.server;
 
 import java.io.Serializable;
 
@@ -37,9 +37,10 @@ import javax.management.MBeanServer;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 
 
 /**
@@ -50,6 +51,7 @@ public class ProActiveServerImpl implements Serializable,
     ProActiveInternalObject {
     private static final long serialVersionUID = -5189383875728195134L;
     private transient MBeanServer mbeanServer;
+    private UniqueID id;
 
     /**
      *  The ProActive Connector version
@@ -90,5 +92,12 @@ public class ProActiveServerImpl implements Serializable,
      */
     public synchronized MBeanServer getMBeanServer() {
         return mbeanServer;
+    }
+
+    public UniqueID getUniqueID() {
+        if (id == null) {
+            id = ProActive.getBodyOnThis().getID();
+        }
+        return id;
     }
 }

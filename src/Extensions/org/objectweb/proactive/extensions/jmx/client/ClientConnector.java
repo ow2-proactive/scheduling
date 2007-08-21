@@ -38,9 +38,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 
 
 /**

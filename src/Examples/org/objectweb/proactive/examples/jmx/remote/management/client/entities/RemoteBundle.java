@@ -36,12 +36,12 @@ import java.util.ArrayList;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.examples.jmx.remote.management.events.EntitiesEventManager;
 import org.objectweb.proactive.examples.jmx.remote.management.mbean.BundleInfo;
 import org.objectweb.proactive.examples.jmx.remote.management.status.Status;
 import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
 
 
 /***
