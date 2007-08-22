@@ -43,7 +43,6 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Master;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
-
 /**
  * Test load balancing
  */
