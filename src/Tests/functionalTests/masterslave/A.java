@@ -35,11 +35,6 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
 public class A implements Task<Integer> {
-
-    /**
-         *
-         */
-    private static final long serialVersionUID = 7562698745274296370L;
     private int taskcounter;
     private long delay;
     private boolean exception;
