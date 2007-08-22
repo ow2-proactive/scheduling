@@ -133,7 +133,10 @@
 				<include name="functionalTests/**/*.fractal" />
 				<include name="functionalTests/**/*.properties" />
 				<include name="functionalTests/**/*.xsd" />
-                                <include name="performanceTests/**/*.xml" />
+				
+				<include name="unitTests/**/*.txt" />
+				
+                <include name="performanceTests/**/*.xml" />
 			</fileset>
 		</copy>
 	</target>

@@ -51,17 +51,20 @@ public class GCMParserHelper {
          */
 
         // Start Error Handler code here
+        @Override
         public void warning(SAXParseException e) {
             System.err.println("Warning Line " + e.getLineNumber() + ": " +
                 e.getMessage() + "\n");
         }
 
+        @Override
         public void error(SAXParseException e) {
             errMessage = new String("Error Line " + e.getLineNumber() + ": " +
                     e.getMessage() + "\n");
             System.err.println(errMessage);
         }
 
+        @Override
         public void fatalError(SAXParseException e) {
             errMessage = new String("Error Line " + e.getLineNumber() + ": " +
                     e.getMessage() + "\n");

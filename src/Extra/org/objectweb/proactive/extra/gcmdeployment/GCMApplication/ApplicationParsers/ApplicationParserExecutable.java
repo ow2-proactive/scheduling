@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers;
 
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;

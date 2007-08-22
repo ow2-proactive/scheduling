@@ -26,6 +26,7 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         return NODE_NAME;
     }
 
+    @Override
     public void parseApplicationNode(Node paNode,
         GCMApplicationParser applicationParser, XPath xpath) {
         super.parseApplicationNode(paNode, applicationParser, xpath);

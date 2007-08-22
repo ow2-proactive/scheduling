@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;

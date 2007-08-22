@@ -3,8 +3,6 @@ package org.objectweb.proactive.extra.gcmdeployment.process;
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-
 
 /**
  *

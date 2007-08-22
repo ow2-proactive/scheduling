@@ -160,7 +160,7 @@ public class StartRuntime {
         }
 
         // Creation & Setup of the local ProActive Runtime
-        ProActiveRuntimeImpl localRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        ProActiveRuntimeImpl localRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveRuntime localRuntime;
         try {
             localRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
