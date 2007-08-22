@@ -1,5 +1,6 @@
 package unitTests;
 
+import org.apache.log4j.Logger;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -18,4 +19,5 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @SuiteClasses(org.objectweb.proactive.core.util.CircularArrayList.UnitTestCircularArrayList.class)
 public class UnitTests {
+    static final public Logger logger = Logger.getLogger("testsuite");
 }
