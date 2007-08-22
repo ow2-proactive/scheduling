@@ -62,7 +62,13 @@ public class StartRuntime {
     static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     /** The URL of the parent ProActive Runtime */
-    protected String parentURL;
+    private String parentURL;
+
+    /** An uniq identifier for the deployment framework */
+    private String deploymentID;
+
+    /** Capacity of this runtime */
+    private long capacity;
 
     /** Command Line arguments */
     private String[] args;
@@ -128,16 +134,38 @@ public class StartRuntime {
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
-        options.addOption(Params.parent.toString(), Params.parent.sOpt, true,
+        options.addOption(Params.parent.sOpt, Params.parent.toString(), true,
             Params.parent.desc);
+        options.addOption(Params.capacity.sOpt, Params.capacity.toString(),
+            true, Params.capacity.desc);
+        options.addOption(Params.deploymentID.sOpt,
+            Params.deploymentID.toString(), true, Params.deploymentID.desc);
 
-        CommandLine line;
+        CommandLine line = null;
 
         try {
+            String arg;
+
             line = parser.parse(options, args);
-            parentURL = line.getOptionValue(Params.parent.toString());
+
+            parentURL = line.getOptionValue(Params.parent.sOpt);
+
+            arg = line.getOptionValue(Params.capacity.sOpt);
+            if (arg == null) {
+                capacity = Runtime.getRuntime().availableProcessors();
+                logger.info(capacity + " cores found. Capacity set to " +
+                    capacity);
+            } else {
+                capacity = new Long(arg);
+            }
+
+            deploymentID = line.getOptionValue(Params.deploymentID.sOpt);
         } catch (ParseException e) {
             logger.warn("Cannot parse command line arguments", e);
+            abort();
+        } catch (NumberFormatException e) {
+            logger.error("Capacity must be a number: " +
+                line.getOptionValue(Params.capacity.toString()));
             abort();
         }
     }
@@ -170,6 +198,8 @@ public class StartRuntime {
             abort();
         }
 
+        localRuntimeImpl.setCapacity(capacity);
+
         // Say hello to our parent if needed
         if (parentURL != null) {
             ProActiveRuntime parentRuntime;
@@ -177,13 +207,6 @@ public class StartRuntime {
                 parentRuntime = RuntimeFactory.getRuntime(parentURL,
                         UrlBuilder.getProtocol(parentURL));
 
-                /*
-                parentRuntime.register(localRuntime, localRuntime.getURL(),
-                    "",
-                    ProActiveConfiguration.getInstance()
-                                          .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
-                    "MKrisIlEstSympa");
-                                */
                 ProActiveRuntimeImpl.getProActiveRuntime()
                                     .setParent(parentRuntime);
                 waitUntilInterupted();
@@ -194,14 +217,7 @@ public class StartRuntime {
         }
 
         if (System.getProperty("proactive.runtime.stayalive") != null) {
-            Object o = new Object();
-            synchronized (o) {
-                try {
-                    o.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            waitUntilInterupted();
         }
     }
 
@@ -215,7 +231,9 @@ public class StartRuntime {
             }
         }
     }
-    private enum Params {parent("p", "URL of the parent ProActive Runtime");
+    private enum Params {parent("p", "URL of the parent ProActive Runtime"),
+        deploymentID("i", "An uniq ID for the deployment framework"),
+        capacity("c", "Number of Node to be created");
         protected String sOpt;
         protected String desc;
 

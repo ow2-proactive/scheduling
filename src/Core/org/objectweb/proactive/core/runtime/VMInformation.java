@@ -96,4 +96,12 @@ public interface VMInformation extends java.io.Serializable, Job {
      * @return the Group Information of this VM
      */
     public DeployerTag getDeployerTag();
+
+    /**
+     * Returns the capacity of the ProActive Runtime
+     *
+     * Capacity corresponds to the number of node created by default on the runtime.
+     * Usually capacity corresponds to the number of cores on which the JVM runs.
+     */
+    public long getCapacity();
 }

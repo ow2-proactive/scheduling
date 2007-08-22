@@ -55,4 +55,16 @@ public interface LocalProActiveRuntime {
      * @param parentPARuntime the creator of this runtime
      */
     public void setParent(ProActiveRuntime parentPARuntime);
+
+    /**
+     * Set the capacity of the local ProActive Runtime and create
+     * as many local nodes.
+     *
+     * Capacity can only be set once.
+     *
+     * @param capacity An long strictly greater than 0.
+     * @throws IllegalStateException if called twice
+     * @throws IllegalArgumentException if capacity is not strictly positive
+     */
+    public void setCapacity(long capacity);
 }
