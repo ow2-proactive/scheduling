@@ -37,6 +37,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.rmi.AlreadyBoundException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -434,12 +435,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public String createLocalNode(String nodeURL,
         boolean replacePreviousBinding,
         ProActiveSecurityManager nodeSecurityManager, String vnName,
-        String jobId) throws NodeException {
+        String jobId) throws NodeException, AlreadyBoundException {
         // check if nodeName is an URI or not
         String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
 
         if (!replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
-            throw new NodeException("Node " + nodeName +
+            throw new AlreadyBoundException("Node " + nodeName +
                 " already created on this ProActiveRuntime. To overwrite this node, use true for replacePreviousBinding");
         }
 
@@ -458,7 +459,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                                                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
                         nodeName);
             } catch (UnknownProtocolException e) {
-                e.printStackTrace();
+                throw new NodeException(e);
             }
         }
         try {
