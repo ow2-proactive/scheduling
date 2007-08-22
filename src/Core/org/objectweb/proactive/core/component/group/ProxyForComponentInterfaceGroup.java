@@ -41,7 +41,6 @@ import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
@@ -278,7 +277,6 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
             //            LocalBodyStore.getInstance().setCurrentThreadBody(body);
         }
 
-        // TODO Auto-generated method stub
         super.oneWayCallOnGroup(mc, exceptionList);
     }
 
