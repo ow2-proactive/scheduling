@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GCMApplication
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
+
+	<application>
+		<executable>
+			<resourceProvider refid="INRIA_LAN" />
+			<!--	<command name="hostname">
+				<arg>-f</arg>
+				</command>  -->
+			<command
+				name="/user/glaurent/home/proactive_command_test">
+			</command>
+		</executable>
+	</application>
+
+	<resources>
+		<resourceProvider id="INRIA_LAN">
+			<file path="../deployment/bridgeSSHgroupSSH.xml" />
+		</resourceProvider>
+	</resources>
+
+</GCMApplication>

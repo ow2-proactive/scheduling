@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
+
+	
+	<resources>
+		<host refid="schubby"/>
+	</resources>
+
+	<infrastructure>
+		<hosts>
+			<host id="schubby" os="unix" hostCapacity="1" vmCapacity="1">
+				<homeDirectory>/user/cmathieu/home</homeDirectory>
+			</host>
+		</hosts>
+	</infrastructure>
+</GCMDeployment>

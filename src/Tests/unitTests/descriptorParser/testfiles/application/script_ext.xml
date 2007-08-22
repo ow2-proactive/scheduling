@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GCMApplication
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema
+	../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension
+	../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/SampleApplicationExtension.xsd">
+
+	<application>
+		<paext:myapplication someattr="foobar" />
+	</application>
+
+	<resources>
+		<resourceProvider id="INRIA_LAN">
+			<file path="../deployment/deployment0.xml" />
+		</resourceProvider>
+	</resources>
+
+</GCMApplication>
