@@ -282,7 +282,10 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             for (int i = 0; i < vnlist.size(); i++) {
                 // we wait for every node creation, in case some nodes were not already deployed
                 try {
-                    ((VirtualNodeImpl) vnlist.get(i)).waitForAllNodesCreation();
+                    if (vnlist.get(i).getNbMappedNodes() > vnlist.get(i)
+                                                                     .getNumberOfCurrentlyCreatedNodes()) {
+                        ((VirtualNodeImpl) vnlist.get(i)).waitForAllNodesCreation();
+                    }
                 } catch (org.objectweb.proactive.core.node.NodeException e) {
                     // do nothing, we ignore node creation exceptions
                 }

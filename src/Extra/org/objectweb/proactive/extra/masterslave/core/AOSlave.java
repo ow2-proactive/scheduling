@@ -256,7 +256,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * {@inheritDoc}
      */
     public void save(final String dataName, final Object data) {
-        memory.put(name, dataName);
+        memory.put(dataName, data);
     }
 
     /**
