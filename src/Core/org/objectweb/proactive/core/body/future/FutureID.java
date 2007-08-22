@@ -35,11 +35,21 @@ public class FutureID implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + (int) (ID ^ (ID >>> 32));
+        result = (prime * result) +
+            ((creatorID == null) ? 0 : creatorID.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
         if (getClass() != obj.getClass()) {
@@ -49,6 +59,13 @@ public class FutureID implements Serializable {
         if (ID != other.ID) {
             return false;
         }
-        return creatorID.equals(other.creatorID);
+        if (creatorID == null) {
+            if (other.creatorID != null) {
+                return false;
+            }
+        } else if (!creatorID.equals(other.creatorID)) {
+            return false;
+        }
+        return true;
     }
 }

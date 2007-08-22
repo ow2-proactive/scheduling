@@ -191,11 +191,15 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     @Override
     public boolean equals(Object obj) {
-        //we test if we have a future object
-        if (isFutureObject(obj)) {
-            return (((StubObject) obj).getProxy().hashCode() == this.hashCode());
+        if (obj instanceof FutureProxy) {
+            return this.id.equals(((FutureProxy) obj).id);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
     }
 
     //
