@@ -12,9 +12,9 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
-import org.objectweb.proactive.extensions.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 
 public class NodeObject extends AbstractData{

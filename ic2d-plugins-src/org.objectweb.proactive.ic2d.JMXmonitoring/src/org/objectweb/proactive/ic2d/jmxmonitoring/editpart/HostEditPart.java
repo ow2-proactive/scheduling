@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;

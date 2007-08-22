@@ -54,7 +54,7 @@ public class AOConnection {
 	 * @param sourceID The source ID.
 	 * @param targetID The target ID.
 	 */
-	public static Connection createConnection(AOFigure source, AOFigure target, Color color){
+	public static RoundedLineConnection createConnection(AOFigure source, AOFigure target, Color color){
 		RoundedLineConnection connection = new RoundedLineConnection(color);
 
 		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);

@@ -136,6 +136,7 @@ public class RuntimeObjectListener implements NotificationListener{
 			RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
 		}
 		else if(type.equals(NotificationType.runtimeDestroyed)){
+			System.out.println("...............................Runtime destroyed "+runtimeObject);
 			runtimeObject.runtimeKilled();
 		}
 		// --- NodeEvent ----------------

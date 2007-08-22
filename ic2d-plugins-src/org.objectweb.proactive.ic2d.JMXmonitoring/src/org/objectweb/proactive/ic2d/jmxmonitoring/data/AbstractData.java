@@ -15,7 +15,7 @@ import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;

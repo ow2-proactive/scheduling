@@ -74,7 +74,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 			public void run(){
 				while(shouldRepaint){
 					try {
-						Thread.sleep(80);
+						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

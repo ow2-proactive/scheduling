@@ -235,26 +235,51 @@ public class ActiveObject extends AbstractData{
 	/**
 	 * Adds a communication to this object.
 	 * Warning: This active object is the destination of the communication.
-	 * @param communication
+	 * @param aoSource Source active object.
 	 */
-	public void addCommunication(UniqueID sourceID){
-		ActiveObject source = getWorldObject().findActiveObject(sourceID);
-		if(source==null){
-			//TODO A faire Traiter l'erreur
-			System.err.println("Don't find the id: "+sourceID);
-			return;
-		}
+	private void addCommunication(ActiveObject aoSource){
 		setChanged();
 		Set<ActiveObject> comm = new HashSet<ActiveObject>();
-		comm.add(source);
+		comm.add(aoSource);
 		notifyObservers(comm);	
 		/*synchronized (communications) {
 			communications.add(source);
 		}*/
 	}
+	
+	/**
+	 * Adds a communication to this object.
+	 * Warning: This active object is the destination of the communication.
+	 * @param sourceID The unique id of the source of the request.
+	 */
+	public void addCommunicationFrom(UniqueID sourceID){
+		ActiveObject source = getWorldObject().findActiveObject(sourceID);
+		if(source == null){
+			//TODO A faire Traiter l'erreur
+			System.err.println("Don't find the id: "+sourceID);
+			return;
+		}
+		this.addCommunication(source);
+	}
+	
+	/**
+	 * Adds a communication to this object.
+	 * Warning: This active object is the source of the communication.
+	 * @param destinationID The unique id of the destination of the request.
+	 */
+	public void addCommunicationTo(UniqueID destinationID){
+		ActiveObject destination = getWorldObject().findActiveObject(destinationID);
+		if(destination == null){
+			//TODO A faire Traiter l'erreur
+			System.err.println("Don't find the id: "+destinationID);
+			return;
+		}
+		destination.addCommunication(this);
+	}
 
 	@Override
 	public void resetCommunications() {
+		System.out.println("ActiveObject.resetCommunications() "+this);
 		setChanged();
 		notifyObservers(new HashSet<ActiveObject>());	
 	}

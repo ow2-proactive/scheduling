@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.MalformedObjectNameException;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.extensions.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 
 /**

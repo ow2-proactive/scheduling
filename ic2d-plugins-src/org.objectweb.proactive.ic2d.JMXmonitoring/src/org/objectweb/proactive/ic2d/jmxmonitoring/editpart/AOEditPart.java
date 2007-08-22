@@ -291,8 +291,15 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	}
 
 	private IFigure getGlobalPanel(){
-		if(globalPanel == null)
+		if(globalPanel == null){
 			globalPanel = getWorldEditPart().getFigure()/*.getParent()*/;
+		}
 		return globalPanel;
+	}
+	
+	@Override
+	public void deactivate(){
+		getCastedModel().resetCommunications();
+		super.deactivate();
 	}
 }

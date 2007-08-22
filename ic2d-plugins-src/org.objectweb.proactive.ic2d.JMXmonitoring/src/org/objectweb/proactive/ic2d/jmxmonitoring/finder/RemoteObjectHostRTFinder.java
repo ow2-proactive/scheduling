@@ -74,8 +74,19 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 		try {
 
 			 URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
-			 uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).list(target);
-
+			 try{
+				 uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).list(target);
+			 }
+			 catch(ProActiveException e){
+				 if(e.getCause() instanceof ConnectException){
+					 Console.getInstance(Activator.CONSOLE_NAME).err("Connection refused to "+host);
+					 return runtimeObjects.values();
+				 }
+				 else{
+					 throw e;
+				 }
+			 }
+			 
 			if (uris != null ) {
 				/* Searchs all ProActive Runtimes */
 				for (int i = 0; i < uris.length; ++i) {
@@ -83,7 +94,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 					try {
 						/*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
 					    RemoteObject ro = RemoteObjectHelper.lookup(url);
-
+					    
 						/*Object stub = ro.getObjectProxy();*/
 					    Object stub = RemoteObjectHelper.generatedObjectStub(ro);
 
@@ -115,7 +126,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 					    // not a remote object (for now...)
 					    // TODO : Arnaud, Active objects should become Remote Objects...
 						pae.printStackTrace();
-					    console.log("Found active object in registry at " + url);
+					    console.warn("Found active object in registry at " + url);
 					}
 				}
 			}

@@ -82,41 +82,35 @@ public class RuntimeObject extends AbstractData{
 		return this.url;
 	}
 	
+	/**
+	 * Kill this runtime.
+	 */
 	public void killRuntime(){
 		new Thread(){
 			public void run(){
-				try {
-					Object[] params = {};
-					String[] signature = {};
-					invoke("killRuntime", params, signature);
-				} catch (InstanceNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (MBeanException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ReflectionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				Object[] params = {};
+				String[] signature = {};
+				invokeAsynchronous("killRuntime", params, signature);
 				runtimeKilled();
 			}
 		}.start();
 	}
+
 	
 	public void runtimeKilled(){
 		setChanged();
 		notifyObservers(methodName.RUNTIME_KILLED);
-		/*try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		destroy();*/
+		new Thread(){
+			public void run(){
+				try {
+					sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				RuntimeObject.this.destroy();
+			}
+		}.start();
 	}
 	
 	/**
