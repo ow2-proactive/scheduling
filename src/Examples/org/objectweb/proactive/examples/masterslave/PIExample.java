@@ -16,18 +16,26 @@ public class PIExample {
 
     public static void main(String[] args)
         throws TaskAlreadySubmittedException, TaskException {
+        // creation of the master
         ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
+
+        // adding resources
         master.addResources(PIExample.class.getResource(
                 "/org/objectweb/proactive/examples/masterslave/WorkersLocal.xml"));
 
+        // defining tasks
         Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
             tasks.add(new ComputePIMonteCarlo());
         }
 
+        // adding tasks to the queue
         master.solve(tasks);
+
+        // waiting for results
         List<Long> successesList = master.waitAllResults();
 
+        // computing PI using the results
         long sumSuccesses = 0;
 
         for (long successes : successesList) {
@@ -41,6 +49,12 @@ public class PIExample {
         master.terminate(true);
     }
 
+    /**
+     * Task which creates randomly a set of points belonging to the [0, 1[x[0, 1[ interval<br>
+     * and tests how many points are inside the uniter circle.
+     * @author fviale
+     *
+     */
     public static class ComputePIMonteCarlo implements Task<Long> {
         public ComputePIMonteCarlo() {
         }
