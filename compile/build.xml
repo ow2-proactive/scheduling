@@ -87,7 +87,6 @@
 				<exclude name="unitTests/commandEscape/*.class"/>
 				<exclude name="unitTests/deployment/*.class"/>
 				<exclude name="unitTests/descriptorParser/*.class"/>
-				<exclude name="unitTests/listGenerator/*.class"/>
 			</fileset>
 		</else>
 	</if>
