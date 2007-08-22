@@ -630,8 +630,7 @@
 
         <para>
             This very simple example computes PI using the Monte-Carlo
-            method. The complete example is available (a slightly
-            optimized version), along with more complex ones under the
+            method. The complete example is available, along with more complex ones under the
             following package in the
             <emphasis>Examples</emphasis>
             source directory:
@@ -645,27 +644,26 @@
             points are inside the uniter circle.
         </para>
 
-        <programlisting lang="java"><![CDATA[    public static class FindPrimeTask implements Task<Boolean> {
-        private long begin;
-        private long end;
-        private long candidate;
-
-        public FindPrimeTask(long candidate, long begin, long end) {
-            this.begin = begin;
-            this.end = end;
-            this.candidate = candidate;
+        <programlisting lang="java"><![CDATA[    public static class ComputePIMonteCarlo implements Task<Long> {
+        public ComputePIMonteCarlo() {
         }
 
-        /* (non-Javadoc)
-         * @see org.objectweb.proactive.extra.masterslave.interfaces.Task#run(org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory)
-         */
-        public Boolean run(SlaveMemory memory) {
-            for (long divider = begin; divider < end; divider++) {
-                if ((candidate % divider) == 0) {
-                    return new Boolean(false);
+        public Long run(SlaveMemory memory) throws Exception {
+            long remaining = NUMBER_OF_EXPERIENCES;
+            long successes = 0;
+            while (remaining > 0) {
+                remaining--;
+                if (experience()) {
+                    successes++;
                 }
             }
-            return new Boolean(true);
+            return successes;
+        }
+
+        public boolean experience() {
+            double x = Math.random();
+            double y = Math.random();
+            return Math.hypot(x, y) < 1;
         }
     }]]></programlisting>
 
@@ -740,7 +738,7 @@
                 </para>
                 <para>
                     In order to change this default value, the method
-                    described underneath must be called :
+                    described underneath can be called :
                 </para>
                 <programlisting lang="java"><![CDATA[    /**
      * Sets the period at which ping messages are sent to the slaves <br/>
