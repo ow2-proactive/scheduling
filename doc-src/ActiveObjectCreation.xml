@@ -1382,25 +1382,10 @@ if(result_from_method == null){
       continuous ping using the FutureMonitoring.monitorFuture(future) API.
       </para>
       
-      <para>In order to honor the "lightweight" property, some limitations of
-      this mechanism must be kept in mind:</para>
-      
-      <itemizedlist>
-        <listitem>
-          <para>The mechanism is implemented by pinging every 21 seconds an
-          active object among the monitored ones. Only one active object per
-          node is ever pinged, implying that the outcome for this active object
-          will be replicated on all other active objects in the same node.
-          </para>
-        </listitem>
-
-        <listitem>
-          <para>When using the fault tolerance this mechanism is disabled as it
-          could interfere with the former. This should not be a problem as the
-          features provided by the fault tolerance mechanism is a super set of
-          this one.</para>
-        </listitem>
-      </itemizedlist>
+      <para>When using the fault tolerance this mechanism is disabled as it
+      could interfere with the former. This should not be a problem as the
+      features provided by the fault tolerance mechanism is a super set of
+      this one.</para>
     </sect2>
   </sect1>
 

@@ -221,6 +221,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         target = obj;
         ExceptionHandler.addResult(this);
+        FutureMonitoring.removeFuture(this);
         ProxyNonFunctionalException nfe = target.getNFE();
         if (nfe != null) {
             NFEManager.fireNFE(nfe, originatingProxy);
