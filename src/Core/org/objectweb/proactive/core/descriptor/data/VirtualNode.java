@@ -21,6 +21,16 @@ import org.objectweb.proactive.core.node.NodeException;
 public interface VirtualNode extends Job, Serializable {
 
     /**
+    * Name of the default Virtual Node.
+    *
+    * A Node belongs to the default Virtual Node until
+    * setVirtualNodeName is called on it.
+    *
+    * @See {@link LocalNode}
+    */
+    static final public String DEFAULT_VN = "DEFAULT_VN";
+
+    /**
      * This method can be used to access to the internal view of this
      * VirtualNode.
      *

@@ -21,16 +21,6 @@ public interface VirtualNode {
     static final public long MAX_CAPACITY = -2;
 
     /**
-     * Name of the default Virtual Node.
-     *
-     * A Node belongs to the default Virtual Node until
-     * setVirtualNodeName is called on it.
-     *
-     * @See {@link LocalNode}
-     */
-    static final public String DEFAULT_VN = "DEFAULT_VN";
-
-    /**
      * Returns the name of this Virtual Node
      * @return name of the Virtual Node as declared inside the GCM Application Descriptor
      */

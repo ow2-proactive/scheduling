@@ -233,6 +233,7 @@ public class NodeImpl implements Node, Serializable {
         private String hostname;
         private String vmName;
         private DeployerTag deployerTag;
+        private long capacity;
 
         public NodeInformationImpl(String url, String protocol, String jobID,
             String vmName, DeployerTag deployerTag) {
@@ -246,6 +247,7 @@ public class NodeImpl implements Node, Serializable {
             this.jobID = jobID;
             this.vmName = vmName;
             this.deployerTag = deployerTag;
+            this.capacity = proActiveRuntime.getVMInformation().getCapacity();
         }
 
         /**
@@ -329,6 +331,10 @@ public class NodeImpl implements Node, Serializable {
          */
         public DeployerTag getDeployerTag() {
             return deployerTag;
+        }
+
+        public long getCapacity() {
+            return capacity;
         }
     }
 
