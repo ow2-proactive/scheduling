@@ -82,6 +82,12 @@
 				<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class"/>
 				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class"/>
 				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class"/>
+
+				<!-- Disable GCM Deployment related unit tests -->
+				<exclude name="unitTests/commandEscape/*.class"/>
+				<exclude name="unitTests/deployment/*.class"/>
+				<exclude name="unitTests/descriptorParser/*.class"/>
+				<exclude name="unitTests/listGenerator/*.class"/>
 			</fileset>
 		</else>
 	</if>
