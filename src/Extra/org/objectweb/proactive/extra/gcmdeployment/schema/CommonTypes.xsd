@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<simpleType name="variableRefType">
+		<restriction base="string">
+			<pattern value="\$\{[A-Za-z0-9._]+\}" />
+		</restriction>
+	</simpleType>
+
+	<!--PosintOrVariableType is defined as a union of a positive integer or a variable ref-->
+	<simpleType name="PosintOrVariableType">
+		<union memberTypes="positiveInteger ct:variableRefType" />
+	</simpleType>
+	<!--BooleanOrVariableType is defined as a union of a positive integer or a variable ref-->
+	<simpleType name="BooleanOrVariableType">
+		<union memberTypes="boolean ct:variableRefType" />
+	</simpleType>
+	<simpleType name="TimeOrVariableType">
+		<union memberTypes="time ct:variableRefType" />
+	</simpleType>
+	<simpleType name="TextOrVariableType">
+		<union memberTypes="string ct:variableRefType" />
+	</simpleType>
+	<!--ListType is defined as a union of a positive integer or a variable ref-->
+	<simpleType name="ListType">
+		<union memberTypes="ct:variableRefType">
+			<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
+			<simpleType>
+				<list itemType="string" />
+			</simpleType>
+		</union>
+	</simpleType>
+
+	<!--CloseStreamType is defined as a global element, it's the union of a CloseStream and a variable type.-->
+	<simpleType name="CloseStreamType">
+		<union memberTypes="ct:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="yes" />
+					<enumeration value="no" />
+				</restriction>
+			</simpleType>
+		</union>
+	</simpleType>
+
+
+	<simpleType name="pathElementBaseType">
+		<restriction base="string">
+			<enumeration value="proactive" />
+			<enumeration value="home" />
+			<enumeration value="root" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="idType">
+		<annotation>
+			<documentation>
+				An id, used in several elements
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="[1-9a-zA-Z_]+"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="capacityType">
+		<restriction base="string">
+			<pattern value="([1-9]+)|max"></pattern>
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="pathElementGeneralType">
+		<annotation>
+			<documentation>
+				A path to a jar or a directory
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<whiteSpace value="collapse"></whiteSpace>
+		</restriction>
+	</simpleType>
+
+	<complexType name="pathElementType">
+		<attribute name="base" type="ct:pathElementBaseType"></attribute>
+		<attribute name="relpath" type="ct:pathElementGeneralType"></attribute>
+	</complexType>
+
+	<complexType name="pathType">
+		<sequence>
+			<element name="pathElement" type="ct:pathElementType"
+				maxOccurs="unbounded">
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="classpathType">
+		<complexContent>
+			<extension base="ct:pathType">
+				<attribute name="type">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="append"></enumeration>
+							<enumeration value="overwrite"></enumeration>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="fileTransferType">
+		<all>
+			<element name="source">
+				<complexType>
+					<attribute name="path"
+						type="ct:pathElementGeneralType">
+					</attribute>
+				</complexType>
+			</element>
+			<element name="dest">
+				<complexType>
+					<attribute name="relpath"
+						type="ct:pathElementGeneralType">
+					</attribute>
+				</complexType>
+			</element>
+		</all>
+	</complexType>
+
+
+</schema>

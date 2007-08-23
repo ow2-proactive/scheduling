@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+	</import>
+
+	<complexType name="BsubProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="commandPath" type="pa:pathElementType" minOccurs="0" />
+					<element name="bsubOption" type="paext:BsubOptionType"
+						minOccurs="0" />
+				</sequence>
+				<attribute name="class" use="required">
+					<simpleType>
+						<restriction base="string">
+							<enumeration
+								value="org.objectweb.proactive.core.process.lsf.LSFBSubProcess" />
+							<enumeration
+								value="org.objectweb.proactive.core.process.lsf.CNLSFProcess" />
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="closeStream" type="ct:CloseStreamType"
+					use="optional" />
+				<attribute name="interactive"
+					type="ct:BooleanOrVariableType" use="optional" />
+				<attribute name="jobname" type="string" use="optional" />
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
+	<complexType name="BsubOptionType" mixed="true">
+		<all>
+			<element name="hostlist" type="string" minOccurs="0" />
+			<element name="processor" type="ct:PosintOrVariableType"
+				minOccurs="0" />
+			<element name="resourceRequirement" minOccurs="0">
+				<complexType>
+					<attribute name="value" type="string" />
+				</complexType>
+			</element>
+			<element name="scriptPath" type="pa:pathElementType"
+				minOccurs="0" />
+		</all>
+	</complexType>
+
+
+</schema>

@@ -12,7 +12,7 @@
       -->
 	<complexType name="myGroupType">
 		<complexContent>
-			<extension base="pa:shType">
+			<extension base="pa:abstractGroupElementType">
 				<attribute name="someattr" type="string"></attribute>
 			</extension>
 		</complexContent>

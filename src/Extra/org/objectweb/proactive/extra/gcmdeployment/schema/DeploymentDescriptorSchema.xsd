@@ -2,7 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
 	elementFormDefault="qualified">
+
+
+	<import schemaLocation="CommonTypes.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"></import>
 
 	<complexType name="variableType">
 		<attribute name="name">
@@ -55,19 +59,23 @@
 	</simpleType>
 
 	<simpleType name="hostnameType">
-		<restriction base="string">
-			<!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
-			<!-- 			<pattern value="([a-z0-9.]*($\{[a-zA-Z0-9]+\})?)+" /> -->
-			<pattern value="[a-z0-9.${}A-Z]+" />
-		</restriction>
+		<union memberTypes="ct:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[a-z0-9.]+" />
+				</restriction>
+			</simpleType>
+		</union>
 	</simpleType>
 
 	<simpleType name="usernameType">
-		<restriction base="string">
-			<!-- the following pattern is more strict but seems to trigger a bug in Eclipse's 3.3. XML editor -->
-			<!--  			<pattern value="([a-z0-9]*($\{[a-zA-Z0-9]+\})?)+" /> -->
-			<pattern value="[a-z0-9${}A-Z]+" />
-		</restriction>
+		<union memberTypes="ct:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[a-z0-9]+" />
+				</restriction>
+			</simpleType>
+		</union>
 	</simpleType>
 
 	<simpleType name="pathElementType">
@@ -81,7 +89,7 @@
 		</restriction>
 	</simpleType>
 
-	<complexType name="shType" abstract="true">
+	<complexType name="abstractGroupElementType" abstract="true">
 		<sequence>
 			<element name="environment" type="pa:environmentType"
 				maxOccurs="1" minOccurs="0">
@@ -95,7 +103,7 @@
 
 	<complexType name="groupTypeSSH">
 		<complexContent>
-			<extension base="pa:shType">
+			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="privateKey" type="pa:pathElementType"
 						minOccurs="0">
@@ -111,13 +119,15 @@
 
 	<complexType name="rshType">
 		<complexContent>
-			<extension base="pa:shType">
+			<extension base="pa:abstractGroupElementType">
 				<attribute name="hostname" type="pa:hostnameType" />
 			</extension>
 		</complexContent>
 	</complexType>
 
-	<element name="abstractShElement" type="pa:shType"></element>
+	<element name="abstractShElement"
+		type="pa:abstractGroupElementType">
+	</element>
 	<element name="sshGroup" substitutionGroup="pa:abstractShElement"
 		type="pa:groupTypeSSH">
 	</element>
@@ -302,7 +312,7 @@
 	<complexType name="abstractBridgeElementType">
 		<attribute name="id" type="pa:idType" use="required" />
 	</complexType>
-	
+
 	<element name="abstractBridgeElement"
 		type="pa:abstractBridgeElementType">
 	</element>

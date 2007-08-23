@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+	</import>
+
+
+	<!--gLiteProcess element has six children: processReference element, gLiteOptions which contains JDLFilePath child and SdtOutput child 
+		environment, rank, inputData, requirements-->
+	<!--Environment : List of string representing environment settings that hava to be performed on the execution machine.-->
+	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
+	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
+	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
+	<complexType name="gLiteProcessType" mixed="true">
+		<all>
+			<element name="environment" type="ct:TextOrVariableType"
+				minOccurs="0" />
+			<element name="requirements" type="ct:TextOrVariableType"
+				minOccurs="0" />
+			<element name="inputData" type="paext:gLiteInputDataType"
+				minOccurs="0" />
+			<element name="rank" minOccurs="0">
+				<complexType>
+					<simpleContent>
+						<extension base="ct:TextOrVariableType">
+							<attribute name="fuzzyrank"
+								type="string" />
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="gLiteOptions" type="paext:gLiteOptionsType"
+				minOccurs="0" />
+			<element name="JdlTransferDeploy"
+				type="ct:fileTransferType" minOccurs="0" maxOccurs="1" />
+		</all>
+		<attribute name="class" type="string" use="required"
+			fixed="org.objectweb.proactive.core.process.glite.GLiteProcess" />
+		<attribute name="hostname" type="string" />
+		<attribute name="virtualOrganisation" type="string"
+			use="required" />
+		<attribute name="JDLFileName" type="string"
+			use="required" />
+		<attribute name="Type" type="string" default="job" />
+		<attribute name="executable" type="string"
+			default="/bin/sh" />
+		<attribute name="jobType" type="string" default="normal" />
+		<attribute name="stdOutput" type="string"
+			default="output.log" />
+		<attribute name="stdError" type="string"
+			default="error.log" />
+		<attribute name="stdInput" type="string" />
+		<attribute name="outputse" type="string" />
+		<attribute name="retryCount" type="string" />
+		<attribute name="myProxyServer" type="string" />
+		<attribute name="nodeNumber" type="string" />
+	</complexType>
+	<!--gLiteRankType-->
+	<complexType name="gLiteRankType">
+		<attribute name="fuzzyrank" type="ct:BooleanOrVariableType"
+			default="false" />
+	</complexType>
+	<!--gLiteInputDataType-->
+	<complexType name="gLiteInputDataType" mixed="true">
+		<attribute name="dataAccessProtocol" type="string" />
+		<attribute name="storageIndex" type="string" />
+		<attribute name="dataCatalog" type="string" />
+	</complexType>
+	<!--gLiteJobType-->
+	<complexType name="gLiteJobType" mixed="true">
+		<choice>
+			<element name="normal" />
+			<element name="interactive">
+				<complexType>
+					<attribute name="listerport" type="string" />
+				</complexType>
+			</element>
+			<element name="mpich">
+				<complexType>
+					<attribute name="nodeNumber"
+						type="ct:PosintOrVariableType" use="required" />
+				</complexType>
+			</element>
+			<element name="checkpointable">
+				<complexType>
+					<attribute name="currentStep" type="string"
+						use="required" />
+					<attribute name="jobStep" type="string"
+						use="required" />
+				</complexType>
+			</element>
+			<element name="partitionable">
+				<complexType>
+					<attribute name="currentStep" type="string"
+						use="required" />
+					<attribute name="jobStep" type="string"
+						use="required" />
+				</complexType>
+			</element>
+		</choice>
+	</complexType>
+	<!--gLiteOptions-->
+	<complexType name="gLiteOptionsType" mixed="true">
+		<all>
+			<element name="configFile" type="ct:pathElementType"
+				minOccurs="0" />
+			<element name="JDLFilePath" type="ct:pathElementType"
+				minOccurs="0" />
+			<element name="JDLRemoteFilePath" type="ct:pathElementType"
+				minOccurs="0" />
+			<element name="jobType" type="paext:gLiteJobType"
+				minOccurs="0" />
+			<element name="arguments" type="ct:TextOrVariableType"
+				minOccurs="0" />
+			<element name="inputSandbox" type="ct:TextOrVariableType"
+				minOccurs="0" />
+			<element name="outputSandbox" type="ct:TextOrVariableType"
+				minOccurs="0" />
+		</all>
+	</complexType>
+	<!-- end of gLiteProcessType -->
+
+
+</schema>
