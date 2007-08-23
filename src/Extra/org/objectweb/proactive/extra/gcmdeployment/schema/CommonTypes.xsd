@@ -56,11 +56,6 @@
 	</simpleType>
 
 	<simpleType name="idType">
-		<annotation>
-			<documentation>
-				An id, used in several elements
-			</documentation>
-		</annotation>
 		<restriction base="string">
 			<pattern value="[1-9a-zA-Z_]+"></pattern>
 			<whiteSpace value="collapse"></whiteSpace>
@@ -75,11 +70,6 @@
 	</simpleType>
 
 	<simpleType name="pathElementGeneralType">
-		<annotation>
-			<documentation>
-				A path to a jar or a directory
-			</documentation>
-		</annotation>
 		<restriction base="string">
 			<whiteSpace value="collapse"></whiteSpace>
 		</restriction>
@@ -131,6 +121,65 @@
 			</element>
 		</all>
 	</complexType>
+
+	<simpleType name="osType">
+		<restriction base="string">
+			<enumeration value="unix"></enumeration>
+			<enumeration value="windows"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="hostnameType">
+		<union memberTypes="ct:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[a-z0-9.]+" />
+				</restriction>
+			</simpleType>
+		</union>
+	</simpleType>
+
+	<simpleType name="usernameType">
+		<union memberTypes="ct:variableRefType">
+			<simpleType>
+				<restriction base="string">
+					<pattern value="[a-z0-9]+" />
+				</restriction>
+			</simpleType>
+		</union>
+	</simpleType>
+
+	<complexType name="variableType">
+		<attribute name="name">
+			<simpleType>
+				<restriction base="string"></restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="value">
+			<simpleType>
+				<restriction base="string"></restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+
+	<element name="abstractVariable" abstract="true"
+		type="ct:variableType">
+	</element>
+	<element name="descriptorVariable"
+		substitutionGroup="ct:abstractVariable" type="ct:variableType">
+	</element>
+	<element name="javaPropertyVariable"
+		substitutionGroup="ct:abstractVariable" type="ct:variableType">
+	</element>
+
+	<complexType name="environmentType">
+		<sequence>
+			<element ref="ct:abstractVariable" maxOccurs="unbounded">
+			</element>
+		</sequence>
+	</complexType>
+
+
 
 
 </schema>

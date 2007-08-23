@@ -2,92 +2,10 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
 	elementFormDefault="qualified">
 
-	<simpleType name="pathElementBaseType">
-		<restriction base="string">
-			<enumeration value="proactive" />
-			<enumeration value="home" />
-			<enumeration value="root" />
-		</restriction>
-	</simpleType>
-
-	<simpleType name="idType">
-		<annotation>
-			<documentation>
-				An id, used in several elements
-			</documentation>
-		</annotation>
-		<restriction base="string">
-			<pattern value="[1-9a-zA-Z_]+"></pattern>
-			<whiteSpace value="collapse"></whiteSpace>
-		</restriction>
-	</simpleType>
-
-	<simpleType name="capacityType">
-		<restriction base="string">
-			<pattern value="([1-9]+)|max"></pattern>
-			<whiteSpace value="collapse"></whiteSpace>
-		</restriction>
-	</simpleType>
-
-	<simpleType name="pathElementGeneralType">
-		<annotation>
-			<documentation>
-				A path to a jar or a directory
-			</documentation>
-		</annotation>
-		<restriction base="string">
-			<whiteSpace value="collapse"></whiteSpace>
-		</restriction>
-	</simpleType>
-
-	<complexType name="pathElementType">
-		<attribute name="base" type="pa:pathElementBaseType"></attribute>
-		<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
-	</complexType>
-
-	<complexType name="pathType">
-		<sequence>
-			<element name="pathElement" type="pa:pathElementType"
-				maxOccurs="unbounded">
-			</element>
-		</sequence>
-	</complexType>
-
-	<complexType name="classpathType">
-		<complexContent>
-			<extension base="pa:pathType">
-				<attribute name="type">
-					<simpleType>
-						<restriction base="string">
-							<enumeration value="append"></enumeration>
-							<enumeration value="overwrite"></enumeration>
-						</restriction>
-					</simpleType>
-				</attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<complexType name="fileTransferType">
-		<all>
-			<element name="source">
-				<complexType>
-					<attribute name="path"
-						type="pa:pathElementGeneralType">
-					</attribute>
-				</complexType>
-			</element>
-			<element name="dest">
-				<complexType>
-					<attribute name="relpath"
-						type="pa:pathElementGeneralType">
-					</attribute>
-				</complexType>
-			</element>
-		</all>
-	</complexType>
+	<import schemaLocation="CommonTypes.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"></import>
 
 	<attribute name="OSAttr">
 		<simpleType>
@@ -126,49 +44,49 @@
 			<element name="file" maxOccurs="unbounded">
 				<complexType>
 					<attribute name="path"
-						type="pa:pathElementGeneralType">
+						type="ct:pathElementGeneralType">
 					</attribute>
 				</complexType>
 			</element>
-			<element name="fileTransfer" type="pa:fileTransferType"
+			<element name="fileTransfer" type="ct:fileTransferType"
 				minOccurs="0" maxOccurs="unbounded">
 			</element>
 			<element name="executable" minOccurs="0">
 				<complexType>
 					<attribute name="relpath"
-						type="pa:pathElementGeneralType">
+						type="ct:pathElementGeneralType">
 					</attribute>
 				</complexType>
 			</element>
 		</sequence>
-		<attribute name="id" type="pa:idType"></attribute>
+		<attribute name="id" type="ct:idType"></attribute>
 	</complexType>
 
 	<complexType name="virtualNodeType">
 		<sequence>
-			<element name="fileTranfer" type="pa:fileTransferType"
+			<element name="fileTranfer" type="ct:fileTransferType"
 				minOccurs="0" maxOccurs="unbounded">
 			</element>
 			<element name="resourceProvider" minOccurs="0"
 				maxOccurs="unbounded">
 				<complexType>
-					<attribute name="refid" type="pa:idType">
+					<attribute name="refid" type="ct:idType">
 					</attribute>
 				</complexType>
 			</element>
 		</sequence>
 		<attribute name="id" type="string" use="required"></attribute>
 		<attribute name="raref" type="string"></attribute>
-		<attribute name="capacity" type="pa:capacityType"></attribute>
+		<attribute name="capacity" type="ct:capacityType"></attribute>
 	</complexType>
 
 	<complexType name="commandType">
 		<sequence>
-			<element name="path" type="pa:pathElementType"
+			<element name="path" type="ct:pathElementType"
 				minOccurs="0" />
 			<element name="arg" type="string" minOccurs="0"
 				maxOccurs="unbounded" />
-			<element name="filetransfer" type="pa:fileTransferType"
+			<element name="filetransfer" type="ct:fileTransferType"
 				minOccurs="0" />
 		</sequence>
 		<attribute name="name" type="pa:parameterType"></attribute>
@@ -184,29 +102,29 @@
 						<complexType>
 							<all>
 								<element name="bootclasspath"
-									type="pa:pathType" minOccurs="0">
+									type="ct:pathType" minOccurs="0">
 								</element>
 								<element name="java" minOccurs="0">
 									<complexType>
 										<attribute name="relpath"
-											type="pa:pathElementGeneralType">
+											type="ct:pathElementGeneralType">
 										</attribute>
 									</complexType>
 								</element>
 								<element name="applicationClasspath"
-									type="pa:classpathType" minOccurs="0">
+									type="ct:classpathType" minOccurs="0">
 								</element>
 								<element name="proactiveClasspath"
-									type="pa:classpathType" minOccurs="0">
+									type="ct:classpathType" minOccurs="0">
 								</element>
 								<element name="securityPolicy"
-									type="pa:pathElementType" minOccurs="0">
+									type="ct:pathElementType" minOccurs="0">
 								</element>
 								<element name="log4jProperties"
-									type="pa:pathElementType" minOccurs="0">
+									type="ct:pathElementType" minOccurs="0">
 								</element>
 								<element name="userProperties"
-									type="pa:pathElementType" minOccurs="0">
+									type="ct:pathElementType" minOccurs="0">
 								</element>
 							</all>
 						</complexType>
@@ -222,10 +140,10 @@
 				<attribute ref="pa:PriorityAttr"></attribute>
 				<attribute ref="pa:OSAttr"></attribute>
 				<attribute name="relpath"
-					type="pa:pathElementGeneralType" use="optional">
+					type="ct:pathElementGeneralType" use="optional">
 				</attribute>
 				<attribute name="javarelpath"
-					type="pa:pathElementGeneralType" use="optional">
+					type="ct:pathElementGeneralType" use="optional">
 				</attribute>
 			</extension>
 		</complexContent>
