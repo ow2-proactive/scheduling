@@ -240,7 +240,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                     ObjectName oname = FactoryName.createActiveObjectName(getID());
                     if (!mbs.isRegistered(oname)) {
-                        mbean = new BodyWrapper(oname, this);
+                        mbean = new BodyWrapper(oname, this, getID());
                         try {
                             mbs.registerMBean(mbean, oname);
                         } catch (InstanceAlreadyExistsException e) {

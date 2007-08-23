@@ -16,6 +16,7 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
@@ -86,9 +87,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      * @param oname
      * @param body
      */
-    public BodyWrapper(ObjectName oname, AbstractBody body) {
+    public BodyWrapper(ObjectName oname, AbstractBody body, UniqueID id) {
         this.objectName = oname;
-        this.id = body.getID();
+        this.id = id;
         this.nodeUrl = body.getNodeURL();
         this.body = body;
 
@@ -108,6 +109,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     }
 
     public ObjectName getObjectName() {
+        if (this.objectName == null) {
+            this.objectName = FactoryName.createActiveObjectName(getID());
+        }
         return this.objectName;
     }
 
