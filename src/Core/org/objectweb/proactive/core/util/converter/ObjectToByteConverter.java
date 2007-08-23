@@ -111,7 +111,7 @@ public class ObjectToByteConverter {
                                                   .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
         //here we check wether or not we are running in ibis
-        if ("ibis".equals(mode)) {
+        if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(mode)) {
             return ibisConvert(o);
         } else {
             return standardConvert(o, conversionMode);
@@ -126,8 +126,7 @@ public class ObjectToByteConverter {
 
     private static byte[] standardConvert(Object o,
         ConversionMode conversionMode) throws IOException {
-
-        /*final*/ ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = null;
 
         try {
@@ -192,18 +191,25 @@ public class ObjectToByteConverter {
             return i_baos.toByteArray();
         } catch (ClassNotFoundException e) {
             //TODO replace by IOException(Throwable e) java 1.6
+            MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         } catch (SecurityException e) {
+            MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         } catch (NoSuchMethodException e) {
+            MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         } catch (IllegalArgumentException e) {
+            MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         } catch (InstantiationException e) {
+            MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         } catch (IllegalAccessException e) {
+            MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         } catch (InvocationTargetException e) {
+            MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }

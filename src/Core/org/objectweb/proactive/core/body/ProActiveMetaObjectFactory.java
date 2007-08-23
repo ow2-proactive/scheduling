@@ -37,7 +37,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
