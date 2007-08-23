@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -44,9 +45,9 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
-import org.objectweb.proactive.core.runtime.DeployerTag;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.runtime.VMInformation;
 
 
 /**
@@ -87,9 +88,7 @@ public class NodeImpl implements Node, Serializable {
     public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
         String protocol, String jobID, String vmName) {
         this.proActiveRuntime = proActiveRuntime;
-        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol,
-                jobID, vmName,
-                proActiveRuntime.getVMInformation().getDeployerTag());
+        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID);
         this.fileTransferServicePool = new ArrayList();
     }
 
@@ -228,33 +227,15 @@ public class NodeImpl implements Node, Serializable {
         private String nodeURL;
         private String protocol;
         private String jobID;
-        private java.net.InetAddress hostInetAddress;
-        private java.rmi.dgc.VMID hostVMID;
-        private String hostname;
-        private String vmName;
-        private DeployerTag deployerTag;
-        private long capacity;
+        private VMInformation vmInformation;
 
-        public NodeInformationImpl(String url, String protocol, String jobID,
-            String vmName, DeployerTag deployerTag) {
+        public NodeInformationImpl(String url, String protocol, String jobID) {
             this.nodeURL = url;
-            this.hostVMID = proActiveRuntime.getVMInformation().getVMID();
-            this.hostInetAddress = proActiveRuntime.getVMInformation()
-                                                   .getInetAddress();
-            this.hostname = proActiveRuntime.getVMInformation().getHostName();
             this.protocol = protocol;
             this.nodeName = extractNameFromUrl(url);
-            this.jobID = jobID;
-            this.vmName = vmName;
-            this.deployerTag = deployerTag;
-            this.capacity = proActiveRuntime.getVMInformation().getCapacity();
-        }
+            this.jobID = (jobID != null) ? jobID : Job.DEFAULT_JOBID;
 
-        /**
-         * @see org.objectweb.proactive.core.runtime.VMInformation#getVMID
-         */
-        public java.rmi.dgc.VMID getVMID() {
-            return hostVMID;
+            this.vmInformation = proActiveRuntime.getVMInformation();
         }
 
         /**
@@ -276,13 +257,6 @@ public class NodeImpl implements Node, Serializable {
          */
         public String getURL() {
             return nodeURL;
-        }
-
-        /**
-         * @see org.objectweb.proactive.core.runtime.VMInformation#getInetAddress()
-         */
-        public java.net.InetAddress getInetAddress() {
-            return hostInetAddress;
         }
 
         /**
@@ -312,29 +286,8 @@ public class NodeImpl implements Node, Serializable {
             this.jobID = jobId;
         }
 
-        /**
-         * @see org.objectweb.proactive.core.node.NodeInformation#getHostName()
-         */
-        public String getHostName() {
-            return this.hostname;
-        }
-
-        /**
-         * @see org.objectweb.proactive.core.node.NodeInformation#getDescriptorVMName()
-         */
-        public String getDescriptorVMName() {
-            return vmName;
-        }
-
-        /**
-         * @see org.objectweb.proactive.core.node.NodeInformation#getDeployerTag()
-         */
-        public DeployerTag getDeployerTag() {
-            return deployerTag;
-        }
-
-        public long getCapacity() {
-            return capacity;
+        public VMInformation getVMInformation() {
+            return vmInformation;
         }
     }
 
@@ -389,6 +342,10 @@ public class NodeImpl implements Node, Serializable {
     public String getProperty(String key) throws ProActiveException {
         return this.proActiveRuntime.getLocalNodeProperty(this.nodeInformation.getName(),
             key);
+    }
+
+    public VMInformation getVMInformation() {
+        return proActiveRuntime.getVMInformation();
     }
 
     /**

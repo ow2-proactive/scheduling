@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -286,7 +287,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         //        }
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
                 "_" + this.nodeCounter++, true, newNodeSecurityManager,
-                P2PConstants.VN_NAME);
+                P2PConstants.VN_NAME, null);
         this.availbaleNodes.add(newNode);
         logger.info("New shared node created @" +
             newNode.getNodeInformation().getURL());

@@ -98,7 +98,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (NonFunctionalException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
-                    myNode.getNodeInformation().getHostName());
+                    myNode.getVMInformation().getHostName());
             }
         }
         if (i >= n) {
@@ -127,7 +127,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (NonFunctionalException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
-                    myNode.getNodeInformation().getHostName());
+                    myNode.getVMInformation().getHostName());
             }
         }
     }
@@ -159,7 +159,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (NonFunctionalException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
-                    myNode.getNodeInformation().getHostName());
+                    myNode.getVMInformation().getHostName());
             }
         }
         if (i >= n) {
@@ -189,7 +189,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (NonFunctionalException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
-                    myNode.getNodeInformation().getHostName());
+                    myNode.getVMInformation().getHostName());
             }
         }
     }

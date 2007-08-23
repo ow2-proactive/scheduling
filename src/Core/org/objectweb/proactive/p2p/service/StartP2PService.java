@@ -39,6 +39,7 @@ import java.rmi.AlreadyBoundException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -505,7 +506,7 @@ public class StartP2PService implements P2PConstants {
             url = paRuntime.createLocalNode(UrlBuilder.buildUrl("localhost",
                         P2PConstants.P2P_NODE_NAME, acquisitionMethod,
                         Integer.parseInt(portNumber)), false, null,
-                    paRuntime.getVMInformation().getName(), paRuntime.getJobID());
+                    paRuntime.getVMInformation().getName(), Job.DEFAULT_JOBID);
         } catch (AlreadyBoundException e) {
             logger.warn("This name " + P2PConstants.P2P_NODE_NAME +
                 " is already bound in the registry", e);

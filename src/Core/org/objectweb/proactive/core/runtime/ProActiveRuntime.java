@@ -79,7 +79,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.91
  *
  */
-public interface ProActiveRuntime extends Job, SecurityEntity {
+public interface ProActiveRuntime extends SecurityEntity {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
     public static final long serialVersionUID = 104088081090593038L;
 
@@ -87,8 +87,11 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * Creates a new Node in the same VM as this ProActiveRuntime
      * @param nodeName the name of the node to create localy
      * @param replacePreviousBinding
+     * @param jobId the jobId of this node. If null the node will belong to
+     *         the default jobID
      * @return the url of the newly created node in the target VM
      * @exception NodeException if the new node cannot be created
+     * @see Job
      */
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,

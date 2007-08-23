@@ -94,8 +94,7 @@ public class TestNodes extends FunctionalTest {
                 remoteVMNode = virtualNode.getNode();
             }
         }
-        remoteHostname = remoteVMNode.getNodeInformation().getInetAddress()
-                                     .getHostName();
+        remoteHostname = remoteVMNode.getVMInformation().getHostName();
     }
 
     /**

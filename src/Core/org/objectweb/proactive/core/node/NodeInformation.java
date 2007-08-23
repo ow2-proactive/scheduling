@@ -30,7 +30,9 @@
  */
 package org.objectweb.proactive.core.node;
 
-import org.objectweb.proactive.core.runtime.DeployerTag;
+import java.io.Serializable;
+
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 
@@ -43,10 +45,9 @@ import org.objectweb.proactive.core.runtime.VMInformation;
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  *
- * @TODO cmathieu: Is 'extends' VMInformation really usefull ?
- *                 Why not only encapsulate vminformation ?
+ * @See {@link VMInformation}
  */
-public interface NodeInformation extends VMInformation {
+public interface NodeInformation extends Serializable, Job {
 
     /**
      * Returns the name of the node
@@ -67,20 +68,16 @@ public interface NodeInformation extends VMInformation {
     public String getURL();
 
     /**
-     * Returns the host where the node has been created
-     * @return the host where the node has been created
-     */
-    public String getHostName();
-
-    /**
-     * Change the Job ID of this node. Used for P2P.
+     * Change the Job ID of this node.
      * @param jobId The new JobID
+     *
+     * TODO: Describe what Job ID is !
      */
     public void setJobID(String jobId);
 
     /**
-     * Returns the deployer tag of this node
-     * @return the deployer tag of this node
+     * Returns informations about the Runtime running this node
+     * @see VMInformation
      */
-    public DeployerTag getDeployerTag();
+    public VMInformation getVMInformation();
 }

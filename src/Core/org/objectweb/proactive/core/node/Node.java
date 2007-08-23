@@ -36,6 +36,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.VMInformation;
 
 
 /**
@@ -65,6 +66,12 @@ public interface Node {
      * @return the node information as one object
      */
     public NodeInformation getNodeInformation();
+
+    /**
+     * Returns the information about the <code>ProActiveRuntime</code> where the node has been created
+     * @return the runtime information as one object
+     */
+    public VMInformation getVMInformation();
 
     /**
      * Returns a reference to the <code>ProActiveRuntime</code> where the node has been created

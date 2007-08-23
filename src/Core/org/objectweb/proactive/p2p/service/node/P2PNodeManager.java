@@ -292,7 +292,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                                                                .getURL()),
                     UrlBuilder.getPortFromUrl(ProActiveRuntimeImpl.getProActiveRuntime()
                                                                   .getURL())),
-                true, newNodeSecurityManager, P2PConstants.VN_NAME);
+                true, newNodeSecurityManager, P2PConstants.VN_NAME, null);
         this.availbaleNodes.add(newNode);
         logger.info("New shared node created @" +
             newNode.getNodeInformation().getURL());

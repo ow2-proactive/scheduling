@@ -94,7 +94,7 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
             mf_writer = new PrintWriter(new BufferedWriter(
                         new FileWriter(hostsFileName)));
             for (int i = 0; i < nodes.length; i++) {
-                mf_writer.println(nodes[i].getNodeInformation().getHostName());
+                mf_writer.println(nodes[i].getVMInformation().getHostName());
             }
             mf_writer.close();
         } catch (IOException e) {

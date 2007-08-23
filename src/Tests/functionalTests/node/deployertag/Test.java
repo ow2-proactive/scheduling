@@ -79,8 +79,8 @@ public class Test extends FunctionalTest {
                     continue;
                 }
 
-                DeployerTag gi_i = nodes[i].getNodeInformation().getDeployerTag();
-                DeployerTag gi_j = nodes[j].getNodeInformation().getDeployerTag();
+                DeployerTag gi_i = nodes[i].getVMInformation().getDeployerTag();
+                DeployerTag gi_j = nodes[j].getVMInformation().getDeployerTag();
                 if (gi_i.equals(gi_j)) {
                     throw new Exception("Two GroupInformations are equals !");
                 }

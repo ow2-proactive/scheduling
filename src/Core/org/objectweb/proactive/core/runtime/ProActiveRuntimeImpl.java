@@ -1132,13 +1132,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return policyServer.getPolicy(sc);
     }
 
-    /**
-     * @see org.objectweb.proactive.Job#getJobID()
-     */
-    public String getJobID() {
-        return this.vmInformation.getJobID();
-    }
-
     public byte[] getClassDataFromParentRuntime(String className)
         throws ProActiveException {
         byte[] classData = null;
@@ -1402,7 +1395,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private final java.rmi.dgc.VMID uniqueVMID;
         private String name;
         private long capacity;
-        private String jobId;
         private final String hostName;
         private final DeployerTag deployerTag;
 
@@ -1426,16 +1418,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 this.name = "PA_JVM" + random + "_" + this.hostName;
             }
 
-            if (ProActiveConfiguration.getInstance()
-                                          .getProperty("proactive.jobid") != null) {
-                this.jobId = ProActiveConfiguration.getInstance()
-                                                   .getProperty("proactive.jobid");
-            } else {
-                // if the property is null, no need to generate another random,
-                // take the one in name
-                this.jobId = "JOB-" + random;
-            }
-
             this.deployerTag = new DeployerTag(ProActiveConfiguration.getGroupInformation());
             this.capacity = -1;
         }
@@ -1457,13 +1439,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         public java.net.InetAddress getInetAddress() {
             return this.hostInetAddress;
-        }
-
-        /**
-         * @see org.objectweb.proactive.Job#getJobID()
-         */
-        public String getJobID() {
-            return this.jobId;
         }
 
         /**
@@ -1600,7 +1575,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 logger.warn(url + "is already registered... replacing it !");
                 try {
                     createLocalNode(url, true, null, VirtualNode.DEFAULT_VN,
-                        "Undefined");
+                        null);
                 } catch (NodeException e1) {
                     logger.warn("Failed to create a capacity node", e1);
                 } catch (AlreadyBoundException e1) {

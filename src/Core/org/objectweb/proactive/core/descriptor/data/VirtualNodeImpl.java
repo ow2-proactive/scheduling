@@ -82,6 +82,7 @@ import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -1601,7 +1602,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                                                  .getMBean();
         if (mbean != null) {
             NodeNotificationData notificationData = new NodeNotificationData(url,
-                    protocol, node.getNodeInformation().getHostName(),
+                    protocol, node.getVMInformation().getHostName(),
                     part.getURL(), this.jobID);
             mbean.sendNotification(NotificationType.nodeCreated,
                 notificationData);
@@ -1741,8 +1742,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                                                  .getMBean();
         if (mbean != null) {
             NodeInformation nodeInfo = newNode.getNodeInformation();
+            VMInformation vmInfo = newNode.getVMInformation();
             NodeNotificationData notificationData = new NodeNotificationData(nodeInfo.getURL(),
-                    nodeInfo.getProtocol(), nodeInfo.getHostName(),
+                    nodeInfo.getProtocol(), vmInfo.getHostName(),
                     ProActiveRuntimeImpl.getProActiveRuntime().getURL(),
                     nodeInfo.getJobID());
             mbean.sendNotification(NotificationType.nodeCreated,
@@ -1787,7 +1789,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
          * the FileTransfer API we retrieve the Files.
          */
         for (int i = 0; i < nodes.length; i++) {
-            String vmName = nodes[i].getNodeInformation().getDescriptorVMName();
+            String vmName = nodes[i].getVMInformation().getDescriptorVMName();
             VirtualMachine vm = getVirtualMachine(vmName);
 
             if (vm == null) {
@@ -1855,7 +1857,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 node.getNodeInformation().getName());
         }
 
-        String vmName = node.getNodeInformation().getDescriptorVMName();
+        String vmName = node.getVMInformation().getDescriptorVMName();
         VirtualMachine vm = getVirtualMachine(vmName);
 
         if (vm == null) {

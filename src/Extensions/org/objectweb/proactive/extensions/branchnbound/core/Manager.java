@@ -558,7 +558,7 @@ public class Manager implements Serializable, InitActive {
                 long endTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {
                     logger.info("The remote Group " +
-                        this.nodes[0].getNodeInformation().getHostName() +
+                        this.nodes[0].getVMInformation().getHostName() +
                         " was created in " + (endTime - startTime) +
                         " ms with " +
                         ProActiveGroup.getGroup(tmpWorkers).size() +

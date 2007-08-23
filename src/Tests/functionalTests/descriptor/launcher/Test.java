@@ -101,15 +101,15 @@ public class Test extends FunctionalTest {
         assertTrue(vnMain.getJobID()
                          .equals(nodeTab2[0].getNodeInformation().getJobID()));
 
-        // 3) all nodes must be in differents VM, and mainNode in current VM
-        assertFalse((nodeTab[0].getNodeInformation().getVMID()
-                               .equals(nodeTab2[0].getNodeInformation().getVMID())));
-        assertFalse(nodeTab[0].getNodeInformation().getVMID()
-                              .equals(mainNode.getNodeInformation().getVMID()));
-        assertFalse(nodeTab2[0].getNodeInformation().getVMID()
-                               .equals(mainNode.getNodeInformation().getVMID()));
+        // 3) all nodes must be in different VM, and mainNode in current VM
+        assertFalse((nodeTab[0].getVMInformation().getVMID()
+                               .equals(nodeTab2[0].getVMInformation().getVMID())));
+        assertFalse(nodeTab[0].getVMInformation().getVMID()
+                              .equals(mainNode.getVMInformation().getVMID()));
+        assertFalse(nodeTab2[0].getVMInformation().getVMID()
+                               .equals(mainNode.getVMInformation().getVMID()));
         assertTrue(part.getVMInformation().getVMID()
-                       .equals(mainNode.getNodeInformation().getVMID()));
+                       .equals(mainNode.getVMInformation().getVMID()));
     }
 
     @After

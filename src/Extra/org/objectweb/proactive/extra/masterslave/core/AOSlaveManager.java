@@ -219,8 +219,8 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
                     logger.debug("Creating slave on " +
                         node.getNodeInformation().getName());
                 }
-                String slavename = node.getNodeInformation().getHostName() +
-                    "_" + slaveNameCounter++;
+                String slavename = node.getVMInformation().getHostName() + "_" +
+                    slaveNameCounter++;
 
                 // Creates the slave which will automatically connect to the master
                 slaves.put(slavename,

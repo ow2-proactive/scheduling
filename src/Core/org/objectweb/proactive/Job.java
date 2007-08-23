@@ -32,10 +32,13 @@ package org.objectweb.proactive;
 
 
 /**
- * An object implemementing this Interface provides access to its jobID
+ * An object implementing this Interface provides access to its jobID
  *
  */
 public interface Job {
+
+    /** If JOBID is not specified, a node belong to this JOB */
+    static final public String DEFAULT_JOBID = "Undefined_JOBID";
 
     /**
      * @return the jobID associated with this object

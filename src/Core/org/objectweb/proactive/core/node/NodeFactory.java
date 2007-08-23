@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
@@ -130,7 +129,7 @@ public class NodeFactory {
      * @return true if the given node belongs to this JVM false else
      */
     public static boolean isNodeLocal(Node node) {
-        return node.getNodeInformation().getVMID()
+        return node.getVMInformation().getVMID()
                    .equals(UniqueID.getCurrentVMID());
     }
 
@@ -150,7 +149,7 @@ public class NodeFactory {
      */
     public static Node createNode(String nodeURL)
         throws NodeException, AlreadyBoundException {
-        return createNode(nodeURL, false, null, null);
+        return createNode(nodeURL, false, null, null, null);
     }
 
     /**
@@ -169,11 +168,10 @@ public class NodeFactory {
      * @exception NodeException if the node cannot be created
      */
     public static Node createNode(String url, boolean replacePreviousBinding,
-        ProActiveSecurityManager psm, String vnname)
+        ProActiveSecurityManager psm, String vnname, String jobId)
         throws NodeException, AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
-        String jobID = ProActive.getJobId();
 
         if (logger.isDebugEnabled()) {
             logger.debug("NodeFactory: createNode(" + url + ")");
@@ -187,12 +185,12 @@ public class NodeFactory {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
             nodeURL = proActiveRuntime.createLocalNode(url,
-                    replacePreviousBinding, psm, vnname, jobID);
+                    replacePreviousBinding, psm, vnname, jobId);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }
 
-        Node node = new NodeImpl(proActiveRuntime, nodeURL, protocol, jobID);
+        Node node = new NodeImpl(proActiveRuntime, nodeURL, protocol, jobId);
 
         return node;
     }

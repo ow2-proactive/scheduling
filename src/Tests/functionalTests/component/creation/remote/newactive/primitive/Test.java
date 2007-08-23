@@ -101,7 +101,7 @@ public class Test extends ComponentTest {
     @Before
     public void preConditions() throws Exception {
         new TestNodes().action();
-        remoteHost = TestNodes.getRemoteACVMNode().getNodeInformation()
+        remoteHost = TestNodes.getRemoteACVMNode().getVMInformation()
                               .getHostName();
         Assert.assertTrue(remoteHost != null);
     }

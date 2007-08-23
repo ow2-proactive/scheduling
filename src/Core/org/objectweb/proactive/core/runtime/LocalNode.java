@@ -45,6 +45,7 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -84,7 +85,7 @@ public class LocalNode {
     public LocalNode(String nodeName, String jobId,
         ProActiveSecurityManager securityManager, String virtualNodeName) {
         this.name = nodeName;
-        this.jobId = jobId;
+        this.jobId = ((jobId != null) ? jobId : Job.DEFAULT_JOBID);
         this.securityManager = securityManager;
         this.virtualNodeName = virtualNodeName;
         this.activeObjectsId = new ArrayList<UniqueID>();

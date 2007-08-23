@@ -26,8 +26,8 @@ public class IMNodeImpl implements IMNode, Serializable {
         this.vnodeName = vnodeName;
         this.padName = padName;
         this.nodeName = node.getNodeInformation().getName();
-        this.hostName = node.getNodeInformation().getHostName();
-        this.vmName = node.getNodeInformation().getDescriptorVMName();
+        this.hostName = node.getVMInformation().getHostName();
+        this.vmName = node.getVMInformation().getDescriptorVMName();
     }
 
     // ----------------------------------------------------------------------//
@@ -120,7 +120,8 @@ public class IMNodeImpl implements IMNode, Serializable {
             mes += ("| VNode 		  	: " + vnodeName + "\n");
             mes += ("| Host  		  	: " + getHostName() + "\n");
             mes += ("| Name of the VM 	: " +
-            getNodeInformation().getDescriptorVMName() + "\n");
+            getNodeInformation().getVMInformation().getDescriptorVMName() +
+            "\n");
             mes += "+-----------------------------------------------+\n";
         } catch (NodeException e) {
             mes += "Node is down \n";

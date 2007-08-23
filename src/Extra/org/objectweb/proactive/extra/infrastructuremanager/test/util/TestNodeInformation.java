@@ -16,9 +16,9 @@ public class TestNodeInformation {
             String mes = "## NodeInformation : \n";
             mes += "+--------------------------------------------------------------------\n";
             mes += ("+--> getDescriptorVMName   : " +
-            nodeInfo.getDescriptorVMName() + "\n");
-            mes += ("+--> getHostName           : " + nodeInfo.getHostName() +
-            "\n");
+            nodeInfo.getVMInformation().getDescriptorVMName() + "\n");
+            mes += ("+--> getHostName           : " +
+            nodeInfo.getVMInformation().getHostName() + "\n");
             mes += ("+--> getJobID              : " + nodeInfo.getJobID() +
             "\n");
             mes += ("+--> getName               : " + nodeInfo.getName() +
