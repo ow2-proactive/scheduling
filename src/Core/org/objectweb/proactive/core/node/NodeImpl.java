@@ -82,11 +82,6 @@ public class NodeImpl implements Node, Serializable {
 
     public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
         String protocol, String jobID) {
-        this(proActiveRuntime, nodeURL, protocol, jobID, null);
-    }
-
-    public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
-        String protocol, String jobID, String vmName) {
         this.proActiveRuntime = proActiveRuntime;
         this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID);
         this.fileTransferServicePool = new ArrayList();

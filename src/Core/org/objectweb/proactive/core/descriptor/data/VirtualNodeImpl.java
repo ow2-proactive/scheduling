@@ -47,7 +47,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
@@ -137,9 +136,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** index of the last associated jvm used */
     private int lastVirtualMachineIndex;
-
-    /** the list of RuntimeForwarder that have been created */
-    private ArrayList<ProActiveRuntime> createdRuntimeF;
 
     /** the list of nodes linked to this VirtualNode that have been created*/
     private java.util.ArrayList<Node> createdNodes;
@@ -244,7 +240,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.virtualMachines = new java.util.ArrayList<VirtualMachine>(5);
         this.localVirtualMachines = new java.util.ArrayList<String>();
         this.createdNodes = new java.util.ArrayList<Node>();
-        this.createdRuntimeF = new ArrayList<ProActiveRuntime>();
         this.awaitedVirtualNodes = new Hashtable<String, VirtualMachine>();
         this.fileTransferDeploy = new ArrayList<FileTransferDefinition>();
         this.fileTransferDeployedStatus = new HashMap<String, FileVector>();
@@ -951,20 +946,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             this.proActiveRuntimeImpl.unregisterVirtualNode(this.name);
         }
-
-        for (int i = 0; i < this.createdRuntimeF.size(); i++) {
-            part = this.createdRuntimeF.get(i);
-
-            try {
-                part.killRT(true);
-            } catch (Exception e) {
-                logger.info(" Forwarder " + part.getVMInformation().getVMID() +
-                    " on host " +
-                    UrlBuilder.getHostNameorIP(part.getVMInformation()
-                                                   .getInetAddress()) +
-                    " terminated!!!");
-            }
-        }
     }
 
     public void createNodeOnCurrentJvm(String protocol) {
@@ -1036,13 +1017,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
     //
     public void runtimeRegistered(RuntimeRegistrationEvent event) {
-        if (event.getType() == RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED) {
-            forwarderRuntimeRegisteredPerform(event);
-        } else {
-            // Try to avoid the contention at EventListener level
-            // A listener shouldn't perform long computation, so a thread is spawned
-            this.rrThreadpool.execute(new RuntimeRegisteredPerform(event));
-        }
+        // Try to avoid the contention at EventListener level
+        // A listener shouldn't perform long computation, so a thread is spawned
+        this.rrThreadpool.execute(new RuntimeRegisteredPerform(event));
     }
 
     private class RuntimeRegisteredPerform implements Runnable {
@@ -1055,28 +1032,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         public void run() {
             runtimeRegisteredPerform(this.event);
         }
-    }
-
-    private synchronized void forwarderRuntimeRegisteredPerform(
-        RuntimeRegistrationEvent event) {
-        VirtualMachine virtualMachine = null;
-
-        for (int i = 0; i < this.virtualMachines.size(); i++) {
-            if ((this.virtualMachines.get(i)).getName().equals(event.getVmName())) {
-                virtualMachine = this.virtualMachines.get(i);
-            }
-        }
-
-        //Check if it this virtualNode that originates the process
-        if ((event.getCreatorID().equals(this.name)) &&
-                (virtualMachine != null)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("forwarder " + event.getCreatorID() +
-                    " registered on virtualnode " + this.name);
-            }
-        }
-
-        this.createdRuntimeF.add(event.getRegisteredRuntime());
     }
 
     private void runtimeRegisteredPerform(RuntimeRegistrationEvent event) {
@@ -1155,7 +1110,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                         // Registration has succeded.
                         performOperations(proActiveRuntimeRegistered, url,
-                            protocol, event.getVmName());
+                            protocol);
 
                         break;
                     } catch (AlreadyBoundException e) {
@@ -1285,8 +1240,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             //add this node to this virtualNode
-            performOperations(defaultRuntime, url, protocol,
-                defaultRuntime.getVMInformation().getDescriptorVMName());
+            performOperations(defaultRuntime, url, protocol);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1568,8 +1522,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     private synchronized void performOperations(ProActiveRuntime part,
-        String url, String protocol, String vmName) {
-        Node node = new NodeImpl(part, url, protocol, this.jobID, vmName);
+        String url, String protocol) {
+        Node node = new NodeImpl(part, url, protocol, this.jobID);
         synchronized (this.createdNodes) {
             this.createdNodes.add(node);
         }
@@ -1579,7 +1533,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.nodeCreated = true;
         this.nbCreatedNodes++;
 
-        //Performe FileTransferDeploy (if needed)
+        //Perform FileTransferDeploy (if needed)
         FileVector fw = fileTransferDeploy(node);
         this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
             fw);

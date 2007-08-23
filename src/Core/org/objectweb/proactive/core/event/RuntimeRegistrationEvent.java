@@ -49,7 +49,6 @@ public class RuntimeRegistrationEvent extends ProActiveEvent {
     public static final int RUNTIME_REGISTERED = 10;
     public static final int RUNTIME_ACQUIRED = 20;
     public static final int RUNTIME_UNREGISTERED = 30;
-    public static final int FORWARDER_RUNTIME_REGISTERED = 40;
     protected String creatorID;
     protected ProActiveRuntime registeredRuntimeName;
     protected String protocol;
