@@ -51,80 +51,82 @@ import sun.rmi.server.MarshalOutputStream;
  *
  */
 public class ObjectToByteConverter {
-	
     private static final String IBIS_SERIALIZATION_OUTPUT_STREAM = "ibis.io.IbisSerializationOutputStream";
-	private static final String BUFFERED_ARRAY_OUTPUT_STREAM = "ibis.io.BufferedArrayOutputStream";
-	private static final String BYTE_ARRAY_OUTPUT_STREAM = "ByteArrayOutputStream";
+    private static final String BUFFERED_ARRAY_OUTPUT_STREAM = "ibis.io.BufferedArrayOutputStream";
+    private static final String BYTE_ARRAY_OUTPUT_STREAM = "ByteArrayOutputStream";
     private static final String CLOSE = "close";
-	private static final String FLUSH = "flush";
-	private static final String WRITE_OBJECT = "writeObject";
-	
-	public static class MarshallStream {
-		/**
-		 * Convert to an object using a marshall stream;
-		 * @param byteArray the byte array to covnert
-		 * @return the unserialized object
-		 * @throws IOException
-		 * @throws ClassNotFoundException
-		 */
+    private static final String FLUSH = "flush";
+    private static final String WRITE_OBJECT = "writeObject";
 
-		/**
-		 * Convert an object to a byte array using a marshall stream 
-		 * @param o The object to convert.
-		 * @return The object converted to a byte array
-		 * @throws IOException
-		 */
+    public static class MarshallStream {
+
+        /**
+         * Convert to an object using a marshall stream;
+         * @param byteArray the byte array to covnert
+         * @return the unserialized object
+         * @throws IOException
+         * @throws ClassNotFoundException
+         */
+
+        /**
+         * Convert an object to a byte array using a marshall stream
+         * @param o The object to convert.
+         * @return The object converted to a byte array
+         * @throws IOException
+         */
         public static byte[] convert(Object o) throws IOException {
             return ObjectToByteConverter.convert(o, ConversionMode.MARSHALL);
         }
     }
 
     public static class ObjectStream {
-		/**
-		 * Convert an object to a byte array using a regular object stream 
-		 * @param o The object to convert.
-		 * @return The object converted to a byte array
-		 * @throws IOException
-		 */
+
+        /**
+         * Convert an object to a byte array using a regular object stream
+         * @param o The object to convert.
+         * @return The object converted to a byte array
+         * @throws IOException
+         */
         public static byte[] convert(Object o) throws IOException {
             return ObjectToByteConverter.convert(o, ConversionMode.OBJECT);
         }
     }
 
     public static class ProActiveObjectStream {
-		/**
-		 * Convert an object to a byte array using a proactive object stream 
-		 * @param o The object to convert.
-		 * @return The object converted to a byte array
-		 * @throws IOException
-		 */
+
+        /**
+         * Convert an object to a byte array using a proactive object stream
+         * @param o The object to convert.
+         * @return The object converted to a byte array
+         * @throws IOException
+         */
         public static byte[] convert(Object o) throws IOException {
             return ObjectToByteConverter.convert(o, ConversionMode.PAOBJECT);
         }
     }
 
-
-	private static byte[] convert(Object o, ConversionMode conversionMode)
+    private static byte[] convert(Object o, ConversionMode conversionMode)
         throws IOException {
-            final String mode = ProActiveConfiguration.getInstance()
-                                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        final String mode = ProActiveConfiguration.getInstance()
+                                                  .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
 
-            //here we check wether or not we are running in ibis
-            if ("ibis".equals(mode)) {
-                return ibisConvert(o);
-            } else {
-                return standardConvert(o, conversionMode);
-            }
+        //here we check wether or not we are running in ibis
+        if ("ibis".equals(mode)) {
+            return ibisConvert(o);
+        } else {
+            return standardConvert(o, conversionMode);
+        }
     }
 
-	private static void writeToStream(ObjectOutputStream objectOutputStream,
+    private static void writeToStream(ObjectOutputStream objectOutputStream,
         Object o) throws IOException {
         objectOutputStream.writeObject(o);
         objectOutputStream.flush();
     }
 
-	private static byte[] standardConvert(Object o,
+    private static byte[] standardConvert(Object o,
         ConversionMode conversionMode) throws IOException {
+
         /*final*/ ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = null;
 
@@ -149,53 +151,60 @@ public class ObjectToByteConverter {
         }
     }
 
-	@SuppressWarnings("unchecked")
-	private static byte[] ibisConvert(Object o) throws IOException {
+    @SuppressWarnings("unchecked")
+    private static byte[] ibisConvert(Object o) throws IOException {
         try {
             final Class cl_baos = Class.forName(BYTE_ARRAY_OUTPUT_STREAM);
-        	final Class cl_buaos = Class.forName(BUFFERED_ARRAY_OUTPUT_STREAM);
-	        final Class cl_isos = Class.forName(IBIS_SERIALIZATION_OUTPUT_STREAM);
-	        final Constructor c_baos = cl_baos.getConstructor();
-	        final Constructor c_buaos = cl_buaos.getConstructor(new Class[]{cl_baos});
-	        final Constructor c_isos = cl_isos.getConstructor(new Class[]{cl_buaos});
-	        
-//          final ByteArrayOutputStream bo = new ByteArrayOutputStream();
-	        final ByteArrayOutputStream i_baos = (ByteArrayOutputStream) c_baos.newInstance(new Object[]{});
-	        
-//	        final BufferedArrayOutputStream ao = new BufferedArrayOutputStream(bo);
-	        final Object i_buaos = c_buaos.newInstance(new Object[] {i_baos});
-	        
-//	        final IbisSerializationOutputStream so = new IbisSerializationOutputStream(ao);
-	        final Object i_isos = c_isos.newInstance(new Object[] {i_buaos});
-	        
-	        final Method writeObjectMth = cl_isos.getMethod(WRITE_OBJECT, new Class[]{Object.class});
-	        final Method flushMth = cl_isos.getMethod(FLUSH);
-	        final Method closeMth = cl_isos.getMethod(CLOSE);	        
-//	        so.writeObject(o);	        
-	        writeObjectMth.invoke(i_isos, new Object[]{o});
-	        
-//			so.flush();	        
-	        flushMth.invoke(i_isos, new Object[]{});
-	        
-//			so.close();	        
-	        closeMth.invoke(i_isos, new Object[]{});
+            final Class cl_buaos = Class.forName(BUFFERED_ARRAY_OUTPUT_STREAM);
+            final Class cl_isos = Class.forName(IBIS_SERIALIZATION_OUTPUT_STREAM);
+            final Constructor c_baos = cl_baos.getConstructor();
+            final Constructor c_buaos = cl_buaos.getConstructor(new Class[] {
+                        cl_baos
+                    });
+            final Constructor c_isos = cl_isos.getConstructor(new Class[] {
+                        cl_buaos
+                    });
 
-	        return i_baos.toByteArray();
-		} catch (ClassNotFoundException e) {
-    		//TODO replace by IOException(Throwable e) java 1.6
-			throw (IOException) new IOException(e.getMessage()).initCause(e);
-		} catch (SecurityException e) {
-			throw (IOException) new IOException(e.getMessage()).initCause(e);
-		} catch (NoSuchMethodException e) {
-			throw (IOException) new IOException(e.getMessage()).initCause(e);
-		} catch (IllegalArgumentException e) {
-			throw (IOException) new IOException(e.getMessage()).initCause(e);			
-		} catch (InstantiationException e) {
-			throw (IOException) new IOException(e.getMessage()).initCause(e);	
-		} catch (IllegalAccessException e) {
-			throw (IOException) new IOException(e.getMessage()).initCause(e);	
-		} catch (InvocationTargetException e) {
-			throw (IOException) new IOException(e.getMessage()).initCause(e);				
-		}
+            //          final ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            final ByteArrayOutputStream i_baos = (ByteArrayOutputStream) c_baos.newInstance(new Object[] {
+                        
+                    });
+
+            //	        final BufferedArrayOutputStream ao = new BufferedArrayOutputStream(bo);
+            final Object i_buaos = c_buaos.newInstance(new Object[] { i_baos });
+
+            //	        final IbisSerializationOutputStream so = new IbisSerializationOutputStream(ao);
+            final Object i_isos = c_isos.newInstance(new Object[] { i_buaos });
+
+            final Method writeObjectMth = cl_isos.getMethod(WRITE_OBJECT,
+                    new Class[] { Object.class });
+            final Method flushMth = cl_isos.getMethod(FLUSH);
+            final Method closeMth = cl_isos.getMethod(CLOSE);
+            //	        so.writeObject(o);	        
+            writeObjectMth.invoke(i_isos, new Object[] { o });
+
+            //			so.flush();	        
+            flushMth.invoke(i_isos, new Object[] {  });
+
+            //			so.close();	        
+            closeMth.invoke(i_isos, new Object[] {  });
+
+            return i_baos.toByteArray();
+        } catch (ClassNotFoundException e) {
+            //TODO replace by IOException(Throwable e) java 1.6
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
+        } catch (SecurityException e) {
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
+        } catch (NoSuchMethodException e) {
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
+        } catch (IllegalArgumentException e) {
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
+        } catch (InstantiationException e) {
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
+        } catch (IllegalAccessException e) {
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
+        } catch (InvocationTargetException e) {
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
+        }
     }
 }

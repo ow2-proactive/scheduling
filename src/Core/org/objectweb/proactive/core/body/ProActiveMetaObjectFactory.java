@@ -476,7 +476,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         try {
             return MakeDeepCopy.WithObjectStream.makeDeepCopy(this);
         } catch (IOException e) {
-    		//TODO replace by CloneNotSupportedException(Throwable e) java 1.6
+            //TODO replace by CloneNotSupportedException(Throwable e) java 1.6
             throw (CloneNotSupportedException) new CloneNotSupportedException(e.getMessage()).initCause(e);
         } catch (ClassNotFoundException e) {
             throw (CloneNotSupportedException) new CloneNotSupportedException(e.getMessage()).initCause(e);
