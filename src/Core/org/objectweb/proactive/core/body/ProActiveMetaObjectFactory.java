@@ -476,14 +476,11 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         try {
             return MakeDeepCopy.WithObjectStream.makeDeepCopy(this);
         } catch (IOException e) {
-            e.printStackTrace();
+    		//TODO replace by CloneNotSupportedException(Throwable e) java 1.6
+            throw (CloneNotSupportedException) new CloneNotSupportedException(e.getMessage()).initCause(e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (ProActiveException e) {
-            e.printStackTrace();
+            throw (CloneNotSupportedException) new CloneNotSupportedException(e.getMessage()).initCause(e);
         }
-
-        return clone;
     }
 
     public void setTimItReductor(Object timItReductor) {

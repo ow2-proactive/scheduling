@@ -55,7 +55,7 @@ public class HttpMarshaller {
 
         try {
             buffer = ObjectToByteConverter.MarshallStream.convert(o);
-        } catch (ProActiveException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

@@ -33,13 +33,13 @@ package org.objectweb.proactive.core.util.converter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.PAObjectInputStream;
-
-import ibis.io.BufferedArrayInputStream;
-import ibis.io.IbisSerializationInputStream;
 
 import sun.rmi.server.MarshalInputStream;
 
@@ -50,7 +50,22 @@ import sun.rmi.server.MarshalInputStream;
  *
  */
 public class ByteToObjectConverter {
-    public static class MarshallStream {
+	
+	// IBIS Classes and methods names we need to perform reflection
+    private static final String CLOSE = "close";
+	private static final String READ_OBJECT = "readObject";
+	private static final String IBIS_SERIALIZATION_INPUT_STREAM = "ibis.io.IbisSerializationInputStream";
+	private static final String BUFFERED_ARRAY_INPUT_STREAM = "ibis.io.BufferedArrayInputStream";
+	private static final String BYTE_ARRAY_INPUT_STREAM = "ByteArrayInputStream";
+
+	public static class MarshallStream {
+		/**
+		 * Convert to an object using a marshall stream;
+		 * @param byteArray the byte array to covnert
+		 * @return the unserialized object
+		 * @throws IOException
+		 * @throws ClassNotFoundException
+		 */
         public static Object convert(byte[] byteArray)
             throws IOException, ClassNotFoundException {
             return ByteToObjectConverter.convert(byteArray,
@@ -59,7 +74,14 @@ public class ByteToObjectConverter {
     }
 
     public static class ObjectStream {
-        public static Object convert(byte[] byteArray)
+		/**
+		 * Convert to an object using a regular object stream;
+		 * @param byteArray the byte array to covnert
+		 * @return the unserialized object
+		 * @throws IOException
+		 * @throws ClassNotFoundException
+		 */
+    	public static Object convert(byte[] byteArray)
             throws IOException, ClassNotFoundException {
             return ByteToObjectConverter.convert(byteArray,
                 MakeDeepCopy.ConversionMode.OBJECT);
@@ -67,6 +89,14 @@ public class ByteToObjectConverter {
     }
 
     public static class ProActiveObjectStream {
+		/**
+		 * Convert to an object using a proactive object stream;
+		 * @param byteArray the byte array to covnert
+		 * @return the unserialized object
+		 * @throws IOException
+		 * @throws ClassNotFoundException
+		 */
+
         public static Object convert(byte[] byteArray)
             throws IOException, ClassNotFoundException {
             return ByteToObjectConverter.convert(byteArray,
@@ -119,14 +149,50 @@ public class ByteToObjectConverter {
         }
     }
 
-    private static Object ibisConvert(byte[] b)
+    @SuppressWarnings("unchecked")
+	private static Object ibisConvert(byte[] b)
         throws IOException, ClassNotFoundException {
-        final ByteArrayInputStream bo = new ByteArrayInputStream(b);
-        final BufferedArrayInputStream ao = new BufferedArrayInputStream(bo);
-        final IbisSerializationInputStream so = new IbisSerializationInputStream(ao);
-        final Object unserialized = so.readObject();
-        so.readArray(b);
-        so.close();
+    	try {
+        final Class cl_bais = Class.forName(BYTE_ARRAY_INPUT_STREAM);
+    	final Class cl_buais = Class.forName(BUFFERED_ARRAY_INPUT_STREAM);
+    	final Class cl_isis = Class.forName(IBIS_SERIALIZATION_INPUT_STREAM);
+        final Constructor c_bais = cl_bais.getConstructor();
+        final Constructor c_buais = cl_buais.getConstructor(new Class[]{cl_bais});
+        final Constructor c_isis = cl_isis.getConstructor(new Class[]{cl_buais});
+        
+//      final ByteArrayInputStream bi = new ByteArrayInputStream(b);
+        final ByteArrayInputStream i_bais = (ByteArrayInputStream) c_bais.newInstance();
+        
+//      final BufferedArrayInputStream ai = new BufferedArrayInputStream(bi);
+        final Object i_buais = c_buais.newInstance(new Object[] {i_bais});
+        
+//      final IbisSerializationInputStream si = new IbisSerializationInputStream(ai);
+        final Object i_isis = c_isis.newInstance(new Object[] {i_buais});
+    
+        final Method readObjectMth = cl_isis.getMethod(READ_OBJECT);
+        final Method closeMth = cl_isis.getMethod(CLOSE);	        
+
+        //      final Object unserialized = si.readObject();	        
+        final Object unserialized = readObjectMth.invoke(i_isis, new Object[]{b});
+     
+        closeMth.invoke(i_isis, new Object[]{});
+        
         return unserialized;
+    	} catch (ClassNotFoundException e) {
+    		//TODO replace by IOException(Throwable e) java 1.6
+			throw (IOException) new IOException(e.getMessage()).initCause(e);	
+    	} catch (SecurityException e) {
+			throw (IOException) new IOException(e.getMessage()).initCause(e);	
+		} catch (NoSuchMethodException e) {
+			throw (IOException) new IOException(e.getMessage()).initCause(e);	
+		} catch (IllegalArgumentException e) {
+			throw (IOException) new IOException(e.getMessage()).initCause(e);	
+		} catch (InstantiationException e) {
+			throw (IOException) new IOException(e.getMessage()).initCause(e);	
+		} catch (IllegalAccessException e) {
+			throw (IOException) new IOException(e.getMessage()).initCause(e);	
+		} catch (InvocationTargetException e) {
+			throw (IOException) new IOException(e.getMessage()).initCause(e);	
+		}
     }
 }
