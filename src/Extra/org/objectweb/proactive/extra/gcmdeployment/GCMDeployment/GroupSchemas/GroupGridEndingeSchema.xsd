@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+	</import>
+
+	<!--gridEngine process -->
+	<complexType name="GridEngineProcessType" mixed="true">
+		<all>
+			<element name="commandPath" type="ct:pathElementGeneralType"
+				minOccurs="0" />
+			<element name="gridEngineOption"
+				type="paext:GridEngineOptionType" />
+		</all>
+		<attribute name="class" type="string" use="required"
+			fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess" />
+		<attribute name="closeStream" type="ct:CloseStreamType"
+			use="optional" />
+		<attribute name="interactive" type="ct:BooleanOrVariableType"
+			use="optional" />
+		<attribute name="queue" type="string" use="optional" />
+	</complexType>
+	<complexType name="GridEngineOptionType" mixed="true">
+		<all>
+			<element name="hostsNumber" type="ct:PosintOrVariableType" />
+			<element name="bookingDuration"
+				type="ct:PosintOrVariableType" />
+			<element name="scriptPath" type="ct:pathElementGeneralType" />
+			<element name="hostlist" type="ct:TextOrVariableType"
+				minOccurs="0" />
+			<element name="parallelEnvironment"
+				type="ct:TextOrVariableType" minOccurs="1" maxOccurs="1" />
+		</all>
+	</complexType>
+
+</schema>
