@@ -59,9 +59,7 @@ public interface VMInformation extends java.io.Serializable {
 
     /**
      * Returns the given name (identifier) of this VM.
-     * For some reasson this has been used to get the name of the Node!
-     * when using de NodeInformation class.
-     * To really get the name of the VM use getVmName();
+     *
      * @return the given name (identifier) of this VM
      */
     public String getName();
@@ -88,6 +86,13 @@ public interface VMInformation extends java.io.Serializable {
      *  &lt;/deployment&gt;
      *  </pre>
      * @return The java virtual machine name if created with a descriptor file, null otherwise.
+     *
+     */
+
+    /* TODO cmathieu, mleyton: Remove this method ?
+     *         Implementations of this method are utterly broken and wrong.
+     *         Basically, they all return the same result than getName()
+     *         See why FT use it & fix or delete this method
      */
     public String getDescriptorVMName();
 
