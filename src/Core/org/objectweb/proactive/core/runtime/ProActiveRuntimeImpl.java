@@ -670,16 +670,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT(boolean)
      */
     public void killRT(boolean softly) {
-        killAllNodes();
-
-        logger.info("terminating Runtime " + getInternalURL());
-
         // JMX Notification
         if (getMBean() != null) {
             getMBean().sendNotification(NotificationType.runtimeDestroyed);
         }
 
         // END JMX Notification
+        killAllNodes();
+
+        logger.info("terminating Runtime " + getInternalURL());
 
         // JMX unregistration
         if (getMBean() != null) {

@@ -66,7 +66,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     private boolean shouldNotify = true;
 
     /** Timeout between updates */
-    private long updateFrequence = 3000;
+    private long updateFrequence = 300;
 
     /** Used by the JMX notifications */
     private long counter = 1;
