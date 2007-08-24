@@ -52,6 +52,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	private MonitoringView monitoringView;
 	
 	private WorldObject castedModel;
+	private IFigure castedFigure;
 	
 	private Set<IFigure> figuresToUpdate;
 	private Set<GraphicalCommunication> communicationsToDraw;
@@ -122,12 +123,24 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	 * to WorldObject (the real type of the model).
 	 * @return the casted model
 	 */
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public WorldObject getCastedModel() {
 		if(castedModel==null)
 			castedModel = (WorldObject)getModel();
 		return castedModel;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public IFigure getCastedFigure() {
+		if(castedFigure==null)
+			castedFigure = getFigure();
+		return castedFigure;
+	}
+	
+	@Override
 	public IFigure getContentPane() {
 		return layer;
 	}
@@ -193,5 +206,4 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 			child.setBounds(bounds);
 		}
 	}
-
 }

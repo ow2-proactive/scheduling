@@ -6,6 +6,7 @@ package org.objectweb.proactive.core.jmx.notification;
  */
 public class NotificationType {
     public final static String unknown = "unknown";
+    public final static String setOfNotifications = "setOfNotifications";
 
     // --- Corresponds to the RequestQueueEvent --------------------
     /* Not Used */
@@ -50,4 +51,7 @@ public class NotificationType {
     /* TODO Send this notification */
     // public final static String forwarderRuntimeRegistered = "forwarderRuntimeRegistered";
     public final static String runtimeDestroyed = "runtimeDestroyed";
+
+    // --- Used in the message of the JMX notifications -------------
+    public final static String migrationMessage = "Migration Finished";
 }

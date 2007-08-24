@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
@@ -64,6 +63,8 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 * to NodeObject (the real type of the model).
 	 * @return the casted model
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public NodeObject getCastedModel(){
 		if(castedModel==null){
 			castedModel = (NodeObject)getModel();
@@ -76,6 +77,8 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 * to NodeFigure (the real type of the figure).
 	 * @return the casted figure
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public NodeFigure getCastedFigure(){
 		if(castedFigure==null){
 			castedFigure = (NodeFigure)getFigure();

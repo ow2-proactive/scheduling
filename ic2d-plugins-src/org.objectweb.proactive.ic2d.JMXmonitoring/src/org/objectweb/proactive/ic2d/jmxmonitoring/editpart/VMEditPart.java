@@ -123,6 +123,8 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	 * to VMObject (the real type of the model).
 	 * @return the casted model
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public RuntimeObject getCastedModel(){
 		if(castedModel==null){
 			castedModel = (RuntimeObject)getModel();
@@ -135,6 +137,8 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 	  * to VMFigure (the real type of the figure).
 	  * @return the casted figure
 	  */
+	@SuppressWarnings("unchecked")
+	@Override
 	public VMFigure getCastedFigure(){
 		if(castedFigure == null)
 			castedFigure = (VMFigure)getFigure();

@@ -39,7 +39,7 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	 */
 	public void activate(){
 		if (!isActive())
-			((AbstractData)getModel()).addObserver(this);
+			getCastedModel().addObserver(this);
 		super.activate();
 	}
 	
@@ -49,7 +49,7 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	 */
 	public void deactivate(){
 		if (isActive()) {
-			((AbstractData)getModel()).deleteObserver(this);
+			getCastedModel().deleteObserver(this);
 			((Figure)getFigure()).removeAll();
 		}
 		super.deactivate();
@@ -100,4 +100,18 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	public void addFigureToUpdtate(IFigure figure){
 		getWorldEditPart().addFigureToUpdtate(figure);
 	}
+	
+	/**
+	 * Convert the result of EditPart.getModel()
+	 * to the real type of the model.
+	 * @return the casted model
+	 */
+	public abstract <T extends AbstractData> T getCastedModel();
+	
+	/**
+	 * Convert the result of EditPart.getFigure()
+	 * to the real type of the figure.
+	 * @return the casted figure
+	 */
+	public abstract <T extends IFigure> T getCastedFigure();
 }

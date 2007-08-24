@@ -16,7 +16,6 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
@@ -134,9 +133,11 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
 
+        // If the migration is finished, we need to inform the JMXNotificationManager
         if (type.equals(NotificationType.migrationFinished)) {
             sendNotifications();
-            sendNotification(notification);
+            notifications.add(notification);
+            sendNotifications(NotificationType.migrationMessage);
         } else {
             notifications.add(notification);
         }
@@ -194,14 +195,22 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      * Sends a notification containing all stored notifications.
      */
     private void sendNotifications() {
+        this.sendNotifications(null);
+    }
+
+    /**
+     * Sends a notification containing all stored notifications.
+     * @param userMessage The message to send with the set of notifications.
+     */
+    private void sendNotifications(String userMessage) {
         if (notifications == null) {
             this.notifications = new ConcurrentLinkedQueue<Notification>();
         }
         synchronized (notifications) {
             if (!notifications.isEmpty()) {
                 ObjectName source = getObjectName();
-                Notification n = new Notification(NotificationType.unknown,
-                        source, counter++);
+                Notification n = new Notification(NotificationType.setOfNotifications,
+                        source, counter++, userMessage);
                 n.setUserData(notifications);
                 super.sendNotification(n);
                 notifications.clear();

@@ -43,6 +43,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.HostListener;
 public class HostEditPart extends AbstractMonitoringEditPart {
 
 	private HostObject castedModel;
+	private HostFigure castedFigure;
+	
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -61,11 +63,22 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 	 * to HostObject (the real type of the model).
 	 * @return the casted model
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public HostObject getCastedModel(){
 		if(castedModel==null){
 			castedModel =  (HostObject)getModel();
 		}
 		return castedModel;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public HostFigure getCastedFigure() {
+		if(castedFigure==null){
+			castedFigure =  (HostFigure)getFigure();
+		}
+		return castedFigure;
 	}
 
 	@Override
@@ -77,7 +90,7 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 		}
 		// OS have been updated
 		else if((param instanceof String) && (o instanceof HostObject)){
-			((HostFigure)getFigure()).changeTitle((String)param);
+			getCastedFigure().changeTitle((String)param);
 		}
 		getViewer().getControl().getDisplay().asyncExec(this);
 	}

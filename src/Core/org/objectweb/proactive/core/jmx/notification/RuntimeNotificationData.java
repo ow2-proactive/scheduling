@@ -2,8 +2,7 @@ package org.objectweb.proactive.core.jmx.notification;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 
 
 /**
@@ -43,13 +42,7 @@ public class RuntimeNotificationData implements Serializable {
         this.creationProtocol = creationProtocol;
         this.vmName = vmName;
 
-        // To have a complete url
-        String host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
-        String name = UrlBuilder.getNameFromUrl(runtimeUrl);
-        String protocol = UrlBuilder.getProtocol(runtimeUrl);
-        int port = UrlBuilder.getPortFromUrl(runtimeUrl);
-
-        this.runtimeUrl = UrlBuilder.buildUrl(host, name, protocol, port);
+        this.runtimeUrl = FactoryName.getCompleteUrl(runtimeUrl);
     }
 
     /**

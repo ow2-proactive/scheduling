@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -96,7 +97,7 @@ public class JMXNotificationManager implements NotificationListener {
     public void subscribe(ObjectName objectName, NotificationListener listener,
         String hostUrl, String serverName) {
         // We want the complete url 'protocol://host:port/path'
-        String completeUrl = getCompleteUrl(hostUrl);
+        String completeUrl = FactoryName.getCompleteUrl(hostUrl);
 
         ServerListened server = new ServerListened(hostUrl, serverName);
         ProActiveConnection connection = connections.get(server);
@@ -192,49 +193,49 @@ public class JMXNotificationManager implements NotificationListener {
                 oname);
         }
 
-        // The active object containing the MBean has migrated, so we have to connect to a new remote host.
-        if (type.equals(NotificationType.migrationFinished)) {
-            // The JMX MBean server url
-            String runtimeUrl = (String) notification.getUserData();
+        if (type.equals(NotificationType.setOfNotifications)) {
+            ConcurrentLinkedQueue<Notification> notifications = (ConcurrentLinkedQueue<Notification>) notification.getUserData();
+            String msg = notification.getMessage();
 
-            String host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
-            String runtimeName = UrlBuilder.getNameFromUrl(runtimeUrl);
-            String protocol = UrlBuilder.getProtocol(runtimeUrl);
-            int port = UrlBuilder.getPortFromUrl(runtimeUrl);
+            // The active object containing the MBean has migrated, so we have to connect to a new remote host.
+            if ((msg != null) && msg.equals(NotificationType.migrationMessage)) {
+                Notification notif = notifications.element();
+                ObjectName ob = (ObjectName) notif.getSource();
 
-            String hostUrl = UrlBuilder.buildUrl(host, "", protocol, port);
+                // The JMX MBean server url
+                String runtimeUrl = (String) notif.getUserData();
 
-            // The JMX MBean Server name
-            // Warning: This is a convention used in the ServerConnector
-            String serverName = runtimeName;
+                String host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
+                String runtimeName = UrlBuilder.getNameFromUrl(runtimeUrl);
+                String protocol = UrlBuilder.getProtocol(runtimeUrl);
+                int port = UrlBuilder.getPortFromUrl(runtimeUrl);
 
-            // Search in our established connections
-            ProActiveConnection connection = connections.get(new ServerListened(
-                        hostUrl, serverName));
+                String hostUrl = UrlBuilder.buildUrl(host, "", protocol, port);
 
-            // We have to open a new connection
-            if (connection == null) {
-                // Creates a new Connection
-                ClientConnector cc = new ClientConnector(hostUrl, serverName);
-                cc.connect();
-                connection = cc.getConnection();
+                // The JMX MBean Server name
+                // Warning: This is a convention used in the ServerConnector
+                String serverName = runtimeName;
+
+                // Search in our established connections
+                ProActiveConnection connection = connections.get(new ServerListened(
+                            hostUrl, serverName));
+
+                // We have to open a new connection
+                if (connection == null) {
+                    // Creates a new Connection
+                    ClientConnector cc = new ClientConnector(hostUrl, serverName);
+                    cc.connect();
+                    connection = cc.getConnection();
+                }
+
+                // Subscribes to the JMX notifications
+                notificationlitener.subscribe(connection, ob, null, null);
+
+                // Updates ours map
+                ServerListened server = new ServerListened(hostUrl, serverName);
+                servers.put(ob, server);
+                connections.put(server, connection);
             }
-
-            // Subscribes to the JMX notifications
-            notificationlitener.subscribe(connection, oname, null, null);
-
-            // Updates ours map
-            ServerListened server = new ServerListened(hostUrl, serverName);
-            servers.put(oname, server);
-            connections.put(server, connection);
-
-            // We send always a notification containing a set of notifications.
-            Notification notif = new Notification(NotificationType.unknown,
-                    notification.getSource(), notification.getSequenceNumber());
-            ConcurrentLinkedQueue<Notification> userData = new ConcurrentLinkedQueue<Notification>();
-            userData.add(notification);
-            notif.setUserData(userData);
-            notification = notif;
         }
 
         listeners.get(oname);
@@ -249,20 +250,6 @@ public class JMXNotificationManager implements NotificationListener {
         for (NotificationListener listener : l) {
             listener.handleNotification(notification, handback);
         }
-    }
-
-    /**
-     * Creates a complete url 'protocol://host:port/path'
-     * @param url
-     * @return A complete url
-     */
-    public static String getCompleteUrl(String url) {
-        String host = UrlBuilder.getHostNameFromUrl(url);
-        String name = UrlBuilder.getNameFromUrl(url);
-        int port = UrlBuilder.getPortFromUrl(url);
-        String protocol = UrlBuilder.getProtocol(url);
-
-        return UrlBuilder.buildUrl(host, name, protocol, port);
     }
 
     public ProActiveConnection getConnection(String hostUrl, String serverName) {

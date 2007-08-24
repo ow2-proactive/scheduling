@@ -260,6 +260,8 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 * to AOObject (the real type of the model).
 	 * @return the casted model
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public ActiveObject getCastedModel(){
 		if(castedModel==null){
 			castedModel = (ActiveObject)getModel();
@@ -272,6 +274,8 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 * to AOFigure (the real type of the figure).
 	 * @return the casted figure
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public AOFigure getCastedFigure(){
 		if(castedFigure == null)
 			castedFigure = (AOFigure)getFigure();

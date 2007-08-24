@@ -94,7 +94,7 @@ public class RMIRuntimeFinder implements RuntimeFinder{
 							String mbeanServerName = proActiveRuntime.getMBeanServerName();
 
 							String runtimeUrl = proActiveRuntime.getURL();
-							runtimeUrl = JMXNotificationManager.getCompleteUrl(runtimeUrl);
+							runtimeUrl = FactoryName.getCompleteUrl(runtimeUrl);
 							
 							ObjectName oname = FactoryName.createRuntimeObjectName(runtimeUrl);
 

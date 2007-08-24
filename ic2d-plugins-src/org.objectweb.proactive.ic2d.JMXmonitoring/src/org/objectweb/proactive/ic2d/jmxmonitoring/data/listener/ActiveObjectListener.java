@@ -15,7 +15,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NamesFactory;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 
 public class ActiveObjectListener implements NotificationListener{
 
@@ -45,13 +44,6 @@ public class ActiveObjectListener implements NotificationListener{
 				logger.debug(".................................Request Received : "+ao.getName());
 				RequestNotificationData request = (RequestNotificationData) notification.getUserData();
 				addRequest(request, ao, Type.RECEIVER);
-			}
-			// --- RequestQueueEvent ----------------
-			else if(type.equals(NotificationType.addRequest)){
-				logger.debug("...............................Add a request");
-			}
-			else if(type.equals(NotificationType.removeRequest)){
-				logger.debug("...............................Remove a request");
 			}
 			else if(type.equals(NotificationType.waitForRequest)){
 				logger.debug("...............................Wait for request");
