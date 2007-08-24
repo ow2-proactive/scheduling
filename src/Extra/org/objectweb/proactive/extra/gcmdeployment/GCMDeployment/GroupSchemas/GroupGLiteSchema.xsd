@@ -20,63 +20,71 @@
 	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
 	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
 	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
-	<complexType name="gLiteProcessType" mixed="true">
-		<all>
-			<element name="environment" type="ct:TextOrVariableType"
-				minOccurs="0" />
-			<element name="requirements" type="ct:TextOrVariableType"
-				minOccurs="0" />
-			<element name="inputData" type="paext:gLiteInputDataType"
-				minOccurs="0" />
-			<element name="rank" minOccurs="0">
-				<complexType>
-					<simpleContent>
-						<extension base="ct:TextOrVariableType">
-							<attribute name="fuzzyrank"
-								type="string" />
-						</extension>
-					</simpleContent>
-				</complexType>
-			</element>
-			<element name="gLiteOptions" type="paext:gLiteOptionsType"
-				minOccurs="0" />
-			<element name="JdlTransferDeploy"
-				type="ct:fileTransferType" minOccurs="0" maxOccurs="1" />
-		</all>
-		<attribute name="class" type="string" use="required"
-			fixed="org.objectweb.proactive.core.process.glite.GLiteProcess" />
-		<attribute name="hostname" type="string" />
-		<attribute name="virtualOrganisation" type="string"
-			use="required" />
-		<attribute name="JDLFileName" type="string"
-			use="required" />
-		<attribute name="Type" type="string" default="job" />
-		<attribute name="executable" type="string"
-			default="/bin/sh" />
-		<attribute name="jobType" type="string" default="normal" />
-		<attribute name="stdOutput" type="string"
-			default="output.log" />
-		<attribute name="stdError" type="string"
-			default="error.log" />
-		<attribute name="stdInput" type="string" />
-		<attribute name="outputse" type="string" />
-		<attribute name="retryCount" type="string" />
-		<attribute name="myProxyServer" type="string" />
-		<attribute name="nodeNumber" type="string" />
+	<complexType name="gLiteProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="environment"
+						type="ct:TextOrVariableType" minOccurs="0" />
+					<element name="requirements"
+						type="ct:TextOrVariableType" minOccurs="0" />
+					<element name="inputData"
+						type="paext:gLiteInputDataType" minOccurs="0" />
+					<element name="rank" minOccurs="0">
+						<complexType>
+							<simpleContent>
+								<extension
+									base="ct:TextOrVariableType">
+									<attribute name="fuzzyrank"
+										type="string" />
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="gLiteOptions"
+						type="paext:gLiteOptionsType" minOccurs="0" />
+					<element name="JdlTransferDeploy"
+						type="ct:fileTransferType" minOccurs="0" maxOccurs="1" />
+				</sequence>
+				<attribute name="class" type="string" use="required"
+					fixed="org.objectweb.proactive.core.process.glite.GLiteProcess" />
+				<attribute name="hostname" type="string" />
+				<attribute name="virtualOrganisation" type="string"
+					use="required" />
+				<attribute name="JDLFileName" type="string"
+					use="required" />
+				<attribute name="Type" type="string" default="job" />
+				<attribute name="executable" type="string"
+					default="/bin/sh" />
+				<attribute name="jobType" type="string"
+					default="normal" />
+				<attribute name="stdOutput" type="string"
+					default="output.log" />
+				<attribute name="stdError" type="string"
+					default="error.log" />
+				<attribute name="stdInput" type="string" />
+				<attribute name="outputse" type="string" />
+				<attribute name="retryCount" type="string" />
+				<attribute name="myProxyServer" type="string" />
+				<attribute name="nodeNumber" type="string" />
+			</extension>
+		</complexContent>
 	</complexType>
+
+
 	<!--gLiteRankType-->
 	<complexType name="gLiteRankType">
 		<attribute name="fuzzyrank" type="ct:BooleanOrVariableType"
 			default="false" />
 	</complexType>
 	<!--gLiteInputDataType-->
-	<complexType name="gLiteInputDataType" mixed="true">
+	<complexType name="gLiteInputDataType">
 		<attribute name="dataAccessProtocol" type="string" />
 		<attribute name="storageIndex" type="string" />
 		<attribute name="dataCatalog" type="string" />
 	</complexType>
 	<!--gLiteJobType-->
-	<complexType name="gLiteJobType" mixed="true">
+	<complexType name="gLiteJobType">
 		<choice>
 			<element name="normal" />
 			<element name="interactive">
@@ -109,7 +117,7 @@
 		</choice>
 	</complexType>
 	<!--gLiteOptions-->
-	<complexType name="gLiteOptionsType" mixed="true">
+	<complexType name="gLiteOptionsType">
 		<all>
 			<element name="configFile" type="ct:pathElementType"
 				minOccurs="0" />

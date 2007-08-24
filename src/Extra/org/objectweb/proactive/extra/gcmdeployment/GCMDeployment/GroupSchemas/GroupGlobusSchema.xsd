@@ -5,7 +5,7 @@
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
 	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
 	elementFormDefault="qualified">
-	
+
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
 	</import>
@@ -14,22 +14,28 @@
 	</import>
 
 	<!--globusProcess element has three childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) , environment, and globusOption element  which represents different options of globus command.They may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.globus.GlobusProcess, and hostname which is required and represents the globus host where the RSL request is destinated -->
-	<complexType name="GlobusProcessType" mixed="true">
-		<all>
-			<element name="environment" type="ct:environmentType" minOccurs="0" />
-			<!--	<element ref="commandPath" minOccurs="0"/>-->
-			<element name="globusOption" type="paext:GlobusOptionType"
-				minOccurs="0" />
-		</all>
-		<attribute name="class" type="string" use="required"
-			fixed="org.objectweb.proactive.core.process.globus.GlobusProcess" />
-		<attribute name="closeStream" type="ct:CloseStreamType"
-			use="optional" />
-		<attribute name="hostname" type="string" use="required" />
-		<attribute name="queue" type="string" use="optional" />
+	<complexType name="GlobusProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="environment"
+						type="ct:environmentType" minOccurs="0" />
+					<!--	<element ref="commandPath" minOccurs="0"/>-->
+					<element name="globusOption"
+						type="paext:GlobusOptionType" minOccurs="0" />
+				</sequence>
+				<attribute name="class" type="string" use="required"
+					fixed="org.objectweb.proactive.core.process.globus.GlobusProcess" />
+				<attribute name="closeStream" type="ct:CloseStreamType"
+					use="optional" />
+				<attribute name="hostname" type="string" use="required" />
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
 	</complexType>
+
 	<!--globusOption element has one child count element-->
-	<complexType name="GlobusOptionType" mixed="true">
+	<complexType name="GlobusOptionType">
 		<all>
 			<element name="count" type="ct:PosintOrVariableType"
 				minOccurs="0" />
@@ -42,5 +48,5 @@
 		</all>
 	</complexType>
 
-	
+
 </schema>

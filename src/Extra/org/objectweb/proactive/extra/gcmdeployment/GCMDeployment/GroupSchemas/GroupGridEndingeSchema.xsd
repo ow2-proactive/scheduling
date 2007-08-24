@@ -14,22 +14,26 @@
 	</import>
 
 	<!--gridEngine process -->
-	<complexType name="GridEngineProcessType" mixed="true">
-		<all>
-			<element name="commandPath" type="ct:pathElementGeneralType"
-				minOccurs="0" />
-			<element name="gridEngineOption"
-				type="paext:GridEngineOptionType" />
-		</all>
-		<attribute name="class" type="string" use="required"
-			fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess" />
-		<attribute name="closeStream" type="ct:CloseStreamType"
-			use="optional" />
-		<attribute name="interactive" type="ct:BooleanOrVariableType"
-			use="optional" />
-		<attribute name="queue" type="string" use="optional" />
+	<complexType name="GridEngineProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="commandPath"
+						type="ct:pathElementGeneralType" minOccurs="0" />
+					<element name="gridEngineOption"
+						type="paext:GridEngineOptionType" />
+				</sequence>
+				<attribute name="class" type="string" use="required"
+					fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess" />
+				<attribute name="closeStream" type="ct:CloseStreamType"
+					use="optional" />
+				<attribute name="interactive"
+					type="ct:BooleanOrVariableType" use="optional" />
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
 	</complexType>
-	<complexType name="GridEngineOptionType" mixed="true">
+	<complexType name="GridEngineOptionType">
 		<all>
 			<element name="hostsNumber" type="ct:PosintOrVariableType" />
 			<element name="bookingDuration"
