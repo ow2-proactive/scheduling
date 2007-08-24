@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+	</import>
+
+	<complexType name="prunProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="commandPath" type="ct:pathElementType" minOccurs="0" />
+					<element name="prunOption" type="paext:prunOptionType"
+						minOccurs="0" />
+				</sequence>
+				<attribute name="class" type="string" use="required"
+					fixed="org.objectweb.proactive.core.process.prun.PrunSubProcess" />
+				<attribute name="closeStream" type="ct:CloseStreamType"
+					use="optional" />
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+	<!--prunOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
+	<complexType name="prunOptionType">
+		<sequence>
+			<element name="hostlist" type="ct:ListType" minOccurs="0" />
+			<element name="hostsNumber" type="ct:PosintOrVariableType"
+				minOccurs="0" />
+			<element name="processorPerNode" type="ct:PosintOrVariableType"
+				minOccurs="0" />
+			<element name="bookingDuration" type="ct:TimeOrVariableType"
+				minOccurs="0" />
+			<element name="outputFile" type="ct:TextOrVariableType"
+				minOccurs="0" />
+		</sequence>
+	</complexType>
+
+</schema>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+	</import>
+
+	<!-- the Prun group schema is needed because the pbsoption element derives from prunoption -->
+	<include schemaLocation="GroupPrunSchema.xsd" />
+
+	<!--PBSProcess-->
+	<complexType name="PbsProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="commandPath"
+						type="ct:pathElementType" minOccurs="0" />
+					<element name="pbsOption" type="paext:PbsOptionType"
+						minOccurs="0" />
+				</sequence>
+				<attribute name="class" type="string" use="required"
+					fixed="org.objectweb.proactive.core.process.pbs.PBSSubProcess" />
+				<attribute name="closeStream" type="ct:CloseStreamType"
+					use="optional" />
+				<attribute name="interactive"
+					type="ct:BooleanOrVariableType" use="optional" />
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<!--PbsOption-->
+	<complexType name="PbsOptionType">
+		<complexContent>
+			<extension base="paext:prunOptionType">
+				<sequence>
+					<element name="scriptPath" type="ct:pathElementType"
+						minOccurs="0" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+</schema>
