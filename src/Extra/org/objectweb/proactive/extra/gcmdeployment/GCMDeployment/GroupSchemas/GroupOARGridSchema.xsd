@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+	</import>
+
+
+	<!--oarGridProcess-->
+	<complexType name="oarGridProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="commandPath"
+						type="ct:pathElementType" minOccurs="0" />
+					<element name="oarGridOption"
+						type="paext:OarGridOptionType" />
+				</sequence>
+				<attribute name="class" type="string" use="required"
+					fixed="org.objectweb.proactive.core.process.oar.OARGRIDSubProcess" />
+				<attribute name="queue" type="string" use="optional" />
+				<attribute name="bookedNodesAccess" use="optional">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="rsh" />
+							<enumeration value="ssh" />
+						</restriction>
+					</simpleType>
+				</attribute>
+				<attribute name="closeStream" type="ct:CloseStreamType"
+					use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<!--oarGridOption-->
+	<complexType name="OarGridOptionType">
+		<all>
+			<element name="resources" type="ct:TextOrVariableType" />
+			<element name="walltime" type="ct:TextOrVariableType"
+				minOccurs="0" />
+			<element name="scriptPath" type="ct:pathElementType"
+				minOccurs="0" />
+		</all>
+	</complexType>
+
+
+</schema>

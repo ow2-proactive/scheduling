@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+	</import>
+
+	<!-- mpiProcessType -->
+	<complexType name="mpiProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="commandPath"
+						type="ct:pathElementType" minOccurs="1" />
+					<element minOccurs="1" name="mpiOptions"
+						type="paext:mpiOptionsType" />
+				</sequence>
+				<attribute
+					fixed="org.objectweb.proactive.core.process.mpi.MPIDependentProcess"
+					name="class" type="string" use="required" />
+				<attribute name="mpiFileName" type="string"
+					use="required" />
+				<attribute name="hostsFileName" type="string"
+					use="optional" />
+				<attribute name="mpiCommandOptions" type="string"
+					use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<!--mpiOptions-->
+	<complexType name="mpiOptionsType">
+		<all>
+			<element minOccurs="1" name="processNumber"
+				type="ct:PosintOrVariableType" />
+			<element minOccurs="1" name="localRelativePath"
+				type="ct:pathElementType" />
+			<element minOccurs="0" name="remoteAbsolutePath"
+				type="ct:pathElementType" />
+		</all>
+	</complexType>
+
+</schema>
