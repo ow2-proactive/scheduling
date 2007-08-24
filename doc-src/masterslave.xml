@@ -249,7 +249,6 @@
                 </figure>
             </para>
             <para />
-            <xref linkend="XML_Descriptors" />
         </sect2>
 
         <sect2 id="ms_principle_gathering">
@@ -507,30 +506,30 @@
         </sect2>
 
         <sect2>
-            <title>Specifying result reception order</title>
-
-        </sect2>
-        <para>
-            Result reception order can be switched from
-            <emphasis>Completion</emphasis>
-            order to
-            <emphasis>Submission</emphasis>
-            order using the following method :
-        </para>
-        <programlisting lang="java"><![CDATA[    /**
+        	<title>Specifying result reception order</title>
+        	<para>
+        		Result reception order can be switched from
+        		<emphasis>Completion</emphasis>
+        		order to
+        		<emphasis>Submission</emphasis>
+        		order using the following method :
+        	</para>
+        	<programlisting lang="java"><![CDATA[    /**
      * Sets the current ordering mode <br/>
      * If reception mode is switched while computations are in progress,<br/>
      * then subsequent calls to waitResults methods will be done according to the new mode.<br/>
      * @param mode the new mode for result gathering
      */
     void setResultReceptionOrder(OrderingMode mode);]]></programlisting>
-        <para>
-            The default mode of the M/S API is
-            <emphasis>Completion</emphasis>
-            order. The mode can be switched dynamically, which means
-            that subsequent calls to waitXXX methods (see below), will
-            be done according to the new mode.
-        </para>
+        	<para>
+        		The default mode of the M/S API is
+        		<emphasis>Completion</emphasis>
+        		order. The mode can be switched dynamically, which means
+        		that subsequent calls to waitXXX methods (see below),
+        		will be done according to the new mode.
+        	</para>
+        </sect2>
+
 
         <sect2>
             <title>Collecting results</title>

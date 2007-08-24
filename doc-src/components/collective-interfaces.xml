@@ -207,7 +207,7 @@ public void bar();</programlisting>
 
         <para>A distribution mode declared at the level of the interface
         defines the distribution mode for all parameters of all methods of
-        this interface, but may be overriden by a distribution mode declared
+        this interface, but may be overridden by a distribution mode declared
         at the level of a method or of a parameter.</para>
 
         <para>The annotation for declaring distribution policies at level of
@@ -229,7 +229,7 @@ interface MyMulticastItf {
 
         <para>A distribution mode declared at the level of a method defines
         the distribution mode for all parameters of this method, but may be
-        overriden at the level of each individual parameter.</para>
+        overridden at the level of each individual parameter.</para>
 
         <para>The annotation for declaring distribution policies at level of a
         method is

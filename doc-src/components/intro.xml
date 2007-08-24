@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="intro">
-  <title>Components introduction</title>
+  <title>Components introduction: a Fractal/GCM implementation</title>
 
   <indexterm>
     <primary>Component</primary>
@@ -12,12 +12,37 @@
   challenges: complexity in the design of applications, complexity of
   deployment, reusability, and performance issues.</para>
 
-  <para>The objective of this work is to provide an answer to these problems
-  through the implementation for ProActive of an extensible, dynamical and
-  hierarchical component model, <ulink
-  url="http://fractal.objectweb.org">Fractal</ulink>.</para>
+  <para>
+  	This work contributes to the
+  	<ulink url="http://www.coregrid.net">CoreGRID</ulink>
+  	european project on Grid computing, by participating to the
+  	definition of a programming model for Grid components (the
+  	<emphasis>Grid Component Model</emphasis>
+  	), and by providing a prototype reference implementation of this
+  	model in the
+  	<ulink url="http://gridcomp.ercim.org/">
+  		GridCOMP european project
+  	</ulink>
+  	.
+  </para>
 
-  <para>This document is an overview of the implementation of Fractal with
+  <para>
+  	The objective of this work is to provide an answer to these
+  	problems through the implementation for ProActive of an
+  	extensible, dynamical and hierarchical component model, Grid
+  	Component Model (GCM) based on
+  	<ulink url="http://fractal.objectweb.org">Fractal</ulink>
+  	. The GCM was defined by the
+  	<ulink url="http://www.coregrid.net/">CoreGRID NoE project</ulink>
+  	and is available
+  	<ulink
+  		url="http://www.coregrid.net/mambo/images/stories/Deliverables/d.pm.04.pdf">
+  		here
+  	</ulink>
+  	.
+  </para>
+
+  <para>This document is an overview of the implementation of GCM with
   ProActive.</para>
 
   <para>It presents:</para>
@@ -51,11 +76,7 @@
     </listitem>
   </itemizedlist>
 
-  <para>This work contributes to the <ulink
-  url="http://www.coregrid.net">CoreGRID</ulink> european project on Grid
-  computing, by participating to the definition of a programming model for
-  Grid components (the <emphasis>Grid Component Model</emphasis>), and by
-  providing a prototype reference implementation of this model.</para>
+
 
   <note>
     <para>For a general overview of this work, one can also refer to the paper

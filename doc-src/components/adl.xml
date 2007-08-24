@@ -24,7 +24,7 @@
     <sect1 >
       <title>Overview</title>
       <para>Components are defined in <emphasis role="bold">definition</emphasis> files, which are .fractal files. The syntax of the
- document is validated against a DTD retreived from the classpath</para>
+ document is validated against a DTD retrieved from the classpath</para>
 <screen> classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd </screen>
       <para>The <emphasis role="bold">definition</emphasis> element has a name (which must be the same name that the file's) and
  inheritance is supported through the attribute 'extends':</para>

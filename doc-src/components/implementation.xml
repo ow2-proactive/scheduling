@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="implementation">
-  <title>An implementation of the Fractal component model geared at Grid
-  Computing</title>
+  <title>An implementation of the GCM</title>
+
+  <para>
+  	The GCM is an extension of the Fractal specification, and it
+  	introduce the new features using a Fractal compliant terminology.
+  </para>
 
   <para>Fractal defines a general conceptual model, along with a programming
   application interface (API) in Java. According to the official
@@ -41,7 +45,7 @@
   geared at Grid Computing and based on the ProActive library.</para>
 
   <para>This implementation is different from Julia both in its objectives and
-  in the programming technniques. As previously stated, we target Grid and P2P
+  in the programming techniques. As previously stated, we target Grid and P2P
   environments. The programming techniques and the architecture of the
   implementation is described in a following section.</para>
 
@@ -195,7 +199,7 @@
 
         <listitem>
           <para>a utility class providing static methods to create collective
-          interfaces and retreive references to
+          interfaces and retrieve references to
           ComponentParametersController</para>
         </listitem>
       </itemizedlist>

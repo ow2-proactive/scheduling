@@ -148,8 +148,8 @@ input-interceptor="true" output-interceptor="true"
       method is called sequentially for each controller in the reverse order
       they are defined in the controllers configuration file.</para>
 
-      <para>If in the controller config file, the list of input interceptors
-      is in this order (the order in the controller config file is from top to
+      <para>If in the controller configuration file, the list of input interceptors
+      is in this order (the order in the controller configuration file is from top to
       bottom):</para>
 
       <screen>
@@ -177,8 +177,8 @@ InputInterceptor2
 
       <para>controllers configuration file.</para>
 
-      <para>If in the controller config file, the list of input interceptors
-      is in this order (the order in the controller config file is from top to
+      <para>If in the controller configuration file, the list of input interceptors
+      is in this order (the order in the controller configuration file is from top to
       bottom):</para>
 
       <screen>
@@ -272,7 +272,7 @@ l invocation");
     lifecycle</title>
 
     <indexterm>
-      <primary>Lifeycle</primary>
+      <primary>Lifecycle</primary>
 
       <secondary>Components</secondary>
     </indexterm>
@@ -346,7 +346,7 @@ l invocation");
       components, is represented with different distributions of the
       components. In a, all components are located in the same JVM, therefore
       all communications are local communications. If the wrapping composites
-      are distributed on different remote jvms, all communications are remote
+      are distributed on different remote JVMs, all communications are remote
       because they have to cross composite enclosing components. The short cut
       optimization is a simple bypassing of the wrapper components, which
       results in 2 local communications for the sole functional
