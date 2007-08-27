@@ -10,7 +10,6 @@ import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
 public class GroupSSH extends AbstractGroup {
     public final static String DEFAULT_SSHPATH = "ssh";
     private String hostList;
-    private String domain;
     private String username;
 
     public GroupSSH() {
@@ -21,7 +20,6 @@ public class GroupSSH extends AbstractGroup {
     public GroupSSH(GroupSSH groupSSH) {
         super(groupSSH);
         this.hostList = groupSSH.hostList;
-        this.domain = groupSSH.domain;
         this.username = groupSSH.username;
     }
 
@@ -58,23 +56,11 @@ public class GroupSSH extends AbstractGroup {
 
         res.append(" ").append(hostname);
 
-        if (domain != null) {
-            res.append(".").append(domain);
-        }
-
         return res.toString();
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getDomain() {
-        return domain;
     }
 
     public String getUsername() {

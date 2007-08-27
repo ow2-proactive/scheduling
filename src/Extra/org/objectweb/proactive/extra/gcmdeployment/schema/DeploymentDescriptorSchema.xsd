@@ -17,7 +17,6 @@
 			</element>
 		</sequence>
 		<attribute name="id" type="ct:idType" use="required" />
-		<attribute name="domain" type="ct:hostnameType" />
 		<attribute name="username" type="ct:usernameType" />
 		<attribute name="commandPath" type="ct:pathElementGeneralType" />
 	</complexType>
