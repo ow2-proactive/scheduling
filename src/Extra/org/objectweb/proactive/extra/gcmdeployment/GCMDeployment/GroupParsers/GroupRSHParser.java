@@ -22,12 +22,6 @@ public class GroupRSHParser extends AbstractGroupParser {
                 "hostList");
         groupSSH.setHostList(hostList);
 
-        // Optional attributes
-        String domain = GCMParserHelper.getAttributeValue(groupNode, "domain");
-        if (domain != null) {
-            groupSSH.setDomain(domain);
-        }
-
         String username = GCMParserHelper.getAttributeValue(groupNode,
                 "username");
         if (username != null) {
