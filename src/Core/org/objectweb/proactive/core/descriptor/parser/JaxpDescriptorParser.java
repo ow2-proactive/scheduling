@@ -300,11 +300,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         // Variables
         //
         String[][] pairs = new String[][] {
-                { VARIABLES_DESCRIPTOR, VARIABLES_DESCRIPTOR_TAG },
-                { VARIABLES_PROGRAM, VARIABLES_PROGRAM_TAG },
-                { VARIABLES_JAVAPROPERTY, VARIABLES_JAVAPROPERTY_TAG },
-                { VARIABLES_PROGRAM_DEFAULT, VARIABLES_PROGRAM_DEFAULT_TAG },
-                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG },
                 {
                     VARIABLES_JAVAPROPERTY_DESCRIPTOR,
                     VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG
@@ -313,6 +308,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     VARIABLES_JAVAPROPERTY_PROGRAM,
                     VARIABLES_JAVAPROPERTY_PROGRAM_TAG
                 },
+                { VARIABLES_JAVAPROPERTY, VARIABLES_JAVAPROPERTY_TAG },
+                { VARIABLES_DESCRIPTOR, VARIABLES_DESCRIPTOR_TAG },
+                { VARIABLES_PROGRAM, VARIABLES_PROGRAM_TAG },
+                { VARIABLES_PROGRAM_DEFAULT, VARIABLES_PROGRAM_DEFAULT_TAG },
+                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG },
             };
 
         for (int i = 0; i < pairs.length; ++i) {
