@@ -1,7 +1,6 @@
 package org.objectweb.proactive.ic2d.timit.data;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,8 @@ public class ChartContainerObject {
     }
 
     protected final void createFromWorldObject(final WorldObject object) {
-        // Get All nodes from the Virtual Machine object and create charts from them
+        // Get All nodes from the Virtual Machine object and create charts from
+        // them
         List<AbstractDataObject> children = object.getMonitoredChildren();
         for (AbstractDataObject o : children) {
             createFromHostObject((HostObject) o);
@@ -61,7 +61,8 @@ public class ChartContainerObject {
     }
 
     protected final void createFromHostObject(final HostObject object) {
-        // Get All nodes from the Virtual Machine object and create charts from them
+        // Get All nodes from the Virtual Machine object and create charts from
+        // them
         List<AbstractDataObject> children = object.getMonitoredChildren();
         for (AbstractDataObject o : children) {
             createFromVMObject((VMObject) o);
@@ -69,7 +70,8 @@ public class ChartContainerObject {
     }
 
     protected final void createFromVMObject(final VMObject object) {
-        // Get All nodes from the Virtual Machine object and create charts from them
+        // Get All nodes from the Virtual Machine object and create charts from
+        // them
         List<AbstractDataObject> children = object.getMonitoredChildren();
         for (AbstractDataObject o : children) {
             createFromNodeObject((NodeObject) o);
@@ -93,14 +95,15 @@ public class ChartContainerObject {
         }
 
         // Before ChartObject instanciation try to take a snapshot of timers
-        Collection<BasicTimer> timersCollection = ChartObject.performSnapshotInternal(aoObject, ChartObject.PROACTIVE_BASIC_LEVEL_TIMERS_NAMES);
+        List<BasicTimer> timersCollection = ChartObject.performSnapshotInternal(aoObject,
+                ChartObject.BASIC_LEVEL);
         if (timersCollection != null) {
             new ChartObject(this, timersCollection, aoObject);
         }
     }
-    
-    public ChartObject getChartObjectById(UniqueID id){
-    	return this.childrenMap.get(id);
+
+    public ChartObject getChartObjectById(UniqueID id) {
+        return this.childrenMap.get(id);
     }
 
     public List<ChartObject> getChildrenList() {

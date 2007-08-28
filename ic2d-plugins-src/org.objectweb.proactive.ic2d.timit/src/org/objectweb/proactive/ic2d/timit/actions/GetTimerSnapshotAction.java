@@ -24,23 +24,20 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  *
  */
 public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
-	
     public static final String GET_TIMER_SNAPSHOT = "Get timer snapshot";
-    
     private AbstractDataObject object;
-    
     private ChartContainerObject container;
 
     public GetTimerSnapshotAction() {
-        this.setId(GET_TIMER_SNAPSHOT);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
+        super.setId(GET_TIMER_SNAPSHOT);
+        super.setImageDescriptor(ImageDescriptor.createFromFile(
                 this.getClass(), "timer.gif"));
-        this.setToolTipText("Get timers snapshot from this object");
-        this.setEnabled(false);
+        super.setToolTipText("Get timers snapshot from this object");
+        super.setEnabled(false);
     }
 
     @Override
-    public void run() {
+    public final void run() {
         ///IWorkbenchWindow currentWindow = null;
         IWorkbench iworkbench = PlatformUI.getWorkbench();
         IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
@@ -57,9 +54,9 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
 
             // Pass the reference of the AbstractDataObject to the ChartContainerObject			
             if ((part != null) && part.getClass().equals(TimItView.class)) {
-            	if ( this.container == null ) {
-            		this.container = ((TimItView) part).getChartContainer(); 
-            	}
+                if (this.container == null) {
+                    this.container = ((TimItView) part).getChartContainer();
+                }
                 this.container.recognizeAndCreateChart(this.object);
             }
 
@@ -76,12 +73,12 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
         this.object = object;
     }
 
-	public final void setActiveSelect(final AOObject ref) {
-		if ( this.container != null ){
-			ChartObject chartObject = this.container.getChartObjectById(ref.getID());
-			if ( chartObject != null ){
-				chartObject.getEp().setSelection();
-			}
-		}		
-	}
+    public final void setActiveSelect(final AOObject ref) {
+        if (this.container != null) {
+            ChartObject chartObject = this.container.getChartObjectById(ref.getID());
+            if (chartObject != null) {
+                chartObject.getEp().handleSelection(true);
+            }
+        }
+    }
 }

@@ -98,14 +98,17 @@ public class Spy implements RunActive, ProActiveInternalObject {
     	return GarbageCollector.getDgcState(bodyID);
     }
 
-    public Collection<BasicTimer> getTimersSnapshotFromBody(UniqueID bodyID, String[] timerNames) throws Exception{
-    	org.objectweb.proactive.core.util.profiling.TimerProvidable container = org.objectweb.proactive.core.util.profiling.TimerWarehouse
-				.getTimerProvidable(bodyID);
-		if (container == null) {
-			throw new NullPointerException("The timers container is null, the body is not timed.");
-		}
-		return container.getSnapshot(timerNames);
-    }
+    public Object[] getTimersSnapshotFromBody(UniqueID bodyID, String[] timerNames) throws Exception{
+        org.objectweb.proactive.core.util.profiling.TimerProvidable container = org.objectweb.proactive.core.util.profiling.TimerWarehouse
+                                .getTimerProvidable(bodyID);
+                if (container == null) {
+                        throw new NullPointerException("The timers container is null, the body is not timed.");
+                }
+                return new Object[]{
+                                container.getSnapshot(timerNames), // The list of timers
+                                System.nanoTime() // The nano timestamp on this machine used to stop all timers at the caller side
+                                };
+    } 
 
 	public void migrateTo(UniqueID bodyId, String nodeDestination)
 	throws MigrationException {

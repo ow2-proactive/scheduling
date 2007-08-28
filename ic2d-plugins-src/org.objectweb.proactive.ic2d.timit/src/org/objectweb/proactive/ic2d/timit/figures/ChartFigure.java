@@ -19,10 +19,10 @@ import org.eclipse.swt.widgets.Display;
 
 
 public class ChartFigure extends Figure {
-    private static final Color UNSELECTED_BORDER_COLOR = Display.getCurrent()
-                                                                .getSystemColor(SWT.COLOR_DARK_GRAY);
-    private static final Color SELECTED_BORDER_COLOR = Display.getCurrent()
-                                                              .getSystemColor(SWT.COLOR_RED);
+    public static final Color UNSELECTED_BORDER_COLOR = Display.getCurrent()
+                                                               .getSystemColor(SWT.COLOR_DARK_GRAY);
+    public static final Color SELECTED_BORDER_COLOR = Display.getCurrent()
+                                                             .getSystemColor(SWT.COLOR_RED);
     private static int UNSELECTED_BORDER_SIZE = 2;
     private static int SELECTED_BORDER_SIZE = 4;
 

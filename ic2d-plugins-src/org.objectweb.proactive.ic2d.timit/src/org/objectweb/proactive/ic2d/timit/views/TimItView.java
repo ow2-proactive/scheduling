@@ -3,6 +3,7 @@ package org.objectweb.proactive.ic2d.timit.views;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -17,33 +18,27 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.timit.actions.ShowInTreeViewAction;
 import org.objectweb.proactive.ic2d.timit.data.ChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.ChartObject;
+import org.objectweb.proactive.ic2d.timit.editparts.ChartEditPart;
 import org.objectweb.proactive.ic2d.timit.editparts.TimItEditPartFactory;
-import org.objectweb.proactive.ic2d.timit.figures.listeners.ChartListener;
 
 
 /**
- * This sample class demonstrates how to plug-in a new workbench view. The view
- * shows data obtained from the model. The sample creates a dummy model on the
- * fly, but a real implementation would connect to the model available either in
- * this or another plug-in (e.g. the workspace). The view is connected to the
- * model using a content provider.
+ * The main TimItView class.
  * <p>
- * The view uses a label provider to define how model objects should be
- * presented in the view. Each view can present the same model objects using
- * different labels and icons, if needed. Alternatively, a single label provider
- * can be shared between views in order to ensure that objects of the same type
- * are presented in the same way everywhere.
+ * The view uses a buttons and actions.
  * <p>
  */
 public class TimItView extends ViewPart {
     public static final String ID = "org.objectweb.proactive.ic2d.timit.views.TimItView";
-    public static Button refreshSelectedButton;
-    public static Button refreshAllButton;
-    public static Button timerLevelButton;
-    private ScrollingGraphicalViewer timItViewer;
-    private ChartContainerObject chartContainer;
+    protected Button refreshSelectedButton;
+    protected Button refreshAllButton;
+    protected Button timerLevelButton;
+    protected ShowInTreeViewAction showInTreeViewAction;
+    protected ScrollingGraphicalViewer timItViewer;
+    protected ChartContainerObject chartContainer;
 
     /**
      * The constructor.
@@ -55,7 +50,9 @@ public class TimItView extends ViewPart {
     /**
      * This is a callback that will allow us to create the viewer and initialize
      * it.
-     * @param Composite parent object
+     *
+     * @param Composite
+     *            parent object
      */
     public void createPartControl(Composite parent) {
         FormLayout form = new FormLayout();
@@ -63,7 +60,7 @@ public class TimItView extends ViewPart {
 
         final int limit = 62;
 
-        //////////////////////////
+        // ////////////////////////
         createGraphicalViewer(parent);
 
         FormData graphicalViewerData = new FormData();
@@ -73,7 +70,7 @@ public class TimItView extends ViewPart {
         graphicalViewerData.bottom = new FormAttachment(100, -limit);
         this.timItViewer.getControl().setLayoutData(graphicalViewerData);
 
-        //////////////////////////		
+        // ////////////////////////
         FormData drawingStyleData = new FormData();
         drawingStyleData.left = new FormAttachment(0, 0);
         drawingStyleData.right = new FormAttachment(100, 0);
@@ -86,13 +83,35 @@ public class TimItView extends ViewPart {
         groupD.setLayout(rowLayout);
         groupD.setLayoutData(drawingStyleData);
 
-        //////////////////////////
+        // ////////////////////////
         Group refreshGroup = new Group(groupD, SWT.NONE);
         refreshGroup.setText("Refresh Charts");
         RowLayout refreshLayout = new RowLayout();
         refreshGroup.setLayout(refreshLayout);
 
-        TimItView.refreshSelectedButton = new Button(refreshGroup, SWT.PUSH);
+        // --------------------
+        this.refreshSelectedButton = new Button(refreshGroup, SWT.PUSH);
+
+        this.refreshAllButton = new Button(refreshGroup, SWT.PUSH);
+
+        this.timerLevelButton = new Button(refreshGroup, SWT.PUSH);
+
+        // Configure buttons
+        this.configureButtons();
+
+        // ---------------------		
+        IToolBarManager toolBarManager = getViewSite().getActionBars()
+                                             .getToolBarManager();
+
+        this.showInTreeViewAction = new ShowInTreeViewAction();
+        toolBarManager.add(showInTreeViewAction);
+    }
+
+    /**
+     * Configures the tool bar buttons of the current view
+     */
+    private void configureButtons() {
+        // Configuration of the refresh button
         refreshSelectedButton.setText("Refresh Selected");
         refreshSelectedButton.setToolTipText("Refresh the Selected Chart");
         refreshSelectedButton.setSelection(false);
@@ -100,13 +119,15 @@ public class TimItView extends ViewPart {
         refreshSelectedButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    if (ChartListener.lastSelected != null) {
-                        ((ChartObject) ChartListener.lastSelected.getModel()).performSnapshot();
+                    if (timItViewer.getSelectedEditParts().size() != 0) {
+                        ChartObject c = (ChartObject) ((ChartEditPart) timItViewer.getSelectedEditParts()
+                                                                                  .get(0)).getModel();
+                        c.performSnapshot();
                     }
                 }
             });
 
-        TimItView.refreshAllButton = new Button(refreshGroup, SWT.PUSH);
+        // Configuration of the refresh all button
         refreshAllButton.setText("Refresh All");
         refreshAllButton.setToolTipText("Refresh All Available Charts");
         refreshAllButton.setSelection(false);
@@ -123,7 +144,8 @@ public class TimItView extends ViewPart {
                         });
                 }
             });
-        TimItView.timerLevelButton = new Button(refreshGroup, SWT.PUSH);
+
+        // Configuration of the switch button
         timerLevelButton.setText("Switch to Detailed");
         timerLevelButton.setToolTipText("Switch Timers Level");
         timerLevelButton.setSelection(false);
@@ -131,15 +153,11 @@ public class TimItView extends ViewPart {
         timerLevelButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                	if (ChartListener.lastSelected != null) {
-                        ((ChartObject) ChartListener.lastSelected.getModel()).switchTimerLevel();
-                        String lev = ((ChartObject) ChartListener.lastSelected.getModel()).getTimerLevel();
-                        if ( lev.equals("Basic") ){
-                        	timerLevelButton.setText("Switch To Detailed");
-                        } else {
-                        	timerLevelButton.setText("Switch To Basic   ");
-                        }
-                        
+                    if (timItViewer.getSelectedEditParts().size() != 0) {
+                        ChartObject c = (ChartObject) ((ChartEditPart) timItViewer.getSelectedEditParts()
+                                                                                  .get(0)).getModel();
+                        timerLevelButton.setText("Switch To " +
+                            c.switchTimerLevel());
                     }
                 }
             });
@@ -147,7 +165,9 @@ public class TimItView extends ViewPart {
 
     /**
      * Creates the graphical viewer.
-     * @param parent The Composite parent object
+     *
+     * @param parent
+     *            The Composite parent object
      */
     private void createGraphicalViewer(Composite parent) {
         // create graphical viewer
@@ -157,23 +177,22 @@ public class TimItView extends ViewPart {
         // configure the viewer
         this.timItViewer.getControl().setBackground(ColorConstants.white);
         ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
-        // root.getFigure().addMouseListener(new WorldListener(this));
         this.timItViewer.setRootEditPart(root);
 
         // activate the viewer as selection provider for Eclipse
         getSite().setSelectionProvider(this.timItViewer);
 
         // initialize the viewer with input
-        this.timItViewer.setEditPartFactory(new TimItEditPartFactory());
+        this.timItViewer.setEditPartFactory(new TimItEditPartFactory(this));
 
         // //////////////////////////////////////////////////
-        // Add contents				
+        // Add contents
         this.timItViewer.setContents(chartContainer);
 
         // ADD for resize event
         parent.addControlListener(new ControlAdapter() { /* resize listener */
                 public void controlResized(ControlEvent event) {
-                    chartContainer.update(true); //timItViewer.getContents().refresh();
+                    chartContainer.update(true); // timItViewer.getContents().refresh();
                 }
             });
     }
@@ -187,6 +206,7 @@ public class TimItView extends ViewPart {
 
     /**
      * A getter for the chartContainer (root model)
+     *
      * @return ChartContainerObject reference
      */
     public ChartContainerObject getChartContainer() {
@@ -195,9 +215,43 @@ public class TimItView extends ViewPart {
 
     /**
      * A setter for the chartContainer (root model)
+     *
      * @param chartContainer
      */
     public void setChartContainer(ChartContainerObject chartContainer) {
         this.chartContainer = chartContainer;
+    }
+
+    public Button getRefreshAllButton() {
+        return refreshAllButton;
+    }
+
+    public void setRefreshAllButton(Button refreshAllButton) {
+        this.refreshAllButton = refreshAllButton;
+    }
+
+    public Button getRefreshSelectedButton() {
+        return refreshSelectedButton;
+    }
+
+    public void setRefreshSelectedButton(Button refreshSelectedButton) {
+        this.refreshSelectedButton = refreshSelectedButton;
+    }
+
+    public ShowInTreeViewAction getShowInTreeViewAction() {
+        return showInTreeViewAction;
+    }
+
+    public void setShowInTreeViewAction(
+        ShowInTreeViewAction showInTreeViewAction) {
+        this.showInTreeViewAction = showInTreeViewAction;
+    }
+
+    public Button getTimerLevelButton() {
+        return timerLevelButton;
+    }
+
+    public void setTimerLevelButton(Button timerLevelButton) {
+        this.timerLevelButton = timerLevelButton;
     }
 }

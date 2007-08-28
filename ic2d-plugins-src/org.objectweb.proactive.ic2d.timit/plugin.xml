@@ -11,6 +11,12 @@
             icon="icons/sample.gif"
             id="org.objectweb.proactive.ic2d.timit.views.TimItView"
             name="TimIt View"/>
+      <view
+            category="org.objectweb.proactive.ic2d.monitoring.category"
+            class="org.objectweb.proactive.ic2d.timit.views.TimerTreeView"
+            icon="icons/sample.gif"
+            id="org.objectweb.proactive.ic2d.timit.views.TimerTreeView"
+            name="Timer Tree View"/>
    </extension>
    <extension
          point="org.objectweb.proactive.ic2d.monitoring.actions_extension">

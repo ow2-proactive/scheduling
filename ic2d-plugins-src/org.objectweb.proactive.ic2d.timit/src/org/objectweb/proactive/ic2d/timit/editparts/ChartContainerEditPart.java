@@ -19,14 +19,17 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  */
 public class ChartContainerEditPart extends AbstractGraphicalEditPart
     implements Runnable {
+    protected TimItView timItView;
 
     /**
      * The constructor of this edit part
      * @param model
      */
-    public ChartContainerEditPart(ChartContainerObject model) {
+    public ChartContainerEditPart(ChartContainerObject model,
+        TimItView timItView) {
         this.setModel(model);
         model.setEp(this);
+        this.timItView = timItView;
     }
 
     /**
@@ -57,7 +60,7 @@ public class ChartContainerEditPart extends AbstractGraphicalEditPart
 
         // If the list is not empty the 
         if (l.size() != 0) {
-            TimItView.refreshAllButton.setEnabled(true);
+            this.timItView.getRefreshAllButton().setEnabled(true);
         }
         return l;
     }
@@ -72,6 +75,7 @@ public class ChartContainerEditPart extends AbstractGraphicalEditPart
     /**
      * The run method performs the refresh
      */
+    @Override
     public void run() {
         refresh();
     }
