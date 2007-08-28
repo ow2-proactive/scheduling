@@ -1,7 +1,8 @@
 package org.objectweb.proactive.ic2d.timit.data;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.birt.chart.model.Chart;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
@@ -22,29 +23,34 @@ import org.objectweb.proactive.ic2d.timit.editparts.ChartEditPart;
  */
 public class ChartObject {
     public static final boolean DEBUG = false;
-    public static final String[] PROACTIVE_BASIC_LEVEL_TIMERS_NAMES = new String[] {
+    public static final String[] BASIC_LEVEL = new String[] {
             "Total", "Serve", "SendRequest", "SendReply", "WaitByNecessity",
             "WaitForRequest"
         };
-    
-    public static final String[] PROACTIVE_DETAILED_LEVEL_TIMERS_NAMES = new String[] {
-        "Total", "Serve", "SendRequest", "SendReply", "WaitByNecessity",
-        "WaitForRequest", "LocalCopy", "BeforeSerialization", "Serialization", "AfterSerialization", "GroupOneWayCall", "GroupAsyncCall"
-    };
-    
+    public static final String[] DETAILED_LEVEL = new String[] {
+            "Total", "Serve", "SendRequest", "SendReply", "WaitByNecessity",
+            "WaitForRequest", "LocalCopy", "BeforeSerialization",
+            "Serialization", "AfterSerialization", "GroupOneWayCall",
+            "GroupAsyncCall"
+        };
     protected BarChartBuilder barChartBuilder;
     protected ChartContainerObject parent;
-    protected Collection<BasicTimer> timersCollection;
+    protected Map<String, TimerObject> timersMap;
+    protected List<TimerObject> timersList;
+    protected TimerObject rootTimer;
     protected AOObject aoObject;
     protected ChartEditPart ep;
     protected boolean hasChanged;
-    protected String[] currentTimerLevel = PROACTIVE_BASIC_LEVEL_TIMERS_NAMES;
-    
+    protected String[] currentTimerLevel = BASIC_LEVEL;
 
-    public ChartObject(ChartContainerObject parent,
-        Collection<BasicTimer> timersCollection, AOObject aoObject) {
+    public ChartObject(final ChartContainerObject parent,
+        final List<BasicTimer> basicTimersList, final AOObject aoObject) {
         this.parent = parent;
-        this.timersCollection = timersCollection;
+        this.timersMap = new java.util.HashMap<String, TimerObject>();
+        this.timersList = new ArrayList<TimerObject>();
+
+        // Populate the map and update root
+        this.rootTimer = this.updateCurrentTimersList(basicTimersList);
         this.hasChanged = true;
         this.aoObject = aoObject;
         this.barChartBuilder = new BarChartBuilder((this.aoObject == null)
@@ -55,126 +61,217 @@ public class ChartObject {
 
     /**
      * Provides the cached or created chart.
+     *
      * @return The created or cached chart.
      */
     public final Chart provideChart() {
         if (this.hasChanged) {
             this.hasChanged = false;
-            // Filter by names
-            Collection<BasicTimer> newCol = new ArrayList<BasicTimer>();
-            for( BasicTimer b : this.timersCollection ){
-            	if ( contains(this.currentTimerLevel, b.getName() ) ){
-            		newCol.add(b);
-            		//System.out.println("ChartObject.provideChart() _____ " + b.getName());
-            	}
-            }
-            return this.barChartBuilder.createChart(newCol, this.currentTimerLevel);
+            return this.barChartBuilder.createChart(this.timersList,
+                this.currentTimerLevel);
         }
         return this.barChartBuilder.chart;
-    }      
-    
-    public String getTimerLevel(){
-    	return ( this.currentTimerLevel.equals(PROACTIVE_BASIC_LEVEL_TIMERS_NAMES) ? "Basic" : "Detailed" );
     }
-    
-    public void switchTimerLevel(){
-    	if ( this.currentTimerLevel == PROACTIVE_BASIC_LEVEL_TIMERS_NAMES ){
-    		this.currentTimerLevel = PROACTIVE_DETAILED_LEVEL_TIMERS_NAMES;
-    	} else {
-    		this.currentTimerLevel = PROACTIVE_BASIC_LEVEL_TIMERS_NAMES;
-    	}    	    	
-    	this.performSnapshot();
-    	
+
+    public final String getInversedTimerLevel() {
+        return (this.currentTimerLevel.equals(BASIC_LEVEL) ? "Detailed"
+                                                           : "Basic   ");
+    }
+
+    public final String switchTimerLevel() {
+        String res;
+        if (this.currentTimerLevel == BASIC_LEVEL) {
+            this.currentTimerLevel = DETAILED_LEVEL;
+            res = "Basic   ";
+        } else {
+            this.currentTimerLevel = BASIC_LEVEL;
+            res = "Detailed";
+        }
+        this.performSnapshot(true);
+        return res;
     }
 
     /**
-     * Performs a snapshot on the associated active object and refreshes
-     * the edit part.
+     * Performs a snapshot on the associated active object and refreshes the
+     * edit part.
      */
-    public void performSnapshot() {
-        Collection<BasicTimer> availableTimersCollection = ChartObject.performSnapshotInternal(this.aoObject, this.currentTimerLevel);
-        if (availableTimersCollection != null) {
-            this.timersCollection = availableTimersCollection;
+    public final void performSnapshot() {
+        this.performSnapshot(false);
+    }
+
+    /**
+     * Performs a snapshot on the associated active object and refreshes the
+     * edit part.
+     */
+    public final void performSnapshot(final boolean updateLevel) {
+        List<BasicTimer> availableTimersList = ChartObject.performSnapshotInternal(this.aoObject,
+                this.currentTimerLevel);
+
+        // If the received collection is not null
+        if (availableTimersList != null) {
+            // Update the current timers object collection
+            updateCurrentTimersList(availableTimersList);
+            // Iterate through all timers to fire changes
+            for (final TimerObject t : this.timersList) {
+                // If update level is asked then check if the timers name is
+                // filtered
+                if (updateLevel && !t.currentTimer.isUserLevel()) {
+                    t.setViewed(contains(this.currentTimerLevel,
+                            t.currentTimer.getName()));
+                }
+            }
+            this.rootTimer.firePropertyChange(TimerObject.P_CHILDREN, null, null);
             this.hasChanged = true;
             this.ep.asyncRefresh();
         }
     }
 
+    public final TimerObject updateCurrentTimersList(
+        final List<BasicTimer> list) {
+        TimerObject root = null;
+        for (BasicTimer basicTimer : list) {
+            TimerObject timerObject = this.timersMap.get(basicTimer.getName());
+
+            if (timerObject != null) {
+                // Update the timer object
+                timerObject.setCurrentTimer(basicTimer);
+            } else {
+                // If is not root
+                if (basicTimer.getParent() != null) {
+                    // Retreive parent object
+                    TimerObject parent = this.timersMap.get(basicTimer.getParent()
+                                                                      .getName());
+                    if (parent != null) {
+                        // Create
+                        timerObject = new TimerObject(basicTimer, parent);
+                        // Add to map
+                        this.timersMap.put(basicTimer.getName(), timerObject);
+                        // Add to list
+                        this.timersList.add(timerObject);
+                    }
+                } else { // If root then add to map and to list and prepare
+                         // to return it
+                    timerObject = new TimerObject(basicTimer, null);
+                    this.timersMap.put(basicTimer.getName(), timerObject);
+                    this.timersList.add(timerObject);
+                    root = timerObject;
+                }
+            }
+        }
+        return root;
+    }
+
     /**
      * Returns this uniqueId of the associated active object
+     *
      * @return The uniqueId of the active object
      */
-    public UniqueID getAoObjectID() {
+    public final UniqueID getAoObjectID() {
         return this.aoObject.getID();
     }
 
     /**
+     * Return the list of timer objects.
+     *
+     * @return The list of timer objects
+     */
+    public final List<TimerObject> getTimersList() {
+        return timersList;
+    }
+
+    /**
+     * Returns the associated active object
+     *
+     * @return The active object representation
+     */
+    public final AOObject getAoObject() {
+        return aoObject;
+    }
+
+    /**
      * Returns the parent of this
+     *
      * @return
      */
-    public ChartContainerObject getParent() {
+    public final ChartContainerObject getParent() {
         return parent;
     }
 
     /**
      * A setter for the parent object
+     *
      * @param parent
      */
-    public void setParent(ChartContainerObject parent) {
+    public final void setParent(final ChartContainerObject parent) {
         this.parent = parent;
     }
 
     /**
      * A getter for hashChanged
+     *
      * @return hashChanged value
      */
-    public boolean getHasChanged() {
+    public final boolean getHasChanged() {
         return hasChanged;
     }
 
     /**
      * A setter for hasChanged
+     *
      * @param hasChanged
      */
-    public void setHasChanged(boolean hasChanged) {
+    public final void setHasChanged(final boolean hasChanged) {
         this.hasChanged = hasChanged;
     }
 
     /**
      * A setter for the current editPart
+     *
      * @param ep
      */
-    public void setEp(ChartEditPart ep) {
+    public final void setEp(final ChartEditPart ep) {
         this.ep = ep;
     }
-    
+
     /**
      * A getter for the current editPart
+     *
      * @return ep
      */
-    public ChartEditPart getEp(){
-    	return this.ep;
+    public final ChartEditPart getEp() {
+        return this.ep;
     }
 
     /**
      * Performs a snapshot on timers of a remote active object
-     * @param aoObject The reference on the remote active object
-     * @return A collection of BasicTimer
+     *
+     * @param aoObject
+     *            The reference on the remote active object
+     * @return A list of BasicTimer
      */
-    protected static final Collection<BasicTimer> performSnapshotInternal(
-        final AOObject aoObject, String[] timerLevel) {
+    protected static final List<BasicTimer> performSnapshotInternal(
+        final AOObject aoObject, final String[] timerLevel) {
         try {
             Spy spy = ((NodeObject) aoObject.getParent()).getSpy();
-            Collection<BasicTimer> availableTimersCollection = spy.getTimersSnapshotFromBody(aoObject.getID(),
-            		timerLevel);
-            if ((availableTimersCollection == null) ||
-                    (availableTimersCollection.size() == 0)) {
+            Object[] result = spy.getTimersSnapshotFromBody(aoObject.getID(),
+                    timerLevel);
+            List<BasicTimer> availableTimersList = (List<BasicTimer>) result[0];
+            long remoteTimeStamp = (Long) result[1];
+
+            // Here we need to stop all timers
+            for (BasicTimer t : availableTimersList) {
+                if (t.isStarted()) {
+                    t.stop(remoteTimeStamp);
+                }
+            }
+            if ((availableTimersList == null) ||
+                    (availableTimersList.size() == 0)) {
                 Console.getInstance(Activator.CONSOLE_NAME)
                        .log("There is no available timers for " +
                     aoObject.getFullName());
                 return null;
             }
-            return availableTimersCollection;
+            return availableTimersList;
         } catch (Exception e) {
             Console console = Console.getInstance(Activator.CONSOLE_NAME);
             console.log("Cannot perform timers snapshot on " +
@@ -189,21 +286,23 @@ public class ChartObject {
         }
         return null;
     }
-    
+
     /**
-     * A predicate that returns true if the string val is contained
-     * in the array.
-     * @param arr An array of strings
-     * @param val A String
+     * A predicate that returns true if the string val is contained in the
+     * array.
+     *
+     * @param arr
+     *            An array of strings
+     * @param val
+     *            A String
      * @return True if val is contained in arr
      */
     private final static boolean contains(String[] arr, String val) {
-        boolean res = false;
         for (String x : arr) {
             if (val.equals(x)) {
-                res = true;
+                return true;
             }
         }
-        return res;
+        return false;
     }
 }

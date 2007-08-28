@@ -1,9 +1,8 @@
 package org.objectweb.proactive.ic2d.timit.data;
 
 import java.text.DateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.birt.chart.model.Chart;
 import org.eclipse.birt.chart.model.ChartWithAxes;
@@ -27,13 +26,12 @@ import org.eclipse.birt.chart.model.data.impl.TextDataSetImpl;
 import org.eclipse.birt.chart.model.impl.ChartWithAxesImpl;
 import org.eclipse.birt.chart.model.type.BarSeries;
 import org.eclipse.birt.chart.model.type.impl.BarSeriesImpl;
-import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
 
 
 /**
- * The Builder of the bar chart.
- * The Chart is customized through the use of a script.
+ * The Builder of the bar chart. The Chart is customized through the use of a
+ * script.
  *
  * @author vbodnart
  *
@@ -49,8 +47,13 @@ public class BarChartBuilder {
      * Font size for all titles, labels, and values.
      */
     protected final static int FONT_SIZE = 8;
-    protected final static String USER_DEFINED_LABEL_VALUE = "User defined"; //"User defined";	
-    protected final static double USER_DEFINED_ELEMENT_VALUE = -1d; // To detect "User defined";
+    protected final static String USER_DEFINED_LABEL_VALUE = "User defined"; // "User
+
+    // defined";
+    protected final static double USER_DEFINED_ELEMENT_VALUE = -1d; // To detect
+
+    // "User
+    // defined";
     protected final static DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
             DateFormat.MEDIUM);
     protected String title;
@@ -96,20 +99,28 @@ public class BarChartBuilder {
         chart.getLegend().setVisible(false);
         chart.setDimension(ChartDimension.TWO_DIMENSIONAL_LITERAL);
 
-        chart.setScript( /////////////////////////////////////////////////////////
+        chart.setScript( // ///////////////////////////////////////////////////////
             "function adaptTime( timeInMillis ) {" + "form = null;" +
             "var result = 0;" // Check if seconds is not ok
              +"if ((timeInMillis / 1000) < 1) {" + "	    form = \"ms\";" +
             "	    result = timeInMillis;" // use milliseconds
              +" } else {" +
-            "   timeInSeconds = timeInMillis / 1000;" // Check if minutes is not ok
+            "   timeInSeconds = timeInMillis / 1000;" // Check if
+                                                      // minutes
+                                                      // is not ok
              +"	   if ((timeInSeconds / 60) < 1) {" + "		   form = \"s\";" +
             "		   result = timeInSeconds;" // use seconds
              +"	   } else {" +
-            "       timeInMinutes = timeInSeconds / 60;" // Check if hours is not ok
+            "       timeInMinutes = timeInSeconds / 60;" // Check
+                                                         // if
+                                                         // hours
+                                                         // is
+                                                         // not
+                                                         // ok
              +"       if ( (timeInMinutes / 60) < 1 ) {" +
             "		      form = \"m\";" +
-            "		      result = timeInSeconds / 60;" // use minutes
+            "		      result = timeInSeconds / 60;" // use
+                                                   // minutes
              +"       } else {" + "		      form = \"h\";" +
             "		      result = timeInMinutes / 60;" // use hours
              +"       }" + "    } " + " }" +
@@ -121,7 +132,7 @@ public class BarChartBuilder {
             "            res = res.substring(0,dotIndex+3); " + "         }" +
             "     } else {" + "        res = res.substring(0, dotIndex);" +
             "     }" + " }" + "return res+form;" +
-            "}" ///////////////////////////////////////////////////////////
+            "}" // /////////////////////////////////////////////////////////
              +"function beforeDrawDataPointLabel(dataPoints, label, scriptContext) {" +
             " if ( dataPoints.getOrthogonalValue() != -1 ) {" +
             " 	label.getCaption( ).getColor( ).set( 0, 0, 0 );" +
@@ -130,7 +141,7 @@ public class BarChartBuilder {
             " 	label.setVisible( true );" +
             " 	label.getCaption().setValue(adaptTime(dataPoints.getOrthogonalValue()));" +
             " }" +
-            "}" ////////////////////////////////////////////////////////
+            "}" // //////////////////////////////////////////////////////
              +"function beforeDrawAxisLabel( axis, label, context )" + "{" +
             " if ( axis.getType() == 'Logarithmic' ) {" +
             "   label.getCaption().setValue(adaptTime(label.getCaption().getValue()));" +
@@ -143,11 +154,14 @@ public class BarChartBuilder {
             "     label.getCaption().getFont().setSize(" + FONT_SIZE + ");" +
             " 	label.getCaption( ).getFont( ).setBold(false);" + "   }" +
             " } " +
-            "}" ////////////////////////////////////////////////////////
-             +"function beforeDrawElement(dataPointHints, fill) {" //+ " java.lang.System.out.println('________ ' + fill.getClass().getName());" 
+            "}" // //////////////////////////////////////////////////////
+             +"function beforeDrawElement(dataPointHints, fill) {" // + "
+                                                                   // java.lang.System.out.println('________
+                                                                   // ' +
+                                                                   // fill.getClass().getName());"
                                                                    // Color of Total
              +" if ( dataPointHints.getBaseValue() == 'Total' ) {" +
-            "  fill.set(225, 225, 255);" // Color of Serve 
+            "  fill.set(225, 225, 255);" // Color of Serve
              +" } else if ( dataPointHints.getBaseValue() == 'Serve' ) { " +
             "  fill.set(" + AOFigure.COLOR_WHEN_SERVING_REQUEST.getRed() + "," +
             AOFigure.COLOR_WHEN_SERVING_REQUEST.getGreen() + "," +
@@ -169,8 +183,11 @@ public class BarChartBuilder {
 
     /**
      * Creates chart instance.
+     *
+     * @param filter
+     *            Used to filter timers
      */
-    public Chart createChart(Collection<BasicTimer> col, String[] timerLevel) {
+    public Chart createChart(List<TimerObject> timerObjectList, String[] filter) {
         if (ChartObject.DEBUG) {
             this.series = new String[] {
                     "Total", "Serve", "SendRequest", "SendReply",
@@ -182,55 +199,65 @@ public class BarChartBuilder {
                     USER_DEFINED_ELEMENT_VALUE
                 };
         } else {
-            Iterator<BasicTimer> it = col.iterator();
-            int userTimersSize;
+            int userTimersSize = 0;
             int paLevelIndex = 0;
             int userLevelIndex = 0;
-            int paTimersSize = timerLevel.length;//ChartObject.PROACTIVE_BASIC_LEVEL_TIMERS_NAMES.length;
 
-            // If the size of col is the same as the asked no user level timers was added
-            if (paTimersSize == col.size()) {
-                if (this.series.length != col.size() || this.values.length != col.size() ) {
-                    this.series = new String[col.size()];
-                    this.values = new double[col.size()];
+            for (TimerObject to : timerObjectList) {
+                if ((to.currentTimer != null) && to.currentTimer.isUserLevel()) {
+                    userTimersSize++;
+                }
+            }
+
+            if (userTimersSize == 0) {
+                if (this.series.length != filter.length) {
+                    this.series = new String[filter.length];
+                    this.values = new double[filter.length];
                 }
             } else {
-                userTimersSize = col.size() - paTimersSize;
+                int realSize = filter.length + userTimersSize;
+
                 // If there is some user defined timers
-                // keep a space for a empty serie used as label
-                if (this.series.length != (col.size() + 1)) {
-                    this.series = new String[col.size() + 1];
-                    this.values = new double[col.size() + 1];
+                // keep a space for an empty serie used as label
+                if (this.series.length != (realSize + 1)) {
+                    this.series = new String[realSize + 1];
+                    this.values = new double[realSize + 1];
                 }
                 paLevelIndex = userTimersSize + 1;
                 // Fill the space with the label
                 series[userTimersSize] = USER_DEFINED_LABEL_VALUE;
                 values[userTimersSize] = USER_DEFINED_ELEMENT_VALUE;
             }
-            while (it.hasNext()) {
-                BasicTimer t = it.next();
+
+            for (TimerObject t : timerObjectList) {
                 double value = 0;
-                if (t.getTotalTime() == 0) {
+                if (t.currentTimer.getTotalTime() == 0) {
                     value = -1;
                 } else {
-                    value = Math.ceil((double) t.getTotalTime() / 1000000d); // total time is in nanoseconds
+                    value = Math.ceil((double) t.currentTimer.getTotalTime() / 1000000d); // total
+                                                                                          // time
+                                                                                          // is
+                                                                                          // in
+                                                                                          // nanoseconds
                 }
 
                 // Choose destination index
-                if (t.isUserLevel()) {
-                    series[userLevelIndex] = t.getName();
+                if (t.currentTimer.isUserLevel()) {
+                    series[userLevelIndex] = t.currentTimer.getName();
                     values[userLevelIndex] = value;
                     userLevelIndex++;
                 } else {
-                    series[paLevelIndex] = t.getName();
-                    values[paLevelIndex] = value;
-                    paLevelIndex++;
+                    if (t.isViewed) {
+                        series[paLevelIndex] = t.currentTimer.getName();
+                        values[paLevelIndex] = value;
+                        paLevelIndex++;
+                    }
                 }
             }
         }
 
         this.cleanChart();
-        
+
         this.buildXSeries(series);
         this.buildYSeries(values);
         this.updateTitle(); // used to update the snapshot time
@@ -255,7 +282,7 @@ public class BarChartBuilder {
         // xAxis.getTitle().getCaption().setValue(xTitle);
         // xAxis.getTitle().getCaption().getFont().setSize(FONT_SIZE);
         // xAxis.getTitle().getCaption().getFont().setName(FONT_NAME);
-        //xAxis.setLabelPosition(Position.ABOVE_LITERAL);
+        // xAxis.setLabelPosition(Position.ABOVE_LITERAL);
         // Label font customization
         xAxis.getLabel().getCaption().getFont().setSize(FONT_SIZE);
         xAxis.getLabel().getCaption().getFont().setName(FONT_NAME);
