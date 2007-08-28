@@ -113,8 +113,9 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
             } catch (Throwable e) {
                 /* when an exception occurs, put it in the result group instead of the (unreturned) value */
                 this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                    new ExceptionInGroup(this.memberList.get(this.index),
-                        this.index, e.fillInStackTrace()), this.index);
+                    new ExceptionInGroup(this.memberList.get(
+                            this.index % getMemberListSize()), this.index,
+                        e.fillInStackTrace()), this.index);
             }
         } else {
             /* when there is a Throwable instead of an Object, a method call is impossible, add null to the result group */
