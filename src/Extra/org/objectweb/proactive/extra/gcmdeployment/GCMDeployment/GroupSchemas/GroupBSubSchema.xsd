@@ -17,7 +17,7 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="commandPath" type="pa:pathElementType" minOccurs="0" />
+					<element name="commandPath" type="ct:pathElementType" minOccurs="0" />
 					<element name="bsubOption" type="paext:BsubOptionType"
 						minOccurs="0" />
 				</sequence>
@@ -53,7 +53,7 @@
 					<attribute name="value" type="string" />
 				</complexType>
 			</element>
-			<element name="scriptPath" type="pa:pathElementType"
+			<element name="scriptPath" type="ct:pathElementType"
 				minOccurs="0" />
 		</all>
 	</complexType>
