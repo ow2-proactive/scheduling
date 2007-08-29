@@ -107,7 +107,7 @@
 	<!--                  Clean up generated files                        -->
 	<!--  =============================================================== -->
 
-	<target name="clean" description="Remove all generated files">
+	<target name="clean" description="Remove all generated files" depends="ic2dLibClean">
 		<delete dir="${classes.dir}" />
 		<delete dir="${dist.dir}" />
 		<delete dir="${docs.dir}" />
@@ -874,15 +874,16 @@
 	<!--  =============================================================== -->
 
 	<target name="ic2dLib" depends="proActiveJar" description="Copy all needed libraries to IC2D">
-		<property name="ic2d-plugin.dir" value="${base.dir}/ic2d-plugins-src" />
-		<property name="plugin.lib" value="org.objectweb.proactive.ic2d.lib" />
 		<copy todir="${ic2d-plugin.dir}/${plugin.lib}/lib" includeemptydirs="no">
 			<fileset dir="${lib.dir}" />
 		</copy>
 		<copy file="${PAdist.dir}/ProActive.jar" todir="${ic2d-plugin.dir}/${plugin.lib}" />
 	</target>
 
-
+	<target name="ic2dLibClean" description="Clean all needed libraries to IC2D">
+		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib"/>
+		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar"/>
+	</target>
 	<!-- ================================================================ -->
 	<!--                      Compile JMX Connector                       -->
 	<!--  =============================================================== -->
