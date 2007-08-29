@@ -84,7 +84,7 @@ public class NodeObject extends AbstractDataObject{
 		}
 		try {
 			SPY_LISTENER_NODE = NodeFactory.createNode(UrlBuilder.buildUrlFromProperties(
-					currentHost, SPY_LISTENER_NODE_NAME), true, null, null);
+					currentHost, SPY_LISTENER_NODE_NAME), true, null, null, null);
 		} catch (NodeException e) {
 			SPY_LISTENER_NODE = null;
 		} catch (AlreadyBoundException e) {
@@ -238,7 +238,7 @@ public class NodeObject extends AbstractDataObject{
 	 * @param id The id of the active object.
 	 * @param jobID The job id of the active object
 	 * @param everywhere The research level. true : Searches on all created objects. false : searches only on the children of this nodeObject.
-	 * It is very useful for the migration because an active object can be in 2 differents nodes at a same time during the migration. 
+	 * It is very useful for the migration because an active object can be in 2 differents nodes at a same time during the migration.
 	 * @return a AOObject created
 	 */
 	public synchronized AOObject createAOObject(String name, UniqueID id, String jobID, boolean everywhere){
@@ -307,7 +307,7 @@ public class NodeObject extends AbstractDataObject{
 			}
 			else if(this.spy.getSystemProperty(HostObject.OS_PROPERTY)==null)
 				System.out.println("NodeObject.foundForTheFirstTime() system property is null");
-			else 
+			else
 				host.setOperatingSystem(this.spy.getSystemProperty(HostObject.OS_PROPERTY));
 		}
 		try {

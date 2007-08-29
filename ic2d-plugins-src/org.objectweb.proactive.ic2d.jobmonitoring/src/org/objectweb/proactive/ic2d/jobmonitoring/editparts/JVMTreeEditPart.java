@@ -46,7 +46,7 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
 	//
 	// -- CONSTRUCTOR ------------------------------------------------
 	//
-	
+
 	/**
 	 * @param model
 	 */
@@ -57,30 +57,30 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
 	//
 	// -- PROTECTED METHODS -------------------------------------------
 	//
-	
+
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
 	 */
 	@Override
 	protected List getModelChildren() {
-		return JobMonitoringTreeUtil.getJVMChildren(getCastedModel(), 
+		return JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
 				(VNObject)getParent().getParent().getModel());
 	}
-	
+
 	/**
 	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
 	 */
 	@Override
 	protected String getText() {
-		return getCastedModel().getFullName()+" ("+getCastedModel().getJobID()+")";
+		return getCastedModel().getFullName();
 	}
-	
+
 	//
 	// -- PRIVATE METHODS -------------------------------------------
 	//
-	
+
 	private VMObject getCastedModel() {
 		return (VMObject)getModel();
 	}
-	
+
 }

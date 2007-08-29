@@ -89,7 +89,6 @@ public class ChartEditPart extends AbstractGraphicalEditPart
         Display.getDefault().asyncExec(this);
     }
 
-    @Override
     public final void run() {
         ChartFigure figure = (ChartFigure) getFigure();
         figure.setChart(this.chartObject.provideChart());

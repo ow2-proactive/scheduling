@@ -19,12 +19,12 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.NamesFactory;
 public class ActiveObjectListener implements NotificationListener{
 
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
-	
+
 	private enum Type{
 		SENDER,
 		RECEIVER
 	}
-	
+
 	private ActiveObject ao;
 	private String name;
 
@@ -33,13 +33,14 @@ public class ActiveObjectListener implements NotificationListener{
 	}
 
 	public void handleNotification(Notification notifications, Object handback) {
-		
+
 		final ConcurrentLinkedQueue<Notification> notifs = (ConcurrentLinkedQueue<Notification>)notifications.getUserData();
 		new Thread(){
+			@Override
 			public void run(){
 		for (Notification notification : notifs) {
 			String type = notification.getType();
-			
+
 			if(type.equals(NotificationType.requestReceived)){
 				logger.debug(".................................Request Received : "+ao.getName());
 				RequestNotificationData request = (RequestNotificationData) notification.getUserData();
@@ -95,7 +96,7 @@ public class ActiveObjectListener implements NotificationListener{
 			else if(type.equals(NotificationType.migrationFinished)){
 				logger.debug("...............................Migration finished : "+ao.getName());
 			}
-			
+
 			// --- FuturEvent -------------------
 			else if(type.equals(NotificationType.waitByNecessity)){
 				logger.debug("...............................Wait By Necessity : "+ao.getName());
@@ -104,16 +105,16 @@ public class ActiveObjectListener implements NotificationListener{
 			else if(type.equals(NotificationType.receivedFutureResult)){
 				logger.debug("...............................Received Future Result : "+ao.getName());
 				ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.RECEIVED_FUTURE_RESULT);
-			}			
-			else{		
+			}
+			else{
 				System.out.println(ao.getName()+" => "+type);
 			}
 		}
 		}}.start();
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param request
 	 * @param ao
 	 * @param type
@@ -126,11 +127,11 @@ public class ActiveObjectListener implements NotificationListener{
 		String destinationHost = UrlBuilder.getHostNameFromUrl(request.getDestinationNode());
 		String hostToDiscovered;
 		String nodeUrlToDiscovered;
-		
-		
-		// MethodName	
+
+
+		// MethodName
 		String methodName = request.getMethodName();
-		
+
 		if(type == Type.SENDER){
 			if(!sourceID.equals(ao.getUniqueID())){
 				System.err.println("ActiveObjectListener.handleNotification() the source id != ao.id");
@@ -147,7 +148,7 @@ public class ActiveObjectListener implements NotificationListener{
 			nodeUrlToDiscovered = request.getSourceNode();
 			hostToDiscovered = sourceHost;
 		}
-		
+
 		// Try to find the name used in the display by the active object
 		String name = NamesFactory.getInstance().getName(aoID);
 		if(name == null){

@@ -53,7 +53,6 @@ public class VMObject extends AbstractDataObject {
 	private ProActiveRuntime runtime;
 
 	/** The JVM job ID */
-	private String jobID;
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -65,7 +64,6 @@ public class VMObject extends AbstractDataObject {
 		this.runtime = runtime;
 		this.key = this.runtime.getVMInformation()/*.getVMID().toString()*/.getName();
 		this.runtime = runtime;
-		this.jobID = runtime.getJobID();
 
 		getWorld().addToMonitoredObject(this);
 	}
@@ -82,7 +80,7 @@ public class VMObject extends AbstractDataObject {
 
 		// Enable or not the P2P Node monitoring
 		boolean hideP2PNode = getWorld().isP2PHidden();
-		
+
 		String[] namesOfNodes = null;
 		try {
 			namesOfNodes = runtime.getLocalNodeNames();
@@ -134,14 +132,6 @@ public class VMObject extends AbstractDataObject {
 	 */
 	public ProActiveRuntime getRuntime() {
 		return this.runtime;
-	}
-
-	/**
-	 * Retuns the job id
-	 * @return the job id
-	 */
-	public String getJobID() {
-		return jobID;
 	}
 
 	@Override
@@ -206,7 +196,7 @@ public class VMObject extends AbstractDataObject {
 	 * Returns all ProActiveRuntimes known by this JVM.
 	 * @return a list containing all ProActiveRuntimes known by this JVM.
 	 */
-	protected List<ProActiveRuntime> getKnownRuntimes() {		
+	protected List<ProActiveRuntime> getKnownRuntimes() {
 		ProActiveRuntime[] registered = null;
 		try {
 			registered = runtime.getProActiveRuntimes();
@@ -229,7 +219,7 @@ public class VMObject extends AbstractDataObject {
 		String hostName = parent.getHostName();
 		String protocol = parent.getProtocol();
 		int port = parent.getPort();
-		
+
 		String nodeUrl = UrlBuilder.buildUrl(hostName, nodeName, protocol, port);
 		Node node = null;
 		try {

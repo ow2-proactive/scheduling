@@ -58,7 +58,7 @@ public class ChartContainerEditPart extends AbstractGraphicalEditPart
     protected List<ChartObject> getModelChildren() {
         List<ChartObject> l = ((ChartContainerObject) getModel()).getChildrenList();
 
-        // If the list is not empty the 
+        // If the list is not empty the
         if (l.size() != 0) {
             this.timItView.getRefreshAllButton().setEnabled(true);
         }
@@ -75,7 +75,6 @@ public class ChartContainerEditPart extends AbstractGraphicalEditPart
     /**
      * The run method performs the refresh
      */
-    @Override
     public void run() {
         refresh();
     }
