@@ -5,7 +5,9 @@ echo --- Scilab example ---------------------------------------------
 
 :doit
 SETLOCAL
-call init.bat
+IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..
+
+call "%PROACTIVE%\scripts\windows\init.bat"
 call scilab_env.bat
 %JAVA_CMD% org.objectweb.proactive.extensions.scilab.gui.SciFrame
 

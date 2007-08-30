@@ -1,0 +1,36 @@
+ProActive Extension for Scilab.
+
+Before being able to use the extension and launch the GUI (scilab.sh or scilab.bat), please follow these installations steps.
+
+STEP 1: Download Scilab 4.1.2 or above BINARY Version
+
+If you can't download version 4.1.2 please follow step 2.
+
+STEP 2: Download Scilab SOURCE version 4.1 or 4.1.1
+
+copy javasci_Scilab2.h and javasci_Scilab2.c from folder PROACTIVE/scripts/linux/scilab/c_sources to SCILAB/routines/Javasci/
+
+make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILAB/Readme_Windows)
+
+STEP 3:
+Edit paths to your SCILAB installation in the scilab_env.sh or scilab_env.bat file
+
+STEP 4: 
+Read documentation on http://proactive.inria.fr/scilab.htm on how to use the GUI
+
+Edit paths inside the ProActiveScilab.xml descriptor if you want to use it to deploy on remote machines, if you want to deploy locally use the ProActiveScilabLocal.xml descriptor
+
+
+STEP 5:
+Run scilab.sh or scilab.bat. 
+
+
+
+ATTENTION :
+
+If you want to use the extension without the script, remember two things :
+
+Under Linux, the environment variables must be set according to the scilab_env.sh script AND the java property java_library_path must contain the directory where the libjavasci.so can be found
+
+Under Windows, the System PATH environment variable(and not the user PATH) must contain the path to where the libjavasci.so can be found
+               OR, the application must be launched next to it  

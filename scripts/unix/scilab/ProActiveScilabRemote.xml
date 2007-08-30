@@ -2,9 +2,12 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="ProActive_RELEASE"/>
-		<descriptorVariable name="REMOTE_HOME" value="/user/amangin/home"/>
-		<descriptorVariable name="SCILAB_HOME" value="scilab/build4/scilab"/>
+        <descriptorVariable name="REMOTE_HOME" value="/user/amangin/home"/> <!-- Path to Remote home directory : CHANGE ME!!!! -->
+        <descriptorVariable name="PROACTIVE_HOME" value="${REMOTE_HOME}/ProActive"/> <!-- Path to ProActive directory : CHANGE ME!!!! -->
+        <descriptorVariable name="JAVA_HOME" 
+            value="${REMOTE_HOME}/bin/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+
+		<descriptorVariable name="SCILAB_HOME" value="${REMOTE_HOME}/scilab/"/> <!-- Path to Scilab on the remote machines , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -44,17 +47,17 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar"/>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar"/>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 						<absolutePath
-							value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar"/>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes"/>
-						<absolutePath value="${REMOTE_HOME}/${SCILAB_HOME}/bin/javasci.jar"/>
+							value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes"/>
+						<absolutePath value="${SCILAB_HOME}/bin/javasci.jar"/>
 					</classpath>
 				</jvmProcess>
 			</processDefinition>

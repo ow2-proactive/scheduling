@@ -14,7 +14,7 @@ fi
 . $PROACTIVE/scripts/unix/env.sh
 . $PROACTIVE/scripts/unix/scilab/scilab_env.sh
 
-$JAVACMD org.objectweb.proactive.ext.scilab.gui.SciFrame
+$JAVACMD org.objectweb.proactive.extensions.scilab.gui.SciFrame
 
 echo
 echo ------------------------------------------------------------

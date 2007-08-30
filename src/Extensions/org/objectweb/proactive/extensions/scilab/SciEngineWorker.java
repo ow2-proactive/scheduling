@@ -110,10 +110,10 @@ public class SciEngineWorker implements Serializable {
     private void clearScilab() {
         ArrayList listData = this.sciTask.getListDataOut();
         SciData data;
-        Scilab.exec("clearglobal();");
+        Scilab.Exec("clearglobal();");
         for (int i = 0; i < listData.size(); i++) {
             data = (SciData) listData.get(i);
-            Scilab.exec("clear " + data.getName() + ";");
+            Scilab.Exec("clear " + data.getName() + ";");
         }
     }
 
@@ -151,7 +151,7 @@ public class SciEngineWorker implements Serializable {
             out.close();
             logger.debug("->SciEngineTask:executeJob:test1:" +
                 temp.getAbsolutePath());
-            isValid = Scilab.exec("exec(''" + temp.getAbsolutePath() + "'');");
+            isValid = Scilab.Exec("exec(''" + temp.getAbsolutePath() + "'');");
         } catch (IOException e) {
             isValid = false;
         }
