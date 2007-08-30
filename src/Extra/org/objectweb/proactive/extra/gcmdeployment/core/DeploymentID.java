@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-
-
 public class DeploymentID {
     static final public String SEPARATOR = "%";
     private String deployerVMID;
