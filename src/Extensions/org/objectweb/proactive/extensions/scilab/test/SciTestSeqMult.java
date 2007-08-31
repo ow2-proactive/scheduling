@@ -85,7 +85,7 @@ public class SciTestSeqMult {
             Scilab.sendData(new SciDoubleMatrix("A", nbRow, nbCol, m1));
             Scilab.sendData(new SciDoubleMatrix("B", nbRow, nbCol, m2));
             Scilab.sendData(new SciData("C"));
-            Scilab.exec("C=A*B;");
+            Scilab.Exec("C=A*B;");
 
             SciData sciResult = Scilab.receiveDataByName("C");
             endTime = System.currentTimeMillis();
