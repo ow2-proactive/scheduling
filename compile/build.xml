@@ -223,11 +223,11 @@
 
 	<target name="core" depends="-configurationCopy" description="Compile the ProActive core classes">
 		<!-- If it is a release, update ProActive.getVersion() -->
-		<echo>${version}</echo>
 		<if name="version" value="${TODAY}">
 			<else>
 				<replaceregexp file="${src.proactive.dir}/${proactive.path}/ProActive.java" match="\$ID.*\$" replace="${version}" byline="true" />
-				<replaceregexp file="${base.dir}/README.html" match="\$ID.*\$" replace="${version}" byline="true" />
+				<replaceregexp file="${base.dir}/README_others.html" match="\$ID.*\$" replace="${version}" byline="true" />
+				<replaceregexp file="${base.dir}/README_docs.html" match="\$ID.*\$" replace="${version}" byline="true" />
 			</else>
 		</if>
 
@@ -646,7 +646,9 @@
 		<!--        copy docs / scripts / src / compile / lib      -->
 		<copy todir="${PAdist.dir}" includeEmptyDirs="no">
 			<fileset dir="${base.dir}">
-				<include name="README.html" />
+				<include name="README_others.html" />
+				<include name="README_docs.html" />
+				<include name="LICENCE.html" />
 				<include name="docs/**" />
 				<include name="doc-src/**" />
 				<include name="scripts/**" />
@@ -662,6 +664,7 @@
 				<exclude name="scripts/unix/gridexperiment/**" />
 			</fileset>
 		</copy>
+		<copy todir="${PAdist.dir}/docs" includeEmptyDirs="no" file="${base.dir}/doc-src/ProActiveRefBook.pdf"/>
 		<!-- set right files permissions -->
 		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh" />
 		<chmod file="${PAdist.dir}/compile/build" perm="755" />
@@ -680,6 +683,7 @@
 	<target name="dist-bin"
 		depends="dist-examples-jar, proActiveJar, dist-cp-files"
 		description="Create zip with only jars">
+		<copy file="${PAdist.dir}/README_others.html" tofile="${PAdist.dir}/README.html" overwrite="true"/>
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
 		<zip zipfile="${dist.dir}/ProActive-bin_${version}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
@@ -688,7 +692,8 @@
 				<exclude name="doc-src/**" />
 				<exclude name="p2p/**" />
 				<exclude name="docs/**" />
-				<exclude name="README.html" />
+				<exclude name="README_others.html" />
+				<exclude name="README_docs.html" />
 				<exclude name="ic2d-plugins-src/**" />
 			</zipfileset>
 		</zip>
@@ -697,19 +702,26 @@
 
 	<target name="dist-doc" depends="docs, dist-cp-files"
 		description="Create zip with only doc">
+		<copy file="${PAdist.dir}/README_docs.html" tofile="${PAdist.dir}/README.html" overwrite="true"/>
 		<zip zipfile="${dist.dir}/ProActive-doc_${version}.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs" />
+			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
+				<include name="README.html"/>
+			</zipfileset>
 		</zip>
 	</target>
 
 
 	<target name="dist-src" depends="dist-cp-files"
 		description="Create zip with only sources and libs">
+		<copy file="${PAdist.dir}/README_others.html" tofile="${PAdist.dir}/README.html" overwrite="true"/>
 		<zip zipfile="${dist.dir}/ProActive-src_${version}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" >
 				<exclude name="docs/**"/>
 				<exclude name="ProActive_examples.jar" />
 				<exclude name="ProActive.jar" />
+				<exclude name="README_others.html" />
+				<exclude name="README_docs.html" />
 			</zipfileset>
 		</zip>
 	</target>
@@ -717,9 +729,12 @@
 
 	<target name="dist-bundle" depends="dist-cp-files, proActiveJar, dist-examples-jar"
 		description="Create a zip with everythings">
+		<copy file="${PAdist.dir}/README_docs.html" tofile="${PAdist.dir}/README.html" overwrite="true"/>
 		<zip zipfile="${dist.dir}/ProActive-bundle_${version}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="doc-src/**" />
+				<exclude name="README_others.html" />
+				<exclude name="README_docs.html" />
 			</zipfileset>
 		</zip>
 	</target>
