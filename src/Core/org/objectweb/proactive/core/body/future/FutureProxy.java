@@ -76,10 +76,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     // -- STATIC MEMBERS -----------------------------------------------
     //
 
-    /** Static point for management of events related to futures.
-     * This FutureEventProducer is responsible for all FutureProxys of this VM */
-    private static FutureEventProducerImpl futureEventProducer;
-
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -175,15 +171,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             result = null;
         }
         return result;
-    }
-
-    /** Returns the <code>FutureEventProducer</code> that is responsible for the
-     * FutureProxys of this VM. Listeners can register themselves here. */
-    public static FutureEventProducer getFutureEventProducer() {
-        if (futureEventProducer == null) {
-            futureEventProducer = new FutureEventProducerImpl();
-        }
-        return futureEventProducer;
     }
 
     //
@@ -321,21 +308,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         UniqueID id = null;
 
-        // ProActiveEvent
-        // send WAIT_BY_NECESSITY event to listeners if there are any
-        if (futureEventProducer != null) {
-            id = ProActive.getBodyOnThis().getID();
-            if (LocalBodyStore.getInstance().getLocalBody(id) != null) {
-                // send event only if ActiveObject, not for HalfBodies
-                futureEventProducer.notifyListeners(id, getCreatorID(),
-                    FutureEvent.WAIT_BY_NECESSITY);
-            } else {
-                id = null;
-            }
-        }
-
-        // END ProActiveEvent
-
         // JMX Notification
         BodyWrapperMBean mbean = null;
         UniqueID bodyId = ProActive.getBodyOnThis().getID();
@@ -363,15 +335,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 e.printStackTrace();
             }
         }
-
-        // ProActiveEvent
-        // send RECEIVED_FUTURE_RESULT event to listeners if there are any
-        if (id != null) {
-            futureEventProducer.notifyListeners(id, getCreatorID(),
-                FutureEvent.RECEIVED_FUTURE_RESULT);
-        }
-
-        // END ProActiveEvent
 
         // JMX Notification
         if (mbean != null) {
