@@ -32,9 +32,8 @@
 	</tstamp>
  
 	<if name="version">
-		<property name="version_" value="${version}"/>
 		<else>
-			<property name="version_" value="${TODAY}"/>
+			<property name="version" value="${TODAY}"/>
 		</else>
 	</if>
 
@@ -682,7 +681,7 @@
 		depends="dist-examples-jar, proActiveJar, dist-cp-files"
 		description="Create zip with only jars">
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
-		<zip zipfile="${dist.dir}/ProActive-bin_${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-bin_${version}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="src/**" />
 				<exclude name="compile/**" />
@@ -698,7 +697,7 @@
 
 	<target name="dist-doc" depends="docs, dist-cp-files"
 		description="Create zip with only doc">
-		<zip zipfile="${dist.dir}/ProActive-doc_${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-doc_${version}.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs" />
 		</zip>
 	</target>
@@ -706,7 +705,7 @@
 
 	<target name="dist-src" depends="dist-cp-files"
 		description="Create zip with only sources and libs">
-		<zip zipfile="${dist.dir}/ProActive-src_${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-src_${version}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" >
 				<exclude name="docs/**"/>
 				<exclude name="ProActive_examples.jar" />
@@ -718,7 +717,7 @@
 
 	<target name="dist-bundle" depends="dist-cp-files, proActiveJar, dist-examples-jar"
 		description="Create a zip with everythings">
-		<zip zipfile="${dist.dir}/ProActive-bundle_${version_}.zip">
+		<zip zipfile="${dist.dir}/ProActive-bundle_${version}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="doc-src/**" />
 			</zipfileset>
