@@ -30,7 +30,7 @@ public class GCMDeploymentResources {
         bridges.add(bridge);
     }
 
-    protected HostInfo getHostInfo() {
+    public HostInfo getHostInfo() {
         return hostInfo;
     }
 

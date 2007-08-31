@@ -8,26 +8,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.objectweb.proactive.core.util.ProActiveCounter;
 
-public class RuntimeNode {
-    protected String id;
+
+public class DeploymentNode {
+    protected long id;
     protected String applicationDescriptorPath;
     protected String deploymentDescriptorPath;
     protected List<String> deploymentPath;
     protected Set<VMNodes> nodeMap;
-    protected List<RuntimeNode> children;
+    protected List<DeploymentNode> children;
 
-    public RuntimeNode() {
+    public DeploymentNode() {
         nodeMap = new HashSet<VMNodes>();
-        children = new ArrayList<RuntimeNode>();
+        children = new ArrayList<DeploymentNode>();
+        id = ProActiveCounter.getUniqID();
     }
 
-    public String getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public List<String> getDeploymentPath() {
@@ -46,11 +45,11 @@ public class RuntimeNode {
         this.nodeMap = nodeMap;
     }
 
-    public List<RuntimeNode> getChildren() {
+    public List<DeploymentNode> getChildren() {
         return children;
     }
 
-    public void addChildren(RuntimeNode node) {
+    public void addChildren(DeploymentNode node) {
         children.add(node);
     }
 

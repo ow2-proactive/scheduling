@@ -98,6 +98,18 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         return 0;
     }
 
+    public GCMDeploymentEnvironment getEnvironment() {
+        return environment;
+    }
+
+    public GCMDeploymentResources getResources() {
+        return resources;
+    }
+
+    public GCMDeploymentParser getParser() {
+        return parser;
+    }
+
     @SuppressWarnings("unused")
     static public class UnitTestGCMDeploymentDescriptorImpl {
         @Test

@@ -4,9 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentResources;
+import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentNode;
+import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
+import org.objectweb.proactive.extra.gcmdeployment.core.VMNodes;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -22,6 +28,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
     /** All the Virtual Nodes defined in this application */
     private Map<String, VirtualNodeInternal> virtualNodes = null;
+    private DeploymentTree runtimeTree;
+    private Map<String, GCMDeploymentDescriptor> selectedDeploymentDesc;
 
     public GCMApplicationDescriptorImpl(String filename)
         throws IllegalArgumentException {
@@ -46,11 +54,14 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
         CommandBuilder commandBuilder = gadParser.getCommandBuilder();
 
-        // 4. Select the GCM Deployment Descriptors to be used
-        gdds = selectGCMD(virtualNodes, gdds);
+        // 3. Select the GCM Deployment Descriptors to be used
+        selectedDeploymentDesc = selectGCMD(virtualNodes, gdds);
+
+        // 4. Build the runtime tree
+        buildDeploymentTree();
 
         // 5. Start the deployment
-        for (GCMDeploymentDescriptor gdd : gdds.values()) {
+        for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
             gdd.start(commandBuilder);
         }
 
@@ -62,6 +73,32 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
          * if a "script" is described. The command has been started on each
          * machine/VM/core and we can safely return
          */
+    }
+
+    protected void buildDeploymentTree() {
+        runtimeTree = new DeploymentTree();
+
+        // make root node from local JVM
+        for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
+            GCMDeploymentDescriptorImpl gddi = (GCMDeploymentDescriptorImpl) gdd;
+
+            GCMDeploymentResources resources = gddi.getResources();
+
+            DeploymentNode runtimeNode = new DeploymentNode();
+            
+            try {
+                runtimeNode.setApplicationDescriptorPath(gadFile.getCanonicalPath());
+            } catch (IOException e) {
+                runtimeNode.setApplicationDescriptorPath("");
+            }
+            runtimeNode.setDeploymentDescriptorPath(gddi.getParser()
+                                                        .getDescriptorFilePath());
+
+            ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
+            VMNodes vmNodes = new VMNodes(proActiveRuntime.getVMInformation());
+//            vmNodes.addNode(proActiveRuntime.getL)
+            
+        }
     }
 
     /**

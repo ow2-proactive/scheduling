@@ -21,4 +21,6 @@ public interface GCMDeploymentParser extends GCMParserConstants {
      * @return
      */
     public GCMDeploymentResources getResources();
+
+    public String getDescriptorFilePath();
 }

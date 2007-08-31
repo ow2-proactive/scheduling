@@ -62,6 +62,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private boolean parsedResource = false;
     private boolean parsedInfrastructure = false;
     protected List<String> schemas;
+    private File descriptor;
 
     public GCMDeploymentParserImpl(File descriptor) throws IOException {
         this(descriptor, null);
@@ -69,6 +70,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas)
         throws IOException {
+        this.descriptor = descriptor;
         infrastructure = new GCMDeploymentInfrastructure();
         resources = new GCMDeploymentResources();
         groupParserMap = new HashMap<String, GroupParser>();
@@ -423,5 +425,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
 
         return resources;
+    }
+
+    public String getDescriptorFilePath() {
+        try {
+            return descriptor.getCanonicalPath();
+        } catch (IOException e) {
+            return "";
+        }
     }
 }
