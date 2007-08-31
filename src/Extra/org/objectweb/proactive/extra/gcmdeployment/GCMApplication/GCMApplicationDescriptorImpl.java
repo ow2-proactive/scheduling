@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentResources;
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
 import org.objectweb.proactive.extra.gcmdeployment.core.VMNodes;
@@ -85,7 +85,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             GCMDeploymentResources resources = gddi.getResources();
 
             DeploymentNode runtimeNode = new DeploymentNode();
-            
+
             try {
                 runtimeNode.setApplicationDescriptorPath(gadFile.getCanonicalPath());
             } catch (IOException e) {
@@ -96,8 +96,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
             ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
             VMNodes vmNodes = new VMNodes(proActiveRuntime.getVMInformation());
-//            vmNodes.addNode(proActiveRuntime.getL)
-            
+
+            //            vmNodes.addNode(proActiveRuntime.getL)
         }
     }
 

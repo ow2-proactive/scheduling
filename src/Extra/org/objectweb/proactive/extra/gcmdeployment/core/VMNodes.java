@@ -19,9 +19,8 @@ public class VMNodes {
         this.vmInfo = vmInfo;
         this.nodes = new ArrayList<Node>();
     }
-    
+
     public void addNode(Node node) {
         nodes.add(node);
     }
-    
 }

@@ -26,7 +26,7 @@ public class DeploymentTree {
     public void registerNode(DeploymentNode node) {
         // TODO
     }
-    
+
     public DeploymentNode getNode(String id) {
         return nodeMap.get(id);
     }
