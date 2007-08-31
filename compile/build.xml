@@ -10,7 +10,7 @@
 	<import file="common.xml" />
 	<import file="doc.xml" />
 
-	
+
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest"/>
 	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
@@ -30,7 +30,7 @@
 	<tstamp>
 		<format property="TODAY" pattern="yyyy-MM-dd" />
 	</tstamp>
- 
+
 	<if name="version">
 		<else>
 			<property name="version" value="${TODAY}"/>
@@ -88,7 +88,7 @@
 			</fileset>
 		</else>
 	</if>
-	
+
 
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
@@ -132,14 +132,14 @@
 				<include name="functionalTests/**/*.fractal" />
 				<include name="functionalTests/**/*.properties" />
 				<include name="functionalTests/**/*.xsd" />
-				
+
 				<include name="unitTests/**/*.txt" />
-				
-                <include name="performanceTests/**/*.xml" />
+
+				<include name="performanceTests/**/*.xml" />
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<target name="check" depends="-init,util">
 		<macrodef name="checkDir">
 			<attribute name="dir" />
@@ -223,12 +223,12 @@
 
 	<target name="core" depends="-configurationCopy" description="Compile the ProActive core classes">
 		<!-- If it is a release, update ProActive.getVersion() -->
-		<if name="version">
-			<replaceregexp 
-				file="${src.proactive.dir}/${proactive.path}/ProActive.java"		
-				match="\$Id.*\$"
-				replace="${version}"
-				byline="true" />
+		<echo>${version}</echo>
+		<if name="version" value="${TODAY}">
+			<else>
+				<replaceregexp file="${src.proactive.dir}/${proactive.path}/ProActive.java" match="\$ID.*\$" replace="${version}" byline="true" />
+				<replaceregexp file="${base.dir}/README.html" match="\$ID.*\$" replace="${version}" byline="true" />
+			</else>
 		</if>
 
 		<javac srcdir="${src.proactive.dir}:${src.utils.dir}" destdir="${cl.proactive.dir}" deprecation="on" source="${source}" debug="${debug}">
@@ -240,7 +240,7 @@
 
 		<rmic base="${cl.proactive.dir}" sourcebase="${cl.proactive.dir}" stubversion="1.2">
 			<classpath refid="project.classpath" />
-			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class"/>	
+			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class"/>
 			<include name="org/objectweb/proactive/core/remoteobject/rmi/RmiRemoteObjectImpl.class"/>
 		</rmic>
 
@@ -249,23 +249,23 @@
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
 		</java>
-	
-		
+
+
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-					<classpath refid="project.classpath" />
-					<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
-				</java>
+			<classpath refid="project.classpath" />
+			<arg line="-srcDir ${cl.proactive.dir} -pkg org.objectweb.proactive.core.util.wrapper" />
+		</java>
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/runtime/ProActiveRuntime" />
 		</java>
-		
+
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-		<classpath refid="project.classpath" />
-		    <arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/body/UniversalBody" />
-	    </java>
-	
-		
+			<classpath refid="project.classpath" />
+			<arg line="-srcDir ${cl.proactive.dir} -class org/objectweb/proactive/core/body/UniversalBody" />
+		</java>
+
+
 		<!-- XXX: MPI should be in Extensions -->
 
 		<if>
@@ -390,7 +390,7 @@
 		<element name="jvmargs" optional="yes" />
 		<element name="additionalClasspath" optional="yes" />
 		<sequential>
-			
+
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
 			<junit printsummary="yes" forkmode="perTest" showoutput="no">
@@ -406,7 +406,7 @@
 				<jvmarg value="-DfunctionalTests.descriptor.defaultnodes.file=@{nodeDescriptor}" />
 
 				<jvmargs/>
-			
+
 				<!--
 					Remote Debug:
 					<jvmarg value="-Xdebug" />
@@ -414,17 +414,17 @@
 					
 					Yourkit (don't forget to set your LD_LIBRARY_PATH):
 					<jvmarg value="-agentlib:yjpagent" />
-				-->	
+				-->
 
 				<formatter type="xml"/>
-				
+
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset refid="testsuite"/>
 				</batchtest>
 			</junit>
 		</sequential>
 	</macrodef>
-	
+
 	<target name="junitDistributed" depends="tests, proActiveJar" description="Run all non regression tests">
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
 	</target>
@@ -434,7 +434,7 @@
 	</target>
 
 	<!-- clover -->
-	
+
 	<target name="with.clover">
 		<taskdef resource="clovertasks"/>
 		<clover-setup initString="ProActiveCoverage.db"/>
@@ -498,7 +498,7 @@
 				metadatafile="${base.dir}/emma/metadata.emma"
 				merge="true">
 				<filter includes="org.objectweb.proactive.*" excludes="pa.*, *_Stub" />
-			</instr>	
+			</instr>
 		</emma>
 
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
@@ -533,9 +533,9 @@
 					columns="name, class, method, block, line"
 					outfile="${base.dir}/emma/coverage.html"
 					depth="source" />
-      			</report>
+			</report>
 		</emma>
-	</target>	
+	</target>
 
 	<!--	
 	<target name="runTestsLocalHttp" depends="nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
@@ -599,7 +599,7 @@
 			<fileset dir="${cl.extra.dir}" includes="**"/>
 
 			<fileset dir="${config.dir}">
-					<include name="ProActiveConfiguration.xml" />
+				<include name="ProActiveConfiguration.xml" />
 			</fileset>
 			<fileset dir="${osgi.res.dir}" >
 				<include name="metadata.xml" />
@@ -608,7 +608,7 @@
 
 
 	</target>
-	
+
 	<!-- ================================================================ -->
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
@@ -867,7 +867,7 @@
 			</fileset>
 		</jar>
 	</target>
-	
+
 	<!-- ================================================================ -->
 	<!--                      Create Scilab javasci.jar                   -->
 	<!--  =============================================================== -->
@@ -898,13 +898,13 @@
 	<!-- ================================================================ -->
 	<!--                      Compile JMX Connector                       -->
 	<!--  =============================================================== -->
-			<target name="proActiveConnectorBundle" >
-				<mkdir dir="${bundle.dir}"/>
-				<jar 
+	<target name="proActiveConnectorBundle" >
+		<mkdir dir="${bundle.dir}"/>
+		<jar 
 					manifest="${manifest.connector.dir}/Manifest.mf" 
-					jarfile="${bundle.dir}/proactiveConnectorBundle.jar">				
-				</jar>			
-			</target> 
+					jarfile="${bundle.dir}/proactiveConnectorBundle.jar">
+		</jar>
+	</target>
 
 	<!-- ================================================================ -->
 	<!--                          Performance test                        -->
@@ -935,14 +935,14 @@
 			<arg value="${x}" />
 		</java>
 	</target>
-		<!-- ================================================================ -->
-		<!--                      Compile JMX Connector                       -->
-		<!--  =============================================================== -->
-		
-		
-		<target name="OSGiBundles" depends="proActiveJar, librariesBundle, proActiveConnectorBundle, osgiMgt">
-		</target>
-	
+	<!-- ================================================================ -->
+	<!--                      Compile JMX Connector                       -->
+	<!--  =============================================================== -->
+
+
+	<target name="OSGiBundles" depends="proActiveJar, librariesBundle, proActiveConnectorBundle, osgiMgt">
+	</target>
+
 	<!-- ================================================================ -->
 	<!--                    Create OSGi  Management Bundle                -->
 	<!--  =============================================================== -->
@@ -950,8 +950,8 @@
 		<mkdir dir="${dist.dir}"/>
 		<jar jarfile="${bundle.dir}/OSGiManagement.jar" manifest="${manifest.example.management.dir}/Manifest.mf">
 			<fileset dir="${cl.examples.dir}/">
-			<include name="org/objectweb/proactive/examples/jmx/remote/**" />
+				<include name="org/objectweb/proactive/examples/jmx/remote/**" />
 			</fileset>
-		</jar>		
+		</jar>
 	</target>
 </project>
