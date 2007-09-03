@@ -41,8 +41,8 @@ public class DeploymentNode {
         return nodeMap;
     }
 
-    public void setNodeMap(Set<VMNodes> nodeMap) {
-        this.nodeMap = nodeMap;
+    public void addVMNodes(VMNodes vmNode) {
+        nodeMap.add(vmNode);
     }
 
     public List<DeploymentNode> getChildren() {

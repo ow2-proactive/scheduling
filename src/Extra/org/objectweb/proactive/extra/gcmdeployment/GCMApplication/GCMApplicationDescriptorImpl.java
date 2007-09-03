@@ -16,6 +16,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VMNodes;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
+import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
@@ -28,7 +29,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
     /** All the Virtual Nodes defined in this application */
     private Map<String, VirtualNodeInternal> virtualNodes = null;
-    private DeploymentTree runtimeTree;
+    private DeploymentTree deploymentTree;
     private Map<String, GCMDeploymentDescriptor> selectedDeploymentDesc;
 
     public GCMApplicationDescriptorImpl(String filename)
@@ -76,28 +77,45 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     }
 
     protected void buildDeploymentTree() {
-        runtimeTree = new DeploymentTree();
+        deploymentTree = new DeploymentTree();
 
         // make root node from local JVM
+        DeploymentNode rootNode = new DeploymentNode();
+
+        rootNode.setDeploymentDescriptorPath(""); // no deployment descriptor here
+
+        try {
+            rootNode.setApplicationDescriptorPath(gadFile.getCanonicalPath());
+        } catch (IOException e) {
+            rootNode.setApplicationDescriptorPath("");
+        }
+
+        ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
+        VMNodes vmNodes = new VMNodes(proActiveRuntime.getVMInformation());
+
+        //                    vmNodes.addNode(<something>); - TODO cmathieu
+        rootNode.addVMNodes(vmNodes);
+
+        deploymentTree.setRootNode(rootNode);
+
+        // Build leaf nodes
         for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
+            DeploymentNode deploymentNode = new DeploymentNode();
+
             GCMDeploymentDescriptorImpl gddi = (GCMDeploymentDescriptorImpl) gdd;
 
             GCMDeploymentResources resources = gddi.getResources();
 
-            DeploymentNode runtimeNode = new DeploymentNode();
+            deploymentNode.setDeploymentDescriptorPath(gddi.getParser()
+                                                           .getDescriptorFilePath());
 
-            try {
-                runtimeNode.setApplicationDescriptorPath(gadFile.getCanonicalPath());
-            } catch (IOException e) {
-                runtimeNode.setApplicationDescriptorPath("");
+            deploymentTree.addNode(deploymentNode, rootNode);
+
+            for (Group group : resources.getGroups()) {
+                DeploymentNode leafNode = new DeploymentNode();
+                leafNode.setDeploymentDescriptorPath(deploymentNode.getDeploymentDescriptorPath());
+                // TODO ...
             }
-            runtimeNode.setDeploymentDescriptorPath(gddi.getParser()
-                                                        .getDescriptorFilePath());
-
-            ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-            VMNodes vmNodes = new VMNodes(proActiveRuntime.getVMInformation());
-
-            //            vmNodes.addNode(proActiveRuntime.getL)
         }
     }
 
