@@ -2,9 +2,11 @@ ProActive Extension for Scilab.
 
 Before being able to use the extension and launch the GUI (scilab.sh or scilab.bat), please follow these installations steps.
 
+
 STEP 1: Download Scilab 4.1.2 or above BINARY Version
 
 If you can't download version 4.1.2 please follow step 2.
+
 
 STEP 2: Download Scilab SOURCE version 4.1 or 4.1.1
 
@@ -12,8 +14,15 @@ copy javasci_Scilab2.h and javasci_Scilab2.c from folder c_sources to SCILAB/rou
 
 make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILAB/Readme_Windows)
 
+
 STEP 3:
 Edit paths to your SCILAB installation in the scilab_env.sh or scilab_env.bat file
+
+Comment out the following line if present in the SCILAB/scilab.star file (should be around line 190):
+show_startupinfo();
+
+To comment out just insert "//" in the beginning of the line like in Java.  
+
 
 STEP 4: 
 Read documentation on http://proactive.inria.fr/scilab.htm on how to use the GUI
