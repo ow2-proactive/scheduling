@@ -25,10 +25,10 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
     /**
          *
          */
-    private static final long serialVersionUID = 1L;
-    protected RemoteObject remoteObject;
+    private static final long serialVersionUID = -1989838338769716953L;
+    private transient RemoteObject remoteObject;
     protected URI uri;
-    protected Object stub;
+    protected transient Object stub;
 
     public IbisRemoteObjectImpl() throws ibis.rmi.RemoteException {
     }

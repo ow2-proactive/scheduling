@@ -384,6 +384,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
+        out.defaultWriteObject();
         if (this.universalBody == null) {
             out.writeObject(null);
         } else {
@@ -399,10 +400,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
         this.universalBody = (UniversalBody) in.readObject();
         Body localBody = LocalBodyStore.getInstance().getLocalBody(getBodyID());
 
-        // Thread.dumpStack();
         if (logger.isDebugEnabled()) {
             logger.debug("Local body is " + localBody);
         }

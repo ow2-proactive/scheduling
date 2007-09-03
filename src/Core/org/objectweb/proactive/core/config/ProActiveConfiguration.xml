@@ -102,5 +102,11 @@
 		<!-- Workaround to fix rmissh/unicore conflict -->
 		<prop key="proactive.unicore.forkclient" value="true" />
 		<prop key="proactive.runtime.stayalive" value="true" />
+
+
+		<!-- Ibis default properties -->		
+        <prop key="ibis.serialization" value="ibis"/>
+        <prop key="ibis.io.serialization.classloader" value="org.objectweb.proactive.core.mop.MOPClassLoader"/>
+
 	</properties>
 </ProActiveUserProperties>

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.util.converter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,7 +56,7 @@ public class ByteToObjectConverter {
     private static final String READ_OBJECT = "readObject";
     private static final String IBIS_SERIALIZATION_INPUT_STREAM = "ibis.io.IbisSerializationInputStream";
     private static final String BUFFERED_ARRAY_INPUT_STREAM = "ibis.io.BufferedArrayInputStream";
-    private static final String BYTE_ARRAY_INPUT_STREAM = "ByteArrayInputStream";
+    private static final String BYTE_ARRAY_INPUT_STREAM = "java.io.ByteArrayInputStream";
 
     public static class MarshallStream {
 
@@ -157,16 +158,18 @@ public class ByteToObjectConverter {
             final Class cl_bais = Class.forName(BYTE_ARRAY_INPUT_STREAM);
             final Class cl_buais = Class.forName(BUFFERED_ARRAY_INPUT_STREAM);
             final Class cl_isis = Class.forName(IBIS_SERIALIZATION_INPUT_STREAM);
-            final Constructor c_bais = cl_bais.getConstructor();
+            final Constructor c_bais = cl_bais.getConstructor(Array.newInstance(
+                        byte.class, 0).getClass());
+
             final Constructor c_buais = cl_buais.getConstructor(new Class[] {
-                        cl_bais
+                        java.io.InputStream.class
                     });
             final Constructor c_isis = cl_isis.getConstructor(new Class[] {
-                        cl_buais
+                        Class.forName("ibis.io.DataInputStream")
                     });
 
             //      final ByteArrayInputStream bi = new ByteArrayInputStream(b);
-            final ByteArrayInputStream i_bais = (ByteArrayInputStream) c_bais.newInstance();
+            final ByteArrayInputStream i_bais = (ByteArrayInputStream) c_bais.newInstance(b);
 
             //      final BufferedArrayInputStream ai = new BufferedArrayInputStream(bi);
             final Object i_buais = c_buais.newInstance(new Object[] { i_bais });
@@ -177,9 +180,9 @@ public class ByteToObjectConverter {
             final Method readObjectMth = cl_isis.getMethod(READ_OBJECT);
             final Method closeMth = cl_isis.getMethod(CLOSE);
 
-            //      final Object unserialized = si.readObject();	        
+            //      final Object unserialized = si.readObject();
             final Object unserialized = readObjectMth.invoke(i_isis,
-                    new Object[] { b });
+                    new Object[] {  });
 
             closeMth.invoke(i_isis, new Object[] {  });
 

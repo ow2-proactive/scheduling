@@ -53,7 +53,7 @@ import sun.rmi.server.MarshalOutputStream;
 public class ObjectToByteConverter {
     private static final String IBIS_SERIALIZATION_OUTPUT_STREAM = "ibis.io.IbisSerializationOutputStream";
     private static final String BUFFERED_ARRAY_OUTPUT_STREAM = "ibis.io.BufferedArrayOutputStream";
-    private static final String BYTE_ARRAY_OUTPUT_STREAM = "ByteArrayOutputStream";
+    private static final String BYTE_ARRAY_OUTPUT_STREAM = "java.io.ByteArrayOutputStream";
     private static final String CLOSE = "close";
     private static final String FLUSH = "flush";
     private static final String WRITE_OBJECT = "writeObject";
@@ -158,10 +158,10 @@ public class ObjectToByteConverter {
             final Class cl_isos = Class.forName(IBIS_SERIALIZATION_OUTPUT_STREAM);
             final Constructor c_baos = cl_baos.getConstructor();
             final Constructor c_buaos = cl_buaos.getConstructor(new Class[] {
-                        cl_baos
+                        java.io.OutputStream.class
                     });
             final Constructor c_isos = cl_isos.getConstructor(new Class[] {
-                        cl_buaos
+                        Class.forName("ibis.io.DataOutputStream")
                     });
 
             //          final ByteArrayOutputStream bo = new ByteArrayOutputStream();
@@ -179,13 +179,14 @@ public class ObjectToByteConverter {
                     new Class[] { Object.class });
             final Method flushMth = cl_isos.getMethod(FLUSH);
             final Method closeMth = cl_isos.getMethod(CLOSE);
-            //	        so.writeObject(o);	        
+
+            //	        so.writeObject(o);
             writeObjectMth.invoke(i_isos, new Object[] { o });
 
-            //			so.flush();	        
+            //			so.flush();
             flushMth.invoke(i_isos, new Object[] {  });
 
-            //			so.close();	        
+            //			so.close();
             closeMth.invoke(i_isos, new Object[] {  });
 
             return i_baos.toByteArray();
@@ -210,6 +211,7 @@ public class ObjectToByteConverter {
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         } catch (InvocationTargetException e) {
             MakeDeepCopy.logger.warn("Check your classpath for ibis jars ");
+            e.printStackTrace();
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
