@@ -47,13 +47,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ModelRecorder;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.actions.CollapseAllAction;
 import org.objectweb.proactive.ic2d.jobmonitoring.actions.ExpandAllAction;
 import org.objectweb.proactive.ic2d.jobmonitoring.editparts.JobMonitoringTreePartFactory;
-import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
-import org.objectweb.proactive.ic2d.monitoring.data.ModelRecorder;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
-
+ 
 /**
  * 
  * @author Jean-Michael Legait and Michèle Reynier
@@ -147,7 +146,7 @@ public class JobMonitoringView extends ViewPart implements Observer{
 	/**
 	 * To monitor a new host.
 	 */
-	public class NewHostJobMonitoringAction extends NewHostAction {
+	public class NewHostJobMonitoringAction extends org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction {
 
 		public NewHostJobMonitoringAction(Composite parent){
 			super(parent.getDisplay(), null);

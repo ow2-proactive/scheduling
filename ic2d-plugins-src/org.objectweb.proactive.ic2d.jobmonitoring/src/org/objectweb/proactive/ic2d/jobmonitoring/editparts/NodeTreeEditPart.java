@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 
 
 public class NodeTreeEditPart extends JobMonitoringTreeEditPart {
@@ -39,7 +39,7 @@ public class NodeTreeEditPart extends JobMonitoringTreeEditPart {
 	/**
 	 * @param model
 	 */
-	public NodeTreeEditPart(AbstractDataObject model) {
+	public NodeTreeEditPart(AbstractData model) {
 		super(model);
 	}
 
@@ -48,7 +48,7 @@ public class NodeTreeEditPart extends JobMonitoringTreeEditPart {
 	 */
 	@Override
 	protected String getText() {
-		return getCastedModel().getFullName() + "("+getCastedModel().getJobID()+")";
+		return getCastedModel().getName() + "("+getCastedModel().getJobId()+")";
 	}
 	
 	

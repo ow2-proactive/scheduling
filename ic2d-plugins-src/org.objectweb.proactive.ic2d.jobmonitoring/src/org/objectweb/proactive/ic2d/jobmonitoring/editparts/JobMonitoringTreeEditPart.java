@@ -38,7 +38,7 @@ import org.eclipse.gef.editparts.AbstractTreeEditPart;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
 /**
  * @author Jean-Michael Legait and Michèle Reynier
@@ -51,7 +51,7 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart imp
 	// -- CONSTRUCTOR ------------------------------------------------
 	//
 	
-	public JobMonitoringTreeEditPart(AbstractDataObject model) {
+	public JobMonitoringTreeEditPart(AbstractData model) {
 		super(model);
 	}
 	
@@ -78,7 +78,7 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart imp
 	@Override
 	public void activate() {
 		if (!isActive())
-			((AbstractDataObject)getModel()).addObserver(this);
+			((AbstractData)getModel()).addObserver(this);
 		super.activate();
 	}
 	
@@ -88,7 +88,7 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart imp
 	@Override
 	public void deactivate() {
 		if (isActive())
-			((AbstractDataObject)getModel()).deleteObserver(this);
+			((AbstractData)getModel()).deleteObserver(this);
 		super.deactivate();
 	}
 	
@@ -101,7 +101,7 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart imp
 	 */
 	@Override
 	protected String getText() {
-		return getCastedModel().getFullName();
+		return getCastedModel().getName();
 	}
 
 	/**
@@ -141,15 +141,15 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart imp
 	 */
 	@Override
 	protected List getModelChildren() {
-		return getCastedModel().getMonitoredChildren();
+		return getCastedModel().getMonitoredChildrenAsList();
 	}
-	
+	 
 	//
 	// -- PRIVATE METHODS -------------------------------------------
 	//
 	
 	
-	private AbstractDataObject getCastedModel() {
-		return (AbstractDataObject)getModel();
+	private AbstractData getCastedModel() {
+		return (AbstractData)getModel();
 	}
 }

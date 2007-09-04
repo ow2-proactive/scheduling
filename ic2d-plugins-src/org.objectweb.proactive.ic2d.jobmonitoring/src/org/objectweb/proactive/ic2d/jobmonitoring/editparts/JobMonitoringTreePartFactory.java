@@ -32,13 +32,13 @@ package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 
 public class JobMonitoringTreePartFactory implements EditPartFactory {
@@ -49,18 +49,19 @@ public class JobMonitoringTreePartFactory implements EditPartFactory {
 	 */
 	public EditPart createEditPart(EditPart context, Object model) {
 		if(model instanceof WorldObject)
-			return new WorldTreeEditPart((AbstractDataObject)model);
+			return new WorldTreeEditPart((AbstractData)model);
 		if(model instanceof VNObject)
-			return new VNTreeEditPart((AbstractDataObject)model);
+			return new VNTreeEditPart((AbstractData)model);
 		if(model instanceof HostObject)
-			return new HostTreeEditPart((AbstractDataObject)model);
-		if(model instanceof VMObject)
-			return new JVMTreeEditPart((AbstractDataObject)model);
+			return new HostTreeEditPart((AbstractData)model);
+		if(model instanceof RuntimeObject)
+			return new JVMTreeEditPart((AbstractData)model);
 		if(model instanceof NodeObject)
-			return new NodeTreeEditPart((AbstractDataObject)model);
-		if(model instanceof AOObject)
-			return new AOTreeEditPart((AbstractDataObject)model);
+			return new NodeTreeEditPart((AbstractData)model);
+		if(model instanceof ActiveObject)
+			return new AOTreeEditPart((AbstractData)model);
 		return null;
 	}
 
 }
+ 

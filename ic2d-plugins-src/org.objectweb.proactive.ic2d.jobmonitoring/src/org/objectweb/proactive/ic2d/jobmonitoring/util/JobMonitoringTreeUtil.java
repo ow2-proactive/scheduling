@@ -33,11 +33,11 @@ package org.objectweb.proactive.ic2d.jobmonitoring.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 
 /**
  * Provides utility methods that can be used to build a job monitoring tree.
@@ -65,8 +65,8 @@ public class JobMonitoringTreeUtil {
 	 */
 	public static List<HostObject> getVNChildren(VNObject vn) {
 		List<HostObject> result = new ArrayList<HostObject>();
-		List<AbstractDataObject> worldChildren = vn.getWorld().getMonitoredChildren();
-		for(AbstractDataObject obj : worldChildren) {
+		List<AbstractData> worldChildren = vn.getWorldObject().getMonitoredChildrenAsList();
+		for(AbstractData obj : worldChildren) {
 			HostObject host = (HostObject) obj;
 			if(! getHostChildren(host, vn).isEmpty())
 				result.add(host);
@@ -89,11 +89,11 @@ public class JobMonitoringTreeUtil {
 	 * @param vn the virtual node parent of the host
 	 * @return Children of the host.
 	 */
-	public static List<VMObject> getHostChildren(HostObject host, VNObject vn) {
-		List<VMObject> result = new ArrayList<VMObject>();
-		List<AbstractDataObject> hostChildren = host.getMonitoredChildren();
-		for(AbstractDataObject obj : hostChildren) {
-			VMObject jvm = (VMObject) obj;
+	public static List<RuntimeObject> getHostChildren(HostObject host, VNObject vn) {
+		List<RuntimeObject> result = new ArrayList<RuntimeObject>();
+		List<AbstractData> hostChildren = host.getMonitoredChildrenAsList();
+		for(AbstractData obj : hostChildren) {
+			RuntimeObject jvm = (RuntimeObject) obj;
 			if((! getJVMChildren(jvm, vn).isEmpty()))
 				result.add(jvm);
 		}
@@ -115,12 +115,12 @@ public class JobMonitoringTreeUtil {
 	 * @param vn the virtual node parent of the JVM
 	 * @return Children of the JVM
 	 */
-	public static List<NodeObject> getJVMChildren(VMObject jvm, VNObject vn) {
+	public static List<NodeObject> getJVMChildren(RuntimeObject jvm, VNObject vn) {
 		List<NodeObject> result = new ArrayList<NodeObject>();
-		List<AbstractDataObject> jvmChildren = jvm.getMonitoredChildren();
-		for(AbstractDataObject obj : jvmChildren) {
+		List<AbstractData> jvmChildren = jvm.getMonitoredChildrenAsList();
+		for(AbstractData obj : jvmChildren) {
 			NodeObject node = (NodeObject) obj;
-			if(node.getVNParent().equals(vn))
+			if(node.getVirtualNode().equals(vn))
 				result.add(node);
 		}
 		return result;

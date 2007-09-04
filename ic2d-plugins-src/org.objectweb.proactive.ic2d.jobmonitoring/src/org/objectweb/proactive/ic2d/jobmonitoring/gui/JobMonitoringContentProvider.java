@@ -2,20 +2,20 @@ package org.objectweb.proactive.ic2d.jobmonitoring.gui;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
 public class JobMonitoringContentProvider implements ITreeContentProvider {
 	
 	public Object[] getChildren(Object parentElement) {
-		return ((AbstractDataObject)parentElement).getMonitoredChildren().toArray();
+		return ((AbstractData)parentElement).getMonitoredChildrenAsList().toArray();
 	}
 
 	public Object getParent(Object element) {
-		return ((AbstractDataObject)element).getParent();
+		return ((AbstractData)element).getParent();
 	}
 
 	public boolean hasChildren(Object element) {
-		return ((AbstractDataObject)element).getMonitoredChildren().size() > 0;
+		return ((AbstractData)element).getMonitoredChildrenAsList().size() > 0;
 	}
 
 	public Object[] getElements(Object inputElement) {
@@ -26,7 +26,7 @@ public class JobMonitoringContentProvider implements ITreeContentProvider {
 		// TODO Auto-generated method stub
 
 	}
-
+ 
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		// TODO Auto-generated method stub
 

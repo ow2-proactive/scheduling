@@ -32,10 +32,10 @@ package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import java.util.List;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VMObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
 
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
@@ -50,7 +50,7 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
 	/**
 	 * @param model
 	 */
-	public JVMTreeEditPart(AbstractDataObject model) {
+	public JVMTreeEditPart(AbstractData model) {
 		super(model);
 	}
 
@@ -72,15 +72,15 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
 	 */
 	@Override
 	protected String getText() {
-		return getCastedModel().getFullName();
+		return getCastedModel().getName();
 	}
 
 	//
 	// -- PRIVATE METHODS -------------------------------------------
 	//
 
-	private VMObject getCastedModel() {
-		return (VMObject)getModel();
+	private RuntimeObject  getCastedModel() {
+		return (RuntimeObject)getModel();
 	}
 
 }

@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
 
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
@@ -51,7 +51,7 @@ public class VNTreeEditPart extends JobMonitoringTreeEditPart {
 	/**
 	 * @param model
 	 */
-	public VNTreeEditPart(AbstractDataObject model) {
+	public VNTreeEditPart(AbstractData model) {
 		super(model);
 	}
 	
@@ -89,7 +89,7 @@ public class VNTreeEditPart extends JobMonitoringTreeEditPart {
 	 */
 	@Override
 	protected String getText() {
-		return getCastedModel().getFullName()+" ("+getCastedModel().getJobID()+")";
+		return getCastedModel().getName()+" ("+getCastedModel().getJobID()+")";
 	}
 	
 	//

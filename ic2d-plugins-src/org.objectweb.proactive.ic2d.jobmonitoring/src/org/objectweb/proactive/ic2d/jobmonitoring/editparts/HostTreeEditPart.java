@@ -32,10 +32,10 @@ package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import java.util.List;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.monitoring.data.VNObject;
 
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
@@ -49,8 +49,8 @@ public class HostTreeEditPart extends JobMonitoringTreeEditPart {
 	
 	/**
 	 * @param model
-	 */
-	public HostTreeEditPart(AbstractDataObject model) {
+	 */ 
+	public HostTreeEditPart(AbstractData model) {
 		super(model);
 	}
 	

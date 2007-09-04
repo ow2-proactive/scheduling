@@ -32,8 +32,8 @@ package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import java.util.List;
 
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
@@ -48,7 +48,7 @@ public class WorldTreeEditPart extends JobMonitoringTreeEditPart {
 	/**
 	 * @param model
 	 */
-	public WorldTreeEditPart(AbstractDataObject model) {
+	public WorldTreeEditPart(AbstractData model) {
 		super(model);
 	}
 	
