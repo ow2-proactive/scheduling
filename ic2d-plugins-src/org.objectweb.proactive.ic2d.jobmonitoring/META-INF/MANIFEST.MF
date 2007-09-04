@@ -7,6 +7,6 @@ Bundle-Activator: org.objectweb.proactive.ic2d.jobmonitoring.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.objectweb.proactive.ic2d.monitoring,
- org.eclipse.gef
+ org.eclipse.gef,
+ org.objectweb.proactive.ic2d.JMXmonitoring
 Eclipse-LazyStart: true
