@@ -8,6 +8,7 @@ import javax.management.ObjectName;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 
 
 /**
@@ -66,4 +67,11 @@ public interface BodyWrapperMBean extends Serializable {
      * @throws MigrationException
      */
     public void migrateTo(String nodeUrl) throws MigrationException;
+
+    /**
+     *  returns a list of outgoing active object references.
+     */
+    public Collection<UniqueID> getReferenceList();
+
+    public String getDgcState();
 }

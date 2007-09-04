@@ -1,9 +1,16 @@
 package org.objectweb.proactive.ic2d.dgc.figures;
 
+import java.io.IOException;
+
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.ReflectionException;
+
 import org.eclipse.draw2d.Label;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.figures.AOFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 
 
 class DgcLabel extends Label {
@@ -14,15 +21,18 @@ class DgcLabel extends Label {
         this.text = text;
     }
 
-    public String getText() {
+    @Override
+	public String getText() {
         return this.text;
     }
 
-    public String getSubStringText() {
+    @Override
+	public String getSubStringText() {
         return getText();
     }
 
-    public void setText(String text) {
+    @Override
+	public void setText(String text) {
         this.text = text;
     }
 }
@@ -35,9 +45,28 @@ public class DgcAOFigure extends AOFigure {
         this.initFigure();
     }
 
-    public void updateDgcState(AOObject model) {
-        NodeObject node = (NodeObject) model.getParent();
-        String state = node.getSpy().getDgcState(model.getID());
-        ((DgcLabel) this.label).setText(model.getFullName() + "\n" + state);
+    public void updateDgcState(ActiveObject model) {
+        NodeObject node = model.getParent();
+        String state = "";
+		try {
+			state = (String) model.getAttribute("DgcState");
+			((DgcLabel) this.label).setText(model.getName() + "\n" + state);
+		} catch (AttributeNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstanceNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MBeanException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ReflectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
     }
 }

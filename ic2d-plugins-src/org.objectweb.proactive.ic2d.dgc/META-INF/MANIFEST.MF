@@ -7,8 +7,8 @@ Bundle-Activator: org.objectweb.proactive.ic2d.dgc.Activator
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.objectweb.proactive.ic2d.monitoring,
  org.eclipse.gef,
- org.objectweb.proactive.ic2d.lib
+ org.objectweb.proactive.ic2d.lib,
+ org.objectweb.proactive.ic2d.JMXmonitoring
 Eclipse-LazyStart: true
 Export-Package: org.objectweb.proactive.ic2d.dgc.views

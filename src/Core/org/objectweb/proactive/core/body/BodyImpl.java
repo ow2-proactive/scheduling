@@ -693,6 +693,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 future.setID(sequenceID);
                 this.futures.receiveFuture(future);
             }
+
             // ProActiveEvent
             messageEventProducer.notifyListeners(request,
                 MessageEvent.REQUEST_SENT, destinationBody.getID());
@@ -708,7 +709,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     UniqueID connectorID = serverConnector.getUniqueID();
                     if (!connectorID.equals(destinationBody.getID())) {
                         mbean.sendNotification(NotificationType.requestSent,
-                            request.getSequenceNumber());
+                            new RequestNotificationData(BodyImpl.this.bodyID,
+                                BodyImpl.this.getNodeURL(),
+                                destinationBody.getID(), null,
+                                methodCall.getName(), -1));
                     }
                 }
             }

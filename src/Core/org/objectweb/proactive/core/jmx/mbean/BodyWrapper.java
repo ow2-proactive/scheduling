@@ -23,6 +23,8 @@ import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.gc.ObjectGraph;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
@@ -177,6 +179,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      */
     private void launchNotificationsThread() {
         new Thread() {
+                @Override
                 public void run() {
                     while (shouldNotify) {
                         try {
@@ -296,5 +299,16 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         }
 
         launchNotificationsThread();
+    }
+
+    /**
+     *  returns a list of outgoing active object references.
+     */
+    public Collection<UniqueID> getReferenceList() {
+        return ObjectGraph.getReferenceList(this.getID());
+    }
+
+    public String getDgcState() {
+        return GarbageCollector.getDgcState(this.getID());
     }
 }

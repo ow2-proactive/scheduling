@@ -8,8 +8,8 @@ import org.eclipse.gef.EditPartFactory;
 import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.ic2d.dgc.data.ObjectGraph;
 import org.objectweb.proactive.ic2d.dgc.editparts.DgcIC2DEditPartFactory;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
 public class DgcView extends MonitoringView implements Runnable {
@@ -23,15 +23,15 @@ public class DgcView extends MonitoringView implements Runnable {
         return new DgcIC2DEditPartFactory(this);
     }
 
-    private void drawGraph(Map<AOObject, Collection<AOObject>> graph) {
-        Set<Map.Entry<AOObject, Collection<AOObject>>> s = graph.entrySet();
-        for (Map.Entry<AOObject, Collection<AOObject>> e : s) {
-            AOObject ao = e.getKey();
+    private void drawGraph(Map<ActiveObject, Collection<ActiveObject>> graph) {
+        Set<Map.Entry<ActiveObject, Collection<ActiveObject>>> s = graph.entrySet();
+        for (Map.Entry<ActiveObject, Collection<ActiveObject>> e : s) {
+            ActiveObject ao = e.getKey();
             ao.resetCommunications();
         }
-        for (Map.Entry<AOObject, Collection<AOObject>> e : s) {
-            AOObject srcAO = e.getKey();
-            for (AOObject destAO : e.getValue()) {
+        for (Map.Entry<ActiveObject, Collection<ActiveObject>> e : s) {
+            ActiveObject srcAO = e.getKey();
+            for (ActiveObject destAO : e.getValue()) {
                 srcAO.addCommunication(destAO);
             }
         }
@@ -44,7 +44,7 @@ public class DgcView extends MonitoringView implements Runnable {
 
     public void run() {
         for (;;) {
-            Map<AOObject, Collection<AOObject>> graph = ObjectGraph.getObjectGraph(this.getWorld());
+            Map<ActiveObject, Collection<ActiveObject>> graph = ObjectGraph.getObjectGraph(this.getWorld());
             drawGraph(graph);
 
             try {

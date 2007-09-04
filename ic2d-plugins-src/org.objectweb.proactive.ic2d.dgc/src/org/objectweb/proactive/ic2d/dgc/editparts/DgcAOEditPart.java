@@ -7,26 +7,29 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.dgc.data.ObjectGraph;
 import org.objectweb.proactive.ic2d.dgc.figures.DgcAOFigure;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.editparts.AOEditPart;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.AOEditPart;
 
 
 public class DgcAOEditPart extends AOEditPart {
-    public DgcAOEditPart(AOObject model) {
+    public DgcAOEditPart(ActiveObject model) {
         super(model);
     }
 
-    protected IFigure createFigure() {
-        return new DgcAOFigure(getCastedModel().getFullName());
+    @Override
+	protected IFigure createFigure() {
+        return new DgcAOFigure(getCastedModel().getName());
     }
 
+	@Override
 	protected Color getArrowColor() {
 		return new Color(Display.getCurrent(), 0, 0, 255);
 	}
-    
-    public void update(Observable o, Object arg) {
-    	ObjectGraph.addObject((AOObject) o);
-    	AOObject model = this.getCastedModel();
+
+    @Override
+	public void update(Observable o, Object arg) {
+    	ObjectGraph.addObject((ActiveObject) o);
+    	ActiveObject model = this.getCastedModel();
     	((DgcAOFigure) super.getCastedFigure()).updateDgcState(model);
     	super.update(o, arg);
     }
