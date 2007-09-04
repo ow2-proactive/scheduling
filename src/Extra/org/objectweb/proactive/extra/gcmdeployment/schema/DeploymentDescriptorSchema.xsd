@@ -26,7 +26,7 @@
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="privateKey" type="ct:pathElementType"
-						minOccurs="0">
+						minOccurs="0" maxOccurs="1">
 					</element>
 				</sequence>
 				<attribute name="commandOptions" type="string"></attribute>
