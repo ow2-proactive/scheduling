@@ -37,7 +37,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,26 +73,26 @@ public class MonitorNewHostDialog extends Dialog {
 
 	private Shell shell = null;
 	private Shell parent = null;
-	
+
 	private Combo hostCombo;
 	private Text portText;
 	private Combo protocolCombo;
 	private Text depthText;
 	private Button okButton;
 	private Button cancelButton;
-	
+
 	/** The World */
 	private WorldObject world;
 
 	/** Host name */
 	String initialHostValue = "localhost";
-	
+
 	// Name of the file
 	String file = ".urls";
 
 	// <hostName,url>
 	Map<String,String> urls = new HashMap<String,String>();
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -104,7 +103,7 @@ public class MonitorNewHostDialog extends Dialog {
 
 		this.parent = parent;
 		this.world = world;
-		
+
 		String port = "";
 
 		/* Get the machine's name */
@@ -122,7 +121,7 @@ public class MonitorNewHostDialog extends Dialog {
 
 		/* Init the display */
 		Display display = getParent().getDisplay();
-		
+
 		/* Init the shell */
 		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
 		shell.setText("Adding host and depth to monitor");
@@ -146,7 +145,7 @@ public class MonitorNewHostDialog extends Dialog {
 		// label "Name or IP"
 		Label hostLabel = new Label(hostGroup, SWT.NONE);
 		hostLabel.setText("Name or IP :");
-		
+
 		// text hostname or IP
 		hostCombo = new Combo(hostGroup, SWT.BORDER);
 		FormData hostFormData = new FormData();
@@ -157,7 +156,7 @@ public class MonitorNewHostDialog extends Dialog {
 		hostCombo.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				String hostName = hostCombo.getText();
-				String url = (String) urls.get(hostName);
+				String url = urls.get(hostName);
 				Integer port = UrlBuilder.getPortFromUrl(url);
 				String protocol = UrlBuilder.getProtocol(url);
 				portText.setText(port.toString());
@@ -202,7 +201,7 @@ public class MonitorNewHostDialog extends Dialog {
 		FormData protocolFormData1 = new FormData();
 		protocolFormData1.left = new FormAttachment(70, 5);
 		protocolLabel.setLayoutData(protocolFormData1);
-		
+
 		// combo protocols
 		protocolCombo = new Combo(hostGroup, SWT.DROP_DOWN);
 		protocolCombo.add(Constants.RMI_PROTOCOL_IDENTIFIER);
@@ -217,7 +216,7 @@ public class MonitorNewHostDialog extends Dialog {
 
 		// Load Urls
 		loadUrls();
-		
+
 		// label depth
 		Label depthLabel = new Label(shell, SWT.NONE);
 		depthLabel.setText("Hosts will be recursively searched up to a depth of :");
@@ -254,7 +253,7 @@ public class MonitorNewHostDialog extends Dialog {
 		okFormData.right = new FormAttachment(50, -10);
 		okButton.setLayoutData(okFormData);
 		shell.setDefaultButton(okButton);
-		
+
 		// button "CANCEL"
 		this.cancelButton = new Button(shell, SWT.NONE);
 		cancelButton.setText("Cancel");
@@ -374,7 +373,7 @@ public class MonitorNewHostDialog extends Dialog {
 			// Record urls
 			Iterator it = urls.values().iterator();
 			while(it.hasNext()){
-				pw.println(it.next());		
+				pw.println(it.next());
 			}
 			// Record the last URL used at the end of the file
 			// in order to find it easily for the next time
@@ -402,6 +401,7 @@ public class MonitorNewHostDialog extends Dialog {
 		int port;
 		String protocol;
 
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 			if (e.widget == okButton) {
 				hostname = hostCombo.getText();
@@ -410,11 +410,11 @@ public class MonitorNewHostDialog extends Dialog {
 				final String url = UrlBuilder.buildUrl(hostname, "", protocol, port);
 				recordUrl(url);
 				world.setDepth(Integer.parseInt(depthText.getText()));
-				new Thread() {
-					public void run() {
+//				new Thread() {
+//					public void run() {
 						world.addHost(url);
-					}
-				}.start();
+//					}
+//				}.start();
 			}
 			shell.close();
 		}

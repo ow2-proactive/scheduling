@@ -45,7 +45,7 @@ public class ActiveObject extends AbstractData{
 	private State currentState = State.UNKNOWN;
 
 	/** request queue length */
-	private int requestQueueLength = -1; // -1 = not known		
+	private int requestQueueLength = -1; // -1 = not known
 
 	// -------------------------------------------
 	// --- Constructor ---------------------------
@@ -192,7 +192,7 @@ public class ActiveObject extends AbstractData{
 				+ nodeTargetURL);
 		return true;
 	}
-	
+
 	/**
 	 * Say to the model that a MigrationException occured during a migration of this active object.
 	 * @param migrationException
@@ -211,7 +211,7 @@ public class ActiveObject extends AbstractData{
 	public String getKey() {
 		return this.id.toString();
 	}
-	
+
 	@Override
 	public String getType() {
 		return "active object";
@@ -237,16 +237,16 @@ public class ActiveObject extends AbstractData{
 	 * Warning: This active object is the destination of the communication.
 	 * @param aoSource Source active object.
 	 */
-	private void addCommunication(ActiveObject aoSource){
+	public void addCommunication(ActiveObject aoSource){
 		setChanged();
 		Set<ActiveObject> comm = new HashSet<ActiveObject>();
 		comm.add(aoSource);
-		notifyObservers(comm);	
+		notifyObservers(comm);
 		/*synchronized (communications) {
 			communications.add(source);
 		}*/
 	}
-	
+
 	/**
 	 * Adds a communication to this object.
 	 * Warning: This active object is the destination of the communication.
@@ -261,7 +261,7 @@ public class ActiveObject extends AbstractData{
 		}
 		this.addCommunication(source);
 	}
-	
+
 	/**
 	 * Adds a communication to this object.
 	 * Warning: This active object is the source of the communication.
@@ -281,7 +281,7 @@ public class ActiveObject extends AbstractData{
 	public void resetCommunications() {
 		System.out.println("ActiveObject.resetCommunications() "+this);
 		setChanged();
-		notifyObservers(new HashSet<ActiveObject>());	
+		notifyObservers(new HashSet<ActiveObject>());
 	}
 
 	public void addRequest(){
@@ -316,7 +316,7 @@ public class ActiveObject extends AbstractData{
 		/**
 		 * Compare two active objects. (For Example: ao#3 and ao#5 give -1
 		 * because ao#3 has been discovered before ao#5.)
-		 * 
+		 *
 		 * @return -1, 0, or 1 as the first argument is less than, equal to, or
 		 *         greater than the second.
 		 */
