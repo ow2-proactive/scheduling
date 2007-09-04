@@ -415,7 +415,17 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        return interfaceReferences;
+        Object[] interfaces = new Object[functionalItfs.size() +
+            interfaceReferences.length];
+        int i = 0;
+        for (i = 0; i < interfaceReferences.length; i++) {
+            interfaces[i] = interfaceReferences[i];
+        }
+        for (Object itf : functionalItfs.values()) {
+            interfaces[i] = itf;
+            i++;
+        }
+        return interfaces;
     }
 
     /*
