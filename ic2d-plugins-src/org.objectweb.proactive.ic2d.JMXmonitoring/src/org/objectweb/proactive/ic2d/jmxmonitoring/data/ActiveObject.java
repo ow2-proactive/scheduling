@@ -326,4 +326,7 @@ public class ActiveObject extends AbstractData{
 			return -(ao1Name.compareTo(ao2Name));
 		}
 	}
+	public String getJobId () {
+		return this.getParent().getJobId();
+	}
 }

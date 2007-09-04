@@ -1,6 +1,8 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -326,5 +328,9 @@ public class WorldObject extends AbstractData{
 
 	public VNObject getVirtualNode(String virtualNodeName) {
 		return vnChildren.get(virtualNodeName);
+	}
+	
+	public List<VNObject>getVNChildren () {
+		return new ArrayList<VNObject>(this.vnChildren.values ());
 	}
 }
