@@ -17,14 +17,6 @@
 	<complexType name="oarProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="commandPath"
-						type="ct:pathElementType" minOccurs="0" />
-					<element name="oarOption" type="paext:OarOptionType"
-						minOccurs="0" />
-				</sequence>
-				<attribute name="class" type="string" use="required"
-					fixed="org.objectweb.proactive.core.process.oar.OARSubProcess" />
 				<attribute name="bookedNodesAccess" use="optional">
 					<simpleType>
 						<restriction base="string">
@@ -33,8 +25,6 @@
 						</restriction>
 					</simpleType>
 				</attribute>
-				<attribute name="closeStream" type="ct:CloseStreamType"
-					use="optional" />
 				<attribute name="interactive"
 					type="ct:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />

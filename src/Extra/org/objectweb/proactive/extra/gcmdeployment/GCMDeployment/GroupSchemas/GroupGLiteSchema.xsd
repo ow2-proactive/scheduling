@@ -25,29 +25,17 @@
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="environment"
-						type="ct:TextOrVariableType" minOccurs="0" />
+						type="ct:environmentType" minOccurs="0" />
 					<element name="requirements"
 						type="ct:TextOrVariableType" minOccurs="0" />
 					<element name="inputData"
 						type="paext:gLiteInputDataType" minOccurs="0" />
-					<element name="rank" minOccurs="0">
-						<complexType>
-							<simpleContent>
-								<extension
-									base="ct:TextOrVariableType">
-									<attribute name="fuzzyrank"
-										type="string" />
-								</extension>
-							</simpleContent>
-						</complexType>
-					</element>
+					<element name="rank" type="paext:gLiteRankType" minOccurs="0" />
 					<element name="gLiteOptions"
 						type="paext:gLiteOptionsType" minOccurs="0" />
 					<element name="JdlTransferDeploy"
 						type="ct:fileTransferType" minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="class" type="string" use="required"
-					fixed="org.objectweb.proactive.core.process.glite.GLiteProcess" />
 				<attribute name="hostname" type="string" />
 				<attribute name="virtualOrganisation" type="string"
 					use="required" />
@@ -83,39 +71,6 @@
 		<attribute name="storageIndex" type="string" />
 		<attribute name="dataCatalog" type="string" />
 	</complexType>
-	<!--gLiteJobType-->
-	<complexType name="gLiteJobType">
-		<choice>
-			<element name="normal" />
-			<element name="interactive">
-				<complexType>
-					<attribute name="listerport" type="string" />
-				</complexType>
-			</element>
-			<element name="mpich">
-				<complexType>
-					<attribute name="nodeNumber"
-						type="ct:PosintOrVariableType" use="required" />
-				</complexType>
-			</element>
-			<element name="checkpointable">
-				<complexType>
-					<attribute name="currentStep" type="string"
-						use="required" />
-					<attribute name="jobStep" type="string"
-						use="required" />
-				</complexType>
-			</element>
-			<element name="partitionable">
-				<complexType>
-					<attribute name="currentStep" type="string"
-						use="required" />
-					<attribute name="jobStep" type="string"
-						use="required" />
-				</complexType>
-			</element>
-		</choice>
-	</complexType>
 	<!--gLiteOptions-->
 	<complexType name="gLiteOptionsType">
 		<all>
@@ -124,8 +79,6 @@
 			<element name="JDLFilePath" type="ct:pathElementType"
 				minOccurs="0" />
 			<element name="JDLRemoteFilePath" type="ct:pathElementType"
-				minOccurs="0" />
-			<element name="jobType" type="paext:gLiteJobType"
 				minOccurs="0" />
 			<element name="arguments" type="ct:TextOrVariableType"
 				minOccurs="0" />

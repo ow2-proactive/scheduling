@@ -17,14 +17,9 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="commandPath" type="ct:pathElementType" minOccurs="0" />
 					<element name="prunOption" type="paext:prunOptionType"
-						minOccurs="0" />
+						minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="class" type="string" use="required"
-					fixed="org.objectweb.proactive.core.process.prun.PrunSubProcess" />
-				<attribute name="closeStream" type="ct:CloseStreamType"
-					use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>

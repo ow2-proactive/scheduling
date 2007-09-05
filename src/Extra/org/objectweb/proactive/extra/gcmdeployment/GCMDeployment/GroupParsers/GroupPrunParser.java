@@ -28,7 +28,7 @@ public class GroupPrunParser extends AbstractGroupParser {
 
         GroupPrun prunGroup = (GroupPrun) getGroup();
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode, "value");
+        String queueName = GCMParserHelper.getAttributeValue(groupNode, "queue");
         prunGroup.setQueueName(queueName);
 
         try {

@@ -23,12 +23,6 @@
 					<element name="gridEngineOption"
 						type="paext:GridEngineOptionType" />
 				</sequence>
-				<attribute name="class" type="string" use="required"
-					fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess" />
-				<attribute name="closeStream" type="ct:CloseStreamType"
-					use="optional" />
-				<attribute name="interactive"
-					type="ct:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>

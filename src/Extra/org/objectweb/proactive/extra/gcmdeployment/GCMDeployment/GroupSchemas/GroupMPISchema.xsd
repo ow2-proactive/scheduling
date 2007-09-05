@@ -17,15 +17,6 @@
 	<complexType name="mpiProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="commandPath"
-						type="ct:pathElementType" minOccurs="1" />
-					<element minOccurs="1" name="mpiOptions"
-						type="paext:mpiOptionsType" />
-				</sequence>
-				<attribute
-					fixed="org.objectweb.proactive.core.process.mpi.MPIDependentProcess"
-					name="class" type="string" use="required" />
 				<attribute name="mpiFileName" type="string"
 					use="required" />
 				<attribute name="hostsFileName" type="string"
