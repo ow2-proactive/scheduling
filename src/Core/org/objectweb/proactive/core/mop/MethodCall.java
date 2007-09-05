@@ -259,7 +259,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     /**
-     *        Tells the recyclying process that the MethodCall object passed as parameter
+     *        Tells the recycling process that the MethodCall object passed as parameter
      *        is ready for recycling. It is the responsibility of the caller of this
      *        method to make sure that this object can safely be disposed of.
      */
@@ -268,7 +268,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             // If there's still one slot left in the pool
             if (MethodCall.recyclePool[MethodCall.index] == null) {
                 // Cleans up a MethodCall object
-                // It is prefereable to do it here rather than at the moment
+                // It is preferable to do it here rather than at the moment
                 // the object is picked out of the pool, because it allows
                 // garbage-collecting the objects referenced in here
                 mc.componentMetaData = null;

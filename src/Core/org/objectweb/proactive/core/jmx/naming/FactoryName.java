@@ -95,10 +95,10 @@ public class FactoryName {
     }
 
     /**
-     * Creates a ObjectName corresponding to a Virutal Node.
-     * @param name The name of the Virutal Node.
-     * @param jobID The jobID of the Virutal Node.
-     * @return The ObjectName corresponding to the Virutal Node.
+     * Creates a ObjectName corresponding to a Virtual Node.
+     * @param name The name of the Virtual Node.
+     * @param jobID The jobID of the Virtual Node.
+     * @return The ObjectName corresponding to the Virtual Node.
      */
     public static ObjectName createVirtualNodeObjectName(String name,
         String jobID) {

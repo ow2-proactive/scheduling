@@ -370,7 +370,7 @@ private static void printMessageAndWait() {
       </sect3>
 
       <sect3>
-        <title>Undestanding various different kind of barriers</title>
+        <title>Understanding various different kind of barriers</title>
 
         <para>The group of neighbors built above is important wrt
         synchronization. Below in method "loop()", an efficient barrier is
@@ -406,7 +406,7 @@ private static void printMessageAndWait() {
         </figure>
 
         <figure>
-          <title>With a barrier, there are many less comunications</title>
+          <title>With a barrier, there are many less communications</title>
 
           <mediaobject>
             <imageobject>
@@ -933,7 +933,7 @@ private static void printMessageAndWait() {
       <title>Initialization</title>
 
       <sect3>
-        <title>MPI Initalization primitives</title>
+        <title>MPI Initialization primitives</title>
 
         <para>Some basic primitives are used, notice that MPI provides a rank
         to each process and the group size ( the number of involved processes
@@ -956,7 +956,7 @@ private static void printMessageAndWait() {
         objects is done in Launcher.java.</para>
 
         <para>The group of active objects is created using specified
-        parameters and the nodes specified in the deployement
+        parameters and the nodes specified in the deployment
         descriptor.</para>
 
         <programlisting lang="java">  // Group creation           
@@ -1062,7 +1062,7 @@ private static void printMessageAndWait() {
 
         <para>The ProActive implementation is quite similar to MPI one. The
         fact is that all communications in ProActive are asynchronous (
-        non-blocking ) by default, therefore we need to specify explicitely to
+        non-blocking ) by default, therefore we need to specify explicitly to
         block until a specific request.</para>
 
         <programlisting lang="java">  // The leader collects partial results.
@@ -1192,7 +1192,7 @@ private static void printMessageAndWait() {
 
         <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat,
         you can specify the number of workers from the command line. Feel free
-        to edit scripts to specify another deployement descriptor.</para>
+        to edit scripts to specify another deployment descriptor.</para>
 
         <screen>bash-3.00$ ./integralpi.sh
 
