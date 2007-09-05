@@ -60,7 +60,17 @@ public class FutureMonitoring implements Runnable {
     private static boolean pingBody(UniqueID bodyId) {
         boolean pinged = false;
         FutureMonitoringPingFailureException bodyException = null;
-        for (FutureProxy fp : futuresToMonitor.get(bodyId)) {
+        Collection<FutureProxy> futures = futuresToMonitor.get(bodyId);
+        if (futures == null) {
+
+            /*
+             * By the time we got to iterate over these futures, they have all
+             * been updated, so the body entry was removed.
+             */
+            return false;
+        }
+
+        for (FutureProxy fp : futures) {
             if (!pinged) {
 
                 /* Not yet pinged somebody */
