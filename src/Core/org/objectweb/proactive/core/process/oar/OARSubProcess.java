@@ -117,11 +117,14 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
      */
     public int getNodeNumber() {
-        if (hostNumber.equals("all")) {
+        try {
+            return (new Integer(hostNumber).intValue() * new Integer(weight).intValue());
+        } catch (NumberFormatException e) {
+            if (!hostNumber.matches("all")) {
+                logger.warn(hostname + " is not an integer", e);
+            }
             return UniversalProcess.UNKNOWN_NODE_NUMBER;
         }
-
-        return (new Integer(hostNumber).intValue() * new Integer(weight).intValue());
     }
 
     /**
