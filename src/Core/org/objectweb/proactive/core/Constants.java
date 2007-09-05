@@ -86,7 +86,7 @@ public interface Constants {
     /** default protocol identifier */
     public static final String DEFAULT_PROTOCOL_IDENTIFIER = RMI_PROTOCOL_IDENTIFIER;
 
-    // list of system properties used within proactive 
+    // list of system properties used within proactive
 
     /** this property identifies the communication protocol */
     public static final String PROPERTY_PA_COMMUNICATION_PROTOCOL = "proactive.communication.protocol";
@@ -141,4 +141,7 @@ public interface Constants {
 
     /** this property indicates to send JMX notifications */
     public static final String PROPERTY_PA_JMX_NOTIFICATION = "proactive.jmx.notification";
+
+    /** this property indicates to send JMX notifications */
+    public static final String PROPERTY_PA_USER_CONFIG_DIR = ".proactive";
 }

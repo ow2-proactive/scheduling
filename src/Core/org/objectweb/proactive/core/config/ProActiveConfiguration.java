@@ -56,8 +56,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveConfiguration {
     protected static Properties properties;
     protected static final String PROACTIVE_CONFIG_FILENAME = "ProActiveConfiguration.xml";
-    protected static final String PROACTIVE_USER_CONFIG_FILENAME = "." +
-        PROACTIVE_CONFIG_FILENAME;
+    protected static final String PROACTIVE_USER_CONFIG_FILENAME = Constants.PROPERTY_PA_USER_CONFIG_DIR +
+        File.separator + PROACTIVE_CONFIG_FILENAME;
     protected static ProActiveConfiguration singleton;
     protected static boolean isLoaded = false;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
@@ -152,7 +152,7 @@ public class ProActiveConfiguration {
         Iterator<String> it = v.iterator();
 
         while (it.hasNext()) {
-            String key = (String) it.next();
+            String key = it.next();
             String value = properties.getProperty(key);
 
             if (System.getProperty(key) == null) {
