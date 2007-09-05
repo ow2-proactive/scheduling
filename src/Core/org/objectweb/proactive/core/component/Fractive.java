@@ -95,7 +95,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <li> a bootstrap component</li>
  * <li> a specialized GenericFactory for instantiating new components on remote nodes (a ProActiveGenericFactory)</li>
  * <li> a utility class providing static methods to create collective interfaces
- * and retreive references to ComponentParametersController</li>
+ * and retrieve references to ComponentParametersController</li>
  * </ol>
  *
  * @author Matthieu Morel
@@ -140,7 +140,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     public static ProActiveBindingController getBindingController(
-        final ProActiveComponent component) throws NoSuchInterfaceException {
+        final Component component) throws NoSuchInterfaceException {
         return (ProActiveBindingController) component.getFcInterface(Constants.BINDING_CONTROLLER);
     }
 
@@ -837,7 +837,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * Common instanciation method called during creation both functional and non functional components
+     * Common instantiation method called during creation both functional and non functional components
      * @param type
      * @param controllerDesc
      * @param contentDesc
@@ -854,7 +854,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             NodeException {
         if (contentDesc == null) {
             // either a parallel or a composite component, no
-            // activitiy/factory/node specified
+            // activity/factory/node specified
             if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
                 contentDesc = new ContentDescription(Composite.class.getName());
             } else {

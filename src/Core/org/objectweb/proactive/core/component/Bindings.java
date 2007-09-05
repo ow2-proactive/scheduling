@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
  * component :
  * <ul>
  * <li>thisComponent.clientInterface --> serverComponent.serverInterface (it
- * also takes in charge collective bindings, ie 1 client to serveral servers)
+ * also takes in charge collective bindings, ie 1 client to several servers)
  * </li>
  * <li>thisParallelComponent.serverInterface -->
  * serverComponents.serverInterface (in the case of a parallel component,
@@ -59,14 +59,14 @@ public class Bindings implements Serializable {
     //	 In case of collective bindings, the interfaces of the collection can be : 
     //	  1. named (as in Fractal 2.0 spec) : they are mapped in clientInterfaceBindings according to their name
     //	  2. anonymous : they are put in a list which is mapped in clientInterfaceBindings with the type name of the collective interface 
-    private Map normalBindings;
-    private Map exportBindings;
+    private Map<String, Object> normalBindings; //values are Binding or List of Binding
+    private Map<String, Object> exportBindings;
 
     // key = interfaceName ; value = binding
     // if collective binding : key = interfaceName ; value = Vector (Binding objects)
     public Bindings() {
-        normalBindings = new HashMap();
-        exportBindings = new HashMap();
+        normalBindings = new HashMap<String, Object>();
+        exportBindings = new HashMap<String, Object>();
     }
 
     /**
@@ -145,27 +145,27 @@ public class Bindings implements Serializable {
 
     /**
      * Returns the names of the external client bindings for this component.
-     * In case of a collective interface, the names of each of its constituing interfaces are not returned ;
+     * In case of a collective interface, the names of each of its constituting interfaces are not returned ;
      * only the name of the collective interface is returned.
      */
     public String[] getExternalClientBindings() {
-        return (String[]) normalBindings.keySet()
-                                        .toArray(new String[normalBindings.keySet()
-                                                                          .size()]);
+        return normalBindings.keySet()
+                             .toArray(new String[normalBindings.keySet().size()]);
     }
 
     /**
      * @param bindingsTable Map map that stores the bindings
      * @param binding Binding the binding to add
      */
-    private static void addCollectiveBinding(Map bindingsTable, Binding binding) {
+    private static void addCollectiveBinding(
+        Map<String, Object> bindingsTable, Binding binding) {
         String client_itf_name = binding.getClientInterfaceName();
         if (binding.getClientInterface().getFcItfName().equals(client_itf_name)) {
             if (bindingsTable.containsKey(client_itf_name)) {
                 // there should be a List for containing the bindings associated
-                ((List) bindingsTable.get(client_itf_name)).add(binding);
+                ((List<Binding>) bindingsTable.get(client_itf_name)).add(binding);
             } else { // we create a List for keeping the bindings
-                ArrayList bindings_collection = new ArrayList();
+                ArrayList<Binding> bindings_collection = new ArrayList<Binding>();
                 bindings_collection.add(binding);
                 bindingsTable.put(client_itf_name, bindings_collection);
             }
@@ -187,7 +187,7 @@ public class Bindings implements Serializable {
      */
     private void addCollectiveBindingOnInternalClientItf(Binding binding) {
         if (exportBindings == null) {
-            exportBindings = new HashMap();
+            exportBindings = new HashMap<String, Object>();
         }
         addCollectiveBinding(exportBindings, binding);
     }

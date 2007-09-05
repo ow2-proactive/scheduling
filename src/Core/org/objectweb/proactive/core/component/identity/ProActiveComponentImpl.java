@@ -89,9 +89,9 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     implements ProActiveComponent, Interface, Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private transient ProActiveComponent representativeOnMyself = null;
-    private Map<String, Interface> functionalItfs = new HashMap<String, Interface>();
+    private Map<String, Interface> serverItfs = new HashMap<String, Interface>();
+    private Map<String, Interface> clientItfs = new HashMap<String, Interface>();
     private Map<String, ProActiveController> controlItfs = new HashMap<String, ProActiveController>();
-    private Interface[] interfaceReferences = new Interface[0];
     private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
     private Body body;
     private RequestHandler firstControllerRequestHandler;
@@ -120,10 +120,10 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                                                             .equals(Constants.PRIMITIVE);
 
         // add interface references
-        ArrayList<Interface> interface_references_list = new ArrayList<Interface>(4);
+        // ArrayList<Interface> interface_references_list = new ArrayList<Interface>(4);
 
         // 1. component identity
-        interface_references_list.add(this);
+        //interface_references_list.add(this);
 
         // 2. control interfaces
         addControllers(componentParameters, component_is_primitive);
@@ -132,7 +132,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
         addFunctionalInterfaces(componentParameters, component_is_primitive);
 
         // put all in a table
-        interfaceReferences = interface_references_list.toArray(new Interface[interface_references_list.size()]);
+        // interfaceReferences = interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " +
                 componentParameters.getControllerDescription().getName());
@@ -189,7 +189,13 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                     // non multicast client itf of primitive comp : do nothing
                 }
 
-                functionalItfs.put(interface_types[i].getFcItfName(), itf_ref);
+                if (!interface_types[i].isFcClientItf()) {
+                    //System.err.println("SERVER" + interface_types[i].getFcItfName() + itf_ref );
+                    serverItfs.put(interface_types[i].getFcItfName(), itf_ref);
+                } else if (itf_ref != null) {
+                    //System.err.println("CLIENT" + interface_types[i].getFcItfName() + itf_ref );
+                    clientItfs.put(interface_types[i].getFcItfName(), itf_ref);
+                }
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -371,15 +377,20 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
         if (!("attribute-controller".equals(interfaceName)) &&
-                (interfaceName.endsWith("-controller") ||
-                interfaceName.equals("component"))) {
+                (interfaceName.endsWith("-controller"))) {
             if (!controlItfs.containsKey(interfaceName)) {
                 throw new NoSuchInterfaceException(interfaceName);
             }
             return (controlItfs.get(interfaceName));
         }
-        if (functionalItfs.containsKey(interfaceName)) {
-            return functionalItfs.get(interfaceName);
+        if (interfaceName.equals("component")) {
+            return this;
+        }
+        if (serverItfs.containsKey(interfaceName)) {
+            return serverItfs.get(interfaceName);
+        }
+        if (clientItfs.containsKey(interfaceName)) {
+            return clientItfs.get(interfaceName);
         }
 
         // a member of a collection itf?
@@ -415,17 +426,27 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        Object[] interfaces = new Object[functionalItfs.size() +
-            interfaceReferences.length];
-        int i = 0;
-        for (i = 0; i < interfaceReferences.length; i++) {
-            interfaces[i] = interfaceReferences[i];
+        List<Object> itfs = new ArrayList<Object>(15); //we have 10 control itfs
+
+        // add interface component
+        itfs.add(this);
+        // add controller interface
+        System.out.println("SIZE" + controlItfs.values().size());
+        for (Object object : controlItfs.values()) {
+            itfs.add(object);
         }
-        for (Object itf : functionalItfs.values()) {
-            interfaces[i] = itf;
-            i++;
+
+        //add server interface
+        for (Object object : serverItfs.values()) {
+            itfs.add(object);
         }
-        return interfaces;
+
+        //add client interface
+        for (Object object : clientItfs.values()) {
+            itfs.add(object);
+        }
+
+        return itfs.toArray(new Object[itfs.size()]);
     }
 
     /*
@@ -550,8 +571,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
     public void migrateControllersDependentActiveObjectsTo(Node node)
         throws MigrationException {
-        for (Iterator iter = controlItfs.values().iterator(); iter.hasNext();) {
-            ProActiveController controller = (ProActiveController) iter.next();
+        for (ProActiveController controller : controlItfs.values()) {
             controller.migrateDependentActiveObjectsTo(node);
         }
     }
