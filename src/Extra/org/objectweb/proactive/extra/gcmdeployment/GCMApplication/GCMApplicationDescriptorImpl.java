@@ -2,6 +2,8 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -34,6 +36,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     private Map<String, VirtualNodeInternal> virtualNodes = null;
     private DeploymentTree deploymentTree;
     private Map<String, GCMDeploymentDescriptor> selectedDeploymentDesc;
+    private ArrayList<String> currentDeploymentPath;
 
     public GCMApplicationDescriptorImpl(String filename)
         throws IllegalArgumentException {
@@ -42,6 +45,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
     public GCMApplicationDescriptorImpl(File file)
         throws IllegalArgumentException {
+        currentDeploymentPath = new ArrayList<String>();
+
         gadFile = Helpers.checkDescriptorFileExist(file);
         try {
             gadParser = new GCMApplicationParserImpl(gadFile);
@@ -93,11 +98,15 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             rootNode.setApplicationDescriptorPath("");
         }
 
+        currentDeploymentPath.clear();
+
         ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
         VMNodes vmNodes = new VMNodes(proActiveRuntime.getVMInformation());
+        currentDeploymentPath.add(proActiveRuntime.getVMInformation().getName());
 
         //                    vmNodes.addNode(<something>); - TODO cmathieu
         rootNode.addVMNodes(vmNodes);
+        rootNode.setDeploymentPath(getCurrentdDeploymentPath());
 
         deploymentTree.setRootNode(rootNode);
 
@@ -107,21 +116,74 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             GCMDeploymentResources resources = gddi.getResources();
 
             for (Group group : resources.getGroups()) {
-                DeploymentNode deploymentNode = new DeploymentNode();
-                deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
-                HostInfoImpl hostInfo = (HostInfoImpl) group.getHostInfo();
-                hostInfo.setNodeId(deploymentNode.getId());
-                deploymentTree.addNode(deploymentNode, rootNode);
+                buildGroupTreeNode(rootNode, group);
             }
 
             for (Bridge bridge : resources.getBridges()) {
-                DeploymentNode deploymentNode = new DeploymentNode();
-                deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
-                HostInfoImpl hostInfo = (HostInfoImpl) bridge.getHostInfo();
-                hostInfo.setNodeId(deploymentNode.getId());
-                deploymentTree.addNode(deploymentNode, rootNode);
+                buildBridgeTree(rootNode, bridge);
             }
         }
+    }
+
+    /**
+     * return a copy of the current deployment path
+     * @return
+     */
+    private List<String> getCurrentdDeploymentPath() {
+        return new ArrayList<String>(currentDeploymentPath);
+    }
+
+    private void buildGroupTreeNode(DeploymentNode rootNode, Group group) {
+        DeploymentNode deploymentNode = new DeploymentNode();
+        deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
+        HostInfoImpl hostInfo = (HostInfoImpl) group.getHostInfo();
+        pushDeploymentPath(hostInfo.getId());
+        hostInfo.setNodeId(deploymentNode.getId());
+        deploymentTree.addNode(deploymentNode, rootNode);
+        popDeploymentPath();
+    }
+
+    private void buildBridgeTree(DeploymentNode baseNode, Bridge bridge) {
+        DeploymentNode deploymentNode = new DeploymentNode();
+        deploymentNode.setDeploymentDescriptorPath(baseNode.getDeploymentDescriptorPath());
+
+        pushDeploymentPath(bridge.getId());
+
+        // first look for a host info...
+        //
+        if (bridge.getHostInfo() != null) {
+            HostInfoImpl hostInfo = (HostInfoImpl) bridge.getHostInfo();
+            pushDeploymentPath(hostInfo.getId());
+            hostInfo.setNodeId(deploymentNode.getId());
+            deploymentTree.addNode(deploymentNode, baseNode);
+            popDeploymentPath();
+        }
+
+        // then groups...
+        //
+        if (bridge.getGroups() != null) {
+            for (Group group : bridge.getGroups()) {
+                buildGroupTreeNode(deploymentNode, group);
+            }
+        }
+
+        // then bridges (and recurse)
+        //
+        if (bridge.getBridges() != null) {
+            for (Bridge subBridge : bridge.getBridges()) {
+                buildBridgeTree(deploymentNode, subBridge);
+            }
+        }
+
+        popDeploymentPath();
+    }
+
+    private boolean pushDeploymentPath(String pathElement) {
+        return currentDeploymentPath.add(pathElement);
+    }
+
+    private void popDeploymentPath() {
+        currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
     }
 
     /**
