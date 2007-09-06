@@ -19,6 +19,7 @@ public class HostInfoImpl implements HostInfo {
     private int vmCapacity;
     private OperatingSystem os;
     private Set<Tool> tools;
+    private long nodeId;
 
     public HostInfoImpl() {
         username = null;
@@ -28,6 +29,7 @@ public class HostInfoImpl implements HostInfo {
         vmCapacity = 0;
         os = null;
         tools = new HashSet<Tool>();
+        nodeId = 0;
     }
 
     public HostInfoImpl(String id) {
@@ -243,5 +245,13 @@ public class HostInfoImpl implements HostInfo {
         public void checkReadygetHomeDirectory() {
             notInitialized.check();
         }
+    }
+
+    public void setNodeId(long nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public long getNodeId() {
+        return nodeId;
     }
 }

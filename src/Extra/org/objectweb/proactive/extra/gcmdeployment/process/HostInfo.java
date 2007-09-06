@@ -20,6 +20,8 @@ public interface HostInfo extends Serializable {
      */
     public String getId();
 
+    public void setId(String id);
+
     /**
      * Returns the username associated to this set of hosts
      * @return the username it is present inside the GCM Deployment Descriptor. If
@@ -79,4 +81,5 @@ public interface HostInfo extends Serializable {
     public void check() throws IllegalStateException;
 
     public Object clone() throws CloneNotSupportedException;
+
 }

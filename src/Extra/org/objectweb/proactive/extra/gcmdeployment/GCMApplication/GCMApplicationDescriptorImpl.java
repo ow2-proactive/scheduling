@@ -15,8 +15,11 @@ import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
 import org.objectweb.proactive.extra.gcmdeployment.core.VMNodes;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
+import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
@@ -100,21 +103,23 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
         // Build leaf nodes
         for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
-            DeploymentNode deploymentNode = new DeploymentNode();
-
             GCMDeploymentDescriptorImpl gddi = (GCMDeploymentDescriptorImpl) gdd;
-
             GCMDeploymentResources resources = gddi.getResources();
 
-            deploymentNode.setDeploymentDescriptorPath(gddi.getParser()
-                                                           .getDescriptorFilePath());
-
-            deploymentTree.addNode(deploymentNode, rootNode);
-
             for (Group group : resources.getGroups()) {
-                DeploymentNode leafNode = new DeploymentNode();
-                leafNode.setDeploymentDescriptorPath(deploymentNode.getDeploymentDescriptorPath());
-                // TODO ...
+                DeploymentNode deploymentNode = new DeploymentNode();
+                deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
+                HostInfoImpl hostInfo = (HostInfoImpl) group.getHostInfo();
+                hostInfo.setNodeId(deploymentNode.getId());
+                deploymentTree.addNode(deploymentNode, rootNode);
+            }
+
+            for (Bridge bridge : resources.getBridges()) {
+                DeploymentNode deploymentNode = new DeploymentNode();
+                deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
+                HostInfoImpl hostInfo = (HostInfoImpl) bridge.getHostInfo();
+                hostInfo.setNodeId(deploymentNode.getId());
+                deploymentTree.addNode(deploymentNode, rootNode);
             }
         }
     }
