@@ -1,4 +1,4 @@
-package unitTests.descriptorParser;
+package unitTests.deployment.descriptorParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.AbstractBridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.AbstractGroupParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;

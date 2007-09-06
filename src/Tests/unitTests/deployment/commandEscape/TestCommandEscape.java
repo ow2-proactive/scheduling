@@ -1,4 +1,4 @@
-package unitTests.commandEscape;
+package unitTests.deployment.commandEscape;
 
 import java.io.IOException;
 

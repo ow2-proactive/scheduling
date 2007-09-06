@@ -1,4 +1,4 @@
-package unitTests.listGenerator;
+package unitTests.deployment.listGenerator;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

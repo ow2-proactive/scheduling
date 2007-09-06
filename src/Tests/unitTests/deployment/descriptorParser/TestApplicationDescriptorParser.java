@@ -1,4 +1,4 @@
-package unitTests.descriptorParser;
+package unitTests.deployment.descriptorParser;
 
 import java.io.File;
 import java.io.IOException;

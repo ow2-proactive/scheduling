@@ -1,4 +1,4 @@
-package unitTests.deployment.pathElement.deploymentID;
+package unitTests.deployment.deploymentID;
 
 import java.rmi.dgc.VMID;
 
