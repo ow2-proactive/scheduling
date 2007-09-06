@@ -81,5 +81,4 @@ public interface HostInfo extends Serializable {
     public void check() throws IllegalStateException;
 
     public Object clone() throws CloneNotSupportedException;
-
 }
