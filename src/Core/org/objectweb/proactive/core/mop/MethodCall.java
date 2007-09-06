@@ -113,10 +113,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     private transient Method reifiedMethod;
 
-    /**
-     * The internal ID of the methodcall
-     */
-    private long methodCallID;
     private String key;
     private transient MethodCallExceptionContext exceptioncontext;
     ComponentMethodCallMetadata componentMetaData = null;
@@ -315,40 +311,30 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * Builds a new MethodCall object. This constructor is a copy constructor.
-     * Fields of the object are also copied.
+     * Builds a new MethodCall object. This constructor is a <b>shallow</b> copy constructor.
+     * Fields of the object are not copied.
      * Please, consider use the factory method  <code>getMethodCall</code>
      * instead of build a new MethodCall object.
      * @param mc - the MethodCall object to copy
      */
     public MethodCall(MethodCall mc) {
-        try {
-            this.componentMetaData = mc.componentMetaData;
-            this.reifiedMethod = mc.getReifiedMethod();
-            if (mc.serializedEffectiveArguments == null) {
-                this.serializedEffectiveArguments = null;
-            } else {
-                // array copy
-                byte[] source = mc.serializedEffectiveArguments;
-                this.serializedEffectiveArguments = new byte[source.length];
-                for (int i = 0; i < this.serializedEffectiveArguments.length;
-                        i++) {
-                    this.serializedEffectiveArguments[i] = source[i];
-                }
+        this.componentMetaData = mc.componentMetaData;
+        this.reifiedMethod = mc.getReifiedMethod();
+        if (mc.serializedEffectiveArguments == null) {
+            this.serializedEffectiveArguments = null;
+        } else {
+            byte[] source = mc.serializedEffectiveArguments;
+            this.serializedEffectiveArguments = new byte[source.length];
+            for (int i = 0; i < this.serializedEffectiveArguments.length;
+                    i++) {
+                this.serializedEffectiveArguments[i] = source[i];
             }
-            if (mc.effectiveArguments == null) {
-                this.effectiveArguments = null;
-            } else {
-                this.effectiveArguments = Utils.makeDeepCopy(mc.effectiveArguments);
-            }
-            this.genericTypesMapping = mc.getGenericTypesMapping();
-            this.key = MethodCall.buildKey(mc.getReifiedMethod(),
-                    mc.getGenericTypesMapping());
-            this.exceptioncontext = mc.exceptioncontext;
-            // methodcallID?
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
         }
+        this.effectiveArguments = mc.effectiveArguments;
+        this.genericTypesMapping = mc.getGenericTypesMapping();
+        this.key = MethodCall.buildKey(mc.getReifiedMethod(),
+                mc.getGenericTypesMapping());
+        this.exceptioncontext = mc.exceptioncontext;
     }
 
     /**
