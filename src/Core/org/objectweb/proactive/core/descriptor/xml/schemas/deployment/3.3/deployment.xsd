@@ -1432,6 +1432,7 @@
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="rsh" />
 					<xs:enumeration value="ssh" />
+					<xs:enumeration value="oarsh" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
