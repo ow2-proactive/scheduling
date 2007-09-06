@@ -49,6 +49,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
         gadFile = Helpers.checkDescriptorFileExist(file);
         try {
+            // FIXME glaurent Handle XML errors ! When invalid content is encountered an exception not always thrown
             gadParser = new GCMApplicationParserImpl(gadFile);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
@@ -57,9 +58,11 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         // 1. Load all GCM Deployment Descriptor
         Map<String, GCMDeploymentDescriptor> gdds;
         gdds = gadParser.getResourceProviders();
+        System.out.println("XXX gdds.size" + gdds.size());
 
         // 2. Get Virtual Node and Command Builder
         virtualNodes = gadParser.getVirtualNodes();
+        System.out.println("XXX virtualNodes.size" + virtualNodes.size());
 
         CommandBuilder commandBuilder = gadParser.getCommandBuilder();
 

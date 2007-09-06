@@ -76,8 +76,8 @@
 	</simpleType>
 
 	<complexType name="pathElementType">
-		<attribute name="base" type="ct:pathElementBaseType"></attribute>
-		<attribute name="relpath" type="ct:pathElementGeneralType"></attribute>
+		<attribute name="base" type="ct:pathElementBaseType" use="required"></attribute>
+		<attribute name="relpath" type="ct:pathElementGeneralType" use="required"></attribute>
 	</complexType>
 
 	<complexType name="pathType">

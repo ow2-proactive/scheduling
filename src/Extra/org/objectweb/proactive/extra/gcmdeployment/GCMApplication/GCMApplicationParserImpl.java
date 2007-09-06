@@ -72,7 +72,6 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         registerUserApplicationParsers();
 
         setup();
-
         InputSource inputSource = new InputSource(new FileInputStream(
                     descriptor));
         try {
@@ -135,7 +134,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         try {
             NodeList nodes;
 
-            nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:resourceProvider",
+            nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:resources/pa:resourceProvider",
                     document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {
@@ -154,13 +153,16 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 if (fileNode != null) {
                     String nodeValue = GCMParserHelper.getAttributeValue(fileNode,
                             "path");
-                    if (nodeValue.startsWith(".")) {
+
+                    // TODO support URL here
+                    if (nodeValue.startsWith(File.separator)) {
+                        // Absolute path
+                        resourceProviderParams.setGCMDescriptor(new File(
+                                nodeValue));
+                    } else {
                         // Path is relative to this descriptor
                         resourceProviderParams.setGCMDescriptor(new File(
                                 descriptor.getParent(), nodeValue));
-                    } else {
-                        resourceProviderParams.setGCMDescriptor(new File(
-                                nodeValue));
                     }
                 }
 
@@ -237,7 +239,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             // make sure these are parsed
             getResourceProviders();
 
-            NodeList nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:proactive/pa:virtualNode",
+            NodeList nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:application/pa:proactive/pa:virtualNode",
                     document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {

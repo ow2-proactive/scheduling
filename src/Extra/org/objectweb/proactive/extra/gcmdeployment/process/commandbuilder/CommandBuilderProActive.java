@@ -140,7 +140,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
 
         // TODO Build the command here
-        return null;
+        return "java -version";
     }
 
     private PathElement getDefaultSecurityPolicy() {

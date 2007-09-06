@@ -380,8 +380,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 hostNode, XPathConstants.NODE);
 
         if (homeDirectoryNode != null) {
-            hostInfo.setHomeDirectory(homeDirectoryNode.getFirstChild()
-                                                       .getNodeValue());
+            // FIXME glaurent checks that base is root. Should be checked in the schema
+            hostInfo.setHomeDirectory(GCMParserHelper.getAttributeValue(
+                    homeDirectoryNode, "relpath"));
         }
 
         NodeList toolNodes = (NodeList) xpath.evaluate("pa:tool", hostNode,
