@@ -64,6 +64,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
+import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
@@ -1460,6 +1461,28 @@ public class ProActive {
     public static String getActiveObjectNodeUrl(Object activeObject) {
         UniversalBody body = getRemoteBody(activeObject);
         return body.getNodeURL();
+    }
+
+    /**
+     * Register a method in the calling active object to be called when the
+     * specified future is updated. The registered method takes a FutureResult
+     * as parameter.
+     * 
+     * @param future the future to watch
+     * @param methodName the name of the method to call on the current active object
+     * @throws NoSuchMethodException if the method could not be found
+     */
+    public static void addFutureCallback(Object future, String methodName)
+        throws NoSuchMethodException {
+        FutureProxy f;
+        try {
+            f = (FutureProxy) ((StubObject) future).getProxy();
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Expected a future, got a " +
+                future.getClass());
+        }
+
+        f.addCallback(methodName);
     }
 
     /**
