@@ -50,11 +50,11 @@
 
 	<path id="examples.classpath">
 		<path refid="project.classpath" />
-		<pathelement location="${lib.dir}/examples/clibwrapper_jiio.jar" />
-		<pathelement location="${lib.dir}/examples/jai_codec.jar" />
-		<pathelement location="${lib.dir}/examples/jai_core.jar" />
-		<pathelement location="${lib.dir}/examples/mlibwrapper_jai.jar" />
-		<pathelement location="${lib.dir}/examples/jai_imageio.jar" />
+		<pathelement location="${lib.dir}/clibwrapper_jiio.jar" />
+		<pathelement location="${lib.dir}/jai_codec.jar" />
+		<pathelement location="${lib.dir}/jai_core.jar" />
+		<pathelement location="${lib.dir}/mlibwrapper_jai.jar" />
+		<pathelement location="${lib.dir}/jai_imageio.jar" />
 	</path>
 
 	<!-- Default testsuite can be overriden by using the -Dtest property -->
@@ -392,7 +392,7 @@
 
 			<delete dir="${junit.dir}"/>
 			<mkdir dir="${junit.dir}"/>
-			<junit printsummary="yes" forkmode="perTest" showoutput="no">
+			<junit printsummary="yes" forkmode="perTest" showoutput="yes">
 				<jvmarg value="-Dproactive.dir=${base.dir}"/>
 
 				<classpath>

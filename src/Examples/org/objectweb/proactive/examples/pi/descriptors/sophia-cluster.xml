@@ -36,19 +36,7 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath value="${CLUSTER_PROACTIVE_HOME}/classes"/>			                                                         
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/asm-2.2.1.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/bouncycastle.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal-adl.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal-gui.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal-swing.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/javassist.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/ganymed-ssh2-build210.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-asm.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-mixins.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-runtime.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/log4j.jar"/>
-                        <absolutePath value="${CLUSTER_JARS_FOLDER}/xercesImpl.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/\*"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/java"/>

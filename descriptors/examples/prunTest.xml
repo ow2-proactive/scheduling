@@ -38,32 +38,16 @@
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/javassist.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/log4j.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+						                                                <absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
 
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/jini-core.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/jini-ext.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/lib/reggie.jar" />
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
 
-						<absolutePath value="${PROACTIVE_HOME}/classes" />
-						<absolutePath
-							value="${IBIS_HOME}/classes" />
-					</classpath>
+						</classpath>
 					<javaPath>
 						<absolutePath
 							value="${JAVA_HOME}/bin/java" />

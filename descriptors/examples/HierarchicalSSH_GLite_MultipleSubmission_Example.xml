@@ -38,17 +38,15 @@
             <processDefinition id="ceJVM">
                 <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
                     <classpath>
-                        <absolutePath value="ganymed-ssh2-build210.jar"/>
-                        <absolutePath value="ProActive_examples.jar"/>
-                        <absolutePath value="ProActive.jar"/>
-                        <absolutePath value="log4j.jar"/>
-                        <absolutePath value="xercesImpl.jar"/>
-                        <absolutePath value="fractal.jar"/>
-                        <absolutePath value="bouncycastle.jar"/>
-                        <absolutePath value="servlet-api.jar"/>
-                        <absolutePath value="glite-wms-jdlj.jar"/>
-                        <absolutePath value="classad.jar"/>
-                        <absolutePath value="." />
+	                                                                    <absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+
                     </classpath>
                     <policyFile>
                         <absolutePath value="proactive.java.policy"/>
@@ -65,17 +63,15 @@
 			<processDefinition id="uiJVM">
                 <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
                     <classpath>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/classes.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/ProActive_examples.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/ws/servlet-api.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/glite/glite-wms-jdlj.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/glite/classad.jar"/>
-                        <absolutePath value="." />
+	                                                                    <absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+
                     </classpath>
 					<javaPath>
 				      <absolutePath  value="${JAVA_HOME}/bin/java"/> 
@@ -124,11 +120,11 @@
                             ${PROACTIVE_HOME}/lib/classes.jar                  
                             ${PROACTIVE_HOME}/lib/log4j.jar
                             ${PROACTIVE_HOME}/lib/xercesImpl.jar
-                            ${PROACTIVE_HOME}/lib/components/fractal.jar
+                            ${PROACTIVE_HOME}/lib/fractal.jar
                             ${PROACTIVE_HOME}/lib/bouncycastle.jar
-                            ${PROACTIVE_HOME}/lib/ws/servlet-api.jar   
-                            ${PROACTIVE_HOME}/lib/glite/glite-wms-jdlj.jar
-                            ${PROACTIVE_HOME}/lib/glite/classad.jar
+                            ${PROACTIVE_HOME}/lib/servlet-api.jar   
+                            ${PROACTIVE_HOME}/lib/glite-wms-jdlj.jar
+                            ${PROACTIVE_HOME}/lib/classad.jar
                             ${PROACTIVE_HOME}/scripts/proactive.java.policy
                             ${PROACTIVE_HOME}/scripts/proactive-log4j
 						    ${PROACTIVE_HOME}/scripts/unix/cluster/gLiteStartRuntime.sh

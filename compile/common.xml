@@ -74,16 +74,6 @@
 	<path id="project.libs">
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
-			<include name="globus/*.jar" />
-			<include name="ws/*.jar" />
-			<include name="osgi/*.jar" />
-			<include name="osgi/management/group/*.jar" />
-			<include name="components/*.jar" />
-			<include name="ibis/*.jar" />
-			<include name="unicore/*.jar" />
-			<include name="glite/*.jar" />
-			<include name="scilab/*.jar" />
-			<include name="timit/*.jar" />
 		</fileset>
 		<!-- XXX ${dev.dir} is not included in the source release ! -->
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/> 

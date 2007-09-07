@@ -59,16 +59,7 @@
 			    <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
                               <classpath>
 				   <absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/asm.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar" />
-				   <absolutePath value="${PROACTIVE_HOME}/classes/Core" />
-                   <absolutePath value="${PROACTIVE_HOME}/classes/Extensions" />
-				   <absolutePath value="${PROACTIVE_HOME}/lib/scilab/javasci.jar" />
+				   <absolutePath value="${PROACTIVE_HOME}/lib/*" />
                                </classpath>
                                <javaPath>
                                    <absolutePath value="${JAVA_HOME}/bin/java" />

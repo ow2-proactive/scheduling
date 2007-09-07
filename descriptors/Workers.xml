@@ -20,10 +20,12 @@
 					<currentJVM />
 					<!-- Uncomment following lines to run the example on four machines with rsh. -->
 					<!-- Don't forget to change the machine names in the hostname attribute of the rsh processes -->
-					<!--		<vmName value="Jvm1"/>
+					<!--
+						<vmName value="Jvm1"/>
 						<vmName value="Jvm2"/>
 						<vmName value="Jvm3"/>
-						<vmName value="Jvm4"/>   -->
+						<vmName value="Jvm4"/>   
+					-->
 				</jvmSet>
 			</map>
 		</mapping>
@@ -55,12 +57,15 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/classes"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+						                                                <absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/bin/java"/>

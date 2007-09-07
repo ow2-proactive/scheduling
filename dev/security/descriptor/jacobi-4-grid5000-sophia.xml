@@ -35,16 +35,16 @@
 						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/xercesImpl.jar"/>
 						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/bouncycastle.jar"/>
 						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/log4j-core.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/fractal.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/fractal-adl.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/dtdparser.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/ow_deployment_scheduling.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/fractal-gui.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/fractal-swing.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/julia-runtime.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/julia-asm.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/julia-mixins.jar"/>
-						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/components/SVGGraphics.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/fractal.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/fractal-adl.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/dtdparser.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/ow_deployment_scheduling.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/fractal-gui.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/fractal-swing.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/julia-runtime.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/julia-asm.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/julia-mixins.jar"/>
+						<absolutePath value="/home/sophia/acontes/work/ProActive/lib/SVGGraphics.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="/home/sophia/acontes/jdk1.4.2/bin/java"/>

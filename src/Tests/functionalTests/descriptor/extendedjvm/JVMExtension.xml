@@ -59,12 +59,7 @@
 				<classpath>
                      <!-- classpath is transformed during the test in order to match the correct path -->
 				     <absolutePath value="proactive.home/dist/ProActive/ProActive.jar"/>
-				     <absolutePath value="proactive.home/lib/asm.jar"/>
-				     <absolutePath value="proactive.home/lib/log4j.jar"/>
-				     <absolutePath value="proactive.home/lib/xercesImpl.jar"/>
-				     <absolutePath value="proactive.home/lib/bouncycastle.jar"/>
-				     <absolutePath value="proactive.home/lib/components/fractal.jar"/>
-				     <absolutePath value="proactive.home/lib/javassist.jar"/>
+				     <absolutePath value="proactive.home/lib/*"/>
 					</classpath>
 					<policyFile>
 						  <absolutePath value="proactive.home/src/Tests/functionalTests/descriptor/extendedjvm/test.policy"/>
