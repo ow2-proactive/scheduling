@@ -1467,7 +1467,7 @@ public class ProActive {
      * Register a method in the calling active object to be called when the
      * specified future is updated. The registered method takes a FutureResult
      * as parameter.
-     * 
+     *
      * @param future the future to watch
      * @param methodName the name of the method to call on the current active object
      * @throws NoSuchMethodException if the method could not be found
