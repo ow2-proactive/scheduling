@@ -43,8 +43,8 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
  *
  * @param <R> the type of the result
  */
-public interface TaskIntern<R extends Serializable> extends Task<R>, Comparable,
-    Identifiable, Serializable {
+public interface TaskIntern<R extends Serializable> extends Task<R>, Identifiable,
+    Serializable {
 
     /**
      * The ID of the NullTask

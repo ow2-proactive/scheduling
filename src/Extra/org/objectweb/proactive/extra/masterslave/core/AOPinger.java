@@ -36,8 +36,13 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     Serializable {
 
     /**
-     * pinger log4j logger
-     */
+         *
+         */
+    private static final long serialVersionUID = -7489033564540496244L;
+
+    /**
+    * pinger log4j logger
+    */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
 
     /**
@@ -68,7 +73,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     /**
      * Slave group
      */
-    protected Group slaveGroup;
+    protected Group<Slave> slaveGroup;
 
     /**
      * for internal use
@@ -102,6 +107,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         try {
             slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
@@ -190,10 +196,15 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     public class DetectMissingGroup implements NFEListener {
 
         /**
-         * {@inheritDoc}
-         */
+                 *
+                 */
+        private static final long serialVersionUID = -3218967627910771077L;
+
+        /**
+        * {@inheritDoc}
+        */
         public boolean handleNFE(final NonFunctionalException nfe) {
-            Iterator exceptions;
+            Iterator<ExceptionInGroup> exceptions;
             ExceptionListException exceptionList;
 
             try {

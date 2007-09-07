@@ -1,11 +1,13 @@
 package org.objectweb.proactive.examples.masterslave;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.cli.HelpFormatter;
+import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
 import org.objectweb.proactive.extra.masterslave.interfaces.SlaveMemory;
@@ -24,6 +26,7 @@ public class BasicPrimeExample extends AbstractExample {
     private static final int DEFAULT_NUMBER_OF_INTERVALS = 15;
     public int number_of_intervals;
     public long prime_to_find;
+    public ProActiveMaster<FindPrimeTask, Boolean> master;
 
     /**
      * Displays result of this test
@@ -132,12 +135,23 @@ public class BasicPrimeExample extends AbstractExample {
         }
     }
 
+    @Override
+    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation() {
+        master = new ProActiveMaster<FindPrimeTask, Boolean>();
+        return (ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable>) master;
+    }
+
     /**
      * Task to find if any number in a specified interval divides the given candidate
      * @author fviale
      *
      */
     public static class FindPrimeTask implements Task<Boolean> {
+
+        /**
+                 *
+                 */
+        private static final long serialVersionUID = -3118018812460915695L;
         private long begin;
         private long end;
         private long candidate;

@@ -1,12 +1,17 @@
 package org.objectweb.proactive.examples.masterslave;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.cli.*;
-import org.objectweb.proactive.examples.masterslave.BasicPrimeExample.FindPrimeTask;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
+import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
 public abstract class AbstractExample {
@@ -14,7 +19,7 @@ public abstract class AbstractExample {
     protected URL descriptor_url;
     protected String vn_name;
     protected String usage_message = "Usage: <java_command> descriptor_path virtual_node_name";
-    protected ProActiveMaster master;
+    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> abstract_master;
     protected CommandLine cmd = null;
     public static final String DEFAULT_DESCRIPTOR = "/org/objectweb/proactive/examples/masterslave/WorkersLocal.xml";
 
@@ -104,14 +109,14 @@ public abstract class AbstractExample {
         String vn_name = cmd.getOptionValue("n");
 
         //      Creating the Master
-        master = new ProActiveMaster();
+        abstract_master = creation();
 
         registerShutdownHook();
 
         if (vn_name == null) {
-            master.addResources(descriptor_url);
+            abstract_master.addResources(descriptor_url);
         } else {
-            master.addResources(descriptor_url, vn_name);
+            abstract_master.addResources(descriptor_url, vn_name);
         }
 
         after_init();
@@ -130,6 +135,11 @@ public abstract class AbstractExample {
     protected abstract void before_init();
 
     /**
+     * A method to be launched to create the master
+     */
+    protected abstract ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation();
+
+    /**
      * A method to be launched after the init method
      */
     protected abstract void after_init();
@@ -144,7 +154,7 @@ public abstract class AbstractExample {
         }
 
         public void run() {
-            master.terminate(true);
+            abstract_master.terminate(true);
         }
     }
 }

@@ -59,8 +59,13 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     SlaveMemory {
 
     /**
-     * log4j logger of the slave
-     */
+         *
+         */
+    private static final long serialVersionUID = 2385554161935080046L;
+
+    /**
+    * log4j logger of the slave
+    */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
 
     /**
@@ -76,7 +81,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     /**
      * The entity which will provide tasks to the slave (i.e. the master)
      */
-    protected TaskProvider provider;
+    protected TaskProvider<Serializable> provider;
 
     /**
      * Tells if the slave is terminated
@@ -107,7 +112,8 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * @param provider the entity which will provide tasks to the slave
      * @param initialMemory initial memory of the slave
      */
-    public AOSlave(final String name, final TaskProvider provider,
+    public AOSlave(final String name,
+        final TaskProvider<Serializable> provider,
         final Map<String, Object> initialMemory) {
         this.name = name;
         this.provider = provider;
@@ -175,15 +181,17 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * gets the initial task to solve
      * @return initial task to solve
      */
-    protected TaskIntern initialGetTask() {
+    @SuppressWarnings("unchecked")
+    protected TaskIntern<Serializable> initialGetTask() {
         if (logger.isDebugEnabled()) {
             logger.debug(name + " asks a new task...");
         }
 
         // InitialTask
-        TaskIntern currentTask = provider.getTask((Slave) stubOnThis, name);
+        TaskIntern<Serializable> currentTask = provider.getTask((Slave) stubOnThis,
+                name);
         // we make sure that we have the real task object and not a future)
-        currentTask = (TaskIntern) ProActive.getFutureValue(currentTask);
+        currentTask = (TaskIntern<Serializable>) ProActive.getFutureValue(currentTask);
         return currentTask;
     }
 
@@ -192,7 +200,8 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * @param task task to run
      * @return the same task, but containing the result
      */
-    protected ResultIntern handleTask(final TaskIntern task) {
+    protected ResultIntern<Serializable> handleTask(
+        final TaskIntern<Serializable> task) {
         Serializable resultObj = null;
         ResultInternImpl result = new ResultInternImpl(task);
 
@@ -213,16 +222,17 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public void runActivity(final Body body) {
         Service service = new Service(body);
 
         while (body.isActive()) {
             while (!isSleeping) {
-                TaskIntern newTask = initialGetTask();
+                TaskIntern<Serializable> newTask = initialGetTask();
                 while (!isSleeping) {
                     // We verify that the task is not a null task (otherwise, we sleep)
                     if (!newTask.isNull()) {
-                        ResultIntern result = handleTask(newTask);
+                        ResultIntern<Serializable> result = handleTask(newTask);
 
                         if (logger.isDebugEnabled()) {
                             logger.debug(name + " sends the result of task " +
@@ -232,7 +242,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
 
                         // We send the result back to the master
                         newTask = provider.sendResultAndGetTask(result, name);
-                        newTask = (TaskIntern) ProActive.getFutureValue(newTask);
+                        newTask = (TaskIntern<Serializable>) ProActive.getFutureValue(newTask);
                     } else {
                         // if the task is null, we automatically sleep
                         isSleeping = true;

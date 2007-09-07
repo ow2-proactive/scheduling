@@ -6,7 +6,7 @@ package org.objectweb.proactive.extra.masterslave.interfaces.internal;
  * @author fviale
  *
  */
-public interface Identifiable {
+public interface Identifiable extends Comparable<Identifiable> {
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>

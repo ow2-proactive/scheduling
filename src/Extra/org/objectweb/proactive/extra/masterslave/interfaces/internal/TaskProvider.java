@@ -38,19 +38,16 @@ import java.io.Serializable;
  * A Task Provider provides tasks to be executed and excepts results of these tasks (i.e. the Master from the slave point of view)
  * @author fviale
  *
- * @param <TI> the type of the task wrapper
- * @param <RI> the type of the result wrapper
  * @param <R> the type of the result client object
  */
-public interface TaskProvider<TI extends TaskIntern<R>, RI extends ResultIntern<R>, R extends Serializable> {
-
+public interface TaskProvider<R extends Serializable> {
     /**
      * Returns a task which needs to be executed
      * @param slave the slave object which asks the tasks (stub)
      * @param slaveName the name of the slave which asks the tasks
      * @return a new task to compute
      */
-    TI getTask(Slave slave, String slaveName);
+    TaskIntern<R> getTask(Slave slave, String slaveName);
 
     /**
      * Returns the result of a task to the provider
@@ -58,5 +55,5 @@ public interface TaskProvider<TI extends TaskIntern<R>, RI extends ResultIntern<
      * @param slaveName the name of the slave sending the result
      * @return a new task to compute
      */
-    TI sendResultAndGetTask(RI result, String slaveName);
+    TaskIntern<R> sendResultAndGetTask(ResultIntern<R> result, String slaveName);
 }

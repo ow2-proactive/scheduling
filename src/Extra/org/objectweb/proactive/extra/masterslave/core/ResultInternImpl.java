@@ -13,11 +13,16 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  * @author fviale
  *
  */
-public class ResultInternImpl implements ResultIntern {
+public class ResultInternImpl implements ResultIntern<Serializable> {
 
     /**
-     * The id of the task
-     */
+         *
+         */
+    private static final long serialVersionUID = 8247315893656368289L;
+
+    /**
+    * The id of the task
+    */
     protected long id = -1;
 
     /**
@@ -39,7 +44,7 @@ public class ResultInternImpl implements ResultIntern {
      * Creates an empty result object for the given task
      * @param task task associated with the result
      */
-    public ResultInternImpl(TaskIntern task) {
+    public ResultInternImpl(TaskIntern<Serializable> task) {
         this.id = task.getId();
     }
 
@@ -109,14 +114,11 @@ public class ResultInternImpl implements ResultIntern {
     /**
      * {@inheritDoc}
      */
-    public int compareTo(final Object o) {
+    public int compareTo(final Identifiable o) {
         if (o == null) {
             throw new NullPointerException();
-        } else if (o instanceof Identifiable) {
-            return (int) (id - ((Identifiable) o).getId());
-        } else {
-            throw new IllegalArgumentException("" + o);
         }
+        return (int) (id - ((Identifiable) o).getId());
     }
 
     public String toString() {

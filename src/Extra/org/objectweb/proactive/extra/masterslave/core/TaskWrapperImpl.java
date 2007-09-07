@@ -44,17 +44,22 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskIntern;
  * @author fviale
  *
  */
-public class TaskWrapperImpl implements TaskIntern {
+public class TaskWrapperImpl implements TaskIntern<Serializable> {
 
     /**
-     * The id of the task
-     */
+         *
+         */
+    private static final long serialVersionUID = -3356496532524748120L;
+
+    /**
+    * The id of the task
+    */
     protected long id = NULL_TASK_ID;
 
     /**
      * The actual task object
      */
-    protected Task realTask = null;
+    protected Task<Serializable> realTask = null;
 
     /**
      *
@@ -67,7 +72,7 @@ public class TaskWrapperImpl implements TaskIntern {
      * @param id id of the task
      * @param realTask the user task
      */
-    public TaskWrapperImpl(final long id, final Task realTask) {
+    public TaskWrapperImpl(final long id, final Task<Serializable> realTask) {
         this.id = id;
         this.realTask = realTask;
     }
@@ -92,7 +97,7 @@ public class TaskWrapperImpl implements TaskIntern {
     /**
      * {@inheritDoc}
      */
-    public Task getTask() {
+    public Task<Serializable> getTask() {
         return realTask;
     }
 
@@ -120,13 +125,10 @@ public class TaskWrapperImpl implements TaskIntern {
     /**
      * {@inheritDoc}
      */
-    public int compareTo(final Object o) {
+    public int compareTo(final Identifiable o) {
         if (o == null) {
             throw new NullPointerException();
-        } else if (o instanceof Identifiable) {
-            return (int) (id - ((Identifiable) o).getId());
-        } else {
-            throw new IllegalArgumentException("" + o);
         }
+        return (int) (id - ((Identifiable) o).getId());
     }
 }

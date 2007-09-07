@@ -31,11 +31,17 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.TaskReposit
  * @author fviale
  *
  */
-public class AOTaskRepository implements TaskRepository, Serializable {
+public class AOTaskRepository implements TaskRepository<Task<?extends Serializable>>,
+    Serializable {
 
     /**
-     * logger of the task repository
-     */
+         *
+         */
+    private static final long serialVersionUID = 6749695599768934980L;
+
+    /**
+    * logger of the task repository
+    */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_REPOSITORY);
 
     /**
@@ -51,7 +57,7 @@ public class AOTaskRepository implements TaskRepository, Serializable {
     /**
      * associations of ids to actual tasks
      */
-    protected HashMap<Long, TaskIntern> idToTaskIntern = new HashMap<Long, TaskIntern>();
+    protected HashMap<Long, TaskIntern<Serializable>> idToTaskIntern = new HashMap<Long, TaskIntern<Serializable>>();
 
     /**
      * associations of ids to zipped versions of the tasks
@@ -77,14 +83,16 @@ public class AOTaskRepository implements TaskRepository, Serializable {
     /**
      * {@inheritDoc}
      */
-    public long addTask(final Task task, final int hashCode)
-        throws TaskAlreadySubmittedException {
+    @SuppressWarnings("unchecked")
+    public long addTask(final Task<?extends Serializable> task,
+        final int hashCode) throws TaskAlreadySubmittedException {
         if (hashCodes.contains(hashCode)) {
             throw new TaskAlreadySubmittedException();
         }
         hashCodes.add(hashCode);
         idTohashCode.put(taskCounter, hashCode);
-        TaskIntern ti = new TaskWrapperImpl(taskCounter, task);
+        TaskIntern<Serializable> ti = new TaskWrapperImpl(taskCounter,
+                (Task<Serializable>) task);
         idToTaskIntern.put(taskCounter, ti);
         taskCounter = (taskCounter + 1) % (Long.MAX_VALUE - 1);
         return ti.getId();
@@ -93,7 +101,7 @@ public class AOTaskRepository implements TaskRepository, Serializable {
     /**
      * {@inheritDoc}
      */
-    public TaskIntern getTask(final long id) {
+    public TaskIntern<Serializable> getTask(final long id) {
         if (!idToTaskIntern.containsKey(id) && !idToZippedTask.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
@@ -136,8 +144,9 @@ public class AOTaskRepository implements TaskRepository, Serializable {
      * @param id the task id
      * @return the loaded task
      */
-    protected TaskIntern loadTask(final long id) {
-        TaskIntern task = null;
+    @SuppressWarnings("unchecked")
+    protected TaskIntern<Serializable> loadTask(final long id) {
+        TaskIntern<Serializable> task = null;
         if (!idToZippedTask.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
@@ -171,7 +180,7 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         ByteArrayInputStream objectInput = new ByteArrayInputStream(decompressedData);
         try {
             ObjectInputStream ois = new ObjectInputStream(objectInput);
-            task = (TaskIntern) ois.readObject();
+            task = (TaskIntern<Serializable>) ois.readObject();
             idToTaskIntern.put(id, task);
         } catch (IOException e) {
             e.printStackTrace();
@@ -188,13 +197,13 @@ public class AOTaskRepository implements TaskRepository, Serializable {
         if (!idToTaskIntern.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
-        TaskIntern task = idToTaskIntern.remove(id);
+        TaskIntern<Serializable> ti = idToTaskIntern.remove(id);
 
         // Serialize the task
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(task);
+            oos.writeObject(ti);
             oos.flush();
             byte[] input = baos.toByteArray();
 

@@ -45,9 +45,14 @@ import java.util.Queue;
  */
 public class HashSetQueue<T> extends LinkedHashSet<T> implements Queue<T> {
 
+    /**
+         *
+         */
+    private static final long serialVersionUID = 5257040493571680215L;
+
     /* (non-Javadoc)
-     * @see java.util.Queue#element()
-     */
+    * @see java.util.Queue#element()
+    */
     public T element() {
         if (isEmpty()) {
             throw new NoSuchElementException();

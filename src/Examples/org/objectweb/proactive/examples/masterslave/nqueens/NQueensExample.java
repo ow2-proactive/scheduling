@@ -1,5 +1,6 @@
 package org.objectweb.proactive.examples.masterslave.nqueens;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.Vector;
 
@@ -12,6 +13,7 @@ import org.objectweb.proactive.examples.masterslave.util.Pair;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
+import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
 /**
@@ -26,10 +28,7 @@ public class NQueensExample extends AbstractExample {
     public static int nqueen_algorithm_depth;
     private ProActiveMaster<QueryExtern, Pair<Long, Long>> master;
 
-    public ProActiveMaster getMaster() {
-        return master;
-    }
-
+    @SuppressWarnings("unchecked")
     public static void main(String[] args)
         throws MalformedURLException, TaskAlreadySubmittedException {
         NQueensExample instance = new NQueensExample();
@@ -119,5 +118,11 @@ public class NQueensExample extends AbstractExample {
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("NQueensExample", command_options);
+    }
+
+    @Override
+    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation() {
+        master = new ProActiveMaster<QueryExtern, Pair<Long, Long>>();
+        return (ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable>) master;
     }
 }

@@ -79,8 +79,13 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     InitActive, Serializable {
 
     /**
-     * log4j logger for the slave manager
-     */
+         *
+         */
+    private static final long serialVersionUID = -1488970573456417472L;
+
+    /**
+    * log4j logger for the slave manager
+    */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVEMANAGER);
 
     /**
@@ -111,7 +116,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     /**
      * the entity which will provide tasks to the slaves
      */
-    protected TaskProvider provider;
+    protected TaskProvider<Serializable> provider;
 
     /**
      * Initial memory of the slaves
@@ -134,7 +139,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
      * @param provider the entity that will give tasks to the slaves created
      * @param initialMemory the initial memory of the slaves
      */
-    public AOSlaveManager(final TaskProvider provider,
+    public AOSlaveManager(final TaskProvider<Serializable> provider,
         final Map<String, Object> initialMemory) {
         this.provider = provider;
         this.initialMemory = initialMemory;

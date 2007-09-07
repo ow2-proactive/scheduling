@@ -37,6 +37,12 @@ package org.objectweb.proactive.extra.masterslave;
  *
  */
 public class TaskException extends Exception {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -5703869323313055580L;
+
     public TaskException(Throwable cause) {
         initCause(cause);
     }

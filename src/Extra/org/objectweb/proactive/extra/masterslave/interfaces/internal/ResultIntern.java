@@ -42,8 +42,8 @@ import java.io.Serializable;
  *
  * @param <R>
  */
-public interface ResultIntern<R extends Serializable> extends Comparable,
-    Identifiable, Serializable {
+public interface ResultIntern<R extends Serializable> extends Identifiable,
+    Serializable {
 
     /**
      * get the result of the task

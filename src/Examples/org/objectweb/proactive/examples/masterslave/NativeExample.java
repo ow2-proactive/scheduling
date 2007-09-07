@@ -1,13 +1,16 @@
 package org.objectweb.proactive.examples.masterslave;
 
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.cli.HelpFormatter;
+import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterslave.TaskException;
+import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
 
 
@@ -18,6 +21,7 @@ import org.objectweb.proactive.extra.masterslave.tasks.NativeTask;
  *
  */
 public class NativeExample extends AbstractExample {
+    ProActiveMaster<SimpleNativeTask, String[]> master;
 
     /**
      * @param args
@@ -62,6 +66,12 @@ public class NativeExample extends AbstractExample {
      *
      */
     public static class SimpleNativeTask extends NativeTask {
+
+        /**
+                 *
+                 */
+        private static final long serialVersionUID = 9148096019099167195L;
+
         public SimpleNativeTask(String command) {
             super(command);
         }
@@ -77,5 +87,11 @@ public class NativeExample extends AbstractExample {
     @Override
     protected void after_init() {
         // nothing to do
+    }
+
+    @Override
+    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation() {
+        master = new ProActiveMaster<SimpleNativeTask, String[]>();
+        return (ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable>) master;
     }
 }

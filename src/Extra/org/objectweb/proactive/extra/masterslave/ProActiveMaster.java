@@ -87,6 +87,11 @@ import org.objectweb.proactive.extra.masterslave.interfaces.internal.ResultInter
  */
 public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     implements Master<T, R>, Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -8400896859797547714L;
     protected AOMaster aomaster = null;
     protected AOTaskRepository aorepository = null;
 
@@ -280,7 +285,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      */
     public void solve(List<T> tasks) throws TaskAlreadySubmittedException {
         List<Long> wrappers = createIds(tasks);
-        aomaster.solve(wrappers);
+        System.out.println("ProActiveMaster.solve() : " +
+            aomaster.getClass().getName());
+        aomaster.solveIds(wrappers);
     }
 
     /**
@@ -295,16 +302,17 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public List<R> waitAllResults() throws TaskException {
-        List<ResultIntern> completed = (List<ResultIntern>) ProActive.getFutureValue(aomaster.waitAllResults());
+        List<ResultIntern<R>> completed = (List<ResultIntern<R>>) ProActive.getFutureValue(aomaster.waitAllResults());
         List<R> results = new ArrayList<R>();
-        for (ResultIntern res : completed) {
+        for (ResultIntern<R> res : completed) {
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
-            Serializable obj = res.getResult();
+            R obj = res.getResult();
             if (obj != null) {
-                results.add((R) res.getResult());
+                results.add(obj);
             } else {
                 results.add(null);
             }
@@ -316,18 +324,19 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public List<R> waitKResults(int k)
         throws IllegalStateException, IllegalArgumentException, TaskException {
-        List<ResultIntern> completed = (List<ResultIntern>) ProActive.getFutureValue(aomaster.waitKResults(
+        List<ResultIntern<R>> completed = (List<ResultIntern<R>>) ProActive.getFutureValue(aomaster.waitKResults(
                     k));
         List<R> results = new ArrayList<R>();
-        for (ResultIntern res : completed) {
+        for (ResultIntern<R> res : completed) {
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
-            Serializable obj = res.getResult();
+            R obj = res.getResult();
             if (obj != null) {
-                results.add((R) res.getResult());
+                results.add(obj);
             } else {
                 results.add(null);
             }
@@ -339,8 +348,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public R waitOneResult() throws TaskException {
-        ResultIntern completed = (ResultIntern) ProActive.getFutureValue(aomaster.waitOneResult());
+        ResultIntern<R> completed = (ResultIntern<R>) ProActive.getFutureValue(aomaster.waitOneResult());
         if (completed.threwException()) {
             throw new TaskException(completed.getException());
         }
@@ -350,9 +360,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         if (completed.threwException()) {
             throw new TaskException(completed.getException());
         }
-        Serializable obj = completed.getResult();
+        R obj = completed.getResult();
         if (obj != null) {
-            return (R) completed.getResult();
+            return obj;
         }
         return null;
     }
