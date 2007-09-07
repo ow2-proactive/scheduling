@@ -310,23 +310,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * Builds a new MethodCall object. This constructor is a <b>shallow</b> copy constructor.
-     * Fields of the object are not copied.
-     * Please, consider use the factory method  <code>getMethodCall</code>
-     * instead of build a new MethodCall object.
-     * @param mc - the MethodCall object to copy
-     */
-    public MethodCall(MethodCall mc) {
-        this.componentMetaData = mc.componentMetaData;
-        this.reifiedMethod = mc.getReifiedMethod();
-        this.serializedEffectiveArguments = mc.serializedEffectiveArguments;
-        this.effectiveArguments = mc.effectiveArguments;
-        this.genericTypesMapping = mc.getGenericTypesMapping();
-        this.key = mc.key;
-        this.exceptioncontext = mc.exceptioncontext;
-    }
-
-    /**
      * Builds a new MethodCall object.
      */
     protected MethodCall() {
@@ -334,6 +317,25 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         this.effectiveArguments = null;
         this.serializedEffectiveArguments = null;
         this.exceptioncontext = null;
+    }
+
+    /**
+     * Builds a new MethodCall object that is a <b>shallow</b> copy of this.
+     * Fields of the object are not copied.
+     * Please, consider use the factory method  <code>getMethodCall</code>
+     * instead of build a new MethodCall object.
+     * @return a shallow copy of this
+     */
+    public MethodCall getShallowCopy() {
+        MethodCall mc = new MethodCall();
+        mc.componentMetaData = this.componentMetaData;
+        mc.reifiedMethod = this.getReifiedMethod();
+        mc.serializedEffectiveArguments = this.serializedEffectiveArguments;
+        mc.effectiveArguments = this.effectiveArguments;
+        mc.genericTypesMapping = this.getGenericTypesMapping();
+        mc.key = this.key;
+        mc.exceptioncontext = this.exceptioncontext;
+        return mc;
     }
 
     /**

@@ -107,7 +107,7 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                         /* add the return value into the result group */
                         this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
                             ((StubObject) object).getProxy()
-                             .reify(new MethodCall(this.mc)), this.index);
+                             .reify(this.mc.getShallowCopy()), this.index);
                     }
                 }
             } catch (Throwable e) {

@@ -106,7 +106,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                     } else if (objectIsLocal) {
                         if (!(mc instanceof MethodCallControlForGroup)) {
                             ((StubObject) object).getProxy()
-                             .reify(new MethodCall(this.mc));
+                             .reify(this.mc.getShallowCopy());
                         } else {
                             ((StubObject) object).getProxy().reify(this.mc);
                         }
