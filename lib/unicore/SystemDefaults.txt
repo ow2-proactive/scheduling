@@ -1,2 +1,0 @@
-systemdefault.usite.url=http://www.unicorepro.com/unicoreSites.xml
-systemdefault.crl.url=https://unicore-ca.lrz-muenchen.de/unicore-ca.crl
