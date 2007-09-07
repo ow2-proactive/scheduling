@@ -10,8 +10,10 @@ import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
 
 
 public class TestListGenerator {
-    final static private String validResource = "/unitTests/listGenerator/data.valid.txt";
-    final static private String invalidResource = "/unitTests/listGenerator/data.invalid.txt";
+    final static private String validResource = TestListGenerator.class.getResource(
+            "data.valid.txt").getFile();
+    final static private String invalidResource = TestListGenerator.class.getResource(
+            "data.invalid.txt").getFile();
 
     /*
     @Test
@@ -21,8 +23,7 @@ public class TestListGenerator {
         */
     @Test
     public void testValid() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader(
-                    getClass().getResource(validResource).getFile()));
+        BufferedReader br = new BufferedReader(new FileReader(validResource));
 
         while (true) {
             String question = br.readLine();
@@ -45,8 +46,7 @@ public class TestListGenerator {
 
     @Test
     public void testInvalid() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader(
-                    getClass().getResource(invalidResource).getFile()));
+        BufferedReader br = new BufferedReader(new FileReader(invalidResource));
 
         while (true) {
             String question = br.readLine();

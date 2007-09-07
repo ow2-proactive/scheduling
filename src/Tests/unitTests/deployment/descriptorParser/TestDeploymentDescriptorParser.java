@@ -20,8 +20,8 @@ import org.w3c.dom.Node;
 public class TestDeploymentDescriptorParser {
     //    @Test
     public void test() throws IOException, XPathExpressionException {
-        File descriptor = new File(getClass()
-                                       .getResource("/unitTests/descriptorParser/testfiles/deployment.xml")
+        File descriptor = new File(this.getClass()
+                                       .getResource("testfiles/deployment.xml")
                                        .getFile());
 
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
@@ -89,11 +89,11 @@ public class TestDeploymentDescriptorParser {
     @Test
     public void userSchemaTest() throws IOException, XPathExpressionException {
         File descriptor = new File(getClass()
-                                       .getResource("/unitTests/descriptorParser/testfiles/deployment/group_bridge_ext.xml")
+                                       .getResource("testfiles/deployment/group_bridge_ext.xml")
                                        .getFile());
 
         String userSchema = getClass()
-                                .getResource("/unitTests/descriptorParser/testfiles/deployment/SampleDeploymentExtension.xsd")
+                                .getResource("testfiles/deployment/SampleDeploymentExtension.xsd")
                                 .toString();
 
         ArrayList<String> schemas = new ArrayList<String>();
