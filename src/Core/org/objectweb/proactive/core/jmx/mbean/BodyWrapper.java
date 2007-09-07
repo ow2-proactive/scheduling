@@ -311,4 +311,16 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     public String getDgcState() {
         return GarbageCollector.getDgcState(this.getID());
     }
+    
+    public Object[] getTimersSnapshotFromBody( String[] timerNames) throws Exception{
+        org.objectweb.proactive.core.util.profiling.TimerProvidable container = org.objectweb.proactive.core.util.profiling.TimerWarehouse
+                                .getTimerProvidable(this.id);
+                if (container == null) {
+                        throw new NullPointerException("The timers container is null, the body is not timed.");
+                }
+                return new Object[]{
+                                container.getSnapshot(timerNames), // The list of timers
+                                System.nanoTime() // The nano timestamp on this machine used to stop all timers at the caller side
+                                };
+    } 
 }

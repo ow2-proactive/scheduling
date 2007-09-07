@@ -8,9 +8,7 @@ import org.eclipse.birt.chart.model.Chart;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.console.Console;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.monitoring.spy.Spy;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.timit.Activator;
 import org.objectweb.proactive.ic2d.timit.editparts.ChartEditPart;
 
@@ -38,13 +36,13 @@ public class ChartObject {
     protected Map<String, TimerObject> timersMap;
     protected List<TimerObject> timersList;
     protected TimerObject rootTimer;
-    protected AOObject aoObject;
+    protected ActiveObject  aoObject;
     protected ChartEditPart ep;
     protected boolean hasChanged;
     protected String[] currentTimerLevel = BASIC_LEVEL;
 
     public ChartObject(final ChartContainerObject parent,
-        final List<BasicTimer> basicTimersList, final AOObject aoObject) {
+        final List<BasicTimer> basicTimersList, final ActiveObject aoObject) {
         this.parent = parent;
         this.timersMap = new java.util.HashMap<String, TimerObject>();
         this.timersList = new ArrayList<TimerObject>();
@@ -54,7 +52,7 @@ public class ChartObject {
         this.hasChanged = true;
         this.aoObject = aoObject;
         this.barChartBuilder = new BarChartBuilder((this.aoObject == null)
-                ? "Unknown name" : this.aoObject.getFullName());
+                ? "Unknown name" : this.aoObject.getName());
 
         this.parent.addChild(this);
     }
@@ -167,7 +165,7 @@ public class ChartObject {
      * @return The uniqueId of the active object
      */
     public final UniqueID getAoObjectID() {
-        return this.aoObject.getID();
+        return this.aoObject.getUniqueID();
     }
 
     /**
@@ -184,7 +182,7 @@ public class ChartObject {
      *
      * @return The active object representation
      */
-    public final AOObject getAoObject() {
+    public final ActiveObject getAoObject() {
         return aoObject;
     }
 
@@ -250,11 +248,11 @@ public class ChartObject {
      * @return A list of BasicTimer
      */
     protected static final List<BasicTimer> performSnapshotInternal(
-        final AOObject aoObject, final String[] timerLevel) {
+        final ActiveObject  aoObject, final String[] timerLevel) {
         try {
-            Spy spy = ((NodeObject) aoObject.getParent()).getSpy();
-            Object[] result = spy.getTimersSnapshotFromBody(aoObject.getID(),
-                    timerLevel);
+//            Spy spy = ((NodeObject) aoObject.getParent()).getSpy();
+            Object[] result = (Object[]) aoObject.invoke("getTimersSnapshotFromBody",new Object [] { timerLevel}, new String[] {String[].class.getName()});
+//                    timerLevel);
             List<BasicTimer> availableTimersList = (List<BasicTimer>) result[0];
             long remoteTimeStamp = (Long) result[1];
 
@@ -263,23 +261,23 @@ public class ChartObject {
                 if (t.isStarted()) {
                     t.stop(remoteTimeStamp);
                 }
-            }
+            } 
             if ((availableTimersList == null) ||
                     (availableTimersList.size() == 0)) {
                 Console.getInstance(Activator.CONSOLE_NAME)
                        .log("There is no available timers for " +
-                    aoObject.getFullName());
+                    aoObject.getName());
                 return null;
             }
             return availableTimersList;
         } catch (Exception e) {
             Console console = Console.getInstance(Activator.CONSOLE_NAME);
             console.log("Cannot perform timers snapshot on " +
-                aoObject.getFullName() + ". Reason : " + e.getMessage());
+                aoObject.getName() + ". Reason : " + e.getMessage());
             if (e instanceof NullPointerException) {
                 console.log(
                     "Be sure to attach a TimIt technical service to the virtual node : " +
-                    aoObject.getParent().getParent().getFullName());
+                    aoObject.getParent().getParent().getName());
             }
 
             // e.printStackTrace();

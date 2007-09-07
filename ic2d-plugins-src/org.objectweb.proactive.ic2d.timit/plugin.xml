@@ -19,7 +19,7 @@
             name="Timer Tree View"/>
    </extension>
    <extension
-         point="org.objectweb.proactive.ic2d.monitoring.actions_extension">
+         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
       <action_class class="org.objectweb.proactive.ic2d.timit.actions.GetTimerSnapshotAction"/>
    </extension>
    

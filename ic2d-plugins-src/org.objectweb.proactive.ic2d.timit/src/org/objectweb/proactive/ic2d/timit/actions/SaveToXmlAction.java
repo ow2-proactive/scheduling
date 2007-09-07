@@ -71,9 +71,9 @@ public class SaveToXmlAction extends Action {
 
             // Add current bag to the
             results.add(new ResultBag(c.getAoObject().getName(),
-                    c.getAoObject().getID().shortString(), timersList,
-                    c.getAoObject().getFullName() + " on " +
-                    c.getAoObject().getParent().getFullName()));
+                    c.getAoObject().getUniqueID().shortString(), timersList,
+                    c.getAoObject().getName() + " on " +
+                    c.getAoObject().getParent().getName()));
         }
 
         BasicResultWriter finalWriter = new BasicResultWriter(path);

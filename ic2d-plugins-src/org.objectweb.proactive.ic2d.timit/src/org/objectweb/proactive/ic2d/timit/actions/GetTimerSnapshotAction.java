@@ -7,9 +7,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
-import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.extpoints.IActionExtPoint;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.timit.data.ChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.ChartObject;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
@@ -25,7 +25,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  */
 public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
     public static final String GET_TIMER_SNAPSHOT = "Get timer snapshot";
-    private AbstractDataObject object;
+    private AbstractData object;
     private ChartContainerObject container;
 
     public GetTimerSnapshotAction() {
@@ -69,13 +69,13 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
     /**
      * Implements IActionExtPoint setAbstractDataObject(AbstractDataObject) method
      */
-    public final void setAbstractDataObject(final AbstractDataObject object) {
+    public final void setAbstractDataObject(final AbstractData object) {
         this.object = object;
     }
 
-    public final void setActiveSelect(final AOObject ref) {
+    public final void setActiveSelect(final ActiveObject ref) {
         if (this.container != null) {
-            ChartObject chartObject = this.container.getChartObjectById(ref.getID());
+            ChartObject chartObject = this.container.getChartObjectById(ref.getUniqueID());
             if (chartObject != null) {
                 chartObject.getEp().handleSelection(true);
             }

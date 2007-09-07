@@ -8,7 +8,6 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.gef,
- org.objectweb.proactive.ic2d.monitoring,
  org.objectweb.proactive.ic2d.lib,
  org.objectweb.proactive.ic2d.console,
  org.eclipse.jface.text,
@@ -28,7 +27,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.birt.chart.reportitem,
  org.eclipse.birt.chart.reportitem.ui,
  org.eclipse.birt.chart.runtime,
- org.eclipse.ui.views
+ org.eclipse.ui.views,
+ org.objectweb.proactive.ic2d.JMXmonitoring,
+ org.eclipse.ui.console
 Eclipse-LazyStart: true
 Export-Package: org.objectweb.proactive.ic2d.timit.views
 Bundle-Vendor: ProActive Team
