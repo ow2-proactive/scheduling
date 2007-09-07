@@ -75,5 +75,6 @@ public interface BodyWrapperMBean extends Serializable {
 
     public String getDgcState();
 
-    public Object[] getTimersSnapshotFromBody( String[] timerNames) throws Exception;
+    public Object[] getTimersSnapshotFromBody(String[] timerNames)
+        throws Exception;
 }
