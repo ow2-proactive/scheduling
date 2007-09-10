@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -112,8 +113,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         }
 
         // We save the current state of the schema validation and set it to false for this example
-        String validatingProperyOld = ProActiveConfiguration.getInstance()
-                                                            .getProperty("schema.validation");
+        String validatingProperyOld = PAProperties.SCHEMA_VALIDATION.getValue();
         System.setProperty("schema.validation", "false");
 
         VariableContract vc = new VariableContract();

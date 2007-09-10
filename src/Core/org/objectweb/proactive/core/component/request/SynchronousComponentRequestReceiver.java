@@ -35,6 +35,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.component.body.ComponentBody;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -64,8 +65,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
     public int receiveRequest(Request r, Body bodyReceiver) {
         if (r instanceof ComponentRequest) {
             if (!((ComponentRequest) r).isControllerRequest()) {
-                if ("true".equals(ProActiveConfiguration.getInstance()
-                                                            .getProperty("proactive.components.use_shortcuts"))) {
+                if (PAProperties.PA_COMPONENT_USE_SHORTCUTS.isTrue()) {
                     if (!((ComponentBody) bodyReceiver).getProActiveComponentImpl()
                               .getInputInterceptors().isEmpty() ||
                             !((ComponentBody) bodyReceiver).getProActiveComponentImpl()

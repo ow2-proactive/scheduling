@@ -188,7 +188,7 @@ public class ProActiveConfiguration {
      * @param key the of the property
      * @param value the value of the property
      */
-    public void setProperty(String key, String value) {
+    protected void setProperty(String key, String value) {
         properties.setProperty(key, value);
         System.setProperty(key, value);
     }

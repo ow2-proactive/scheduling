@@ -37,6 +37,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.BodyEventProducerImpl;
@@ -310,8 +311,7 @@ public class LocalBodyStore {
 
         // END ProActiveEvent
         if ((this.localBodyMap.size() == 0) &&
-                "true".equals(ProActiveConfiguration.getInstance()
-                                                        .getProperty("proactive.exit_on_empty"))) {
+                PAProperties.PA_EXIT_ON_EMPTY.isTrue()) {
             ProActive.exitSuccess();
         }
     }

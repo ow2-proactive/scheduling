@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -98,9 +99,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = new Boolean(!"false".equals(
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty("proactive.stack_trace")));
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
@@ -118,9 +117,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = new Boolean(!"false".equals(
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty("proactive.stack_trace")));
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
@@ -139,9 +136,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = new Boolean(!"false".equals(
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty("proactive.stack_trace")));
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
@@ -155,9 +150,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = new Boolean(!"false".equals(
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty("proactive.stack_trace")));
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();

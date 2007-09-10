@@ -1399,10 +1399,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.hostName = UrlBuilder.getHostNameorIP(this.hostInetAddress);
             String random = Integer.toString(ProActiveRandom.nextPosInt());
 
-            if (ProActiveConfiguration.getInstance()
-                                          .getProperty("proactive.runtime.name") != null) {
-                this.name = ProActiveConfiguration.getInstance()
-                                                  .getProperty("proactive.runtime.name");
+            if (PAProperties.PA_RUNTIME_NAME.isSet()) {
+                this.name = PAProperties.PA_RUNTIME_NAME.getValue();
 
                 if (this.name.indexOf("PA_JVM") < 0) {
                     runtimeLogger.warn(

@@ -35,6 +35,7 @@ import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -141,16 +142,14 @@ public class HostsInfos {
     final static String REGEXP_KEYVAL = "(([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]{1,3}\\.){3}[0-9]{1,3})";
 
     private void loadProperties() {
-        String userNames = ProActiveConfiguration.getInstance()
-                                                 .getProperty("proactive.ssh.username");
+        String userNames = PAProperties.PA_SSH_USERNAME.getValue();
 
         if (userNames == null) {
             userNames = System.getProperty("user.name");
         }
         parseUserNames(userNames);
 
-        String secondaryNames = ProActiveConfiguration.getInstance()
-                                                      .getProperty("proactive.secondaryNames");
+        String secondaryNames = PAProperties.PA_SECONDARYNAMES.getValue();
         if (secondaryNames != null) {
             if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL +
                         ")?")) {

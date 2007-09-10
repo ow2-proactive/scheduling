@@ -43,6 +43,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -73,8 +74,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private final Vector<Object> bookedNodes = new Vector<Object>();
     private final Vector usingNodes = new Vector();
     private int nodeCounter = 0;
-    private final String descriptorPath = ProActiveConfiguration.getInstance()
-                                                                .getProperty(PROPERPY_XML_PATH);
+    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
     private ProActiveDescriptorInternal pad = null;
 
     //--------------------------------------------------------------------------
@@ -306,14 +306,12 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         assert PROC > 0 : "Processor count = 0";
         logger.debug("Number of available processors for this JVM: " + PROC);
         int nodes = PROC;
-        if (!new Boolean(ProActiveConfiguration.getInstance()
-                                                   .getProperty(PROPERTY_MULTI_PROC_NODES)).booleanValue()) {
+        if (!PAProperties.PA_P2P_MULTI_PROC_NODES.isTrue()) {
             nodes = 1;
         }
 
         // No sharing enable
-        if (new Boolean(ProActiveConfiguration.getInstance()
-                                                  .getProperty(PROPERTY_NO_SHARING)).booleanValue()) {
+        if (PAProperties.PA_P2P_NO_SHARING.isTrue()) {
             nodes = 0;
         }
 

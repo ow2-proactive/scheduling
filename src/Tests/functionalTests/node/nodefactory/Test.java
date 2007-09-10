@@ -33,6 +33,7 @@ package functionalTests.node.nodefactory;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -60,8 +61,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        String port = ProActiveConfiguration.getInstance()
-                                            .getProperty("proactive.rmi.port");
+        String port = PAProperties.PA_RMI_PORT.getValue();
         if (port != null) {
             rmiURL = UrlBuilder.buildUrl("localhost",
                     "RMINode" + System.currentTimeMillis(),

@@ -58,8 +58,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
 
     static {
         if ((System.getSecurityManager() == null) &&
-                !("false".equals(ProActiveConfiguration.getInstance()
-                                                           .getProperty("proactive.securitymanager")))) {
+                PAProperties.PA_SECURITYMANAGER.isTrue()) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 

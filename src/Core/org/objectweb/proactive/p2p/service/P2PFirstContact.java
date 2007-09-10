@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -95,8 +96,7 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
                 connectingPeer();
             }
             try {
-                Thread.sleep(Long.parseLong(ProActiveConfiguration.getInstance()
-                                                                  .getProperty(PROPERTY_TTU)));
+                Thread.sleep(Long.parseLong(PAProperties.PA_P2P_TTU.getValue()));
             } catch (Exception e) {
             }
         }

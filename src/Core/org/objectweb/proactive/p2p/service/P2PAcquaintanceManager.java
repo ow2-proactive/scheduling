@@ -43,6 +43,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.Group;
@@ -69,12 +70,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     private P2PService acquaintances = null;
     private P2PService acquaintancesActived = null;
     private Group<P2PService> groupOfAcquaintances = null;
-    private static final long TTU = Long.parseLong(ProActiveConfiguration.getInstance()
-                                                                         .getProperty(P2PConstants.PROPERTY_TTU));
-    private static final int NOA = Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                                          .getProperty(P2PConstants.PROPERTY_NOA));
-    private static final int TTL = Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                                          .getProperty(P2PConstants.PROPERTY_TTL));
+    private static final long TTU = Long.parseLong(PAProperties.PA_P2P_TTU.getValue());
+    private static final int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
+    private static final int TTL = Integer.parseInt(PAProperties.PA_P2P_TTL.getValue());
 
     /**
      * The empty constructor for activating.

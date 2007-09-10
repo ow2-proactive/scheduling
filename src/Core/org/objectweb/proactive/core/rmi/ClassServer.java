@@ -85,8 +85,7 @@ public class ClassServer implements Runnable {
             server = new java.net.ServerSocket(port);
         }
 
-        ProActiveConfiguration.getInstance()
-                              .setProperty("proactive.http.port", port + "");
+        PAProperties.PA_HTTP_PORT.setValue(port + "");
 
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
         //        System.out.println("URL du classServer : " + hostname + ":" + port);

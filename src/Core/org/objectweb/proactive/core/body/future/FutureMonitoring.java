@@ -31,8 +31,7 @@ public class FutureMonitoring implements Runnable {
     static {
 
         /* Dynamically configurable to make shorter tests */
-        String ttm = ProActiveConfiguration.getInstance()
-                                           .getProperty("proactive.futuremonitoring.ttm");
+        String ttm = PAProperties.PA_FUTUREMONITORING_TTM.getValue();
         if (ttm != null) {
             TTM = Integer.parseInt(ttm);
         }

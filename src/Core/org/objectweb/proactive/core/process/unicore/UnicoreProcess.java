@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.process.unicore;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -78,10 +79,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
         /* Depending on the system property UnicoreProActiveClient
          * can be forked or called directly.
          */
-        String forkclient = ProActiveConfiguration.getInstance()
-                                                  .getProperty("proactive.unicore.forkclient");
-
-        if (forkclient.equalsIgnoreCase("false")) {
+        if (!PAProperties.PA_UNICORE_FORKCLIENT.isTrue()) {
             logger.debug("Not Forking UnicoreProActiveClient");
             UnicoreProActiveClient uProClient;
 

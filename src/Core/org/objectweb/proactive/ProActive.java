@@ -811,8 +811,8 @@ public class ProActive {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(ProActiveConfiguration.getInstance()
-                                                                          .getProperty("components.creation.timeout")),
+            threadPool.awaitTermination(new Integer(
+                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -864,8 +864,8 @@ public class ProActive {
         }
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(ProActiveConfiguration.getInstance()
-                                                                          .getProperty("components.creation.timeout")),
+            threadPool.awaitTermination(new Integer(
+                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -1567,8 +1567,7 @@ public class ProActive {
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor()
         throws ProActiveException, IOException {
-        String padURL = ProActiveConfiguration.getInstance()
-                                              .getProperty("proactive.pad");
+        String padURL = PAProperties.PA_PAD.getValue();
 
         //System.out.println("pad propertie : " + padURL) ;
         if (padURL == null) {

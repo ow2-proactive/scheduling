@@ -119,10 +119,8 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      */
     private P2PService getPrecedentService() {
         String url = UrlBuilder.buildUrl("localhost", P2P_NODE_NAME,
-                ProActiveConfiguration.getInstance()
-                                      .getProperty(PROPERTY_ACQUISITION),
-                Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                       .getProperty(PROPERTY_PORT)));
+                PAProperties.PA_P2P_ACQUISITION.getValue(),
+                Integer.parseInt(PAProperties.PA_P2P_PORT.getValue()));
 
         try {
             Node serviceNode = NodeFactory.getNode(url);

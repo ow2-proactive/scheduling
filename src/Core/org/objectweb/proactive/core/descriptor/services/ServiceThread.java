@@ -35,6 +35,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -62,8 +63,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @since   ProActive 2.0.1
  */
 public class ServiceThread extends Thread {
-    private static final long LOOK_UP_FREQ = new Long(ProActiveConfiguration.getInstance()
-                                                                            .getProperty(P2PConstants.PROPERTY_LOOKUP_FREQ)).longValue();
+    private static final long LOOK_UP_FREQ = new Long(PAProperties.PA_P2P_LOOKUP_FREQ.getValue()).longValue();
     private static final int MAX_NODE = P2PConstants.MAX_NODE;
     private VirtualNodeInternal vn;
     private UniversalService service;
@@ -73,8 +73,7 @@ public class ServiceThread extends Thread {
     long timeout = 0;
     int nodeRequested;
     public static Logger loggerDeployment = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
-    private static final long TIMEOUT = Long.parseLong(ProActiveConfiguration.getInstance()
-                                                                             .getProperty(P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+    private static final long TIMEOUT = Long.parseLong(PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
     private long expirationTime;
 
     public ServiceThread(VirtualNodeInternal vn, VirtualMachine vm) {

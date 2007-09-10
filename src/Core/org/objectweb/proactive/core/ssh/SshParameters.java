@@ -46,8 +46,7 @@ public class SshParameters {
 
     static public int getConnectTimeout() {
         if (_connectTimeout == -1) {
-            String timeout = ProActiveConfiguration.getInstance()
-                                                   .getProperty("proactive.tunneling.connect_timeout");
+            String timeout = PAProperties.PA_SSH_TUNNELING_CONNECT_TIMEOUT.getValue();
             if (timeout != null) {
                 _connectTimeout = Integer.parseInt(timeout);
             } else {
@@ -82,7 +81,7 @@ public class SshParameters {
     }
 
     static public String getSshPort() {
-        String sshPort = PAProperties.PA_RMISSH_PORT.getValue();
+        String sshPort = PAProperties.PA_SSH_PORT.getValue();
         if (sshPort == null) {
             sshPort = "22";
         }
@@ -90,16 +89,15 @@ public class SshParameters {
     }
 
     static public String getSshKnownHostsFile() {
-        if (PAProperties.PA_RMISSH_KNOWN_HOST.getValue() != null) {
+        if (PAProperties.PA_SSH_KNOWN_HOST.getValue() != null) {
             return PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
         }
         return System.getProperty("user.home") +
-        ProActiveConfiguration.getInstance()
-                              .getProperty(Constants.SSH_TUNNELING_DEFAULT_KNOW_HOSTS);
+        PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
     }
 
     static public String getSshKeyDirectory() {
-        String keydir = PAProperties.PA_RMISSH_KEY_DIR.getValue();
+        String keydir = PAProperties.PA_SSH_KEY_DIR.getValue();
         if (keydir == null) {
             keydir = SSHKeys.SSH_DIR;
         }
