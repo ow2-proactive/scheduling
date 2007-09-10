@@ -49,6 +49,18 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
+    private static final String XPATH_GCMDEPLOYMENT       = "/pa:GCMDeployment/";
+    private static final String XPATH_INFRASTRUCTURE      = XPATH_GCMDEPLOYMENT + "pa:infrastructure";
+    private static final String XPATH_RESOURCES           = XPATH_GCMDEPLOYMENT + "pa:resources";
+    private static final String XPATH_ENVIRONMENT         = XPATH_GCMDEPLOYMENT + "pa:environment";
+    private static final String XPATH_TOOL                = "pa:tool";
+    private static final String XPATH_HOME_DIRECTORY      = "pa:homeDirectory";
+    private static final String XPATH_BRIDGES             = "pa:bridges/*";
+    private static final String XPATH_GROUPS              = "pa:groups/*";
+    private static final String XPATH_HOSTS               = "pa:hosts/pa:host";
+    private static final String XPATH_HOST                = "pa:host";
+    private static final String XPATH_DESCRIPTOR_VARIABLE = "pa:descriptorVariable";
+    
     protected Document document;
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
@@ -155,10 +167,10 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public void parseEnvironment() throws XPathExpressionException {
-        Node environmentNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:environment",
+        Node environmentNode = (Node) xpath.evaluate(XPATH_ENVIRONMENT,
                 document, XPathConstants.NODE);
 
-        NodeList descriptorVarNodes = (NodeList) xpath.evaluate("pa:descriptorVariable",
+        NodeList descriptorVarNodes = (NodeList) xpath.evaluate(XPATH_DESCRIPTOR_VARIABLE,
                 environmentNode, XPathConstants.NODESET);
 
         for (int i = 0; i < descriptorVarNodes.getLength(); ++i) {
@@ -182,7 +194,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             parseInfrastructure();
         }
 
-        Node resourcesNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:resources",
+        Node resourcesNode = (Node) xpath.evaluate(XPATH_RESOURCES,
                 document, XPathConstants.NODE);
 
         NodeList childNodes = resourcesNode.getChildNodes();
@@ -233,7 +245,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
     protected void parseGroupResource(Node resourceNode, Group group)
         throws XPathExpressionException, IOException {
-        Node hostNode = (Node) xpath.evaluate("pa:host", resourceNode,
+        Node hostNode = (Node) xpath.evaluate(XPATH_HOST, resourceNode,
                 XPathConstants.NODE);
 
         String refid = GCMParserHelper.getAttributeValue(hostNode, "refid");
@@ -274,13 +286,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 "parseInfrastructure can only be called once");
         }
 
-        Node infrastructureNode = (Node) xpath.evaluate("/pa:GCMDeployment/pa:infrastructure",
+        Node infrastructureNode = (Node) xpath.evaluate(XPATH_INFRASTRUCTURE,
                 document, XPathConstants.NODE);
 
         //
         // Hosts
         //
-        NodeList hosts = (NodeList) xpath.evaluate("pa:hosts/pa:host",
+        NodeList hosts = (NodeList) xpath.evaluate(XPATH_HOSTS,
                 infrastructureNode, XPathConstants.NODESET);
 
         for (int i = 0; i < hosts.getLength(); ++i) {
@@ -291,14 +303,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         //
         // Groups
         //
-        NodeList groups = (NodeList) xpath.evaluate("pa:groups/*",
+        NodeList groups = (NodeList) xpath.evaluate(XPATH_GROUPS,
                 infrastructureNode, XPathConstants.NODESET);
 
         for (int i = 0; i < groups.getLength(); ++i) {
             Node groupNode = groups.item(i);
             GroupParser groupParser = groupParserMap.get(groupNode.getNodeName());
             if (groupParser == null) {
-                GCMDeploymentLoggers.GCMA_LOGGER.warn(
+                GCMDeploymentLoggers.GCMD_LOGGER.warn(
                     "No group parser registered for node <" +
                     groupNode.getNodeName() + ">");
             } else {
@@ -310,14 +322,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         //
         // Bridges
         //
-        NodeList bridges = (NodeList) xpath.evaluate("pa:bridges/*",
+        NodeList bridges = (NodeList) xpath.evaluate(XPATH_BRIDGES,
                 infrastructureNode, XPathConstants.NODESET);
 
         for (int i = 0; i < bridges.getLength(); ++i) {
             Node bridgeNode = bridges.item(i);
             BridgeParser bridgeParser = bridgeParserMap.get(bridgeNode.getNodeName());
             if (bridgeParser == null) {
-                GCMDeploymentLoggers.GCMA_LOGGER.warn(
+                GCMDeploymentLoggers.GCMD_LOGGER.warn(
                     "No bridge parser registered for node <" +
                     bridgeNode.getNodeName() + ">");
             } else {
@@ -376,16 +388,15 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             hostInfo.setUsername(username);
         }
 
-        Node homeDirectoryNode = (Node) xpath.evaluate("pa:homeDirectory",
+        Node homeDirectoryNode = (Node) xpath.evaluate(XPATH_HOME_DIRECTORY,
                 hostNode, XPathConstants.NODE);
 
         if (homeDirectoryNode != null) {
-            // FIXME glaurent checks that base is root. Should be checked in the schema
             hostInfo.setHomeDirectory(GCMParserHelper.getAttributeValue(
                     homeDirectoryNode, "relpath"));
         }
 
-        NodeList toolNodes = (NodeList) xpath.evaluate("pa:tool", hostNode,
+        NodeList toolNodes = (NodeList) xpath.evaluate(XPATH_TOOL, hostNode,
                 XPathConstants.NODESET);
 
         for (int i = 0; i < toolNodes.getLength(); ++i) {

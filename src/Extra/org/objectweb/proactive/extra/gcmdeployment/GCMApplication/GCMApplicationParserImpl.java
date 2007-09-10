@@ -44,6 +44,15 @@ import org.xml.sax.SAXException;
  *  - Write some comment to explain how it works
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
+    
+    private static final String XPATH_GCMAPP             = "/pa:GCMApplication/";
+    private static final String XPATH_VIRTUAL_NODE       = XPATH_GCMAPP + "pa:application/pa:proactive/pa:virtualNode";
+    private static final String XPATH_RESOURCE_PROVIDERS = XPATH_GCMAPP + "pa:resources/pa:resourceProvider";
+    private static final String XPATH_APPLICATION        = XPATH_GCMAPP + "pa:application";
+    private static final String XPATH_RESOURCE_PROVIDER  = "pa:resourceProvider";
+    private static final String XPATH_FILETRANSFER       = "pa:filetransfer";
+    private static final String XPATH_FILE               = "pa:file";
+    
     protected File descriptor;
     protected Document document;
     protected DocumentBuilderFactory domFactory;
@@ -134,7 +143,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         try {
             NodeList nodes;
 
-            nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:resources/pa:resourceProvider",
+            nodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDERS,
                     document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {
@@ -148,7 +157,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 // get GCMDescriptor file
                 //
-                Node fileNode = (Node) xpath.evaluate("pa:file", node,
+                Node fileNode = (Node) xpath.evaluate(XPATH_FILE, node,
                         XPathConstants.NODE);
                 if (fileNode != null) {
                     String nodeValue = GCMParserHelper.getAttributeValue(fileNode,
@@ -169,7 +178,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 // get fileTransfers
                 //
                 HashSet<FileTransferBlock> fileTransferBlocks = new HashSet<FileTransferBlock>();
-                NodeList fileTransferNodes = (NodeList) xpath.evaluate("pa:filetransfer",
+                NodeList fileTransferNodes = (NodeList) xpath.evaluate(XPATH_FILETRANSFER,
                         node, XPathConstants.NODESET);
                 for (int j = 0; j < fileTransferNodes.getLength(); ++j) {
                     Node fileTransferNode = fileTransferNodes.item(j);
@@ -194,7 +203,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         }
 
         try {
-            Node applicationNode = (Node) xpath.evaluate("/pa:GCMApplication/pa:application",
+            Node applicationNode = (Node) xpath.evaluate(XPATH_APPLICATION,
                     document, XPathConstants.NODE);
 
             NodeList appNodes = applicationNode.getChildNodes();
@@ -239,7 +248,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             // make sure these are parsed
             getResourceProviders();
 
-            NodeList nodes = (NodeList) xpath.evaluate("/pa:GCMApplication/pa:application/pa:proactive/pa:virtualNode",
+            NodeList nodes = (NodeList) xpath.evaluate(XPATH_VIRTUAL_NODE,
                     document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {
@@ -267,7 +276,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 // get resource providers references
                 //
-                NodeList resourceProviderNodes = (NodeList) xpath.evaluate("pa:resourceProvider",
+                NodeList resourceProviderNodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDER,
                         node, XPathConstants.NODESET);
                 List<GCMDeploymentDescriptor> providers = new ArrayList<GCMDeploymentDescriptor>();
 
@@ -285,8 +294,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 virtualNodes.put(virtualNode.getId(), virtualNode);
             }
         } catch (XPathExpressionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         }
 
         return virtualNodes;
