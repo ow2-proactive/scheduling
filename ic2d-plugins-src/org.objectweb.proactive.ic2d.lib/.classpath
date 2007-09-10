@@ -1,79 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibis/bcel-5.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibis/bcel-5.1-fixes-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibis/colobus-0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibis/ibis-1.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibis/ibis-connect-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibis/ibis-util-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/examples/clibwrapper_jiio.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/dtdparser.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/fractal.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/fractal-adl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/fractal-gui.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/fractal-swing.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/julia-asm.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/julia-mixins.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/julia-runtime.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/ow_deployment_scheduling.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/components/SVGGraphics.jar"/>
+	<classpathentry exported="true" kind="lib" path="ProActive.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="lib/bouncycastle.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/examples/jai_codec.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/examples/jai_core.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/examples/jai_imageio.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/examples/mlibwrapper_jai.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/glite/classad.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/glite/glite-wms-jdlj.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/globus/cog-jglobus.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/globus/cog-jglobus-1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/globus/cog-ogce.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/globus/cryptix.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/globus/cryptix32.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/globus/cryptix-asn1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/globus/puretls.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/osgi/http.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/osgi/moduleloader.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/osgi/oscar.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/osgi/osgi.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/osgi/servicebinder.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/osgi/shell.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/scilab/javasci.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/unicore/ajo.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/unicore/client.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/unicore/jh.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/unicore/njs_client.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/unicore/scriptPlugin.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/activation.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/axis.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/commons-discovery.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/commons-logging.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/jaxrpc.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/mail.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/saaj-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/servlet-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/soap.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/wsdl4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws/xml-apis.jar"/>
-	<classpathentry exported="true" kind="lib" path="ProActive.jar" sourcepath="/ProActive/src"/>
-	<classpathentry kind="lib" path="lib/components/asm-2.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-awt-util.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-dom.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-svggen.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-util.jar"/>
-	<classpathentry kind="lib" path="lib/timit/batik-xml.jar"/>
-	<classpathentry kind="lib" path="lib/timit/commons-cli-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/timit/jcommon-1.0.6.jar"/>
-	<classpathentry kind="lib" path="lib/timit/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/timit/jfreechart-1.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jung/colt.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jung/commons-collections-3.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jung/concurrent.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jung/jung-1.7.4.jar"/>
+	<classpathentry kind="lib" path="lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/ajo.jar"/>
+	<classpathentry kind="lib" path="lib/asm-2.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/axis.jar"/>
+	<classpathentry kind="lib" path="lib/batik-awt-util.jar"/>
+	<classpathentry kind="lib" path="lib/batik-dom.jar"/>
+	<classpathentry kind="lib" path="lib/batik-svggen.jar"/>
+	<classpathentry kind="lib" path="lib/batik-util.jar"/>
+	<classpathentry kind="lib" path="lib/batik-xml.jar"/>
+	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
+	<classpathentry kind="lib" path="lib/bcel-5.1-fixes-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/bundlerepository.jar"/>
+	<classpathentry kind="lib" path="lib/classad.jar"/>
+	<classpathentry kind="lib" path="lib/clibwrapper_jiio.jar"/>
+	<classpathentry kind="lib" path="lib/client.jar"/>
+	<classpathentry kind="lib" path="lib/cog-jglobus.jar"/>
+	<classpathentry kind="lib" path="lib/cog-jglobus-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/cog-ogce.jar"/>
+	<classpathentry kind="lib" path="lib/colobus-0.1.jar"/>
+	<classpathentry kind="lib" path="lib/colt.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-discovery.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/concurrent.jar"/>
+	<classpathentry kind="lib" path="lib/cryptix.jar"/>
+	<classpathentry kind="lib" path="lib/cryptix32.jar"/>
+	<classpathentry kind="lib" path="lib/cryptix-asn1.jar"/>
+	<classpathentry kind="lib" path="lib/dtdparser.jar"/>
+	<classpathentry kind="lib" path="lib/fractal.jar"/>
+	<classpathentry kind="lib" path="lib/fractal-adl.jar"/>
+	<classpathentry kind="lib" path="lib/fractal-gui.jar"/>
+	<classpathentry kind="lib" path="lib/fractal-swing.jar"/>
+	<classpathentry kind="lib" path="lib/glite-wms-jdlj.jar"/>
+	<classpathentry kind="lib" path="lib/http.jar"/>
+	<classpathentry kind="lib" path="lib/ibis-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/ibis-connect-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/ibis-util-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jai_codec.jar"/>
+	<classpathentry kind="lib" path="lib/jai_core.jar"/>
+	<classpathentry kind="lib" path="lib/jai_imageio.jar"/>
+	<classpathentry kind="lib" path="lib/javasci.jar"/>
+	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/jh.jar"/>
+	<classpathentry kind="lib" path="lib/julia-asm.jar"/>
+	<classpathentry kind="lib" path="lib/julia-mixins.jar"/>
+	<classpathentry kind="lib" path="lib/julia-runtime.jar"/>
+	<classpathentry kind="lib" path="lib/jung-1.7.4.jar"/>
+	<classpathentry kind="lib" path="lib/mail.jar"/>
+	<classpathentry kind="lib" path="lib/mlibwrapper_jai.jar"/>
+	<classpathentry kind="lib" path="lib/moduleloader.jar"/>
+	<classpathentry kind="lib" path="lib/njs_client.jar"/>
+	<classpathentry kind="lib" path="lib/oscar.jar"/>
+	<classpathentry kind="lib" path="lib/osgi.jar"/>
+	<classpathentry kind="lib" path="lib/ow_deployment_scheduling.jar"/>
+	<classpathentry kind="lib" path="lib/puretls.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
+	<classpathentry kind="lib" path="lib/scriptPlugin.jar"/>
+	<classpathentry kind="lib" path="lib/servicebinder.jar"/>
+	<classpathentry kind="lib" path="lib/servlet.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="lib/shell.jar"/>
+	<classpathentry kind="lib" path="lib/shellgui.jar"/>
+	<classpathentry kind="lib" path="lib/shellplugin.jar"/>
+	<classpathentry kind="lib" path="lib/shelltui.jar"/>
+	<classpathentry kind="lib" path="lib/simple.jar"/>
+	<classpathentry kind="lib" path="lib/soap.jar"/>
+	<classpathentry kind="lib" path="lib/SVGGraphics.jar"/>
+	<classpathentry kind="lib" path="lib/tablelayout.jar"/>
+	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
