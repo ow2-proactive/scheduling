@@ -35,8 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
-
 
 /**
  * This class represent an ordered list of reception events.

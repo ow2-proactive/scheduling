@@ -50,7 +50,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -63,7 +62,7 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
@@ -229,8 +228,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
 
         // JMX registration
-        String mbeanProperty = ProActiveConfiguration.getInstance()
-                                                     .getProperty(Constants.PROPERTY_PA_JMX_MBEAN);
+        String mbeanProperty = PAProperties.PA_JMX_MBEAN.getValue();
         isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
 
         if ((mbeanProperty != null) && mbeanProperty.equals("true")) {

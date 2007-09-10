@@ -36,8 +36,8 @@ import java.net.URL;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -166,14 +166,11 @@ public class StartRuntime {
      */
     private void register(ProActiveRuntime PART) {
         try {
-            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
-                                                                                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getKey());
 
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
                 this.creatorID,
-                ProActiveConfiguration.getInstance()
-                                      .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL),
-                this.vmName);
+                PAProperties.PA_COMMUNICATION_PROTOCOL.getKey(), this.vmName);
         } catch (ProActiveException e) {
             e.printStackTrace();
 

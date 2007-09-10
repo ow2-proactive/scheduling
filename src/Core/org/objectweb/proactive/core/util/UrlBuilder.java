@@ -37,7 +37,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
@@ -177,12 +177,10 @@ public class UrlBuilder {
      */
     public static String buildUrlFromProperties(String host, String name) {
         String port = null;
-        String protocol = ProActiveConfiguration.getInstance()
-                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
                 protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = ProActiveConfiguration.getInstance()
-                                         .getProperty(Constants.PROPERTY_PA_RMI_PORT);
+            port = PAProperties.PA_RMI_PORT.getValue();
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             try {
@@ -191,8 +189,7 @@ public class UrlBuilder {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            port = ProActiveConfiguration.getInstance()
-                                         .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
+            port = PAProperties.PA_XMLHTTP_PORT.getValue();
         }
 
         if (port == null) {
@@ -257,8 +254,7 @@ public class UrlBuilder {
     public static String getProtocol(String nodeURL) {
         String protocol = URI.create(nodeURL).getScheme();
         if (protocol == null) {
-            return ProActiveConfiguration.getInstance()
-                                         .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+            return PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
         }
         return protocol;
     }
@@ -319,19 +315,14 @@ public class UrlBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
-        if (ProActiveConfiguration.getInstance()
-                                      .getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS) != null) {
-            return ProActiveConfiguration.getInstance()
-                                         .getProperty(Constants.PROPERTY_PA_RUNTIME_IPADDRESS);
+        if (PAProperties.PA_RUNTIME_IPADDRESS.getValue() != null) {
+            return PAProperties.PA_RUNTIME_IPADDRESS.getValue();
         }
 
-        if (ProActiveConfiguration.getInstance()
-                                      .getProperty(Constants.PROPERTY_PA_HOSTNAME) != null) {
-            return ProActiveConfiguration.getInstance()
-                                         .getProperty(Constants.PROPERTY_PA_HOSTNAME);
+        if (PAProperties.PA_HOSTNAME.getValue() != null) {
+            return PAProperties.PA_HOSTNAME.getValue();
         }
-        if ("true".equals(ProActiveConfiguration.getInstance()
-                                                    .getProperty(Constants.PROPERTY_PA_USE_IP_ADDRESS))) {
+        if ("true".equals(PAProperties.PA_USE_IP_ADDRESS.getValue())) {
             return address.getHostAddress();
         } else {
             return address.getCanonicalHostName();

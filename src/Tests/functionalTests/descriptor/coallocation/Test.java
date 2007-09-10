@@ -32,6 +32,7 @@ package functionalTests.descriptor.coallocation;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
@@ -50,8 +51,7 @@ public class Test extends FunctionalTest {
     private static String AGENT_XML_LOCATION_UNIX = null;
 
     static {
-        if ("ibis".equals(ProActiveConfiguration.getInstance()
-                                                    .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL))) {
+        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getKey())) {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
                     "/functionalTests/descriptor/coallocation/coallocationIbis.xml")
                                                 .getPath();

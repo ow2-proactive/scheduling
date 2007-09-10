@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
 import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
@@ -87,7 +87,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures = new FutureMap();
         valuesForFutures = new java.util.HashMap<String, FutureResult>();
         this.newState = false;
-        if ("enable".equals(ProActiveConfiguration.getInstance().getACState())) {
+        if ("enable".equals(PAProperties.PA_FUTURE_AC.getValue())) {
             this.registerACs = true;
             this.sendACs = true;
             this.queueAC = new ActiveACQueue();

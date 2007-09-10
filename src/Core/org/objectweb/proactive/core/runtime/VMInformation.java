@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.objectweb.proactive.Job;
-
 
 /**
  * <p>

@@ -34,8 +34,8 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         CommandBuilderProActive commandBuilderProActive = (CommandBuilderProActive) commandBuilder;
 
         String relPath = GCMParserHelper.getAttributeValue(paNode, "relpath");
+        commandBuilderProActive.setProActivePath(relPath);
 
-        // TODO - what do we do with this ?
         Node javaNode;
         try {
             javaNode = (Node) xpath.evaluate("pa:java", paNode,
@@ -67,37 +67,37 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
     protected void parseProActiveConfiguration(XPath xpath,
         CommandBuilderProActive commandBuilderProActive, Node configNode)
         throws XPathExpressionException {
-        Node classPathNode = (Node) xpath.evaluate("pa:proactiveClasspath",
+        Node classPathNode;
+
+        // Optional: proactiveClasspath
+        classPathNode = (Node) xpath.evaluate("pa:proactiveClasspath",
                 configNode, XPathConstants.NODE);
+        if (classPathNode != null) {
+            List<PathElement> proactiveClassPath = GCMParserHelper.parseClasspath(xpath,
+                    classPathNode);
+            commandBuilderProActive.setProActiveClasspath(proactiveClassPath);
+        }
 
-        List<PathElement> proactiveClassPath = GCMParserHelper.parseClasspath(xpath,
-                classPathNode);
-
-        commandBuilderProActive.setProActiveClasspath(proactiveClassPath);
-
+        // Optional: applicationClasspath
         classPathNode = (Node) xpath.evaluate("pa:applicationClasspath",
                 configNode, XPathConstants.NODE);
+        if (classPathNode != null) {
+            List<PathElement> applicationClassPath = GCMParserHelper.parseClasspath(xpath,
+                    classPathNode);
+            commandBuilderProActive.setApplicationClasspath(applicationClassPath);
+        }
 
-        List<PathElement> applicationClassPath = GCMParserHelper.parseClasspath(xpath,
-                classPathNode);
-
-        commandBuilderProActive.setApplicationClasspath(applicationClassPath);
-
-        // security policy
-        //
+        // Optional: security policy
         Node securityPolicyNode = (Node) xpath.evaluate("pa:securityPolicy",
                 configNode, XPathConstants.NODE);
-
         if (securityPolicyNode != null) {
             PathElement pathElement = GCMParserHelper.parsePathElementNode(securityPolicyNode);
             commandBuilderProActive.setSecurityPolicy(pathElement);
         }
 
-        // log4j properties
-        //
+        // Optional: log4j properties
         Node log4jPropertiesNode = (Node) xpath.evaluate("pa:log4jProperties",
                 configNode, XPathConstants.NODE);
-
         if (log4jPropertiesNode != null) {
             PathElement pathElement = GCMParserHelper.parsePathElementNode(log4jPropertiesNode);
             commandBuilderProActive.setLog4jProperties(pathElement);

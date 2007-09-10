@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.component.request;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.request.Request;

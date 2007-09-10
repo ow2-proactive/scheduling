@@ -83,7 +83,7 @@
 	<complexType name="pathType">
 		<sequence>
 			<element name="pathElement" type="ct:pathElementType"
-				maxOccurs="unbounded">
+				maxOccurs="unbounded" minOccurs="1">
 			</element>
 		</sequence>
 	</complexType>
@@ -91,7 +91,7 @@
 	<complexType name="classpathType">
 		<complexContent>
 			<extension base="ct:pathType">
-				<attribute name="type">
+				<attribute name="type" use="required">
 					<simpleType>
 						<restriction base="string">
 							<enumeration value="append"></enumeration>

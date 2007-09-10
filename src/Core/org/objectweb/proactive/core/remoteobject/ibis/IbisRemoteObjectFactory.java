@@ -35,6 +35,7 @@ import java.net.URI;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
@@ -192,7 +193,6 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
     }
 
     public int getPort() {
-        return Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                      .getProperty(Constants.PROPERTY_PA_RMI_PORT));
+        return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
     }
 }

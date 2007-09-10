@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
@@ -60,8 +61,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        String serverUrl = ProActiveConfiguration.getInstance()
-                                                 .getLocationServerRmi();
+        String serverUrl = PAProperties.PA_LOCATION_SERVER_RMI.getValue();
 
         this.server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });

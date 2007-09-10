@@ -83,65 +83,15 @@ public interface Constants {
     /**xml-http protocol identifier */
     public static final String XMLHTTP_PROTOCOL_IDENTIFIER = "http";
 
+    /** this property identifies the https protocol */
+    public static final String HTTPSSH_PROTOCOL_IDENTIFIER = "httpssh";
+
     /** default protocol identifier */
     public static final String DEFAULT_PROTOCOL_IDENTIFIER = RMI_PROTOCOL_IDENTIFIER;
 
     // list of system properties used within proactive
-
-    /** this property identifies the communication protocol */
-    public static final String PROPERTY_PA_COMMUNICATION_PROTOCOL = "proactive.communication.protocol";
-
-    /** this property allows to override the default java behaviour when retrieving the runtime url */
-    public static final String PROPERTY_PA_RUNTIME_IPADDRESS = "proactive.runtime.ipaddress";
-
-    /** this property allows to set the hostname of a runtime */
-    public static final String PROPERTY_PA_HOSTNAME = "proactive.hostname";
-
-    /** this property indicates to use the ip adress instead of DNS entry for a runtime url */
-    public static final String PROPERTY_PA_USE_IP_ADDRESS = "proactive.useIPaddress";
-
-    /** this property identifies the default port used by the RMI transport layer */
-    public static final String PROPERTY_PA_RMI_PORT = "proactive.rmi.port";
-
-    /** this property identifies the default port used by the RMISSH transport layer */
-    public static final String PROPERTY_PA_RMISSH_PORT = "proactive.ssh.port";
-
-    /** this property identifies the location of the known host file for the RMISSH transport layer */
-    public static final String PROPERTY_PA_RMISSH_KNOWN_HOST = "proactive.ssh.known_hosts";
-
-    /** this property identifies the location of RMISSH key directory */
-    public static final String PROPERTY_PA_RMISSH_KEY_DIR = "proactive.ssh.key_directory";
-
-    /** this property identifies the default port for the xml-http protocol  */
-    public static final String PROPERTY_PA_XMLHTTP_PORT = "proactive.http.port";
-
-    /** this property identifies that when using ssh tunneling, a normal connection should be tried before tunneling */
-    public static final String PROPERTY_PA_SSH_TUNNELING_TRY_NORMAL_FIRST = "proactive.tunneling.try_normal_first";
-
-    /** this property identifies if the garbage collector should be turned on when using ssh tunneling */
-    public static final String PROPERTY_PA_SSH_TUNNELING_USE_GC = "proactive.tunneling.use_gc";
-
-    /** this property identifies the garbage collector period when using ssh tunneling */
-    public static final String PROPERTY_PA_SSH_TUNNELING_GC_PERIOD = "proactive.tunneling.gc_period";
-
-    /** this property identifies the know hosts file location when using ssh tunneling
-     *  if undefined, the default value is user.home property concatenated to SSH_TUNNELING_DEFAULT_KNOW_HOSTS
-     *  */
-    public static final String PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS = "proactive.ssh.known_hosts";
     public static final String SSH_TUNNELING_DEFAULT_KNOW_HOSTS = "/.ssh/known_hosts";
 
-    /** this property identifies proactive's configuration file */
-    public static final String PROPERTY_PA_CONFIGURATION_FILE = "proactive.configuration";
-
-    /** this property identifies the https protocol */
-    public static final String HTTPSSH_PROTOCOL_IDENTIFIER = "httpssh";
-
-    /** this property indicates to create for each ProActive object a MBeans */
-    public static final String PROPERTY_PA_JMX_MBEAN = "proactive.jmx.mbean";
-
     /** this property indicates to send JMX notifications */
-    public static final String PROPERTY_PA_JMX_NOTIFICATION = "proactive.jmx.notification";
-
-    /** this property indicates to send JMX notifications */
-    public static final String PROPERTY_PA_USER_CONFIG_DIR = ".proactive";
+    public static final String USER_CONFIG_DIR = ".proactive";
 }

@@ -31,17 +31,7 @@
 package org.objectweb.proactive.core.body.migration;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-
-import javax.management.InstanceNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.ListenerNotFoundException;
-import javax.management.ListenerNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServer;
-import javax.management.NotificationListener;
-import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;

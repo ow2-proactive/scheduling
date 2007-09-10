@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -127,25 +127,21 @@ public abstract class FTManager implements java.io.Serializable {
         this.owner = owner;
         this.ownerID = owner.getID();
         try {
-            String ttcValue = ProActiveConfiguration.getInstance().getTTCValue();
+            String ttcValue = PAProperties.PA_FT_TTC.getValue();
             if (ttcValue != null) {
                 this.ttc = Integer.parseInt(ttcValue) * 1000;
             } else {
                 this.ttc = FTManager.DEFAULT_TTC_VALUE;
             }
-            String urlGlobal = ProActiveConfiguration.getInstance()
-                                                     .getGlobalFTServer();
+            String urlGlobal = PAProperties.PA_FT_SERVER_GLOBAL.getValue();
             if (urlGlobal != null) {
                 this.storage = (CheckpointServer) (Naming.lookup(urlGlobal));
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
                 this.recovery = (RecoveryProcess) (Naming.lookup(urlGlobal));
             } else {
-                String urlCheckpoint = ProActiveConfiguration.getInstance()
-                                                             .getCheckpointServer();
-                String urlRecovery = ProActiveConfiguration.getInstance()
-                                                           .getRecoveryServer();
-                String urlLocation = ProActiveConfiguration.getInstance()
-                                                           .getLocationServer();
+                String urlCheckpoint = PAProperties.PA_FT_SERVER_CHECKPOINT.getValue();
+                String urlRecovery = PAProperties.PA_FT_SERVER_RECOVERY.getValue();
+                String urlLocation = PAProperties.PA_LOCATION_SERVER.getValue();
                 if ((urlCheckpoint != null) && (urlRecovery != null) &&
                         (urlLocation != null)) {
                     this.storage = (CheckpointServer) (Naming.lookup(urlCheckpoint));

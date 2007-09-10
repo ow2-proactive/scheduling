@@ -23,9 +23,9 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
@@ -473,9 +473,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node protocol = node.getAttributes().getNamedItem("protocol");
             String p = getNodeExpandedValue(protocol);
             String protocolValue = (p != null) ? p
-                                               : ProActiveConfiguration.getInstance()
-                                                                       .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
-
+                                               : PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
             VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(getNodeExpandedValue(
                         virtualNodeName), false);
 
@@ -532,8 +530,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node protocolAttr = node.getAttributes().getNamedItem("protocol");
             String protocol = getNodeExpandedValue(protocolAttr);
             if (protocol == null) {
-                protocol = ProActiveConfiguration.getInstance()
-                                                 .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
             }
 
             vn.createNodeOnCurrentJvm(protocol);

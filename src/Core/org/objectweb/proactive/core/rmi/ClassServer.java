@@ -34,6 +34,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -52,15 +53,11 @@ public class ClassServer implements Runnable {
     static {
         String newport;
 
-        if (ProActiveConfiguration.getInstance()
-                                      .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
-            newport = ProActiveConfiguration.getInstance()
-                                            .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT);
+        if (PAProperties.PA_XMLHTTP_PORT.getValue() != null) {
+            newport = PAProperties.PA_XMLHTTP_PORT.getValue();
         } else {
             newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            ProActiveConfiguration.getInstance()
-                                  .setProperty(Constants.PROPERTY_PA_XMLHTTP_PORT,
-                newport);
+            PAProperties.PA_XMLHTTP_PORT.setValue(newport);
         }
     }
 
@@ -81,9 +78,7 @@ public class ClassServer implements Runnable {
     protected ClassServer(int port_) throws java.io.IOException {
         if (port_ == 0) {
             port = boundServerSocket(Integer.parseInt(
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT)),
-                    MAX_RETRY);
+                        PAProperties.PA_XMLHTTP_PORT.getValue()), MAX_RETRY);
             //            Thread.dumpStack();
         } else {
             port = port_;

@@ -40,6 +40,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
@@ -212,7 +213,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
 
     public static void main(String[] args) {
         ProActiveConfiguration.load();
-        String name = ProActiveConfiguration.getInstance().getLocationServerRmi();
+        String name = PAProperties.PA_LOCATION_SERVER_RMI.getValue();
 
         Object[] arg = new Object[1];
         arg[0] = name;

@@ -8,6 +8,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -199,8 +200,7 @@ public class FutureMonitoring implements Runnable {
      * disable the monitoring if FT is enabled.
      */
     private static int lastNumberOfNodes = 0;
-    private static boolean FTEnabled = "enable".equals(ProActiveConfiguration.getInstance()
-                                                                             .getFTState());
+    private static boolean FTEnabled = "enable".equals(PAProperties.PA_FT.getValue());
 
     private static boolean isFTEnabled() {
         if (!FTEnabled) {

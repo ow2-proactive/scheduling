@@ -33,11 +33,6 @@ package org.objectweb.proactive.core.remoteobject.http.message;
 import java.io.Serializable;
 import java.net.URI;
 
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.http.HTTPRemoteObjectFactory;
-import org.objectweb.proactive.core.remoteobject.http.HttpRemoteObjectImpl;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 

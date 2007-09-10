@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
@@ -175,7 +175,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        String ftstate = ProActiveConfiguration.getInstance().getFTState();
+        String ftstate = PAProperties.PA_FT.getValue();
         if ("enable".equals(ftstate)) {
             // if the object is a ProActive internal object, FT is disabled
             if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
@@ -183,8 +183,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
                     try {
                         // create the fault tolerance manager
-                        int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getInstance()
-                                                                                                .getFTProtocol());
+                        int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());
                         this.ftmanager = factory.newFTManagerFactory()
                                                 .newFTManager(protocolSelector);
                         this.ftmanager.init(this);

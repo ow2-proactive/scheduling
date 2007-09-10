@@ -56,20 +56,14 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveConfiguration {
     protected static Properties properties;
     protected static final String PROACTIVE_CONFIG_FILENAME = "ProActiveConfiguration.xml";
-    protected static final String PROACTIVE_USER_CONFIG_FILENAME = Constants.PROPERTY_PA_USER_CONFIG_DIR +
+    protected static final String PROACTIVE_USER_CONFIG_FILENAME = Constants.USER_CONFIG_DIR +
         File.separator + PROACTIVE_CONFIG_FILENAME;
     protected static ProActiveConfiguration singleton;
     protected static boolean isLoaded = false;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
 
-    // Cached value since isForwarder is frequently called
-    private static boolean isForwarder;
-
     static {
         singleton = new ProActiveConfiguration();
-        String prop = System.getProperty("proactive.hierarchicalRuntime");
-        isForwarder = ((prop != null) &&
-            (prop.equals("true") || prop.equals("root")));
     }
 
     private ProActiveConfiguration() {
@@ -104,9 +98,9 @@ public class ProActiveConfiguration {
             filename = null;
 
             /* First we look for the user defined properties */
-            if (System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE) != null) {
+            if (System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey()) != null) {
                 // if specified as a system property
-                filename = System.getProperty(Constants.PROPERTY_PA_CONFIGURATION_FILE);
+                filename = System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey());
             } else {
                 // or if the file exists in the user home dir
                 File f = new File(System.getProperty("user.home") +
@@ -128,7 +122,7 @@ public class ProActiveConfiguration {
             // set the properties
             setProperties(properties);
 
-            if (System.getProperty("log4j.configuration") == null) {
+            if (System.getProperty(PAProperties.LOG4J.getKey()) == null) {
                 //if logger is not defined create default logger with level info that logs
                 // on the console
                 Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
@@ -183,55 +177,6 @@ public class ProActiveConfiguration {
         return System.getProperty(property, defaultValue);
     }
 
-    public String getLocationServerClass() {
-        return System.getProperty("proactive.locationserver");
-    }
-
-    public String getLocationServerRmi() {
-        return System.getProperties().getProperty("proactive.locationserver.rmi");
-    }
-
-    public String getACState() {
-        return System.getProperty("proactive.future.ac");
-    }
-
-    public String getSchemaValidationState() {
-        return System.getProperty("schema.validation");
-    }
-
-    // FAULT TOLERANCE
-    public String getFTState() {
-        return System.getProperty("proactive.ft");
-    }
-
-    public String getCheckpointServer() {
-        return System.getProperty("proactive.ft.server.checkpoint");
-    }
-
-    public String getLocationServer() {
-        return System.getProperty("proactive.ft.server.location");
-    }
-
-    public String getRecoveryServer() {
-        return System.getProperty("proactive.ft.server.recovery");
-    }
-
-    public String getGlobalFTServer() {
-        return System.getProperty("proactive.ft.server.global");
-    }
-
-    public String getTTCValue() {
-        return System.getProperty("proactive.ft.ttc");
-    }
-
-    public String getAttachedResourceServer() {
-        return System.getProperty("proactive.ft.server.resource");
-    }
-
-    public String getFTProtocol() {
-        return System.getProperty("proactive.ft.protocol");
-    }
-
     public boolean osgiServletEnabled() {
         return "enabled".equals(System.getProperty("proactive.http.servlet"));
     }
@@ -239,10 +184,6 @@ public class ProActiveConfiguration {
     public static String getGroupInformation() {
         return System.getProperty("proactive.groupInformation",
             UniqueID.getCurrentVMID().toString() + "~-1");
-    }
-
-    public boolean isForwarder() {
-        return isForwarder;
     }
 
     /**

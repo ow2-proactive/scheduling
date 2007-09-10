@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -191,8 +192,7 @@ public class StartRuntime {
         ProActiveRuntimeImpl localRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveRuntime localRuntime;
         try {
-            localRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
-                                                                                           .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+            localRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getKey());
         } catch (ProActiveException e1) {
             logger.warn("Cannot get the local ProActive Runtime", e1);
             abort();
@@ -231,7 +231,7 @@ public class StartRuntime {
             }
         }
     }
-    private enum Params {parent("p", "URL of the parent ProActive Runtime"),
+    public enum Params {parent("p", "URL of the parent ProActive Runtime"),
         deploymentID("i", "An uniq ID for the deployment framework"),
         capacity("c", "Number of Node to be created");
         protected String sOpt;
@@ -240,6 +240,14 @@ public class StartRuntime {
         private Params(String sOpt, String desc) {
             this.sOpt = sOpt;
             this.desc = desc;
+        }
+
+        public String shortOpt() {
+            return sOpt;
+        }
+
+        public String longOpt() {
+            return toString();
         }
     }
 }

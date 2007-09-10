@@ -30,8 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.legacyparser;
 
-import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -109,8 +108,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             String protocol = attributes.getValue("protocol");
 
             if (!checkNonEmpty(protocol)) {
-                protocol = ProActiveConfiguration.getInstance()
-                                                 .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
             }
 
             //            protocol = UrlBuilder.checkProtocol(protocol);
@@ -239,8 +237,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
                     if (!checkNonEmpty(protocol)) {
-                        protocol = ProActiveConfiguration.getInstance()
-                                                         .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+                        protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
                     }
 
                     vn.createNodeOnCurrentJvm(protocol);

@@ -39,7 +39,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.PAObjectInputStream;
 
 import sun.rmi.server.MarshalInputStream;
@@ -109,8 +109,7 @@ public class ByteToObjectConverter {
     private static Object convert(byte[] byteArray,
         MakeDeepCopy.ConversionMode conversionMode)
         throws IOException, ClassNotFoundException {
-        final String mode = ProActiveConfiguration.getInstance()
-                                                  .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
 
         //here we check wether or not we are running in ibis
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(mode)) {

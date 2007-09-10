@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.ssh;
 
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.HostsInfos;
 
@@ -46,8 +47,7 @@ public class SshParameters {
 
     static public boolean getTryNormalFirst() {
         if (_tryNormalFirst == null) {
-            _tryNormalFirst = ProActiveConfiguration.getInstance()
-                                                    .getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_TRY_NORMAL_FIRST);
+            _tryNormalFirst = PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.getValue();
         }
         if ((_tryNormalFirst != null) && _tryNormalFirst.equals("yes")) {
             return true;
@@ -70,8 +70,7 @@ public class SshParameters {
     }
 
     static public boolean getUseTunnelGC() {
-        String useTunnelGC = ProActiveConfiguration.getInstance()
-                                                   .getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_USE_GC);
+        String useTunnelGC = PAProperties.PA_SSH_TUNNELING_USE_GC.getValue();
         if ((useTunnelGC != null) && useTunnelGC.equals("yes")) {
             return true;
         } else {
@@ -80,8 +79,7 @@ public class SshParameters {
     }
 
     static public int getTunnelGCPeriod() {
-        String gcPeriod = ProActiveConfiguration.getInstance()
-                                                .getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_GC_PERIOD);
+        String gcPeriod = PAProperties.PA_SSH_TUNNELING_GC_PERIOD.getValue();
         if (gcPeriod != null) {
             return Integer.parseInt(gcPeriod);
         } else {
@@ -91,8 +89,7 @@ public class SshParameters {
     }
 
     static public boolean getSshTunneling() {
-        String tunneling = ProActiveConfiguration.getInstance()
-                                                 .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        String tunneling = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
         if ((tunneling != null) &&
                 tunneling.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             return true;
@@ -106,8 +103,7 @@ public class SshParameters {
     }
 
     static public String getSshPort() {
-        String sshPort = ProActiveConfiguration.getInstance()
-                                               .getProperty(Constants.PROPERTY_PA_RMISSH_PORT);
+        String sshPort = PAProperties.PA_RMISSH_PORT.getValue();
         if (sshPort == null) {
             sshPort = "22";
         }
@@ -115,10 +111,8 @@ public class SshParameters {
     }
 
     static public String getSshKnownHostsFile() {
-        if (ProActiveConfiguration.getInstance()
-                                      .getProperty(Constants.PROPERTY_PA_RMISSH_KNOWN_HOST) != null) {
-            return ProActiveConfiguration.getInstance()
-                                         .getProperty(Constants.PROPERTY_PA_SSH_TUNNELING_KNOW_HOSTS);
+        if (PAProperties.PA_RMISSH_KNOWN_HOST.getValue() != null) {
+            return PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
         }
         return System.getProperty("user.home") +
         ProActiveConfiguration.getInstance()
@@ -126,8 +120,7 @@ public class SshParameters {
     }
 
     static public String getSshKeyDirectory() {
-        String keydir = ProActiveConfiguration.getInstance()
-                                              .getProperty(Constants.PROPERTY_PA_RMISSH_KEY_DIR);
+        String keydir = PAProperties.PA_RMISSH_KEY_DIR.getValue();
         if (keydir == null) {
             keydir = SSHKeys.SSH_DIR;
         }

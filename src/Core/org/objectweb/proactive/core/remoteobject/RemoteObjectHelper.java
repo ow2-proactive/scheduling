@@ -34,7 +34,7 @@ import java.net.URI;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.ReifiedCastException;
@@ -62,16 +62,13 @@ public class RemoteObjectHelper {
             // so we first instantiante the factory which will set the new port if necessary
             getRemoteObjectFactory(protocol);
 
-            if (ProActiveConfiguration.getInstance()
-                                          .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT) != null) {
-                return Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                              .getProperty(Constants.PROPERTY_PA_XMLHTTP_PORT));
+            if (PAProperties.PA_XMLHTTP_PORT.getValue() != null) {
+                return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
             }
         } else if ((Constants.RMI_PROTOCOL_IDENTIFIER.equals(protocol)) ||
                 Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol) ||
                 Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            return Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                          .getProperty(Constants.PROPERTY_PA_RMI_PORT));
+            return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
         }
 
         // default would be to return the RMI default port
@@ -102,8 +99,7 @@ public class RemoteObjectHelper {
      * @return the URI for the given name
      */
     public static URI generateUrl(String name) {
-        String protocol = ProActiveConfiguration.getInstance()
-                                                .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
         try {
             return URI.create(UrlBuilder.buildUrl(null, name, protocol,
                     getDefaultPortForProtocol(protocol), true));
@@ -136,8 +132,7 @@ public class RemoteObjectHelper {
                         uri.getPath());
             } else {
                 uri = URIBuilder.setProtocol(uri,
-                        ProActiveConfiguration.getInstance()
-                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
+                        PAProperties.PA_COMMUNICATION_PROTOCOL.getKey());
             }
         }
         return uri;

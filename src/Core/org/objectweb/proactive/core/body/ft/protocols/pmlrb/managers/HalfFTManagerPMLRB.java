@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.body.ft.protocols.pmlrb.infos.MessageInfoPML
 import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -75,13 +75,11 @@ public class HalfFTManagerPMLRB extends FTManager {
     public int init(AbstractBody owner) throws ProActiveException {
         //super.init(owner);        
         try {
-            String urlGlobal = ProActiveConfiguration.getInstance()
-                                                     .getGlobalFTServer();
+            String urlGlobal = PAProperties.PA_FT_SERVER_GLOBAL.getValue();
             if (urlGlobal != null) {
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
             } else {
-                String urlLocation = ProActiveConfiguration.getInstance()
-                                                           .getLocationServer();
+                String urlLocation = PAProperties.PA_LOCATION_SERVER.getValue();
                 if (urlLocation != null) {
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                 } else {

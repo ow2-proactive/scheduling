@@ -135,14 +135,7 @@
 					</element>
 
 				</sequence>
-				<attribute name="closeStream" type="boolean"></attribute>
-				<attribute name="name" type="string"></attribute>
-				<attribute ref="pa:PriorityAttr"></attribute>
-				<attribute ref="pa:OSAttr"></attribute>
 				<attribute name="relpath"
-					type="ct:pathElementGeneralType" use="optional">
-				</attribute>
-				<attribute name="javarelpath"
 					type="ct:pathElementGeneralType" use="optional">
 				</attribute>
 			</extension>
