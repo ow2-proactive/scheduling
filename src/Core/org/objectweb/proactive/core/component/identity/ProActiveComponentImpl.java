@@ -431,7 +431,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
         // add interface component
         itfs.add(this);
         // add controller interface
-        System.out.println("SIZE" + controlItfs.values().size());
         for (Object object : controlItfs.values()) {
             itfs.add(object);
         }
