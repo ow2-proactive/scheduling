@@ -179,9 +179,22 @@
 		<attribute name="version" type="string"></attribute>
 	</complexType>
 
+	<complexType name="homeDirectoryType">
+		<complexContent>
+			<restriction base="ct:pathElementType">
+				<attribute name="base" type="ct:pathElementBaseType"
+					fixed="root" use="required">
+				</attribute>
+				<attribute name="relpath"
+					type="ct:pathElementGeneralType" use="required">
+				</attribute>
+			</restriction>
+		</complexContent>
+	</complexType>
+
 	<complexType name="hostType">
 		<sequence>
-			<element name="homeDirectory" type="ct:pathElementType"></element>
+			<element name="homeDirectory" type="pa:homeDirectoryType"></element>
 			<element name="tool" type="pa:toolType" minOccurs="0"
 				maxOccurs="unbounded">
 			</element>
