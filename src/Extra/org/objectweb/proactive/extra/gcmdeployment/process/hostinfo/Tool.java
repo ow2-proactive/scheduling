@@ -1,6 +1,9 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.hostinfo;
 
-public class Tool implements Cloneable {
+import java.io.Serializable;
+
+
+public class Tool implements Serializable {
     private String id;
     private String path;
 
@@ -62,11 +65,5 @@ public class Tool implements Cloneable {
         sb.append(" id=" + id);
         sb.append(" path=" + path);
         return super.toString();
-    }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        Tool res = new Tool(new String(this.id), new String(this.path));
-        return res;
     }
 }

@@ -17,7 +17,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-public class GCMParserHelper {
+public class GCMParserHelper implements GCMParserConstants {
     static public String getAttributeValue(Node node, String attributeName) {
         Node namedItem = node.getAttributes().getNamedItem(attributeName);
         return (namedItem != null) ? namedItem.getNodeValue() : null;
@@ -84,6 +84,8 @@ public class GCMParserHelper {
                 throw new NullPointerException("Null prefix");
             } else if ("pa".equals(prefix)) {
                 return namespace;
+            } else if ("ct".equals(prefix)) {
+                return COMMON_TYPES_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }

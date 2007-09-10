@@ -3,11 +3,13 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"	
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/SampleDeploymentExtension.xsd">
+	http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes                ../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/CommonTypes.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension            ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/SampleDeploymentExtension.xsd">
 
 	<environment>
-		<descriptorVariable name="USERNAME" value="cmathieu" />
+		<ct:descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
 	<resources>
@@ -20,7 +22,7 @@
 		<hosts>
 			<host id="hSchubby" os="unix" hostCapacity="1"
 				vmCapacity="1">
-				<homeDirectory>/user/cmathieu/home</homeDirectory>
+				<homeDirectory base="root" relpath=">/user/cmathieu/home" />
 			</host>
 		</hosts>
 

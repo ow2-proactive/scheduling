@@ -190,21 +190,6 @@ public class HostInfoImpl implements HostInfo {
         return vmCapacity;
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        HostInfoImpl res = new HostInfoImpl();
-        res.username = this.username;
-        res.homeDirectory = this.homeDirectory;
-        res.hostCapacity = this.hostCapacity;
-        res.vmCapacity = this.vmCapacity;
-        res.id = this.id;
-        res.os = this.os;
-        for (Tool t : tools) {
-            res.tools.add((Tool) t.clone());
-        }
-        return res;
-    }
-
     @SuppressWarnings("unused")
     static public class UnitTestHostInfoImpl {
         HostInfoImpl notInitialized;

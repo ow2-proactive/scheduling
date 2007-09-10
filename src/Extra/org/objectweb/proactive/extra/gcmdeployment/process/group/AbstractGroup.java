@@ -1,8 +1,10 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -21,12 +23,12 @@ public abstract class AbstractGroup implements Group {
     public AbstractGroup(AbstractGroup group) {
         try {
             this.hostInfo = (HostInfo) ((group.hostInfo != null)
-                ? group.hostInfo.clone() : null);
+                ? Utils.makeDeepCopy(group.hostInfo) : null);
             this.commandPath = (commandPath != null) ? new String(commandPath)
                                                      : null;
             this.env = (group.env != null) ? new String(group.env) : null;
             this.id = (group.id != null) ? new String(group.id) : null;
-        } catch (CloneNotSupportedException e) {
+        } catch (IOException e) {
             // can't happen
         }
     }

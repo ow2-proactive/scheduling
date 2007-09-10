@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.util;
 
-public enum OperatingSystem {windows(';', '\\'),
+import java.io.Serializable;
+public enum OperatingSystem implements Serializable {windows(';', '\\'),
     unix(':', '/');
     protected char pathSeparator;
     protected char fileSeparator;

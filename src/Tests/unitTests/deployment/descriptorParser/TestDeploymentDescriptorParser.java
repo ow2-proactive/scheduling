@@ -18,12 +18,13 @@ import org.w3c.dom.Node;
 
 
 public class TestDeploymentDescriptorParser {
-    //    @Test
+    @Test
     public void test() throws IOException, XPathExpressionException {
         File descriptor = new File(this.getClass()
                                        .getResource("testfiles/deployment.xml")
                                        .getFile());
 
+        System.out.println("Parsing " + descriptor.getAbsolutePath());
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
 
         parser.parseEnvironment();
@@ -99,6 +100,8 @@ public class TestDeploymentDescriptorParser {
         ArrayList<String> schemas = new ArrayList<String>();
         schemas.add(userSchema);
 
+        System.out.println("Parsing " + descriptor.getAbsolutePath() +
+            " with custom schema " + userSchema);
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor,
                 schemas);
 

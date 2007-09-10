@@ -120,13 +120,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerGroupParser(new GroupMPIParser());
         registerGroupParser(new GroupUnicoreParser());
         registerGroupParser(new GroupPrunParser());
-        // TODO add other group parsers here 
+        // TODO add other group parsers here
     }
 
     protected void registerDefaultBridgeParsers() {
         registerBridgeParser(new BridgeSSHParser());
         registerBridgeParser(new BridgeRSHParser());
-        // TODO add other bridge parsers here 
+        // TODO add other bridge parsers here
     }
 
     /**
@@ -151,7 +151,12 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                                       .getResource(DEPLOYMENT_DESC_LOCATION)
                                       .toString();
 
+        String commonTypesSchema = getClass()
+                                       .getResource(COMMON_TYPES_DESC_LOCATION)
+                                       .toString();
+
         schemas.add(0, deploymentSchema);
+        schemas.add(0, commonTypesSchema);
 
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
