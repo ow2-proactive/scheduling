@@ -17,10 +17,6 @@
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl</implementation>
-        </controller>
-        <controller>
             <interface>org.objectweb.fractal.api.control.NameController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveNameController</implementation>
         </controller>
@@ -37,5 +33,4 @@
             <implementation>org.objectweb.proactive.core.component.controller.MigrationControllerImpl</implementation>
         </controller>
     </controllers>
-    
 </componentConfiguration>

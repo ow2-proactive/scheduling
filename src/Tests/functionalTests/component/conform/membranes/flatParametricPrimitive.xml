@@ -4,6 +4,7 @@
  name="defaultConfiguration">
  <!--  This is the default configuration file for the controllers and interceptors of a **primitive** component in the proactive implementation.-->
     <controllers>
+        <!-- need to add the factory itf -->
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl</implementation>
@@ -15,10 +16,6 @@
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
-        </controller>
-        <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.fractal.api.control.NameController</interface>
