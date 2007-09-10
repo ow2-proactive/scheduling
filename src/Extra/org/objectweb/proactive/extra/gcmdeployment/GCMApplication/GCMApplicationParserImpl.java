@@ -44,15 +44,16 @@ import org.xml.sax.SAXException;
  *  - Write some comment to explain how it works
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
-    
-    private static final String XPATH_GCMAPP             = "/pa:GCMApplication/";
-    private static final String XPATH_VIRTUAL_NODE       = XPATH_GCMAPP + "pa:application/pa:proactive/pa:virtualNode";
-    private static final String XPATH_RESOURCE_PROVIDERS = XPATH_GCMAPP + "pa:resources/pa:resourceProvider";
-    private static final String XPATH_APPLICATION        = XPATH_GCMAPP + "pa:application";
-    private static final String XPATH_RESOURCE_PROVIDER  = "pa:resourceProvider";
-    private static final String XPATH_FILETRANSFER       = "pa:filetransfer";
-    private static final String XPATH_FILE               = "pa:file";
-    
+    private static final String XPATH_GCMAPP = "/pa:GCMApplication/";
+    private static final String XPATH_VIRTUAL_NODE = XPATH_GCMAPP +
+        "pa:application/pa:proactive/pa:virtualNode";
+    private static final String XPATH_RESOURCE_PROVIDERS = XPATH_GCMAPP +
+        "pa:resources/pa:resourceProvider";
+    private static final String XPATH_APPLICATION = XPATH_GCMAPP +
+        "pa:application";
+    private static final String XPATH_RESOURCE_PROVIDER = "pa:resourceProvider";
+    private static final String XPATH_FILETRANSFER = "pa:filetransfer";
+    private static final String XPATH_FILE = "pa:file";
     protected File descriptor;
     protected Document document;
     protected DocumentBuilderFactory domFactory;

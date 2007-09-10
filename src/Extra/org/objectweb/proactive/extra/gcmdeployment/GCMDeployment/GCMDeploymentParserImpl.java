@@ -49,18 +49,20 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
-    private static final String XPATH_GCMDEPLOYMENT       = "/pa:GCMDeployment/";
-    private static final String XPATH_INFRASTRUCTURE      = XPATH_GCMDEPLOYMENT + "pa:infrastructure";
-    private static final String XPATH_RESOURCES           = XPATH_GCMDEPLOYMENT + "pa:resources";
-    private static final String XPATH_ENVIRONMENT         = XPATH_GCMDEPLOYMENT + "pa:environment";
-    private static final String XPATH_TOOL                = "pa:tool";
-    private static final String XPATH_HOME_DIRECTORY      = "pa:homeDirectory";
-    private static final String XPATH_BRIDGES             = "pa:bridges/*";
-    private static final String XPATH_GROUPS              = "pa:groups/*";
-    private static final String XPATH_HOSTS               = "pa:hosts/pa:host";
-    private static final String XPATH_HOST                = "pa:host";
+    private static final String XPATH_GCMDEPLOYMENT = "/pa:GCMDeployment/";
+    private static final String XPATH_INFRASTRUCTURE = XPATH_GCMDEPLOYMENT +
+        "pa:infrastructure";
+    private static final String XPATH_RESOURCES = XPATH_GCMDEPLOYMENT +
+        "pa:resources";
+    private static final String XPATH_ENVIRONMENT = XPATH_GCMDEPLOYMENT +
+        "pa:environment";
+    private static final String XPATH_TOOL = "pa:tool";
+    private static final String XPATH_HOME_DIRECTORY = "pa:homeDirectory";
+    private static final String XPATH_BRIDGES = "pa:bridges/*";
+    private static final String XPATH_GROUPS = "pa:groups/*";
+    private static final String XPATH_HOSTS = "pa:hosts/pa:host";
+    private static final String XPATH_HOST = "pa:host";
     private static final String XPATH_DESCRIPTOR_VARIABLE = "pa:descriptorVariable";
-    
     protected Document document;
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
@@ -194,8 +196,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             parseInfrastructure();
         }
 
-        Node resourcesNode = (Node) xpath.evaluate(XPATH_RESOURCES,
-                document, XPathConstants.NODE);
+        Node resourcesNode = (Node) xpath.evaluate(XPATH_RESOURCES, document,
+                XPathConstants.NODE);
 
         NodeList childNodes = resourcesNode.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); ++i) {
