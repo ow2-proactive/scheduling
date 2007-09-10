@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.ressourceallocator;
 
 import java.io.CharArrayWriter;
-import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;

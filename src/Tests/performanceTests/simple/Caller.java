@@ -30,10 +30,7 @@
  */
 package performanceTests.simple;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
 /**

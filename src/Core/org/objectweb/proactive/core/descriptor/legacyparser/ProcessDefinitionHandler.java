@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.legacyparser;
 
+import java.io.File;
 import java.util.StringTokenizer;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -921,7 +922,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
                 if (paths.length > 0) {
                     StringBuffer sb = new StringBuffer();
-                    String pathSeparator = System.getProperty("path.separator");
+                    String pathSeparator = File.pathSeparator;
                     sb.append(paths[0].trim());
 
                     for (int i = 1; i < paths.length; i++) {

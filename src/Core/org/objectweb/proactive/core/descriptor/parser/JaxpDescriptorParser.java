@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.descriptor.parser;
 
 import java.io.CharArrayWriter;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -473,7 +474,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node protocol = node.getAttributes().getNamedItem("protocol");
             String p = getNodeExpandedValue(protocol);
             String protocolValue = (p != null) ? p
-                                               : PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+                                               : PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
             VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(getNodeExpandedValue(
                         virtualNodeName), false);
 
@@ -530,7 +531,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node protocolAttr = node.getAttributes().getNamedItem("protocol");
             String protocol = getNodeExpandedValue(protocolAttr);
             if (protocol == null) {
-                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
             }
 
             vn.createNodeOnCurrentJvm(protocol);
@@ -1967,7 +1968,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         NodeList childNodes = node.getChildNodes();
 
         StringBuffer sb = new StringBuffer();
-        String pathSeparator = System.getProperty("path.separator");
+        String pathSeparator = File.pathSeparator;
 
         boolean firstPathComponent = true;
         for (int i = 0; i < childNodes.getLength(); ++i) {

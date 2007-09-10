@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;

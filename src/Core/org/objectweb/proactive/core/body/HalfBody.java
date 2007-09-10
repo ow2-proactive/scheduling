@@ -105,8 +105,7 @@ public class HalfBody extends AbstractBody {
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        String ftstate = PAProperties.PA_FT.getValue();
-        if ("enable".equals(ftstate)) {
+        if (PAProperties.PA_FT.isTrue()) {
             try {
                 // create the fault-tolerance manager
                 int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());

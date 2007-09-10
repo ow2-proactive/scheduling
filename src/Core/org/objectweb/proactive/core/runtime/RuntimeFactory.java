@@ -148,7 +148,7 @@ public abstract class RuntimeFactory {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
             //            defaultRuntime = getProtocolSpecificRuntime(ProActiveConfiguration.getInstance()
             //                                                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
-            defaultRuntime = getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getKey());
+            defaultRuntime = getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
             if (runtimeLogger.isDebugEnabled()) {
                 runtimeLogger.debug("default runtime = " +
                     defaultRuntime.getURL());

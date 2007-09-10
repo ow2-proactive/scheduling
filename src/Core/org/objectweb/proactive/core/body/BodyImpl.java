@@ -175,8 +175,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        String ftstate = PAProperties.PA_FT.getValue();
-        if ("enable".equals(ftstate)) {
+        if (PAProperties.PA_FT.isTrue()) {
             // if the object is a ProActive internal object, FT is disabled
             if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
                 // if the object is not serilizable, FT is disabled

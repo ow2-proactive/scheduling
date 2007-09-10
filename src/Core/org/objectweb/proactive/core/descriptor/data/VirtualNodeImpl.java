@@ -949,7 +949,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void createNodeOnCurrentJvm(String protocol) {
         if (protocol == null) {
-            protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+            protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
 
         this.localVirtualMachines.add(protocol);

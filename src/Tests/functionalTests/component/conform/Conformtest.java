@@ -31,7 +31,6 @@ import static org.junit.Assert.fail;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.util.Fractal;

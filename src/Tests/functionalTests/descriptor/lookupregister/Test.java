@@ -31,9 +31,7 @@
 package functionalTests.descriptor.lookupregister;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -51,7 +49,7 @@ public class Test extends FunctionalTest {
     private static String AGENT_XML_LOCATION_UNIX;
 
     static {
-        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getKey())) {
+        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
                     "/functionalTests/descriptor/lookupregister/AgentIbis.xml")
                                                 .getPath();

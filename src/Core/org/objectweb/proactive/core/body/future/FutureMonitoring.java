@@ -200,7 +200,7 @@ public class FutureMonitoring implements Runnable {
      * disable the monitoring if FT is enabled.
      */
     private static int lastNumberOfNodes = 0;
-    private static boolean FTEnabled = "enable".equals(PAProperties.PA_FT.getValue());
+    private static boolean FTEnabled = PAProperties.PA_FT.isTrue();
 
     private static boolean isFTEnabled() {
         if (!FTEnabled) {

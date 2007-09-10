@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.AlreadyBoundException;
-import java.text.Annotation;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
@@ -47,9 +46,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;

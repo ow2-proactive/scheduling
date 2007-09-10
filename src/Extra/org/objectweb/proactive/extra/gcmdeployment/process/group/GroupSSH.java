@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
 

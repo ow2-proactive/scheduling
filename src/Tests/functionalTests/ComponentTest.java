@@ -31,6 +31,7 @@
 package functionalTests;
 
 import org.junit.BeforeClass;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 import functionalTests.FunctionalTest;
@@ -59,8 +60,7 @@ public abstract class ComponentTest extends FunctionalTest {
 
     @BeforeClass
     public static void componentPreConditions() throws Exception {
-        if (!"enable".equals(ProActiveConfiguration.getInstance()
-                                                       .getProperty("proactive.future.ac"))) {
+        if (!PAProperties.PA_FUTURE_AC.isTrue()) {
             throw new Exception(
                 "The components framework needs the automatic continuations (system property 'proactive.future.ac' set to 'enable') to be operative");
         }

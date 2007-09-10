@@ -177,10 +177,6 @@ public class ProActiveConfiguration {
         return System.getProperty(property, defaultValue);
     }
 
-    public boolean osgiServletEnabled() {
-        return "enabled".equals(System.getProperty("proactive.http.servlet"));
-    }
-
     public static String getGroupInformation() {
         return System.getProperty("proactive.groupInformation",
             UniqueID.getCurrentVMID().toString() + "~-1");

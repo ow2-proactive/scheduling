@@ -177,7 +177,7 @@ public class UrlBuilder {
      */
     public static String buildUrlFromProperties(String host, String name) {
         String port = null;
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
                 protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             port = PAProperties.PA_RMI_PORT.getValue();
@@ -254,7 +254,7 @@ public class UrlBuilder {
     public static String getProtocol(String nodeURL) {
         String protocol = URI.create(nodeURL).getScheme();
         if (protocol == null) {
-            return PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+            return PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
         return protocol;
     }
@@ -322,7 +322,7 @@ public class UrlBuilder {
         if (PAProperties.PA_HOSTNAME.getValue() != null) {
             return PAProperties.PA_HOSTNAME.getValue();
         }
-        if ("true".equals(PAProperties.PA_USE_IP_ADDRESS.getValue())) {
+        if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
             return address.getHostAddress();
         } else {
             return address.getCanonicalHostName();

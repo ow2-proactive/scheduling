@@ -108,7 +108,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             String protocol = attributes.getValue("protocol");
 
             if (!checkNonEmpty(protocol)) {
-                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
             }
 
             //            protocol = UrlBuilder.checkProtocol(protocol);
@@ -237,7 +237,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
                     if (!checkNonEmpty(protocol)) {
-                        protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+                        protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
                     }
 
                     vn.createNodeOnCurrentJvm(protocol);

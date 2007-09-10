@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.rmi;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -233,7 +234,7 @@ public class FileProcess {
     }
 
     private java.io.File[] findClasspathRoots(String classpath) {
-        String pathSeparator = System.getProperty("path.separator");
+        String pathSeparator = File.pathSeparator;
         java.util.StringTokenizer st = new java.util.StringTokenizer(classpath,
                 pathSeparator);
         int n = st.countTokens();

@@ -87,7 +87,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures = new FutureMap();
         valuesForFutures = new java.util.HashMap<String, FutureResult>();
         this.newState = false;
-        if ("enable".equals(PAProperties.PA_FUTURE_AC.getValue())) {
+        if (PAProperties.PA_FUTURE_AC.isTrue()) {
             this.registerACs = true;
             this.sendACs = true;
             this.queueAC = new ActiveACQueue();

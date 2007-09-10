@@ -191,7 +191,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
         inputSource.setSystemId(uri.toString());
 
-        if ("enable".equals(PAProperties.SCHEMA_VALIDATION.getValue())) {
+        if (PAProperties.SCHEMA_VALIDATION.isTrue()) {
             String[] selectedSchemasArray = selectedSchemas.toArray(new String[0]);
             if (selectedSchemasArray.length == 0) {
                 selectedSchemasArray = null;

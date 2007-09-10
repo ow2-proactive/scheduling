@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.soap.SOAPException;
 import org.apache.soap.server.DefaultConfigManager;
 import org.apache.soap.server.DeploymentDescriptor;
+import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
@@ -65,7 +66,7 @@ public class WsdlServlet extends HttpServlet {
             }
 
             Hashtable<String, String> options = new Hashtable<String, String>();
-            String catalinaBase = System.getProperty("catalina.base");
+            String catalinaBase = PAProperties.CATALINA_BASE.getValue();
             options.put("filename",
                 catalinaBase + "/webapps/soap/DeployedServices.ds");
             cm.setOptions(options);

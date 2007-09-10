@@ -9,6 +9,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
@@ -93,8 +94,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     public AOPinger(final SlaveDeadListener listener) {
         this.listener = listener;
         terminated = false;
-        pingPeriod = Long.parseLong(System.getProperty(
-                    "proactive.masterslave.pingperiod"));
+        pingPeriod = Long.parseLong(PAProperties.PA_MASTERSLAVE_PINGPERIOD.getValue());
     }
 
     /**

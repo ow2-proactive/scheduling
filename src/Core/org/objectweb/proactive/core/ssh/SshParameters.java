@@ -43,18 +43,6 @@ import org.objectweb.proactive.core.util.HostsInfos;
  */
 public class SshParameters {
     static private int _connectTimeout = -1;
-    static private String _tryNormalFirst = null;
-
-    static public boolean getTryNormalFirst() {
-        if (_tryNormalFirst == null) {
-            _tryNormalFirst = PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.getValue();
-        }
-        if ((_tryNormalFirst != null) && _tryNormalFirst.equals("yes")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     static public int getConnectTimeout() {
         if (_connectTimeout == -1) {
@@ -69,15 +57,6 @@ public class SshParameters {
         return _connectTimeout;
     }
 
-    static public boolean getUseTunnelGC() {
-        String useTunnelGC = PAProperties.PA_SSH_TUNNELING_USE_GC.getValue();
-        if ((useTunnelGC != null) && useTunnelGC.equals("yes")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     static public int getTunnelGCPeriod() {
         String gcPeriod = PAProperties.PA_SSH_TUNNELING_GC_PERIOD.getValue();
         if (gcPeriod != null) {
@@ -89,7 +68,7 @@ public class SshParameters {
     }
 
     static public boolean getSshTunneling() {
-        String tunneling = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+        String tunneling = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         if ((tunneling != null) &&
                 tunneling.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             return true;

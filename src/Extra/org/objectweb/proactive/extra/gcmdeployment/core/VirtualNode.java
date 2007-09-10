@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.runtime.LocalNode;
 
 
 /**

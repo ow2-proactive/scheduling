@@ -33,7 +33,7 @@ package functionalTests.activeobject.acontinuation;
 import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -54,15 +54,14 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        String initial_ca_setting = ProActiveConfiguration.getInstance()
-                                                          .getProperty("proactive.future.ac");
-        if (!"enable".equals(initial_ca_setting)) {
-            System.setProperty("proactive.future.ac", "enable");
+        String initial_ca_setting = PAProperties.PA_FUTURE_AC.getValue();
+        if (!PAProperties.PA_FUTURE_AC.isTrue()) {
+            PAProperties.PA_FUTURE_AC.setValue(PAProperties.TRUE);
         }
         ACThread acthread = new ACThread();
         acthread.start();
         acthread.join();
-        System.setProperty("proactive.future.ac", initial_ca_setting);
+        PAProperties.PA_FUTURE_AC.setValue(initial_ca_setting);
 
         assertTrue(futureByResult && a.isSuccessful());
         assertTrue(a.getFinalResult().equals("dummy"));

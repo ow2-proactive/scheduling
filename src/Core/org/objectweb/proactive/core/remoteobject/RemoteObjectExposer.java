@@ -120,7 +120,7 @@ public class RemoteObjectExposer implements Serializable {
     }
 
     public String getURL() {
-        return getURL(PAProperties.PA_COMMUNICATION_PROTOCOL.getKey());
+        return getURL(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
     }
 
     public void unregisterAll() {

@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.ressourceallocator;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import junit.framework.JUnit4TestAdapter;
 

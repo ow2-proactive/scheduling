@@ -89,7 +89,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                         "org.objectweb.proactive.p2p.service.StartP2PService");
 
                     if (this.acquistion == null) {
-                        this.acquistion = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+                        this.acquistion = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
                     }
 
                     process.setParameters("-port " + this.port + " -acq " +

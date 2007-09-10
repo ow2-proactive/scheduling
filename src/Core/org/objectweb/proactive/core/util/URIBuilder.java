@@ -178,7 +178,7 @@ public class URIBuilder {
      */
     public static URI buildURIFromProperties(String host, String name) {
         String port = null;
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
                 protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             port = PAProperties.PA_RMI_PORT.getValue();
@@ -291,7 +291,7 @@ public class URIBuilder {
         if (PAProperties.PA_HOSTNAME.getValue() != null) {
             return PAProperties.PA_HOSTNAME.getValue();
         }
-        if ("true".equals(PAProperties.PA_USE_IP_ADDRESS.getValue())) {
+        if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
             return address.getHostAddress();
         } else {
             return address.getCanonicalHostName();

@@ -1810,7 +1810,7 @@ public class ProActive {
                 "Cannot register such virtualNode since it results from a lookup!");
         }
         if (registrationProtocol == null) {
-            registrationProtocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+            registrationProtocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);

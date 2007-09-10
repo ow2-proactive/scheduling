@@ -1,10 +1,7 @@
 package functionalTests.gcmdeployment.capacity;
 
-import java.util.Collection;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.StartRuntime;
 

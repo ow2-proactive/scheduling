@@ -228,10 +228,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
 
         // JMX registration
-        String mbeanProperty = PAProperties.PA_JMX_MBEAN.getValue();
         isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
 
-        if ((mbeanProperty != null) && mbeanProperty.equals("true")) {
+        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
             if (!isProActiveInternalObject) {
                 // If the node is not a HalfBody
                 if (!nodeURL.equals("LOCAL")) {

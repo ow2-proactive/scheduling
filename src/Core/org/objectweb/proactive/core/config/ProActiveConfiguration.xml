@@ -12,12 +12,12 @@
 		<prop key="proactive.mixedlocation.maxMigrationNb" value="-1"/>
 		<prop key="proactive.mixedlocation.maxTimeOnSite" value="-1"/>
 		
-		<prop key="proactive.future.ac" value="enable"/>
+		<prop key="proactive.future.ac" value="true"/>
 		<prop key="proactive.future.maxdelay" value="0"/> <!-- 0: no timeout -->
 		<prop key="proactive.stack_trace" value="false"/> <!-- complete stack traces in requests -->
 		<prop key="proactive.dgc" value="false"/>
 		<prop key="proactive.exit_on_empty" value="false"/> <!-- destroy the JVM when there is no more active object -->
-		<prop key="schema.validation" value="enable"/>
+		<prop key="schema.validation" value="true"/>
 		<prop key="name_server" value="localhost"/>
 		<prop key="name_server_pool" value="rutget"/>
 		<prop key="pool_host_number" value="1"/>
@@ -33,14 +33,14 @@
 		<prop key="ibis.name_server.key" value="12"/>
 		<prop key="fractal.provider" value="org.objectweb.proactive.core.component.Fractive"/>
 		<prop key="ibis.name" value="tcp"/>
-		<prop key="proactive.http.servlet" value="disabled" />
+		<prop key="proactive.http.servlet" value="false" />
 		<prop key="java.protocol.handler.pkgs" value="org.objectweb.proactive.core.ssh"/>
 
 		<!-- <prop key="proactive.tunneling.connect_timeout" value="2000"/> -->
 		<prop key="proactive.tunneling.try_normal_first" value="yes"/>
 		<prop key="proactive.tunneling.use_gc" value="yes"/>
 		<prop key="proactive.tunneling.gc_period" value="10000"/>
-		<prop key="proactive.classloader" value="disable"/>
+		<prop key="proactive.classloader" value="false"/>
 		<!-- <prop key="proactive.ssh.known_hosts" value="/user/mlacage/home/.ssh/known_hosts"/> -->
 		<!-- <prop key="proactive.ssh.key_directory" value="/user/mlacage/home/.ssh/"/> -->
 		<!-- <prop key="proactive.ssh.port" value="22"/> -->
@@ -48,7 +48,7 @@
 
 		<prop key="components.creation.timeout" value="10000"/> <!-- timeout in seconds for parallel creation of components -->
 		
-		<prop key="proactive.ft" value="disable"/>
+		<prop key="proactive.ft" value="false"/>
 		<prop key="proactive.ft.ttc" value="30"/>
 		
 		<prop key="proactive.scheduler.default_policy_factory" value="getNewPolicy" />

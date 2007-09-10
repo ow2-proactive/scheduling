@@ -163,7 +163,7 @@ public class ClassServer implements Runnable {
     }
 
     public static int getServerSocketPort() {
-        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
+        if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
             return ClassServerServlet.getPort();
         }
         return port;
@@ -175,7 +175,7 @@ public class ClassServer implements Runnable {
 
     public static String getUrl() {
         try {
-            if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
+            if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
                 return ClassServerServlet.getUrl();
             } else {
                 return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(

@@ -69,9 +69,7 @@ public abstract class AbstractExecuteCommand {
 
         if ((add2path != null) && (add2path.length() > 0)) {
             Map<String, String> env = pb.environment();
-            env.put("PATH",
-                env.get("PATH") + System.getProperty("path.separator") +
-                add2path);
+            env.put("PATH", env.get("PATH") + File.pathSeparator + add2path);
         }
 
         Process p = pb.start();

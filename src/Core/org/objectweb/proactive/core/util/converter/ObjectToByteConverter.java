@@ -107,7 +107,7 @@ public class ObjectToByteConverter {
 
     private static byte[] convert(Object o, ConversionMode conversionMode)
         throws IOException {
-        final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+        final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
         //here we check wether or not we are running in ibis
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(mode)) {

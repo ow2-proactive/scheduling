@@ -145,8 +145,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             // JMX
             String mbeanProperty = PAProperties.PA_JMX_MBEAN.getValue();
-            createMBean = ((mbeanProperty != null) &&
-                mbeanProperty.equals("true"));
+            createMBean = PAProperties.PA_JMX_MBEAN.isTrue();
             if (createMBean) {
                 proActiveRuntime.createMBean();
             }
@@ -204,8 +203,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.nodeMap = new java.util.Hashtable<String, LocalNode>();
 
             try {
-                String file = System.getProperties()
-                                    .getProperty("proactive.runtime.security");
+                String file = PAProperties.PA_RUNTIME_SECURITY.getValue();
                 ProActiveSecurity.loadProvider();
 
                 if ((file != null) && new File(file).exists()) {
@@ -216,8 +214,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                         file);
 
                     // Is the runtime included within a Domain ?
-                    String domainURL = System.getProperties()
-                                             .getProperty("proactive.runtime.domain.url");
+                    String domainURL = PAProperties.PA_RUNTIME_DOMAIN_URL.getValue();
 
                     if (domainURL != null) {
                         SecurityEntity domain = (SecurityDomain) ProActive.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
@@ -466,7 +463,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         URI realnodeURL = URI.create(nodeURL);
         if (!realnodeURL.isAbsolute()) {
             try {
-                realnodeURL = RemoteObjectHelper.generateUrl(PAProperties.PA_COMMUNICATION_PROTOCOL.getKey(),
+                realnodeURL = RemoteObjectHelper.generateUrl(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(),
                         nodeName);
             } catch (UnknownProtocolException e) {
                 throw new NodeException(e);
@@ -1553,7 +1550,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         logger.debug("Capacity set to " + capacity + ". Creating the nodes...");
         vmInformation.setCapacity(capacity);
 
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
             String nodeName = "CapacityNode-" + i;

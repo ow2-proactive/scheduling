@@ -99,7 +99,7 @@ public class RemoteObjectHelper {
      * @return the URI for the given name
      */
     public static URI generateUrl(String name) {
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         try {
             return URI.create(UrlBuilder.buildUrl(null, name, protocol,
                     getDefaultPortForProtocol(protocol), true));
@@ -132,7 +132,7 @@ public class RemoteObjectHelper {
                         uri.getPath());
             } else {
                 uri = URIBuilder.setProtocol(uri,
-                        PAProperties.PA_COMMUNICATION_PROTOCOL.getKey());
+                        PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
             }
         }
         return uri;

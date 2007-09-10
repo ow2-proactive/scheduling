@@ -31,7 +31,6 @@
 package functionalTests.activeobject.context;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;

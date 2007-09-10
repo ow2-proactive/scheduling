@@ -109,7 +109,7 @@ public class ByteToObjectConverter {
     private static Object convert(byte[] byteArray,
         MakeDeepCopy.ConversionMode conversionMode)
         throws IOException, ClassNotFoundException {
-        final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getKey();
+        final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
         //here we check wether or not we are running in ibis
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(mode)) {

@@ -38,6 +38,7 @@ import java.io.FileWriter;
 
 import org.junit.Before;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 import functionalTests.FunctionalTest;
@@ -62,7 +63,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        System.setProperty("proactive.classloader", "enable");
+        PAProperties.PA_CLASSLOADER.setValue(PAProperties.TRUE);
         String oldFilePath = getClass()
                                  .getResource("/functionalTests/runtime/classloader/deployment.xml")
                                  .getPath();
