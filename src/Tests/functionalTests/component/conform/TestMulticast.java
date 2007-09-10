@@ -20,11 +20,11 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
-import functionalTests.component.binding.SlaveImpl;
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.MasterImpl;
 import functionalTests.component.conform.components.Slave;
+import functionalTests.component.conform.components.SlaveImpl;
 import functionalTests.component.conform.components.SlaveMulticast;
 
 
