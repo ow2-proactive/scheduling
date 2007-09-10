@@ -49,7 +49,6 @@
 			<processDefinition id="linuxJVM1">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
 						<parameter value="-Dproactive.test=true"/>
 						<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001" />
 						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
@@ -59,7 +58,6 @@
 						<processDefinition id="linuxJVM2">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
 						<parameter value="-Dproactive.test=true"/>
 						<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8002" />
 						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
@@ -69,7 +67,6 @@
 						<processDefinition id="linuxJVM3">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
 						<parameter value="-Dproactive.test=true"/>
 						<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8003" />
 						<parameter  value="-Dproactive.test.timeout=9999999999"/> 
@@ -79,7 +76,6 @@
 						<processDefinition id="linuxJVM4">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
 						<parameter value="-Dproactive.test=true"/>
 							<parameter value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8004" />
 					

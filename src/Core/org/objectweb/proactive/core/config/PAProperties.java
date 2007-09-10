@@ -175,8 +175,8 @@ public enum PAProperties {
             return false;
         }
 
-        logger.warn(key + "is a boolean property but its value is nor " + TRUE +
-            " nor " + FALSE + " " + "(" + val + "). ");
+        logger.warn(key + " is a boolean property but its value is nor " +
+            TRUE + " nor " + FALSE + " " + "(" + val + "). ");
         return false;
     }
 

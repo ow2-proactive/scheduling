@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FaultToleranceService implements UniversalService {
     public static final String FT_SERVICE_NAME = "Fault-Tolerance Service";
-    public static final String DEFAULT_PARAM_LINE = "-Dproactive.ft=disable";
+    public static final String DEFAULT_PARAM_LINE = "-Dproactive.ft=false";
 
     // logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
@@ -97,7 +97,7 @@ public class FaultToleranceService implements UniversalService {
      * @return the java properties sequence corresponding to the set values.
      */
     public String buildParamsLine() {
-        StringBuffer line = new StringBuffer("-Dproactive.ft=enable");
+        StringBuffer line = new StringBuffer("-Dproactive.ft=true");
         if (this.getGlobalServerURL() != null) {
             if ((this.getCheckpointServerURL() != null) ||
                     (this.getLocationServerURL() != null) ||
