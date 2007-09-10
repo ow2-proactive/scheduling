@@ -79,5 +79,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="/ProActiveTrunk/lib/log4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="/ProActiveTrunk/lib/javassist.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
