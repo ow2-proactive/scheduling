@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
 
 public class TestApplicationDescriptorParser {
     final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass()
-                                                                            .getResource("/unitTests/descriptorParser/testfiles/application")
+                                                                            .getResource("/unitTests/deployment/descriptorParser/testfiles/application")
                                                                             .getFile();
 
     //    @Test
@@ -73,7 +73,7 @@ public class TestApplicationDescriptorParser {
             System.out.println(file);
 
             String userSchema = getClass()
-                                    .getResource("/unitTests/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
+                                    .getResource("/unitTests/deployment/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
                                     .toString();
 
             ArrayList<String> schemas = new ArrayList<String>();
