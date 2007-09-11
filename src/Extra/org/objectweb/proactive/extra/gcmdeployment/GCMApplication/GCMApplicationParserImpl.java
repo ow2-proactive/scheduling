@@ -122,8 +122,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                                        .toString();
 
         schemas.add(0, deploymentSchema);
-        schemas.add(0, commonTypesSchema);
-
+        //        schemas.add(0, commonTypesSchema);
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
@@ -133,7 +132,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                    GCMParserConstants.APPLICATION_DESCRIPTOR_NAMESPACE));
+                    GCM_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
         }
@@ -197,7 +196,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                         resourceProviderParams));
             }
         } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         }
 
         return resourceProvidersMap;

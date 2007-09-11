@@ -84,8 +84,6 @@ public class GCMParserHelper implements GCMParserConstants {
                 throw new NullPointerException("Null prefix");
             } else if ("pa".equals(prefix)) {
                 return namespace;
-            } else if ("ct".equals(prefix)) {
-                return COMMON_TYPES_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }

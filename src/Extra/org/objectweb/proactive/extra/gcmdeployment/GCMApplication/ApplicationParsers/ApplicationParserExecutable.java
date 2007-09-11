@@ -9,6 +9,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderScript;
@@ -17,6 +18,10 @@ import org.w3c.dom.NodeList;
 
 
 public class ApplicationParserExecutable extends AbstractApplicationParser {
+    private static final String PA_RESOURCE_PROVIDER = "pa:resourceProvider";
+    private static final String PA_COMMAND = "pa:command";
+    private static final String PA_ARG = "pa:arg";
+    private static final String PA_FILE_TRANSFER = "pa:fileTransfer";
     protected static final String NODE_NAME = "executable";
 
     @Override
@@ -44,7 +49,7 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
 
         NodeList resourceProviderNodes;
         try {
-            resourceProviderNodes = (NodeList) xpath.evaluate("pa:resourceProvider",
+            resourceProviderNodes = (NodeList) xpath.evaluate(PA_RESOURCE_PROVIDER,
                     appNode, XPathConstants.NODESET);
             Map<String, GCMDeploymentDescriptor> resourceProvidersMap = applicationParser.getResourceProviders();
 
@@ -61,7 +66,7 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
                 }
             }
 
-            Node commandNode = (Node) xpath.evaluate("pa:command", appNode,
+            Node commandNode = (Node) xpath.evaluate(PA_COMMAND, appNode,
                     XPathConstants.NODE);
 
             String name = GCMParserHelper.getAttributeValue(commandNode, "name");
@@ -77,8 +82,8 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
 
             // command args
             //
-            NodeList argNodes = (NodeList) xpath.evaluate("pa:arg",
-                    commandNode, XPathConstants.NODESET);
+            NodeList argNodes = (NodeList) xpath.evaluate(PA_ARG, commandNode,
+                    XPathConstants.NODESET);
             for (int i = 0; i < argNodes.getLength(); ++i) {
                 Node argNode = argNodes.item(i);
                 String argVal = argNode.getFirstChild().getNodeValue();
@@ -87,7 +92,7 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
 
             // filetransfer
             //
-            NodeList fileTransferNodes = (NodeList) xpath.evaluate("pa:filetransfer",
+            NodeList fileTransferNodes = (NodeList) xpath.evaluate(PA_FILE_TRANSFER,
                     appNode, XPathConstants.NODESET);
 
             for (int i = 0; i < fileTransferNodes.getLength(); ++i) {
@@ -96,8 +101,7 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
                 commandBuilderScript.addFileTransferBlock(fileTransferBlock);
             }
         } catch (XPathExpressionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         }
     }
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <GCMApplication
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema
-	../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas
+	../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd
 	http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension
-	../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/SampleApplicationExtension.xsd">
+	SampleApplicationExtension.xsd">
 
 	<application>
 		<paext:myapplication someattr="foobar" />

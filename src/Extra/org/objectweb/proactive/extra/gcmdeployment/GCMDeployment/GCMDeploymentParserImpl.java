@@ -156,8 +156,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                                        .toString();
 
         schemas.add(0, deploymentSchema);
-        schemas.add(0, commonTypesSchema);
-
+        //        schemas.add(0, commonTypesSchema);
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
@@ -167,7 +166,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
             xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                    DEPLOYMENT_DESCRIPTOR_NAMESPACE));
+                    GCM_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         }

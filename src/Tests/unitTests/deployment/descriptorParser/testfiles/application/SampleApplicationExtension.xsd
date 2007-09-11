@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema">
+	<import schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 	<complexType name="myapplicationType">
