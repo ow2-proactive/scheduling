@@ -191,12 +191,14 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         ExceptionListException exceptionList = null;
 
         /* if the method called is toString, apply it to the proxy, not to the members */
-        if ("toString".equals(mc.getName())) {
+        if (("toString".equals(mc.getName())) &&
+                (mc.getNumberOfParameter() == 0)) {
             return this.toString();
         }
 
         /* if the method called is hashCode, apply it to the proxy, not to the members */
-        if ("hashCode".equals(mc.getName())) {
+        if (("hashCode".equals(mc.getName())) &&
+                (mc.getNumberOfParameter() == 0)) {
             return new Integer(this.hashCode());
         }
 
