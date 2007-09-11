@@ -56,6 +56,9 @@ public class CommandBuilderProActive implements CommandBuilder {
     /** Log4j configuration file */
     private PathElement log4jProperties;
 
+    /** User properties file */
+    private PathElement userProperties;
+
     public CommandBuilderProActive() {
         GCMD_LOGGER.trace(this.getClass().getSimpleName() + " created");
         vns = new HashMap<String, VirtualNodeInternal>();
@@ -144,6 +147,18 @@ public class CommandBuilderProActive implements CommandBuilder {
             GCMD_LOGGER.trace(" Set securityPolicy relpath to " +
                 pe.getRelPath());
             securityPolicy = pe;
+        }
+    }
+
+    public PathElement getUserProperties() {
+        return userProperties;
+    }
+
+    public void setUserProperties(PathElement userProperties) {
+        if (userProperties != null) {
+            GCMD_LOGGER.trace(" Set userProperties relpath to " +
+                userProperties.getRelPath());
+            this.userProperties = userProperties;
         }
     }
 
