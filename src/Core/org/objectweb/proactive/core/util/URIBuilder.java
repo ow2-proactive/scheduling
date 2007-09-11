@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.util;
 
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -284,6 +285,8 @@ public class URIBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
+        address = UrlBuilder.getNetworkInterfaces();
+
         if (PAProperties.PA_RUNTIME_IPADDRESS.getValue() != null) {
             return PAProperties.PA_RUNTIME_IPADDRESS.getValue();
         }
@@ -291,11 +294,15 @@ public class URIBuilder {
         if (PAProperties.PA_HOSTNAME.getValue() != null) {
             return PAProperties.PA_HOSTNAME.getValue();
         }
+        String temp = "";
+
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
-            return address.getHostAddress();
+            temp = ((Inet6Address) address).getHostAddress();
         } else {
-            return address.getCanonicalHostName();
+            temp = address.getCanonicalHostName();
         }
+
+        return URIBuilder.ipv6withoutscope(temp);
     }
 
     /**
@@ -355,5 +362,26 @@ public class URIBuilder {
         }
 
         return u;
+    }
+
+    public static String ipv6withoutscope(String address) {
+        String name = address;
+        int indexPercent = name.indexOf('%');
+        if (indexPercent != 0) {
+            return "[" + name.substring(0, indexPercent) + "]";
+        } else {
+            return address;
+        }
+    }
+
+    public static String ipv6withoutscope(InetAddress address) {
+        String name = address.getHostAddress();
+        int indexPercent = name.indexOf('%');
+
+        if (indexPercent != 0) {
+            return "[" + name.substring(0, indexPercent) + "]";
+        } else {
+            return name;
+        }
     }
 }
