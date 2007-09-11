@@ -63,7 +63,6 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -94,8 +93,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, Interface, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    protected Map fcInterfaceReferences;
-    protected Map nfInterfaceReferences;
+    protected Map<String, Interface> fcInterfaceReferences;
+    protected Map<String, Interface> nfInterfaceReferences;
     protected Proxy proxy;
     protected ComponentType componentType = null; // immutable
     protected StubObject stubOnBaseObject = null;
@@ -119,7 +118,7 @@ public class ProActiveComponentRepresentativeImpl
      * @param componentType
      */
     private void addFunctionalInterfaces(ComponentType componentType) {
-        fcInterfaceReferences = new HashMap(componentType.getFcInterfaceTypes().length);
+        fcInterfaceReferences = new HashMap<String, Interface>(componentType.getFcInterfaceTypes().length);
         InterfaceType[] interface_types = componentType.getFcInterfaceTypes();
         try {
             for (int j = 0; j < interface_types.length; j++) {
@@ -161,7 +160,7 @@ public class ProActiveComponentRepresentativeImpl
         // - the number of client functional interfaces
         // - the number of server functional interfaces
         //ArrayList interface_references_list = new ArrayList(1 +componentType.getFcInterfaceTypes().length+controllersConfiguration.size());
-        nfInterfaceReferences = new HashMap(1 +
+        nfInterfaceReferences = new HashMap<String, Interface>(1 +
                 controllersConfiguration.size());
 
         int i = 0;
@@ -250,7 +249,7 @@ public class ProActiveComponentRepresentativeImpl
         if (interfaceName.endsWith("-controller") &&
                 !("attribute-controller".equals(interfaceName))) {
             if (nfInterfaceReferences == null) {
-                // retreive the configuration by calling directly the mandatory component parameters controller itf
+                // retrieve the configuration by calling directly the mandatory component parameters controller itf
                 ComponentParameters params = (ComponentParameters) reifyCall(ComponentParametersController.class.getName(),
                         "getComponentParameters", new Class[] {  },
                         new Object[] {  }, ComponentRequest.STRICT_FIFO_PRIORITY);
@@ -446,19 +445,38 @@ public class ProActiveComponentRepresentativeImpl
     public void _terminateAOImmediatly(Proxy proxy) {
     }
 
+    /**
+     * @see org.objectweb.fractal.api.Interface#getFcItfName()
+     */
     public String getFcItfName() {
         return "component";
     }
 
+    /**
+     * @see org.objectweb.fractal.api.Interface#getFcItfOwner()
+     */
     public Component getFcItfOwner() {
         return this;
     }
 
+    /**
+     * @see org.objectweb.fractal.api.Interface#getFcItfType()
+     */
     public Type getFcItfType() {
         return componentType;
     }
 
+    /**
+     * @see org.objectweb.fractal.api.Interface#isFcInternalItf()
+     */
     public boolean isFcInternalItf() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        String string = "name : " + getFcItfName() + "\n" + getFcItfType() +
+            "\n" + "isInternal : " + isFcInternalItf() + "\n";
+        return string;
     }
 }

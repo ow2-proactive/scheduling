@@ -98,18 +98,20 @@ public class TestCollection extends Conformtest {
         checkComponent(c,
             new HashSet(Arrays.asList(
                     new Object[] {
-                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, serverI, clientI
+                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, serverI, clientI
                     })));
         //       new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
     }
 
     @Test
-    @Ignore
     public void testCompositeWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "composite", null);
         checkComponent(c,
             new HashSet(Arrays.asList(
-                    new Object[] { COMP, BC, CC, LC, SC, NC, serverI, clientI })));
+                    new Object[] {
+                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, serverI,
+                        clientI
+                    })));
     }
 
     @Test
@@ -297,7 +299,6 @@ public class TestCollection extends Conformtest {
     }
 
     @Test
-    @Ignore
     public void testCompositeTemplateNoSuchCollectionItf()
         throws Exception {
         Component c = gf.newFcInstance(t, compositeTemplate, null);

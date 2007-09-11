@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.component.identity;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -426,26 +425,27 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        List<Object> itfs = new ArrayList<Object>(15); //we have 10 control itfs
-
-        // add interface component
-        itfs.add(this);
-        // add controller interface
-        for (Object object : controlItfs.values()) {
-            itfs.add(object);
-        }
-
-        //add server interface
-        for (Object object : serverItfs.values()) {
-            itfs.add(object);
-        }
-
-        //add client interface
-        for (Object object : clientItfs.values()) {
-            itfs.add(object);
-        }
-
-        return itfs.toArray(new Object[itfs.size()]);
+        //        List<Object> itfs = new ArrayList<Object>(15); //we have at least 10 control itfs
+        //
+        //        // add interface component
+        //        itfs.add(this);
+        //        // add controller interface
+        //        for (Object object : controlItfs.values()) {
+        //            itfs.add(object);
+        //        }
+        //
+        //        //add server interface
+        //        for (Object object : serverItfs.values()) {
+        //            itfs.add(object);
+        //        }
+        //
+        //        //add client interface
+        //        for (Object object : clientItfs.values()) {
+        //            itfs.add(object);
+        //        }
+        //
+        //        return itfs.toArray(new Object[itfs.size()]);
+        return getRepresentativeOnThis().getFcInterfaces();
     }
 
     /*
@@ -551,6 +551,13 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
             throw new ProActiveRuntimeException("This component could not generate a reference on itself",
                 e);
         }
+    }
+
+    @Override
+    public String toString() {
+        String string = "name : " + getFcItfName() + "\n" + getFcItfType() +
+            "\n" + "isInternal : " + isFcInternalItf() + "\n";
+        return string;
     }
 
     /**

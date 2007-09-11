@@ -107,9 +107,9 @@ public abstract class Utils extends Object {
     /**
      * Removes the keyword 'native' from the String given as argument.
      *
-     * We assume there is only one occurence of 'native' in the string.
+     * We assume there is only one occurrence of 'native' in the string.
      *
-     * @return the input String minus the first occurence of 'native'.
+     * @return the input String minus the first occurrence of 'native'.
      * @param  in The String the keyword 'native' is to be removed from.
      */
     static public String getRidOfNative(String in) {

@@ -71,7 +71,7 @@ public class TestMulticast extends Conformtest {
     // Test component instantiation
     // -------------------------------------------------------------------------
     @Test
-    public void testPrimitiveWithCollection() throws Exception {
+    public void testPrimitiveWithMulticast() throws Exception {
         Component master = gf.newFcInstance(tMaster, "primitive",
                 MasterImpl.class.getName());
         checkComponent(master,
@@ -88,7 +88,7 @@ public class TestMulticast extends Conformtest {
     }
 
     @Test
-    public void testCompositeWithCollection() throws Exception {
+    public void testCompositeWithMulticast() throws Exception {
         Component master = gf.newFcInstance(tMaster, "composite", null);
         checkComponent(master,
             new HashSet(Arrays.asList(
