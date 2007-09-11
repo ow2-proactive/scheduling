@@ -62,49 +62,6 @@ public interface P2PConstants {
     public static final String VN_NAME = "SharedNodes";
 
     // -------------------------------------------------------------------------
-    // Java system properties names
-    // -------------------------------------------------------------------------
-
-    /** Acquisition method. */
-    public static final String PROPERTY_ACQUISITION = "proactive.p2p.acq";
-
-    /** Port number. */
-    public static final String PROPERTY_PORT = "proactive.p2p.port";
-
-    /** NOA is in number of peers. */
-    public static final String PROPERTY_NOA = "proactive.p2p.noa";
-
-    /** TTU is in minutes. */
-    public static final String PROPERTY_TTU = "proactive.p2p.ttu";
-
-    /** TTL is in hops. */
-    public static final String PROPERTY_TTL = "proactive.p2p.ttl";
-
-    /** List capacity of message sequence number. */
-    public static final String PROPERTY_MSG_MEMORY = "proactive.p2p.msg_capacity";
-
-    /** Percentage of agree response. */
-    public static final String PROPERTY_EXPLORING_MSG = "proactive.p2p.expl_msg";
-
-    /** Timeout for node acquisition. */
-    public static final String PROPERTY_NODES_ACQUISITION_T0 = "proactive.p2p.nodes_acq_to";
-
-    /** Lookup frequency for nodes. */
-    public static final String PROPERTY_LOOKUP_FREQ = "proactive.p2p.lookup_freq";
-
-    /** If true deploying one shared nodes by CPU, else only one node is shared. */
-    public static final String PROPERTY_MULTI_PROC_NODES = "proactive.p2p.multi_proc_nodes";
-
-    /** Path of the xml deployment descriptor, for deploying shared nodes. */
-    public static final String PROPERPY_XML_PATH = "proactive.p2p.xml_path";
-
-    /** Boolean for using or not p2p load balanced. */
-    public static final String PROPERTY_LOAD_BAL = "proactive.p2p.loadbalancing";
-
-    /** Boolean value for disable node sharing. */
-    public static final String PROPERTY_NO_SHARING = "proactive.p2p.nosharing";
-
-    // -------------------------------------------------------------------------
     // IC2D P2P Property
     // -------------------------------------------------------------------------
 

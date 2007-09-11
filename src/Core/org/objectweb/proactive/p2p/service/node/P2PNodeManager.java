@@ -74,7 +74,9 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private final Vector<Object> bookedNodes = new Vector<Object>();
     private final Vector usingNodes = new Vector();
     private int nodeCounter = 0;
-    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
+
+    //    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
+    private final String descriptorPath = System.getProperty(PAProperties.PA_P2P_XML_PATH.getKey());
     private ProActiveDescriptorInternal pad = null;
 
     //--------------------------------------------------------------------------
