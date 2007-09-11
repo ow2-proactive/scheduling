@@ -8,7 +8,7 @@ public class TestBasicDescriptorParsing {
     @Test
     public void action() throws Exception {
         String descriptorLocation = getClass()
-                                        .getResource("SSH_LSF_Example.xml")
+                                        .getResource("javaproperty_ERROR.xml")
                                         .getPath();
 
         Object proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
