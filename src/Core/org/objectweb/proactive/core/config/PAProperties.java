@@ -192,7 +192,7 @@ public enum PAProperties {
 
     // -------------- Master/Slave
 
-    /** TODO fviale Describe this property */
+    /** The ping period is the default interval at which slaves receive a ping message (to check if they're alive).*/
     PA_MASTERSLAVE_PINGPERIOD("proactive.masterslave.pingperiod", false),
 
     // -------------- P2P
@@ -334,6 +334,7 @@ public enum PAProperties {
         if (TRUE.equals(val)) {
             return true;
         }
+
         if (FALSE.equals(val)) {
             return false;
         }
