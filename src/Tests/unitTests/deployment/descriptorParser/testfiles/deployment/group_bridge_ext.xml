@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMDeployment
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
+	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"	
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes                ../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/CommonTypes.xsd
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
 	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension            ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/SampleDeploymentExtension.xsd">
 
 	<environment>
-		<ct:descriptorVariable name="USERNAME" value="cmathieu" />
+		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
 	<resources>

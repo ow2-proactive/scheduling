@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="CommonTypes.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"></import>
+	<include schemaLocation="CommonTypes.xsd"></include>
 
 	<attribute name="OSAttr">
 		<simpleType>
@@ -44,49 +43,49 @@
 			<element name="file" maxOccurs="unbounded">
 				<complexType>
 					<attribute name="path"
-						type="ct:pathElementGeneralType">
+						type="pa:pathElementGeneralType">
 					</attribute>
 				</complexType>
 			</element>
-			<element name="fileTransfer" type="ct:fileTransferType"
+			<element name="fileTransfer" type="pa:fileTransferType"
 				minOccurs="0" maxOccurs="unbounded">
 			</element>
 			<element name="executable" minOccurs="0">
 				<complexType>
 					<attribute name="relpath"
-						type="ct:pathElementGeneralType">
+						type="pa:pathElementGeneralType">
 					</attribute>
 				</complexType>
 			</element>
 		</sequence>
-		<attribute name="id" type="ct:idType"></attribute>
+		<attribute name="id" type="pa:idType"></attribute>
 	</complexType>
 
 	<complexType name="virtualNodeType">
 		<sequence>
-			<element name="fileTranfer" type="ct:fileTransferType"
+			<element name="fileTranfer" type="pa:fileTransferType"
 				minOccurs="0" maxOccurs="unbounded">
 			</element>
 			<element name="resourceProvider" minOccurs="0"
 				maxOccurs="unbounded">
 				<complexType>
-					<attribute name="refid" type="ct:idType">
+					<attribute name="refid" type="pa:idType">
 					</attribute>
 				</complexType>
 			</element>
 		</sequence>
 		<attribute name="id" type="string" use="required"></attribute>
 		<attribute name="raref" type="string"></attribute>
-		<attribute name="capacity" type="ct:capacityType"></attribute>
+		<attribute name="capacity" type="pa:capacityType"></attribute>
 	</complexType>
 
 	<complexType name="commandType">
 		<sequence>
-			<element name="path" type="ct:pathElementType"
+			<element name="path" type="pa:pathElementType"
 				minOccurs="0" />
 			<element name="arg" type="string" minOccurs="0"
 				maxOccurs="unbounded" />
-			<element name="filetransfer" type="ct:fileTransferType"
+			<element name="filetransfer" type="pa:fileTransferType"
 				minOccurs="0" />
 		</sequence>
 		<attribute name="name" type="pa:parameterType"></attribute>
@@ -102,29 +101,29 @@
 						<complexType>
 							<all>
 								<element name="bootclasspath"
-									type="ct:pathType" minOccurs="0">
+									type="pa:pathType" minOccurs="0">
 								</element>
 								<element name="java" minOccurs="0">
 									<complexType>
 										<attribute name="relpath"
-											type="ct:pathElementGeneralType">
+											type="pa:pathElementGeneralType">
 										</attribute>
 									</complexType>
 								</element>
 								<element name="applicationClasspath"
-									type="ct:classpathType" minOccurs="0">
+									type="pa:classpathType" minOccurs="0">
 								</element>
 								<element name="proactiveClasspath"
-									type="ct:classpathType" minOccurs="0">
+									type="pa:classpathType" minOccurs="0">
 								</element>
 								<element name="securityPolicy"
-									type="ct:pathElementType" minOccurs="0">
+									type="pa:pathElementType" minOccurs="0">
 								</element>
 								<element name="log4jProperties"
-									type="ct:pathElementType" minOccurs="0">
+									type="pa:pathElementType" minOccurs="0">
 								</element>
 								<element name="userProperties"
-									type="ct:pathElementType" minOccurs="0">
+									type="pa:pathElementType" minOccurs="0">
 								</element>
 							</all>
 						</complexType>
@@ -136,7 +135,7 @@
 
 				</sequence>
 				<attribute name="relpath"
-					type="ct:pathElementGeneralType" use="optional">
+					type="pa:pathElementGeneralType" use="optional">
 				</attribute>
 			</extension>
 		</complexContent>
