@@ -86,8 +86,8 @@ public class ClassServer implements Runnable {
 
         PAProperties.PA_HTTP_PORT.setValue(port + "");
 
-                hostname = java.net.InetAddress.getLocalHost().getHostAddress();
-//        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
+        hostname = java.net.InetAddress.getLocalHost().getHostAddress();
+        //        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
 
         //        System.out.println("URL du classServer : " + hostname + ":" + port);
         newListener();

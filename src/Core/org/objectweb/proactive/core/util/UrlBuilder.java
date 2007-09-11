@@ -321,8 +321,7 @@ public class UrlBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
-//        address = getNetworkInterfaces();
-
+        //        address = getNetworkInterfaces();
         if (PAProperties.PA_RUNTIME_IPADDRESS.getValue() != null) {
             return PAProperties.PA_RUNTIME_IPADDRESS.getValue();
         }

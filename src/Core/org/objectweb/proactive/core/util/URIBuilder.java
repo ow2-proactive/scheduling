@@ -285,8 +285,7 @@ public class URIBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
-//        address = UrlBuilder.getNetworkInterfaces();
-
+        //        address = UrlBuilder.getNetworkInterfaces();
         if (PAProperties.PA_RUNTIME_IPADDRESS.getValue() != null) {
             return PAProperties.PA_RUNTIME_IPADDRESS.getValue();
         }
