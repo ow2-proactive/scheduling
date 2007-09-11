@@ -366,7 +366,7 @@ public class URIBuilder {
     public static String ipv6withoutscope(String address) {
         String name = address;
         int indexPercent = name.indexOf('%');
-        if (indexPercent != 0) {
+        if (indexPercent != -1) {
             return "[" + name.substring(0, indexPercent) + "]";
         } else {
             return address;
