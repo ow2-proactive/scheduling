@@ -68,4 +68,8 @@ public class FutureID implements Serializable {
         }
         return true;
     }
+
+    public String toString() {
+        return "[Future " + this.ID + " created by " + this.creatorID + "]";
+    }
 }

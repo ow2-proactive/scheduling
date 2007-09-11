@@ -106,47 +106,40 @@ public class FuturePool extends Object implements java.io.Serializable {
     // this table is used to register destination before sending.
     // So, a future could retreive its destination during serialization
     // this table indexed by the thread which perform the registration.
-    static private java.util.Hashtable<Thread, ArrayList<UniversalBody>> bodiesDestination;
+    static private ThreadLocal<ArrayList<UniversalBody>> bodiesDestination;
 
     // to register in the table
     static public void registerBodiesDestination(ArrayList<UniversalBody> dests) {
-        bodiesDestination.put(Thread.currentThread(), dests);
+        bodiesDestination.set(dests);
     }
 
     // to clear an entry in the table
     static public void removeBodiesDestination() {
-        bodiesDestination.remove(Thread.currentThread());
+        bodiesDestination.remove();
     }
 
     // to get a destination
     static public ArrayList<UniversalBody> getBodiesDestination() {
-        return (bodiesDestination.get(Thread.currentThread()));
+        return bodiesDestination.get();
     }
 
     // this table is used to register deserialized futures after receive
     // So, futures to add in the local futurePool could be retreived
-    static private java.util.Hashtable<Thread, ArrayList<Future>> incomingFutures;
+    static private ThreadLocal<ArrayList<Future>> incomingFutures;
 
     // to register an incoming future in the table
     public static void registerIncomingFuture(Future f) {
-        ArrayList<Future> listOfFutures = incomingFutures.get(Thread.currentThread());
-        if (listOfFutures != null) {
-            listOfFutures.add(f);
-        } else {
-            ArrayList<Future> newListOfFutures = new ArrayList<Future>();
-            newListOfFutures.add(f);
-            incomingFutures.put(Thread.currentThread(), newListOfFutures);
-        }
+        incomingFutures.get().add(f);
     }
 
     // to remove an entry from the table
     static public void removeIncomingFutures() {
-        incomingFutures.remove(Thread.currentThread());
+        incomingFutures.remove();
     }
 
     // to get a list of incomingFutures
     static public ArrayList<Future> getIncomingFutures() {
-        return (incomingFutures.get(Thread.currentThread()));
+        return (incomingFutures.get());
     }
 
     // body forwarders
@@ -170,8 +163,12 @@ public class FuturePool extends Object implements java.io.Serializable {
     }
 
     static {
-        bodiesDestination = new java.util.Hashtable<Thread, ArrayList<UniversalBody>>();
-        incomingFutures = new java.util.Hashtable<Thread, ArrayList<Future>>();
+        bodiesDestination = new ThreadLocal<ArrayList<UniversalBody>>();
+        incomingFutures = new ThreadLocal<ArrayList<Future>>() {
+                    protected synchronized ArrayList<Future> initialValue() {
+                        return new ArrayList<Future>();
+                    }
+                };
         // A HashTable cannot contain null as value so we use a syncrhonized HashMap
         forwarderThreads = Collections.synchronizedMap(new HashMap<Thread, Object>());
     }
@@ -290,8 +287,8 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             // 2) create and put ACservices
             if (this.registerACs) {
-                ArrayList<UniversalBody> bodiesToContinue = futures.getAutomaticContinuation(id,
-                        creatorID);
+                ArrayList<UniversalBody> bodiesToContinue = (ArrayList<UniversalBody>) (futures.getAutomaticContinuation(id,
+                        creatorID).clone());
                 if ((bodiesToContinue != null) &&
                         (bodiesToContinue.size() != 0)) {
                     ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
@@ -578,9 +575,6 @@ public class FuturePool extends Object implements java.io.Serializable {
                     FuturePool.this.getOwnerBody().exitFromThreadStore();
                 } catch (Exception e2) {
                     // to unblock active object
-                    System.out.println(
-                        "ActiveACQueue.run() BOOOOOOOOOOOOOMMMMM");
-
                     e2.printStackTrace();
                     FuturePool.this.getOwnerBody().exitFromThreadStore();
                     throw new ProActiveRuntimeException("Error while sending reply for AC ",
