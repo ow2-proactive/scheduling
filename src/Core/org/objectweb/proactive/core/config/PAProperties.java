@@ -268,8 +268,8 @@ public enum PAProperties {
 
     /** TODO vlegrand Describe this property */
     CATALINA_BASE("catalina.base", false),
-    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", true);// Jalopy sucks !
-    static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
+    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", true);static final Logger logger =
+        ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     private String key;
