@@ -48,11 +48,9 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 public class RemoteObjectHelper {
 
     /**
-     * returns the default port set for the given protocol
-     *
+     * returns the default port set for the given protocol or -1 if none
      * @param protocol
-     *            the protocol
-     * @return the default port number associated to the protocol
+     * @return the default port number associated to the protocol or -1 if none
      * @throws UnknownProtocolException
      */
     public static int getDefaultPortForProtocol(String protocol)
@@ -80,7 +78,6 @@ public class RemoteObjectHelper {
      * protocol and name
      *
      * @param protocol
-     *            the protocol
      * @return the default port number associated to the protocol
      * @throws UnknownProtocolException
      */
@@ -95,7 +92,6 @@ public class RemoteObjectHelper {
      * default protocol and name
      *
      * @param name
-     *            the name
      * @return the URI for the given name
      */
     public static URI generateUrl(String name) {
@@ -109,21 +105,41 @@ public class RemoteObjectHelper {
         return null;
     }
 
+    /**
+     * @param protocol
+     * @return return the remote object factory for a given protocol
+     * @throws UnknownProtocolException
+     */
     public static RemoteObjectFactory getRemoteObjectFactory(String protocol)
         throws UnknownProtocolException {
         return AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
     }
 
+    /**
+     * @param url
+     * @return eturn the remote object factory for the protocol contained within the url
+     * @throws UnknownProtocolException
+     */
     public static RemoteObjectFactory getFactoryFromURL(URI url)
         throws UnknownProtocolException {
         url = expandURI(url);
         return getRemoteObjectFactory(url.getScheme());
     }
 
+    /**
+     * @param url url of the registry
+     * @return return the list of objects (not only remote objects) registered in the registry identified by the param url
+     * @throws ProActiveException
+     */
     public static URI[] list(URI url) throws ProActiveException {
         return getFactoryFromURL(url).list(expandURI(url));
     }
 
+    /**
+     * make the url 'absolute' by explicitly setting all the possibly not set default values
+     * @param uri
+     * @return the uri with all values set
+     */
     public static URI expandURI(URI uri) {
         if (uri.getScheme() == null) {
             int port = uri.getPort();
@@ -138,33 +154,56 @@ public class RemoteObjectHelper {
         return uri;
     }
 
+    /**
+     * register a remote object at the endpoint identified by the url
+     * @param target the remote object to register
+     * @param url the url where to register the remote object
+     * @param replacePreviousBinding true if any previous bindng as to be replaced
+     * @return return a remote reference on the remote object (aka a RemoteRemoteObject)
+     * @throws ProActiveException
+     */
     public static RemoteRemoteObject register(RemoteObject target, URI url,
         boolean replacePreviousBinding) throws ProActiveException {
         return getFactoryFromURL(url)
                    .register(target, expandURI(url), replacePreviousBinding);
     }
 
+    /**
+     * unregister the object located at the endpoint identified by the url
+     * @param url
+     * @throws ProActiveException
+     */
     public static void unregister(URI url) throws ProActiveException {
         getFactoryFromURL(url).unregister(expandURI(url));
     }
 
+    /**
+     * perform a lookup on the url in order to retrieve a reference on the remote object identified by this url
+     * @param url
+     * @return a remote object adapter wrapping a remote reference to a remote object
+     * @throws ProActiveException
+     */
     public static RemoteObject lookup(URI url) throws ProActiveException {
         return getFactoryFromURL(url).lookup(expandURI(url));
     }
 
-    public static Object generatedObjectStub(RemoteObject rro)
+    /**
+     * generate a couple stub + proxy on the given remote object and set the remote object as target of the proxy
+     * @param ro the remote object
+     * @return the couple stub + proxy on the given remote object
+     * @throws ProActiveException if the stub generation has failed or if the remote object is no longer available
+     */
+    public static Object generatedObjectStub(RemoteObject ro)
         throws ProActiveException {
         try {
-            Object reifiedObjectStub = MOP.createStubObject(rro.getClassName(),
-                    rro.getTargetClass(), new Class[] {  });
+            Object reifiedObjectStub = MOP.createStubObject(ro.getClassName(),
+                    ro.getTargetClass(), new Class[] {  });
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(
-                    null, new Object[] { rro }));
+                    null, new Object[] { ro }));
 
-            Class adapter = rro.getAdapterClass();
+            Class adapter = ro.getAdapterClass();
 
             if (adapter != null) {
-                //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
-                //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
                 Adapter ad = (Adapter) adapter.newInstance();
                 ad.setAdapter(reifiedObjectStub);
                 return ad;

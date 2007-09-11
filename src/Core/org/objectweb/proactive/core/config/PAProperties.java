@@ -15,7 +15,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public enum PAProperties {
 
-    // ---------- 
+    // ----------
 
     /** this property identifies proactive's configuration file */
     PA_CONFIGURATION_FILE("proactive.configuration", false),
@@ -77,7 +77,7 @@ public enum PAProperties {
     /** TODO cmathieu Describe this property */
     PA_SECONDARYNAMES("proactive.secondaryNames", false),
 
-    /** TODO acontes Describe this property */
+    /** this property should be used when one wants to start only a runtime without an additionnal main class */
     PA_RUNTIME_STAYALIVE("proactive.runtime.stayalive", true),
 
     // ---------- RMI
@@ -186,13 +186,13 @@ public enum PAProperties {
 
     // ---------- Security
 
-    /** TODO acontes Describe this property */
+    /** this property indicates if a RMISecurityManager has to be instanciated*/
     PA_SECURITYMANAGER("proactive.securitymanager", true),
 
-    /** TODO acontes Describe this property */
+    /** this property indicates the location of the runtime' security manager configuration file */
     PA_RUNTIME_SECURITY("proactive.runtime.security", false),
 
-    /** TODO acontes Describe this property */
+    /** this property indicates the url of the security domain the runtime depends on */
     PA_RUNTIME_DOMAIN_URL("proactive.runtime.domain.url", false),
 
     // ------------ Timit

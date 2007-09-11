@@ -33,6 +33,10 @@ package org.objectweb.proactive.core.remoteobject.exception;
 import org.objectweb.proactive.core.ProActiveException;
 
 
+/**
+ * @author acontes
+ * indicates that the connection to a remote object has failed
+ */
 public class RemoteObjectConnection extends ProActiveException {
     public RemoteObjectConnection() {
         super();

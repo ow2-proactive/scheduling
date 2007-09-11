@@ -51,6 +51,10 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * @author acontes
+ * RemoteObjectAdapter are used to hide the protocol specific part of a remote object ie the RemoteRemoteObject
+ */
 public class RemoteObjectAdapter implements RemoteObject {
     protected RemoteRemoteObject remoteObject;
     protected Object stub;

@@ -36,7 +36,6 @@ import java.net.URI;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
@@ -68,6 +67,9 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
         createRegistry();
     }
 
+    /**
+     * create the registry used by the ibis protocol
+     */
     private static synchronized void createRegistry() {
         if (registryHelper == null) {
             registryHelper = new RegistryHelper();
@@ -79,6 +81,9 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
+     */
     public RemoteRemoteObject newRemoteObject(RemoteObject target)
         throws ProActiveException {
         try {
@@ -88,6 +93,9 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#list(java.net.URI)
+     */
     public URI[] list(URI url) throws ProActiveException {
         try {
             String[] names = ibis.rmi.Naming.list(URIBuilder.removeProtocol(url)
@@ -107,6 +115,9 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
+     */
     public RemoteRemoteObject register(RemoteObject target, URI url,
         boolean replacePreviousBinding) throws ProActiveException {
         IbisRemoteObject rro = null;
@@ -145,6 +156,9 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
         return rro;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#unregister(java.net.URI)
+     */
     public void unregister(URI url) throws ProActiveException {
         try {
             ibis.rmi.Naming.unbind(UrlBuilder.removeProtocol(url.toString()));
@@ -160,6 +174,9 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#lookup(java.net.URI)
+     */
     public RemoteObject lookup(URI url1) throws ProActiveException {
         Object o = null;
         String url = UrlBuilder.removeProtocol(url1.toString());
@@ -191,6 +208,9 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
             url + " class found is " + o.getClass().getName());
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#getPort()
+     */
     public int getPort() {
         return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
     }

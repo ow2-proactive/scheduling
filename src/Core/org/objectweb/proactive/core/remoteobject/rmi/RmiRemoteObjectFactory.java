@@ -39,7 +39,6 @@ import java.rmi.registry.Registry;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
@@ -52,6 +51,10 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * @author acontes
+ *        remote object Factory for the RMI protocol
+ */
 public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     implements RemoteObjectFactory {
     protected static RegistryHelper registryHelper;
@@ -66,6 +69,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         createRegistry();
     }
 
+    /**
+     *  create the RMI registry
+     */
     private static synchronized void createRegistry() {
         if (registryHelper == null) {
             registryHelper = new RegistryHelper();
@@ -77,6 +83,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
+     */
     public RemoteRemoteObject newRemoteObject(RemoteObject target)
         throws ProActiveException {
         try {
@@ -86,6 +95,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#list(java.net.URI)
+     */
     public URI[] list(URI url) throws ProActiveException {
         try {
             String[] names = java.rmi.Naming.list(URIBuilder.removeProtocol(url)
@@ -105,6 +117,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
+     */
     public RemoteRemoteObject register(RemoteObject target, URI url,
         boolean replacePreviousBinding) throws ProActiveException {
         RmiRemoteObject rro = null;
@@ -162,6 +177,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         return rro;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#unregister(java.net.URI)
+     */
     public void unregister(URI url) throws ProActiveException {
         try {
             java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url.toString()));
@@ -177,6 +195,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#lookup(java.net.URI)
+     */
     public RemoteObject lookup(URI url1) throws ProActiveException {
         Object o = null;
         String url = url1.toString();
@@ -208,6 +229,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
             url + " class found is " + o.getClass().getName());
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#getPort()
+     */
     public int getPort() {
         return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
     }

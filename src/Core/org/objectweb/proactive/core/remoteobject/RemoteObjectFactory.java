@@ -67,5 +67,8 @@ public interface RemoteObjectFactory {
      */
     public RemoteObject lookup(URI url) throws ProActiveException;
 
+    /**
+     * @return return the port number
+     */
     public int getPort();
 }

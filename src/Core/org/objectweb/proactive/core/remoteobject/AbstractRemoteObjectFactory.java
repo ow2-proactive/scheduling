@@ -68,6 +68,11 @@ public abstract class AbstractRemoteObjectFactory {
         activatedRemoteObjectFactories = new Hashtable<String, RemoteObjectFactory>();
     }
 
+    /**
+     * insert a new location within the codebase property
+     * @param newLocationURL the new location to add
+     * @return the new codebase
+     */
     protected static synchronized String addCodebase(String newLocationURL) {
         String oldCodebase = System.getProperty("java.rmi.server.codebase");
         String newCodebase = null;
@@ -83,6 +88,9 @@ public abstract class AbstractRemoteObjectFactory {
         return newCodebase;
     }
 
+    /**
+     *        create the class server -- mandatory for class file transfer
+     */
     protected static synchronized void createClassServer() {
         if (classServerHelper == null) {
             try {
@@ -98,6 +106,11 @@ public abstract class AbstractRemoteObjectFactory {
         }
     }
 
+    /**
+     * @param protocol
+     * @return return the remote object factory associated to the given protocol
+     * @throws UnknownProtocolException
+     */
     public static RemoteObjectFactory getRemoteObjectFactory(String protocol)
         throws UnknownProtocolException {
         try {
@@ -116,10 +129,8 @@ public abstract class AbstractRemoteObjectFactory {
                 }
             }
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

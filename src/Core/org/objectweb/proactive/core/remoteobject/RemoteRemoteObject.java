@@ -48,6 +48,16 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  *
  */
 public interface RemoteRemoteObject extends SecurityEntity {
+
+    /**
+     * Send a message containing a reified method call to a remote object. the target of the message
+     * could be either the reified object or the remote object itself
+     * @param message the reified method call
+     * @return a reply containing the result of the method call
+     * @throws ProActiveException
+     * @throws RenegotiateSessionException if the security infrastructure needs to (re)initiate the session
+     * @throws IOException if the message transfer has failed
+     */
     public Reply receiveMessage(Request message)
         throws ProActiveException, IOException, RenegotiateSessionException;
 

@@ -14,11 +14,13 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * @author acontes
+ * The RemoteObjectExposer is in charge of exposing an object as a remote object.
+ * It allows the exposition of the object it represents on one or multiple protocols, keeps
+ * references on already activated protocols, allows to unexpose one or more protocols.
+ */
 public class RemoteObjectExposer implements Serializable {
-
-    /**
-         *
-         */
     private static final long serialVersionUID = -4162510983888994949L;
     protected Hashtable<URI, RemoteRemoteObject> activatedProtocols;
     private String className;
@@ -31,6 +33,12 @@ public class RemoteObjectExposer implements Serializable {
         this(className, target, null);
     }
 
+    /**
+     *
+     * @param className the classname of the stub for the remote object
+     * @param target the object to turn into a remote object
+     * @param targetRemoteObjectAdapter the adapter object that allows to implement specific behaviour like cache mechanism
+     */
     public RemoteObjectExposer(String className, Object target,
         Adapter targetRemoteObjectAdapter) {
         this.className = className;
@@ -39,16 +47,25 @@ public class RemoteObjectExposer implements Serializable {
         this.activatedProtocols = new Hashtable<URI, RemoteRemoteObject>();
     }
 
+    /**
+     * activate and register the remote object on the given url
+     * @param url The URI where to register the remote object
+     * @return a remote reference to the remote object ie a RemoteRemoteObject
+     * @throws UnknownProtocolException thrown if the protocol specified within the url is unknow
+     */
     public synchronized RemoteRemoteObject activateProtocol(URI url)
         throws UnknownProtocolException {
         String protocol = null;
 
+        // check if the url contains a scheme (protocol)
         if (!url.isAbsolute()) {
+            // if not expand it
             url = RemoteObjectHelper.expandURI(url);
         }
 
         protocol = url.getScheme();
 
+        // select the factory matching the required protocol
         RemoteObjectFactory rof = RemoteObjectHelper.getRemoteObjectFactory(protocol);
 
         try {
@@ -65,8 +82,10 @@ public class RemoteObjectExposer implements Serializable {
                 }
             }
 
+            // register the object on the register
             RemoteRemoteObject rmo = rof.register(this.remoteObject, url, true);
 
+            // put the url within the list of the activated protocols
             this.activatedProtocols.put(url, rmo);
 
             return rmo;
@@ -80,6 +99,11 @@ public class RemoteObjectExposer implements Serializable {
         }
     }
 
+    /**
+     *
+     * @param protocol
+     * @return return the remote reference on the remote object targetted by the protocol
+     */
     public RemoteRemoteObject getRemoteObject(String protocol) {
         Enumeration<URI> e = this.activatedProtocols.keys();
 
@@ -93,6 +117,9 @@ public class RemoteObjectExposer implements Serializable {
         return null;
     }
 
+    /**
+     * @return return the activated urls
+     */
     public String[] getURLs() {
         String[] urls = new String[this.activatedProtocols.size()];
 
@@ -123,6 +150,9 @@ public class RemoteObjectExposer implements Serializable {
         return getURL(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
     }
 
+    /**
+     * unregister all the remote references on the remote object.
+     */
     public void unregisterAll() {
         Enumeration<URI> uris = this.activatedProtocols.keys();
         URI uri = null;
@@ -139,6 +169,9 @@ public class RemoteObjectExposer implements Serializable {
         }
     }
 
+    /**
+     * @return return the remote object
+     */
     public RemoteObjectImpl getRemoteObject() {
         return this.remoteObject;
     }
