@@ -35,7 +35,6 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -87,7 +86,9 @@ public class ClassServer implements Runnable {
 
         PAProperties.PA_HTTP_PORT.setValue(port + "");
 
-        hostname = java.net.InetAddress.getLocalHost().getHostAddress();
+                hostname = java.net.InetAddress.getLocalHost().getHostAddress();
+//        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
+
         //        System.out.println("URL du classServer : " + hostname + ":" + port);
         newListener();
         //        if (logger.isInfoEnabled()) {
