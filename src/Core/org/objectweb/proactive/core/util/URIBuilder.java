@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.util;
 
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -296,7 +295,7 @@ public class URIBuilder {
         String temp = "";
 
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
-            temp = ((Inet6Address) address).getHostAddress();
+            temp = ((InetAddress) address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();
         }

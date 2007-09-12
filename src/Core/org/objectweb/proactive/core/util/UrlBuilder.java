@@ -333,7 +333,7 @@ public class UrlBuilder {
         String temp = "";
 
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
-            temp = ((Inet6Address) address).getHostAddress();
+            temp = ((InetAddress) address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();
         }
