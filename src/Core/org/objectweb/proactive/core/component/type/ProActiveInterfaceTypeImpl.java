@@ -36,6 +36,7 @@ import java.lang.reflect.ParameterizedType;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Type;
+import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -92,7 +93,8 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType,
      * Constructor for ProActiveInterfaceTypeImpl.
      */
     public ProActiveInterfaceTypeImpl(String name, String signature,
-        boolean isClient, boolean isOptional, String cardinality) {
+        boolean isClient, boolean isOptional, String cardinality)
+        throws InstantiationException {
         this.name = name;
         this.signature = signature;
         this.isClient = isClient;
@@ -101,15 +103,16 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType,
         checkMethodsSignatures(signature, cardinality);
     }
 
-    private boolean checkMethodsSignatures(String signature, String cardinality) {
+    private boolean checkMethodsSignatures(String signature, String cardinality)
+        throws InstantiationException {
         try {
             if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
-                Class c = Class.forName(signature);
+                Class<?> c = Class.forName(signature);
                 Method[] methods = c.getMethods();
                 for (Method m : methods) {
                     if (!(m.getGenericReturnType() instanceof ParameterizedType) &&
                             !(Void.TYPE == m.getReturnType())) {
-                        throw new ProActiveRuntimeException(
+                        throw new InstantiationException(
                             "methods of a multicast interface must return parameterized types or void, " +
                             "which is not the case for method " + m.toString() +
                             " in interface " + signature);
