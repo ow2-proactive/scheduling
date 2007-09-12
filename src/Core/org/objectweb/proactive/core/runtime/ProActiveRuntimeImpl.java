@@ -144,11 +144,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             proActiveRuntime = new ProActiveRuntimeImpl();
 
             // JMX
-//            String mbeanProperty = PAProperties.PA_JMX_MBEAN.getValue();
-//            createMBean = PAProperties.PA_JMX_MBEAN.isTrue();
-//            if (createMBean) { 
-                proActiveRuntime.createMBean();
-//            }
+            //            String mbeanProperty = PAProperties.PA_JMX_MBEAN.getValue();
+            //            createMBean = PAProperties.PA_JMX_MBEAN.isTrue();
+            //            if (createMBean) { 
+            proActiveRuntime.createMBean();
+            //            }
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }

@@ -709,7 +709,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         mbean.sendNotification(NotificationType.requestSent,
                             new RequestNotificationData(BodyImpl.this.bodyID,
                                 BodyImpl.this.getNodeURL(),
-                                destinationBody.getID(), destinationBody.getNodeURL(),
+                                destinationBody.getID(),
+                                destinationBody.getNodeURL(),
                                 methodCall.getName(), -1));
                     }
                 }

@@ -108,27 +108,26 @@ public class LocalNode {
                 ProActiveRuntimeImpl.getProActiveRuntime());
 
         // JMX registration
-//        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
-            String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                    .getURL();
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName oname = FactoryName.createNodeObjectName(runtimeUrl,
-                    nodeName);
-            if (!mbs.isRegistered(oname)) {
-                mbean = new NodeWrapper(oname, this, runtimeUrl);
-                try {
-                    mbs.registerMBean(mbean, oname);
-                } catch (InstanceAlreadyExistsException e) {
-                    logger.error("A MBean with the object name " + oname +
-                        " already exists", e);
-                } catch (MBeanRegistrationException e) {
-                    logger.error("Can't register the MBean of the LocalNode", e);
-                } catch (NotCompliantMBeanException e) {
-                    logger.error("The MBean of the LocalNode is not JMX compliant",
-                        e);
-                }
+        //        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
+        String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime().getURL();
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = FactoryName.createNodeObjectName(runtimeUrl, nodeName);
+        if (!mbs.isRegistered(oname)) {
+            mbean = new NodeWrapper(oname, this, runtimeUrl);
+            try {
+                mbs.registerMBean(mbean, oname);
+            } catch (InstanceAlreadyExistsException e) {
+                logger.error("A MBean with the object name " + oname +
+                    " already exists", e);
+            } catch (MBeanRegistrationException e) {
+                logger.error("Can't register the MBean of the LocalNode", e);
+            } catch (NotCompliantMBeanException e) {
+                logger.error("The MBean of the LocalNode is not JMX compliant",
+                    e);
             }
-//        }
+        }
+
+        //        }
 
         // END JMX registration
     }
