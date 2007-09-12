@@ -108,7 +108,7 @@ public class LocalNode {
                 ProActiveRuntimeImpl.getProActiveRuntime());
 
         // JMX registration
-        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
+//        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
             String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
                                                     .getURL();
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -128,7 +128,7 @@ public class LocalNode {
                         e);
                 }
             }
-        }
+//        }
 
         // END JMX registration
     }

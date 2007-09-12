@@ -51,7 +51,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
 
 public class Legend extends ViewPart {
 
-	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.views.Legend";
+	public static final String ID = "org.objectweb.proactive.ic2d.jmxmonitoring.view.Legend";
 
 	public Legend() {
 		// TODO Auto-generated constructor stub

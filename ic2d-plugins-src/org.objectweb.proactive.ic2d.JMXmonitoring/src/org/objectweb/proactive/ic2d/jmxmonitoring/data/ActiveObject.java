@@ -279,7 +279,6 @@ public class ActiveObject extends AbstractData{
 
 	@Override
 	public void resetCommunications() {
-		System.out.println("ActiveObject.resetCommunications() "+this);
 		setChanged();
 		notifyObservers(new HashSet<ActiveObject>());
 	}

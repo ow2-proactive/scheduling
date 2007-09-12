@@ -230,7 +230,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // JMX registration
         isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
 
-        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
+//        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
             if (!isProActiveInternalObject) {
                 // If the node is not a HalfBody
                 if (!nodeURL.equals("LOCAL")) {
@@ -253,7 +253,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     }
                 }
             }
-        }
+//        }
 
         // END JMX registration
     }
