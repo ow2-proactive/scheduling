@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-
-import junit.framework.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -27,6 +25,8 @@ import functionalTests.component.conform.components.MasterImpl;
 import functionalTests.component.conform.components.Slave;
 import functionalTests.component.conform.components.SlaveImpl;
 import functionalTests.component.conform.components.SlaveMulticast;
+
+import junit.framework.Assert;
 
 
 public class TestMulticast extends Conformtest {
@@ -153,9 +153,9 @@ public class TestMulticast extends Conformtest {
                     "Asynchronous call");
             ArrayList<String> resultsAL = new ArrayList<String>();
             for (StringWrapper sw : results) {
-            	Assert.assertNotNull("One result is null", sw);
-				resultsAL.add(sw.stringValue());
-			}
+                Assert.assertNotNull("One result is null", sw);
+                resultsAL.add(sw.stringValue());
+            }
             checkResult(stringList, "Asynchronous call", resultsAL);
             System.err.println("TM: async call" + results);
         }
@@ -184,16 +184,15 @@ public class TestMulticast extends Conformtest {
         }
         return multicastArgsList;
     }
-    
-    private static void checkResult (List<String> args, String other, ArrayList<String> results) {
-    	Slave mySlave = new SlaveImpl();
-    	ArrayList<String> expectedResults = new ArrayList<String>(args.size());
-    	
-    	for (String string : args) {
-        	expectedResults.add(mySlave.computeSync(string, other));
-		}
-    	Assert.assertEquals("Result aren't equals", expectedResults, results);
-    	
-    
+
+    private static void checkResult(List<String> args, String other,
+        ArrayList<String> results) {
+        Slave mySlave = new SlaveImpl();
+        ArrayList<String> expectedResults = new ArrayList<String>(args.size());
+
+        for (String string : args) {
+            expectedResults.add(mySlave.computeSync(string, other));
+        }
+        Assert.assertEquals("Result aren't equals", expectedResults, results);
     }
 }
