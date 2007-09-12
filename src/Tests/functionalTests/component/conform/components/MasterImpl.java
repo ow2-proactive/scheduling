@@ -106,15 +106,15 @@ public class MasterImpl implements BindingController, Master {
     }
 
     public void computeOneWay(List<String> args, String other) {
-    	slaves.computeOneWay(args, other);
+        slaves.computeOneWay(args, other);
     }
-    
-	public List<StringWrapper> computeAsync(List<String> args, String other) {
-		return slaves.computeAsync(args, other);
-	}
-	
-    public List<GenericTypeWrapper<String>> computeAsyncGenerics(List<String> args,
-        String other) {
+
+    public List<StringWrapper> computeAsync(List<String> args, String other) {
+        return slaves.computeAsync(args, other);
+    }
+
+    public List<GenericTypeWrapper<String>> computeAsyncGenerics(
+        List<String> args, String other) {
         //            System.err.println("Async calls with " + list.size() + " arguments.");
         //            Object[] sw = ((List<StringWrapper>) slaves.computeAsync(list,
         //                    "Async")).toArray();
@@ -128,6 +128,4 @@ public class MasterImpl implements BindingController, Master {
         // TODO Auto-generated method stub
         return null;
     }
-
-
 }
