@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.runtime;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -42,7 +41,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
-import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -222,18 +220,6 @@ public abstract class RuntimeFactory {
     //
 
     /**
-     * Creates an Adapter for the given RemoteProActiveRuntime
-     * @param remoteProActiveRuntime object we will create an Adapter for
-     * @return the newly created Adpater for the given RemoteProActiveRuntime
-     * @throws ProActiveException if a pb occurs during the creation
-     */
-    protected ProActiveRuntimeAdapterImpl createRuntimeAdapter(
-        RemoteProActiveRuntime remoteProActiveRuntime)
-        throws ProActiveException {
-        return new ProActiveRuntimeAdapterImpl(remoteProActiveRuntime);
-    }
-
-    /**
      * Returns the reference of the only one instance of the ProActiveRuntime
      * associated with the local JVM.
      * If this runtime does not yet exist, it creates it with the associated protocol.
@@ -248,95 +234,4 @@ public abstract class RuntimeFactory {
      */
     protected abstract ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException;
-
-    /**
-     * Creates a new Adapter
-     * @return the newly created Adapter
-     * @throws ProActiveException if a pb occurs during the creation
-     */
-    protected abstract ProActiveRuntimeAdapterImpl createRuntimeAdapter()
-        throws ProActiveException;
-
-    //
-    // -- PRIVATE METHODS - STATIC -----------------------------------------------
-    //
-    private static void createClassServer() {
-        try {
-            new ClassServerHelper().initializeClassServer();
-        } catch (Exception e) {
-            if (runtimeLogger.isInfoEnabled()) {
-                runtimeLogger.info("Error with the ClassServer : " +
-                    e.getMessage());
-            }
-        }
-    }
-
-    private static void registerProtocolFactories() {
-        setFactory(Constants.IBIS_PROTOCOL_IDENTIFIER,
-            "org.objectweb.proactive.core.runtime.ibis.IbisRuntimeFactory");
-
-        setFactory(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
-            "org.objectweb.proactive.core.runtime.http.HttpRuntimeFactory");
-
-        setFactory(Constants.RMISSH_PROTOCOL_IDENTIFIER,
-            "org.objectweb.proactive.core.runtime.rmi.SshRmiRuntimeFactory");
-
-        setFactory(Constants.RMI_PROTOCOL_IDENTIFIER,
-            "org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory");
-    }
-
-    private static RuntimeFactory createRuntimeFactory(Class factoryClass,
-        String protocol) throws ProActiveException {
-        try {
-            RuntimeFactory nf = (RuntimeFactory) factoryClass.newInstance();
-            instanceFactoryMapping.put(protocol, nf);
-            return nf;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ProActiveException("Error while creating the factory " +
-                factoryClass.getName() + " for the protocol " + protocol);
-        }
-    }
-
-    private static RuntimeFactory createRuntimeFactory(
-        String factoryClassName, String protocol) throws ProActiveException {
-        Class factoryClass = null;
-        if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("factoryClassName " + factoryClassName);
-        }
-        try {
-            factoryClass = Class.forName(factoryClassName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new ProActiveException(
-                "Error while getting the class of the factory " +
-                factoryClassName + " for the protocol " + protocol);
-        }
-        return createRuntimeFactory(factoryClass, protocol);
-    }
-
-    private static synchronized RuntimeFactory getFactory(String protocol)
-        throws ProActiveException {
-        if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("protocol1 = " + protocol);
-            //
-            //            if (protocol.endsWith(":"))
-            //            throw new RuntimeException();
-        }
-
-        RuntimeFactory factory = instanceFactoryMapping.get(protocol);
-        if (factory != null) {
-            return factory;
-        }
-
-        String factoryClassName = protocolFactoryMapping.get(protocol);
-        if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("factoryClassName  = " + factoryClassName);
-        }
-        if (factoryClassName != null) {
-            return createRuntimeFactory(factoryClassName, protocol);
-        }
-        throw new ProActiveException(
-            "No RuntimeFactory is registered for the protocol " + protocol);
-    }
 }
