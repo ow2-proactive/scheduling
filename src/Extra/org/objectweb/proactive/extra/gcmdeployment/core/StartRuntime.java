@@ -207,8 +207,6 @@ public class StartRuntime {
 
                 ProActiveRuntimeImpl.getProActiveRuntime()
                                     .setParent(parentRuntime);
-
-                parentRuntime.registerVirtualNode(localRuntime);
                 waitUntilInterupted();
             } catch (ProActiveException e) {
                 logger.warn("Cannot register to my parent", e);
