@@ -62,327 +62,327 @@ import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
  * Created on Jan 12, 2005
  */
 public class P2PNodeManager implements Serializable, InitActive, EndActive,
-P2PConstants, ProActiveInternalObject {
-	private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
-	private static final int PROC = Runtime.getRuntime().availableProcessors();
-	private Node p2pServiceNode = null;
-	private ProActiveRuntime proactiveRuntime = null;
-	private Vector availbaleNodes = new Vector();
-	private Vector bookedNodes = new Vector();
-	private Vector usingNodes = new Vector();
-	private int nodeCounter = 0;
-	private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
-	private ProActiveDescriptor pad = null;
+    P2PConstants, ProActiveInternalObject {
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
+    private static final int PROC = Runtime.getRuntime().availableProcessors();
+    private Node p2pServiceNode = null;
+    private ProActiveRuntime proactiveRuntime = null;
+    private Vector availbaleNodes = new Vector();
+    private Vector bookedNodes = new Vector();
+    private Vector usingNodes = new Vector();
+    private int nodeCounter = 0;
+    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
+    private ProActiveDescriptor pad = null;
 
-	//--------------------------------------------------------------------------
-	// Class Constructors
-	//--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // Class Constructors
+    //--------------------------------------------------------------------------
 
-	/**
-	 * Empty constructor for new active.
-	 */
-	public P2PNodeManager() {
-		// The empty constructor
-	}
+    /**
+     * Empty constructor for new active.
+     */
+    public P2PNodeManager() {
+        // The empty constructor
+    }
 
-	//--------------------------------------------------------------------------
-	// Public Class methods
-	// -------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // Public Class methods
+    // -------------------------------------------------------------------------
 
-	/**
-	 * Asking a shared node.
-	 * @return a <code>P2PNode</code> which contains a node or <code>null</code>
-	 * if no shared nodes are available.
-	 */
-	public P2PNode askingNode(String nodeFamilyRegexp) {
-		logger.debug("Asking a node to the nodes manager");
-		if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
-				System.getProperty("os.name").matches(nodeFamilyRegexp)) {
-			logger.debug("Family Match");
-			if ((this.availbaleNodes.size() == 0) &&
-					(this.bookedNodes.size() == 0) &&
-					(this.usingNodes.size() == 0)) {
-				this.deployingDefaultSharedNodes();
-			}
-			if (this.availbaleNodes.size() > 0) {
-				Node node = (Node) this.availbaleNodes.remove(0);
-				this.bookedNodes.add(new Booking(node));
-				logger.debug("Yes the manager has a node");
-				return new P2PNode(node,
-						(P2PNodeManager) ProActive.getStubOnThis());
-			}
-		}
+    /**
+     * Asking a shared node.
+     * @return a <code>P2PNode</code> which contains a node or <code>null</code>
+     * if no shared nodes are available.
+     */
+    public P2PNode askingNode(String nodeFamilyRegexp) {
+        logger.debug("Asking a node to the nodes manager");
+        if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
+                System.getProperty("os.name").matches(nodeFamilyRegexp)) {
+            logger.debug("Family Match");
+            if ((this.availbaleNodes.size() == 0) &&
+                    (this.bookedNodes.size() == 0) &&
+                    (this.usingNodes.size() == 0)) {
+                this.deployingDefaultSharedNodes();
+            }
+            if (this.availbaleNodes.size() > 0) {
+                Node node = (Node) this.availbaleNodes.remove(0);
+                this.bookedNodes.add(new Booking(node));
+                logger.debug("Yes the manager has a node");
+                return new P2PNode(node,
+                    (P2PNodeManager) ProActive.getStubOnThis());
+            }
+        }
 
-		// All nodes is already assigned
-		logger.debug("Sorry no availbale node for the moment");
-		return new P2PNode(null, null);
-	}
+        // All nodes is already assigned
+        logger.debug("Sorry no availbale node for the moment");
+        return new P2PNode(null, null);
+    }
 
-	public Vector<Node> askingAllNodes(String nodeFamilyRegexp) {
-		logger.debug("Asking all nodes to the nodes manager");
-		if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
-				System.getProperty("os.name").matches(nodeFamilyRegexp)) {
-			logger.debug("Family Match");
-			if ((this.availbaleNodes.size() == 0) &&
-					(this.bookedNodes.size() == 0) &&
-					(this.usingNodes.size() == 0)) {
-				this.deployingDefaultSharedNodes();
-			}
-			if (this.availbaleNodes.size() > 0) {
-				Vector allNodes = new Vector(this.availbaleNodes);
-				this.availbaleNodes.removeAllElements();
-				this.bookedNodes.addAll(allNodes);
-				logger.debug("Yes the manager has some nodes");
-				return allNodes;
-			}
-		}
+    public Vector<Node> askingAllNodes(String nodeFamilyRegexp) {
+        logger.debug("Asking all nodes to the nodes manager");
+        if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
+                System.getProperty("os.name").matches(nodeFamilyRegexp)) {
+            logger.debug("Family Match");
+            if ((this.availbaleNodes.size() == 0) &&
+                    (this.bookedNodes.size() == 0) &&
+                    (this.usingNodes.size() == 0)) {
+                this.deployingDefaultSharedNodes();
+            }
+            if (this.availbaleNodes.size() > 0) {
+                Vector allNodes = new Vector(this.availbaleNodes);
+                this.availbaleNodes.removeAllElements();
+                this.bookedNodes.addAll(allNodes);
+                logger.debug("Yes the manager has some nodes");
+                return allNodes;
+            }
+        }
 
-		// All nodes is already assigned
-		logger.debug("Sorry no availbale node for the moment");
-		return new Vector();
-	}
+        // All nodes is already assigned
+        logger.debug("Sorry no availbale node for the moment");
+        return new Vector();
+    }
 
-	public P2PNode askingNode(boolean evenIfItIsShared) {
-		if (!evenIfItIsShared) {
-			return askingNode(null);
-		}
-		logger.debug("Asking a node to the nodes manager");
-		if ((this.availbaleNodes.size() == 0) &&
-				(this.bookedNodes.size() == 0) &&
-				(this.usingNodes.size() == 0)) {
-			this.deployingDefaultSharedNodes();
-		}
-		if (this.availbaleNodes.size() > 0) {
-			Node node = (Node) this.availbaleNodes.remove(0);
-			this.bookedNodes.add(new Booking(node));
-			logger.debug("Yes, the manager has an empty node");
-			return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
-		} else if (this.bookedNodes.size() > 0) {
-			Node node = ((Booking) this.bookedNodes.get(0)).getNode();
-			logger.debug("Yes, the manager has a shared node");
-			return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
-		} else {
-			// All nodes is already assigned
-			logger.debug("Sorry no availbale node for the moment");
-			return new P2PNode(null, null);
-		}
-	}
+    public P2PNode askingNode(boolean evenIfItIsShared) {
+        if (!evenIfItIsShared) {
+            return askingNode(null);
+        }
+        logger.debug("Asking a node to the nodes manager");
+        if ((this.availbaleNodes.size() == 0) &&
+                (this.bookedNodes.size() == 0) &&
+                (this.usingNodes.size() == 0)) {
+            this.deployingDefaultSharedNodes();
+        }
+        if (this.availbaleNodes.size() > 0) {
+            Node node = (Node) this.availbaleNodes.remove(0);
+            this.bookedNodes.add(new Booking(node));
+            logger.debug("Yes, the manager has an empty node");
+            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+        } else if (this.bookedNodes.size() > 0) {
+            Node node = ((Booking) this.bookedNodes.get(0)).getNode();
+            logger.debug("Yes, the manager has a shared node");
+            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+        } else {
+            // All nodes is already assigned
+            logger.debug("Sorry no availbale node for the moment");
+            return new P2PNode(null, null);
+        }
+    }
 
-	/**
-	 * Leave the specified node. The node is killed and new one is created and
-	 * ready for sharing.
-	 * @param nodeToFree the node to kill.
-	 * @param vnName Virtual node name to unregister or null.
-	 */
-	public void leaveNode(Node nodeToFree, String vnName) {
-		String nodeUrl = nodeToFree.getNodeInformation().getURL();
-		logger.debug("LeaveNode message received for node @" + nodeUrl);
-		this.usingNodes.remove(nodeToFree);
-		try {
-			// Kill the node
-			if (this.descriptorPath == null) {
-				this.proactiveRuntime.killNode(nodeUrl);
-				logger.info("Node @" + nodeUrl + " left");
-				// Creating a new node
-				this.createNewNode();
-			} else {
-				this.availbaleNodes.add(nodeToFree);
-			}
-		} catch (Exception e) {
-			logger.fatal("Coudln't delete or create a shared node", e);
-		}
-	}
+    /**
+     * Leave the specified node. The node is killed and new one is created and
+     * ready for sharing.
+     * @param nodeToFree the node to kill.
+     * @param vnName Virtual node name to unregister or null.
+     */
+    public void leaveNode(Node nodeToFree, String vnName) {
+        String nodeUrl = nodeToFree.getNodeInformation().getURL();
+        logger.debug("LeaveNode message received for node @" + nodeUrl);
+        this.usingNodes.remove(nodeToFree);
+        try {
+            // Kill the node
+            if (this.descriptorPath == null) {
+                this.proactiveRuntime.killNode(nodeUrl);
+                logger.info("Node @" + nodeUrl + " left");
+                // Creating a new node
+                this.createNewNode();
+            } else {
+                this.availbaleNodes.add(nodeToFree);
+            }
+        } catch (Exception e) {
+            logger.fatal("Coudln't delete or create a shared node", e);
+        }
+    }
 
-	/**
-	 * Free a booked node.
-	 * @param givenNode node given and not used.
-	 */
-	public void noMoreNodeNeeded(Node givenNode) {
-		Iterator it = this.bookedNodes.iterator();
-		while (it.hasNext()) {
-			Booking current = (Booking) it.next();
-			if (current.getNode().equals(givenNode)) {
-				this.bookedNodes.remove(current);
-				break;
-			}
-		}
-		this.availbaleNodes.add(givenNode);
-		if (logger.isInfoEnabled()) {
-			logger.info("Booked node " +
-					givenNode.getNodeInformation().getURL() + " is now shared");
-		}
-	}
+    /**
+     * Free a booked node.
+     * @param givenNode node given and not used.
+     */
+    public void noMoreNodeNeeded(Node givenNode) {
+        Iterator it = this.bookedNodes.iterator();
+        while (it.hasNext()) {
+            Booking current = (Booking) it.next();
+            if (current.getNode().equals(givenNode)) {
+                this.bookedNodes.remove(current);
+                break;
+            }
+        }
+        this.availbaleNodes.add(givenNode);
+        if (logger.isInfoEnabled()) {
+            logger.info("Booked node " +
+                givenNode.getNodeInformation().getURL() + " is now shared");
+        }
+    }
 
-	//--------------------------------------------------------------------------
-	// Active Object methods
-	//--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // Active Object methods
+    //--------------------------------------------------------------------------
 
-	/**
-	 * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
-	 */
-	public void initActivity(Body body) {
-		logger.debug("Entering initActivity");
+    /**
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+     */
+    public void initActivity(Body body) {
+        logger.debug("Entering initActivity");
 
-		try {
-			// Getting reference to the P2P node
-			this.p2pServiceNode = NodeFactory.getNode(body.getNodeURL());
-			// Getting ProActive runtime
-			this.proactiveRuntime = this.p2pServiceNode.getProActiveRuntime();
-		} catch (NodeException e) {
-			logger.fatal("Couldn't get reference to the local p2pServiceNode", e);
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("P2P node manager is running at " +
-					this.p2pServiceNode.getNodeInformation().getURL());
-			logger.debug("ProActiveRuntime at " +
-					this.proactiveRuntime.getURL());
-		}
+        try {
+            // Getting reference to the P2P node
+            this.p2pServiceNode = NodeFactory.getNode(body.getNodeURL());
+            // Getting ProActive runtime
+            this.proactiveRuntime = this.p2pServiceNode.getProActiveRuntime();
+        } catch (NodeException e) {
+            logger.fatal("Couldn't get reference to the local p2pServiceNode", e);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("P2P node manager is running at " +
+                this.p2pServiceNode.getNodeInformation().getURL());
+            logger.debug("ProActiveRuntime at " +
+                this.proactiveRuntime.getURL());
+        }
 
-		// Creating shared nodes
-		if (this.descriptorPath == null) {
-			this.deployingDefaultSharedNodes();
-		} else {
-			this.deployingXmlSharedNodes();
-		}
+        // Creating shared nodes
+        if (this.descriptorPath == null) {
+            this.deployingDefaultSharedNodes();
+        } else {
+            this.deployingXmlSharedNodes();
+        }
 
-		logger.debug("Exiting initActivity");
-	}
+        logger.debug("Exiting initActivity");
+    }
 
-	/**
-	 * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)
-	 */
-	public void endActivity(Body body) {
-		if (this.pad != null) {
-			try {
-				this.pad.killall(false);
-			} catch (ProActiveException e) {
-				logger.warn("Couldn't kill deployed nodes", e);
-			}
-		}
-	}
+    /**
+     * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)
+     */
+    public void endActivity(Body body) {
+        if (this.pad != null) {
+            try {
+                this.pad.killall(false);
+            } catch (ProActiveException e) {
+                logger.warn("Couldn't kill deployed nodes", e);
+            }
+        }
+    }
 
-	// -------------------------------------------------------------------------
-	// Private class method
-	// -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // Private class method
+    // -------------------------------------------------------------------------
 
-	/**
-	 * @return a new shared node.
-	 * @throws NodeException
-	 * @throws ProActiveException
-	 * @throws AlreadyBoundException
-	 */
-	private Node createNewNode()
-	throws NodeException, ProActiveException, AlreadyBoundException {
-		// security 
-		ProActiveSecurityManager newNodeSecurityManager = null;
+    /**
+     * @return a new shared node.
+     * @throws NodeException
+     * @throws ProActiveException
+     * @throws AlreadyBoundException
+     */
+    private Node createNewNode()
+        throws NodeException, ProActiveException, AlreadyBoundException {
+        // security 
+        ProActiveSecurityManager newNodeSecurityManager = null;
 
-		try {
-			newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
-			.generateSiblingCertificate(P2PConstants.VN_NAME);
+        try {
+            newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
+                                      .generateSiblingCertificate(P2PConstants.VN_NAME);
+        } catch (NullPointerException e) {
+            // well nothing to do except maybe log it
+            ProActiveLogger.getLogger(Loggers.SECURITY_NODE)
+                           .debug("Node created without security manager");
+        }
+        Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
+                "_" + this.nodeCounter++, true, newNodeSecurityManager,
+                P2PConstants.VN_NAME, null);
+        this.availbaleNodes.add(newNode);
+        logger.info("New shared node created @" +
+            newNode.getNodeInformation().getURL());
+        return newNode;
+    }
 
-		} catch (NullPointerException e) {
-			// well nothing to do except maybe log it
-			ProActiveLogger.getLogger(Loggers.SECURITY_NODE).debug("Node created without security manager");
-		}
-		Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
-				"_" + this.nodeCounter++, true, newNodeSecurityManager,
-				P2PConstants.VN_NAME, null);
-		this.availbaleNodes.add(newNode);
-		logger.info("New shared node created @" +
-				newNode.getNodeInformation().getURL());
-		return newNode;
-	}
+    /**
+     * Starting default shared nodes. One by processor.
+     */
+    private void deployingDefaultSharedNodes() {
+        assert PROC > 0 : "Processor count = 0";
+        logger.debug("Number of available processors for this JVM: " + PROC);
+        int nodes = PROC;
+        if (!PAProperties.PA_P2P_MULTI_PROC_NODES.isTrue()) {
+            nodes = 1;
+        }
 
-	/**
-	 * Starting default shared nodes. One by processor.
-	 */
-	private void deployingDefaultSharedNodes() {
-		assert PROC > 0 : "Processor count = 0";
-		logger.debug("Number of available processors for this JVM: " + PROC);
-		int nodes = PROC;
-		if (!PAProperties.PA_P2P_MULTI_PROC_NODES.isTrue()) {
-			nodes = 1;
-		}
+        // No sharing enable
+        if (PAProperties.PA_P2P_NO_SHARING.isTrue()) {
+            nodes = 0;
+        }
 
-		// No sharing enable
-		if (PAProperties.PA_P2P_NO_SHARING.isTrue()) {
-			nodes = 0;
-		}
+        // Starting default shared nodes
+        for (int procNumber = 0; procNumber < nodes; procNumber++) {
+            try {
+                Node node = this.createNewNode();
+                logger.debug("Default shared node succefuly created at: " +
+                    node.getNodeInformation().getURL());
+            } catch (Exception e) {
+                logger.warn("Couldn't create default shared node", e);
+            }
+        }
+        logger.info(nodes + " shared nodes deployed");
+    }
 
-		// Starting default shared nodes
-		for (int procNumber = 0; procNumber < nodes; procNumber++) {
-			try {
-				Node node = this.createNewNode();
-				logger.debug("Default shared node succefuly created at: " +
-						node.getNodeInformation().getURL());
-			} catch (Exception e) {
-				logger.warn("Couldn't create default shared node", e);
-			}
-		}
-		logger.info(nodes + " shared nodes deployed");
-	}
+    /**
+     * Deploying shred nodes from a XML descriptor
+     */
+    private void deployingXmlSharedNodes() {
+        try {
+            this.pad = ProActive.getProactiveDescriptor(this.descriptorPath);
+        } catch (ProActiveException e) {
+            logger.fatal("Could't get ProActive Descripor at " +
+                this.descriptorPath, e);
+            return;
+        }
+        VirtualNode[] virtualNodes = this.pad.getVirtualNodes();
+        this.pad.activateMappings();
+        for (int i = 0; i < virtualNodes.length; i++) {
+            VirtualNode currentVn = virtualNodes[i];
+            Node[] nodes;
+            try {
+                nodes = currentVn.getNodes();
+                for (int j = 0; j < nodes.length; j++) {
+                    this.availbaleNodes.add(nodes[j]);
+                }
+            } catch (NodeException e) {
+                logger.warn("Problem with nodes for " + currentVn.getName(), e);
+            }
+        }
 
-	/**
-	 * Deploying shred nodes from a XML descriptor
-	 */
-	private void deployingXmlSharedNodes() {
-		try {
-			this.pad = ProActive.getProactiveDescriptor(this.descriptorPath);
-		} catch (ProActiveException e) {
-			logger.fatal("Could't get ProActive Descripor at " +
-					this.descriptorPath, e);
-			return;
-		}
-		VirtualNode[] virtualNodes = this.pad.getVirtualNodes();
-		this.pad.activateMappings();
-		for (int i = 0; i < virtualNodes.length; i++) {
-			VirtualNode currentVn = virtualNodes[i];
-			Node[] nodes;
-			try {
-				nodes = currentVn.getNodes();
-				for (int j = 0; j < nodes.length; j++) {
-					this.availbaleNodes.add(nodes[j]);
-				}
-			} catch (NodeException e) {
-				logger.warn("Problem with nodes for " + currentVn.getName(), e);
-			}
-		}
+        // Killing deployed nodes at the JVM shutdown
+        XmlNodeKiller killer = new XmlNodeKiller(pad);
+        Runtime.getRuntime().addShutdownHook(new Thread(killer));
 
-		// Killing deployed nodes at the JVM shutdown
-		XmlNodeKiller killer = new XmlNodeKiller(pad);
-		Runtime.getRuntime().addShutdownHook(new Thread(killer));
+        logger.info(this.availbaleNodes.size() + " shared nodes deployed");
+    }
 
-		logger.info(this.availbaleNodes.size() + " shared nodes deployed");
-	}
+    // -------------------------------------------------------------------------
+    // Inner class
+    // -------------------------------------------------------------------------
 
-	// -------------------------------------------------------------------------
-	// Inner class
-	// -------------------------------------------------------------------------
+    /**
+     *
+     * Representing a booking node.
+     *
+     * @author Alexandre di Costanzo
+     *
+     * Created on Jan 14, 2005
+     */
+    private class Booking {
+        private Node node = null;
 
-	/**
-	 *
-	 * Representing a booking node.
-	 *
-	 * @author Alexandre di Costanzo
-	 *
-	 * Created on Jan 14, 2005
-	 */
-	private class Booking {
-		private Node node = null;
+        /**
+         * Construct a new <code>Booking</code> for a node.
+         * @param node the node to book.
+         */
+        public Booking(Node node) {
+            this.node = node;
+        }
 
-		/**
-		 * Construct a new <code>Booking</code> for a node.
-		 * @param node the node to book.
-		 */
-		public Booking(Node node) {
-			this.node = node;
-		}
-
-		/**
-		 * @return Returns the booked node.
-		 */
-		public Node getNode() {
-			return this.node;
-		}
-	}
+        /**
+         * @return Returns the booked node.
+         */
+        public Node getNode() {
+            return this.node;
+        }
+    }
 }
