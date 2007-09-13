@@ -20,111 +20,111 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class AcquaintancesWrapper implements Serializable {
-    private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
-    private P2PService acquaintances = null;
-    private Group groupOfAcquaintances = null;
-    private ArrayList<String> urlList = new ArrayList<String>();
+	private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
+	private P2PService acquaintances_active = null;
+	private Group groupOfAcquaintances = null;
+	private ArrayList<String> urlList = new ArrayList<String>();
 
-    public AcquaintancesWrapper() {
-        try {
-            acquaintances = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
-            ProActive.addNFEListenerOnGroup(this.acquaintances,
-                new AutomaticPurgeGroup());
-            this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances);
-        } catch (ClassNotReifiableException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+	public AcquaintancesWrapper() {
+		try {
+			acquaintances_active = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
+			ProActive.addNFEListenerOnGroup(this.acquaintances_active,
+					new AutomaticPurgeGroup());
+			this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances_active);
+		} catch (ClassNotReifiableException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
-    public boolean contains(P2PService p) {
-        return this.groupOfAcquaintances.contains(p);
-    }
+	public boolean contains(P2PService p) {
+		return this.groupOfAcquaintances.contains(p);
+	}
 
-    public boolean add(P2PService p, String peerUrl) {
-        boolean result = this.groupOfAcquaintances.add(p);
+	public boolean add(P2PService p, String peerUrl) {
+		boolean result = this.groupOfAcquaintances.add(p);
 
-        //this.groupOfAcquaintances.indexOf(p);
-        if (result) {
-            //            try {
-            logger.info("----- Adding " + peerUrl);
-            urlList.add(P2PService.getHostNameAndPortFromUrl(peerUrl));
-            //            } catch (UnknownHostException e) {
-            //                e.printStackTrace();
-            //            }
-        }
+		//this.groupOfAcquaintances.indexOf(p);
+		if (result) {
+			//            try {
+				logger.info("----- Adding " + peerUrl);
+				urlList.add(P2PService.getHostNameAndPortFromUrl(peerUrl));
+				//            } catch (UnknownHostException e) {
+				//                e.printStackTrace();
+				//            }
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    public boolean remove(P2PService p, String peerUrl) {
-        logger.info("------ Removing " + p);
-        //        try {
-        urlList.remove(P2PService.getHostNameAndPortFromUrl(peerUrl));
-        //		} catch (UnknownHostException e) {
-        //			e.printStackTrace();
-        //		}
-        return this.groupOfAcquaintances.remove(p);
-    }
+	public boolean remove(P2PService p, String peerUrl) {
+		logger.info("------ Removing " + p);
+		//        try {
+		urlList.remove(P2PService.getHostNameAndPortFromUrl(peerUrl));
+		//		} catch (UnknownHostException e) {
+		//			e.printStackTrace();
+		//		}
+		return this.groupOfAcquaintances.remove(p);
+	}
 
-    public P2PService get(int i) {
-        return (P2PService) this.groupOfAcquaintances.get(i);
-    }
+	public P2PService get(int i) {
+		return (P2PService) this.groupOfAcquaintances.get(i);
+	}
 
-    public P2PService getAcquaintances() {
-        return this.acquaintances;
-    }
+	public P2PService getAcquaintances() {
+		return this.acquaintances_active;
+	}
 
-    public Group getAcquaintancesAsGroup() {
-        return groupOfAcquaintances;
-    }
+	public Group getAcquaintancesAsGroup() {
+		return groupOfAcquaintances;
+	}
 
-    public int size() {
-        return this.groupOfAcquaintances.size();
-    }
+	public int size() {
+		return this.groupOfAcquaintances.size();
+	}
 
-    //    public void dumpAcquaintances() {
-    //        Iterator it = urlList.iterator();
-    //        logger.info("***********************");
-    //        while (it.hasNext()) {
-    //            logger.info(it.next());
-    //        }
-    //        logger.info("***********************");
-    //    }
-    public String[] getAcquaintancesURLs() {
-        return (String[]) urlList.toArray(new String[] {  });
-    }
+	//    public void dumpAcquaintances() {
+	//        Iterator it = urlList.iterator();
+	//        logger.info("***********************");
+	//        while (it.hasNext()) {
+	//            logger.info(it.next());
+	//        }
+	//        logger.info("***********************");
+	//    }
+	public String[] getAcquaintancesURLs() {
+		return (String[]) urlList.toArray(new String[] {  });
+	}
 
-    class AutomaticPurgeGroup implements NFEListener {
-        public boolean handleNFE(NonFunctionalException nfe) {
-            Iterator exceptions;
-            ProxyForGroup group;
-            ExceptionListException exceptionList;
+	class AutomaticPurgeGroup implements NFEListener {
+		public boolean handleNFE(NonFunctionalException nfe) {
+			Iterator exceptions;
+			ProxyForGroup group;
+			ExceptionListException exceptionList;
 
-            try {
-                FailedGroupRendezVousException fgrve = (FailedGroupRendezVousException) nfe;
-                exceptionList = (ExceptionListException) fgrve.getCause();
-                group = fgrve.getGroup();
-            } catch (ClassCastException cce) {
-                return false;
-            }
+			try {
+				FailedGroupRendezVousException fgrve = (FailedGroupRendezVousException) nfe;
+				exceptionList = (ExceptionListException) fgrve.getCause();
+				group = fgrve.getGroup();
+			} catch (ClassCastException cce) {
+				return false;
+			}
 
-            synchronized (exceptionList) {
-                exceptions = exceptionList.iterator();
+			synchronized (exceptionList) {
+				exceptions = exceptionList.iterator();
 
-                while (exceptions.hasNext()) {
-                    ExceptionInGroup eig = (ExceptionInGroup) exceptions.next();
-                    group.remove(eig.getObject());
+				while (exceptions.hasNext()) {
+					ExceptionInGroup eig = (ExceptionInGroup) exceptions.next();
+					group.remove(eig.getObject());
 
-                    int index = eig.getIndex();
-                    System.out.println(
-                        "AutomaticPurgeGroup.handleNFE() removing " + index);
-                    urlList.remove(index);
-                }
-            }
+					int index = eig.getIndex();
+					System.out.println(
+							"AutomaticPurgeGroup.handleNFE() removing " + index);
+					urlList.remove(index);
+				}
+			}
 
-            return true;
-        }
-    }
+			return true;
+		}
+	}
 }
