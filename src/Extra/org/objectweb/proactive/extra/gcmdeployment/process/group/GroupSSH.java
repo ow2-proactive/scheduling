@@ -10,6 +10,15 @@ public class GroupSSH extends AbstractGroup {
     public final static String DEFAULT_SSHPATH = "ssh";
     private String hostList;
     private String username;
+    private String commandOptions;
+
+    public String getCommandOption() {
+        return commandOptions;
+    }
+
+    public void setCommandOption(String commandOption) {
+        this.commandOptions = commandOption;
+    }
 
     public GroupSSH() {
         setCommandPath(DEFAULT_SSHPATH);
@@ -49,11 +58,19 @@ public class GroupSSH extends AbstractGroup {
     private String makeSingleCommand(String hostname) {
         StringBuilder res = new StringBuilder(getCommandPath());
         res.append(" ");
+
         if (username != null) {
             res.append("-l ").append(username);
+            res.append(" ");
         }
 
-        res.append(" ").append(hostname);
+        if (commandOptions != null) {
+            res.append(" ");
+            res.append(commandOptions);
+            res.append(" ");
+        }
+
+        res.append(hostname);
 
         return res.toString();
     }

@@ -72,6 +72,8 @@ public interface HostInfo extends Serializable {
      */
     public int getVmCapacity();
 
+    public boolean isCapacitiyValid();
+
     /**
      * Check that this bridge is in a consistent state and is ready to be
      * used.

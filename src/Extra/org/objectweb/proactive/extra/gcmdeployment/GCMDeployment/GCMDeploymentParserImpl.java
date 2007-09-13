@@ -255,6 +255,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 XPathConstants.NODE);
 
         String refid = GCMParserHelper.getAttributeValue(hostNode, "refid");
+
+        // FIXME glaurent XSD does not enforce keyref integrity so a check is needed to see if refid exist or not
         HostInfo hostInfo = getHostInfo(refid);
         group.setHostInfo(hostInfo);
     }

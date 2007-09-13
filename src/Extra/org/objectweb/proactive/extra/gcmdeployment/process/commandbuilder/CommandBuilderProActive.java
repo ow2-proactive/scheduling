@@ -42,6 +42,7 @@ public class CommandBuilderProActive implements CommandBuilder {
      *  If not set, then the default classpath is used
      */
     private List<PathElement> proactiveClasspath;
+    private boolean overwriteClasspath;
 
     /** Application classpath */
     private List<PathElement> applicationClasspath;
@@ -202,12 +203,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         StringBuilder sb = new StringBuilder();
 
         sb.append("-cp ");
-        if (proactiveClasspath != null) {
-            for (PathElement pe : proactiveClasspath) {
-                sb.append(pe.getFullPath(hostInfo, this));
-                sb.append(hostInfo.getOS().pathSeparator());
-            }
-        } else {
+        if (!overwriteClasspath) {
             // Automatically load all JARs inside the lib directory 
             char fs = hostInfo.getOS().fileSeparator();
             sb.append(getPath(hostInfo));
@@ -216,6 +212,13 @@ public class CommandBuilderProActive implements CommandBuilder {
             sb.append(fs);
             sb.append("*");
             sb.append(hostInfo.getOS().pathSeparator());
+        }
+
+        if (proactiveClasspath != null) {
+            for (PathElement pe : proactiveClasspath) {
+                sb.append(pe.getFullPath(hostInfo, this));
+                sb.append(hostInfo.getOS().pathSeparator());
+            }
         }
 
         if (applicationClasspath != null) {
@@ -237,8 +240,13 @@ public class CommandBuilderProActive implements CommandBuilder {
                 hostInfo.getId());
         }
 
-        StringBuilder command = new StringBuilder();
+        if (!hostInfo.isCapacitiyValid()) {
+            throw new IllegalStateException(
+                "To enable capacity autodetection nor VM Capacity nor Host Capacity must be specified. HostInfo=" +
+                hostInfo.getId());
+        }
 
+        StringBuilder command = new StringBuilder();
         // Java
         command.append(getJava(hostInfo));
         command.append(" ");
@@ -278,9 +286,16 @@ public class CommandBuilderProActive implements CommandBuilder {
             parentURL);
         command.append(" ");
 
-        command.append("-" + StartRuntime.Params.capacity.shortOpt() + " " +
-            hostInfo.getVmCapacity());
-        command.append(" ");
+        if (hostInfo.getVmCapacity() != 0) {
+            command.append("-" + StartRuntime.Params.capacity.shortOpt() + " " +
+                hostInfo.getVmCapacity());
+            command.append(" ");
+        }
+
+        for (int i = 1; i < hostInfo.getHostCapacity(); i++) {
+            // TODO cmathieu Support windows here
+            command.append(" & " + command);
+        }
 
         // TODO cmathieu pass deployment ID here    	
         //command.append("-" + StartRuntime.Params.deploymentID.shortOpt() + " " + deploymentID);
@@ -334,5 +349,9 @@ public class CommandBuilderProActive implements CommandBuilder {
             GCMDeploymentLoggers.GCMA_LOGGER.error(e.getMessage());
             return path;
         }
+    }
+
+    public void setOverwriteClasspath(boolean overwriteClasspath) {
+        this.overwriteClasspath = overwriteClasspath;
     }
 }

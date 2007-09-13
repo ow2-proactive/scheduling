@@ -247,4 +247,15 @@ public class HostInfoImpl implements HostInfo {
     public long getNodeId() {
         return nodeId;
     }
+
+    public boolean isCapacitiyValid() {
+        if ((hostCapacity == 0) && (vmCapacity == 0)) {
+            return true;
+        }
+        if ((hostCapacity != 0) && (vmCapacity != 0)) {
+            return true;
+        }
+
+        return false;
+    }
 }

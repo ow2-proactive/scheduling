@@ -32,6 +32,12 @@ public class GroupSSHParser extends AbstractGroupParser {
         if (commandPath != null) {
             groupSSH.setCommandPath(commandPath);
         }
+
+        String commandOptions = GCMParserHelper.getAttributeValue(groupNode,
+                "commandOptions");
+        if (commandOptions != null) {
+            groupSSH.setCommandOption(commandOptions);
+        }
     }
 
     @Override

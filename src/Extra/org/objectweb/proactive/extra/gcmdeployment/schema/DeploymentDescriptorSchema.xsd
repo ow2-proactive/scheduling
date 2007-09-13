@@ -198,8 +198,10 @@
 		<attribute name="id" type="pa:idType" use="required"></attribute>
 		<attribute name="os" type="pa:osType" use="required"></attribute>
 		<attribute name="username" type="string"></attribute>
-		<attribute name="hostCapacity" type="int"></attribute>
-		<attribute name="vmCapacity" type="int"></attribute>
+		<!-- FIXME glaurent strictly positive int  -->
+		<attribute name="hostCapacity" type="int" use="optional"/>
+		<!-- FIXME glaurent strictly positive int  -->
+		<attribute name="vmCapacity" type="int" use="optional"/>
 	</complexType>
 
 	<complexType name="hostRefType">
@@ -245,6 +247,7 @@
 					use="required" />
 				<attribute name="username" type="pa:usernameType"></attribute>
 				<attribute name="commandPath" type="string"></attribute>
+				<attribute name="commandOptions" type="string"></attribute>
 			</extension>
 		</complexContent>
 	</complexType>

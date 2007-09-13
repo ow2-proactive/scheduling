@@ -44,19 +44,7 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         String relPath = GCMParserHelper.getAttributeValue(paNode, "relpath");
         commandBuilderProActive.setProActivePath(relPath);
 
-        Node javaNode;
         try {
-            javaNode = (Node) xpath.evaluate(XPATH_JAVA, paNode,
-                    XPathConstants.NODE);
-
-            if (javaNode != null) {
-                String javaRelPath = GCMParserHelper.getAttributeValue(javaNode,
-                        "relpath");
-                PathElement pathElement = new PathElement();
-                pathElement.setRelPath(javaRelPath);
-                commandBuilderProActive.setJavaPath(pathElement);
-            }
-
             Node configNode = (Node) xpath.evaluate(XPATH_CONFIGURATION,
                     paNode, XPathConstants.NODE);
 
@@ -74,15 +62,32 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
     protected void parseProActiveConfiguration(XPath xpath,
         CommandBuilderProActive commandBuilderProActive, Node configNode)
         throws XPathExpressionException {
-        Node classPathNode;
+        // Optional: java
+        Node javaNode = (Node) xpath.evaluate(XPATH_JAVA, configNode,
+                XPathConstants.NODE);
+        if (javaNode != null) {
+            String javaRelPath = GCMParserHelper.getAttributeValue(javaNode,
+                    "relpath");
+            PathElement pathElement = new PathElement();
+            pathElement.setRelPath(javaRelPath);
+            commandBuilderProActive.setJavaPath(pathElement);
+        }
 
+        Node classPathNode;
         // Optional: proactiveClasspath
         classPathNode = (Node) xpath.evaluate(XPATH_PROACTIVE_CLASSPATH,
                 configNode, XPathConstants.NODE);
         if (classPathNode != null) {
+            String type = GCMParserHelper.getAttributeValue(classPathNode,
+                    "type");
             List<PathElement> proactiveClassPath = GCMParserHelper.parseClasspath(xpath,
                     classPathNode);
             commandBuilderProActive.setProActiveClasspath(proactiveClassPath);
+            if ("overwrite".equals(type)) {
+                commandBuilderProActive.setOverwriteClasspath(true);
+            } else {
+                commandBuilderProActive.setOverwriteClasspath(false);
+            }
         }
 
         // Optional: applicationClasspath
