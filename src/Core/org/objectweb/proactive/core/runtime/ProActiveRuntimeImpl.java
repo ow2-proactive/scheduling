@@ -1392,7 +1392,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String name;
         private long capacity;
         private final String hostName;
-        private final DeployerTag deployerTag;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
@@ -1412,7 +1411,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 this.name = "PA_JVM" + random + "_" + this.hostName;
             }
 
-            this.deployerTag = new DeployerTag(ProActiveConfiguration.getGroupInformation());
             this.capacity = -1;
         }
 
@@ -1447,13 +1445,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
          */
         public String getDescriptorVMName() {
             return this.name;
-        }
-
-        /**
-         * @see org.objectweb.proactive.core.runtime.VMInformation#getDeployerTag()
-         */
-        public DeployerTag getDeployerTag() {
-            return this.deployerTag;
         }
 
         public long getCapacity() {

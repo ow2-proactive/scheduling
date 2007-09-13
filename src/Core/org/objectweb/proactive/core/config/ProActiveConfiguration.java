@@ -41,7 +41,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.xml.PropertyHandler;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -175,11 +174,6 @@ public class ProActiveConfiguration {
      */
     public String getProperty(String property, String defaultValue) {
         return System.getProperty(property, defaultValue);
-    }
-
-    public static String getGroupInformation() {
-        return System.getProperty("proactive.groupInformation",
-            UniqueID.getCurrentVMID().toString() + "~-1");
     }
 
     /**
