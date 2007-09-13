@@ -2,15 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 <!--  TODO - not fully converted -->

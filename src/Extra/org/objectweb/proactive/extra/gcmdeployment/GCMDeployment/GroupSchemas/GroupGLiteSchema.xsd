@@ -2,15 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 
@@ -25,16 +21,16 @@
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="environment"
-						type="ct:environmentType" minOccurs="0" />
+						type="pa:environmentType" minOccurs="0" />
 					<element name="requirements"
-						type="ct:TextOrVariableType" minOccurs="0" />
+						type="pa:TextOrVariableType" minOccurs="0" />
 					<element name="inputData"
 						type="paext:gLiteInputDataType" minOccurs="0" />
 					<element name="rank" type="paext:gLiteRankType" minOccurs="0" />
 					<element name="gLiteOptions"
 						type="paext:gLiteOptionsType" minOccurs="0" />
 					<element name="JdlTransferDeploy"
-						type="ct:fileTransferType" minOccurs="0" maxOccurs="1" />
+						type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
 				</sequence>
 				<attribute name="hostname" type="string" />
 				<attribute name="virtualOrganisation" type="string"
@@ -62,7 +58,7 @@
 
 	<!--gLiteRankType-->
 	<complexType name="gLiteRankType">
-		<attribute name="fuzzyrank" type="ct:BooleanOrVariableType"
+		<attribute name="fuzzyrank" type="pa:BooleanOrVariableType"
 			default="false" />
 	</complexType>
 	<!--gLiteInputDataType-->
@@ -74,17 +70,17 @@
 	<!--gLiteOptions-->
 	<complexType name="gLiteOptionsType">
 		<all>
-			<element name="configFile" type="ct:pathElementType"
+			<element name="configFile" type="pa:pathElementType"
 				minOccurs="0" />
-			<element name="JDLFilePath" type="ct:pathElementType"
+			<element name="JDLFilePath" type="pa:pathElementType"
 				minOccurs="0" />
-			<element name="JDLRemoteFilePath" type="ct:pathElementType"
+			<element name="JDLRemoteFilePath" type="pa:pathElementType"
 				minOccurs="0" />
-			<element name="arguments" type="ct:TextOrVariableType"
+			<element name="arguments" type="pa:TextOrVariableType"
 				minOccurs="0" />
-			<element name="inputSandbox" type="ct:TextOrVariableType"
+			<element name="inputSandbox" type="pa:TextOrVariableType"
 				minOccurs="0" />
-			<element name="outputSandbox" type="ct:TextOrVariableType"
+			<element name="outputSandbox" type="pa:TextOrVariableType"
 				minOccurs="0" />
 		</all>
 	</complexType>

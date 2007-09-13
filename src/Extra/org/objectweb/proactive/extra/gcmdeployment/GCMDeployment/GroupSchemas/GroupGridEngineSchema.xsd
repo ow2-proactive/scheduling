@@ -2,15 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 	<!--gridEngine process -->
@@ -19,7 +15,7 @@
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="commandPath"
-						type="ct:pathElementGeneralType" minOccurs="0" />
+						type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="gridEngineOption"
 						type="paext:GridEngineOptionType" />
 				</sequence>
@@ -29,14 +25,14 @@
 	</complexType>
 	<complexType name="GridEngineOptionType">
 		<all>
-			<element name="hostsNumber" type="ct:PosintOrVariableType" />
+			<element name="hostsNumber" type="pa:PosintOrVariableType" />
 			<element name="bookingDuration"
-				type="ct:PosintOrVariableType" />
-			<element name="scriptPath" type="ct:pathElementGeneralType" />
-			<element name="hostlist" type="ct:TextOrVariableType"
+				type="pa:PosintOrVariableType" />
+			<element name="scriptPath" type="pa:pathElementGeneralType" />
+			<element name="hostlist" type="pa:TextOrVariableType"
 				minOccurs="0" />
 			<element name="parallelEnvironment"
-				type="ct:TextOrVariableType" minOccurs="1" maxOccurs="1" />
+				type="pa:TextOrVariableType" minOccurs="1" maxOccurs="1" />
 		</all>
 	</complexType>
 

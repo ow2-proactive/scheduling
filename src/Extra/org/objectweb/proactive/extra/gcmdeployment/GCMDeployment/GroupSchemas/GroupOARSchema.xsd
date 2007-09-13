@@ -2,15 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 	<!--oarProcess-->
@@ -26,7 +22,7 @@
 					</simpleType>
 				</attribute>
 				<attribute name="interactive"
-					type="ct:BooleanOrVariableType" use="optional" />
+					type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>
@@ -35,10 +31,10 @@
 	<!--oarOption-->
 	<complexType name="OarOptionType">
 		<all>
-			<element name="resources" type="ct:TextOrVariableType"
+			<element name="resources" type="pa:TextOrVariableType"
 				minOccurs="0" />
 			<!--<element name="properties" type="string" minOccurs="0"/>-->
-			<element name="scriptPath" type="ct:pathElementType"
+			<element name="scriptPath" type="pa:pathElementType"
 				minOccurs="0" />
 		</all>
 	</complexType>

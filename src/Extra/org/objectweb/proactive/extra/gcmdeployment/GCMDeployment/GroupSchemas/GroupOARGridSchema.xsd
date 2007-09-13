@@ -2,15 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 
@@ -20,7 +16,7 @@
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="commandPath"
-						type="ct:pathElementType" minOccurs="0" />
+						type="pa:pathElementType" minOccurs="0" />
 					<element name="oarGridOption"
 						type="paext:OarGridOptionType" />
 				</sequence>
@@ -35,7 +31,7 @@
 						</restriction>
 					</simpleType>
 				</attribute>
-				<attribute name="closeStream" type="ct:CloseStreamType"
+				<attribute name="closeStream" type="pa:CloseStreamType"
 					use="optional" />
 			</extension>
 		</complexContent>
@@ -44,10 +40,10 @@
 	<!--oarGridOption-->
 	<complexType name="OarGridOptionType">
 		<all>
-			<element name="resources" type="ct:TextOrVariableType" />
-			<element name="walltime" type="ct:TextOrVariableType"
+			<element name="resources" type="pa:TextOrVariableType" />
+			<element name="walltime" type="pa:TextOrVariableType"
 				minOccurs="0" />
-			<element name="scriptPath" type="ct:pathElementType"
+			<element name="scriptPath" type="pa:pathElementType"
 				minOccurs="0" />
 		</all>
 	</complexType>

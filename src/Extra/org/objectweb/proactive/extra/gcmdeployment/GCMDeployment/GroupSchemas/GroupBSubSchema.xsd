@@ -2,22 +2,18 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 	<complexType name="BsubProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="commandPath" type="ct:pathElementType" minOccurs="0" />
+					<element name="commandPath" type="pa:pathElementType" minOccurs="0" />
 					<element name="bsubOption" type="paext:BsubOptionType"
 						minOccurs="0" />
 				</sequence>
@@ -31,10 +27,10 @@
 						</restriction>
 					</simpleType>
 				</attribute>
-				<attribute name="closeStream" type="ct:CloseStreamType"
+				<attribute name="closeStream" type="pa:CloseStreamType"
 					use="optional" />
 				<attribute name="interactive"
-					type="ct:BooleanOrVariableType" use="optional" />
+					type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="jobname" type="string" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
@@ -46,14 +42,14 @@
 	<complexType name="BsubOptionType" mixed="true">
 		<all>
 			<element name="hostlist" type="string" minOccurs="0" />
-			<element name="processor" type="ct:PosintOrVariableType"
+			<element name="processor" type="pa:PosintOrVariableType"
 				minOccurs="0" />
 			<element name="resourceRequirement" minOccurs="0">
 				<complexType>
 					<attribute name="value" type="string" />
 				</complexType>
 			</element>
-			<element name="scriptPath" type="ct:pathElementType"
+			<element name="scriptPath" type="pa:pathElementType"
 				minOccurs="0" />
 		</all>
 	</complexType>

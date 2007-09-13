@@ -2,15 +2,11 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema"
-	xmlns:ct="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchema">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/CommonTypes">
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
 	<complexType name="prunProcessType">
@@ -27,14 +23,14 @@
 	<!--prunOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<complexType name="prunOptionType">
 		<sequence>
-			<element name="hostlist" type="ct:ListType" minOccurs="0" />
-			<element name="hostsNumber" type="ct:PosintOrVariableType"
+			<element name="hostlist" type="pa:ListType" minOccurs="0" />
+			<element name="hostsNumber" type="pa:PosintOrVariableType"
 				minOccurs="0" />
-			<element name="processorPerNode" type="ct:PosintOrVariableType"
+			<element name="processorPerNode" type="pa:PosintOrVariableType"
 				minOccurs="0" />
-			<element name="bookingDuration" type="ct:TimeOrVariableType"
+			<element name="bookingDuration" type="pa:TimeOrVariableType"
 				minOccurs="0" />
-			<element name="outputFile" type="ct:TextOrVariableType"
+			<element name="outputFile" type="pa:TextOrVariableType"
 				minOccurs="0" />
 		</sequence>
 	</complexType>
