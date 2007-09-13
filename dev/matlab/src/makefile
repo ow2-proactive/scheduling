@@ -301,7 +301,7 @@ include $(ROOT)/mk/ptcommon.mk
 proactive:
 	rm -rf ../classes
 	mkdir ../classes 
-	for dir in $(shell find ptolemy -type d); do \
+	for dir in $(shell find ptolemy -type d  -not -path "*.svn*"); do \
 		mkdir ../classes/$$dir; \
 		cp $$dir/*.class ../classes/$$dir; \
 	done
