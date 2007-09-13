@@ -38,7 +38,6 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.future.Future;
@@ -421,7 +420,7 @@ public class EncryptedBody implements Body, Serializable {
         Class[] parametersTypes) {
     }
 
-    public BodyAdapter getRemoteAdapter() {
+    public UniversalBody getRemoteAdapter() {
         return null;
     }
 
