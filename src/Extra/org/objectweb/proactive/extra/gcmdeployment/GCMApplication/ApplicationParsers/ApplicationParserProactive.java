@@ -66,11 +66,8 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         Node javaNode = (Node) xpath.evaluate(XPATH_JAVA, configNode,
                 XPathConstants.NODE);
         if (javaNode != null) {
-            String javaRelPath = GCMParserHelper.getAttributeValue(javaNode,
-                    "relpath");
-            PathElement pathElement = new PathElement();
-            pathElement.setRelPath(javaRelPath);
-            commandBuilderProActive.setJavaPath(pathElement);
+            PathElement pe = GCMParserHelper.parsePathElementNode(javaNode);
+            commandBuilderProActive.setJavaPath(pe);
         }
 
         Node classPathNode;

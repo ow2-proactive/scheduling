@@ -57,6 +57,7 @@ import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -1551,11 +1552,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
-            String nodeName = "CapacityNode-" + i;
+            String nodeName = Constants.GCM_NODE_NAME + i;
             String url = UrlBuilder.buildUrl(hostname, nodeName, protocol);
 
             try {
-                // FIXME acontes: PSM ?
+                // FIXME acontes PSM ?
                 createLocalNode(url, false, null, VirtualNode.DEFAULT_VN,
                     "Undefined");
             } catch (NodeException e) {
@@ -1576,5 +1577,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 }
             }
         }
+    }
+
+    public void register(ProActiveRuntime childPART) {
     }
 }

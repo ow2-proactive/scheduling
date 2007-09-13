@@ -292,6 +292,10 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
+        command.append("-" + StartRuntime.Params.deploymentID.shortOpt() + " " +
+            hostInfo.getDeploymentId());
+        command.append(" ");
+
         for (int i = 1; i < hostInfo.getHostCapacity(); i++) {
             // TODO cmathieu Support windows here
             command.append(" & " + command);

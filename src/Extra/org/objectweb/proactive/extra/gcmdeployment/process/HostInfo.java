@@ -81,4 +81,20 @@ public interface HostInfo extends Serializable {
      * @throws IllegalStateException thrown if anything is wrong
      */
     public void check() throws IllegalStateException;
+
+    /**
+     * Return the deployment id of this HostInfo.
+     *
+     * A Deployment ID is an uniq ID associated to an HostInfo at runtime. This
+     * ID can be used to discover topology and manage the application. This ID is a link
+     * between GCM descriptors and middlewares/runtime.
+     *
+     * @return the deployment ID
+     */
+    public long getDeploymentId();
+
+    /**
+     * Set the deployment id of this HostInfo
+     */
+    public void setDeploymentId(long deploymentId);
 }

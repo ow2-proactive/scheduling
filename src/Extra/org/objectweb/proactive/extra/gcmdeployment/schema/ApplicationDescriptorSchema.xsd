@@ -103,15 +103,8 @@
 								<element name="bootclasspath"
 									type="pa:pathType" minOccurs="0">
 								</element>
-								<element name="java" minOccurs="0">
-									<complexType>
-										<attribute name="relpath"
-											type="pa:pathElementGeneralType">
-										</attribute>
-									</complexType>
-								</element>
-								<element name="applicationClasspath"
-									type="pa:classpathType" minOccurs="0">
+								<element name="java" minOccurs="0" type="pa:pathElementType"/>
+								<element name="applicationClasspath" type="pa:classpathType" minOccurs="0">
 								</element>
 								<element name="proactiveClasspath"
 									type="pa:classpathType" minOccurs="0">

@@ -19,7 +19,7 @@ public class HostInfoImpl implements HostInfo {
     private int vmCapacity;
     private OperatingSystem os;
     private Set<Tool> tools;
-    private long nodeId;
+    private long deploymentId;
 
     public HostInfoImpl() {
         username = null;
@@ -29,7 +29,7 @@ public class HostInfoImpl implements HostInfo {
         vmCapacity = 0;
         os = null;
         tools = new HashSet<Tool>();
-        nodeId = 0;
+        deploymentId = 0;
     }
 
     public HostInfoImpl(String id) {
@@ -78,6 +78,10 @@ public class HostInfoImpl implements HostInfo {
         sb.append(" os=" + os);
         sb.append(" username=" + username);
         sb.append(" homeDir=" + homeDirectory);
+        sb.append(" VMCapacity=" + vmCapacity);
+        sb.append(" HostCapacity=" + hostCapacity);
+        sb.append(" deploymentId=" + deploymentId);
+
         sb.append("\n");
         for (Tool tool : tools) {
             sb.append("\t" + tool + "\n");
@@ -190,6 +194,27 @@ public class HostInfoImpl implements HostInfo {
         return vmCapacity;
     }
 
+    public long getDeploymentId() {
+        return deploymentId;
+    }
+
+    public void setDeploymentId(long nodeId) {
+        GCMD_LOGGER.trace("HostInfo " + id + ".nodeId <-- " + nodeId);
+        this.deploymentId = nodeId;
+        GCMD_LOGGER.trace(toString());
+    }
+
+    public boolean isCapacitiyValid() {
+        if ((hostCapacity == 0) && (vmCapacity == 0)) {
+            return true;
+        }
+        if ((hostCapacity != 0) && (vmCapacity != 0)) {
+            return true;
+        }
+
+        return false;
+    }
+
     @SuppressWarnings("unused")
     static public class UnitTestHostInfoImpl {
         HostInfoImpl notInitialized;
@@ -238,24 +263,5 @@ public class HostInfoImpl implements HostInfo {
         public void checkReadygetHomeDirectory() {
             notInitialized.check();
         }
-    }
-
-    public void setNodeId(long nodeId) {
-        this.nodeId = nodeId;
-    }
-
-    public long getNodeId() {
-        return nodeId;
-    }
-
-    public boolean isCapacitiyValid() {
-        if ((hostCapacity == 0) && (vmCapacity == 0)) {
-            return true;
-        }
-        if ((hostCapacity != 0) && (vmCapacity != 0)) {
-            return true;
-        }
-
-        return false;
     }
 }

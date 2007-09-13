@@ -20,7 +20,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
-import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
+import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
@@ -115,6 +115,11 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             GCMDeploymentDescriptorImpl gddi = (GCMDeploymentDescriptorImpl) gdd;
             GCMDeploymentResources resources = gddi.getResources();
 
+            HostInfo hostInfo = resources.getHostInfo();
+            if (hostInfo != null) {
+                buildHostInfoTreeNode(rootNode, hostInfo);
+            }
+
             for (Group group : resources.getGroups()) {
                 buildGroupTreeNode(rootNode, group);
             }
@@ -133,12 +138,21 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         return new ArrayList<String>(currentDeploymentPath);
     }
 
+    private void buildHostInfoTreeNode(DeploymentNode rootNode,
+        HostInfo hostInfo) {
+        DeploymentNode deploymentNode = new DeploymentNode();
+        deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
+        pushDeploymentPath(hostInfo.getId());
+        hostInfo.setDeploymentId(deploymentNode.getId());
+        deploymentTree.addNode(deploymentNode, rootNode);
+    }
+
     private void buildGroupTreeNode(DeploymentNode rootNode, Group group) {
         DeploymentNode deploymentNode = new DeploymentNode();
         deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
-        HostInfoImpl hostInfo = (HostInfoImpl) group.getHostInfo();
+        HostInfo hostInfo = group.getHostInfo();
         pushDeploymentPath(hostInfo.getId());
-        hostInfo.setNodeId(deploymentNode.getId());
+        hostInfo.setDeploymentId(deploymentNode.getId());
         deploymentTree.addNode(deploymentNode, rootNode);
         popDeploymentPath();
     }
@@ -152,9 +166,9 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         // first look for a host info...
         //
         if (bridge.getHostInfo() != null) {
-            HostInfoImpl hostInfo = (HostInfoImpl) bridge.getHostInfo();
+            HostInfo hostInfo = bridge.getHostInfo();
             pushDeploymentPath(hostInfo.getId());
-            hostInfo.setNodeId(deploymentNode.getId());
+            hostInfo.setDeploymentId(deploymentNode.getId());
             deploymentTree.addNode(deploymentNode, baseNode);
             popDeploymentPath();
         }

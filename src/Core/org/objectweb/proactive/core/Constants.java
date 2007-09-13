@@ -94,4 +94,11 @@ public interface Constants {
 
     /** this property indicates to send JMX notifications */
     public static final String USER_CONFIG_DIR = ".proactive";
+
+    /** The name of nodes created by a GCM Deployment
+     *
+     * User are not allowed to create node with this name.
+     * @TODO enforce this rule, currently the user node is destroyed
+     */
+    public static final String GCM_NODE_NAME = "CapacityNode-";
 }

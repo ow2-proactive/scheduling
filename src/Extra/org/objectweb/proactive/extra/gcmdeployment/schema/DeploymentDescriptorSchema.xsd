@@ -214,7 +214,7 @@
 		<complexContent>
 			<extension base="pa:abstractInfrastructureType">
 				<sequence>
-					<element name="host" type="pa:hostType"></element>
+					<element name="host" type="pa:hostType" minOccurs="1" maxOccurs="unbounded"/>
 				</sequence>
 			</extension>
 		</complexContent>
@@ -223,9 +223,8 @@
 	<complexType name="groupsType">
 		<complexContent>
 			<extension base="pa:abstractInfrastructureType">
-				<sequence>
-					<element ref="pa:abstractShElement"
-						maxOccurs="unbounded">
+				<sequence minOccurs="1">
+					<element ref="pa:abstractShElement" minOccurs="1" maxOccurs="unbounded">
 					</element>
 				</sequence>
 			</extension>
