@@ -1834,7 +1834,7 @@ public class ProActive {
         throws ProActiveException {
         ProActiveRuntime remoteProActiveRuntime = null;
         remoteProActiveRuntime = RuntimeFactory.getRuntime(URIBuilder.buildVirtualNodeUrl(
-                    url).toString(), URIBuilder.getProtocol(url));
+                    url).toString());
         return remoteProActiveRuntime.getVirtualNode(URIBuilder.getNameFromURI(
                 url));
     }

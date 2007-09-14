@@ -136,8 +136,7 @@ public class StartRuntime {
         if (this.defaultRuntimeURL != null) {
             ProActiveRuntime PART;
             try {
-                PART = RuntimeFactory.getRuntime(this.defaultRuntimeURL,
-                        URIBuilder.getProtocol(this.defaultRuntimeURL));
+                PART = RuntimeFactory.getRuntime(this.defaultRuntimeURL);
                 register(PART);
                 impl.setParent(PART);
 

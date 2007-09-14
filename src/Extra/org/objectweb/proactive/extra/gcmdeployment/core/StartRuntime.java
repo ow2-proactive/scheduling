@@ -202,8 +202,7 @@ public class StartRuntime {
         if (parentURL != null) {
             ProActiveRuntime parentRuntime;
             try {
-                parentRuntime = RuntimeFactory.getRuntime(parentURL,
-                        URIBuilder.getProtocol(parentURL));
+                parentRuntime = RuntimeFactory.getRuntime(parentURL);
 
                 ProActiveRuntimeImpl.getProActiveRuntime()
                                     .setParent(parentRuntime);

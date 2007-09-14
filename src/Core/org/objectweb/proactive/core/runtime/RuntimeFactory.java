@@ -196,14 +196,12 @@ public abstract class RuntimeFactory {
      * Returns a reference to the ProActiveRuntime created with the given protocol and
      * located at the given url.This url can be either local or remote
      * @param proActiveRuntimeURL
-     * @param protocol
      * @return ProActiveRuntime
      * @throws ProActiveException if the runtime cannot be found
      */
-    public static ProActiveRuntime getRuntime(String proActiveRuntimeURL,
-        String protocol) throws ProActiveException {
-        runtimeLogger.debug("proActiveRunTimeURL " + proActiveRuntimeURL + " " +
-            protocol);
+    public static ProActiveRuntime getRuntime(String proActiveRuntimeURL)
+        throws ProActiveException {
+        runtimeLogger.debug("proActiveRunTimeURL " + proActiveRuntimeURL);
 
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);

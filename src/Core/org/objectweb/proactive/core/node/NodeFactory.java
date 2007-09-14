@@ -212,7 +212,7 @@ public class NodeFactory {
         //String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);
         try {
             url = URIBuilder.checkURI(nodeURL).toString();
-            proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
+            proActiveRuntime = RuntimeFactory.getRuntime(url);
             jobID = proActiveRuntime.getJobID(url);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
@@ -234,11 +234,9 @@ public class NodeFactory {
         ProActiveRuntime proActiveRuntime;
         String url;
 
-        String protocol = URIBuilder.getProtocol(nodeURL);
-
         try {
             url = URIBuilder.checkURI(nodeURL).toString();
-            proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
+            proActiveRuntime = RuntimeFactory.getRuntime(url);
             proActiveRuntime.killNode(url);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
