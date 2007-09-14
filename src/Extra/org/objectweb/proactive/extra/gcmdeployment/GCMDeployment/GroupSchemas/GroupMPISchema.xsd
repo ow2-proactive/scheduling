@@ -13,6 +13,9 @@
 	<complexType name="mpiProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="mpiOption" type="paext:mpiOptionsType" />
+				</sequence>
 				<attribute name="mpiFileName" type="string"
 					use="required" />
 				<attribute name="hostsFileName" type="string"
@@ -35,4 +38,7 @@
 		</all>
 	</complexType>
 
+	<element name="mpiGroup" type="paext:mpiProcessType"
+		substitutionGroup="pa:abstractShElement">
+	</element>
 </schema>

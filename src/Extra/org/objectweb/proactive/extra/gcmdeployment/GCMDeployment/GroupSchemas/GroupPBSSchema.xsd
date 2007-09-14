@@ -45,4 +45,6 @@
 		</complexContent>
 	</complexType>
 
+	<element name="pbsGroup" type="paext:PbsProcessType" substitutionGroup="pa:abstractShElement"/>
+
 </schema>

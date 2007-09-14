@@ -86,5 +86,6 @@
 	</complexType>
 	<!-- end of gLiteProcessType -->
 
+	<element name="gliteGroup" type="paext:gLiteProcessType" substitutionGroup="pa:abstractShElement"></element>
 
 </schema>

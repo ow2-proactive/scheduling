@@ -54,5 +54,6 @@
 		</all>
 	</complexType>
 
+	<element name="lsfGroup" substitutionGroup="pa:abstractShElement" type="paext:BsubProcessType"></element>
 
 </schema>

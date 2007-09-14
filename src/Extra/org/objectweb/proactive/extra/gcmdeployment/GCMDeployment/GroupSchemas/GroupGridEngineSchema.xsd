@@ -36,4 +36,5 @@
 		</all>
 	</complexType>
 
+	<element name="gridEngineGroup" type="paext:GridEngineProcessType" substitutionGroup="pa:abstractShElement"></element>
 </schema>

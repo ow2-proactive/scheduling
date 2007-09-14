@@ -44,5 +44,6 @@
 		</all>
 	</complexType>
 
+	<element name="globusGroup" type="paext:GlobusProcessType" substitutionGroup="pa:abstractShElement"></element>
 
 </schema>

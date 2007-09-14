@@ -35,4 +35,6 @@
 		</sequence>
 	</complexType>
 
+	<element name="prunGroup" type="paext:prunProcessType" substitutionGroup="pa:abstractShElement" />
+
 </schema>

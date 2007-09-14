@@ -49,4 +49,7 @@
 	</complexType>
 
 
+	<element name="oarGridGroup" type="paext:oarGridProcessType" substitutionGroup="pa:abstractShElement"/>
+	
+
 </schema>

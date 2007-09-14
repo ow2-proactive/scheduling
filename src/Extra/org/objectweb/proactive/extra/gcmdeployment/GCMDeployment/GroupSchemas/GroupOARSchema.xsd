@@ -13,6 +13,9 @@
 	<complexType name="oarProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="oarOption" type="paext:oarOptionType" />
+				</sequence>
 				<attribute name="bookedNodesAccess" use="optional">
 					<simpleType>
 						<restriction base="string">
@@ -29,7 +32,7 @@
 	</complexType>
 	
 	<!--oarOption-->
-	<complexType name="OarOptionType">
+	<complexType name="oarOptionType">
 		<all>
 			<element name="resources" type="pa:TextOrVariableType"
 				minOccurs="0" />
@@ -38,5 +41,7 @@
 				minOccurs="0" />
 		</all>
 	</complexType>
+
+	<element name="oarGroup" type="paext:oarProcessType" substitutionGroup="pa:abstractShElement"/>
 
 </schema>
