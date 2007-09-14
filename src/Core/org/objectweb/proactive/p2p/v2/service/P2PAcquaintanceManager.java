@@ -49,6 +49,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -74,8 +75,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     private static long MAX_WAIT_TIME = 10000;
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
-    static public int NOA = Integer.parseInt(System.getProperty(
-                "proactive.p2p.noa"));
+    static public int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
 
     //	static public int NOA = new NOAPowerLawGenerator(1, 9, -3).nextInt();
 
