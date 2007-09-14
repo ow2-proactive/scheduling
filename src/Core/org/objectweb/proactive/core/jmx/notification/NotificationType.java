@@ -48,6 +48,9 @@ public class NotificationType {
     public final static String runtimeUnregistered = "runtimeUnregistered";
     public final static String runtimeAcquired = "runtimeAcquired";
 
+    // --- GCM Deployment
+    public final static String GCMRuntimeRegistered = "GCMRuntimeRegistered";
+
     /* TODO Send this notification */
     // public final static String forwarderRuntimeRegistered = "forwarderRuntimeRegistered";
     public final static String runtimeDestroyed = "runtimeDestroyed";

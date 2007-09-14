@@ -62,7 +62,6 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;

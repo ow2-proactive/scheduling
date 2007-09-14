@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import java.io.IOException;
 
+import javax.management.NotificationListener;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
@@ -56,7 +58,7 @@ import org.objectweb.proactive.filetransfer.FileVector;
  * @see VirtualMachine
  */
 @PublicAPI
-public interface VirtualNodeInternal extends VirtualNode {
+public interface VirtualNodeInternal extends VirtualNode, NotificationListener {
     public final static Logger vnLogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
 
     /**

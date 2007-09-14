@@ -45,6 +45,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -65,7 +66,7 @@ public class StartRuntime {
     private String parentURL;
 
     /** An uniq identifier for the deployment framework */
-    private String deploymentID;
+    private long deploymentID;
 
     /** Capacity of this runtime */
     private long capacity;
@@ -158,11 +159,17 @@ public class StartRuntime {
                 capacity = new Long(arg);
             }
 
-            deploymentID = line.getOptionValue(Params.deploymentID.sOpt);
+            arg = line.getOptionValue(Params.deploymentID.sOpt);
+            if (arg != null) {
+                deploymentID = new Long(arg);
+            } else {
+                deploymentID = -1;
+            }
         } catch (ParseException e) {
             logger.warn("Cannot parse command line arguments", e);
             abort();
         } catch (NumberFormatException e) {
+            // TODO cmathieu gracefully handle errors
             logger.error("Capacity must be a number: " +
                 line.getOptionValue(Params.capacity.toString()));
             abort();
@@ -188,7 +195,7 @@ public class StartRuntime {
 
         // Creation & Setup of the local ProActive Runtime
         ProActiveRuntimeImpl localRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
-        ProActiveRuntime localRuntime;
+        ProActiveRuntime localRuntime = null;
         try {
             localRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
         } catch (ProActiveException e1) {
@@ -204,8 +211,13 @@ public class StartRuntime {
             try {
                 parentRuntime = RuntimeFactory.getRuntime(parentURL);
 
-                ProActiveRuntimeImpl.getProActiveRuntime()
-                                    .setParent(parentRuntime);
+                localRuntimeImpl.setParent(parentRuntime);
+
+                // Register
+                GCMRuntimeRegistrationNotificationData notification = new GCMRuntimeRegistrationNotificationData(localRuntime.getURL(),
+                        deploymentID);
+                parentRuntime.register(notification);
+
                 waitUntilInterupted();
             } catch (ProActiveException e) {
                 logger.warn("Cannot register to my parent", e);

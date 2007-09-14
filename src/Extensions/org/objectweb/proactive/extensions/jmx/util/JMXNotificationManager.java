@@ -11,10 +11,13 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -85,6 +88,18 @@ public class JMXNotificationManager implements NotificationListener {
             instance = new JMXNotificationManager();
         }
         return instance;
+    }
+
+    public void subscribe(ObjectName objectName, NotificationListener listener) {
+        try {
+            ProActiveRuntime localRuntime = RuntimeFactory.getDefaultRuntime();
+            subscribe(objectName, listener,
+                localRuntime.getVMInformation().getHostName(),
+                localRuntime.getMBeanServerName());
+        } catch (ProActiveException e) {
+            logger.warn(listener + " failed to subscribe to " + objectName +
+                " notifications", e);
+        }
     }
 
     /**

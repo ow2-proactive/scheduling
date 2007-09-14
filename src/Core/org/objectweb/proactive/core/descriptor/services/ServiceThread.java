@@ -39,10 +39,10 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
-import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NodeNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.node.Node;
@@ -134,9 +134,8 @@ public class ServiceThread extends Thread {
                         nodeCount++;
 
                         // ProActiveEvent
-                        ((VirtualNodeImpl) vn).nodeCreated(new NodeCreationEvent(
-                                vn, NodeCreationEvent.NODE_CREATED, node,
-                                nodeCount));
+                        ((VirtualNodeImpl) vn).nodeCreated(new NodeNotificationData(
+                                node, vn.getName()), true);
                         // END ProActiveEvent
                         if (loggerDeployment.isInfoEnabled()) {
                             loggerDeployment.info(

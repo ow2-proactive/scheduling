@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
@@ -68,6 +70,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
         // 4. Build the runtime tree
         buildDeploymentTree();
+
+        //		JMXNotificationManager.getInstance().subscribe(FactoryName.createRuntimeObjectName(.getURL()), this);
 
         // 5. Start the deployment
         for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {

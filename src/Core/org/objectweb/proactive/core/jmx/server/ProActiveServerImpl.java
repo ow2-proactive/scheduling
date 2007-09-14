@@ -58,7 +58,7 @@ public class ProActiveServerImpl implements Serializable,
      * @return
      */
     public String getVersion() {
-        return ProActiveJMXConstants.VERSION;
+        return ProActive.getProActiveVersion();
     }
 
     /**

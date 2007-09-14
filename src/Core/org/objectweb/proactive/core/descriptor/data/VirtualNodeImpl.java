@@ -40,8 +40,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import javax.management.Notification;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -54,18 +54,15 @@ import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
-import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
-import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
-import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.NodeNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
-import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentProcess;
@@ -80,13 +77,13 @@ import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
@@ -104,9 +101,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @see VirtualMachine
  */
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
-    implements VirtualNodeInternal, Serializable,
-        RuntimeRegistrationEventListener, NodeCreationEventListener,
-        ServiceUser {
+    implements VirtualNodeInternal, Serializable, ServiceUser {
 
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
@@ -398,7 +393,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 }
             }
 
-            this.proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
+            JMXNotificationManager.getInstance()
+                                  .subscribe(ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getMBean()
+                                                                 .getObjectName(),
+                this);
             this.proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
 
             for (int i = 0; i < this.virtualMachines.size(); i++) {
@@ -1006,62 +1005,59 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         return this.jobID;
     }
 
-    //
-    //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
-    //
-    private transient ExecutorService rrThreadpool = Executors.newCachedThreadPool();
-
-    //
-    //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
-    //
-    public void runtimeRegistered(RuntimeRegistrationEvent event) {
-        // Try to avoid the contention at EventListener level
-        // A listener shouldn't perform long computation, so a thread is spawned
-        this.rrThreadpool.execute(new RuntimeRegisteredPerform(event));
-    }
-
-    private class RuntimeRegisteredPerform implements Runnable {
-        private final RuntimeRegistrationEvent event;
-
-        public RuntimeRegisteredPerform(RuntimeRegistrationEvent _event) {
-            this.event = _event;
+    public void handleNotification(Notification notification, Object handback) {
+        String type = notification.getType();
+        if (logger.isTraceEnabled()) {
+            logger.trace("VN<" + this.getName() + "> received " + type +
+                " notification");
         }
 
-        public void run() {
-            runtimeRegisteredPerform(this.event);
-        }
-    }
+        // ------- Runtime Registered
+        if (NotificationType.runtimeRegistered.equals(type)) {
 
-    private void runtimeRegisteredPerform(RuntimeRegistrationEvent event) {
-        VirtualMachine virtualMachine = null;
+            /*
+             * Check if the runtime has been created by this VirtualNode/VirtualMachine
+             * if not the notification is dropped
+             */
+            RuntimeNotificationData data = (RuntimeNotificationData) notification.getUserData();
+            VirtualMachine virtualMachine = null;
 
-        // Not synchronized because it is now impossible to add a new VirtualMachine
-        for (int i = 0; i < this.virtualMachines.size(); i++) {
-            if ((this.virtualMachines.get(i)).getName().equals(event.getVmName())) {
-                virtualMachine = this.virtualMachines.get(i);
+            // Not synchronized because it is now impossible to add a new VirtualMachine
+            for (int i = 0; i < this.virtualMachines.size(); i++) {
+                if ((this.virtualMachines.get(i)).getName()
+                         .equals(data.getVmName())) {
+                    virtualMachine = this.virtualMachines.get(i);
+                }
             }
-        }
 
-        //Check if it this virtualNode that originates the process
-        if ((event.getCreatorID().equals(this.name)) &&
-                (virtualMachine != null)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("runtime " + event.getCreatorID() +
+            //Check if it this virtualNode that originates the process
+            if ((data.getCreatorID().equals(this.name)) &&
+                    (virtualMachine != null)) {
+                logger.debug("runtime " + data.getRuntimeUrl() +
                     " registered on virtualnode " + this.name);
+
+                createNodes(data, virtualMachine);
             }
 
-            createNodes(event, virtualMachine);
+            // Check if the virtualNode that originates the process is among awaited
+            // VirtualNodes
+            if (this.awaitedVirtualNodes.containsKey(data.getCreatorID())) {
+                createNodes(data,
+                    this.awaitedVirtualNodes.get(data.getCreatorID()));
+            }
         }
 
-        // Check if the virtualNode that originates the process is among awaited
-        // VirtualNodes
-        if (this.awaitedVirtualNodes.containsKey(event.getCreatorID())) {
-            createNodes(event,
-                this.awaitedVirtualNodes.get(event.getCreatorID()));
+        // ------------ Node created
+        if (NotificationType.nodeCreated.equals(type)) {
+            NodeNotificationData data = (NodeNotificationData) notification.getUserData();
+            if (name.equals(data.getVirtualNode())) {
+                nodeCreated((NodeNotificationData) notification.getUserData(),
+                    false);
+            }
         }
     }
 
-    private void createNodes(RuntimeRegistrationEvent event,
+    private void createNodes(RuntimeNotificationData notification,
         VirtualMachine _virtualMachine) {
         String protocol;
         ProActiveRuntime proActiveRuntimeRegistered;
@@ -1069,13 +1065,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         int port;
         String url;
 
-        protocol = event.getProtocol();
-        proActiveRuntimeRegistered = event.getRegisteredRuntime();
-        nodeHost = proActiveRuntimeRegistered.getVMInformation().getHostName();
-        port = URIBuilder.getPortNumber(proActiveRuntimeRegistered.getURL());
-        url = null;
-
+        protocol = URIBuilder.getProtocol(notification.getRuntimeUrl());
         try {
+            proActiveRuntimeRegistered = RuntimeFactory.getRuntime(notification.getRuntimeUrl());
+            nodeHost = proActiveRuntimeRegistered.getVMInformation()
+                                                 .getHostName();
+            port = URIBuilder.getPortNumber(proActiveRuntimeRegistered.getURL());
+            url = null;
+
             int nodeNumber = (new Integer(_virtualMachine.getNbNodesOnCreatedVMs())).intValue();
 
             for (int i = 1; i <= nodeNumber; i++) {
@@ -1106,10 +1103,18 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         proActiveRuntimeRegistered.createLocalNode(url, false,
                             siblingPSM, this.getName(), this.jobID);
 
-                        // Registration has succeded.
-                        performOperations(proActiveRuntimeRegistered, url,
-                            protocol);
+                        Node node = new NodeImpl(proActiveRuntimeRegistered,
+                                url, protocol, this.jobID);
 
+                        // JMX Notification
+                        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                                 .getMBean();
+                        if (mbean != null) {
+                            NodeNotificationData notificationData = new NodeNotificationData(node,
+                                    this.getName());
+                            mbean.sendNotification(NotificationType.nodeCreated,
+                                notificationData);
+                        }
                         break;
                     } catch (AlreadyBoundException e) {
                         registerAttempts--;
@@ -1238,7 +1243,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             //add this node to this virtualNode
-            performOperations(defaultRuntime, url, protocol);
+            Node node = new NodeImpl(defaultRuntime, url, protocol, this.jobID);
+
+            // JMX Notification
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                     .getMBean();
+            if (mbean != null) {
+                NodeNotificationData notificationData = new NodeNotificationData(node,
+                        this.getName());
+                mbean.sendNotification(NotificationType.nodeCreated,
+                    notificationData);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1519,50 +1534,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
-    private synchronized void performOperations(ProActiveRuntime part,
-        String url, String protocol) {
-        Node node = new NodeImpl(part, url, protocol, this.jobID);
-        synchronized (this.createdNodes) {
-            this.createdNodes.add(node);
-        }
-
-        logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
-            url + " done");
-        this.nodeCreated = true;
-        this.nbCreatedNodes++;
-
-        //Perform FileTransferDeploy (if needed)
-        FileVector fw = fileTransferDeploy(node);
-        this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
-            fw);
-
-        if (this.technicalService != null) {
-            this.technicalService.apply(node);
-        }
-
-        // wakes up Thread that are waiting for the node creation
-        notifyAll();
-
-        // ProActiveEvent
-        //notify all listeners that a node has been created
-        notifyListeners(this, NodeCreationEvent.NODE_CREATED, node,
-            this.nbCreatedNodes);
-        // END ProActiveEvent
-
-        // JMX Notification
-        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                 .getMBean();
-        if (mbean != null) {
-            NodeNotificationData notificationData = new NodeNotificationData(url,
-                    protocol, node.getVMInformation().getHostName(),
-                    part.getURL(), this.jobID);
-            mbean.sendNotification(NotificationType.nodeCreated,
-                notificationData);
-        }
-
-        // END JMX Notification
-    }
-
     private void register() {
         try {
             waitForAllNodesCreation();
@@ -1659,7 +1630,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.proActiveRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
-        this.rrThreadpool = Executors.newCachedThreadPool();
     }
 
     // -------------------------------------------------------------------------
@@ -1670,40 +1640,38 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * Use for p2p infrastructure to get nodes.
      * @see org.objectweb.proactive.core.event.NodeCreationEventListener#nodeCreated(org.objectweb.proactive.core.event.NodeCreationEvent)
      */
-    public synchronized void nodeCreated(NodeCreationEvent event) {
-        Node newNode = event.getNode();
-        this.createdNodes.add(newNode);
-        this.p2pNodes.add(newNode);
+    public synchronized void nodeCreated(NodeNotificationData notification,
+        boolean isP2PNode) {
+        Node node = notification.getNode();
+        logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
+            node.getNodeInformation().getURL() + " done");
+
+        synchronized (this.createdNodes) {
+            this.createdNodes.add(node);
+        }
         this.nbCreatedNodes++;
         this.nodeCreated = true;
 
+        if (isP2PNode) {
+            this.p2pNodes.add(node);
+        }
+
+        //Perform FileTransferDeploy (if needed)
+        FileVector fw = fileTransferDeploy(node);
+        this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
+            fw);
+
         if (this.technicalService != null) {
-            this.technicalService.apply(newNode);
+            this.technicalService.apply(node);
         }
 
         //notify all listeners that a node has been created
         notifyAll();
 
-        // ProActiveEvent
-        notifyListeners(this, NodeCreationEvent.NODE_CREATED, newNode,
+        // Notify the application that a node is ready
+        // Legacy event listener is kept only to be backward compatible
+        notifyListeners(this, NodeCreationEvent.NODE_CREATED, node,
             this.nbCreatedNodes);
-        // END ProActiveEvent
-
-        // JMX Notification
-        ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                 .getMBean();
-        if (mbean != null) {
-            NodeInformation nodeInfo = newNode.getNodeInformation();
-            VMInformation vmInfo = newNode.getVMInformation();
-            NodeNotificationData notificationData = new NodeNotificationData(nodeInfo.getURL(),
-                    nodeInfo.getProtocol(), vmInfo.getHostName(),
-                    ProActiveRuntimeImpl.getProActiveRuntime().getURL(),
-                    nodeInfo.getJobID());
-            mbean.sendNotification(NotificationType.nodeCreated,
-                notificationData);
-        }
-
-        // END JMX Notification
     }
 
     /**

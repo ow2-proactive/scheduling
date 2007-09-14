@@ -122,7 +122,6 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     public RemoteRemoteObject register(RemoteObject target, URI url,
         boolean replacePreviousBinding) throws ProActiveException {
         RmiRemoteObject rro = null;
-
         try {
             rro = new RmiRemoteObjectImpl(target);
         } catch (RemoteException e1) {

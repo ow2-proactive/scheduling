@@ -68,10 +68,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
@@ -81,6 +79,7 @@ import org.objectweb.proactive.core.jmx.mbean.JMXClassLoader;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapper;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
@@ -114,6 +113,7 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
 
 
 /**
@@ -137,19 +137,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntimeImpl proActiveRuntime;
 
     // JMX
-    private static boolean createMBean;
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
 
     static {
         try {
             proActiveRuntime = new ProActiveRuntimeImpl();
-
-            // JMX
-            //            String mbeanProperty = PAProperties.PA_JMX_MBEAN.getValue();
-            //            createMBean = PAProperties.PA_JMX_MBEAN.isTrue();
-            //            if (createMBean) { 
             proActiveRuntime.createMBean();
-            //            }
+            proActiveRuntime.createServerConnector();
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }
@@ -285,10 +279,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getMBean()
      */
-    public synchronized ProActiveRuntimeWrapperMBean getMBean() {
-        if (createMBean && (mbean == null)) {
-            createMBean();
-        }
+    public ProActiveRuntimeWrapperMBean getMBean() {
         return mbean;
     }
 
@@ -773,9 +764,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {
-        removeRuntimeRegistrationEventListener((VirtualNodeImpl) this.virtualNodesMap.get(
-                virtualNodeName));
-        this.virtualNodesMap.remove(virtualNodeName);
+        VirtualNodeInternal vn = virtualNodesMap.get(virtualNodeName);
+        if (vn != null) {
+            JMXNotificationManager.getInstance()
+                                  .unsubscribe(getMBean().getObjectName(), vn);
+        }
+        virtualNodesMap.remove(virtualNodeName);
     }
 
     public void unregisterAllVirtualNodes() {
@@ -1571,6 +1565,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
     }
 
-    public void register(ProActiveRuntime childPART) {
+    public void register(GCMRuntimeRegistrationNotificationData notification) {
+        getMBean()
+            .sendNotification(NotificationType.GCMRuntimeRegistered,
+            notification);
     }
 }

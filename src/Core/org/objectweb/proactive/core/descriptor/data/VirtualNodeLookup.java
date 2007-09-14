@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import javax.management.Notification;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -432,5 +434,12 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
 
     public VirtualNodeInternal getVirtualNodeInternal() {
         return this;
+    }
+
+    public void handleNotification(Notification notification, Object handback) {
+
+        /**
+         * @TODO VirtualNodeLookup can be remotely notified of node arrival via JMX
+         */
     }
 }
