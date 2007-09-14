@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -114,7 +114,7 @@ public class StartNode {
             printUsage();
         } else {
             nodeURL = args[0];
-            registryPortNumber = UrlBuilder.getPortFromUrl(nodeURL);
+            registryPortNumber = URIBuilder.getPortNumber(nodeURL);
             checkOptions(args, 1);
             readClassPath(args, 1);
         }
@@ -240,7 +240,7 @@ public class StartNode {
         String localhost = "localhost";
 
         try {
-            localhost = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            localhost = URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
             logger.error("InetAddress failed: " + e.getMessage());
             e.printStackTrace();

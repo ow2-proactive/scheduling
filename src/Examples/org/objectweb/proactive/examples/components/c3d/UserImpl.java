@@ -35,7 +35,7 @@ import java.io.IOException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.C3DUser;
 import org.objectweb.proactive.examples.c3d.User;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
@@ -73,10 +73,10 @@ public class UserImpl extends C3DUser implements BindingController, User {
             setUserName("Bob");
         }
 
-        // Register the User in the Registry. 
+        // Register the User in the Registry.
         try {
             Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-                UrlBuilder.buildUrlFromProperties("localhost", "User"));
+                URIBuilder.buildURIFromProperties("localhost", "User").toString());
         } catch (IOException e) {
             logger.error("Registering 'User' for future lookup failed");
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class UserImpl extends C3DUser implements BindingController, User {
         if (interfaceName.equals("user2dispatcher")) {
             c3ddispatcher = (org.objectweb.proactive.examples.c3d.Dispatcher) serverInterface;
 
-            // Registering back to the dispatcher is done in the go() method 
+            // Registering back to the dispatcher is done in the go() method
         }
     }
 

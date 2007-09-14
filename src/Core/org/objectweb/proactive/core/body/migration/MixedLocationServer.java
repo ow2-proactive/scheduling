@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
@@ -91,7 +91,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
      */
     public UniversalBody searchObject(UniqueID id) {
         //System.out.print("Searching for "+ id);
-        UniversalBody u = (UniversalBody) table.getBody(id);
+        UniversalBody u = table.getBody(id);
         return u;
     }
 
@@ -192,7 +192,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
         String tmp = url;
 
         try {
-            tmp = UrlBuilder.checkUrl(url);
+            tmp = URIBuilder.checkURI(url).toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

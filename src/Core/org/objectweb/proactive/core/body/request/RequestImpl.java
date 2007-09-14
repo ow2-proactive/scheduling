@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
@@ -271,7 +272,7 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     public boolean crypt(ProActiveSecurityManager psm,
-        UniversalBody destinationBody) throws RenegotiateSessionException {
+        SecurityEntity destinationBody) throws RenegotiateSessionException {
         try {
             if (logger.isDebugEnabled()) {
                 ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)

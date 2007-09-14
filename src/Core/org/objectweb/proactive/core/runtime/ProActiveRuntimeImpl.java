@@ -111,7 +111,7 @@ import org.objectweb.proactive.core.security.securityentity.EntityCertificate;
 import org.objectweb.proactive.core.security.securityentity.EntityVirtualNode;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -248,9 +248,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
                 this);
 
-        String url = UrlBuilder.buildUrlFromProperties(UrlBuilder.getHostNameFromUrl(
+        String url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(
                     getInternalURL()),
-                UrlBuilder.getNameFromUrl(getInternalURL()));
+                URIBuilder.getNameFromURI(getInternalURL())).toString();
 
         this.roe.activateProtocol(URI.create(url));
 
@@ -296,7 +296,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getMBeanServerName()
      */
     public String getMBeanServerName() {
-        return UrlBuilder.getNameFromUrl(proActiveRuntime.getURL());
+        return URIBuilder.getNameFromURI(proActiveRuntime.getURL());
     }
 
     /**
@@ -372,7 +372,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void createServerConnector() {
         // One the Serverconnector is launched any ProActive JMX Connector
         // client can connect to it remotely and manage the MBeans.
-        serverConnector = new ServerConnector(UrlBuilder.getNameFromUrl(
+        serverConnector = new ServerConnector(URIBuilder.getNameFromURI(
                     proActiveRuntime.getURL()));
         try {
             serverConnector.start();
@@ -385,7 +385,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * Creates the MBean associated to the ProActiveRuntime
      */
-    public void createMBean() {
+    protected void createMBean() {
         // JMX registration
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         JMXClassLoader jmxClassLoader = new JMXClassLoader(classLoader);
@@ -446,7 +446,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ProActiveSecurityManager nodeSecurityManager, String vnName,
         String jobId) throws NodeException, AlreadyBoundException {
         // check if nodeName is an URI or not
-        String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
+        String nodeName = URIBuilder.getNameFromURI(nodeURL);
 
         if (!replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
             throw new AlreadyBoundException("Node " + nodeName +
@@ -702,9 +702,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */
     protected String getInternalURL() {
-        return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
+        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
                 this.vmInformation.getInetAddress()),
-            this.vmInformation.getName());
+            this.vmInformation.getName()).toString();
     }
 
     /**
@@ -767,8 +767,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) throws UnknownProtocolException {
         String url;
-        url = UrlBuilder.buildUrlFromProperties(UrlBuilder.getHostNameFromUrl(
-                    getInternalURL()), virtualNodeName);
+        url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(
+                    getInternalURL()), virtualNodeName).toString();
         this.roe.activateProtocol(URI.create(url));
     }
 
@@ -786,7 +786,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getJobID(java.lang.String)
      */
     public String getJobID(String nodeUrl) {
-        String name = UrlBuilder.getNameFromUrl(nodeUrl);
+        String name = URIBuilder.getNameFromURI(nodeUrl);
         LocalNode localNode = this.nodeMap.get(name);
         return localNode.getJobId();
     }
@@ -910,7 +910,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // update node url
         ret.updateNodeURL(nodeURL);
 
-        String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
+        String nodeName = URIBuilder.getNameFromURI(nodeURL);
 
         // push the initial context for the current thread.
         // need to register as thread of the corresponding active object: this
@@ -1396,7 +1396,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
             this.hostInetAddress = java.net.InetAddress.getLocalHost();
-            this.hostName = UrlBuilder.getHostNameorIP(this.hostInetAddress);
+            this.hostName = URIBuilder.getHostNameorIP(this.hostInetAddress);
             String random = Integer.toString(ProActiveRandom.nextPosInt());
 
             if (PAProperties.PA_RUNTIME_NAME.isSet()) {
@@ -1408,7 +1408,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                         "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
                 }
             } else {
-                this.name = "PA_JVM" + random + "_" + this.hostName;
+                this.name = "PA_JVM" + random; //+ "_" + this.hostName;
             }
 
             this.capacity = -1;
@@ -1544,7 +1544,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
             String nodeName = Constants.GCM_NODE_NAME + i;
-            String url = UrlBuilder.buildUrl(hostname, nodeName, protocol);
+            String url = URIBuilder.buildURI(hostname, nodeName, protocol)
+                                   .toString();
 
             try {
                 // FIXME acontes PSM ?

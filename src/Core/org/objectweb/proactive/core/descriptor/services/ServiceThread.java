@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
@@ -49,7 +48,7 @@ import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
@@ -179,7 +178,7 @@ public class ServiceThread extends Thread {
     public void notifyVirtualNode(ProActiveRuntime[] part) {
         for (int i = 0; i < part.length; i++) {
             String url = part[i].getURL();
-            String protocol = UrlBuilder.getProtocol(url);
+            String protocol = URIBuilder.getProtocol(url);
 
             // ProActiveEvent
             RuntimeRegistrationEvent event = new RuntimeRegistrationEvent(localRuntime,

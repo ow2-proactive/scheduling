@@ -40,7 +40,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -76,17 +76,17 @@ public class ClientConnector implements Serializable {
 
             /*  build the jmx Url */
             if (this.serverName != null) {
-                this.url = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(
+                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
                             this.url),
                         ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" +
                         serverName, "service:jmx:proactive",
-                        UrlBuilder.getPortFromUrl(this.url));
+                        URIBuilder.getPortNumber(this.url)).toString();
             } else {
-                this.url = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(
+                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
                             this.url),
                         ProActiveJMXConstants.SERVER_REGISTERED_NAME,
                         "service:jmx:proactive",
-                        UrlBuilder.getPortFromUrl(this.url));
+                        URIBuilder.getPortNumber(this.url)).toString();
             }
             JMXServiceURL jmxUrl = new JMXServiceURL(url);
             /* connect to the connector server  */

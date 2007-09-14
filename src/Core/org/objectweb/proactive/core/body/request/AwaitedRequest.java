@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -251,7 +252,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     }
 
     public boolean crypt(ProActiveSecurityManager psm,
-        UniversalBody destinationBody) throws RenegotiateSessionException {
+        SecurityEntity destinationBody) throws RenegotiateSessionException {
         return this.wrappedRequest.crypt(psm, destinationBody);
     }
 

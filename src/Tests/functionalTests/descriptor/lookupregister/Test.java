@@ -34,7 +34,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -71,8 +71,8 @@ public class Test extends FunctionalTest {
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
         ProActive.newActive(A.class.getName(), new Object[] { "local" },
             vnAgent.getNode());
-        VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties(
-                    "localhost", "Agent"));
+        VirtualNode vnLookup = ProActive.lookupVirtualNode(URIBuilder.buildURIFromProperties(
+                    "localhost", "Agent").toString());
         a = (A) vnLookup.getUniqueAO();
 
         assertTrue((a.getName().equals("local")));

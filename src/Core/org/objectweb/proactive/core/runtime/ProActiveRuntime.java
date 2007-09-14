@@ -418,11 +418,6 @@ public interface ProActiveRuntime extends SecurityEntity {
     public void startJMXServerConnector();
 
     /**
-     * Create the MBean associated to the ProActive Runtime.
-     */
-    public void createMBean();
-
-    /**
      * Return the MBean associated to this ProActiveRuntime.
      * @return the MBean associated to this ProActiveRuntime.
      */

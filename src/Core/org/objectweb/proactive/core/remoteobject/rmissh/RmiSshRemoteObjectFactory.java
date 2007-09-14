@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIClientSocketFactory;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -64,9 +63,9 @@ public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
             }
             String codebase = classServerHelper.initializeClassServer();
 
-            codebase = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(
+            codebase = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
                         codebase), "/", Constants.HTTPSSH_PROTOCOL_IDENTIFIER,
-                    ClassServer.getServerSocketPort());
+                    ClassServer.getServerSocketPort()).toString();
 
             codebase = addCodebase(codebase);
         } catch (Exception e) {
@@ -110,18 +109,17 @@ public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
     @Override
     public RemoteObject lookup(URI url1) throws ProActiveException {
         String host;
-        String url = url1.toString();
-        host = UrlBuilder.getHostNameFromUrl(url);
+        host = URIBuilder.getHostNameFromUrl(url1);
 
-        int port = UrlBuilder.getPortFromUrl(url);
+        int port = URIBuilder.getPortNumber(url1);
         try {
             Registry registry = LocateRegistry.getRegistry(host, port,
                     new SshRMIClientSocketFactory());
-            RmiRemoteObject objectStub = (RmiRemoteObject) registry.lookup(UrlBuilder.getNameFromUrl(
-                        url));
+            RmiRemoteObject objectStub = (RmiRemoteObject) registry.lookup(URIBuilder.getNameFromURI(
+                        url1));
             return new RemoteObjectAdapter(objectStub);
         } catch (java.rmi.NotBoundException e) {
-            throw new ProActiveException("The url " + url +
+            throw new ProActiveException("The url " + url1 +
                 " is not bound to any known object");
         } catch (RemoteException e) {
             e.printStackTrace();

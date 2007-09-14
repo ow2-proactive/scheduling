@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentRunActive;
 import org.objectweb.proactive.core.component.body.NFRequestFilterImpl;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
@@ -149,8 +149,8 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
 
                     try {
                         Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-                            UrlBuilder.buildUrlFromProperties("localhost",
-                                "Dispatcher"));
+                            URIBuilder.buildURIFromProperties("localhost",
+                                "Dispatcher").toString());
                     } catch (IOException e) {
                         System.err.println("HEY, couldn't register dispatcher");
                         e.printStackTrace();
@@ -178,7 +178,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
         }
     }
 
-    // attributes control (methods of DispatcherAttributes) 
+    // attributes control (methods of DispatcherAttributes)
     public int getLastUserId() {
         return this.lastUserID;
     }

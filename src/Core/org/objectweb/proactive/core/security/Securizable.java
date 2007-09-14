@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.security;
 
-import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
@@ -72,5 +71,5 @@ public interface Securizable {
      * @throws RenegotiateSessionException
      */
     public boolean crypt(ProActiveSecurityManager psm,
-        UniversalBody destinationBody) throws RenegotiateSessionException;
+        SecurityEntity destinationBody) throws RenegotiateSessionException;
 }

@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -158,8 +158,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         //            //check if there is a port
         //            return validUrl.substring(n + 2, m);
         //        }
-        return UrlBuilder.getHostNameFromUrl(url) + ":" +
-        UrlBuilder.getPortFromUrl(url);
+        return URIBuilder.getHostNameFromUrl(url) + ":" +
+        URIBuilder.getPortNumber(url);
     }
 
     //--------------------------------------------------------------------------
@@ -487,7 +487,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     private void wakeUpEveryBody() {
         for (int i = 0; i < this.waitingNodesLookup.size(); i++) {
-            ((P2PNodeLookup) this.waitingNodesLookup.get(i)).wakeUp();
+            (this.waitingNodesLookup.get(i)).wakeUp();
         }
     }
 
@@ -538,8 +538,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     }
 
     public static P2PService getLocalP2PService() throws Exception {
-        UniversalBody body = (UniversalBody) ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                 .getActiveObjects(P2P_NODE_NAME,
+        UniversalBody body = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                 .getActiveObjects(P2P_NODE_NAME,
                 P2PService.class.getName()).get(0);
         return (P2PService) MOP.newInstance(P2PService.class, (Object[]) null,
             Constants.DEFAULT_BODY_PROXY_CLASS_NAME, new Object[] { body });

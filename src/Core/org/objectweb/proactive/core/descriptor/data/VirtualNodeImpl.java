@@ -83,7 +83,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -912,7 +912,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     } catch (Exception e) {
                         logger.info(" Virtual Machine " +
                             part.getVMInformation().getVMID() + " on host " +
-                            UrlBuilder.getHostNameorIP(
+                            URIBuilder.getHostNameorIP(
                                 part.getVMInformation().getInetAddress()) +
                             " terminated!!!");
                     }
@@ -1072,7 +1072,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         protocol = event.getProtocol();
         proActiveRuntimeRegistered = event.getRegisteredRuntime();
         nodeHost = proActiveRuntimeRegistered.getVMInformation().getHostName();
-        port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
+        port = URIBuilder.getPortNumber(proActiveRuntimeRegistered.getURL());
         url = null;
 
         try {
@@ -1493,9 +1493,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     private String buildURL(String host, String name, String protocol, int port) {
         if (port != 0) {
-            return UrlBuilder.buildUrl(host, name, protocol, port);
+            return URIBuilder.buildURI(host, name, protocol, port).toString();
         } else {
-            return UrlBuilder.buildUrl(host, name, protocol);
+            return URIBuilder.buildURI(host, name, protocol).toString();
         }
     }
 

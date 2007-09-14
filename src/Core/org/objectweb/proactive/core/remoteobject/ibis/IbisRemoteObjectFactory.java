@@ -44,7 +44,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.util.IbisProperties;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -130,10 +129,10 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
 
         try {
             if (replacePreviousBinding) {
-                ibis.rmi.Naming.rebind(UrlBuilder.removeProtocol(url.toString()),
+                ibis.rmi.Naming.rebind(URIBuilder.removeProtocol(url).toString(),
                     rro);
             } else {
-                ibis.rmi.Naming.bind(UrlBuilder.removeProtocol(url.toString()),
+                ibis.rmi.Naming.bind(URIBuilder.removeProtocol(url).toString(),
                     rro);
             }
             rro.setURI(url);
@@ -161,7 +160,7 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
      */
     public void unregister(URI url) throws ProActiveException {
         try {
-            ibis.rmi.Naming.unbind(UrlBuilder.removeProtocol(url.toString()));
+            ibis.rmi.Naming.unbind(URIBuilder.removeProtocol(url).toString());
 
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .debug(url + " unbound in registry");
@@ -179,23 +178,22 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
      */
     public RemoteObject lookup(URI url1) throws ProActiveException {
         Object o = null;
-        String url = UrlBuilder.removeProtocol(url1.toString());
 
         // Try if URL is the address of a RmiRemoteBody
         try {
-            o = ibis.rmi.Naming.lookup(url);
+            o = ibis.rmi.Naming.lookup(URIBuilder.removeProtocol(url1).toString());
         } catch (IOException e) {
             // connection failed, try to find a rmiregistry at proactive.rmi.port port
-            String url2 = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
-                    UrlBuilder.getNameFromUrl(url));
+            URI url2 = URIBuilder.buildURI(url1.getHost(),
+                    URIBuilder.getNameFromURI(url1));
             try {
-                o = ibis.rmi.Naming.lookup(url);
+                o = ibis.rmi.Naming.lookup(url2.toString());
             } catch (Exception e1) {
                 throw new ProActiveException(e);
             }
         } catch (ibis.rmi.NotBoundException e) {
             // there are one rmiregistry on target computer but nothing bound to this url isn t bound
-            throw new ProActiveException("The url " + url +
+            throw new ProActiveException("The url " + url1 +
                 " is not bound to any known object");
         }
 
@@ -205,7 +203,7 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
 
         throw new ProActiveException(
             "The given url does exist but doesn't point to a remote object  url=" +
-            url + " class found is " + o.getClass().getName());
+            url1 + " class found is " + o.getClass().getName());
     }
 
     /* (non-Javadoc)

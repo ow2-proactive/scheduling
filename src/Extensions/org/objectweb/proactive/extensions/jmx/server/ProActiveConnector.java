@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extensions.jmx.listeners.ProActiveConnectionNotificationEmitter;
 
 
@@ -126,8 +126,8 @@ public class ProActiveConnector implements JMXConnector, Serializable,
             int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
             String serverName = path.substring(index);
             String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-            String lookupUrl = UrlBuilder.buildUrl(hostname, serverName,
-                    protocol, port);
+            String lookupUrl = URIBuilder.buildURI(hostname, serverName,
+                    protocol, port).toString();
             System.out.println("ProActiveConnector.connect() lookup url = " +
                 lookupUrl);
             ProActiveServerImpl paServer = (ProActiveServerImpl) ProActive.lookupActive(ProActiveServerImpl.class.getName(),

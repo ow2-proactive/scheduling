@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
@@ -94,7 +94,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
         //if it starts with rmi we remove it
         String temp = null;
         try {
-            tmp = UrlBuilder.checkUrl(url);
+            tmp = URIBuilder.checkURI(url).toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }

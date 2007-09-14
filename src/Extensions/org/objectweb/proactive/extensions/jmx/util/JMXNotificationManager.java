@@ -15,7 +15,7 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.jmx.client.ClientConnector;
@@ -205,12 +205,13 @@ public class JMXNotificationManager implements NotificationListener {
                 // The JMX MBean server url
                 String runtimeUrl = (String) notif.getUserData();
 
-                String host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
-                String runtimeName = UrlBuilder.getNameFromUrl(runtimeUrl);
-                String protocol = UrlBuilder.getProtocol(runtimeUrl);
-                int port = UrlBuilder.getPortFromUrl(runtimeUrl);
+                String host = URIBuilder.getHostNameFromUrl(runtimeUrl);
+                String runtimeName = URIBuilder.getNameFromURI(runtimeUrl);
+                String protocol = URIBuilder.getProtocol(runtimeUrl);
+                int port = URIBuilder.getPortNumber(runtimeUrl);
 
-                String hostUrl = UrlBuilder.buildUrl(host, "", protocol, port);
+                String hostUrl = URIBuilder.buildURI(host, "", protocol, port)
+                                           .toString();
 
                 // The JMX MBean Server name
                 // Warning: This is a convention used in the ServerConnector

@@ -33,7 +33,7 @@ package functionalTests.activeobject.lookupactive;
 import java.io.IOException;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class A {
@@ -52,8 +52,8 @@ public class A {
 
     public int register() {
         try {
-            ProActive.register((A) ProActive.getStubOnThis(),
-                UrlBuilder.buildUrlFromProperties("localhost", "A"));
+            ProActive.register(ProActive.getStubOnThis(),
+                URIBuilder.buildURIFromProperties("localhost", "A").toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

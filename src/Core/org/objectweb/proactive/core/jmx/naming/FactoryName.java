@@ -1,11 +1,13 @@
 package org.objectweb.proactive.core.jmx.naming;
 
+import java.net.URI;
+
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -121,13 +123,14 @@ public class FactoryName {
      * @return A complete url
      */
     public static String getCompleteUrl(String url) {
-        String host = UrlBuilder.getHostNameFromUrl(url);
-        String name = UrlBuilder.getNameFromUrl(url);
-        String protocol = UrlBuilder.getProtocol(url);
-        int port = UrlBuilder.getPortFromUrl(url);
-
-        String newUrl = UrlBuilder.buildUrl(host, name, protocol, port);
-
-        return newUrl;
+        //        String host = UrlBuilder.getHostNameFromUrl(url);
+        //        String name = UrlBuilder.getNameFromUrl(url);
+        //        String protocol = UrlBuilder.getProtocol(url);
+        //        int port = UrlBuilder.getPortFromUrl(url);
+        //
+        //        String newUrl = UrlBuilder.buildUrl(host, name, protocol, port);
+        //
+        //        return newUrl;
+        return RemoteObjectHelper.expandURI(URI.create(url)).toString();
     }
 }

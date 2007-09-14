@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.hello;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -62,7 +62,7 @@ public class SimpleAgent implements java.io.Serializable {
     /** Returns the machine name on which the Active Objzect is currently */
     public String whereAreYou() {
         try {
-            return UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            return URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (Exception e) {
             return "Localhost lookup failed";
         }

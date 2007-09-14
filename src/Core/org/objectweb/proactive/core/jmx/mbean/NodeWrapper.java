@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.jmx.mbean;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.filter.ProActiveInternalObjectFilter;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.runtime.LocalNode;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -66,12 +67,13 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         this.localNode = localNode;
         this.runtimeUrl = runtimeUrl;
 
-        String host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
-        String protocol = UrlBuilder.getProtocol(runtimeUrl);
-        int port = UrlBuilder.getPortFromUrl(runtimeUrl);
+        URI runtimeURI = URI.create(runtimeUrl);
+        String host = runtimeURI.getHost();
+        String protocol = URIBuilder.getProtocol(runtimeURI);
+        int port = runtimeURI.getPort();
 
-        this.nodeUrl = UrlBuilder.buildUrl(host, localNode.getName(), protocol,
-                port);
+        this.nodeUrl = URIBuilder.buildURI(host, localNode.getName(), protocol,
+                port).toString();
     }
 
     public String getURL() {

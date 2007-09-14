@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -178,15 +178,15 @@ public class ClassServer implements Runnable {
             if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
                 return ClassServerServlet.getUrl();
             } else {
-                return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
+                return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
                         java.net.InetAddress.getLocalHost()), "",
-                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port);
+                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        return UrlBuilder.buildUrl("localhost", "",
-            Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port);
+        return URIBuilder.buildURI("localhost", "",
+            Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
     }
 
     /**

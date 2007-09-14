@@ -59,7 +59,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
 
 
@@ -108,7 +108,7 @@ public class DispatcherGUI implements ActionListener {
      * Creates the menu which is used in the mainFrame
      */
     private JMenuBar createMenuBar() {
-        //First, the menu items 
+        //First, the menu items
         clearLogMenuItem = new JMenuItem("Clear Log", KeyEvent.VK_C);
         exitMenuItem = new JMenuItem("Quit", KeyEvent.VK_Q);
         benchmarkMenuItem = new JMenuItem("Benchmark", KeyEvent.VK_B);
@@ -159,7 +159,7 @@ public class DispatcherGUI implements ActionListener {
         Box box = Box.createVerticalBox();
         String localhostName = "";
         try {
-            localhostName = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost());
+            localhostName = URIBuilder.getHostNameorIP(InetAddress.getLocalHost());
         } catch (UnknownHostException e) {
             localhostName = "unknown host name!";
         }
@@ -324,8 +324,8 @@ public class DispatcherGUI implements ActionListener {
         } else if (source == benchmarkMenuItem) {
             if (benchmarkMenuItem.getText().equals("Stop benchmark")) {
                 benchmarkMenuItem.setText("Benchmark");
-                c3dDispatcher.doBenchmarks(); // this call says "Stop the benchmark, 
-                                              // it is read by the doBenchmark method which checks the request queue for this... 
+                c3dDispatcher.doBenchmarks(); // this call says "Stop the benchmark,
+                                              // it is read by the doBenchmark method which checks the request queue for this...
             } else {
                 benchmarkMenuItem.setText("Stop benchmark");
                 c3dDispatcher.doBenchmarks();

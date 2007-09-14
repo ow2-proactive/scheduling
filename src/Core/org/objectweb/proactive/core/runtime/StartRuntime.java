@@ -39,7 +39,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -76,7 +76,7 @@ public class StartRuntime {
     private StartRuntime(String[] args) {
         if (args.length != 0) {
             this.creatorID = args[0].trim();
-            this.defaultRuntimeURL = UrlBuilder.removeUsername(args[1]);
+            this.defaultRuntimeURL = URIBuilder.removeUsername(args[1]);
             this.vmName = args[2];
         }
     }
@@ -100,7 +100,7 @@ public class StartRuntime {
 
         try {
             logger.info("**** Starting jvm on " +
-                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("**** Starting jvm with classpath " +
@@ -137,7 +137,7 @@ public class StartRuntime {
             ProActiveRuntime PART;
             try {
                 PART = RuntimeFactory.getRuntime(this.defaultRuntimeURL,
-                        UrlBuilder.getProtocol(this.defaultRuntimeURL));
+                        URIBuilder.getProtocol(this.defaultRuntimeURL));
                 register(PART);
                 impl.setParent(PART);
 

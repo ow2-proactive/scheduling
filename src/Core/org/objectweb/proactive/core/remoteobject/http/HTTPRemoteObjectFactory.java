@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -66,7 +66,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
                 classServerHelper = new ClassServerHelper();
                 String codebase = classServerHelper.initializeClassServer();
 
-                PAProperties.PA_XMLHTTP_PORT.setValue(UrlBuilder.getPortNumber(
+                PAProperties.PA_XMLHTTP_PORT.setValue(URIBuilder.getPortNumber(
                         codebase) + "");
 
                 addCodebase(codebase);

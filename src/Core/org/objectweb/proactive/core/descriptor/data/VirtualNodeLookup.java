@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.filetransfer.FileVector;
 
 
@@ -135,8 +135,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 return;
             }
             try {
-                this.urlForLookup = UrlBuilder.buildUrl(this.lookupHost,
-                        this.name, this.lookupProtocol, this.portForLookup);
+                this.urlForLookup = URIBuilder.buildURI(this.lookupHost,
+                        this.name, this.lookupProtocol, this.portForLookup)
+                                              .toString();
                 //		this.remoteProActiveRuntime = RuntimeFactory.getRuntime(urlForLookup,lookupProtocol);
                 //		this.virtualNode = remoteProActiveRuntime.getVirtualNode(this.name);
                 this.virtualNode = ProActive.lookupVirtualNode(urlForLookup)
@@ -330,9 +331,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     //	//
     //	//-----------------------implements DeploymentPropertiesEventListener ----------
     //	//
-    //	
+    //
     //	public void  lookForProperty(DeploymentPropertiesEvent event){
-    //		
+    //
     //	}
     public void setLookupInformations(String host, String protocol, String port) {
         //this.urlForLookup = url;
@@ -384,8 +385,8 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         }
         runtimeProperties.remove(information);
         if (!isWaitingForProperties()) {
-            this.urlForLookup = UrlBuilder.buildUrl(this.lookupHost, this.name,
-                    this.lookupProtocol, this.portForLookup);
+            this.urlForLookup = URIBuilder.buildURI(this.lookupHost, this.name,
+                    this.lookupProtocol, this.portForLookup).toString();
             activate();
         }
     }

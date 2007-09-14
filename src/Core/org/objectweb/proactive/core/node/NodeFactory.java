@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -82,12 +82,7 @@ public class NodeFactory {
 
     static {
         ProActiveConfiguration.load();
-
-        //        String protocol = UrlBuilder.checkProtocol(System.getProperty(
-        //                    "proactive.communication.protocol"));
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-
-        DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node", protocol);
+        DEFAULT_NODE_NAME = URIBuilder.buildURI("localhost", "Node").toString();
     }
 
     // test with class loader
@@ -175,7 +170,7 @@ public class NodeFactory {
         }
 
         //first look for the prototcol
-        String protocol = UrlBuilder.getProtocol(url);
+        String protocol = URIBuilder.getProtocol(url);
 
         //NodeFactory factory = getFactory(protocol);
         //then create a node
@@ -209,14 +204,14 @@ public class NodeFactory {
         }
 
         //do we have any association for this node?
-        String protocol = UrlBuilder.getProtocol(nodeURL);
+        String protocol = URIBuilder.getProtocol(nodeURL);
         if (protocol == null) {
             protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
 
         //String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);
         try {
-            url = UrlBuilder.checkUrl(nodeURL);
+            url = URIBuilder.checkURI(nodeURL).toString();
             proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
             jobID = proActiveRuntime.getJobID(url);
         } catch (ProActiveException e) {
@@ -239,10 +234,10 @@ public class NodeFactory {
         ProActiveRuntime proActiveRuntime;
         String url;
 
-        String protocol = UrlBuilder.getProtocol(nodeURL);
+        String protocol = URIBuilder.getProtocol(nodeURL);
 
         try {
-            url = UrlBuilder.checkUrl(nodeURL);
+            url = URIBuilder.checkURI(nodeURL).toString();
             proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
             proActiveRuntime.killNode(url);
         } catch (ProActiveException e) {

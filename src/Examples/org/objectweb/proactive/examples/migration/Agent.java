@@ -36,7 +36,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -61,8 +61,8 @@ public class Agent implements InitActive, RunActive, EndActive,
     public String getName() {
         try {
             //System.out.println("getName called");
-            //return the name of the Host  
-            return UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())
+            //return the name of the Host
+            return URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())
                              .toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class Agent implements InitActive, RunActive, EndActive,
     public String getNodeName() {
         try {
             //System.out.println("getNodeName called");
-            //return the name of the Node  
+            //return the name of the Node
             return ProActive.getBodyOnThis().getNodeURL().toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();

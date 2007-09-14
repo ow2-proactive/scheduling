@@ -51,7 +51,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
 
@@ -183,7 +183,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         // Second, check the url given does map to a machine, and get list of registered objects on it
         try {
-            hostName = UrlBuilder.getHostNameFromUrl(url);
+            hostName = URIBuilder.getHostNameFromUrl(url);
             registeredObjects = ProActive.listActive(url);
         } catch (IOException e) {
             treatException(e,
@@ -194,7 +194,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         // third, for every registered object, try to save it as a dispatcher
         for (int i = 0; i < registeredObjects.length; i++) {
-            String name = UrlBuilder.getNameFromUrl(registeredObjects[i]);
+            String name = URIBuilder.getNameFromURI(registeredObjects[i]);
 
             if (name.equals("Dispatcher") && (name.indexOf("_VN") == -1)) { // replace by (java 1.5 String.contains)
                 try {
@@ -253,8 +253,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
                             protocol + ".port"));
             }
 
-            localhost = UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
-                        InetAddress.getLocalHost()), null, null, port);
+            localhost = URIBuilder.buildURI(URIBuilder.getHostNameorIP(
+                        InetAddress.getLocalHost()), null, null, port).toString();
         } catch (UnknownHostException e) {
             localhost = "";
         }

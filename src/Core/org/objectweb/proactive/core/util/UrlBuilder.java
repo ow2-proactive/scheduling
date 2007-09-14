@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class is a utility class to perform modifications and operations on urls.
  */
+@Deprecated
 public class UrlBuilder {
     private static String[] LOCAL_URLS = {
             "", "localhost.localdomain", "localhost", "127.0.0.1"
@@ -276,9 +277,9 @@ public class UrlBuilder {
     //        return url;
     //    }
     public static String removeProtocol(String url) {
-        String tmp = UrlBuilder.buildUrl(UrlBuilder.getHostNameFromUrl(url),
-                UrlBuilder.getNameFromUrl(url), null,
-                UrlBuilder.getPortFromUrl(url));
+        String tmp = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(url),
+                URIBuilder.getNameFromURI(url), null,
+                URIBuilder.getPortNumber(url)).toString();
         return tmp;
     }
 
@@ -333,7 +334,7 @@ public class UrlBuilder {
         String temp = "";
 
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
-            temp = ((InetAddress) address).getHostAddress();
+            temp = (address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();
         }
@@ -373,7 +374,7 @@ public class UrlBuilder {
 
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {
-                return UrlBuilder.getHostNameorIP(hostInetAddress);
+                return URIBuilder.getHostNameorIP(hostInetAddress);
             }
         }
 

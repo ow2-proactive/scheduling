@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
@@ -117,9 +117,9 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @return a precedent running P2P servie or <code>null</code>
      */
     private P2PService getPrecedentService() {
-        String url = UrlBuilder.buildUrl("localhost", P2P_NODE_NAME,
+        String url = URIBuilder.buildURI("localhost", P2P_NODE_NAME,
                 PAProperties.PA_P2P_ACQUISITION.getValue(),
-                Integer.parseInt(PAProperties.PA_P2P_PORT.getValue()));
+                Integer.parseInt(PAProperties.PA_P2P_PORT.getValue())).toString();
 
         try {
             Node serviceNode = NodeFactory.getNode(url);

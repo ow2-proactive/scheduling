@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityEntity;
 
 
 public class BodyRequest extends MessageImpl implements Request,
@@ -105,7 +106,7 @@ public class BodyRequest extends MessageImpl implements Request,
     }
 
     public boolean crypt(ProActiveSecurityManager psm,
-        UniversalBody destinationBody) {
+        SecurityEntity destinationBody) {
         return true;
     }
 

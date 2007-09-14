@@ -34,10 +34,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -63,14 +62,14 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
         String port = PAProperties.PA_RMI_PORT.getValue();
         if (port != null) {
-            rmiURL = UrlBuilder.buildUrl("localhost",
+            rmiURL = URIBuilder.buildURI("localhost",
                     "RMINode" + System.currentTimeMillis(),
                     Constants.RMI_PROTOCOL_IDENTIFIER,
-                    new Integer(port).intValue());
+                    new Integer(port).intValue()).toString();
         } else {
-            rmiURL = UrlBuilder.buildUrl("localhost",
+            rmiURL = URIBuilder.buildURI("localhost",
                     "RMINode" + System.currentTimeMillis(),
-                    Constants.RMI_PROTOCOL_IDENTIFIER);
+                    Constants.RMI_PROTOCOL_IDENTIFIER).toString();
         }
     }
 

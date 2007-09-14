@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -368,7 +368,7 @@ public class StartP2PService implements P2PConstants {
         // For Debbugging
         try {
             logger.info("**** Starting jvm on " +
-                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
         } catch (UnknownHostException e) {
             logger.warn("Couldn't get local host name", e);
         }
@@ -495,9 +495,9 @@ public class StartP2PService implements P2PConstants {
         String url = null;
 
         try {
-            url = paRuntime.createLocalNode(UrlBuilder.buildUrl("localhost",
+            url = paRuntime.createLocalNode(URIBuilder.buildURI("localhost",
                         P2PConstants.P2P_NODE_NAME, acquisitionMethod,
-                        Integer.parseInt(portNumber)), false, null,
+                        Integer.parseInt(portNumber)).toString(), false, null,
                     paRuntime.getVMInformation().getName(), Job.DEFAULT_JOBID);
         } catch (AlreadyBoundException e) {
             logger.warn("This name " + P2PConstants.P2P_NODE_NAME +

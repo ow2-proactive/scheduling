@@ -42,7 +42,6 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 public class RemoteObjectHelper {
@@ -83,8 +82,8 @@ public class RemoteObjectHelper {
      */
     public static URI generateUrl(String protocol, String name)
         throws UnknownProtocolException {
-        return URI.create(UrlBuilder.buildUrl(null, name, protocol,
-                getDefaultPortForProtocol(protocol), true));
+        return URIBuilder.buildURI(null, name, protocol,
+            getDefaultPortForProtocol(protocol), true);
     }
 
     /**
@@ -97,8 +96,8 @@ public class RemoteObjectHelper {
     public static URI generateUrl(String name) {
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         try {
-            return URI.create(UrlBuilder.buildUrl(null, name, protocol,
-                    getDefaultPortForProtocol(protocol), true));
+            return URIBuilder.buildURI(null, name, protocol,
+                getDefaultPortForProtocol(protocol), true);
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }

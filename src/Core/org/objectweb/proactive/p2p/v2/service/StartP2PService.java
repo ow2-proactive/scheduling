@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
@@ -367,7 +367,7 @@ public class StartP2PService implements P2PConstants {
         // For Debbugging
         try {
             logger.info("**** Starting jvm on " +
-                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
         } catch (UnknownHostException e) {
             logger.warn("Couldn't get local host name", e);
         }

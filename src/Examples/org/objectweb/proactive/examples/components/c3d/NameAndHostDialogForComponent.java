@@ -38,7 +38,7 @@ import javax.naming.NamingException;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 
@@ -56,14 +56,14 @@ public class NameAndHostDialogForComponent extends NameAndHostDialog {
     protected void tryTheLookup() {
         String hostName = null;
         try {
-            hostName = UrlBuilder.getHostNameFromUrl(hostNameTextField.getText());
-            int portNumber = UrlBuilder.getPortFromUrl(hostNameTextField.getText());
+            hostName = URIBuilder.getHostNameFromUrl(hostNameTextField.getText());
+            int portNumber = URIBuilder.getPortNumber(hostNameTextField.getText());
 
-            String protocol = UrlBuilder.getProtocol(hostNameTextField.getText());
+            String protocol = URIBuilder.getProtocol(hostNameTextField.getText());
 
             ProActiveComponentRepresentative a;
-            a = Fractive.lookup(UrlBuilder.buildUrl(hostName, COMPONENT_ALIAS,
-                        protocol, portNumber));
+            a = Fractive.lookup(URIBuilder.buildURI(hostName, COMPONENT_ALIAS,
+                        protocol, portNumber).toString());
             this.c3dDispatcher = (Dispatcher) a.getFcInterface(
                     "user2dispatcher");
             setVisible(false);

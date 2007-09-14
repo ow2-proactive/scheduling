@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class ClassServerServlet extends HttpServlet {
@@ -69,7 +69,7 @@ public class ClassServerServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
-        //        try { 
+        //        try {
         //        System.out.println(
         //            "*************************** DO GET ****************************** ");
         doPost(request, response);
@@ -109,7 +109,7 @@ public class ClassServerServlet extends HttpServlet {
             //            int port = Integer.parseInt(System.getProperty(
             //                        "proactive.http.port"));
             String url = Constants.XMLHTTP_PROTOCOL_IDENTIFIER + "://" +
-                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
+                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
                 ':' + port + '/' + SERVLET_NAME;
 
             //                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+

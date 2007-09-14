@@ -44,7 +44,6 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -53,7 +52,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -288,13 +287,15 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                            .debug("Node created without security manager");
         }
 
-        Node newNode = NodeFactory.createNode(UrlBuilder.buildUrl("localhost",
+        Node newNode = NodeFactory.createNode(URIBuilder.buildURI("localhost",
                     P2PConstants.SHARED_NODE_NAME + "_" + this.nodeCounter++,
-                    UrlBuilder.getProtocol(ProActiveRuntimeImpl.getProActiveRuntime()
-                                                               .getURL()),
-                    UrlBuilder.getPortFromUrl(ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                  .getURL())),
-                true, newNodeSecurityManager, P2PConstants.VN_NAME, null);
+                    URIBuilder.getProtocol(ProActiveRuntimeImpl.getProActiveRuntime()
+                                                               .getURL())
+                              .toString(),
+                    URIBuilder.getPortNumber(ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getURL()))
+                                                        .toString(), true,
+                newNodeSecurityManager, P2PConstants.VN_NAME, null);
         this.availbaleNodes.add(newNode);
         logger.info("New shared node created @" +
             newNode.getNodeInformation().getURL());
