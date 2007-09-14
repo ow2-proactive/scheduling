@@ -717,18 +717,18 @@ public class ProActive {
         // in BodyImpl for the timing of a body.
         if (Profiling.TIMERS_COMPILED) {
             try {
-                if (TimItBasicManager.checkNodeProperties(node) &&
+//                if (TimItBasicManager.checkNodeProperties(node) &&
                         // Because we don't want to time the TimItReductor
                     // active object and avoid StackOverflow
                     // we need to check the current activated object
                     // classname
-                    !TimItBasicManager.getReductorClassName().equals(classname) &&
-                        !classname.contains("Spy")) {
-                    // The timit reductor will be passed to the factory
-                    // and used when a body is created
-                    clonedFactory.setTimItReductor(TimItBasicManager.getInstance()
-                                                                    .createReductor());
-                }
+//                    !TimItBasicManager.getReductorClassName().equals(classname) &&
+//                        !classname.contains("Spy")) {
+//                    // The timit reductor will be passed to the factory
+//                    // and used when a body is created
+//                    clonedFactory.setTimItReductor(TimItBasicManager.getInstance()
+//                                                                    .createReductor());
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
