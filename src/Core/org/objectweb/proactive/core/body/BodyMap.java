@@ -36,7 +36,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.AbstractEventProducer;
 import org.objectweb.proactive.core.event.BodyEvent;
-import org.objectweb.proactive.core.event.BodyEventListener;
+//import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
 
@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.event.ProActiveListener;
  * @version 1.1,  2001/12/23
  * @since   ProActive 0.9
  */
-public class BodyMap extends AbstractEventProducer implements Cloneable,
+public class BodyMap /* extends AbstractEventProducer */ implements Cloneable,
     java.io.Externalizable {
     //
     // -- PRIVATE MEMBER -----------------------------------------------
@@ -91,9 +91,9 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         idToBodyMap.put(id, b);
 
         // ProActiveEvent
-        if (hasListeners()) {
-            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
-        }
+        //        if (hasListeners()) {
+        //            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
+        //        }
 
         // END ProActiveEvent
     }
@@ -112,9 +112,9 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         idToBodyMap.put(id, b);
 
         // ProActiveEvent
-        if (hasListeners()) {
-            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
-        }
+        //        if (hasListeners()) {
+        //            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
+        //        }
 
         // END ProActiveEvent
     }
@@ -124,9 +124,9 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         notifyAll();
 
         // ProActiveEvent
-        if ((b != null) && hasListeners()) {
-            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
-        }
+        //        if ((b != null) && hasListeners()) {
+        //            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
+        //        }
 
         // END ProActiveEvent
     }
@@ -185,14 +185,14 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
 
     //
     // -- methods for BodyEventProducer -----------------------------------------------
+    //    //
+    //    public void addBodyEventListener(BodyEventListener listener) {
+    //        addListener(listener);
+    //    }
     //
-    public void addBodyEventListener(BodyEventListener listener) {
-        addListener(listener);
-    }
-
-    public void removeBodyEventListener(BodyEventListener listener) {
-        removeListener(listener);
-    }
+    //    public void removeBodyEventListener(BodyEventListener listener) {
+    //        removeListener(listener);
+    //    }
 
     //
     // -- implements Externalizable -----------------------------------------------
@@ -237,24 +237,6 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
             } else {
                 out.writeObject(value);
             }
-        }
-    }
-
-    //
-    // -- PROTECTED METHODS -----------------------------------------------
-    //
-    @Override
-    protected void notifyOneListener(ProActiveListener listener,
-        ProActiveEvent event) {
-        BodyEvent bodyEvent = (BodyEvent) event;
-
-        switch (bodyEvent.getType()) {
-        case BodyEvent.BODY_CREATED:
-            ((BodyEventListener) listener).bodyCreated(bodyEvent);
-            break;
-        case BodyEvent.BODY_DESTROYED:
-            ((BodyEventListener) listener).bodyDestroyed(bodyEvent);
-            break;
         }
     }
 }

@@ -38,9 +38,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.event.BodyEventListener;
-import org.objectweb.proactive.core.event.BodyEventProducerImpl;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -102,7 +99,8 @@ public class LocalBodyStore {
      * Static object that manages the registration of listeners and the sending of
      * events
      */
-    private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
+
+    //    private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
     private MetaObjectFactory halfBodyMetaObjectFactory = null;
 
     /**
@@ -251,17 +249,19 @@ public class LocalBodyStore {
      * (active or not) is registered or unregistered in this JVM.
      * @param listener the listener of body events to add
      */
-    public void addBodyEventListener(BodyEventListener listener) {
-        this.bodyEventProducer.addBodyEventListener(listener);
-    }
+
+    //    public void addBodyEventListener(BodyEventListener listener) {
+    //        this.bodyEventProducer.addBodyEventListener(listener);
+    //    }
 
     /**
      * Removes a listener of body events.
      * @param listener the listener of body events to remove
      */
-    public void removeBodyEventListener(BodyEventListener listener) {
-        this.bodyEventProducer.removeBodyEventListener(listener);
-    }
+
+    //    public void removeBodyEventListener(BodyEventListener listener) {
+    //        this.bodyEventProducer.removeBodyEventListener(listener);
+    //    }
 
     //
     // -- FRIENDLY METHODS -----------------------------------------------
@@ -274,8 +274,8 @@ public class LocalBodyStore {
         localBodyMap.putBody(body.bodyID, body);
 
         // ProActiveEvent
-        bodyEventProducer.fireBodyCreated(body);
-        // END ProActiveEvent
+        //        bodyEventProducer.fireBodyCreated(body);
+        //        // END ProActiveEvent
 
         // JMX Notification
         if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
@@ -295,7 +295,7 @@ public class LocalBodyStore {
         localBodyMap.removeBody(body.bodyID);
 
         // ProActiveEvent
-        bodyEventProducer.fireBodyRemoved(body);
+        //        bodyEventProducer.fireBodyRemoved(body);
         // END ProActiveEvent
 
         // JMX Notification
