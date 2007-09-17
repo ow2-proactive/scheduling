@@ -1,24 +1,25 @@
 package org.objectweb.proactive.core.jmx.util;
 
+import java.lang.management.ManagementFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.ListenerNotFoundException;
 import javax.management.Notification;
+import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -90,20 +91,42 @@ public class JMXNotificationManager implements NotificationListener {
         return instance;
     }
 
+    /**
+     * Subscribes a notification listener to a <b>local</b> JMX MBean Server.
+     * @param objectName The name of the MBean on which the listener should
+     * be added.
+     * @param listener The listener object which will handle the
+     * notifications emitted by the registered MBean.
+     */
     public void subscribe(ObjectName objectName, NotificationListener listener) {
+        subscribe(objectName, listener, (NotificationFilter) null, null);
+    }
+
+    /**
+     * Subscribes a notification listener to a <b>local</b> JMX MBean Server.
+     * @param name The name of the MBean on which the listener should
+     * be added.
+     * @param listener The listener object which will handle the
+     * notifications emitted by the registered MBean.
+     * @param filter The filter object. If filter is null, no
+     * filtering will be performed before handling notifications.
+     * @param handback The context to be sent to the listener when a
+     * notification is emitted.
+     */
+    public void subscribe(ObjectName objectName, NotificationListener listener,
+        NotificationFilter filter, Object handback) {
         try {
-            ProActiveRuntime localRuntime = RuntimeFactory.getDefaultRuntime();
-            subscribe(objectName, listener,
-                localRuntime.getVMInformation().getHostName(),
-                localRuntime.getMBeanServerName());
-        } catch (ProActiveException e) {
-            logger.warn(listener + " failed to subscribe to " + objectName +
-                " notifications", e);
+            ManagementFactory.getPlatformMBeanServer()
+                             .addNotificationListener(objectName, listener,
+                filter, handback);
+        } catch (InstanceNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
     /**
-     * Subscribes a notification listener to a remote JMX MBean.
+     * Subscribes a notification listener to a <b>remote</b> JMX MBean Server.
      * @param objectName The object name of the MBean.
      * @param listener The notification listener.
      * @param hostUrl The url of the remote host.
@@ -158,44 +181,54 @@ public class JMXNotificationManager implements NotificationListener {
     }
 
     /**
-     * Unsubscribes a notification listener to a remote JMX MBean.
+     * Unsubscribes a notification listener to a local or remote JMX MBean Server.
      * @param objectName The object name if the MBean.
      * @param listener The notification listener.
      */
     public void unsubscribe(ObjectName objectName, NotificationListener listener) {
-        ConcurrentLinkedQueue<NotificationListener> notificationListeners = listeners.get(objectName);
+        // ------------- Try to unsubscribe to a LOCAL MBean Server ------------
+        try {
+            ManagementFactory.getPlatformMBeanServer()
+                             .removeNotificationListener(objectName, listener);
+        } catch (InstanceNotFoundException e) {
+            //---------- Try to unsubscribe to a REMOTE MBean Server -----------
+            ConcurrentLinkedQueue<NotificationListener> notificationListeners = listeners.get(objectName);
 
-        // No listener listen this objectName, so we display an error message.
-        if (notificationListeners == null) {
-            logger.warn(
-                "JMXNotificationManager.unsubscribe() ObjectName not known");
-            return;
-        }
-        // We have to remove the listener.
-        else {
-            boolean isRemoved = notificationListeners.remove(listener);
-
-            // The listener didn't be listening this objectName, so we display an error message.
-            if (!isRemoved) {
+            // No listener listen this objectName, so we display an error message.
+            if (notificationListeners == null) {
                 logger.warn(
-                    "JMXNotificationManager.unsubscribe() Listener not known");
+                    "JMXNotificationManager.unsubscribe() ObjectName not known");
+                return;
             }
+            // We have to remove the listener.
+            else {
+                boolean isRemoved = notificationListeners.remove(listener);
 
-            // If there is no listeners which listen this objectName, we remove this one.
-            if (notificationListeners.isEmpty()) {
-                listeners.remove(objectName);
-                ServerListened server = servers.get(objectName);
-                if (server != null) {
-                    ProActiveConnection connection = connections.get(server);
-                    if (connection != null) {
-                        // The connection is not yet closed
-                        notificationlitener.unsubscribe(connections.get(server),
-                            objectName, null, null);
-                    }
+                // The listener didn't be listening this objectName, so we display an error message.
+                if (!isRemoved) {
+                    logger.warn(
+                        "JMXNotificationManager.unsubscribe() Listener not known");
                 }
-                // Updates our maps
-                servers.remove(objectName);
+
+                // If there is no listeners which listen this objectName, we remove this one.
+                if (notificationListeners.isEmpty()) {
+                    listeners.remove(objectName);
+                    ServerListened server = servers.get(objectName);
+                    if (server != null) {
+                        ProActiveConnection connection = connections.get(server);
+                        if (connection != null) {
+                            // The connection is not yet closed
+                            notificationlitener.unsubscribe(connections.get(
+                                    server), objectName, null, null);
+                        }
+                    }
+                    // Updates our maps
+                    servers.remove(objectName);
+                }
             }
+        } catch (ListenerNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 
