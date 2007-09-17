@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.jmx.util;
+package org.objectweb.proactive.core.jmx.util;
 
 import java.io.IOException;
 import java.io.Serializable;

@@ -28,14 +28,14 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.listeners;
+package org.objectweb.proactive.core.jmx.listeners;
 
 import java.io.IOException;
 
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.remote.JMXConnectionNotification;
 
-import org.objectweb.proactive.extensions.jmx.server.ProActiveConnector;
+import org.objectweb.proactive.core.jmx.server.ProActiveConnector;
 
 
 /**

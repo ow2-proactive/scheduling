@@ -17,7 +17,7 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
  *
  * @author cvergoni
  * Main et CallBack pour TracerWithCallbackMessage
- * Main soit: -démarre le dump de la topologie à partir d'une addresse
+ * Main soit: -dï¿½marre le dump de la topologie ï¿½ partir d'une addresse
  *            -trace le nombre d'acquaintance pour l'ensemble des noeuds p2p
  *            -fait une requete pour obtenir un noeud ProActive
  */
@@ -39,7 +39,7 @@ public class Tracer implements java.io.Serializable {
 
     /**
      * Dump la topologie a l'aide de org.objectweb.proactive.p2p.v2.monitoring.Dumper pour @param addr
-     * @param addr l'addresse du point d'entré pour le dump de la topologie
+     * @param addr l'addresse du point d'entrï¿½ pour le dump de la topologie
      */
     public static void dumpP2PNetwork(String addr) {
         Dumper dumper = null;
@@ -79,9 +79,9 @@ public class Tracer implements java.io.Serializable {
     }
 
     /**
-     * Permet de récupérer ou de creer un index identifiant de manière unique tout au long de l'execution l'adresse d'un noeud
+     * Permet de rï¿½cupï¿½rer ou de creer un index identifiant de maniï¿½re unique tout au long de l'execution l'adresse d'un noeud
      * @param addr addresse du noeud
-     * @return un index associé de manière unique tout au long de l'execution à l'adresse passée en paramètre
+     * @return un index associï¿½ de maniï¿½re unique tout au long de l'execution ï¿½ l'adresse passï¿½e en paramï¿½tre
      */
     public int getTabPositionOf(String addr) {
         int current;

@@ -52,7 +52,7 @@ public class StartP2P {
 
         try {
             System.out.println(
-                "°°°°°°°°°°°°°°°°°°°°°°°°°°°Starting Entry Node°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+                "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Starting Entry Nodeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             Node entryNode = vn0.getNode();
 
             P2PLauncher entryp2pLauncher = (P2PLauncher) ProActive.newActive(P2PLauncher.class.getName(),
@@ -61,7 +61,7 @@ public class StartP2P {
             Thread.sleep(10000);
 
             System.out.println(
-                "°°°°°°°°°°°°°°°°°°°°°°°°°°°Starting Others Entry Nodes°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+                "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Starting Others Entry Nodesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             for (Node othersEntryNodes : vn1.getNodes()) {
                 P2PLauncher p2pLauncher = (P2PLauncher) ProActive.newActive(P2PLauncher.class.getName(),
                         new Object[] { arg0 + s }, othersEntryNodes);
@@ -76,7 +76,7 @@ public class StartP2P {
                     entryPoint[(i + 1) % entryPoint.length] +
                     entryPoint[(i + 2) % entryPoint.length];
                 System.out.println(
-                    "°°°°°°°°°°°°°°°°°°°°°°°°°°°Starting Others Nodes°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+                    "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Starting Others Nodesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
                 P2PLauncher p2pLauncher = (P2PLauncher) ProActive.newActive(P2PLauncher.class.getName(),
                         new Object[] { arg0 + s }, node);
                 p2pLauncher.start();

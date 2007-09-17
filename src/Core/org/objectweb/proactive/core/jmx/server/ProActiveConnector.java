@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.server;
+package org.objectweb.proactive.core.jmx.server;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -51,9 +51,8 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
-import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
+import org.objectweb.proactive.core.jmx.listeners.ProActiveConnectionNotificationEmitter;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.extensions.jmx.listeners.ProActiveConnectionNotificationEmitter;
 
 
 /**

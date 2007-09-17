@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.provider.proactive;
+package org.objectweb.proactive.core.jmx.provider.proactive;
 
 import java.io.IOException;
 import java.util.Map;

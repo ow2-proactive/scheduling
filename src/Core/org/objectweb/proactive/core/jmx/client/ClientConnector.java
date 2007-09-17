@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.client;
+package org.objectweb.proactive.core.jmx.client;
 
 import java.io.IOException;
 import java.io.Serializable;

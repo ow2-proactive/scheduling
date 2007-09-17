@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.jmx.provider.proactive;
+package org.objectweb.proactive.core.jmx.provider.proactive;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -40,7 +40,7 @@ import javax.management.remote.JMXConnectorProvider;
 import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
-import org.objectweb.proactive.extensions.jmx.server.ProActiveConnector;
+import org.objectweb.proactive.core.jmx.server.ProActiveConnector;
 
 
 /**
