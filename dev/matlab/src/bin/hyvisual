@@ -1,4 +1,0 @@
-#!/bin/sh
-# $Id: hyvisual,v 1.3 2005/07/05 20:14:57 cxh Exp $
-# Invoke vergil -hyvisual
-$PTII/bin/vergil -hyvisual $@

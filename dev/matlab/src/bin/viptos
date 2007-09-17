@@ -1,4 +1,0 @@
-#!/bin/sh
-# $Id: viptos,v 1.2 2005/10/12 15:30:17 cxh Exp $
-# Invoke vergil -viptos
-$PTII/bin/vergil -viptos $@
