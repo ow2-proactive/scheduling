@@ -9,12 +9,12 @@
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
-	<complexType name="BsubProcessType">
+	<complexType name="lsfGroupType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="commandPath" type="pa:pathElementType" minOccurs="0" />
-					<element name="bsubOption" type="paext:BsubOptionType"
+					<element name="lsfOption" type="paext:lsfOptionType"
 						minOccurs="0" />
 				</sequence>
 				<attribute name="closeStream" type="pa:CloseStreamType"
@@ -29,7 +29,7 @@
 
 
 	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
-	<complexType name="BsubOptionType" mixed="true">
+	<complexType name="lsfOptionType" mixed="true">
 		<all>
 			<element name="hostlist" type="string" minOccurs="0" />
 			<element name="processor" type="pa:PosintOrVariableType"
@@ -44,6 +44,6 @@
 		</all>
 	</complexType>
 
-	<element name="lsfGroup" substitutionGroup="pa:abstractShElement" type="paext:BsubProcessType"></element>
+	<element name="lsfGroup" substitutionGroup="pa:abstractShElement" type="paext:lsfGroupType"></element>
 
 </schema>

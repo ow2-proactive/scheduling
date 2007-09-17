@@ -8,26 +8,26 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
-import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupBSub;
+import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupLSF;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class GroupBSubParser extends AbstractGroupParser {
+public class GroupLSFParser extends AbstractGroupParser {
     @Override
     public AbstractGroup createGroup() {
-        return new GroupBSub();
+        return new GroupLSF();
     }
 
     public String getNodeName() {
-        return "bsubProcess";
+        return "lsfProcess";
     }
 
     @Override
     public void parseGroupNode(Node groupNode, XPath xpath) {
         super.parseGroupNode(groupNode, xpath);
 
-        GroupBSub bsubGroup = (GroupBSub) getGroup();
+        GroupLSF bsubGroup = (GroupLSF) getGroup();
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
                 "interactive");
@@ -40,7 +40,7 @@ public class GroupBSubParser extends AbstractGroupParser {
         bsubGroup.setJobName(jobName);
 
         try {
-            Node optionNode = (Node) xpath.evaluate("bsubOption", groupNode,
+            Node optionNode = (Node) xpath.evaluate("lsfOption", groupNode,
                     XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();

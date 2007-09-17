@@ -5,7 +5,7 @@ import java.util.List;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
-public class GroupBSub extends AbstractGroup {
+public class GroupLSF extends AbstractGroup {
     private String interactive;
     private String jobName;
     private String queueName;
