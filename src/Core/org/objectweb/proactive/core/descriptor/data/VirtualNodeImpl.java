@@ -1129,7 +1129,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 }
             }
         } catch (ProActiveException e) {
-            e.printStackTrace();
+            logger.warn("Unable to create nodes on " +
+                notification.getRuntimeUrl(), e);
         }
     }
 
