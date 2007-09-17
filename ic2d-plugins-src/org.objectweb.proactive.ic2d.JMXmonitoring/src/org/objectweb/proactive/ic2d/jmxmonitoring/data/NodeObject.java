@@ -15,7 +15,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 
 public class NodeObject extends AbstractData{
 

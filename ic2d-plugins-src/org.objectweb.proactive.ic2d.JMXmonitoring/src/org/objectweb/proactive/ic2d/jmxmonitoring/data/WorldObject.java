@@ -10,7 +10,7 @@ import javax.management.MalformedObjectNameException;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
-import org.objectweb.proactive.extensions.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 
 /**
  * Holder class for all monitored hosts and virtual nodes
