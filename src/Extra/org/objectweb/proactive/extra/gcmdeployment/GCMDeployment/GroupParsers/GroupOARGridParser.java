@@ -14,20 +14,29 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupOARGridParser extends AbstractGroupParser {
+    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
+    private static final String NODE_NAME_WALLTIME = "walltime";
+    private static final String NODE_NAME_RESOURCES = "resources";
+    private static final String XPATH_OAR_GRID_OPTION = "oarGridOption";
+    private static final String ATTR_BOOKED_NODES_ACCESS = "bookedNodesAccess";
+    private static final String ATTR_QUEUE = "queue";
+    private static final String NODE_NAME = "oarGridProcess";
+
     @Override
     public AbstractGroup createGroup() {
         return new GroupOARGrid();
     }
 
     public String getNodeName() {
-        return "oarGridProcess";
+        return NODE_NAME;
     }
 
     @Override
     public void parseGroupNode(Node groupNode, XPath xpath) {
         super.parseGroupNode(groupNode, xpath);
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode, "queue");
+        String queueName = GCMParserHelper.getAttributeValue(groupNode,
+                ATTR_QUEUE);
 
         GroupOARGrid oarGridSubProcess = (GroupOARGrid) getGroup();
 
@@ -36,15 +45,15 @@ public class GroupOARGridParser extends AbstractGroupParser {
         }
 
         String accessProtocol = GCMParserHelper.getAttributeValue(groupNode,
-                "bookedNodesAccess");
+                ATTR_BOOKED_NODES_ACCESS);
 
         if (accessProtocol != null) {
             oarGridSubProcess.setAccessProtocol(accessProtocol);
         }
 
         try {
-            Node optionNode = (Node) xpath.evaluate("oarGridOption", groupNode,
-                    XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XPATH_OAR_GRID_OPTION,
+                    groupNode, XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); ++i) {
@@ -55,11 +64,11 @@ public class GroupOARGridParser extends AbstractGroupParser {
 
                 String nodeName = childNode.getNodeName();
                 String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals("resources")) {
+                if (nodeName.equals(NODE_NAME_RESOURCES)) {
                     oarGridSubProcess.setResources(nodeExpandedValue);
-                } else if (nodeName.equals("walltime")) {
+                } else if (nodeName.equals(NODE_NAME_WALLTIME)) {
                     oarGridSubProcess.setWallTime(nodeExpandedValue);
-                } else if (nodeName.equals("scriptPath")) {
+                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
                     PathElement path = GCMParserHelper.parsePathElementNode(childNode);
                     oarGridSubProcess.setScriptLocation(path);
                 }

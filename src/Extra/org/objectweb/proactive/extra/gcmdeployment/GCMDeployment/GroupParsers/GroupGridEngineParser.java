@@ -14,13 +14,22 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupGridEngineParser extends AbstractGroupParser {
+    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
+    private static final String NODE_NAME_BOOKING_DURATION = "bookingDuration";
+    private static final String NODE_NAME_PARALLEL_ENVIRONMENT = "parallelEnvironment";
+    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
+    private static final String NODE_NAME_HOSTLIST = "hostlist";
+    private static final String XPATH_GRID_ENGINE_OPTION = "gridEngineOption";
+    private static final String ATTR_QUEUE = "queue";
+    private static final String NODE_NAME = "gridEngineGroup";
+
     @Override
     public AbstractGroup createGroup() {
         return new GroupGridEngine();
     }
 
     public String getNodeName() {
-        return "gridEngineProcess";
+        return NODE_NAME;
     }
 
     @Override
@@ -29,11 +38,12 @@ public class GroupGridEngineParser extends AbstractGroupParser {
 
         GroupGridEngine gridGroup = (GroupGridEngine) getGroup();
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode, "queue");
+        String queueName = GCMParserHelper.getAttributeValue(groupNode,
+                ATTR_QUEUE);
         gridGroup.setQueueName(queueName);
 
         try {
-            Node optionNode = (Node) xpath.evaluate("gridEngineOption",
+            Node optionNode = (Node) xpath.evaluate(XPATH_GRID_ENGINE_OPTION,
                     groupNode, XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
@@ -45,17 +55,17 @@ public class GroupGridEngineParser extends AbstractGroupParser {
 
                 String nodeName = childNode.getNodeName();
                 String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals("hostlist")) {
+                if (nodeName.equals(NODE_NAME_HOSTLIST)) {
                     gridGroup.setHostList(nodeExpandedValue);
-                } else if (nodeName.equals("hostsNumber")) {
+                } else if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
                     gridGroup.setHostsNumber(nodeExpandedValue);
-                } else if (nodeName.equals("parallelEnvironment")) {
+                } else if (nodeName.equals(NODE_NAME_PARALLEL_ENVIRONMENT)) {
                     gridGroup.setParallelEnvironment(nodeExpandedValue);
-                } else if (nodeName.equals("bookingDuration")) {
+                } else if (nodeName.equals(NODE_NAME_BOOKING_DURATION)) {
                     gridGroup.setBookingDuration(nodeExpandedValue);
                     //                    } else if (nodeName.equals(OUTPUT_FILE)) {
                     //                        gridGroup.setOutputFile(nodeExpandedValue);
-                } else if (nodeName.equals("scriptPath")) {
+                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
                     PathElement path = GCMParserHelper.parsePathElementNode(childNode);
                     gridGroup.setScriptLocation(path);
                 }

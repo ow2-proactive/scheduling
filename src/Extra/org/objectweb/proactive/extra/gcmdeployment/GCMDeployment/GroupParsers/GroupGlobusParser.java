@@ -13,13 +13,20 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupGlobusParser extends AbstractGroupParser {
+    private static final String NODE_NAME_ERROR_FILE = "errorFile";
+    private static final String NODE_NAME_OUTPUT_FILE = "outputFile";
+    private static final String NODE_NAME_MAX_TIME = "maxTime";
+    private static final String NODE_NAME_COUNT = "count";
+    private static final String XPATH_GLOBUS_OPTION = "globusOption";
+    private static final String NODE_NAME = "globusProcess";
+
     @Override
     public AbstractGroup createGroup() {
         return new GroupGlobus();
     }
 
     public String getNodeName() {
-        return "globusProcess";
+        return NODE_NAME;
     }
 
     @Override
@@ -29,8 +36,8 @@ public class GroupGlobusParser extends AbstractGroupParser {
         GroupGlobus globusGroup = (GroupGlobus) getGroup();
 
         try {
-            Node optionNode = (Node) xpath.evaluate("globusOption", groupNode,
-                    XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XPATH_GLOBUS_OPTION,
+                    groupNode, XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
             for (int j = 0; j < childNodes.getLength(); ++j) {
@@ -41,13 +48,13 @@ public class GroupGlobusParser extends AbstractGroupParser {
 
                 String nodeValue = GCMParserHelper.getElementValue(child);
                 String nodeName = child.getNodeName();
-                if (nodeName.equals("count")) {
+                if (nodeName.equals(NODE_NAME_COUNT)) {
                     globusGroup.setCount(nodeValue);
-                } else if (nodeName.equals("maxTime")) {
+                } else if (nodeName.equals(NODE_NAME_MAX_TIME)) {
                     globusGroup.setMaxTime(nodeValue);
-                } else if (nodeName.equals("outputFile")) {
+                } else if (nodeName.equals(NODE_NAME_OUTPUT_FILE)) {
                     globusGroup.setStdout(nodeValue);
-                } else if (nodeName.equals("errorFile")) {
+                } else if (nodeName.equals(NODE_NAME_ERROR_FILE)) {
                     globusGroup.setStderr(nodeValue);
                 }
             }

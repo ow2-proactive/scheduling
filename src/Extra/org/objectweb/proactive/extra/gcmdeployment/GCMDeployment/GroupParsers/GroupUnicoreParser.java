@@ -10,6 +10,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
+/**
+ * Not used
+ * @author glaurent
+ *
+ */
 public class GroupUnicoreParser extends AbstractGroupParser {
     @Override
     public AbstractGroup createGroup() {

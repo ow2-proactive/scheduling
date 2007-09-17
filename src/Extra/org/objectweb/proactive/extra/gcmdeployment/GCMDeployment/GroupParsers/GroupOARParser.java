@@ -14,13 +14,21 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupOARParser extends AbstractGroupParser {
+    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
+    private static final String NODE_NAME_RESOURCES = "resources";
+    private static final String XPATH_OAR_OPTION = "oarOption";
+    private static final String ATTR_BOOKED_NODES_ACCESS = "bookedNodesAccess";
+    private static final String ATTR_QUEUE = "queue";
+    private static final String ATTR_INTERACTIVE = "interactive";
+    private static final String NODE_NAME = "oarProcess";
+
     @Override
     public AbstractGroup createGroup() {
         return new GroupOAR();
     }
 
     public String getNodeName() {
-        return "oarProcess";
+        return NODE_NAME;
     }
 
     @Override
@@ -30,20 +38,21 @@ public class GroupOARParser extends AbstractGroupParser {
         GroupOAR oarGroup = (GroupOAR) getGroup();
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
-                "interactive");
+                ATTR_INTERACTIVE);
 
         if (interactive != null) {
             oarGroup.setInteractive(interactive);
         }
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode, "queue");
+        String queueName = GCMParserHelper.getAttributeValue(groupNode,
+                ATTR_QUEUE);
 
         if (queueName != null) {
             oarGroup.setQueueName(queueName);
         }
 
         String accessProtocol = GCMParserHelper.getAttributeValue(groupNode,
-                "bookedNodesAccess");
+                ATTR_BOOKED_NODES_ACCESS);
 
         if (accessProtocol != null) {
             oarGroup.setAccessProtocol(accessProtocol);
@@ -53,8 +62,8 @@ public class GroupOARParser extends AbstractGroupParser {
         // Parse options
         //
         try {
-            Node optionNode = (Node) xpath.evaluate("oarOption", groupNode,
-                    XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XPATH_OAR_OPTION,
+                    groupNode, XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); ++i) {
@@ -64,10 +73,10 @@ public class GroupOARParser extends AbstractGroupParser {
                 }
 
                 String nodeName = childNode.getNodeName();
-                if (nodeName.equals("resources")) {
+                if (nodeName.equals(NODE_NAME_RESOURCES)) {
                     oarGroup.setResources(GCMParserHelper.getElementValue(
                             childNode));
-                } else if (nodeName.equals("scriptPath")) {
+                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
                     PathElement path = GCMParserHelper.parsePathElementNode(childNode);
                     oarGroup.setScriptLocation(path);
                 }

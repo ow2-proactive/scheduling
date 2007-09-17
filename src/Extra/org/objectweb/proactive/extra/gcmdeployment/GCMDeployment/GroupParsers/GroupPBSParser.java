@@ -14,13 +14,24 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPBSParser extends AbstractGroupParser {
+    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
+    private static final String NODE_NAME_OUTPUT_FILE = "outputFile";
+    private static final String NODE_NAME_BOOKING_DURATION = "bookingDuration";
+    private static final String NODE_NAME_PROCESSOR_PER_NODE = "processorPerNode";
+    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
+    private static final String NODE_NAME_HOSTLIST = "hostlist";
+    private static final String XPATH_PBS_OPTIONS = "pbsOptions";
+    private static final String ATTR_QUEUE_NAME = "queueName";
+    private static final String ATTR_INTERACTIVE = "interactive";
+    private static final String NODE_NAME = "pbsProcess";
+
     @Override
     public AbstractGroup createGroup() {
         return new GroupPBS();
     }
 
     public String getNodeName() {
-        return "pbsProcess";
+        return NODE_NAME;
     }
 
     @Override
@@ -30,20 +41,20 @@ public class GroupPBSParser extends AbstractGroupParser {
         GroupPBS pbsGroup = (GroupPBS) getGroup();
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
-                "interactive");
+                ATTR_INTERACTIVE);
         if (interactive != null) {
             pbsGroup.setInteractive(interactive);
         }
 
         String queueName = GCMParserHelper.getAttributeValue(groupNode,
-                "queueName");
+                ATTR_QUEUE_NAME);
         if (queueName != null) {
             pbsGroup.setQueueName(queueName);
         }
 
         Node optionNode;
         try {
-            optionNode = (Node) xpath.evaluate("pbsOptions", groupNode,
+            optionNode = (Node) xpath.evaluate(XPATH_PBS_OPTIONS, groupNode,
                     XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
@@ -55,17 +66,17 @@ public class GroupPBSParser extends AbstractGroupParser {
 
                 String nodeName = childNode.getNodeName();
                 String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals("hostlist")) {
+                if (nodeName.equals(NODE_NAME_HOSTLIST)) {
                     pbsGroup.setHostList(nodeExpandedValue);
-                } else if (nodeName.equals("hostsNumber")) {
+                } else if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
                     pbsGroup.setHostsNumber(nodeExpandedValue);
-                } else if (nodeName.equals("processorPerNode")) {
+                } else if (nodeName.equals(NODE_NAME_PROCESSOR_PER_NODE)) {
                     pbsGroup.setProcessorPerNodeNumber(nodeExpandedValue);
-                } else if (nodeName.equals("bookingDuration")) {
+                } else if (nodeName.equals(NODE_NAME_BOOKING_DURATION)) {
                     pbsGroup.setBookingDuration(nodeExpandedValue);
-                } else if (nodeName.equals("outputFile")) {
+                } else if (nodeName.equals(NODE_NAME_OUTPUT_FILE)) {
                     pbsGroup.setOutputFile(nodeExpandedValue);
-                } else if (nodeName.equals("scriptPath")) {
+                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
                     PathElement path = GCMParserHelper.parsePathElementNode(childNode);
                     pbsGroup.setScriptLocation(path);
                 }

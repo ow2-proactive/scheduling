@@ -14,6 +14,14 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupLSFParser extends AbstractGroupParser {
+    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
+    private static final String NODE_NAME_RESOURCE_REQUIREMENT = "resourceRequirement";
+    private static final String NODE_NAME_PROCESSOR = "processor";
+    private static final String NODE_NAME_HOSTLIST = "hostlist";
+    private static final String XPATH_LSF_OPTION = "lsfOption";
+    private static final String ATTR_JOBNAME = "jobname";
+    private static final String ATTR_QUEUE = "queue";
+
     @Override
     public AbstractGroup createGroup() {
         return new GroupLSF();
@@ -33,15 +41,17 @@ public class GroupLSFParser extends AbstractGroupParser {
                 "interactive");
         bsubGroup.setInteractive(interactive);
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode, "queue");
+        String queueName = GCMParserHelper.getAttributeValue(groupNode,
+                ATTR_QUEUE);
         bsubGroup.setQueueName(queueName);
 
-        String jobName = GCMParserHelper.getAttributeValue(groupNode, "jobname");
+        String jobName = GCMParserHelper.getAttributeValue(groupNode,
+                ATTR_JOBNAME);
         bsubGroup.setJobName(jobName);
 
         try {
-            Node optionNode = (Node) xpath.evaluate("lsfOption", groupNode,
-                    XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XPATH_LSF_OPTION,
+                    groupNode, XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
 
@@ -53,13 +63,13 @@ public class GroupLSFParser extends AbstractGroupParser {
 
                 String nodeName = childNode.getNodeName();
                 String nodeValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals("hostlist")) {
+                if (nodeName.equals(NODE_NAME_HOSTLIST)) {
                     bsubGroup.setHostList(nodeValue);
-                } else if (nodeName.equals("processor")) {
+                } else if (nodeName.equals(NODE_NAME_PROCESSOR)) {
                     bsubGroup.setProcessorNumber(nodeValue);
-                } else if (nodeName.equals("resourceRequirement")) {
+                } else if (nodeName.equals(NODE_NAME_RESOURCE_REQUIREMENT)) {
                     bsubGroup.setResourceRequirement(nodeValue);
-                } else if (nodeName.equals("scriptPath")) {
+                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
                     PathElement path = GCMParserHelper.parsePathElementNode(childNode);
                     bsubGroup.setScriptLocation(path);
                 }

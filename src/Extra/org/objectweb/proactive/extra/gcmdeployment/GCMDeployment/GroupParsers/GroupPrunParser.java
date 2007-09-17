@@ -13,13 +13,22 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPrunParser extends AbstractGroupParser {
+    private static final String NODE_NAME_OUTPUT_FILE = "outputFile";
+    private static final String NODE_NAME_BOOKING_DURATION = "bookingDuration";
+    private static final String NODE_NAME_PROCESSOR_PER_NODE = "processorPerNode";
+    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
+    private static final String NODE_NAME_HOSTLIST = "hostlist";
+    private static final String XPATH_PRUN_OPTION = "prunOption";
+    private static final String ATTR_QUEUE = "queue";
+    private static final String NODE_NAME = "prunProcess";
+
     @Override
     public AbstractGroup createGroup() {
         return new GroupPrun();
     }
 
     public String getNodeName() {
-        return "prunProcess";
+        return NODE_NAME;
     }
 
     @Override
@@ -28,12 +37,13 @@ public class GroupPrunParser extends AbstractGroupParser {
 
         GroupPrun prunGroup = (GroupPrun) getGroup();
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode, "queue");
+        String queueName = GCMParserHelper.getAttributeValue(groupNode,
+                ATTR_QUEUE);
         prunGroup.setQueueName(queueName);
 
         try {
-            Node optionNode = (Node) xpath.evaluate("prunOption", groupNode,
-                    XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XPATH_PRUN_OPTION,
+                    groupNode, XPathConstants.NODE);
 
             NodeList childNodes = optionNode.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); ++i) {
@@ -44,15 +54,15 @@ public class GroupPrunParser extends AbstractGroupParser {
 
                 String nodeName = childNode.getNodeName();
                 String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals("hostlist")) {
+                if (nodeName.equals(NODE_NAME_HOSTLIST)) {
                     prunGroup.setHostList(nodeExpandedValue);
-                } else if (nodeName.equals("hostsNumber")) {
+                } else if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
                     prunGroup.setHostsNumber(nodeExpandedValue);
-                } else if (nodeName.equals("processorPerNode")) {
+                } else if (nodeName.equals(NODE_NAME_PROCESSOR_PER_NODE)) {
                     prunGroup.setProcessorPerNodeNumber(nodeExpandedValue);
-                } else if (nodeName.equals("bookingDuration")) {
+                } else if (nodeName.equals(NODE_NAME_BOOKING_DURATION)) {
                     prunGroup.setBookingDuration(nodeExpandedValue);
-                } else if (nodeName.equals("outputFile")) {
+                } else if (nodeName.equals(NODE_NAME_OUTPUT_FILE)) {
                     prunGroup.setOutputFile(nodeExpandedValue);
                 }
             }
