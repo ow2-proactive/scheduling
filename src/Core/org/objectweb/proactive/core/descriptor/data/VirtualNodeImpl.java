@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.Notification;
 
@@ -141,7 +142,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private java.util.ArrayList<FileTransferDefinition> fileTransferRetrieve;
 
     /** Holds the futures for the status of the deployed files using pftp */
-    private HashMap<String, FileVector> fileTransferDeployedStatus;
+    private ConcurrentHashMap<String, FileVector> fileTransferDeployedStatus;
     private int fileBlockSize;
     private int overlapping;
 
@@ -236,7 +237,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.createdNodes = new java.util.ArrayList<Node>();
         this.awaitedVirtualNodes = new Hashtable<String, VirtualMachine>();
         this.fileTransferDeploy = new ArrayList<FileTransferDefinition>();
-        this.fileTransferDeployedStatus = new HashMap<String, FileVector>();
+        this.fileTransferDeployedStatus = new ConcurrentHashMap<String, FileVector>();
         this.fileTransferRetrieve = new ArrayList<FileTransferDefinition>();
         this.proActiveRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         this.fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
