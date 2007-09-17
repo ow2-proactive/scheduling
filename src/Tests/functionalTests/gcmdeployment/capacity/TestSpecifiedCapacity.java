@@ -25,15 +25,17 @@ public class TestSpecifiedCapacity extends FunctionalTest {
          * Otherwise getCapacity will return -1 due to a race condition
          */
         Thread.yield();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
 
         long cap = part.getVMInformation().getCapacity();
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         Assert.assertEquals(askedCapacity, cap);
         Assert.assertEquals(askedCapacity, part.getLocalNodes().size());
     }
