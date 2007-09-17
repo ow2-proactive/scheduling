@@ -37,8 +37,8 @@
 		<prop key="java.protocol.handler.pkgs" value="org.objectweb.proactive.core.ssh"/>
 
 		<!-- <prop key="proactive.tunneling.connect_timeout" value="2000"/> -->
-		<prop key="proactive.tunneling.try_normal_first" value="yes"/>
-		<prop key="proactive.tunneling.use_gc" value="yes"/>
+		<prop key="proactive.tunneling.try_normal_first" value="true"/>
+		<prop key="proactive.tunneling.use_gc" value="true"/>
 		<prop key="proactive.tunneling.gc_period" value="10000"/>
 		<prop key="proactive.classloader" value="false"/>
 		<!-- <prop key="proactive.ssh.known_hosts" value="/user/mlacage/home/.ssh/known_hosts"/> -->
