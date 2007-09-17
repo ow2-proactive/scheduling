@@ -17,16 +17,6 @@
 					<element name="bsubOption" type="paext:BsubOptionType"
 						minOccurs="0" />
 				</sequence>
-				<attribute name="class" use="required">
-					<simpleType>
-						<restriction base="string">
-							<enumeration
-								value="org.objectweb.proactive.core.process.lsf.LSFBSubProcess" />
-							<enumeration
-								value="org.objectweb.proactive.core.process.lsf.CNLSFProcess" />
-						</restriction>
-					</simpleType>
-				</attribute>
 				<attribute name="closeStream" type="pa:CloseStreamType"
 					use="optional" />
 				<attribute name="interactive"

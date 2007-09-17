@@ -2,8 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
@@ -14,26 +13,21 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="commandPath"
-						type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="gridEngineOption"
-						type="paext:GridEngineOptionType" />
+					<element name="commandPath" type="pa:pathElementType" minOccurs="0" />
+					<element name="gridEngineOption" type="paext:GridEngineOptionType" />
 				</sequence>
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>
 	</complexType>
 	<complexType name="GridEngineOptionType">
-		<all>
-			<element name="hostsNumber" type="pa:PosintOrVariableType" />
-			<element name="bookingDuration"
-				type="pa:PosintOrVariableType" />
-			<element name="scriptPath" type="pa:pathElementGeneralType" />
-			<element name="hostlist" type="pa:TextOrVariableType"
-				minOccurs="0" />
-			<element name="parallelEnvironment"
-				type="pa:TextOrVariableType" minOccurs="1" maxOccurs="1" />
-		</all>
+		<sequence>
+			<element name="hostsNumber" type="pa:PosintOrVariableType" minOccurs="0" />
+			<element name="bookingDuration" type="pa:PosintOrVariableType" minOccurs="0" />
+			<element name="scriptPath" type="pa:pathElementGeneralType" minOccurs="0" />
+			<element name="hostlist" type="pa:TextOrVariableType" minOccurs="0" />
+			<element name="parallelEnvironment" type="pa:TextOrVariableType" minOccurs="0" />
+		</sequence>
 	</complexType>
 
 	<element name="gridEngineGroup" type="paext:GridEngineProcessType" substitutionGroup="pa:abstractShElement"></element>

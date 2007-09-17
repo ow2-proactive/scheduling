@@ -33,7 +33,7 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="rshType">
+	<complexType name="groupTypeRSH">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<attribute name="hostname" type="pa:hostnameType" />
@@ -47,8 +47,8 @@
 	<element name="sshGroup" substitutionGroup="pa:abstractShElement"
 		type="pa:groupTypeSSH">
 	</element>
-	<element name="rsh" substitutionGroup="pa:abstractShElement"
-		type="pa:rshType">
+	<element name="rshGroup" substitutionGroup="pa:abstractShElement"
+		type="pa:groupTypeRSH">
 	</element>
 
 	<complexType name="peerSetType"></complexType>
@@ -198,10 +198,8 @@
 		<attribute name="id" type="pa:idType" use="required"></attribute>
 		<attribute name="os" type="pa:osType" use="required"></attribute>
 		<attribute name="username" type="string"></attribute>
-		<!-- FIXME glaurent strictly positive int  -->
-		<attribute name="hostCapacity" type="int" use="optional"/>
-		<!-- FIXME glaurent strictly positive int  -->
-		<attribute name="vmCapacity" type="int" use="optional"/>
+		<attribute name="hostCapacity" type="positiveInteger" use="optional"/>
+		<attribute name="vmCapacity" type="positiveInteger" use="optional"/>
 	</complexType>
 
 	<complexType name="hostRefType">

@@ -19,9 +19,7 @@
 					<!--	<element ref="commandPath" minOccurs="0"/>-->
 					<element name="globusOption"
 						type="paext:GlobusOptionType" minOccurs="0" />
-				</sequence>
-				<attribute name="class" type="string" use="required"
-					fixed="org.objectweb.proactive.core.process.globus.GlobusProcess" />
+				</sequence>				
 				<attribute name="closeStream" type="pa:CloseStreamType"
 					use="optional" />
 				<attribute name="hostname" type="string" use="required" />
@@ -37,9 +35,9 @@
 				minOccurs="0" />
 			<element name="maxTime" type="pa:PosintOrVariableType"
 				minOccurs="0" />
-			<element name="outputFile" type="pa:TextOrVariableType"
+			<element name="outputFile" type="pa:pathElementType"
 				minOccurs="0" />
-			<element name="errorFile" type="pa:TextOrVariableType"
+			<element name="errorFile" type="pa:pathElementType"
 				minOccurs="0" />
 		</all>
 	</complexType>

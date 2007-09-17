@@ -22,13 +22,12 @@
 					<element name="pbsOption" type="paext:PbsOptionType"
 						minOccurs="0" />
 				</sequence>
-				<attribute name="class" type="string" use="required"
-					fixed="org.objectweb.proactive.core.process.pbs.PBSSubProcess" />
 				<attribute name="closeStream" type="pa:CloseStreamType"
 					use="optional" />
 				<attribute name="interactive"
 					type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
+				<attribute name="jobName" type="string" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -40,6 +39,7 @@
 				<sequence>
 					<element name="scriptPath" type="pa:pathElementType"
 						minOccurs="0" />
+					<element name="node" type="positiveInteger" minOccurs="0" />
 				</sequence>
 			</extension>
 		</complexContent>
