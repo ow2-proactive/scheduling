@@ -9,6 +9,8 @@ import org.w3c.dom.Node;
 
 
 public class BridgeSSHParser extends AbstractBridgeParser {
+    private static final String ATTR_USERNAME = "username";
+    private static final String ATTR_HOSTNAME = "hostname";
     static final String NODE_NAME = "sshBridge";
 
     @Override
@@ -16,9 +18,9 @@ public class BridgeSSHParser extends AbstractBridgeParser {
         super.parseBridgeNode(bridgeNode, xpath);
 
         String hostname = GCMParserHelper.getAttributeValue(bridgeNode,
-                "hostname");
+                ATTR_HOSTNAME);
         String username = GCMParserHelper.getAttributeValue(bridgeNode,
-                "username");
+                ATTR_USERNAME);
 
         BridgeSSH bridgeSSH = ((BridgeSSH) bridge);
         bridgeSSH.setHostname(hostname);
