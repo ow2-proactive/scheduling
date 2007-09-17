@@ -137,7 +137,6 @@ public class ActiveObjectListener implements NotificationListener{
 		UniqueID destinationID = request.getDestination();
 		UniqueID aoID;
 		String sourceHost = UrlBuilder.getHostNameFromUrl(request.getSourceNode());
-		System.out.println("ActiveObjectListener.addRequest() :::::::::::::::::::::: " + type);
 		String destinationHost = UrlBuilder.getHostNameFromUrl(request.getDestinationNode());
 		String hostToDiscovered;
 		String nodeUrlToDiscovered;
