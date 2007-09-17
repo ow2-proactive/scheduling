@@ -41,14 +41,22 @@ public class ChartObject {
     protected boolean hasChanged;
     protected String[] currentTimerLevel = BASIC_LEVEL;
 
-    public ChartObject(final ChartContainerObject parent,
+    public TimerObject getRootTimer() {
+		return rootTimer;
+	}
+
+	public void setRootTimer(TimerObject rootTimer) {
+		this.rootTimer = rootTimer;
+	}
+
+	public ChartObject(final ChartContainerObject parent,
         final List<BasicTimer> basicTimersList, final ActiveObject aoObject) {
         this.parent = parent;
         this.timersMap = new java.util.HashMap<String, TimerObject>();
         this.timersList = new ArrayList<TimerObject>();
 
         // Populate the map and update root
-        this.rootTimer = this.updateCurrentTimersList(basicTimersList);
+        this.updateCurrentTimersList(basicTimersList);
         this.hasChanged = true;
         this.aoObject = aoObject;
         this.barChartBuilder = new BarChartBuilder((this.aoObject == null)
@@ -124,15 +132,14 @@ public class ChartObject {
         }
     }
 
-    public final TimerObject updateCurrentTimersList(
-        final List<BasicTimer> list) {
-        TimerObject root = null;
-        for (BasicTimer basicTimer : list) {
+    public final void updateCurrentTimersList(
+        final List<BasicTimer> list) {        
+        for (final BasicTimer basicTimer : list) {        	
             TimerObject timerObject = this.timersMap.get(basicTimer.getName());
 
             if (timerObject != null) {
                 // Update the timer object
-                timerObject.setCurrentTimer(basicTimer);
+                timerObject.updateCurrentTimerAndCompute(basicTimer);
             } else {
                 // If is not root
                 if (basicTimer.getParent() != null) {
@@ -140,30 +147,32 @@ public class ChartObject {
                     TimerObject parent = this.timersMap.get(basicTimer.getParent()
                                                                       .getName());
                     if (parent != null) {
-                        // Create
+                        // Create the timer object
                         timerObject = new TimerObject(basicTimer, parent);
+                        // Set the total timer reference
+                        timerObject.setTotalTimerAndCompute(this.rootTimer);                        
                         // Add to map
                         this.timersMap.put(basicTimer.getName(), timerObject);
                         // Add to list
                         this.timersList.add(timerObject);
                     }
-                } else { // If root then add to map and to list and prepare
-                         // to return it
-                    timerObject = new TimerObject(basicTimer, null);
-                    this.timersMap.put(basicTimer.getName(), timerObject);
-                    this.timersList.add(timerObject);
-                    root = timerObject;
+                } else { // If root then add to map and to list
+                	if (this.rootTimer == null) {
+						this.rootTimer = new TimerObject(basicTimer, null);
+						this.rootTimer.setTotalTimerAndCompute(this.rootTimer);
+						this.timersMap.put(basicTimer.getName(), this.rootTimer);
+						this.timersList.add(this.rootTimer);						
+					}
                 }
             }
-        }
-        return root;
+        }        
     }
 
     /**
-     * Returns this uniqueId of the associated active object
-     *
-     * @return The uniqueId of the active object
-     */
+	 * Returns this uniqueId of the associated active object
+	 * 
+	 * @return The uniqueId of the active object
+	 */
     public final UniqueID getAoObjectID() {
         return this.aoObject.getUniqueID();
     }

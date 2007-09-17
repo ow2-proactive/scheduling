@@ -10,11 +10,11 @@ import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
 public class TreeEditPartFactory implements EditPartFactory {
     private TimerTreeView timerTreeView;
 
-    public TreeEditPartFactory(TimerTreeView timerTreeView) {
+    public TreeEditPartFactory(final TimerTreeView timerTreeView) {
         this.timerTreeView = timerTreeView;
     }
 
-    public EditPart createEditPart(EditPart context, Object model) {
+    public final EditPart createEditPart(final EditPart context, final Object model) {
         EditPart part = null;
         if (model instanceof TimerTreeHolder) {
             part = new TimerTreeHolderEditPart();
@@ -24,7 +24,6 @@ public class TreeEditPartFactory implements EditPartFactory {
         if (part != null) {
             part.setModel(model);
         }
-
         return part;
     }
 }

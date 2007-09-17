@@ -38,7 +38,7 @@ public class ShowInTreeViewAction extends Action {
                     "org.objectweb.proactive.ic2d.timit.views.TimerTreeView");
 
             if (target != null) {
-                TimerTreeHolder.getInstance().provideChartObject(target);
+                TimerTreeHolder.getInstance().provideChartObject(target, false);
                 target = null;
             }
         } catch (Exception e) {

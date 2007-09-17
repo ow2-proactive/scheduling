@@ -1,20 +1,28 @@
 package org.objectweb.proactive.ic2d.timit.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 
 
 public class TimerObject extends AbstractObject {
-    public static final String P_CHILDREN = "_children";
-    public static final String P_LABEL = "_label";
-    public static final String P_SELECTION = "_selection";
-    public static final String P_VIEW = "_view";
-    public static final String P_EXPAND_STATE = "_expand_state";
+    public static final String P_CHILDREN = "0";
+    public static final String P_LABEL = "1";
+    public static final String P_SELECTION = "2";
+    public static final String P_VIEW = "3";
+    public static final String P_EXPAND_STATE = "4";
+    public static final String P_SORT = "5";
+    
     protected double percentageFromParent;
+    protected double percentageFromTotal;
+    protected double currentTotalTimeInMsInDouble;
     protected String labelName;
     protected TimerObject parent;
+    protected TimerObject totalTimer;
     protected BasicTimer currentTimer;
     protected List<TimerObject> children;
 
@@ -30,40 +38,43 @@ public class TimerObject extends AbstractObject {
     public TimerObject(BasicTimer currentTimer, TimerObject parent) {
         this.parent = parent;
         this.currentTimer = currentTimer;
+        this.labelName = currentTimer.getName(); 
         this.isViewed = true;
-        this.updateLabel();
         if (parent != null) {
             parent.children.add(this);
         }
-        this.children = new ArrayList<TimerObject>();
+        this.children = new ArrayList<TimerObject>();    
     }
+    
+	public final void setTotalTimerAndCompute(final TimerObject totalTimer) {
+		this.totalTimer = totalTimer;
+		if ( this.currentTimer.getTotalTime() != 0l ){
+			this.compute();
+		}
+	}
 
-    public void setCurrentTimer(BasicTimer currentTimer) {
+    public final void updateCurrentTimerAndCompute(final BasicTimer currentTimer) {
         this.currentTimer = currentTimer;
-        this.updateLabel();
-        //		if ( this.parent!= null && !this.parent.children.contains(this) ){
-        //			System.out.println("TimerObject.setCurrentTimer() ------> ");
-        //			this.parent.children.add(this);
-        //		}
-    }
-
-    public void updateLabel() {
-        this.updatePercentage();
-        this.labelName = currentTimer.getName() + " [ " +
-            String.format("%1.2f", this.percentageFromParent) +
-            "% , cumulatedTime : " +
-            Math.ceil((double) currentTimer.getTotalTime() / 1000000d) +
-            "ms ]";
-    }
-
-    public void updatePercentage() {
-        double currentTotalTime;
-        double parentTotalTime;
-        if ((parent != null) && (parent.currentTimer != null) &&
-                ((currentTotalTime = this.currentTimer.getTotalTime()) != 0) &&
-                ((parentTotalTime = this.parent.currentTimer.getTotalTime()) != 0)) {
-            this.percentageFromParent = (currentTotalTime * 100) / parentTotalTime;
+        if ( this.currentTimer.getTotalTime() != 0l ){
+        	this.compute();    	
         }
+    }
+
+    /**
+     * TODO : OPTIMIZE ME     
+     */
+    private final void compute() {    	
+    	// Compute current time (convert from ns to ms)
+    	Long tempTotal = new Long(this.currentTimer.getTotalTime());
+    	this.currentTotalTimeInMsInDouble = tempTotal.doubleValue() / 1000000d;
+    	
+    	// Compute total percentage
+    	this.percentageFromTotal = (this.currentTotalTimeInMsInDouble * 100d) / this.totalTimer.currentTotalTimeInMsInDouble;
+    	
+    	// Compute parent percentage
+    	if ( this.parent != null && this.parent.currentTimer.getTotalTime() != 0 ){
+    		this.percentageFromParent = (this.currentTotalTimeInMsInDouble * 100d) / this.parent.currentTotalTimeInMsInDouble;
+    	}    	        	  
     }
 
     public List<TimerObject> getChildren() {
@@ -112,4 +123,62 @@ public class TimerObject extends AbstractObject {
     public BasicTimer getCurrentTimer() {
         return currentTimer;
     }
+
+	public double getCurrentTotalTimeInDouble() {
+		return currentTotalTimeInMsInDouble;
+	}
+	
+	public final String getFormatedCurrentTotalTimeInDouble() {
+		return String.format(Locale.US,"%1.2f", this.currentTotalTimeInMsInDouble);
+	}
+
+	public final String getFormatedPercentageFromParent() {
+		return String.format(Locale.US, "%1.2f", this.percentageFromParent);
+	}
+	
+	public final String getFormatedPercentageFromTotal() {
+		return String.format(Locale.US, "%1.2f", this.percentageFromTotal);
+	}
+	
+	// SORT CHILDREN UTILITY METHODS
+	
+	public final void sortChildrenByTime(final boolean up){
+		Collections.sort(this.children, 
+				new Comparator<TimerObject>() {
+			public final int compare(final TimerObject t1, final TimerObject t2) {
+				return ( up ?  Double.compare(t1.currentTotalTimeInMsInDouble, t2.currentTotalTimeInMsInDouble) 
+						: Double.compare(t2.currentTotalTimeInMsInDouble, t1.currentTotalTimeInMsInDouble) );				
+			}
+		});
+	}
+	
+	public final void sortChildrenByTotalPercent(final boolean up){
+		Collections.sort(this.children, 
+				new Comparator<TimerObject>() {
+			public final int compare(final TimerObject t1, final TimerObject t2) {
+				return ( up ?  Double.compare(t1.currentTotalTimeInMsInDouble, t2.currentTotalTimeInMsInDouble) 
+						: Double.compare(t2.currentTotalTimeInMsInDouble, t1.currentTotalTimeInMsInDouble) );				
+			}
+		});
+	}
+	
+	public final void sortChildrenByInvocations(final boolean up){
+		Collections.sort(this.children, 
+				new Comparator<TimerObject>() {
+			public final int compare(final TimerObject t1, final TimerObject t2) {
+				return ( up ?  ((Integer)t1.currentTimer.getStartStopCoupleCount()).compareTo(t2.currentTimer.getStartStopCoupleCount()) 
+						: ((Integer)t2.currentTimer.getStartStopCoupleCount()).compareTo(t1.currentTimer.getStartStopCoupleCount()) );				
+			}
+		});
+	}
+	
+	public final void sortChildrenByParentPercent(final boolean up){
+		Collections.sort(this.children, 
+				new Comparator<TimerObject>() {
+			public final int compare(final TimerObject t1, final TimerObject t2) {
+				return ( up ?  Double.compare(t1.percentageFromParent, t2.percentageFromParent) 
+						: Double.compare(t2.percentageFromParent, t1.percentageFromParent) );				
+			}
+		});
+	}
 }
