@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<include schemaLocation="CommonTypes.xsd"></include>
 
 	<complexType name="abstractGroupElementType" abstract="true">
 		<sequence>
-			<element name="environment" type="pa:environmentType"
-				maxOccurs="1" minOccurs="0">
-			</element>
+			<element name="environment" type="pa:environmentType" maxOccurs="1" minOccurs="0"></element>
 		</sequence>
 		<attribute name="id" type="pa:idType" use="required" />
 		<attribute name="username" type="pa:usernameType" />
@@ -21,14 +17,10 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="privateKey" type="pa:pathElementType"
-						minOccurs="0" maxOccurs="1">
-					</element>
+					<element name="privateKey" type="pa:pathElementType" minOccurs="0" maxOccurs="1"></element>
 				</sequence>
 				<attribute name="commandOptions" type="string"></attribute>
-				<attribute name="hostList" type="string"
-					use="required">
-				</attribute>
+				<attribute name="hostList" type="string" use="required"></attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -41,15 +33,9 @@
 		</complexContent>
 	</complexType>
 
-	<element name="abstractShElement"
-		type="pa:abstractGroupElementType">
-	</element>
-	<element name="sshGroup" substitutionGroup="pa:abstractShElement"
-		type="pa:groupTypeSSH">
-	</element>
-	<element name="rshGroup" substitutionGroup="pa:abstractShElement"
-		type="pa:groupTypeRSH">
-	</element>
+	<element name="abstractShElement" type="pa:abstractGroupElementType"></element>
+	<element name="sshGroup" substitutionGroup="pa:abstractShElement" type="pa:groupTypeSSH"></element>
+	<element name="rshGroup" substitutionGroup="pa:abstractShElement" type="pa:groupTypeRSH"></element>
 
 	<complexType name="peerSetType"></complexType>
 	<complexType name="abstractAcquisitionType" abstract="true"></complexType>
@@ -83,21 +69,13 @@
 		</complexContent>
 	</complexType>
 
-	<element name="abstractAcquisitionElement"
-		type="pa:abstractAcquisitionType">
-	</element>
-	<element name="lookup" type="pa:lookupType"
-		substitutionGroup="pa:abstractAcquisitionElement">
-	</element>
-	<element name="p2p" type="pa:p2pType"
-		substitutionGroup="pa:abstractAcquisitionElement">
-	</element>
+	<element name="abstractAcquisitionElement" type="pa:abstractAcquisitionType"></element>
+	<element name="lookup" type="pa:lookupType" substitutionGroup="pa:abstractAcquisitionElement"></element>
+	<element name="p2p" type="pa:p2pType" substitutionGroup="pa:abstractAcquisitionElement"></element>
 
 	<complexType name="acquisitionType">
 		<sequence>
-			<element ref="pa:abstractAcquisitionElement"
-				maxOccurs="unbounded">
-			</element>
+			<element ref="pa:abstractAcquisitionElement" maxOccurs="unbounded"></element>
 		</sequence>
 	</complexType>
 
@@ -115,8 +93,7 @@
 				<sequence>
 					<element name="host" type="pa:hostRefType"></element>
 				</sequence>
-				<attribute name="refid" type="pa:refType"
-					use="required" />
+				<attribute name="refid" type="pa:refType" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -129,43 +106,26 @@
 					of an abstract common type, and then we have to check in the parser that there is at most one host,
 					or we keep it as it is and check in the parser that at least one element is present -->
 				<sequence>
-					<element name="group" type="pa:groupRefType"
-						minOccurs="0" maxOccurs="unbounded">
-					</element>
-					<element name="bridge" type="pa:bridgeRefType"
-						minOccurs="0" maxOccurs="unbounded">
-					</element>
-					<element name="host" type="pa:hostRefType"
-						minOccurs="0" maxOccurs="1" />
+					<element name="group" type="pa:groupRefType" minOccurs="0" maxOccurs="unbounded"></element>
+					<element name="bridge" type="pa:bridgeRefType" minOccurs="0" maxOccurs="unbounded"></element>
+					<element name="host" type="pa:hostRefType" minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="refid" type="pa:refType"
-					use="required" />
+				<attribute name="refid" type="pa:refType" use="required" />
 				<attribute name="relay" type="string"></attribute>
 			</extension>
 		</complexContent>
 	</complexType>
 
-	<element name="abstractResourceElement" abstract="true"
-		type="pa:abstractResourceType">
-	</element>
+	<element name="abstractResourceElement" abstract="true" type="pa:abstractResourceType"></element>
 
-	<element name="group" substitutionGroup="pa:abstractResourceElement"
-		type="pa:groupRefType">
-	</element>
+	<element name="group" substitutionGroup="pa:abstractResourceElement" type="pa:groupRefType"></element>
 
-	<element name="bridge"
-		substitutionGroup="pa:abstractResourceElement"
-		type="pa:bridgeRefType">
-	</element>
+	<element name="bridge" substitutionGroup="pa:abstractResourceElement" type="pa:bridgeRefType"></element>
 
 	<complexType name="resourceType">
 		<sequence>
-			<element name="host" type="pa:hostRefType" minOccurs="0"
-				maxOccurs="1">
-			</element>
-			<element ref="pa:abstractResourceElement" minOccurs="0"
-				maxOccurs="unbounded">
-			</element>
+			<element name="host" type="pa:hostRefType" minOccurs="0" maxOccurs="1"></element>
+			<element ref="pa:abstractResourceElement" minOccurs="0" maxOccurs="unbounded"></element>
 		</sequence>
 	</complexType>
 
@@ -178,12 +138,8 @@
 	<complexType name="homeDirectoryType">
 		<complexContent>
 			<restriction base="pa:pathElementType">
-				<attribute name="base" type="pa:pathElementBaseType"
-					fixed="root" use="required">
-				</attribute>
-				<attribute name="relpath"
-					type="pa:pathElementGeneralType" use="required">
-				</attribute>
+				<attribute name="base" type="pa:pathElementBaseType" fixed="root" use="required"></attribute>
+				<attribute name="relpath" type="pa:pathElementGeneralType" use="required"></attribute>
 			</restriction>
 		</complexContent>
 	</complexType>
@@ -191,15 +147,13 @@
 	<complexType name="hostType">
 		<sequence>
 			<element name="homeDirectory" type="pa:homeDirectoryType"></element>
-			<element name="tool" type="pa:toolType" minOccurs="0"
-				maxOccurs="unbounded">
-			</element>
+			<element name="tool" type="pa:toolType" minOccurs="0" maxOccurs="unbounded"></element>
 		</sequence>
 		<attribute name="id" type="pa:idType" use="required"></attribute>
 		<attribute name="os" type="pa:osType" use="required"></attribute>
 		<attribute name="username" type="string"></attribute>
-		<attribute name="hostCapacity" type="positiveInteger" use="optional"/>
-		<attribute name="vmCapacity" type="positiveInteger" use="optional"/>
+		<attribute name="hostCapacity" type="positiveInteger" use="optional" />
+		<attribute name="vmCapacity" type="positiveInteger" use="optional" />
 	</complexType>
 
 	<complexType name="hostRefType">
@@ -209,39 +163,27 @@
 	<complexType name="abstractInfrastructureType"></complexType>
 
 	<complexType name="hostsType">
-		<complexContent>
-			<extension base="pa:abstractInfrastructureType">
-				<sequence>
-					<element name="host" type="pa:hostType" minOccurs="1" maxOccurs="unbounded"/>
-				</sequence>
-			</extension>
-		</complexContent>
+		<sequence>
+			<element name="host" type="pa:hostType" minOccurs="1" maxOccurs="unbounded" />
+		</sequence>
 	</complexType>
 
 	<complexType name="groupsType">
-		<complexContent>
-			<extension base="pa:abstractInfrastructureType">
-				<sequence minOccurs="1">
-					<element ref="pa:abstractShElement" minOccurs="1" maxOccurs="unbounded">
-					</element>
-				</sequence>
-			</extension>
-		</complexContent>
+		<sequence minOccurs="1">
+			<element ref="pa:abstractShElement" minOccurs="1" maxOccurs="unbounded"></element>
+		</sequence>
 	</complexType>
 
 	<complexType name="abstractBridgeElementType">
 		<attribute name="id" type="pa:idType" use="required" />
 	</complexType>
 
-	<element name="abstractBridgeElement"
-		type="pa:abstractBridgeElementType">
-	</element>
+	<element name="abstractBridgeElement" type="pa:abstractBridgeElementType"></element>
 
 	<complexType name="bridgeTypeSSH">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
-				<attribute name="hostname" type="pa:hostnameType"
-					use="required" />
+				<attribute name="hostname" type="pa:hostnameType" use="required" />
 				<attribute name="username" type="pa:usernameType"></attribute>
 				<attribute name="commandPath" type="string"></attribute>
 				<attribute name="commandOptions" type="string"></attribute>
@@ -249,59 +191,29 @@
 		</complexContent>
 	</complexType>
 
-	<element name="sshBridge" type="pa:bridgeTypeSSH"
-		substitutionGroup="pa:abstractBridgeElement">
-	</element>
+	<element name="sshBridge" type="pa:bridgeTypeSSH" substitutionGroup="pa:abstractBridgeElement"></element>
 
 	<complexType name="bridgesType">
-		<complexContent>
-			<extension base="pa:abstractInfrastructureType">
-				<sequence>
-					<element ref="pa:abstractBridgeElement"
-						maxOccurs="unbounded">
-					</element>
-				</sequence>
-			</extension>
-		</complexContent>
+		<sequence>
+			<element ref="pa:abstractBridgeElement" maxOccurs="unbounded"></element>
+		</sequence>
 	</complexType>
 
-	<element name="abstractInfrastructureElement"
-		type="pa:abstractInfrastructureType">
-	</element>
-	<element name="hosts"
-		substitutionGroup="pa:abstractInfrastructureElement"
-		type="pa:hostsType">
-	</element>
-
-	<element name="groups" type="pa:groupsType"
-		substitutionGroup="pa:abstractInfrastructureElement">
-	</element>
-	<element name="bridges" type="pa:bridgesType"
-		substitutionGroup="pa:abstractInfrastructureElement">
-	</element>
-
 	<complexType name="infrastructureType">
-		<sequence>
-			<element ref="pa:abstractInfrastructureElement"
-				maxOccurs="unbounded">
-			</element>
-		</sequence>
+		<all>
+			<element name="hosts" type="pa:hostsType" minOccurs="0" />
+			<element name="groups" type="pa:groupsType" minOccurs="0" />
+			<element name="bridges" type="pa:bridgesType" minOccurs="0" />
+		</all>
 	</complexType>
 
 	<element name="GCMDeployment">
 		<complexType>
 			<all>
-				<element name="environment" type="pa:environmentType"
-					minOccurs="0">
-				</element>
-				<element name="acquisition" type="pa:acquisitionType"
-					minOccurs="0">
-				</element>
-				<element name="resources" type="pa:resourceType">
-				</element>
-				<element name="infrastructure"
-					type="pa:infrastructureType">
-				</element>
+				<element name="environment" type="pa:environmentType" minOccurs="0"></element>
+				<element name="acquisition" type="pa:acquisitionType" minOccurs="0"></element>
+				<element name="resources" type="pa:resourceType"></element>
+				<element name="infrastructure" type="pa:infrastructureType"></element>
 			</all>
 		</complexType>
 
