@@ -40,7 +40,8 @@ public class TimeoutAccounter {
     public long getRemainingTimeout() {
         long remainingTimeout = 0;
         if (this.timeout != 0) {
-            remainingTimeout = (System.nanoTime() / 1000000) - start - timeout;
+            long elapsedTime = (System.nanoTime() / 1000000) - start;
+            remainingTimeout = timeout - elapsedTime;
             if (remainingTimeout <= 0) {
                 /* Returning a timeout of 0 would mean infinite timeout */
                 remainingTimeout = 1;
