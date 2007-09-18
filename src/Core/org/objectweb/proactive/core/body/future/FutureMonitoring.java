@@ -157,6 +157,9 @@ public class FutureMonitoring implements Runnable {
     }
 
     public static void monitorFutureProxy(FutureProxy fp) {
+        if (fp.isAvailable()) {
+            return;
+        }
         UniqueID updaterId = getUpdaterBodyId(fp);
         if (updaterId == null) {
             return;
@@ -171,7 +174,7 @@ public class FutureMonitoring implements Runnable {
                 futures = new ConcurrentLinkedQueue<FutureProxy>();
                 futuresToMonitor.put(updaterId, futures);
             }
-            if (fp.isAwaited() && !futures.contains(fp)) {
+            if (!futures.contains(fp)) {
                 futures.add(fp);
             }
         }
