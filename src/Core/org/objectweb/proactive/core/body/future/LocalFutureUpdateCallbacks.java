@@ -33,6 +33,11 @@ public class LocalFutureUpdateCallbacks {
     }
 
     void add(String methodName) {
+        if (ProActive.getBodyOnThis() != this.body) {
+            throw new IllegalStateException("Callbacks added by different " +
+                "bodies on the same future, this cannot be possible" +
+                "without breaking the no-sharing property");
+        }
         Object target = this.body.getReifiedObject();
         Class<?> c = target.getClass();
         Method m;
