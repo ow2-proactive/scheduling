@@ -117,7 +117,7 @@ public class TestDeploymentDescriptorParser {
         parser.parseResources();
     }
 
-    protected void idConstrainTest(String descriptorLocation) {
+    protected void idConstraintTest(String descriptorLocation) {
         File descriptor = new File(this.getClass()
                                        .getResource(descriptorLocation).getFile());
 
@@ -138,17 +138,58 @@ public class TestDeploymentDescriptorParser {
     }
 
     @Test
-    public void hostIdConstrainTest() {
-        idConstrainTest("testfiles/deployment/duplicateHostId.xml");
+    public void hostIdConstraintTest() {
+        idConstraintTest("testfiles/deployment/duplicateHostId.xml");
     }
 
     @Test
-    public void groupIdConstrainTest() {
-        idConstrainTest("testfiles/deployment/duplicateGroupId.xml");
+    public void groupIdConstraintTest() {
+        idConstraintTest("testfiles/deployment/duplicateGroupId.xml");
     }
 
     @Test
-    public void bridgeIdConstrainTest() {
-        idConstrainTest("testfiles/deployment/duplicateBridgeId.xml");
+    public void bridgeIdConstraintTest() {
+        idConstraintTest("testfiles/deployment/duplicateBridgeId.xml");
+    }
+
+    protected void refConstraintTest(String descriptorLocation) {
+        File descriptor = new File(this.getClass()
+                                       .getResource(descriptorLocation).getFile());
+
+        System.out.println("Parsing " + descriptor.getAbsolutePath());
+        boolean gotException = false;
+
+        try {
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        } catch (SAXException e) {
+            e.printStackTrace();
+            gotException = e.getMessage()
+                            .contains("not found for identity constraint");
+        }
+
+        Assert.assertTrue(gotException);
+    }
+
+    @Test
+    public void hostRefIdConstraintTest() {
+        refConstraintTest("testfiles/deployment/missingHostId.xml");
+    }
+
+    @Test
+    public void groupRefIdConstraintTest() {
+        refConstraintTest("testfiles/deployment/missingGroupId.xml");
+    }
+
+    @Test
+    public void groupHostRefIdConstraintTest() {
+        refConstraintTest("testfiles/deployment/missingGroupHostId.xml");
+    }
+
+    @Test
+    public void bridgeRefIdConstraintTest() {
+        refConstraintTest("testfiles/deployment/missingBridgeId.xml");
     }
 }

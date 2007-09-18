@@ -337,6 +337,10 @@
 			<selector xpath="pa:resources/pa:host"></selector>
 			<field xpath="@refid"></field>
 		</keyref>
+		<keyref name="refIdKeyGroupHost" refer="pa:idKeyHosts">
+			<selector xpath="pa:resources/pa:group/pa:host"></selector>
+			<field xpath="@refid"></field>
+		</keyref>
 
 	</element>
 
