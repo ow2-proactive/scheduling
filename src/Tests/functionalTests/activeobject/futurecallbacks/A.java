@@ -23,10 +23,10 @@ public class A {
 
     public void start() throws NoSuchMethodException {
         MutableInteger slow = this.brother.slow();
-        ProActive.addFutureCallback(slow, "myCallback");
+        ProActive.addActionOnFuture(slow, "myCallback");
         MutableInteger fast = this.brother.fast();
         ProActive.waitFor(fast);
-        ProActive.addFutureCallback(fast, "myCallback");
+        ProActive.addActionOnFuture(fast, "myCallback");
     }
 
     public MutableInteger slow() {

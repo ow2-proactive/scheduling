@@ -1471,7 +1471,7 @@ public class ProActive {
      * @param methodName the name of the method to call on the current active object
      * @throws NoSuchMethodException if the method could not be found
      */
-    public static void addFutureCallback(Object future, String methodName)
+    public static void addActionOnFuture(Object future, String methodName)
         throws NoSuchMethodException {
         FutureProxy f;
         try {
