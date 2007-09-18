@@ -32,9 +32,16 @@ public class LocalFutureUpdateCallbacks {
         this.future = future;
     }
 
-    void add(String methodName) throws NoSuchMethodException {
+    void add(String methodName) {
         Object target = this.body.getReifiedObject();
-        Method m = target.getClass().getMethod(methodName, FutureResult.class);
+        Class<?> c = target.getClass();
+        Method m;
+        try {
+            m = c.getMethod(methodName, FutureResult.class);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("Cannot find method: " +
+                c.getName() + "." + methodName + "(FutureResult)", e);
+        }
         this.methods.add(m);
     }
 

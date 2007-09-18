@@ -567,8 +567,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * Add a method to call when the future is arrived, or call it now if the
      * future is already arrived.
      */
-    public synchronized void addCallback(String methodName)
-        throws NoSuchMethodException {
+    public synchronized void addCallback(String methodName) {
         if (this.callbacks == null) {
             this.callbacks = new LocalFutureUpdateCallbacks(this);
         }

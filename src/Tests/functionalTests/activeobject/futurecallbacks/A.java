@@ -21,7 +21,7 @@ public class A {
         }
     }
 
-    public void start() throws NoSuchMethodException {
+    public void start() {
         MutableInteger slow = this.brother.slow();
         ProActive.addActionOnFuture(slow, "myCallback");
         MutableInteger fast = this.brother.fast();

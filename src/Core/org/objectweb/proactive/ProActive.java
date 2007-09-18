@@ -1469,10 +1469,10 @@ public class ProActive {
      *
      * @param future the future to watch
      * @param methodName the name of the method to call on the current active object
-     * @throws NoSuchMethodException if the method could not be found
+     * @throws IllegalArgumentException if the first argument is not a future or if
+     * the method could not be found
      */
-    public static void addActionOnFuture(Object future, String methodName)
-        throws NoSuchMethodException {
+    public static void addActionOnFuture(Object future, String methodName) {
         FutureProxy f;
         try {
             f = (FutureProxy) ((StubObject) future).getProxy();
