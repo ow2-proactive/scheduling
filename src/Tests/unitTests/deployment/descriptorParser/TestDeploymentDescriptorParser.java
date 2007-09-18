@@ -8,6 +8,7 @@ import java.util.List;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.AbstractBridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
@@ -114,5 +115,40 @@ public class TestDeploymentDescriptorParser {
         parser.parseEnvironment();
         parser.parseInfrastructure();
         parser.parseResources();
+    }
+
+    protected void idConstrainTest(String descriptorLocation) {
+        File descriptor = new File(this.getClass()
+                                       .getResource(descriptorLocation).getFile());
+
+        System.out.println("Parsing " + descriptor.getAbsolutePath());
+        boolean gotException = false;
+
+        try {
+            GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail(e.getMessage());
+        } catch (SAXException e) {
+            e.printStackTrace();
+            gotException = e.getMessage().contains("Duplicate key value");
+        }
+
+        Assert.assertTrue(gotException);
+    }
+
+    @Test
+    public void hostIdConstrainTest() {
+        idConstrainTest("testfiles/deployment/duplicateHostId.xml");
+    }
+
+    @Test
+    public void groupIdConstrainTest() {
+        idConstrainTest("testfiles/deployment/duplicateGroupId.xml");
+    }
+
+    @Test
+    public void bridgeIdConstrainTest() {
+        idConstrainTest("testfiles/deployment/duplicateBridgeId.xml");
     }
 }
