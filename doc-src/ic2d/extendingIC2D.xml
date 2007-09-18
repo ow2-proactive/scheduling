@@ -2060,5 +2060,233 @@ public class ExamplePerspective implements IPerspectiveFactory {
 
 	</sect1>
 
-</chapter><!-- newIC2D -->
+	<sect1>
+		<title>How to create the IC2D stand-alone application from the sources</title>
 
+		<sect2 id="Required">
+			<title>Required</title>
+			<note>
+			<title>Required</title>
+			<para>
+				You need to have :
+			</para>
+			
+			<itemizedlist>
+				<listitem>
+					<para>
+						Eclipse 3.2 (with the GEF plug-in) (To install GEF go to the FAQ chapter)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Sources of ProActive (To get the current SVN repository of ProActive, see <ulink
+								url="http://proactive.inria.fr/svn_access.htm">http://proactive.inria.fr/svn_access.htm</ulink>)
+					</para>
+				</listitem>
+			</itemizedlist>
+			</note>
+		</sect2>
+		
+		<sect2 id="FirstStep">
+			<title>First step: Import required libraries in the 'org.objectweb.proactive.ic2d.lib' plug-in</title>
+				<para>
+				<screen>
+	cd ProActive/compile
+	./build ic2dLib (linux)
+	./build.bat ic2dLib (windows)</screen>
+			</para>
+
+			<para>
+			A new '<emphasis role="bold">ProActive.jar</emphasis>' is created and pasted in the '<emphasis role="bold">org.objectweb.proactive.ic2d.lib</emphasis>'.
+			</para>
+
+			<note>
+			<para>
+			The 'org.objectweb.proactive.ic2d.lib' plug-in has a lot of libraries including ProActive.
+			If a plug-in want to use ProActive, it need to depends on this plug-in.
+			</para>
+			</note>
+		</sect2>
+
+		<sect2 id="SecondStep">
+			<title>Second step: Import the different plug-ins in Eclipse</title>
+			<para>
+			 In Eclipse
+			 </para>
+			 	<orderedlist>
+					<listitem>
+						<para>Select:
+						<emphasis role="bold">'File'>'Import'>'General'>'Existing Projects into Workspace'</emphasis>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+						Next, select as root directory '<emphasis role="bold">ProActive/ic2d-plugins-src</emphasis>'
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+						 And select all (except P2P)
+						 </para>
+					</listitem>
+				</orderedlist>
+			<para>
+			 Now, you have several new projects in your workspace.
+			</para>
+		</sect2>
+
+		<sect2 id="ThirdStep">
+			<title>Third step: Launch IC2D in Eclipse</title>
+			<para>Copy the file '<emphasis role="bold">ic2d.java.policy </emphasis>' from '<emphasis role="bold">ProActive/ic2d-plugins-src/org.objectweb.proactive.ic2d/ic2d.java.policy</emphasis>' and paste this one in your <emphasis role="bold">home</emphasis> directory.</para>
+
+			<note>
+			<title>On Windows</title>
+			<itemizedlist>
+				<listitem><para>Select the '<emphasis role="bold">org.objectweb.proactive.ic2d</emphasis>' plug-in, and open the file '<emphasis role="bold">ic2d.product</emphasis>'</para></listitem>
+				<listitem><para>Select the '<emphasis role="bold">Launcher</emphasis>' panel, and in the VM Arguments replace : -Djava.security.policy=<emphasis role="bold">${env_var:HOME}</emphasis> by -Djava.security.policy=<emphasis role="bold">"C:\pathToYourHome\ic2d.java.policy"</emphasis> (example: C:\Document And Settings\YourLogin\ic2d.java.policy)</para></listitem>
+				<listitem><para>Next, Save.</para></listitem>
+			</itemizedlist>
+			</note>
+			<para>
+				In the Testing part, press '<emphasis role="bold">Synchronize</emphasis>', and '<emphasis role="bold">Launch the product</emphasis>'
+			</para>
+		</sect2>
+
+		<sect2 id="lastStep">
+			<title>Last step: Export IC2D</title>
+			<para>
+				<orderedlist>
+					<listitem>
+						<para>
+						Select the '<emphasis role="bold">org.objectweb.proactive.ic2d</emphasis>' plug-in, and open the file '<emphasis role="bold">ic2d.product</emphasis>'
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+						In the Exporting part, press '<emphasis role="bold">Eclipse Product export wizard</emphasis>'
+						</para>
+					</listitem>					
+
+					<listitem>
+						<para>
+						Select the name of the root directory of the IC2D stand-alone application (ex: MyIC2D).
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+						Select, also the destination, where to create the IC2D stand-alone application.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+						Press 'Finish'
+						</para>
+					</listitem>
+					
+					<listitem>
+						<para>
+							Now, you have a new directory containing your product.
+							Modify the file <emphasis role="bold">IC2D.ini</emphasis> and replace:
+				<emphasis role="bold">${env_var:HOME}</emphasis>
+				by:
+				<emphasis role="bold">${user.home}</emphasis>
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+			<para>
+
+			</para>
+		</sect2>
+
+		<sect2 id="FAQExportProduct">
+			<title>FAQ</title>
+			<sect3 id="isGEFinstalled">
+				<title>How to know if my Eclipse contains the GEF plug-in?</title>
+				<para>
+					In Eclipse, go to:
+					'Help'>'About Eclipse SDK'>'Feature Details'
+					And search 'Graphical Editing Framework' as Feature Name.
+				</para>
+			</sect3>
+			<sect3 id="installGEF">
+				<title>How to install GEF in Eclipse?</title>
+				<para>
+					In Eclipse, go to:
+					<orderedlist>
+					<listitem>
+						<para><emphasis role="bold">'Help'>'Software Updates'>'Find and Install'</emphasis></para>
+					</listitem>
+					<listitem>
+						<para>	
+						Select '<emphasis role="bold">Search fo new features to install</emphasis>'
+						</para>
+					</listitem>
+					<listitem>
+					<para>
+					And check '<emphasis role="bold">Callist Discovery Site</emphasis>'
+					</para>
+					</listitem>
+					<listitem>
+					<para>
+					Select the '<emphasis role="bold">Callisto Discovery Site</emphasis>' in the Update Site Mirrors frame.
+					</para>
+					</listitem>
+					<listitem>
+					<para>
+					Then, Check '<emphasis role="bold">Graphical Editing Framework</emphasis>'
+					</para>
+					</listitem>
+					<listitem>
+					<para>
+					And install this new feature.
+					</para>
+					</listitem>
+					</orderedlist>
+				</para>
+			</sect3>
+			<sect3 id="useSubclipse">
+				<title>How use SVN with Eclipse?</title>
+				<para>See <ulink url="http://subclipse.tigris.org/install.html">http://subclipse.tigris.org/install.html</ulink>
+				</para>
+			</sect3>
+			<sect3 id="useSVN">
+				<title>How to get the current SVN repository of ProActive?</title>
+				<para>See
+				<ulink url="http://proactive.inria.fr/svn_access.htm">http://proactive.inria.fr/svn_access.htm</ulink>
+				</para>
+			</sect3>
+			<sect3 id="compileLIB">
+				<title>The project 'org.objectweb.proactive.ic2d.lib' desn't compile</title>
+				<para>
+					Maybe, the plug-in try to export some classes which it doesn't contains.
+					So, on the '<emphasis role="bold">org.objectweb.proactive.ic2d.lib</emphasis>' project, do a right click, and select '<emphasis role="bold">Properties</emphasis>'
+					Go to Java Build Path, and select the '<emphasis role="bold">Libraries</emphasis>' frame.
+					Now remove jar files which displays an error message.
+				</para>
+			</sect3>
+			<sect3 id="deltaPack">
+				<title>How to create a IC2D stand-alone application for multiple platforms?</title>
+				<para>
+					Install the RCP delta pack. See <ulink url="http://help.eclipse.org/help32/index.jsp?topic=/org.eclipse.pde.doc.user/guide/tools/export_wizards/export_product.htm">Export Product</ulink>
+				</para>
+			</sect3>
+		</sect2>
+		
+		<sect2 id="RCPLinks">
+			<title>UseFul links</title>
+			<itemizedlist>
+				<listitem><para><ulink url="http://www.eclipse.org/articles/Article-RCP-1/tutorial1.html">Rich Client Tutorial</ulink></para></listitem>
+				<listitem><para><ulink url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">Eclipse Wiki : Rich Client Platform</ulink></para></listitem>
+				<listitem><para><ulink url="http://wiki.eclipse.org/RCP_FAQ">RCP Eclipse FAQ</ulink></para></listitem>
+				<listitem><para><ulink url="http://www-128.ibm.com/developerworks/edu/os-dw-os-ecl-rcpapp.html">Developing your first Eclipse RCP application</ulink></para></listitem>
+				<listitem><para><ulink url=""></ulink></para></listitem>				
+			</itemizedlist>
+		</sect2>
+	</sect1>
+
+
+</chapter><!-- newIC2D -->

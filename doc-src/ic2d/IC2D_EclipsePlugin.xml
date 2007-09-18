@@ -425,8 +425,142 @@
 		<title>Launcher and Scheduler</title>
 		
 		<sect2>
-			<title>The Launcher plug-in</title>
+			<title>Launcher</title>
 			
+			<sect3>
+				<title>Principles</title>
+				
+				<para>The launcher allows users to launch applications directly from an
+      XML descriptor file, without any script. The new XML descriptor is
+      nearly the same as classical descriptor files, the syntax is only
+      extended. The deployment will be done in two different phasis.</para>
+
+      <para>first, a new node, a "main node" will be created and activated and
+      then, it is this node that will deploy the rest of the
+      application.</para>
+		    </sect3>
+      
+		    <sect3>
+      			<title>MainDefinition tag</title>
+
+		      <para>A new tag has been introduced, just before the component
+		      definition tag. This tag is named "mainDefinition" and its syntax is:</para>
+
+      <screen>   &lt;mainDefinition id="mainID" class="theClassToLaunchContainingAMainMethod"&gt;
+   &lt;arg value="param1"&gt; 
+   &lt;arg value="param2"&gt;
+   &lt;mapToVirtualNode value="main-Node"/&gt;
+  &lt;/mainDefinition&gt;</screen>
+
+      <para>Eventually, several mains might be defined so the <emphasis
+      role="bold">id</emphasis> allows to identify all mainDefinitions.</para>
+
+      <para>The <emphasis role="bold">class</emphasis> attribute is the path
+      where can be found the class to launch.</para>
+
+      <para><emphasis role="bold">This class MUST contain a main
+      method.</emphasis></para>
+
+      <para>Then any number of parameters can be declared in <emphasis
+      role="bold">arg</emphasis> tags. The parameters will be given to the
+      main method in the same order the were declared.</para>
+
+      <para>And finally a <emphasis role="bold">mapToVirtualNode</emphasis>
+      tag will link the main info to virtual node, declared with the same name
+      in the virtualNodeDefinitions tag (in componentDefinition).</para>
+
+      <screen>  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+  &lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation=
+ "http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
+   &lt;!-- &lt;security file="../../descriptors/c3dPolicy.xml"&gt;&lt;/security&gt; --&gt; 
+   &lt; componentDefinition&gt;
+    &lt; virtualNodesDefinition&gt;
+     &lt; virtualNode name="Dispatcher"
+ property="unique_singleAO"/&gt;
+     &lt; virtualNode name="Renderer"/&gt;
+    &lt; /virtualNodesDefinition&gt;
+   &lt; /componentDefinition&gt;
+   &lt; deployment&gt;
+    &lt; register virtualNode="Dispatcher"/&gt;
+    &lt; mapping&gt;
+     &lt; map virtualNode="Dispatcher"&gt;
+      &lt; jvmSet&gt;
+       &lt; currentJVM/&gt;
+      &lt; /jvmSet&gt;
+     &lt; /map&gt;
+     &lt; map virtualNode="Renderer"&gt;
+      &lt; jvmSet&gt;
+      &lt; vmName value="Jvm1"/&gt;
+      &lt; vmName value="Jvm2"/&gt;
+      &lt; vmName value="Jvm3"/&gt;
+      &lt; vmName value="Jvm4"/&gt;
+      &lt; /jvmSet&gt;
+     &lt; /map&gt;
+    &lt; /mapping&gt;
+    &lt; jvms&gt;
+     &lt; jvm name="Jvm1"&gt;
+      &lt; creation&gt;
+       &lt; processReference
+ refid="localJVM"/&gt;
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+     &lt; jvm name="Jvm2"&gt;
+      &lt; creation&gt;
+       &lt; processReference
+ refid="localJVM"/&gt;
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+      &lt; jvm name="Jvm3"&gt;
+      &lt; creation&gt;
+        &lt; processReference refid="localJVM"/&gt;
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+     &lt; jvm name="Jvm4"&gt;
+      &lt; creation&gt;
+       &lt; processReference refid="localJVM"/&gt;
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+    &lt; /jvms&gt;
+   &lt; /deployment&gt;
+   &lt; infrastructure&gt;
+    &lt; processes&gt;
+     &lt; processDefinition id="localJVM"&gt;
+      &lt; jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;&lt;/jvmProcess&gt;
+     &lt; /processDefinition&gt;
+    &lt; /processes&gt;
+   &lt; /infrastructure&gt;
+  &lt;/ProActiveDescriptor&gt;</screen>
+    </sect3>
+
+    <sect3>
+      <title>API</title>
+
+      <para>The Launcher class is located in the package <emphasis
+      role="bold">org.objectweb.proactive.core.descriptor</emphasis>. To use
+      it you will have to create a new instance of the launcher with the path
+      of the XML descriptor (this descriptor must contain a <emphasis
+      role="bold">mainDefinition tag</emphasis>). The constructor will parse
+      the file and reify a ProActiveDescriptor. You only have to call the
+      <emphasis role="bold">activate()</emphasis> method on the launcher
+      instance to launch the application.</para>
+
+      <para><emphasis role="underline">For
+      example:</emphasis></para>
+      <para><literal>Launcher launcher = new Launcher
+      ("myDescriptor.xml") ;</literal></para>
+
+      <para><literal>launcher.activate() ;</literal></para>
+
+      <para>you can also get the ProActiveDescriptor built by the launcher by
+      calling the getDescriptor() method on the launcher instance.</para>
+
+      <para><literal>ProActiveDescriptor pad = launcher.getDescriptor()
+      ;</literal></para>
+    </sect3>
+				
+			<sect3>
+				<title>The Launcher Plug-in</title>
 			<para>
 				In order to launch a
 				<emphasis role="bold">deployment descriptor</emphasis>
@@ -437,7 +571,7 @@
 			
 			<para>To use this editor, you have two possibilities:</para>
 			
-			<sect3>
+			<sect4>
 				<title>First possibility</title>
 				
 				<para>
@@ -476,9 +610,9 @@
 					</emphasis>
 					list.
 				</para>
-			</sect3>
+			</sect4>
 			
-			<sect3>
+			<sect4>
 				<title>Second possibility</title>
 				<para>
 					In the Navigator view, or another similar, a right
@@ -499,9 +633,9 @@
 						</mediaobject>
 					</figure>
 				</para>
-			</sect3>
+			</sect4>
 			
-			<sect3>
+			<sect4>
 				<title>The Launcher perspective</title>
 				
 				<para>
@@ -551,10 +685,9 @@
 					</figure>
 				</para>
 				
-			</sect3>
-		</sect2> <!-- The Launcher plug-in -->
-		
-		
+			</sect4>
+		</sect3> <!-- The Launcher plug-in -->
+		</sect2>
 		
 		<sect2>
 			<title>The Scheduler plug-in</title>
