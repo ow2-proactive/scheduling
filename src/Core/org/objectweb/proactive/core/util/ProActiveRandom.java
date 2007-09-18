@@ -40,7 +40,7 @@ public class ProActiveRandom {
 
     /** Returns the next pseudorandom, uniformly distributed positive int  value from this random number generator's sequence.*/
     synchronized static public int nextPosInt() {
-        return prng.nextInt();
+        return prng.nextInt(Integer.MAX_VALUE);
     }
 
     /** Returns a pseudorandom, uniformly distributed int value between 0 (inclusive) and the specified value (exclusive), drawn from this random number generator's sequence. */
