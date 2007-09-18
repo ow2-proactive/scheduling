@@ -17,6 +17,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.bridge.BridgeDummy;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderDummy;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupDummy;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
+import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
@@ -25,15 +26,10 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentResources resources;
 
     public GCMDeploymentDescriptorImpl(File descriptor,
-        Set<FileTransferBlock> ftBlocks) {
-        try {
-            parser = new GCMDeploymentParserImpl(descriptor);
-            environment = parser.getEnvironment();
-            resources = parser.getResources();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        Set<FileTransferBlock> ftBlocks) throws SAXException, IOException {
+        parser = new GCMDeploymentParserImpl(descriptor);
+        environment = parser.getEnvironment();
+        resources = parser.getResources();
     }
 
     /**

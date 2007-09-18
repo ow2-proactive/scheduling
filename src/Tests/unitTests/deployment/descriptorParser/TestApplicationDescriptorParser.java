@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.AbstractApplicationParser;
@@ -16,6 +17,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderScript;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 
 public class TestApplicationDescriptorParser {
@@ -24,7 +26,8 @@ public class TestApplicationDescriptorParser {
                                                                             .getFile();
 
     //    @Test
-    public void test() throws IOException {
+    public void test()
+        throws IOException, XPathExpressionException, SAXException {
         for (File descriptor : getApplicationDescriptors()) {
             if (descriptor.toString().contains("script_ext")) {
                 continue;
@@ -56,7 +59,8 @@ public class TestApplicationDescriptorParser {
 
         @Override
         public void parseApplicationNode(Node paNode,
-            GCMApplicationParser applicationParser, XPath xpath) {
+            GCMApplicationParser applicationParser, XPath xpath)
+            throws XPathExpressionException, SAXException, IOException {
             super.parseApplicationNode(paNode, applicationParser, xpath);
 
             System.out.println("User Application Parser - someattr value = " +
@@ -65,7 +69,8 @@ public class TestApplicationDescriptorParser {
     }
 
     @Test
-    public void userSchemaTest() throws IOException {
+    public void userSchemaTest()
+        throws IOException, XPathExpressionException, SAXException {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("script_ext")) {
                 continue;
@@ -91,7 +96,9 @@ public class TestApplicationDescriptorParser {
     }
 
     //    @Test
-    public void doit() throws IOException {
+    public void doit()
+        throws IOException, IllegalArgumentException, SAXException,
+            XPathExpressionException {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("scriptHostname")) {
                 continue;

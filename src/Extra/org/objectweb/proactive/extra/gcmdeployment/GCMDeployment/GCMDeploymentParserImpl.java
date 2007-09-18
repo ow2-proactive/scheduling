@@ -78,12 +78,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected List<String> schemas;
     private File descriptor;
 
-    public GCMDeploymentParserImpl(File descriptor) throws IOException {
+    public GCMDeploymentParserImpl(File descriptor)
+        throws IOException, SAXException {
         this(descriptor, null);
     }
 
     public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas)
-        throws IOException {
+        throws IOException, SAXException {
         this.descriptor = descriptor;
         infrastructure = new GCMDeploymentInfrastructure();
         resources = new GCMDeploymentResources();
@@ -104,6 +105,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
+            throw e;
         }
     }
 

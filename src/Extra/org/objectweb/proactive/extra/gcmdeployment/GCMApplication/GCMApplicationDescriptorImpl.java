@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.xpath.XPathExpressionException;
+
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
@@ -21,6 +23,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.xml.sax.SAXException;
 
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
@@ -38,12 +41,14 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     private ArrayList<String> currentDeploymentPath;
 
     public GCMApplicationDescriptorImpl(String filename)
-        throws IllegalArgumentException {
+        throws IllegalArgumentException, SAXException, IOException,
+            XPathExpressionException {
         this(new File(filename));
     }
 
     public GCMApplicationDescriptorImpl(File file)
-        throws IllegalArgumentException {
+        throws IllegalArgumentException, SAXException, IOException,
+            XPathExpressionException {
         currentDeploymentPath = new ArrayList<String>();
 
         gadFile = Helpers.checkDescriptorFileExist(file);

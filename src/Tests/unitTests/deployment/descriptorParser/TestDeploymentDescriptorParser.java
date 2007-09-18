@@ -15,11 +15,13 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Ab
 import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 
 public class TestDeploymentDescriptorParser {
     @Test
-    public void test() throws IOException, XPathExpressionException {
+    public void test()
+        throws IOException, XPathExpressionException, SAXException {
         File descriptor = new File(this.getClass()
                                        .getResource("testfiles/deployment.xml")
                                        .getFile());
@@ -88,7 +90,8 @@ public class TestDeploymentDescriptorParser {
     }
 
     @Test
-    public void userSchemaTest() throws IOException, XPathExpressionException {
+    public void userSchemaTest()
+        throws IOException, XPathExpressionException, SAXException {
         File descriptor = new File(getClass()
                                        .getResource("testfiles/deployment/group_bridge_ext.xml")
                                        .getFile());
