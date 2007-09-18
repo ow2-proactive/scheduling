@@ -127,6 +127,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     protected static long futureMaxDelay = -1;
 
+    /**
+     * The methods to call when this future is updated
+     */
+    private transient LocalFutureUpdateCallbacks callbacks;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -558,8 +563,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         this.exceptionLevel = exceptionLevel;
     }
 
-    private transient LocalFutureUpdateCallbacks callbacks;
-
+    /**
+     * Add a method to call when the future is arrived, or call it now if the
+     * future is already arrived.
+     */
     public synchronized void addCallback(String methodName)
         throws NoSuchMethodException {
         if (this.callbacks == null) {
