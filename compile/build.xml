@@ -84,6 +84,7 @@
 
 				<!-- Disable GCM Deployment related unit tests -->
 				<exclude name="unitTests/deployment/**/*.class"/>
+				<exclude name="functionalTests/gcmdeployment/**/*.class"/>
 			</fileset>
 		</else>
 	</if>
