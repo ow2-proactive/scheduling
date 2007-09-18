@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GCMDeployment
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
 	<environment>
 		<descriptorVariable name="USERNAME" value="cmathieu" />
@@ -18,26 +17,21 @@
 
 	<infrastructure>
 		<hosts>
-			<host id="INRIA_x86_64" os="unix" hostCapacity="4"
-				vmCapacity="2">
-				<homeDirectory base="root"
-					relpath="/user/${USERNAME}/home"/>
+			<host id="INRIA_x86_64" os="unix" hostCapacity="4" vmCapacity="2">
+				<homeDirectory base="root" relpath="/user/${USERNAME}/home" />
 				<tool id="java" path="/usr/java/j2sdk/bin/java" />
-				<tool id="proactive"
-					path="$HOME/myApps/ProActive_3.2.1" />
+				<tool id="proactive" path="$HOME/myApps/ProActive_3.2.1" />
 			</host>
 		</hosts>
 
 		<groups>
-			<sshGroup id="LAN_INRIA"
-				hostList="cheypa schubby petawawa naruto" username="${USERNAME}"
+			<sshGroup id="LAN_INRIA" hostList="cheypa schubby petawawa naruto" username="${USERNAME}"
 				commandPath="/usr/local/bin/ssh">
 			</sshGroup>
 		</groups>
 
 		<bridges>
-			<sshBridge id="SEA" hostname="sea.inria.fr"
-				username="${USERNAME}" commandPath="" />
+			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
 		</bridges>
 	</infrastructure>
 </GCMDeployment>
