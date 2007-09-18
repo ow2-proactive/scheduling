@@ -33,7 +33,7 @@ import org.objectweb.proactive.ic2d.infrastructuremanager.dialog.IMDialogKill;
 import org.objectweb.proactive.ic2d.infrastructuremanager.dialog.IMDialogRedeploy;
 import org.objectweb.proactive.ic2d.infrastructuremanager.figure.IMFigureNode;
 import org.objectweb.proactive.ic2d.infrastructuremanager.figure.IMFigureHost;
-import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
 
 
 public class IMViewInfrastructure extends ViewPart {

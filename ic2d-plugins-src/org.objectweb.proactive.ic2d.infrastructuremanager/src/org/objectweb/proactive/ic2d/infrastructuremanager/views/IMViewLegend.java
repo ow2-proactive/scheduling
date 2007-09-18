@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
 import org.objectweb.proactive.ic2d.infrastructuremanager.figure.IMFigureNode;
-import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.VMFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.HostFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
 
 
 public class IMViewLegend extends ViewPart {

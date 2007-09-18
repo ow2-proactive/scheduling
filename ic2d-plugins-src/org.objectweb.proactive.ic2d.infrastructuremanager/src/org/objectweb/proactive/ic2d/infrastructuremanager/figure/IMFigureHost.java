@@ -8,8 +8,8 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.monitoring.figures.AbstractRectangleFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.ToolTipFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AbstractRectangleFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.ToolTipFigure;
 
 public class IMFigureHost extends AbstractRectangleFigure {
 

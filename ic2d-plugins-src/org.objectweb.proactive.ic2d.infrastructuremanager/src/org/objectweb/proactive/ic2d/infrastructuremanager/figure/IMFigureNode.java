@@ -12,7 +12,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMNode;
 import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
 import org.objectweb.proactive.ic2d.infrastructuremanager.views.IMViewInfrastructure;
-import org.objectweb.proactive.ic2d.monitoring.figures.AbstractRectangleFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AbstractRectangleFigure;
 
 public class IMFigureNode extends AbstractRectangleFigure{
 

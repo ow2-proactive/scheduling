@@ -9,7 +9,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.infrastructuremanager.IMConstants;
-import org.objectweb.proactive.ic2d.monitoring.figures.AbstractRectangleFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AbstractRectangleFigure;
 
 public class IMNodeFigure extends AbstractRectangleFigure{
 
