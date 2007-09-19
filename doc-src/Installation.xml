@@ -53,7 +53,7 @@
 
         <listitem>
           <para>Launch the JVM with a <ulink
-          url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">security policy file</ulink>using the option -Djava.security.policy=pathToFile. A basic policy file can be found at ProActive/scripts/proactive.java.policy. You can also specify a<ulink url="http://logging.apache.org/log4j/docs/manual.html">log4j configuration file</ulink> with the property
+          url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">security policy file</ulink> using the option -Djava.security.policy=pathToFile. A basic policy file can be found at ProActive/scripts/proactive.java.policy. You can also specify a<ulink url="http://logging.apache.org/log4j/docs/manual.html">log4j configuration file</ulink> with the property
           <literal>-Dlog4j.configuration=file:pathToFile</literal>. If not specified a default logger that logs on the console will be created.</para>
         </listitem>
       </itemizedlist>
@@ -238,8 +238,7 @@
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">lib/*.jar</emphasis> Used to
-        interface with Globus.cryptix.jar, cog-jglobus-1.2.jar, puretls.jar, cryptix32.jar, cryptix-asn1.jar, cog-ogce.jar, cog-jglobus.jar - used to interface with Globus</para>
+        <para>cryptix.jar, cog-jglobus-1.2.jar, puretls.jar, cryptix32.jar, cryptix-asn1.jar, cog-ogce.jar, cog-jglobus.jar - used to interface with Globus</para>
       </listitem>
 
       <listitem>
@@ -248,7 +247,7 @@
 
       <listitem>
         <para> commons-discovery.jar, saaj-api.jar, commons-logging.jar, jaxrpc.jar, activation.jar, wsdl4j.jar, mail.jar,servlet-api.jar,
-				xml-apis.jar, axis.jar, soap.jar- used by the Web Services features </para>
+				xml-apis.jar, axis.jar, soap.jar - used by the Web Services features </para>
       </listitem>
 
       <listitem>
@@ -257,7 +256,7 @@
       </listitem>
 
       <listitem>
-        <para>client.jar, ajo.jar, SystemDefaults.txt, njs_client.jar, scriptPlugin.jar, jh.jarsed - used when deploying to a unicore site.</para>
+        <para>client.jar, ajo.jar, SystemDefaults.txt, njs_client.jar, scriptPlugin.jar, jh.jar - used when deploying to a UNICORE site.</para>
       </listitem>
 
       <listitem>
