@@ -296,7 +296,7 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 
 	private IFigure getGlobalPanel(){
 		if(globalPanel == null){
-			globalPanel = getWorldEditPart().getFigure()/*.getParent()*/;
+			globalPanel = getWorldEditPart().getFigure().getParent();
 		}
 		return globalPanel;
 	}
