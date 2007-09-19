@@ -11,11 +11,13 @@ import java.util.Observable;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
+import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
@@ -109,7 +111,7 @@ public abstract class AbstractData extends Observable {
 	 * Returns the number of monitored children.
 	 * @return The number of monitored children.
 	 */
-	public int getMonitoresChildrenSize(){
+	public int getMonitoredChildrenSize(){
 		return this.monitoredChildren.size();
 	}
 	

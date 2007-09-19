@@ -5,16 +5,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.filter.ProActiveInternalObjectFilter;
@@ -80,10 +75,7 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         return this.nodeUrl;
     }
 
-    public List<ObjectName> getActiveObjects()
-        throws ProActiveException, MalformedObjectNameException,
-            NullPointerException, InstanceAlreadyExistsException,
-            MBeanRegistrationException, NotCompliantMBeanException {
+    public List<ObjectName> getActiveObjects() {
         List<List<Object>> activeObjects = this.localNode.getActiveObjects(new ProActiveInternalObjectFilter());
 
         List<ObjectName> onames = new ArrayList<ObjectName>();

@@ -71,10 +71,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
         runtime.killRT(true);
     }
 
-    public List<ObjectName> getNodes()
-        throws ProActiveException, MalformedObjectNameException,
-            NullPointerException, InstanceAlreadyExistsException,
-            MBeanRegistrationException, NotCompliantMBeanException {
+    public List<ObjectName> getNodes() throws ProActiveException {
         String[] nodeNames = null;
         nodeNames = this.runtime.getLocalNodeNames();
 

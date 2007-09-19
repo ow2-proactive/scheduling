@@ -3,13 +3,9 @@ package org.objectweb.proactive.core.jmx.mbean;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 
 
 /**
@@ -27,17 +23,8 @@ public interface NodeWrapperMBean extends Serializable {
     /**
      * Returns a list of Object Name used by the MBeans of the active objects containing in the Node.
      * @return The list of ObjectName of MBeans representing the active objects of this node.
-     * @throws ProActiveException
-     * @throws MalformedObjectNameException
-     * @throws NullPointerException
-     * @throws InstanceAlreadyExistsException
-     * @throws MBeanRegistrationException
-     * @throws NotCompliantMBeanException
      */
-    public List<ObjectName> getActiveObjects()
-        throws ProActiveException, MalformedObjectNameException,
-            NullPointerException, InstanceAlreadyExistsException,
-            MBeanRegistrationException, NotCompliantMBeanException;
+    public List<ObjectName> getActiveObjects();
 
     /**
      * Sends a new notification.

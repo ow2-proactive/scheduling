@@ -3,12 +3,13 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 import java.io.IOException;
 import java.util.List;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
+import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 /**
@@ -28,16 +29,13 @@ public class RuntimeObject extends AbstractData{
 	private String hostUrlServer;
 	private String serverName;
 	
+	private ProActiveRuntimeWrapperMBean proxyMBean;
+	
 	public RuntimeObject(HostObject parent, String url, ObjectName objectName, String hostUrl, String serverName) {
 		super(objectName);
 		this.parent = parent;
 		
-		String host = UrlBuilder.getHostNameFromUrl(url);
-		String name = UrlBuilder.getNameFromUrl(url);
-		String protocol = UrlBuilder.getProtocol(url);
-		int port = UrlBuilder.getPortFromUrl(url);
-		
-		this.url = UrlBuilder.buildUrl(host, name, protocol, port);
+		this.url = FactoryName.getCompleteUrl(url);
 		
 		this.hostUrlServer = hostUrl;
 		this.serverName = serverName;
@@ -118,55 +116,30 @@ public class RuntimeObject extends AbstractData{
 	 */
 	@SuppressWarnings("unchecked")
 	private void findNodes(){
-		List<ObjectName> nodeNames = null;
+		proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
 		try {
 			if(!(getConnection().isRegistered(getObjectName()))){
 				return;
 			}
-			nodeNames = (List<ObjectName>) getConnection().getAttribute(getObjectName(), "Nodes");
-		} catch (AttributeNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}        
+		}
+		
+		List<ObjectName> nodeNames = null;
+		try {
+			nodeNames = nodeNames = proxyMBean.getNodes();
+		} catch (ProActiveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		for (ObjectName name : nodeNames) {
-			String url = null;
-			try {
-				url = (String) getConnection().getAttribute(name, "URL");
-			} catch (AttributeNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstanceNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (MBeanException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReflectionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			NodeWrapperMBean proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), name, NodeWrapperMBean.class, false);
+			String url = proxyNodeMBean.getURL();
+			
 			// We need to have a complete url protocol://host:port/name
-        	String hostInUrl = UrlBuilder.getHostNameFromUrl(url);
-        	String nameInUrl = UrlBuilder.getNameFromUrl(url);
-        	String protocolInUrl = UrlBuilder.getProtocol(url);
-        	int portInUrl = UrlBuilder.getPortFromUrl(url);
-        	NodeObject child = new NodeObject(this,UrlBuilder.buildUrl(hostInUrl, nameInUrl, protocolInUrl, portInUrl), name);
+        	NodeObject child = new NodeObject(this,FactoryName.getCompleteUrl(url), name);
         	String virtualNodeName = child.getVirtualNodeName();
         	VNObject vn = getWorldObject().getVirtualNode(virtualNodeName);
         	// this virtual node is not monitored

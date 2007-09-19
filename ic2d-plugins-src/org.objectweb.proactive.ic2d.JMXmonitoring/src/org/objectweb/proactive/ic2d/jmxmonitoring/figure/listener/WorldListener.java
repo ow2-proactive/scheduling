@@ -111,7 +111,7 @@ public class WorldListener implements MouseListener, MouseMotionListener {
 			
 			// Manual handling of an action for timer snapshot ... needs
 			// improvement
-			if (this.world.getMonitoresChildrenSize() != 0) {
+			if (this.world.getMonitoredChildrenSize() != 0) {
 				IAction anAction = registry.getAction("Get timer snapshot");
 				if (anAction != null) {
 					((IActionExtPoint) anAction)

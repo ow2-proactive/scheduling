@@ -1,20 +1,18 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
-import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
+import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RemoteObjectHostRTFinder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder;
@@ -175,10 +173,10 @@ public class HostObject extends AbstractData{
 	}
 	
 	private void updateOSNameAndVersion(ProActiveConnection connection){
-		if(this.osName==null){
-			ObjectName osOName = null;
+		if(this.osName==null || this.osVersion==null){
+			ObjectName OSoname = null;
 			try {
-				osOName = new ObjectName(FactoryName.OS);
+				OSoname = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
 			} catch (MalformedObjectNameException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -186,56 +184,11 @@ public class HostObject extends AbstractData{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			try {
-				this.osName = (String)connection.getAttribute(osOName, "Name");
-			} catch (AttributeNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstanceNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (MBeanException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReflectionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			setChanged();
-			notifyObservers(this.toString());
-		}
-		if(this.osVersion==null){
-			ObjectName versionOName = null;
-			try {
-				versionOName = new ObjectName(FactoryName.OS);
-			} catch (MalformedObjectNameException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NullPointerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				this.osVersion = (String) connection.getAttribute(versionOName, "Version");
-			} catch (AttributeNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstanceNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (MBeanException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReflectionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
+			OperatingSystemMXBean proxyMXBean = (OperatingSystemMXBean) MBeanServerInvocationHandler.newProxyInstance(connection, OSoname, OperatingSystemMXBean.class, false);			
+			this.osName = proxyMXBean.getName();			
+			this.osVersion = proxyMXBean.getVersion();
+			
 			setChanged();
 			notifyObservers(this.toString());
 		}

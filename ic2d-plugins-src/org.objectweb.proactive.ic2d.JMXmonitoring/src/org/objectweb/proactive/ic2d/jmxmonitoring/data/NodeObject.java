@@ -1,21 +1,20 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
+import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 public class NodeObject extends AbstractData{
 
@@ -23,19 +22,17 @@ public class NodeObject extends AbstractData{
 	private VNObject vnParent;
 	private String url;
 
+ 	//Warning: Don't use this variavle directly, use getProxyNodeMBean().
+	private NodeWrapperMBean proxyNodeMBean;
+	
 	public NodeObject(RuntimeObject parent, String url, ObjectName objectName){
 		super(objectName);
 		this.parent = parent;
 		
-		String host = UrlBuilder.getHostNameFromUrl(url);
-		String name = UrlBuilder.getNameFromUrl(url);
-		String protocol = UrlBuilder.getProtocol(url);
-		int port = UrlBuilder.getPortFromUrl(url);
-		
-		this.url = UrlBuilder.buildUrl(host, name, protocol, port);
+		this.url = FactoryName.getCompleteUrl(url);
 		
 		Comparator<String> comparator = new ActiveObject.ActiveObjectComparator();
-		this.monitoredChildren = new TreeMap<String, AbstractData>(comparator); 
+		this.monitoredChildren = new TreeMap<String, AbstractData>(comparator);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -58,6 +55,13 @@ public class NodeObject extends AbstractData{
 	 */
 	public VNObject getVirtualNode(){
 		return this.vnParent;
+	}
+	
+	private NodeWrapperMBean getProxyNodeMBean(){
+		if(proxyNodeMBean==null){
+			proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), NodeWrapperMBean.class, false);
+		}
+		return proxyNodeMBean;
 	}
 	
 	@Override
@@ -94,48 +98,12 @@ public class NodeObject extends AbstractData{
 	 */
 	@SuppressWarnings("unchecked")
 	private void findActiveObjects(){
-		List<ObjectName> activeObjectNames = null;
-		try {
-			activeObjectNames = (List<ObjectName>) getConnection().getAttribute(getObjectName(),"ActiveObjects");
-		} catch (AttributeNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
+		
 		for (ObjectName oname : activeObjectNames) {
-			UniqueID id = null;
-			String activeObjectName = null;
-			try {
-				id = (UniqueID) getConnection().getAttribute(oname, "ID");
-				activeObjectName = (String) getConnection().getAttribute(oname, "Name");
-				//System.out.println("NodeObject.findActiveObjects() ===>>>> name="+activeObjectName);
-			} catch (AttributeNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InstanceNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (MBeanException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ReflectionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), oname, BodyWrapperMBean.class, false);
+			UniqueID id = proxyBodyMBean.getID();
+			String activeObjectName = proxyBodyMBean.getName();
 			ActiveObject ao = new ActiveObject(this,id, activeObjectName, oname);
 			addChild(ao);
 		}
@@ -169,25 +137,7 @@ public class NodeObject extends AbstractData{
 	 * @return the virtual node name.
 	 */
 	public String getVirtualNodeName() {
-		try {
-			return (String) getAttribute("VirtualNodeName");
-		} catch (AttributeNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		return getProxyNodeMBean().getVirtualNodeName();
 	}
 	
 	/**
@@ -195,25 +145,7 @@ public class NodeObject extends AbstractData{
 	 * @return the Job Id.
 	 */
 	public String getJobId() {
-		try {
-			return (String) getAttribute("JobId");
-		} catch (AttributeNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		return getProxyNodeMBean().getJobId();
 	}
 	
 	/**

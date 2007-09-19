@@ -7,12 +7,14 @@ import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
+import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
@@ -47,6 +49,9 @@ public class ActiveObject extends AbstractData{
 	/** request queue length */
 	private int requestQueueLength = -1; // -1 = not known
 
+	/** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
+	private BodyWrapperMBean proxyMBean;
+	
 	// -------------------------------------------
 	// --- Constructor ---------------------------
 	// -------------------------------------------
@@ -69,6 +74,8 @@ public class ActiveObject extends AbstractData{
 		getWorldObject().addActiveObject(this);
 
 		this.listener = new ActiveObjectListener(this);
+		
+		proxyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), BodyWrapperMBean.class, false);
 	}
 
 	/**
@@ -154,40 +161,16 @@ public class ActiveObject extends AbstractData{
 		Console console = Console.getInstance(Activator.CONSOLE_NAME);
 		State oldState = getState();
 		setState(State.MIGRATING);
-		Object[] params = { nodeTargetURL };
-		String[] signature = { "java.lang.String" };
 		try {
-			invoke("migrateTo", params, signature);
-		} catch (InstanceNotFoundException e) {
-			console
-			.err("Couldn't migrate " + this + " to "
-					+ nodeTargetURL);
-			setState(oldState);
-			console.logException(e);
-			return false;
-		} catch (MBeanException e) {
-			console
-			.err("Couldn't migrate " + this + " to "
-					+ nodeTargetURL);
-			setState(oldState);
-			console.logException(e);
-			return false;
-		} catch (ReflectionException e) {
-			console
-			.err("Couldn't migrate " + this + " to "
+			proxyMBean.migrateTo(nodeTargetURL);
+		} catch (MigrationException e) {
+			console.err("Couldn't migrate " + this + " to "
 					+ nodeTargetURL);
 			setState(oldState);
 			console.logException(e);
 			return false;
 		}
-		 catch (IOException e) {
-			 console
-				.err("Couldn't migrate " + this + " to "
-						+ nodeTargetURL);
-				setState(oldState);
-				console.logException(e);
-				return false;
-		}
+
 		console.log("Successfully migrated " + this + " to "
 				+ nodeTargetURL);
 		return true;
@@ -256,7 +239,7 @@ public class ActiveObject extends AbstractData{
 		ActiveObject source = getWorldObject().findActiveObject(sourceID);
 		if(source == null){
 			//TODO A faire Traiter l'erreur
-			System.err.println("Don't find the id: "+sourceID);
+			System.err.println("Can't draw a communication from id :"+sourceID+" to "+this);
 			return;
 		}
 		this.addCommunication(source);
@@ -271,7 +254,7 @@ public class ActiveObject extends AbstractData{
 		ActiveObject destination = getWorldObject().findActiveObject(destinationID);
 		if(destination == null){
 			//TODO A faire Traiter l'erreur
-			System.err.println("Don't find the id: "+destinationID);
+			System.err.println("Can't draw a communication from "+this+" to id :"+destinationID);
 			return;
 		}
 		destination.addCommunication(this);

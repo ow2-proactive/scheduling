@@ -122,7 +122,7 @@ public class WorldObject extends AbstractData{
 			e.printStackTrace();
 		}
 		setChanged();
-		if(getMonitoresChildrenSize() == 1)
+		if(getMonitoredChildrenSize() == 1)
 			notifyObservers(methodName.ADD_CHILD);
 		notifyObservers();
 	}
@@ -139,7 +139,7 @@ public class WorldObject extends AbstractData{
 	public void removeChild(AbstractData child){
 		super.removeChild(child);
 		setChanged();
-		if(getMonitoresChildrenSize() == 0)
+		if(getMonitoredChildrenSize() == 0)
 			notifyObservers(methodName.REMOVE_CHILD);
 		notifyObservers();
 	}
