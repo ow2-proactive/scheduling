@@ -1464,8 +1464,8 @@ public class ProActive {
 
     /**
      * Register a method in the calling active object to be called when the
-     * specified future is updated. The registered method takes a FutureResult
-     * as parameter.
+     * specified future is updated. The registered method takes a
+     * java.util.concurrent.Future as parameter.
      *
      * @param future the future to watch
      * @param methodName the name of the method to call on the current active object

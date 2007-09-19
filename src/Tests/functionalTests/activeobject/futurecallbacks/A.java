@@ -1,7 +1,8 @@
 package functionalTests.activeobject.futurecallbacks;
 
+import java.util.concurrent.Future;
+
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.util.MutableInteger;
 
 
@@ -12,8 +13,8 @@ public class A {
     public A() {
     }
 
-    public void myCallback(FutureResult f) {
-        MutableInteger i = (MutableInteger) f.getResult();
+    public void myCallback(Future<MutableInteger> f) throws Exception {
+        MutableInteger i = f.get();
         i.getValue();
         synchronized (A.class) {
             A.counter++;

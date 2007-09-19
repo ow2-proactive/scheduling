@@ -4,11 +4,47 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+
+
+class ProActiveFuture implements java.util.concurrent.Future<Object> {
+    private FutureResult result;
+
+    public ProActiveFuture(FutureResult result) {
+        this.result = result;
+    }
+
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        throw new IllegalStateException(
+            "Cannot cancel an already arrived ProActive future");
+    }
+
+    public Object get() throws ExecutionException {
+        try {
+            return this.result.getResult();
+        } catch (Throwable t) {
+            throw new ExecutionException(t);
+        }
+    }
+
+    public Object get(long timeout, TimeUnit unit) throws ExecutionException {
+        return get();
+    }
+
+    public boolean isCancelled() {
+        return false;
+    }
+
+    public boolean isDone() {
+        return true;
+    }
+}
 
 
 /**
@@ -42,16 +78,18 @@ public class LocalFutureUpdateCallbacks {
         Class<?> c = target.getClass();
         Method m;
         try {
-            m = c.getMethod(methodName, FutureResult.class);
+            m = c.getMethod(methodName, java.util.concurrent.Future.class);
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("Cannot find method: " +
-                c.getName() + "." + methodName + "(FutureResult)", e);
+                c.getName() + "." + methodName + "(Future)", e);
         }
         this.methods.add(m);
     }
 
     void run() {
-        FutureResult[] args = new FutureResult[] { this.future.getFutureResult() };
+        ProActiveFuture[] args = new ProActiveFuture[] {
+                new ProActiveFuture(this.future.getFutureResult())
+            };
 
         for (Method m : this.methods) {
             MethodCall mc = MethodCall.getMethodCall(m, args, null);
