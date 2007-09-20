@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="Installation">
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?><chapter id="Installation">
   <title>ProActive Installation</title>
 
   <para>ProActive is available for<ulink
@@ -404,90 +403,5 @@
     <para>We are currently developing an Eclipse plugin that will help
     developers to easily create ProActive applications. Have a look at the
     plugin documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
-  </sect1>
-
-  <sect1>
-    <title>Troubleshooting and support</title>
-
-    <para>If you encounter any problem with installing ProActive and running
-    the examples, please make sure you correctly followed all the steps
-    described above. If it doesn't help, here is a list of the most common
-    mistakes:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Permission denied when trying to launch
-        scripts under Linux</emphasis> Permissions do not allow to execute
-        files. Just change the permissions with <emphasis role="bold">chmod
-        755 *.sh</emphasis></para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Java complains about not being able to
-        find ProActive's classes.</emphasis> Your <literal>CLASSPATH</literal>
-        environment variable does not contain the entry for the ProActive's or
-        ASM's or Log4j's or Xerces' or Fractal's or BouncyCastle's classes.
-        <literal>ProActive.jar,</literal><literal>asmXX.jar, log4j.jar,
-        xercesImpl.jar, fractal.jar, bouncycastle.jar</literal> must be in
-        your <literal>CLASSPATH</literal>.</para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Java complains about denial of
-        access.</emphasis> If you get the following exceptions, you probably
-        didn't change the file java.policy as described in <xref lang=""
-        linkend="Create_Java_Policy" />.</para>
-
-        <screen>org.objectweb.proactive.NodeException:
-java.security.AccessControlException: access denied
-(java.net.SocketPermission 127.0.0.1:1099 connect,resolve)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeImpl.&lt;init&gt;(RmiNode.java:17)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory._createDefaultNode
-                        (RmiNodeFactory.java, Compiled Code)
-                at org.objectweb.proactive.core.node.NodeFactory.createDefaultNode(NodeFactory.java:127)
-                at org.objectweb.proactive.core.node.NodeFactory.getDefaultNode(NodeFactory.java:57)
-                at org.objectweb.proactive.ProActive.newActive(ProActive.java:315)
-                ...
-Exception in thread "main" java.lang.ExceptionInInitializerError:
-java.security.AccessControlException: access denied
-(java.util.PropertyPermission user.home re ad)
-                at java.security.AccessControlContext.checkPermission (AccessControlContext.java, Compiled Code)
-                at java.security.AccessController.checkPermission(AccessController.java:403)
-                at java.lang.SecurityManager.checkPermission(SecurityManager.java:549)
-                at java.lang.SecurityManager.checkPropertyAccess(SecurityManager.java:1243)
-                at java.lang.System.getProperty(System.java:539)
-                at org.objectweb.proactive.mop.MOPProperties.createDefaultProperties (MOPProperties.java:190)
-                ...         </screen>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Java complains log4j
-        initialization</emphasis> If you get the following message, you
-        probably made a mistake when giving the
-        <literal>-Dlog4j.configuration</literal> property to the java command.
-        Be sure that the given path is right, try also to add file: before the
-        path.</para>
-
-        <screen>    log4j:WARN No appender could be found for logger .....
-    log4j:WARN Please initialize the log4j system properly            </screen>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Examples and compilation do not work at
-        all under Windows system:</emphasis> Check if your java installation
-        is not in a path containing spaces like C:\Program Files\java or
-        C:\Documents and Settings\java. Batch scripts, indeed, do not run
-        properly when JAVA_HOME is set to such a directory. To get rid of
-        those problems, the best thing to do is to install the jdk under a
-        space-free directory and path (e.g. C:\java\j2sdk.... or
-        D:\java\j2sdk... ) and then set the JAVA_HOME environment variable
-        accordingly.</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>If you cannot solve the problem, feel free to email us for support
-    at <email>proactive@objectweb.org</email>. Make sure that you include a
-    precise description of your problem along with a full copy of the error
-    message you get.</para>
   </sect1>
 </chapter>
