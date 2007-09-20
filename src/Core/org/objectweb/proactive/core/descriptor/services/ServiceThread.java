@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
-import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.NodeNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -197,7 +196,9 @@ public class ServiceThread extends Thread {
             }
 
             // END JMX Notification
-            ((RuntimeRegistrationEventListener) vn).runtimeRegistered(event);
+
+            // FIXME: cmathieu.  java.lang.ClassCastException: org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl cannot be cast to org.objectweb.proactive.core.event.RuntimeRegistrationEventListener
+            // ((RuntimeRegistrationEventListener) vn).runtimeRegistered(event);
         }
     }
 
