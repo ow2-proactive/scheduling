@@ -178,13 +178,6 @@ public class ServiceThread extends Thread {
             String url = part[i].getURL();
             String protocol = URIBuilder.getProtocol(url);
 
-            // ProActiveEvent
-            RuntimeRegistrationEvent event = new RuntimeRegistrationEvent(localRuntime,
-                    RuntimeRegistrationEvent.RUNTIME_ACQUIRED, part[i],
-                    vn.getName(), protocol, vm.getName());
-
-            // END ProActiveEvent
-
             // JMX Notification
             ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
                                                                      .getMBean();
@@ -196,9 +189,6 @@ public class ServiceThread extends Thread {
             }
 
             // END JMX Notification
-
-            // FIXME: cmathieu.  java.lang.ClassCastException: org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl cannot be cast to org.objectweb.proactive.core.event.RuntimeRegistrationEventListener
-            // ((RuntimeRegistrationEventListener) vn).runtimeRegistered(event);
         }
     }
 

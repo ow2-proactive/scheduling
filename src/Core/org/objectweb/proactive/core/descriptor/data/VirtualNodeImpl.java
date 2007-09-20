@@ -1014,7 +1014,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         // ------- Runtime Registered
-        if (NotificationType.runtimeRegistered.equals(type)) {
+        if (NotificationType.runtimeRegistered.equals(type) ||
+                NotificationType.runtimeAcquired.equals(type)) {
 
             /*
              * Check if the runtime has been created by this VirtualNode/VirtualMachine
