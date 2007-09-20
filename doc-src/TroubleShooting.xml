@@ -4,10 +4,92 @@
   <title>ProActive Trouble Shooting</title>
 
   <para>In this section we present common problems encountered while trying to
-  use ProActive. For further assistance, please post your question on the
+  use ProActive. For further assistance, or if you cannot solve a problem, feel free to post your question on the
   ProActive mailing list <ulink
   url="http://forge.objectweb.org/mail/?group_id=7">proactive@objectweb.org
-  </ulink>.</para>
+  </ulink> Make sure that you include a
+    precise description of your problem along with a full copy of the error
+    message.</para><sect1>
+    <title>Common problems</title>
+
+    <para>If you encounter any problem with installing ProActive and running
+    the examples, please make sure you correctly followed all the steps
+    described above. If it doesn't help, here is a list of the most common
+    mistakes:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis role="bold">Permission denied when trying to launch
+        scripts under Linux</emphasis> Files have the wrong permissions set. 
+        You will have to change the permissions by executing <literal>chmod
+        755 *.sh</literal></para> in the <literal>ProActive/scripts/unix directory</literal>. The command will 
+        set the files to executable and readable for all users and also writeable for the current user.
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Java complains about not being able to
+        find the ProActive classes.</emphasis> Your <literal>CLASSPATH</literal>
+        environment variable does not contain the entry for classes belonging to ProActive,
+        ASM, Log4, Xerces, Fractal, or BouncyCastle.
+        <literal>ProActive.jar,asmXX.jar, log4j.jar,
+        xercesImpl.jar, fractal.jar, bouncycastle.jar</literal> must be in
+        your <literal>CLASSPATH</literal>.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Java complains about denial of
+        access.</emphasis> If you get the following exceptions, you probably
+        didn't change the file java.policy as described in <xref lang=""
+        linkend="Create_Java_Policy" />.</para>
+
+        <screen>org.objectweb.proactive.NodeException:
+java.security.AccessControlException: access denied
+(java.net.SocketPermission 127.0.0.1:1099 connect,resolve)
+                at org.objectweb.proactive.core.node.rmi.RemoteNodeImpl.&lt;init&gt;(RmiNode.java:17)
+                at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory._createDefaultNode
+                        (RmiNodeFactory.java, Compiled Code)
+                at org.objectweb.proactive.core.node.NodeFactory.createDefaultNode(NodeFactory.java:127)
+                at org.objectweb.proactive.core.node.NodeFactory.getDefaultNode(NodeFactory.java:57)
+                at org.objectweb.proactive.ProActive.newActive(ProActive.java:315)
+                ...
+Exception in thread "main" java.lang.ExceptionInInitializerError:
+java.security.AccessControlException: access denied
+(java.util.PropertyPermission user.home re ad)
+                at java.security.AccessControlContext.checkPermission (AccessControlContext.java, Compiled Code)
+                at java.security.AccessController.checkPermission(AccessController.java:403)
+                at java.lang.SecurityManager.checkPermission(SecurityManager.java:549)
+                at java.lang.SecurityManager.checkPropertyAccess(SecurityManager.java:1243)
+                at java.lang.System.getProperty(System.java:539)
+                at org.objectweb.proactive.mop.MOPProperties.createDefaultProperties (MOPProperties.java:190)
+                ...         </screen>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Java complains on log4j
+        initialization</emphasis> If you get the following message, you
+        probably made a mistake when giving the
+        <literal>-Dlog4j.configuration</literal> property to the java command.
+        Be sure that the given path is right, try also to add <literal>file:</literal> before the
+        path.</para>
+
+        <screen>    log4j:WARN No appender could be found for logger .....
+    log4j:WARN Please initialize the log4j system properly            </screen>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Examples and compilation do not work at
+        all under Windows system:</emphasis> Check if your java installation
+        is not in a path containing spaces like C:\Program Files\java or
+        C:\Documents and Settings\java. Batch scripts do not run
+        properly when JAVA_HOME is set to such a directory. The solution is to install the JDK under a
+        space-free path (e.g. C:\java\j2sdk.... or
+        D:\java\j2sdk... ) and then set the JAVA_HOME environment variable
+        accordingly.</para>
+      </listitem>
+    </itemizedlist>
+
+    
+  </sect1>
 
   <sect1 id="TroubleShooting_html_loggers">
     <title>Enabling the loggers</title>
@@ -18,7 +100,7 @@
     <screen>-Dlog4j.configuration=file:ProActive/compile/proactive-log4j</screen>
 
     <para>In this file, the relevant loggers can be uncommented (by removing
-    the leading #). For example, the <emphasis>deployment</emphasis> loggers
+    the leading #). For example, the deployment loggers
     are activated with the following lines:</para>
 
     <screen>log4j.logger.proactive.deployment = DEBUG, CONSOLE
@@ -30,7 +112,7 @@ log4j.logger.proactive.deployment.process = DEBUG, CONSOLE</screen>
     <title>Hostname and IP Address</title>
 
     <para>To function properly, ProActive requires machines to have a
-    correctly configured hostname and domain name. If the names of a machines
+    correctly configured hostname and domain name. If the name of a machines
     is not properly configured, then remote nodes will be unable to locate the
     machine.</para>
 
@@ -43,9 +125,9 @@ localhost     //This is an error!
 $&gt;hostname -i
 127.0.0.1     //This is an error!</screen>
 
-    <para><emphasis role="bold">hostname</emphasis> should print the hostname
-    of the machine as known by the other hosts, and <emphasis
-    role="bold">hostname -i</emphasis> should return the network interface
+    <para><literal>hostname</literal> should print the hostname
+    of the machine as known by the other hosts, and <literal
+    role="bold">hostname -i</literal> should return the network interface
     accessible by other machines.</para>
   </sect1>
 
@@ -57,27 +139,26 @@ $&gt;hostname -i
 
     <screen>-Dproactive.useIPaddress=true</screen>
 
-    <para>This property should be given as parameter to java virtual machines
-    deployed on machines who's names can not be properly resolved.</para>
+    <para>This property should be given as parameter to Java virtual machines
+    deployed on computers that have names that do not resolve properly.</para>
   </sect1>
 
   <sect1 id="dbdoclet.id.TroubleShooting_rmi_tunneling">
     <title>RMI Tunneling</title>
 
-    <para>ProActive provides rmi tunneling through ssh for crossing firewalls
+    <para>ProActive provides RMI tunneling through ssh for crossing firewalls
     that only allow ssh connections. Things to verify when using rmissh
     tunneling:</para>
 
     <itemizedlist>
       <listitem>
-        <para>ProActlive/lib/ganymed-ssh2-build210.jar must be uncluded in the classpath of the
+        <para>ProActlive/lib/ganymed-ssh2-build210.jar must be included in the <literal>CLASSPATH</literal> of the
         concerned machines.</para>
       </listitem>
 
       <listitem>
-        <para>The jvm that is only accesible with ssh must be started using:
-        <emphasis
-        role="bold">-Dproactive.communication.protocol=rmissh</emphasis></para>
+        <para>The JVM that is only accesible with ssh must be started using:
+        <literal>-Dproactive.communication.protocol=rmissh</literal></para>
       </listitem>
 
       <listitem>
@@ -92,8 +173,8 @@ $&gt;hostname -i
   <sect1 id="dbdoclet.id.TroubleShooting_public_remote_method_calls">
     <title>Public remote method calls</title>
 
-    <para>Methods that will be called remotely on an active object must be
-    public. While java will impose this restriction between classes of
+    <para>Methods that will be called remotely on an Active Object must be
+    public. While Java will impose this restriction between classes of
     different types, this problem usually takes place when invoking a remote
     method on an object of the same type.</para>
 
@@ -101,7 +182,7 @@ $&gt;hostname -i
 
   <emphasis>public</emphasis> void foo(A a){ 
    ...
-   a.bar();           //This call will not be handled by the remote active object!!!
+   a.bar();           //This call will not be handled by the remote Active Object!!!
    ...
   }
 
