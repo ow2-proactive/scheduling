@@ -34,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.jfree.chart.needle.LongNeedle;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -76,6 +77,7 @@ public class Launcher {
                     params, provideNodes(args[0]));
 
             String input = "";
+            //default number of iterations
             long numOfIterations = 1;
             double result;
             double error;
@@ -92,9 +94,16 @@ public class Launcher {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-
-                numOfIterations = Long.parseLong(input);
-
+                //System.out.println("Iterations:" + numOfIterations);
+                try{
+                	numOfIterations = Long.parseLong(input);
+                }
+                catch(NumberFormatException numberException){
+                	System.err.println(numberException.getMessage());
+                	System.out.println("No valid number entered using 1 iteration...");
+                }
+                
+                
                 if (numOfIterations <= 0) {
                     break;
                 }
