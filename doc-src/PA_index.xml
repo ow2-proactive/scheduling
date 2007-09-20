@@ -24,7 +24,6 @@
 <!ENTITY SSHTunneling SYSTEM "SSHTunneling.xml">
 <!ENTITY faultTolerance SYSTEM "faultTolerance.xml">
 <!ENTITY technicalService SYSTEM "technicalService.xml">
-<!ENTITY scheduler SYSTEM "scheduler.xml">
 <!ENTITY intro SYSTEM "components/intro.xml">
 <!ENTITY implementation SYSTEM "components/implementation.xml">
 <!ENTITY conformance SYSTEM "components/conformance.xml">
@@ -142,7 +141,6 @@
     <title>Graphical User Interface (GUI) and tools</title>
     &IC2D_EclipsePlugin;
     &scilab;
-    &scheduler;
     &TimIt;
    </part>
 
