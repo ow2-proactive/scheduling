@@ -1,7 +1,9 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
@@ -11,6 +13,7 @@ import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 /**
  * Represents a Runtime in the IC2D model.
@@ -134,24 +137,56 @@ public class RuntimeObject extends AbstractData{
 			e.printStackTrace();
 		}
 		
+		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
+		
 		for (ObjectName name : nodeNames) {
+			
+			// Search if the node is a P2P node
+			String nodeName  = name.getKeyProperty(FactoryName.NODE_NAME_PROPERTY);
+			if(nodeName.startsWith(P2PConstants.P2P_NODE_NAME) && getWorldObject().isP2PHidden()){
+				// We have to skeep this node because it is a P2PNode
+				continue;
+			}
+			
 			NodeWrapperMBean proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), name, NodeWrapperMBean.class, false);
 			String url = proxyNodeMBean.getURL();
-			
+
 			// We need to have a complete url protocol://host:port/name
-        	NodeObject child = new NodeObject(this,FactoryName.getCompleteUrl(url), name);
-        	String virtualNodeName = child.getVirtualNodeName();
-        	VNObject vn = getWorldObject().getVirtualNode(virtualNodeName);
-        	// this virtual node is not monitored
-        	if(vn==null){
-        		vn = new VNObject(virtualNodeName, child.getJobId(), getWorldObject());
-        		getWorldObject().addVirtualNode(vn);
-        	}
-        	// Set to the node the parent virtual node.
-        	child.setVirtualNode(vn);
-        	vn.addChild(child);
-        	
-			addChild(child);
+			url = FactoryName.getCompleteUrl(url);
+			
+			// If this child is a NOT monitored child.
+			if(containsChildInNOTMonitoredChildren(url)){
+				continue;
+			}
+			
+			NodeObject child = (NodeObject)this.getMonitoredChild(url);
+			// If this child is not monitored.
+			if(child==null){
+				child = new NodeObject(this,url, name);
+				String virtualNodeName = child.getVirtualNodeName();
+	        	VNObject vn = getWorldObject().getVirtualNode(virtualNodeName);
+	        	// this virtual node is not monitored
+	        	if(vn==null){
+	        		vn = new VNObject(virtualNodeName, child.getJobId(), getWorldObject());
+	        		getWorldObject().addVirtualNode(vn);
+	        	}
+	        	// Set to the node the parent virtual node.
+	        	child.setVirtualNode(vn);
+	        	vn.addChild(child);
+				addChild(child);
+			}
+			// This child is already monitored, but this child maybe contains some not monitord objects.
+			else{
+				child.explore();
+			}
+			// Removes from the model the not monitored or termined nodes.
+			childrenToRemoved.remove(child.getKey());
+		}
+		
+		// Some child have to be removed
+		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
+			NodeObject child = (NodeObject) iter.next();
+			child.destroy();
 		}
 	}
 	

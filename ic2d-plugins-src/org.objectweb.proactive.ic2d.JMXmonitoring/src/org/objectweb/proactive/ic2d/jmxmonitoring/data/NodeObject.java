@@ -1,7 +1,9 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.management.MBeanServerInvocationHandler;
@@ -98,14 +100,34 @@ public class NodeObject extends AbstractData{
 	 */
 	@SuppressWarnings("unchecked")
 	private void findActiveObjects(){
-		List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
+		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 		
+		List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();		
 		for (ObjectName oname : activeObjectNames) {
 			BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), oname, BodyWrapperMBean.class, false);
 			UniqueID id = proxyBodyMBean.getID();
 			String activeObjectName = proxyBodyMBean.getName();
-			ActiveObject ao = new ActiveObject(this,id, activeObjectName, oname);
-			addChild(ao);
+			// If this child is a NOT monitored child.
+			if(containsChildInNOTMonitoredChildren(id.toString())){
+				continue;
+			}
+			ActiveObject child = (ActiveObject) this.getMonitoredChild(id.toString());
+			// If this child is not yet monitored.
+			if(child==null){
+				child = new ActiveObject(this,id, activeObjectName, oname);
+				addChild(child);	
+			}
+			else{
+				child.explore();
+			}
+			// Removes from the model the not monitored or termined aos.
+			childrenToRemoved.remove(child.getKey());
+		}
+		
+		// Some child have to be removed
+		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
+			ActiveObject child = (ActiveObject)iter.next();
+			child.destroy();
 		}
 	}
 

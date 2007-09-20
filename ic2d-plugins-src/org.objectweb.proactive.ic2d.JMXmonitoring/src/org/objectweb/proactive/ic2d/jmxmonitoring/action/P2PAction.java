@@ -22,7 +22,6 @@ public class P2PAction extends Action {
 
 	@Override
 	public void run(){
-		// TODO A faire
-		/*world.hideP2P(!isChecked());*/
+		world.hideP2P(!isChecked());
 	}
 }

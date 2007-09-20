@@ -70,6 +70,8 @@ public class WorldObject extends AbstractData{
 	
 	private JMXNotificationManager notificationManager;
 	
+	private boolean hideP2P = HIDE_P2PNODE_MONITORING;
+	
 	// -------------------------------------------
 	// --- Constructor ---------------------------
 	// -------------------------------------------
@@ -332,5 +334,22 @@ public class WorldObject extends AbstractData{
 	
 	public List<VNObject>getVNChildren () {
 		return new ArrayList<VNObject>(this.vnChildren.values ());
+	}
+
+	/**
+	 * Use to hide or nor the p2p objects.
+	 * @param hide true for hide the p2p object, false otherwise
+	 */
+	public void hideP2P(boolean hide){
+		this.hideP2P = hide;
+		getMonitorThread().forceRefresh();
+	}
+
+	/**
+	 * Return true if the p2p objects ars hidden, false otherwise
+	 * @return true if the p2p objects ars hidden, false otherwise
+	 */
+	public boolean isP2PHidden(){
+		return this.hideP2P;
 	}
 }

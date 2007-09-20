@@ -11,13 +11,11 @@ import java.util.Observable;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
-import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
@@ -35,6 +33,11 @@ public abstract class AbstractData extends Observable {
 	 * The monitored children
 	 */ 
 	protected Map<String, AbstractData> monitoredChildren;
+	
+	/**
+	 * The NOT monitored children
+	 */
+	protected Map<String, AbstractData> notMonitoredChildren;
 
 	/**
 	 * The object name associated to this object.
@@ -48,6 +51,7 @@ public abstract class AbstractData extends Observable {
 	public AbstractData(ObjectName objectName){
 		this.objectName = objectName;
 		this.monitoredChildren = new HashMap<String, AbstractData>();
+		this.notMonitoredChildren = new HashMap<String, AbstractData>();
 	}
 
 	// -------------------------------------------
@@ -59,7 +63,6 @@ public abstract class AbstractData extends Observable {
 	 * @return
 	 */
 	public ObjectName getObjectName(){
-
 		return this.objectName;
 	}
 	
@@ -87,10 +90,22 @@ public abstract class AbstractData extends Observable {
 			return;
 		String key = child.getKey();
 		monitoredChildren.remove(key);
+		notMonitoredChildren.remove(key);
 		setChanged();
 		notifyObservers();
 	}
 
+	/**
+	 * Moves a child from the monitored children to the NOT monitored children.
+	 * @param child The child to add to the NOT monitored children.
+	 */
+	public void removeChildFromMonitoredChildren(AbstractData child){
+		monitoredChildren.remove(child.getKey());
+		notMonitoredChildren.put(child.getKey(), child);
+		setChanged();
+		notifyObservers();
+	}
+	
 	/**
 	 * Returns the list of monitored children
 	 * @return The list of monitored children
@@ -116,21 +131,52 @@ public abstract class AbstractData extends Observable {
 	}
 	
 	/**
-	 * Returns a monitored Child
+	 * Returns a child, searches in all recorded data
 	 * @param key
-	 * @return
+	 * @return the child
 	 */
 	public AbstractData getChild(String key){
+		AbstractData child = this.monitoredChildren.get(key);
+		if(child==null){
+			return this.notMonitoredChildren.get(key);
+		}
+		return child;
+	}
+	
+	/**
+	 * Returns a monitored Child
+	 * @param key
+	 * @return The monitored child.
+	 */
+	public AbstractData getMonitoredChild(String key){
 		return this.monitoredChildren.get(key);
 	}
 	
 	/**
 	 * Returns true if this object has associated a child with this key.
 	 * @param keyChild
-	 * @return
+	 * @return True if this object has associated a child with this key.
 	 */
 	public boolean containsChild(String keyChild){
+		return containsChildInMonitoredChildren(keyChild) || containsChildInNOTMonitoredChildren(keyChild);
+	}
+	
+	/**
+	 * Returns true if this object has associated a monitored child with this key.
+	 * @param keyChild
+	 * @return True if this object has associated a monitored child with this key.
+	 */
+	public boolean containsChildInMonitoredChildren(String keyChild){
 		return this.monitoredChildren.containsKey(keyChild);
+	}
+	
+	/**
+	 * Returns true if this object has associated a NOT monitored child with this key.
+	 * @param keyChild
+	 * @return True if this object has associated a NOT monitored child with this key.
+	 */
+	public boolean containsChildInNOTMonitoredChildren(String keyChild){
+		return this.notMonitoredChildren.containsKey(keyChild);
 	}
 	
 	/**
@@ -176,8 +222,7 @@ public abstract class AbstractData extends Observable {
 			AbstractData child = (AbstractData) iter.next();
 			child.stopMonitoring(false);
 		}
-		getParent().removeChild(this);
-		//getWorld().removeFromMonitoredObjects(this);
+		getParent().removeChildFromMonitoredChildren(this);
 		setChanged();
 		notifyObservers(/*State.NOT_MONITORED*/);
 	}
@@ -263,6 +308,10 @@ public abstract class AbstractData extends Observable {
 		return getParent().getHostUrlServer();
 	}
 	
+	/**
+	 * Returns the JMX Server Name
+	 * @return the JMX Server Name
+	 */
 	protected String getServerName(){
 		return getParent().getServerName();
 	}

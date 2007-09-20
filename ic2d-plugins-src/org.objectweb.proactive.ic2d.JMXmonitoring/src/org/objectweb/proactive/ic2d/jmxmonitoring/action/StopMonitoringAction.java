@@ -53,7 +53,6 @@ public class StopMonitoringAction extends Action {
 	
 	@Override
 	public void run() {
-		// TODO A faire
 		object.stopMonitoring(true);
 	}
 	

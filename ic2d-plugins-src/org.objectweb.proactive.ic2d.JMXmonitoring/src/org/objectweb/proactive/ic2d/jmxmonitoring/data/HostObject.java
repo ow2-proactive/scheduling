@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.MalformedObjectNameException;
@@ -159,16 +160,38 @@ public class HostObject extends AbstractData{
 		RuntimeFinder rfinder = new RemoteObjectHostRTFinder();
 		Collection<RuntimeObject> runtimeObjects = rfinder.getRuntimeObjects(this);
 		
+		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
+		
 		Iterator<RuntimeObject> it = runtimeObjects.iterator();
 		while(it.hasNext()){			
 			RuntimeObject runtimeObject = it.next();
+			
+			// If this child is a NOT monitored child.
+			if(containsChildInNOTMonitoredChildren(runtimeObject.getKey())){
+				continue;
+			}
+			
+			RuntimeObject child = (RuntimeObject) this.getMonitoredChild(runtimeObject.getKey());
 			// If this child is not yet monitored.
-			if(!(this.containsChild(runtimeObject.getKey()))){
+			if(child==null){
+				child = runtimeObject;
 				ObjectName oname = runtimeObject.getObjectName();		
 				JMXNotificationManager.getInstance().subscribe(oname, new RuntimeObjectListener(runtimeObject), this.getUrl(), runtimeObject.getServerName());
 				addChild(runtimeObject);
 				updateOSNameAndVersion(runtimeObject.getConnection());
 			}
+			else{
+				// This child is already monitored, but this child maybe contains some not monitord objects.
+				child.explore();
+			}
+			// Removes from the model the not monitored or termined runtimes.
+			childrenToRemoved.remove(child.getKey());
+		}
+		
+		// Some child have to be removed
+		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
+			RuntimeObject child = (RuntimeObject) iter.next();
+			child.destroy();
 		}
 	}
 	
