@@ -34,6 +34,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -46,6 +48,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -203,7 +208,15 @@ public class StartRuntime {
             abort();
         }
 
-        localRuntimeImpl.setCapacity(capacity);
+        Set<Node> nodes = new HashSet<Node>();
+        for (String url : localRuntimeImpl.setCapacity(capacity)) {
+            try {
+                nodes.add(NodeFactory.getNode(url));
+            } catch (NodeException e) {
+                logger.error("Unable to get a GCM Deployment node on the local runtime",
+                    e);
+            }
+        }
 
         // Say hello to our parent if needed
         if (parentURL != null) {
@@ -215,7 +228,7 @@ public class StartRuntime {
 
                 // Register
                 GCMRuntimeRegistrationNotificationData notification = new GCMRuntimeRegistrationNotificationData(localRuntime.getURL(),
-                        deploymentID);
+                        deploymentID, nodes);
                 parentRuntime.register(notification);
 
                 waitUntilInterupted();

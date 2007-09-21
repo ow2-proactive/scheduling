@@ -1617,13 +1617,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         if (this.isActivated) {
-            try {
-                waitForAllNodesCreation();
-            } catch (NodeException e) {
-                out.defaultWriteObject();
-
-                return;
-            }
+            //            try {
+            //                waitForAllNodesCreation();
+            //            } catch (NodeException e) {
+            //                out.defaultWriteObject();
+            //
+            //                return;
+            //            }
         }
 
         out.defaultWriteObject();
@@ -1643,8 +1643,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * Use for p2p infrastructure to get nodes.
      * @see org.objectweb.proactive.core.event.NodeCreationEventListener#nodeCreated(org.objectweb.proactive.core.event.NodeCreationEvent)
      */
-    public synchronized void nodeCreated(NodeNotificationData notification,
-        boolean isP2PNode) {
+    public void nodeCreated(NodeNotificationData notification, boolean isP2PNode) {
         Node node = notification.getNode();
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             node.getNodeInformation().getURL() + " done");
@@ -1669,7 +1668,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         //notify all listeners that a node has been created
-        notifyAll();
+        //        notifyAll();
 
         // Notify the application that a node is ready
         // Legacy event listener is kept only to be backward compatible

@@ -43,6 +43,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -1521,7 +1523,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return this.roe.getURLs();
     }
 
-    public void setCapacity(long capacity) {
+    public Set<String> setCapacity(long capacity) {
         if (vmInformation.getCapacity() > 0) {
             throw new IllegalStateException("setCapacity already set to " +
                 vmInformation.getCapacity());
@@ -1534,6 +1536,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         logger.debug("Capacity set to " + capacity + ". Creating the nodes...");
         vmInformation.setCapacity(capacity);
 
+        Set<String> nodeUrls = new HashSet<String>();
+
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
@@ -1543,8 +1547,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             try {
                 // FIXME acontes PSM ?
-                createLocalNode(url, false, null, VirtualNode.DEFAULT_VN,
-                    "Undefined");
+                nodeUrls.add(createLocalNode(url, false, null,
+                        VirtualNode.DEFAULT_VN, "Undefined"));
             } catch (NodeException e) {
                 // Cannot do something here. This node will node be created
                 logger.warn("Failed to create a capacity node", e);
@@ -1553,8 +1557,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 // Should not happen, log it and delete the old node
                 logger.warn(url + "is already registered... replacing it !");
                 try {
-                    createLocalNode(url, true, null, VirtualNode.DEFAULT_VN,
-                        null);
+                    nodeUrls.add(createLocalNode(url, true, null,
+                            VirtualNode.DEFAULT_VN, null));
                 } catch (NodeException e1) {
                     logger.warn("Failed to create a capacity node", e1);
                 } catch (AlreadyBoundException e1) {
@@ -1563,6 +1567,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 }
             }
         }
+        return nodeUrls;
     }
 
     public void register(GCMRuntimeRegistrationNotificationData notification) {

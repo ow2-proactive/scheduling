@@ -1,20 +1,25 @@
 package org.objectweb.proactive.core.jmx.notification;
 
 import java.io.Serializable;
+import java.util.Set;
+
+import org.objectweb.proactive.core.node.Node;
 
 
 public class GCMRuntimeRegistrationNotificationData implements Serializable {
     private String childURL;
     private long deploymentId;
+    private Set<Node> nodes;
 
     public GCMRuntimeRegistrationNotificationData() {
         // No-args constructor
     }
 
     public GCMRuntimeRegistrationNotificationData(String childURL,
-        long deploymentId) {
+        long deploymentId, Set<Node> nodes) {
         this.childURL = childURL;
         this.deploymentId = deploymentId;
+        this.nodes = nodes;
     }
 
     public String getChildURL() {
@@ -31,5 +36,13 @@ public class GCMRuntimeRegistrationNotificationData implements Serializable {
 
     public void setDeploymentId(long deploymentId) {
         this.deploymentId = deploymentId;
+    }
+
+    public Set<Node> getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(Set<Node> nodes) {
+        this.nodes = nodes;
     }
 }

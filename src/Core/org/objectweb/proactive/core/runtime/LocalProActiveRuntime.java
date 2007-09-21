@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.util.Set;
+
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
@@ -65,6 +67,7 @@ public interface LocalProActiveRuntime {
      * @param capacity An long strictly greater than 0.
      * @throws IllegalStateException if called twice
      * @throws IllegalArgumentException if capacity is not strictly positive
+     * @return URLs of the created nodes
      */
-    public void setCapacity(long capacity);
+    public Set<String> setCapacity(long capacity);
 }
