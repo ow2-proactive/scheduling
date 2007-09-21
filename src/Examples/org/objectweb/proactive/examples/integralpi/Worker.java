@@ -89,6 +89,13 @@ public class Worker implements Serializable {
         workersArray = (Worker[]) ProActiveGroup.getGroup(ProSPMD.getSPMDGroup())
                                                 .toArray(new Worker[0]);
         body = ProActive.getBodyOnThis();
+        
+        if (this.rank == 0){
+        	// Call start on each other
+        	for(int i = 1; i < groupSize; i++){
+        		workersArray[i].start(numOfIterations);
+        	}
+        }
 
         // Do the computation in N steps
         // There are "groupSize" instances participating.  Each

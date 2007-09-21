@@ -34,7 +34,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.jfree.chart.needle.LongNeedle;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -82,7 +81,7 @@ public class Launcher {
             long numOfIterations = 1;
             double result;
             double error;
-            DoubleWrapper results;
+            DoubleWrapper wrappedResult;
 
             while (numOfIterations > 0) {
                 // Prompt the user
@@ -96,25 +95,23 @@ public class Launcher {
                     ex.printStackTrace();
                 }
 
-                //System.out.println("Iterations:" + numOfIterations);
                 try {
                     numOfIterations = Long.parseLong(input);
                 } catch (NumberFormatException numberException) {
                     System.err.println(numberException.getMessage());
                     System.out.println(
                         "No valid number entered using 1 iteration...");
-                }
+                }                                
 
                 if (numOfIterations <= 0) {
                     break;
                 }
 
-                // Workers starts their job and return a group of Futures
-                results = workers.start(numOfIterations);
-
-                result = ((DoubleWrapper) ProActiveGroup.getGroup(results).get(0)).doubleValue();
+                // Send the number of iterations to the first worker
+                Worker firstWorker = (Worker)ProActiveGroup.getGroup(workers).get(0);                
+                wrappedResult = firstWorker.start(numOfIterations);
+                result = wrappedResult.doubleValue();               
                 error = result - Math.PI;
-
                 System.out.println("\nCalculated PI is " + result +
                     " error is " + error);
             }
@@ -138,7 +135,7 @@ public class Launcher {
             VirtualNode vnode = pad.getVirtualNodes()[0];
 
             Node[] nodes = vnode.getNodes();
-
+            
             System.out.println(nodes.length + " nodes found");
 
             return nodes;
