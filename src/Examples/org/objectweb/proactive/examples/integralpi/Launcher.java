@@ -77,6 +77,7 @@ public class Launcher {
                     params, provideNodes(args[0]));
 
             String input = "";
+
             //default number of iterations
             long numOfIterations = 1;
             double result;
@@ -94,16 +95,16 @@ public class Launcher {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+
                 //System.out.println("Iterations:" + numOfIterations);
-                try{
-                	numOfIterations = Long.parseLong(input);
+                try {
+                    numOfIterations = Long.parseLong(input);
+                } catch (NumberFormatException numberException) {
+                    System.err.println(numberException.getMessage());
+                    System.out.println(
+                        "No valid number entered using 1 iteration...");
                 }
-                catch(NumberFormatException numberException){
-                	System.err.println(numberException.getMessage());
-                	System.out.println("No valid number entered using 1 iteration...");
-                }
-                
-                
+
                 if (numOfIterations <= 0) {
                     break;
                 }
