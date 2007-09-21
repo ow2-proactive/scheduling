@@ -101,16 +101,17 @@ public class Launcher {
                     System.err.println(numberException.getMessage());
                     System.out.println(
                         "No valid number entered using 1 iteration...");
-                }                                
+                }
 
                 if (numOfIterations <= 0) {
                     break;
                 }
 
                 // Send the number of iterations to the first worker
-                Worker firstWorker = (Worker)ProActiveGroup.getGroup(workers).get(0);                
+                Worker firstWorker = (Worker) ProActiveGroup.getGroup(workers)
+                                                            .get(0);
                 wrappedResult = firstWorker.start(numOfIterations);
-                result = wrappedResult.doubleValue();               
+                result = wrappedResult.doubleValue();
                 error = result - Math.PI;
                 System.out.println("\nCalculated PI is " + result +
                     " error is " + error);
@@ -135,7 +136,7 @@ public class Launcher {
             VirtualNode vnode = pad.getVirtualNodes()[0];
 
             Node[] nodes = vnode.getNodes();
-            
+
             System.out.println(nodes.length + " nodes found");
 
             return nodes;
