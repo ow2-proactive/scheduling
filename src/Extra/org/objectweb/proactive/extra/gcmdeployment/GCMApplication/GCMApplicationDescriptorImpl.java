@@ -16,7 +16,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentRe
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
-import org.objectweb.proactive.extra.gcmdeployment.core.VMNodes;
+import org.objectweb.proactive.extra.gcmdeployment.core.VMNodeList;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
@@ -108,11 +108,11 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         currentDeploymentPath.clear();
 
         ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-        VMNodes vmNodes = new VMNodes(proActiveRuntime.getVMInformation());
+        VMNodeList vmNodeList = new VMNodeList(proActiveRuntime.getVMInformation());
         currentDeploymentPath.add(proActiveRuntime.getVMInformation().getName());
 
         //                    vmNodes.addNode(<something>); - TODO cmathieu
-        rootNode.addVMNodes(vmNodes);
+        rootNode.addVMNodes(vmNodeList);
         rootNode.setDeploymentPath(getCurrentdDeploymentPath());
 
         deploymentTree.setRootNode(rootNode);

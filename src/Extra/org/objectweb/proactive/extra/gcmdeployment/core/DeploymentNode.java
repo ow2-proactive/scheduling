@@ -16,11 +16,11 @@ public class DeploymentNode {
     protected String applicationDescriptorPath;
     protected String deploymentDescriptorPath;
     protected List<String> deploymentPath;
-    protected Set<VMNodes> nodeMap;
+    protected Set<VMNodeList> nodeMap;
     protected List<DeploymentNode> children;
 
     public DeploymentNode() {
-        nodeMap = new HashSet<VMNodes>();
+        nodeMap = new HashSet<VMNodeList>();
         children = new ArrayList<DeploymentNode>();
         id = ProActiveCounter.getUniqID();
     }
@@ -37,11 +37,11 @@ public class DeploymentNode {
         this.deploymentPath = deploymentPath;
     }
 
-    public Set<VMNodes> getNodeMap() {
+    public Set<VMNodeList> getNodeMap() {
         return nodeMap;
     }
 
-    public void addVMNodes(VMNodes vmNode) {
+    public void addVMNodes(VMNodeList vmNode) {
         nodeMap.add(vmNode);
     }
 
