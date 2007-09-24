@@ -64,9 +64,6 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     // -- JMX Datas --
 
-    /** To know if we have to send the JMX notifications */
-    private boolean shouldNotify = true;
-
     /** Timeout between updates */
     private long updateFrequence = 300;
 
@@ -181,7 +178,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         new Thread() {
                 @Override
                 public void run() {
-                    while (shouldNotify) {
+                    while (BodyWrapper.this.body.isActive()) {
                         try {
                             Thread.sleep(updateFrequence);
                         } catch (InterruptedException e) {
