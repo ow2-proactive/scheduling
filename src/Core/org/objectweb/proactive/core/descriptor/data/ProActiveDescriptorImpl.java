@@ -899,7 +899,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         throws Exception {
         TechnicalService ts = (TechnicalService) tsParsed.getType().newInstance();
         ((TechnicalService) ts).init(tsParsed.getArgs());
-        ((TechnicalServiceWrapper) this.technicalServiceMapping.get(tsParsed.getId())).setTs(ts);
+        if (technicalServiceMapping.containsKey(tsParsed.getId())) {
+            ((TechnicalServiceWrapper) this.technicalServiceMapping.get(tsParsed.getId())).setTs(ts);
+        } else {
+            logger.warn("Unregistered technical service id : " +
+                tsParsed.getId());
+        }
     }
 
     public TechnicalService getTechnicalService(String technicalServiceId) {
