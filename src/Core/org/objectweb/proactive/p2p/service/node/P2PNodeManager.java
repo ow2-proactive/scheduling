@@ -176,9 +176,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      * Leave the specified node. The node is killed and new one is created and
      * ready for sharing.
      * @param nodeToFree the node to kill.
-     * @param vnName Virtual node name to unregister or null.
      */
-    public void leaveNode(Node nodeToFree, String vnName) {
+    public void leaveNode(Node nodeToFree) {
         String nodeUrl = nodeToFree.getNodeInformation().getURL();
         logger.debug("LeaveNode message received for node @" + nodeUrl);
         this.usingNodes.remove(nodeToFree);

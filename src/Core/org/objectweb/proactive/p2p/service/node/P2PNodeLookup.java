@@ -44,7 +44,6 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -145,7 +144,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             remoteRuntime.unregisterVirtualNode(vnName);
             remoteRuntime.rmAcquaintance(this.parUrl);
             this.paRuntime.rmAcquaintance(remoteRuntime.getURL());
-            remoteNodeManager.leaveNode(remoteNode, this.vnName);
+            remoteNodeManager.leaveNode(remoteNode);
 
             logger.info("Node at " + node + " succefuly removed");
 

@@ -48,12 +48,13 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -483,6 +484,34 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         }
         return this.acquaintanceManager.randomPeer()
                                        .getANode(vnName, jobId, service);
+    }
+
+    /**
+    * Kill the given node.
+    * @param node the node url to kill.
+    */
+    public void killNode(String node) {
+        try {
+            ProActiveRuntime paRuntime = RuntimeFactory.getDefaultRuntime();
+            String parUrl = paRuntime.getURL();
+
+            Node remoteNode = NodeFactory.getNode(node);
+            ProActiveRuntime remoteRuntime = remoteNode.getProActiveRuntime();
+            P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteRuntime.getActiveObjects(P2P_NODE_NAME,
+                    P2PNodeManager.class.getName()).get(0);
+            remoteRuntime.rmAcquaintance(parUrl);
+            paRuntime.rmAcquaintance(remoteRuntime.getURL());
+            remoteNodeManager.leaveNode(remoteNode);
+
+            logger.info("Node at " + node + " succefuly removed");
+
+            // Unregister the remote runtime
+            paRuntime.unregister(remoteRuntime, remoteRuntime.getURL(), "p2p",
+                PAProperties.PA_P2P_ACQUISITION.getValue() + ":",
+                remoteRuntime.getVMInformation().getName());
+        } catch (Exception e) {
+            logger.info("Node @" + node + " already down");
+        }
     }
 
     /**
