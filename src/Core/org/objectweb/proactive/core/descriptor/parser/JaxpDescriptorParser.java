@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
+import org.objectweb.proactive.core.process.loadleveler.LoadLevelerProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.process.nordugrid.NGProcess;
@@ -247,7 +248,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         "value Tag without any mapToVirtualNode defined");
                 }
 
-                VirtualNodeInternal vn = (VirtualNodeInternal) proActiveDescriptor.createVirtualNode(virtualNode,
+                VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNode,
                         false, true);
 
                 proActiveDescriptor.mainDefinitionAddVirtualNode(vn);
@@ -629,6 +630,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new RloginProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(BSUB_PROCESS_TAG)) {
                 new BSubProcessExtractor(node, infrastructureContext);
+            } else if (processType.equals(LOADLEVELER_PROCESS_TAG)) {
+                new LoadLevelerProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(GLOBUS_PROCESS_TAG)) {
                 new GlobusProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(PRUN_PROCESS_TAG)) {
@@ -1069,6 +1072,129 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         public RloginProcessExtractor(Node node, Node context)
             throws XPathExpressionException, SAXException, ProActiveException {
             super(node, context);
+        }
+    }
+
+    protected class LoadLevelerProcessExtractor extends ProcessExtractor {
+        public LoadLevelerProcessExtractor(Node node, Node context)
+            throws XPathExpressionException, SAXException, ProActiveException {
+            super(node, context);
+
+            Node taskRepartitionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    LOADLEVELER_TASK_REPARTITION_TAG, node, XPathConstants.NODE);
+            if (taskRepartitionNode != null) {
+                new LoadLevelerTaskRepartitionExtractor(targetProcess,
+                    taskRepartitionNode);
+            }
+
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    LOADLEVELER_OPTIONS_TAG, node, XPathConstants.NODE);
+            if (optionNode != null) {
+                new LoadLevelerOptionExtractor(targetProcess, optionNode);
+            }
+        }
+    }
+
+    protected class LoadLevelerOptionExtractor {
+        public LoadLevelerOptionExtractor(ExternalProcess targetProcess,
+            Node node) throws SAXException {
+            final NodeList childNodes = node.getChildNodes();
+            final LoadLevelerProcess llProcess = (LoadLevelerProcess) targetProcess;
+
+            for (int i = 0; i < childNodes.getLength(); ++i) {
+                final Node childNode = childNodes.item(i);
+                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+
+                final String nodeName = childNode.getNodeName();
+                final String nodeValue = getNodeExpandedValue(childNode);
+                if (nodeName.equals(LL_OPT_WALL_CLOCK_LIMIT)) {
+                    llProcess.setWallClockLimit(nodeValue);
+                } else if (nodeName.equals(LL_OPT_RESOURCES)) {
+                    llProcess.setResources(nodeValue);
+                } else if (nodeName.equals(LL_OPT_INITIAL_DIR)) {
+                    final String path = getPath(childNode);
+                    llProcess.setInitialDir(path);
+                } else if (nodeName.equals(LL_OPT_JOB_SUBMISSION_SCRIPT)) {
+                    final String path = getPath(childNode);
+                    llProcess.setJobSubmissionScriptPath(path);
+                } else if (nodeName.equals(LL_OPT_EXECUTABLE)) {
+                    final String path = getPath(childNode);
+                    llProcess.setExecutable(path);
+                } else if (nodeName.equals(LL_OPT_ARGUMENTS)) {
+                    llProcess.setArguments(nodeValue);
+                } else if (nodeName.equals(LL_OPT_ERROR)) {
+                    final String path = getPath(childNode);
+                    llProcess.setErrorFile(path);
+                } else if (nodeName.equals(LL_OPT_OUTPUT)) {
+                    final String path = getPath(childNode);
+                    llProcess.setOutputFile(path);
+                } else if (nodeName.equals(LL_OPT_ENVIRONMENT)) {
+                    llProcess.setTaskEnvironment(nodeValue);
+                }
+            }
+        }
+    }
+
+    protected class LoadLevelerTaskRepartitionExtractor {
+        public LoadLevelerTaskRepartitionExtractor(
+            ExternalProcess targetProcess, Node node)
+            throws SAXException, XPathExpressionException {
+            final LoadLevelerProcess llProcess = (LoadLevelerProcess) targetProcess;
+
+            final Node simple = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    LOADLEVELER_TASK_REPARTITION_TAG_SIMPLE, node,
+                    XPathConstants.NODE);
+            if (simple != null) {
+                final NodeList childNodes = simple.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    final Node childNode = childNodes.item(i);
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    final String nodeName = childNode.getNodeName();
+                    final String nodeValue = getNodeExpandedValue(childNode);
+                    if (nodeName.equals(LL_TASK_REP_NBTASKS)) {
+                        llProcess.setNbTasks(nodeValue);
+                    }
+                    if (nodeName.equals(LL_TASK_REP_CPUS_PER_TASKS)) {
+                        llProcess.setCpusPerTasks(nodeValue);
+                    }
+                    if (nodeName.equals(LL_TASK_REP_TASKS_PER_HOSTS)) {
+                        llProcess.setTasksPerHosts(nodeValue);
+                    }
+                }
+            }
+
+            final Node advanced = (Node) xpath.evaluate(XMLNS_PREFIX +
+                    LOADLEVELER_TASK_REPARTITION_TAG_ADVANCED, node,
+                    XPathConstants.NODE);
+
+            if (advanced != null) {
+                final NodeList childNodes = advanced.getChildNodes();
+                for (int i = 0; i < childNodes.getLength(); ++i) {
+                    final Node childNode = childNodes.item(i);
+                    if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                        continue;
+                    }
+
+                    final String nodeName = childNode.getNodeName();
+                    final String nodeValue = getNodeExpandedValue(childNode);
+                    if (nodeName.equals(LL_TASK_REP_BLOCKING)) {
+                        llProcess.setBlocking(nodeValue);
+                    } else if (nodeName.equals(LL_TASK_REP_NODE)) {
+                        llProcess.setNode(nodeValue);
+                    } else if (nodeName.equals(LL_TASK_REP_TASKS_PER_NODE)) {
+                        llProcess.setTasksPerNode(nodeValue);
+                    } else if (nodeName.equals(LL_TASK_REP_TASK_GEOMETRY)) {
+                        llProcess.setTaskGeometry(nodeValue);
+                    } else if (nodeName.equals(LL_TASK_REP_TOTAL_TASKS)) {
+                        llProcess.setTotalTasks(nodeValue);
+                    }
+                }
+            }
         }
     }
 

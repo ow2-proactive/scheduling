@@ -51,7 +51,7 @@ public class InternalBodySecurity implements SecurityEntity {
     protected SecurityEntity distantBody;
 
     public InternalBodySecurity(UniversalBody distantBody) {
-        this.distantBody = (SecurityEntity) distantBody;
+        this.distantBody = distantBody;
     }
 
     public void terminateSession(long sessionID)

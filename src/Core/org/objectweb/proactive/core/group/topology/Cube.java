@@ -314,7 +314,6 @@ public class Cube extends Plan { // implements Topology3D {
         }
 
         int begining = this.getX(this.indexOf(o));
-        ;
         for (int i = 0; i < this.getHeight(); i++) {
             for (int j = 0; j < this.getDepth(); j++) {
                 tmp.add(this.get((begining + (i * this.getWidth())) +

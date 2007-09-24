@@ -239,7 +239,6 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
      */
     public UniversalProcess getFinalProcess() {
         checkStarted();
-        ;
         return targetProcess.getFinalProcess();
     }
 

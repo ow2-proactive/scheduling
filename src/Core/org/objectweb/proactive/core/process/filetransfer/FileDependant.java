@@ -37,5 +37,5 @@ package org.objectweb.proactive.core.process.filetransfer;
  * @since   ProActive 2.2
  */
 public interface FileDependant {
-    public FileTransferDefinition getFileTransfertDefiniton();
+    public FileTransferDefinition getFileTransfertDefinition();
 }

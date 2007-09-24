@@ -340,7 +340,6 @@ public class ProActiveComponentRepresentativeImpl
         for (int i = 0; i < interfaces.length; i++) {
             if (interfaces[i].equals(this)) {
                 //TODO_C
-                ;
             } else {
                 interface_references[i] = (ProActiveInterface) interfaces[i];
             }

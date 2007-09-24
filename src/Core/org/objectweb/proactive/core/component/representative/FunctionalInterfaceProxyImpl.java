@@ -103,7 +103,7 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
             if (logger.isDebugEnabled()) {
                 logger.debug("changing reference on body");
             }
-            UniversalBodyProxy proxy = (UniversalBodyProxy) UniversalBodyProxy.class.newInstance();
+            UniversalBodyProxy proxy = UniversalBodyProxy.class.newInstance();
             universalBodyField.set(proxy, body);
             bodyIDField.set(proxy, body.getID());
             bodyProxyDelegatee = proxy;

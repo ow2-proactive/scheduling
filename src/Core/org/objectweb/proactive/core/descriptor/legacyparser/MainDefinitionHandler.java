@@ -148,7 +148,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
                     "value Tag without any mapToVirtualNode defined");
             }
 
-            VirtualNodeInternal vn = (VirtualNodeInternal) proActiveDescriptor.createVirtualNode(virtualNode,
+            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNode,
                     false, true);
 
             proActiveDescriptor.mainDefinitionAddVirtualNode(vn);

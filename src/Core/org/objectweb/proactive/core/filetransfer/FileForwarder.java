@@ -247,7 +247,7 @@ class FileForwarder {
     public synchronized void closeForwardingService(File srcFile, Exception e) {
         servingFTS.closeWrite(srcFile);
 
-        Vector requests = (Vector) this.servingRequests.remove(srcFile);
+        Vector requests = this.servingRequests.remove(srcFile);
         if (requests == null) {
             return;
         }

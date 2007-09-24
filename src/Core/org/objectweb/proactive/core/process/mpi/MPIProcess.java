@@ -121,7 +121,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         return mpiSubCommand.toString();
     }
 
-    public FileTransferDefinition getFileTransfertDefiniton() {
+    public FileTransferDefinition getFileTransfertDefinition() {
         FileTransferDefinition ft = new FileTransferDefinition("mpiProcess");
         if (remotePath != null) {
             ft.addFile(localPath + "/" + hostsFileName,

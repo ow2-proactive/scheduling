@@ -82,6 +82,7 @@ public interface ProActiveDescriptorConstants {
     public static final String SSH_PROCESS_TAG = "sshProcess";
     public static final String RLOGIN_PROCESS_TAG = "rloginProcess";
     public static final String BSUB_PROCESS_TAG = "bsubProcess";
+    public static final String LOADLEVELER_PROCESS_TAG = "loadLevelerProcess";
     public static final String GLOBUS_PROCESS_TAG = "globusProcess";
     public static final String PRUN_PROCESS_TAG = "prunProcess";
     public static final String PBS_PROCESS_TAG = "pbsProcess";
@@ -111,6 +112,29 @@ public interface ProActiveDescriptorConstants {
     public static final String ENVIRONMENT_TAG = "environment";
     public static final String HOST_LIST_TAG = "hostlist";
     public static final String BSUB_OPTIONS_TAG = "bsubOption";
+
+    //LoadLeveler XML tags
+    public static final String LOADLEVELER_OPTIONS_TAG = "loadLevelerJobOptions";
+    public static final String LOADLEVELER_TASK_REPARTITION_TAG = "loadLevelerTaskRepartition";
+    public static final String LOADLEVELER_TASK_REPARTITION_TAG_SIMPLE = "simple";
+    public static final String LOADLEVELER_TASK_REPARTITION_TAG_ADVANCED = "advanced";
+    public static final String LL_OPT_WALL_CLOCK_LIMIT = "wallClockLimit";
+    public static final String LL_OPT_RESOURCES = "resources";
+    public static final String LL_OPT_INITIAL_DIR = "initialDir";
+    public static final String LL_OPT_JOB_SUBMISSION_SCRIPT = "jobSubmissionScript";
+    public static final String LL_OPT_EXECUTABLE = "executable";
+    public static final String LL_OPT_ARGUMENTS = "arguments";
+    public static final String LL_OPT_OUTPUT = "outputFile";
+    public static final String LL_OPT_ERROR = "errorFile";
+    public static final String LL_OPT_ENVIRONMENT = "taskEnvironment";
+    public static final String LL_TASK_REP_BLOCKING = "blocking";
+    public static final String LL_TASK_REP_NODE = "node";
+    public static final String LL_TASK_REP_TASKS_PER_NODE = "tasks_per_node";
+    public static final String LL_TASK_REP_TASK_GEOMETRY = "task_geometry";
+    public static final String LL_TASK_REP_TOTAL_TASKS = "total_tasks";
+    public static final String LL_TASK_REP_NBTASKS = "nbTasks";
+    public static final String LL_TASK_REP_CPUS_PER_TASKS = "cpusPerTasks";
+    public static final String LL_TASK_REP_TASKS_PER_HOSTS = "tasksPerHosts";
     public static final String RES_REQ_TAG = "resourceRequirement";
     public static final String SCRIPT_PATH_TAG = "scriptPath";
     public static final String GLOBUS_OPTIONS_TAG = "globusOption";

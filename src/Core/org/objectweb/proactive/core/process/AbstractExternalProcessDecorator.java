@@ -124,9 +124,9 @@ public abstract class AbstractExternalProcessDecorator
     protected abstract String internalBuildCommand();
 
     @Override
-    protected void internalStartProcess(String command)
+    protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
-        super.internalStartProcess(command);
+        super.internalStartProcess(commandToExecute);
         if (compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) {
             try {
                 Thread.sleep(3000);
@@ -153,7 +153,7 @@ public abstract class AbstractExternalProcessDecorator
         ftw.setFileTransferStructureDstInfo("hostname", hostname);
         ftw.setFileTransferStructureDstInfo("username", username);
         try {
-            ftw.addFileTransfer(((FileDependant) targetProcess).getFileTransfertDefiniton());
+            ftw.addFileTransfer(((FileDependant) targetProcess).getFileTransfertDefinition());
         } catch (ClassCastException e) {
             logger.error(
                 "Unable to handle the file transfert dependant process");

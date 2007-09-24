@@ -886,6 +886,7 @@
 			<xs:element name="bsubProcess" type="BsubProcessType" />
 			<xs:element name="pbsProcess" type="PbsProcessType" />
 			<xs:element name="oarProcess" type="oarProcessType" />
+			<xs:element name="loadLevelerProcess" type="LoadLevelerProcessType" />
 			<xs:element name="oarGridProcess" type="oarGridProcessType" />
 			<xs:element name="clusterForkProcess"
 				type="clusterForkProcessType" />
@@ -1238,6 +1239,87 @@
 				minOccurs="0" />
 		</xs:all>
 	</xs:complexType>
+	<!--LoadLevelerProcess-->
+	<xs:complexType name="LoadLevelerProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference" minOccurs="0"/>
+			<xs:element name="loadLevelerJobOptions"
+				type="LoadLevelerJobOptionsType" maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="loadLevelerTaskRepartition"
+				type="LoadLevelerTaskRepartitionType" maxOccurs="1" minOccurs="1">
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.loadleveler.LoadLevelerProcess"/>
+	</xs:complexType>
+
+	<xs:complexType name="LoadLevelerJobOptionsType">
+		<xs:sequence>
+			<xs:element name="initialDir" type="FilePathType" minOccurs="1"></xs:element>
+			<xs:element name="jobSubmissionScript" type="FilePathType" minOccurs="1"></xs:element>
+			<xs:element name="executable" type="FilePathType" minOccurs="0"></xs:element>
+			<xs:element name="arguments" type="xs:string" minOccurs="1"></xs:element>
+			<xs:element name="outputFile" type="FilePathType" minOccurs="0"></xs:element>
+			<xs:element name="errorFile" type="FilePathType" minOccurs="0"></xs:element>
+			<xs:element name="resources" type="xs:string" minOccurs="0"></xs:element>
+			<xs:element name="wallClockLimit" type="xs:string" minOccurs="0"></xs:element>
+			<xs:element name="taskEnvironment" type="xs:string" minOccurs="0"></xs:element>			
+		</xs:sequence>
+	</xs:complexType>
+	
+    <xs:complexType name="LoadLevelerTaskRepartitionType">
+    	<xs:choice>
+    		<xs:element name="simple" type="SimpleTaskType"></xs:element>
+    		<xs:element name="advanced" type="AdvancedTaskType"></xs:element>
+    	</xs:choice>
+    </xs:complexType>
+
+
+    <xs:element name="simple" type="xs:string"></xs:element>
+
+    <xs:complexType name="SimpleTaskType">
+    	<xs:sequence>
+    		<xs:element name="nbTasks" type="xs:nonNegativeInteger" maxOccurs="1" minOccurs="1"></xs:element>
+    		<xs:element name="tasksPerHosts" type="xs:nonNegativeInteger" maxOccurs="1" minOccurs="1"></xs:element>
+    		<xs:element name="cpusPerTasks" type="xs:nonNegativeInteger" maxOccurs="1" minOccurs="1"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+    
+    <xs:group name="LoadLevelerBlockingGroup">
+	  <xs:sequence>
+        	<xs:element name="total_tasks" type="xs:nonNegativeInteger"></xs:element>
+        	<xs:element name="blocking" type="xs:nonNegativeInteger"></xs:element>        	
+	  </xs:sequence>
+	</xs:group>
+
+    <xs:group name="LoadLevelerTotalTasksGroup">
+	  <xs:sequence>
+         	<xs:element name="node" type="xs:nonNegativeInteger"></xs:element>
+        	<xs:element name="total_tasks" type="xs:nonNegativeInteger"></xs:element>  	
+	  </xs:sequence>
+	</xs:group>
+
+    <xs:group name="LoadLevelerTasksPerNodeGroup">
+	  <xs:sequence>
+        	<xs:element name="tasks_per_node" type="xs:nonNegativeInteger"></xs:element>
+        	<xs:element name="node" type="xs:nonNegativeInteger"></xs:element>        	
+	  </xs:sequence>
+	</xs:group>
+
+   <xs:group name="LoadLevelerGeometryGroup">
+	  <xs:sequence>
+        	<xs:element name="task_geometry" type="xs:string"></xs:element>
+	  </xs:sequence>
+	</xs:group>
+		
+    <xs:complexType name="AdvancedTaskType">
+    	<xs:choice>    
+			<xs:group ref="LoadLevelerBlockingGroup"/>			
+			<xs:group ref="LoadLevelerTotalTasksGroup"/>
+			<xs:group ref="LoadLevelerTasksPerNodeGroup"/>
+			<xs:group ref="LoadLevelerGeometryGroup"/>			
+    	</xs:choice>    		
+    </xs:complexType>
 	<!--PBSProcess-->
 	<xs:complexType name="PbsProcessType" mixed="true">
 		<xs:all>

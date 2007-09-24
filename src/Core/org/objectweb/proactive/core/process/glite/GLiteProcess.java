@@ -520,7 +520,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         this.remoteFilePath = remoteFilePath;
     }
 
-    public FileTransferDefinition getFileTransfertDefiniton() {
+    public FileTransferDefinition getFileTransfertDefinition() {
         FileTransferDefinition ft = new FileTransferDefinition("gliteProcess");
         ft.addFile(filePath + "/" + fileName, remoteFilePath + "/" + fileName);
         return ft;

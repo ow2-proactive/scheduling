@@ -152,7 +152,6 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
      */
     public UniversalProcess getFinalProcess() {
         checkStarted();
-        ;
         return targetProcess.getFinalProcess();
     }
 

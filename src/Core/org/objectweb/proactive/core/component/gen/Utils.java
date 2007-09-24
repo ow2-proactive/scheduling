@@ -311,7 +311,6 @@ public class Utils {
                 // one char Flags : 'GEN_ESCAPE_CHAR''a_char' 
                 case GEN_ESCAPE_CHAR:
                     sb.append(GEN_ESCAPE_CHAR);
-                    ;
                     break;
                 case GEN_PACKAGE_SEPARATOR_CHAR:
                     sb.append('.');
