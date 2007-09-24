@@ -36,6 +36,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -57,6 +58,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     implements RemoteObjectFactory {
     protected static RegistryHelper registryHelper;
+    static final Logger LOGGER_RO = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
 
     static {
         if ((System.getSecurityManager() == null) &&
@@ -132,14 +134,12 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         try {
             Registry reg = LocateRegistry.getRegistry(url.getPort());
         } catch (Exception e) {
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .debug("creating new rmiregistry on port : " +
+            LOGGER_RO.debug("creating new rmiregistry on port : " +
                 url.getPort());
             try {
                 LocateRegistry.createRegistry(url.getPort());
             } catch (RemoteException e1) {
-                ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                               .warn("damn cannot start a rmiregistry on port " +
+                LOGGER_RO.warn("damn cannot start a rmiregistry on port " +
                     url.getPort());
                 throw new ProActiveException(e1);
             }
@@ -154,21 +154,17 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
                     rro);
             }
             rro.setURI(url);
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .debug(" successfully bound in registry at " + url);
+            LOGGER_RO.debug(" successfully bound in registry at " + url);
         } catch (java.rmi.AlreadyBoundException e) {
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .warn(url + " already bound in registry", e);
+            LOGGER_RO.warn(url + " already bound in registry", e);
             throw new ProActiveException(e);
         } catch (java.net.MalformedURLException e) {
             throw new ProActiveException("cannot bind in registry at " + url, e);
         } catch (RemoteException e) {
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .debug(" cannot bind object at " + url);
+            LOGGER_RO.debug(" cannot bind object at " + url);
             throw new ProActiveException(e);
         } catch (IOException e) {
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .warn(" cannot bind object at " + url +
+            LOGGER_RO.warn(" cannot bind object at " + url +
                 " \n reason is : " + e.getMessage());
             throw new ProActiveException(e);
         }
@@ -182,12 +178,10 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         try {
             java.rmi.Naming.unbind(URIBuilder.removeProtocol(url).toString());
 
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .debug(url + " unbound in registry");
+            LOGGER_RO.debug(url + " unbound in registry");
         } catch (IOException e) {
             //No need to throw an exception if an object is already unregistered
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .warn(url + " is not bound in the registry ");
+            LOGGER_RO.warn(url + " is not bound in the registry ");
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
@@ -206,10 +200,11 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
             // connection failed, try to find a rmiregistry at proactive.rmi.port port
             URI url2 = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(uri),
                     URIBuilder.getHostNameFromUrl(uri));
+
             try {
                 o = java.rmi.Naming.lookup(url2.toString());
             } catch (Exception e1) {
-                throw new ProActiveException(e);
+                LOGGER_RO.warn("Lookup of " + url2.toString() + " failed", e);
             }
         } catch (java.rmi.NotBoundException e) {
             // there are one rmiregistry on target computer but nothing bound to this url isn t bound
