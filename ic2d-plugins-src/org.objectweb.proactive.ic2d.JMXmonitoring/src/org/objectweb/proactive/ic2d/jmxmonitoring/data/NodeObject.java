@@ -149,8 +149,7 @@ public class NodeObject extends AbstractData{
 				(!name.equals(ProActiveServerImpl.class.getName())))){
 			ObjectName oname = child.getObjectName();
 			
-			JMXNotificationManager.getInstance().subscribe(oname, child.getListener(), this.getHostUrlServer(), this.getServerName());
-			//subscribe(new NotificationSource(oname,getUrl()), child.getListener());
+			JMXNotificationManager.getInstance().subscribe(oname, child.getListener(), getParent().getUrl());
 		}
 	}
 

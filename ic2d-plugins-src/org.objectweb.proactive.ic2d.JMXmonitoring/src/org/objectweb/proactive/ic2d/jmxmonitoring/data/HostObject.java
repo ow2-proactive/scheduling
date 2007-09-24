@@ -176,7 +176,7 @@ public class HostObject extends AbstractData{
 			if(child==null){
 				child = runtimeObject;
 				ObjectName oname = runtimeObject.getObjectName();		
-				JMXNotificationManager.getInstance().subscribe(oname, new RuntimeObjectListener(runtimeObject), this.getUrl(), runtimeObject.getServerName());
+				JMXNotificationManager.getInstance().subscribe(oname, new RuntimeObjectListener(runtimeObject), runtimeObject.getUrl());
 				addChild(runtimeObject);
 				updateOSNameAndVersion(runtimeObject.getConnection());
 			}
@@ -215,5 +215,11 @@ public class HostObject extends AbstractData{
 			setChanged();
 			notifyObservers(this.toString());
 		}
+	}
+	
+	@Override
+	public ProActiveConnection getConnection(){
+		// A host object has no JMX ProActiveConnection
+		return null;
 	}
 }

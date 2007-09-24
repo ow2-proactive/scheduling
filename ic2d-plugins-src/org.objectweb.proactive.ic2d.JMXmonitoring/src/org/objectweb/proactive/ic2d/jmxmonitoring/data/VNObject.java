@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 
 
@@ -110,5 +111,11 @@ public class VNObject extends AbstractData {
 	@Override
 	public WorldObject getParent() {
 		return parent;
+	}
+	
+	@Override
+	public ProActiveConnection getConnection(){
+		// A Virtual node has no JMX ProActiveConnection
+		return null;
 	}
 }

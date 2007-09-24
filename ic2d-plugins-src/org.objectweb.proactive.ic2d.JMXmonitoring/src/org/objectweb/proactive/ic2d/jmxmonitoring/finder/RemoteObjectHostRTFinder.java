@@ -115,8 +115,6 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 							if(runtime==null){
 								// This runtime is not yet monitored
 								runtime = new RuntimeObject(host, runtimeUrl, oname, hostUrl, mbeanServerName);
-								proActiveRuntime.startJMXServerConnector();
-								//proActiveRuntime.getMBean();
 							}
 							runtimeObjects.put(runtimeUrl,runtime);
 	                    }

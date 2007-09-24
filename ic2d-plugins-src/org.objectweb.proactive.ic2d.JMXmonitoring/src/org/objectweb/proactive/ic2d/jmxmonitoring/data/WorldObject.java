@@ -48,8 +48,6 @@ public class WorldObject extends AbstractData{
 
 	private String name;
 
-	private ProActiveConnection connection;
-
 	/** Contains all virtual nodes. */
 	private Map<String, VNObject> vnChildren;
 
@@ -95,11 +93,6 @@ public class WorldObject extends AbstractData{
 		
 		// Creates a notification manager
 		notificationManager = JMXNotificationManager.getInstance();
-	}
-
-	public WorldObject(ProActiveConnection connection){
-		this();
-		this.connection = connection;
 	}
 
 	// -------------------------------------------
@@ -198,7 +191,7 @@ public class WorldObject extends AbstractData{
 		
 		ao.resetCommunications();
 		ao.getParent().removeChild(ao);
-		ao.unsubscribe(ao.getListener());
+		JMXNotificationManager.getInstance().unsubscribe(ao.getObjectName(), ao.getListener());
 	}
 		
 
@@ -216,12 +209,7 @@ public class WorldObject extends AbstractData{
 	public WorldObject getWorldObject(){
 		return this;
 	}
-
-	@Override
-	protected ProActiveConnection getConnection(){
-		return this.connection;
-	}
-
+	
 	@Override
 	public String getKey() {
 		return this.name;

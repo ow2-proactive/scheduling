@@ -212,6 +212,19 @@ public class Console extends MessageConsole {
 	}
 
 	
+	/**
+	 * Logs an exception in the console
+	 * @param message the message to display.
+	 * @param e the exception to log
+	 */
+	public synchronized void logException(String message, Throwable e) {
+		printTime();
+		err(message);
+		logExceptionWhithoutTime(e, false);
+		e.printStackTrace();
+	}
+	
+	
 	public synchronized void debug(String message) {
 		if(debug)
 			log(message);

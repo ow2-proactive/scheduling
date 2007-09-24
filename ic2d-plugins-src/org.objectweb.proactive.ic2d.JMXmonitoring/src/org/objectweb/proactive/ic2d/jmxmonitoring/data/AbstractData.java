@@ -251,8 +251,8 @@ public abstract class AbstractData extends Observable {
 	 * Returns the ProActive Connection
 	 * @return a ProActiveConnection
 	 */
-	protected ProActiveConnection getConnection(){
-		return JMXNotificationManager.getInstance().getConnection(getHostUrlServer(), getServerName());
+	public ProActiveConnection getConnection(){
+		return getParent().getConnection();
 	}
 
 	/**
@@ -314,28 +314,6 @@ public abstract class AbstractData extends Observable {
 	 */
 	protected String getServerName(){
 		return getParent().getServerName();
-	}
-	
-	/**
-	 * Subscribe an object to the ProActive events.
-	 * @param oname The JMX object name of the object to subscribe.
-	 * @param listener A ProActive listener.
-	 */
-	public void subscribe(ObjectName oname, NotificationListener listener){
-		JMXNotificationManager.getInstance().subscribe(oname, listener, getHostUrlServer(), getServerName());
-	}
-
-	/**
-	 * Subscribe an object to the ProActive events.
-	 * @param oname The JMX object name of the object to subscribe.
-	 * @param listener A ProActive listener.
-	 */
-	protected void subscribe(ObjectName oname, NotificationListener listener, String hostUrlServer, String serverName){
-		JMXNotificationManager.getInstance().subscribe(oname, listener, hostUrlServer, serverName);
-	}
-	
-	protected void unsubscribe(NotificationListener listener){
-		JMXNotificationManager.getInstance().unsubscribe(getObjectName(), listener);
 	}
 	
 	/**

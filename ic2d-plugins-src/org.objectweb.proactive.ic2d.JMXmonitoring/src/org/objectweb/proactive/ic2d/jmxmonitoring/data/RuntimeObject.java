@@ -9,9 +9,11 @@ import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -34,11 +36,11 @@ public class RuntimeObject extends AbstractData{
 	
 	private ProActiveRuntimeWrapperMBean proxyMBean;
 	
-	public RuntimeObject(HostObject parent, String url, ObjectName objectName, String hostUrl, String serverName) {
+	public RuntimeObject(HostObject parent, String runtimeUrl, ObjectName objectName, String hostUrl, String serverName) {
 		super(objectName);
 		this.parent = parent;
 		
-		this.url = FactoryName.getCompleteUrl(url);
+		this.url = FactoryName.getCompleteUrl(runtimeUrl);
 		
 		this.hostUrlServer = hostUrl;
 		this.serverName = serverName;
@@ -193,6 +195,11 @@ public class RuntimeObject extends AbstractData{
 	@Override
 	public String getName(){
 		return UrlBuilder.getNameFromUrl(getUrl());
+	}
+	
+	@Override
+	public ProActiveConnection getConnection(){
+		return JMXNotificationManager.getInstance().getConnection(getUrl());
 	}
 	
 	public String toString(){

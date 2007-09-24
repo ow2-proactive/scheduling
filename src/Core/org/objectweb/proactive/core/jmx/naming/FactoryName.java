@@ -8,6 +8,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -125,11 +126,31 @@ public class FactoryName {
     }
 
     /**
+     * Return the JMX Server Name used for a given url of a runtime
+     * @param runtimeUrl
+     * @return The JMX Server Name
+     */
+    public static String getJMXServerName(String runtimeUrl) {
+        return URIBuilder.getNameFromURI(runtimeUrl);
+    }
+
+    /**
+     * Return the JMX Server Name used for a given uri of a runtime
+     * @param runtimeUrl
+     * @return The JMX Server Name
+     */
+    public static String getJMXServerName(URI runtimeURI) {
+        return URIBuilder.getNameFromURI(runtimeURI);
+    }
+
+    /**
      * Creates a complete url 'protocol://host:port/path'
      * @param url
      * @return A complete url
      */
     public static String getCompleteUrl(String url) {
-        return RemoteObjectHelper.expandURI(URI.create(url)).toString();
+        URI uri = URI.create(url);
+        URI expandedURI = RemoteObjectHelper.expandURI(uri);
+        return expandedURI.toString();
     }
 }

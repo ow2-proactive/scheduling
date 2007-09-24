@@ -1,20 +1,18 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
@@ -181,7 +179,7 @@ public class ActiveObject extends AbstractData{
 	 * @param migrationException
 	 */
 	public void migrationFailed(MigrationException migrationException){
-		System.err.println("ActiveObject.migrationFailed() the active object "+this+" didn't migrate!");
+		Console.getInstance(Activator.CONSOLE_NAME).logException("The active object "+this+" didn't migrate!", migrationException);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -287,7 +285,9 @@ public class ActiveObject extends AbstractData{
 
 	}
 
-
+	public String getJobId() {
+		return this.getParent().getJobId();
+	}
 
 	//
 	// -- INNER CLASS -----------------------------------------------
@@ -307,8 +307,5 @@ public class ActiveObject extends AbstractData{
 			String ao2Name = ao2;
 			return -(ao1Name.compareTo(ao2Name));
 		}
-	}
-	public String getJobId () {
-		return this.getParent().getJobId();
 	}
 }

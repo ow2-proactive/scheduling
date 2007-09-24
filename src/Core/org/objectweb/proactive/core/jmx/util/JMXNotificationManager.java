@@ -1,6 +1,8 @@
 package org.objectweb.proactive.core.jmx.util;
 
 import java.lang.management.ManagementFactory;
+import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -15,12 +17,15 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -39,20 +44,23 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class JMXNotificationManager implements NotificationListener {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
 
-    /**
-     * To find the connection for a given server
-     */
-    private Map<ServerListened, ProActiveConnection> connections;
-
-    /**
-     * To find the server for a given ObjectName
-     */
-    private Map<ObjectName, ServerListened> servers;
-
+    // --- Variables ---
     /**
      * To find the listeners for a given ObjectName
      */
-    private Map<ObjectName, ConcurrentLinkedQueue<NotificationListener>> listeners;
+    private Map<ObjectName, ConcurrentLinkedQueue<NotificationListener>> allListeners;
+
+    /**
+     * To find the JMX Connection for a given ObjectName
+     * (Several ObjectNames can have the same connection)
+     */
+    private Map<ObjectName, Connection> connectionsWithObjectName;
+
+    /**
+     * To find the JMX Connection for a given runtime URL
+     * (A runtime has an unique connection)
+     */
+    private Map<String, Connection> connectionsWithRuntimeUrl;
 
     // Singleton
     private static JMXNotificationManager instance;
@@ -63,12 +71,12 @@ public class JMXNotificationManager implements NotificationListener {
     private JMXNotificationListener notificationlitener;
 
     private JMXNotificationManager() {
-        connections = new ConcurrentHashMap<ServerListened, ProActiveConnection>();
-        servers = new ConcurrentHashMap<ObjectName, ServerListened>();
-
-        listeners = new ConcurrentHashMap<ObjectName, ConcurrentLinkedQueue<NotificationListener>>();
+        allListeners = new ConcurrentHashMap<ObjectName, ConcurrentLinkedQueue<NotificationListener>>();
+        connectionsWithObjectName = new ConcurrentHashMap<ObjectName, Connection>();
+        connectionsWithRuntimeUrl = new ConcurrentHashMap<String, Connection>();
 
         try {
+            // Initalise the JMXNotificationListener which is an active object listening all needed MBeans
             this.notificationlitener = (JMXNotificationListener) ProActive.newActive(JMXNotificationListener.class.getName(),
                     new Object[] {  });
         } catch (ActiveObjectCreationException e) {
@@ -92,7 +100,7 @@ public class JMXNotificationManager implements NotificationListener {
     }
 
     /**
-     * Subscribes a notification listener to a <b>local</b> JMX MBean Server.
+     * Subscribes a notification listener to a <b>LOCAL</b> JMX MBean Server.
      * @param objectName The name of the MBean on which the listener should
      * be added.
      * @param listener The listener object which will handle the
@@ -103,7 +111,7 @@ public class JMXNotificationManager implements NotificationListener {
     }
 
     /**
-     * Subscribes a notification listener to a <b>local</b> JMX MBean Server.
+     * Subscribes a notification listener to a <b>LOCAL</b> JMX MBean Server.
      * @param name The name of the MBean on which the listener should
      * be added.
      * @param listener The listener object which will handle the
@@ -120,68 +128,53 @@ public class JMXNotificationManager implements NotificationListener {
                              .addNotificationListener(objectName, listener,
                 filter, handback);
         } catch (InstanceNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("The objectName: " + objectName +
+                " cooresponds tot none registered MBeans", e);
         }
     }
 
     /**
-     * Subscribes a notification listener to a <b>remote</b> JMX MBean Server.
+     * Subscribes a notification listener to a <b>REMOTE</b> JMX MBean Server.
      * @param objectName The object name of the MBean.
      * @param listener The notification listener.
-     * @param hostUrl The url of the remote host.
-     * @param serverName The name of the MBean server.
+     * @param runtimeUrl The url of the remote ProActiveRuntime where the MBean is located
      */
     public void subscribe(ObjectName objectName, NotificationListener listener,
-        String hostUrl, String serverName) {
-        // We want the complete url 'protocol://host:port/path'
-        String completeUrl = FactoryName.getCompleteUrl(hostUrl);
+        String runtimeUrl) {
+        // Search if this objectName is already listened
+        ConcurrentLinkedQueue<NotificationListener> listeners = allListeners.get(objectName);
 
-        ServerListened server = new ServerListened(hostUrl, serverName);
-        ProActiveConnection connection = connections.get(server);
+        // The MBean with this objectName is not listened
+        if (listeners == null) {
+            listeners = new ConcurrentLinkedQueue<NotificationListener>();
+            allListeners.put(objectName, listeners);
 
-        // We have to create a new connection
-        if (connection == null) {
-            // Creation of the new connection
-            ClientConnector cc = new ClientConnector(completeUrl, serverName);
-            cc.connect();
-            connection = cc.getConnection();
-            if (server == null) {
-                System.err.println(
-                    "JMXNotificationManager.subscribe() server is null");
-                return;
-            }
+            // Search if we are already connected to this JMX Server connector
+            Connection connection = connectionsWithRuntimeUrl.get(runtimeUrl);
             if (connection == null) {
-                System.err.println(
-                    "JMXNotificationManager.subscribe() connection is null");
-                return;
+                // Create a new connection
+                connection = new Connection(runtimeUrl);
+
+                // Store the connection in order to be able to close the connection later
+                connectionsWithRuntimeUrl.put(runtimeUrl, connection);
             }
-            // Updates our maps
-            connections.put(server, connection);
-            servers.put(objectName, server);
+            // Add the objectName to the established connection
+            connection.addObjectName(objectName);
+
+            // Subscribes the JMXNotificationManager to the notifications of this MBean.
+            notificationlitener.subscribe(connection.getConnection(),
+                objectName, null, null);
+
+            // Updates our map
+            connectionsWithObjectName.put(objectName, connection);
         }
 
-        ConcurrentLinkedQueue<NotificationListener> notificationListeners = listeners.get(objectName);
-
-        // This objectName is already listened
-        if (notificationListeners != null) {
-            // We add this listener to the listeners of this object.
-            notificationListeners.add(listener);
-
-            // Is it useful?
-            listeners.put(objectName, notificationListeners);
-        }
-        // This objectName is not yet listened
-        else {
-            notificationListeners = new ConcurrentLinkedQueue<NotificationListener>();
-            notificationListeners.add(listener);
-            listeners.put(objectName, notificationListeners);
-            notificationlitener.subscribe(connection, objectName, null, null);
-        }
+        // Add the listener to the set of listeners to notify
+        listeners.add(listener);
     }
 
     /**
-     * Unsubscribes a notification listener to a local or remote JMX MBean Server.
+     * Unsubscribes a notification listener to a local OR remote JMX MBean Server.
      * @param objectName The object name if the MBean.
      * @param listener The notification listener.
      */
@@ -192,43 +185,52 @@ public class JMXNotificationManager implements NotificationListener {
                              .removeNotificationListener(objectName, listener);
         } catch (InstanceNotFoundException e) {
             //---------- Try to unsubscribe to a REMOTE MBean Server -----------
-            ConcurrentLinkedQueue<NotificationListener> notificationListeners = listeners.get(objectName);
+            ConcurrentLinkedQueue<NotificationListener> listeners = allListeners.get(objectName);
 
             // No listener listen this objectName, so we display an error message.
-            if (notificationListeners == null) {
+            if (listeners == null) {
                 logger.warn(
-                    "JMXNotificationManager.unsubscribe() ObjectName not known");
+                    "The unsubscribe action has failed : The objectName=" +
+                    objectName + " has been already unsubscribe");
                 return;
             }
             // We have to remove the listener.
             else {
-                boolean isRemoved = notificationListeners.remove(listener);
+                // Try to remove the listener
+                boolean isRemoved = listeners.remove(listener);
 
                 // The listener didn't be listening this objectName, so we display an error message.
                 if (!isRemoved) {
                     logger.warn(
-                        "JMXNotificationManager.unsubscribe() Listener not known");
+                        "The unsubscribe action has failed : The given listener doesn't listen the objectName=" +
+                        objectName);
+                    return;
                 }
 
-                // If there is no listeners which listen this objectName, we remove this one.
-                if (notificationListeners.isEmpty()) {
-                    listeners.remove(objectName);
-                    ServerListened server = servers.get(objectName);
-                    if (server != null) {
-                        ProActiveConnection connection = connections.get(server);
-                        if (connection != null) {
-                            // The connection is not yet closed
-                            notificationlitener.unsubscribe(connections.get(
-                                    server), objectName, null, null);
-                        }
+                // None listeners listen this objectName, so we stop to listen this one.
+                if (listeners.isEmpty()) {
+                    allListeners.remove(objectName);
+
+                    Connection connection = connectionsWithObjectName.get(objectName);
+
+                    // Remove the objectName to the established connection
+                    connection.removeObjectName(objectName);
+
+                    // The connection is not used, so we close this connection
+                    if (!connection.isUsed()) {
+                        // Unsubscribes to the JMX notifications of the remote MBean.
+                        notificationlitener.unsubscribe(connection.getConnection(),
+                            objectName, null, null);
+
+                        // Updates our map
+                        connectionsWithRuntimeUrl.remove(connection.getRuntimeUrl());
                     }
-                    // Updates our maps
-                    servers.remove(objectName);
+                    // Updates our map
+                    connectionsWithObjectName.remove(objectName);
                 }
             }
         } catch (ListenerNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("The listener is not registered in the MBean.", e);
         }
     }
 
@@ -250,115 +252,159 @@ public class JMXNotificationManager implements NotificationListener {
                 Notification notif = notifications.element();
                 ObjectName ob = (ObjectName) notif.getSource();
 
-                // The JMX MBean server url
+                // The url of the runtime
                 String runtimeUrl = (String) notif.getUserData();
 
-                String host = URIBuilder.getHostNameFromUrl(runtimeUrl);
-                String runtimeName = URIBuilder.getNameFromURI(runtimeUrl);
-                String protocol = URIBuilder.getProtocol(runtimeUrl);
-                int port = URIBuilder.getPortNumber(runtimeUrl);
+                Connection establishedConnection = connectionsWithRuntimeUrl.get(runtimeUrl);
+                if (establishedConnection == null) {
+                    // We need to open a new connection
+                    establishedConnection = new Connection(runtimeUrl);
 
-                String hostUrl = URIBuilder.buildURI(host, "", protocol, port)
-                                           .toString();
-
-                // The JMX MBean Server name
-                // Warning: This is a convention used in the ServerConnector
-                String serverName = runtimeName;
-
-                // Search in our established connections
-                ProActiveConnection connection = connections.get(new ServerListened(
-                            hostUrl, serverName));
-
-                // We have to open a new connection
-                if (connection == null) {
-                    // Creates a new Connection
-                    ClientConnector cc = new ClientConnector(hostUrl, serverName);
-                    cc.connect();
-                    connection = cc.getConnection();
+                    // Updates our map
+                    connectionsWithRuntimeUrl.put(runtimeUrl,
+                        establishedConnection);
                 }
+                // Add the objectName to the established connection
+                establishedConnection.addObjectName(ob);
 
                 // Subscribes to the JMX notifications
-                notificationlitener.subscribe(connection, ob, null, null);
+                notificationlitener.subscribe(establishedConnection.getConnection(),
+                    ob, null, null);
 
-                // Updates ours map
-                ServerListened server = new ServerListened(hostUrl, serverName);
-                servers.put(ob, server);
-                connections.put(server, connection);
+                // Updates our map
+                connectionsWithObjectName.put(ob, establishedConnection);
             }
         }
 
-        listeners.get(oname);
-        ConcurrentLinkedQueue<NotificationListener> l = listeners.get(oname);
-        if (l == null) {
+        ConcurrentLinkedQueue<NotificationListener> notificationListeners = allListeners.get(oname);
+        if (notificationListeners == null) {
             // No listener listen this objectName
-            listeners.remove(oname);
+            allListeners.remove(oname);
             return;
         }
 
         // Sends to the listeners the notification
-        for (NotificationListener listener : l) {
+        for (NotificationListener listener : notificationListeners) {
             listener.handleNotification(notification, handback);
         }
     }
 
-    public ProActiveConnection getConnection(String hostUrl, String serverName) {
-        return connections.get(new ServerListened(hostUrl, serverName));
+    /**
+     * Returns the JMX ProActiveConnection to the remote JMX MBean Server
+     * @param runtimeUrl The url of the remote runtime
+     * @return The ProActiveConnection used to connect to the JMX MBean Server where the MBean is located
+     */
+    public ProActiveConnection getConnection(String runtimeUrl) {
+        return connectionsWithRuntimeUrl.get(runtimeUrl).getConnection();
+    }
+
+    private ProActiveConnection createProActiveConnection(String runtimeUrl) {
+        return createProActiveConnection(URI.create(runtimeUrl));
+    }
+
+    /**
+     * Creates an actives a new Remote JMX Connection
+     * @param runtimeUrl
+     * @return
+     */
+    private ProActiveConnection createProActiveConnection(URI runtimeURI) {
+        RemoteObject remoteObject = null;
+        Object stub = null;
+        try {
+            remoteObject = RemoteObjectHelper.lookup(runtimeURI);
+            stub = RemoteObjectHelper.generatedObjectStub(remoteObject);
+        } catch (ProActiveException e) {
+            logger.error("Can't lookup the ProActiveRuntime: " + runtimeURI, e);
+        }
+        if (stub instanceof ProActiveRuntime) {
+            // Active the Remote JMX Server Connector
+            ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
+            proActiveRuntime.startJMXServerConnector();
+
+            // Create a new connection
+            ClientConnector cc = new ClientConnector(runtimeURI.toString(),
+                    FactoryName.getJMXServerName(runtimeURI));
+            // Connect to the remote JMX Server Connector
+            cc.connect();
+
+            ProActiveConnection connection = cc.getConnection();
+            return connection;
+        } else {
+            logger.error(
+                "Can't create a JMX/ProActive connection: the object is not an instance of ProActiveRuntime");
+            return null;
+        }
     }
 
     //
     // ------- INNER CLASS ---------
     //
-    private class ServerListened {
+
+    /**
+     * This class represents a connection to a remote JMX Server Connector.
+     */
+    private class Connection {
 
         /**
-         * The url of the remote host
-         */
-        private String hostUrl;
+             * The url of the runtime
+             */
+        private String runtimeUrl;
 
         /**
-         * The JMX MBean Server name
-         */
-        private String serverName;
+             * The collection of objectName representing the MBeans listened with the connection
+             */
+        private Collection<ObjectName> objectNames;
 
         /**
-         * Creates a new ServerListened
-         * @param hostUrl The url of the remote host.
-         * @param serverName The JMX MBean Server name
-         */
-        public ServerListened(String hostUrl, String serverName) {
-            this.hostUrl = hostUrl;
-            this.serverName = serverName;
+             * The connection
+             */
+        private ProActiveConnection connection;
+
+        /**
+             * Creates a new Connection
+             * @param runtimeUrl The url of the remote ProActive Runtime
+             */
+        public Connection(String runtimeUrl) {
+            this.runtimeUrl = runtimeUrl;
+            this.objectNames = new ConcurrentLinkedQueue<ObjectName>();
+            this.connection = createProActiveConnection(runtimeUrl);
         }
 
         /**
-         * Returns the url of the remote host.
-         * @return the url of the remote host.
-         */
-        public String getHostUrl() {
-            return hostUrl;
+             * Add a MBean to listen.
+             * @param objectName The objectName of the MBean
+             */
+        public void addObjectName(ObjectName objectName) {
+            objectNames.add(objectName);
         }
 
         /**
-         * Returns the JMX MBean Server name.
-         * @return The JMX MBean Server name.
-         */
-        public String getServerName() {
-            return serverName;
+             * Removes an MBean to listen
+             * @param objectName The objectName of the MBean
+             */
+        public void removeObjectName(ObjectName objectName) {
+            objectNames.remove(objectName);
         }
 
-        @Override
-        public boolean equals(Object anObject) {
-            if (!(anObject instanceof ServerListened)) {
-                return false;
-            }
-            ServerListened otherServerListened = (ServerListened) anObject;
-            return (this.hostUrl.equals(otherServerListened.getHostUrl()) &&
-            this.serverName.equals(otherServerListened.getServerName()));
+        /**
+             * @return true if this connection is used to listen a MBean, false otherwise.
+             */
+        public boolean isUsed() {
+            return !objectNames.isEmpty();
         }
 
-        @Override
-        public int hashCode() {
-            return this.hostUrl.hashCode() + this.serverName.hashCode();
+        /**
+             * @return The url of the remote runtime, where the MBean Server is located.
+             */
+        public String getRuntimeUrl() {
+            return runtimeUrl;
+        }
+
+        /**
+             * @return The ProActiveConnection used to connect to the JMX Bean Server.
+             */
+        public ProActiveConnection getConnection() {
+            return connection;
         }
     }
 }

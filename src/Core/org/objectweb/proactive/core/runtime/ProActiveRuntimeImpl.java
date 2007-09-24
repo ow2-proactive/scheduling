@@ -145,7 +145,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         try {
             proActiveRuntime = new ProActiveRuntimeImpl();
             proActiveRuntime.createMBean();
-            proActiveRuntime.createServerConnector();
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }
