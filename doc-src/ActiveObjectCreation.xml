@@ -925,60 +925,86 @@ ProActive.turnActive(
         type</title>
 
         <tgroup cols="4">
+        <colspec colnum="1" colname="col1" colwidth="1*"/>
+		<colspec colnum="2" colname="col2" colwidth="2*"/>
+		<colspec colnum="3" colname="col3" colwidth="1.5*"/>
+		<colspec colnum="4" colname="col4" colwidth="1*"/>
+		<spanspec spanname="onetwo" namest="col1" nameend="col2"/>
           <tbody>
-            <row>
-              <entry><para><emphasis role="bold">Return
+            <row align="center">
+              <entry spanname="onetwo"> <para><emphasis role="bold">Method Signature</emphasis></para> </entry>
+              <entry morerows="1" valign="middle"><para><emphasis role="bold">Creation of a
+              future</emphasis></para></entry>
+
+              <entry morerows="1" valign="middle"><para><emphasis
+              role="bold">Asynchronous</emphasis></para></entry>
+            </row>
+            
+	 		<row align="center">
+				<entry><para><emphasis role="bold">Return
               type</emphasis></para></entry>
 
               <entry><para><emphasis role="bold">Can throw checked
               exception</emphasis></para></entry>
+			</row>
+            <row>
+              <entry><para>Void</para></entry>
+    		   <entry align="center"><para>No</para></entry>
+              <entry align="center"><para>No</para></entry>
 
-              <entry><para><emphasis role="bold">Creation of a
-              future</emphasis></para></entry>
+              <entry align="center"><para>Yes</para></entry>
 
-              <entry><para><emphasis
-              role="bold">Asynchronous</emphasis></para></entry>
+              
+            </row>
+			<row>
+              <entry><para>Void</para></entry>
+    		  <entry align="center"><para>Yes</para></entry>
+              <entry align="center"><para>No</para></entry>
+
+              <entry align="center"><para>No</para></entry>
+
+              
             </row>
 
-            <row>
-              <entry><para>void</para></entry>
 
-              <entry><para>No</para></entry>
+			<row>
+              <entry><para>Non Reifiable Object</para></entry>
 
-              <entry><para>No</para></entry>
+              <entry align="center"><para>No</para></entry>
 
-              <entry><para>Yes</para></entry>
+              <entry align="center"><para>No</para></entry>
+
+              <entry align="center"><para>No</para></entry>
             </row>
 
             <row>
               <entry><para>Non Reifiable Object</para></entry>
 
-              <entry><para>-</para></entry>
+              <entry align="center"><para>Yes</para></entry>
 
-              <entry><para>No</para></entry>
+              <entry align="center"><para>No</para></entry>
 
-              <entry><para>No</para></entry>
+              <entry align="center"><para>No</para></entry>
             </row>
+           <row>
+              <entry><para>Reifiable Object</para></entry>
 
-            <row>
-              <entry><para>-</para></entry>
+              <entry align="center"><para>No</para></entry>
 
-              <entry><para>Yes</para></entry>
+              <entry align="center"><para>Yes</para></entry>
 
-              <entry><para>No</para></entry>
-
-              <entry><para>No</para></entry>
+              <entry align="center"><para>Yes</para></entry>
             </row>
-
             <row>
               <entry><para>Reifiable Object</para></entry>
 
-              <entry><para>No</para></entry>
+              <entry align="center"><para>Yes</para></entry>
 
-              <entry><para>Yes</para></entry>
+              <entry align="center"><para>No</para></entry>
 
-              <entry><para>Yes</para></entry>
+              <entry align="center"><para>No</para></entry>
             </row>
+
           </tbody>
         </tgroup>
       </table>
