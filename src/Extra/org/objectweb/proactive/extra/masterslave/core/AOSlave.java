@@ -127,6 +127,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         if (obj instanceof AOSlave) {
             return name.equals(((Slave) obj).getName());
         }
+
         return false;
     }
 
@@ -210,10 +211,12 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
             if (logger.isDebugEnabled()) {
                 logger.debug(name + " runs task " + task.getId() + "...");
             }
+
             resultObj = task.run(this);
         } catch (Exception e) {
             result.setException(e);
         }
+
         // We store the result inside our internal version of the task
         result.setResult(resultObj);
         return result;
@@ -238,6 +241,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
                             logger.debug(name + " sends the result of task " +
                                 result.getId() + " and asks a new task...");
                         }
+
                         newTask = null;
 
                         // We send the result back to the master
@@ -276,11 +280,13 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating " + name + "...");
         }
+
         this.terminated = true;
         ProActive.terminateActiveObject(true);
         if (logger.isDebugEnabled()) {
             logger.debug(name + " terminated...");
         }
+
         return new BooleanWrapper(true);
     }
 

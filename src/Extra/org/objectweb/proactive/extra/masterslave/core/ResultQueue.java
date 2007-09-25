@@ -120,6 +120,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
             while (it.hasNext() && (it.next().getId() == it2.next())) {
                 resultcount++;
             }
+
             return resultcount;
         }
     }
@@ -153,8 +154,10 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Result " + taskId + " received by the user.");
                 }
+
                 idsubmitted.remove(taskId);
             }
+
             return answer;
         } else {
             throw new NoSuchElementException();
@@ -175,6 +178,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 answer = it.next();
                 it.remove();
             }
+
             idsubmitted.remove(answer.getId());
             return answer;
         } else {
@@ -196,6 +200,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
             } else {
                 it = orderedResults.iterator();
             }
+
             int count = 0;
             while (it.hasNext() && (count < k)) {
                 ResultIntern<R> res = it.next();
@@ -204,6 +209,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 count++;
                 idsubmitted.remove(res.getId());
             }
+
             return answer;
         } else {
             throw new NoSuchElementException();
@@ -233,6 +239,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
             if (!orderedResults.isEmpty()) {
                 return (orderedResults.first().getId() == idsubmitted.first());
             }
+
             return false;
         }
     }
@@ -259,6 +266,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 it.remove();
             }
         }
+
         this.mode = mode;
     }
 }

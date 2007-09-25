@@ -142,6 +142,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
             while (service.hasRequestToServe()) {
                 service.serveOldest();
             }
+
             slaveGroupStub.heartBeat();
             try {
                 Thread.sleep(pingPeriod);
@@ -149,6 +150,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
                 // do not print message, pinger is terminating
             }
         }
+
         body.terminate();
     }
 
@@ -169,6 +171,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
                 logger.debug(
                     "A slave is missing...reporting back to the Master");
             }
+
             if (slaveGroup.contains(slave)) {
                 listener.isDead(slave);
                 slaveGroup.remove(slave);
@@ -186,6 +189,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
         if (logger.isDebugEnabled()) {
             logger.debug("Pinger terminated...");
         }
+
         return new BooleanWrapper(true);
     }
 

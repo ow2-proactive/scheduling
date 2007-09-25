@@ -55,6 +55,7 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
         if (obj instanceof Identifiable) {
             return id == ((Identifiable) obj).getId();
         }
+
         return false;
     }
 
@@ -93,6 +94,7 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
         if (e == null) {
             throw new IllegalArgumentException("Exception can't be null");
         }
+
         this.exception = e;
         this.isException = true;
     }
@@ -118,6 +120,7 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
         if (o == null) {
             throw new NullPointerException();
         }
+
         return (int) (id - ((Identifiable) o).getId());
     }
 

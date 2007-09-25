@@ -84,6 +84,7 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
         if (obj instanceof Identifiable) {
             return id == ((Identifiable) obj).getId();
         }
+
         return false;
     }
 
@@ -129,6 +130,7 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
         if (o == null) {
             throw new NullPointerException();
         }
+
         return (int) (id - ((Identifiable) o).getId());
     }
 }

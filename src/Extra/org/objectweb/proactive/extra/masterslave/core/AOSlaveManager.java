@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventListener;
+import org.objectweb.proactive.core.exceptions.proxy.SendRequestCommunicationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -205,6 +206,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
                     e.printStackTrace();
                 }
             }
+
             vnlist.add(virtualnode);
             if (logger.isDebugEnabled()) {
                 logger.debug("Virtual Node " + virtualnode.getName() +
@@ -224,6 +226,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
                     logger.debug("Creating slave on " +
                         node.getNodeInformation().getName());
                 }
+
                 String slavename = node.getVMInformation().getHostName() + "_" +
                     slaveNameCounter++;
 
@@ -256,6 +259,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
         if (logger.isDebugEnabled()) {
             logger.debug("Resource Manager Initialized");
         }
+
         threadPool = Executors.newCachedThreadPool();
     }
 
@@ -280,6 +284,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
         if (logger.isDebugEnabled()) {
             logger.debug("Terminating SlaveManager...");
         }
+
         try {
             // we shutdown the thread pool, no new thread will be accepted
             threadPool.shutdown();
@@ -302,10 +307,16 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
 
             // we send the terminate message to every thread
             for (Entry<String, Slave> slave : slaves.entrySet()) {
-                BooleanWrapper term = slave.getValue().terminate();
-                ProActive.waitFor(term);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(slave.getKey() + " freed.");
+                try {
+                    BooleanWrapper term = slave.getValue().terminate();
+                    ProActive.waitFor(term);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(slave.getKey() + " freed.");
+                    }
+                } catch (SendRequestCommunicationException exp) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(slave.getKey() + " is already freed.");
+                    }
                 }
             }
 
@@ -315,6 +326,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
                     if (logger.isDebugEnabled()) {
                         logger.debug("Killing all active objects...");
                     }
+
                     ((VirtualNodeImpl) vnlist.get(i)).killAll(false);
                 }
             }
@@ -325,6 +337,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             if (logger.isDebugEnabled()) {
                 logger.debug("SlaveManager terminated...");
             }
+
             return new BooleanWrapper(true);
         } catch (Exception e) {
             logger.error("Couldn't Terminate the Resource manager");

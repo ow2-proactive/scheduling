@@ -214,6 +214,18 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * {@inheritDoc}
      */
     public void addResources(VirtualNode virtualnode) {
+        if (virtualnode.isActivated()) {
+            // because of commit 6344, Nodes Creations are not waited anymore before the VirtualNode object is serialized.
+            // as a quick dirty fix, we wait manually for Nodes creation if the VirtualNode is activated.
+            if (virtualnode.isActivated()) {
+                try {
+                    virtualnode.getNodes();
+                } catch (NodeException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         aomaster.addResources(virtualnode);
     }
 
@@ -248,6 +260,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         for (T task : tasks) {
             wrappings.add(createId(task));
         }
+
         return wrappings;
     }
 
@@ -310,14 +323,17 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
+
             R obj = res.getResult();
             if (obj != null) {
                 results.add(obj);
             } else {
                 results.add(null);
             }
+
             aorepository.removeId(res.getId());
         }
+
         return results;
     }
 
@@ -334,14 +350,17 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
             if (res.threwException()) {
                 throw new TaskException(res.getException());
             }
+
             R obj = res.getResult();
             if (obj != null) {
                 results.add(obj);
             } else {
                 results.add(null);
             }
+
             aorepository.removeId(res.getId());
         }
+
         return results;
     }
 
@@ -360,10 +379,12 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
         if (completed.threwException()) {
             throw new TaskException(completed.getException());
         }
+
         R obj = completed.getResult();
         if (obj != null) {
             return obj;
         }
+
         return null;
     }
 }

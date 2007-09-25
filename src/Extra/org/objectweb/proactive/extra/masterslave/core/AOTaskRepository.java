@@ -89,6 +89,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
         if (hashCodes.contains(hashCode)) {
             throw new TaskAlreadySubmittedException();
         }
+
         hashCodes.add(hashCode);
         idTohashCode.put(taskCounter, hashCode);
         TaskIntern<Serializable> ti = new TaskWrapperImpl(taskCounter,
@@ -105,6 +106,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
         if (!idToTaskIntern.containsKey(id) && !idToZippedTask.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
+
         if (idToTaskIntern.containsKey(id)) {
             return idToTaskIntern.get(id);
         } else {
@@ -135,6 +137,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
         if (!idTohashCode.containsKey(id)) {
             throw new NoSuchElementException("unknown id");
         }
+
         int hashCode = idTohashCode.get(id);
         hashCodes.remove(hashCode);
     }
@@ -150,6 +153,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
         if (!idToZippedTask.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
+
         byte[] compressedData = idToZippedTask.get(id);
 
         // Create the decompressor and give it the data to compress
@@ -169,6 +173,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
                 logger.error("Error during task decompression", e);
             }
         }
+
         try {
             bos.close();
         } catch (IOException e) {
@@ -187,6 +192,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
         return task;
     }
 
@@ -197,6 +203,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
         if (!idToTaskIntern.containsKey(id)) {
             throw new NoSuchElementException("task unknown");
         }
+
         TaskIntern<Serializable> ti = idToTaskIntern.remove(id);
 
         // Serialize the task
@@ -225,6 +232,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
                 int count = compressor.deflate(buf);
                 bos.write(buf, 0, count);
             }
+
             try {
                 bos.close();
             } catch (IOException e) {

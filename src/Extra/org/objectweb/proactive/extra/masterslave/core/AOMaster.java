@@ -266,6 +266,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             if (sleepingGroup.contains(slave)) {
                 sleepingGroup.remove(slave);
             }
+
             Iterator<Long> it = pendingTasks.iterator();
             long taskId = it.next();
             // We remove the task from the pending list
@@ -350,6 +351,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             if (sleepingGroup.contains(slave)) {
                 sleepingGroup.remove(slave);
             }
+
             slavesByNameRev.remove(slave);
             slavesByName.remove(slaveName);
             // if the slave was handling a task we put the task back to the pending queue
@@ -367,6 +369,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
                         // We wake up the sleeping guys
                         sleepingGroupStub.wakeup();
                     }
+
                     pendingTasks.add(taskId);
                 } else {
                     pendingTasks.add(taskId);
@@ -416,6 +419,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
                     service.serveOldest(new FindWaitFilter());
                 }
             }
+
             // we serve directly every methods from the slaves
             service.serveAll("getTask");
             service.serveAll("sendResultAndGetTask");
@@ -428,6 +432,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             // we maybe serve the pending waitXXX method if there is one and if the necessary results are collected
             maybeServePending();
         }
+
         // we clear the service to avoid dirty pending requests 
         service.flushAll();
         // we block the communications because a getTask request might still be coming from a slave created just before the master termination
@@ -446,6 +451,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             if (logger.isDebugEnabled()) {
                 logger.debug("Result of task " + taskId + " received.");
             }
+
             launchedTasks.remove(taskId);
             // We add the result in the result queue
             resultQueue.addCompletedTask(result);
@@ -596,9 +602,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             throw new IllegalStateException(
                 "Already waiting for a wait request");
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("All results received by the user.");
         }
+
         return resultQueue.getAll();
     }
 
@@ -611,15 +619,18 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             throw new IllegalStateException(
                 "Already waiting for a wait request");
         }
+
         if ((resultQueue.countPendingResults() +
                 resultQueue.countAvailableResults()) < k) {
             throw new IllegalArgumentException("" + k + " is too big");
         } else if (k <= 0) {
             throw new IllegalArgumentException("Wrong value : " + k);
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("" + k + " results received by the user.");
         }
+
         return resultQueue.getNextK(k);
     }
 
@@ -631,12 +642,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             throw new IllegalStateException(
                 "Already waiting for a wait request");
         }
+
         ResultIntern<Serializable> res = resultQueue.getNext();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Result of task " + res.getId() +
                 " received by the user.");
         }
+
         return res;
     }
 
