@@ -40,8 +40,8 @@ import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciEngineWorker;
-import org.objectweb.proactive.extensions.scilab.SciResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
@@ -96,23 +96,22 @@ public class SciTest4 {
                     nbCol, m1);
             SciDoubleMatrix sciMatrix2 = new SciDoubleMatrix("M2", nbRow,
                     nbCol, m2);
-            SciData sciMatrix3 = new SciData("M3");
 
             SciTask sciTask = new SciTask("mult");
             sciTask.addDataIn(sciMatrix1);
             sciTask.addDataIn(sciMatrix2);
-            sciTask.addDataOut(sciMatrix3);
-            sciTask.setJob(sciMatrix3.getName() + "=" + sciMatrix1.getName() +
-                "*" + sciMatrix1.getName() + ";");
+            sciTask.addDataOut("M3");
+            sciTask.setJob("M3=" + sciMatrix1.getName() + "*" +
+                sciMatrix1.getName() + ";");
 
             startTime = System.currentTimeMillis();
 
-            SciResult sciResult = sciEngineWorker.execute(sciTask);
-            sciMatrix3 = (SciData) sciResult.getList().get(0);
+            GeneralResult sciResult = sciEngineWorker.execute(sciTask);
+            SciData sciMatrix3 = (SciData) sciResult.getList().get(0).getData();
 
             endTime = System.currentTimeMillis();
 
-            //System.out.println(sciMatrix3);
+            writer.println(sciMatrix3);
             writer.println(nbRow + " " + (endTime - startTime));
         }
 

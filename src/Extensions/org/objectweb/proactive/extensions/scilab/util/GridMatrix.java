@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.extensions.scilab.util;
 
-import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
+import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
 import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
@@ -65,8 +65,7 @@ public class GridMatrix {
         service.addEventListenerTask(new MandelbrotEventListener(service,
                 nbBloc, res));
 
-        SciTask sciTask;
-        boolean isSend;
+        AbstractGeneralTask sciTask;
         int nbRow = (int) yres / nbBloc;
         double sizeBloc = (double) ((ymax - ymin) / nbBloc);
 
@@ -74,13 +73,14 @@ public class GridMatrix {
         double y2 = ymin + sizeBloc;
         for (int i = 0; i < nbBloc; i++) {
             sciTask = new SciTask(name + i);
-            sciTask.addDataOut(new SciData(name + i));
+            sciTask.addDataOut(name + i);
             sciTask.setJob(SciMath.formulaMandelbrot(name + i, nbRow, xres,
                     xmin, xmax, y1, y2, precision));
             service.sendTask(sciTask);
             y1 = y2;
             y2 += sizeBloc;
         }
+
         return res;
     }
 
@@ -98,14 +98,14 @@ public class GridMatrix {
         int sizeBloc = precision / nbBloc;
         service.addEventListenerTask(new PiEventListener(service, nbBloc, res));
 
-        SciTask sciTask;
-        boolean isSend;
+        AbstractGeneralTask sciTask;
         for (int i = 0; i < nbBloc; i++) {
             sciTask = new SciTask(name + i);
-            sciTask.addDataOut(new SciData("pi" + i));
+            sciTask.addDataOut("pi" + i);
             sciTask.setJob(SciMath.formulaPi("pi" + i, i, sizeBloc));
             service.sendTask(sciTask);
         }
+
         return res;
     }
 
@@ -140,7 +140,6 @@ public class GridMatrix {
         SciDoubleMatrix sciMatrix = new SciDoubleMatrix("M", nbRow1, nbCol1,
                 matrix1);
 
-        boolean isSend;
         int nbRow = nbRow2;
         int nbCol = nbCol2 / nbTask;
         int sizeSubMatrix = nbRow * nbCol;
@@ -157,11 +156,12 @@ public class GridMatrix {
             SciTask sciTask = new SciTask(name + i);
             sciTask.addDataIn(sciMatrix);
             sciTask.addDataIn(sciSubMatrix);
-            sciTask.addDataOut(new SciData("M" + i));
+            sciTask.addDataOut("M" + i);
             sciTask.setJob(sciSubMatrix.getName() + "=" + sciMatrix.getName() +
                 "*" + sciSubMatrix.getName() + ";");
             service.sendTask(sciTask);
         }
+
         return res;
     }
 }

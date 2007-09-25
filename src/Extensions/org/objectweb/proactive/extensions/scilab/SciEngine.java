@@ -37,7 +37,9 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.process.AbstractExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -49,6 +51,11 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  *
  */
 public class SciEngine implements Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -5906306770453347764L;
     private SciEngineWorker sciEngineWorker;
     private String idEngine;
     private JVMProcessImpl process;
@@ -87,10 +94,13 @@ public class SciEngine implements Serializable {
      * @param sciTask Scilab task
      * @return result of the computation
      */
-    public SciResult execute(SciTask sciTask) {
-        logger.debug("->SciEngineWorker In:execute:" + sciTask.getId());
-        SciResult sciResult = this.sciEngineWorker.execute(sciTask);
-        return sciResult;
+    public GeneralResult execute(GeneralTask genTask) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("->SciEngine In:execute:" + genTask.getId());
+        }
+
+        GeneralResult genResult = this.sciEngineWorker.execute(genTask);
+        return genResult;
     }
 
     /**
@@ -98,12 +108,16 @@ public class SciEngine implements Serializable {
      * @return a future representing the state of the activation
      */
     public BooleanWrapper activate() {
-        logger.debug("->SciEngineWorker In:activate");
-        String url = "//localhost/" + idEngine + (new Date()).getTime();
+        if (logger.isDebugEnabled()) {
+            logger.debug("->SciEngine In:activate");
+        }
+
+        String uri = URIBuilder.buildURI("localhost",
+                "" + idEngine + (new Date()).getTime()).toString();
         try {
             process = new JVMProcessImpl();
-            process.setClassname("org.objectweb.proactive.core.node.StartNode");
-            process.setParameters(url);
+            process.setInputMessageLogger(new AbstractExternalProcess.StandardOutputMessageLogger());
+            process.setParameters(uri);
             process.startProcess();
         } catch (IOException e) {
             return new BooleanWrapper(false);
@@ -113,7 +127,7 @@ public class SciEngine implements Serializable {
             try {
                 try {
                     sciEngineWorker = (SciEngineWorker) ProActive.newActive(SciEngineWorker.class.getName(),
-                            null, url);
+                            null, uri);
                     return new BooleanWrapper(true);
                 } catch (ProActiveException e) {
                 }
@@ -123,6 +137,7 @@ public class SciEngine implements Serializable {
                 e.printStackTrace();
             }
         }
+
         return new BooleanWrapper(false);
     }
 

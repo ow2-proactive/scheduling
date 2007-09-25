@@ -1,6 +1,8 @@
-ProActive Extension for Scilab.
+ProActive Extension for Scilab/Matlab.
 
-Before being able to use the extension and launch the GUI (scilab.sh or scilab.bat), please follow these installations steps.
+Before being able to use the extension and launch the GUI (scilab.sh), please follow these installations steps.
+
+--------------------------------        SCILAB          --------------------------------------
 
 
 STEP 1: Download Scilab 4.1.2 or above BINARY Version
@@ -16,7 +18,7 @@ make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILA
 
 
 STEP 3:
-Edit paths to your SCILAB installation in the scilab_env.sh or scilab_env.bat file
+Edit paths to your SCILAB installation in the scilab_env.sh file
 
 Comment out the following line if present in the SCILAB/scilab.star file (should be around line 190):
 show_startupinfo();
@@ -31,15 +33,42 @@ Edit paths inside the ProActiveScilab.xml descriptor if you want to use it to de
 
 
 STEP 5:
-Run scilab.sh or scilab.bat. 
+Run scilab.sh. 
 
 
+--------------------------------        MATLAB          --------------------------------------
 
-ATTENTION :
+STEP 1:
+Edit paths to your MATLAB installation in the scilab_env.sh file
 
-If you want to use the extension without the script, remember two things :
+STEP 2: 
+Read documentation on http://proactive.inria.fr/scilab.htm on how to use the GUI
 
-Under Linux, the environment variables must be set according to the scilab_env.sh script AND the java property java_library_path must contain the directory where the libjavasci.so can be found
+Edit paths inside the ProActiveScilab.xml descriptor if you want to use it to deploy on remote machines, if you want to deploy locally use the ProActiveScilabLocal.xml descriptor
 
-Under Windows, the System PATH environment variable(and not the user PATH) must contain the path to where the libjavasci.so can be found
-               OR, the application must be launched next to it  
+STEP 3:
+Run scilab.sh. 
+
+
+--------------------------------      STANDALONE USE    --------------------------------------
+
+If you want to use the extension without the script, remember several things :
+
+In order to run Scilab or Matlab from ProActive, several native libraries and jar files are needed. 
+
+**** Native libraries *****
+
+Scilab :          native libraries contained in SCILAB/bin (including libjavasci.so which is the Scilab/Java interface)
+
+Matlab : 		  libptmatlab.so contained in PROACTIVE/lib
+				  native libraries contained in MATLAB/bin/glnx86 and MATLAB/sys/os/glnx86
+				  
+The JVM must be executed with the java.library.path property set and containing these paths
+
+******** JAR files *********   
+
+Scilab: 
+	javasci.jar contained in PROACTIVE/lib
+
+Matlab:
+	ptolemy.jar contained in PROACTIVE/lib

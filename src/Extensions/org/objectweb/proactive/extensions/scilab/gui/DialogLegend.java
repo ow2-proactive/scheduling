@@ -53,6 +53,11 @@ import javax.swing.JPanel;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class DialogLegend extends javax.swing.JDialog {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 6549328184403592998L;
     private JPanel pnlTaskWait;
     private JPanel pnlTaskRun;
     private JPanel pnlTaskEnd;
@@ -99,6 +104,12 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlLegendWait.setLayout(pnlLegendWaitLayout);
                 pnlTaskWait.add(pnlLegendWait);
                 pnlIconWait = new JPanel() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = 6126219757994056557L;
+
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -118,6 +129,12 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendWait.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendWait.setSize(100, 28);
                 pnlIconCancel = new JPanel() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = 825828661786789883L;
+
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -138,6 +155,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendCancel.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendCancel.setSize(100, 28);
             }
+
             pnlTaskRun = new JPanel();
             getContentPane().add(pnlTaskRun);
             pnlTaskRun.setBorder(BorderFactory.createTitledBorder(
@@ -154,6 +172,12 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlLegendRun.setLayout(pnlLegendRunLayout);
                 pnlTaskRun.add(pnlLegendRun);
                 pnlIconRun = new JPanel() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = -4360589620462031715L;
+
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -173,6 +197,12 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendRun.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendRun.setSize(100, 28);
                 pnlIconKill = new JPanel() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = -8143023097232932524L;
+
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -193,6 +223,7 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendKill.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendKill.setSize(100, 28);
             }
+
             pnlTaskEnd = new JPanel();
             getContentPane().add(pnlTaskEnd);
             pnlTaskEnd.setBorder(BorderFactory.createTitledBorder(
@@ -207,6 +238,12 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlLegendEnd.setLayout(pnlLegendEndLayout);
                 pnlTaskEnd.add(pnlLegendEnd);
                 pnlIconSuccess = new JPanel() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = -5919733083275533178L;
+
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -226,6 +263,12 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendSuccess.setPreferredSize(new java.awt.Dimension(100, 28));
                 lblLegendSuccess.setSize(100, 28);
                 pnlIconAbort = new JPanel() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = 1891961450729453972L;
+
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);

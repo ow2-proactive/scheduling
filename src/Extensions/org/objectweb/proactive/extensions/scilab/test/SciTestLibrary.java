@@ -41,16 +41,17 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
 import org.objectweb.proactive.extensions.scilab.SciEngine;
-import org.objectweb.proactive.extensions.scilab.SciResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
 
 public class SciTestLibrary {
-    private HashMap mapEngine;
+    private HashMap<String, SciEngine> mapEngine;
 
     public SciTestLibrary(String nameVN, String pathDescriptor,
         String[] arrayEngine, String localSource, String remoteDest)
@@ -83,7 +84,7 @@ public class SciTestLibrary {
         }
 
         //Loading
-        SciTask sciTaskEnv;
+        AbstractGeneralTask sciTaskEnv;
         SciEngine sciEngine;
         for (int i = 0; i < arrayKey.length; i++) {
             sciTaskEnv = new SciTask("sciEnv" + arrayKey[i]);
@@ -94,20 +95,18 @@ public class SciTestLibrary {
 
         //Call Function
         SciTask sciTaskCallFun;
-        SciResult sciResult;
+        GeneralResult sciResult;
         SciData dataIn;
-        SciData dataOut;
         for (int i = 0; i < arrayKey.length; i++) {
             sciTaskCallFun = new SciTask("sciCallFun" + arrayKey[i]);
             dataIn = new SciDoubleMatrix("x", 1, 1, new double[] { i });
-            dataOut = new SciData("z");
             sciTaskCallFun.addDataIn(dataIn);
-            sciTaskCallFun.addDataOut(dataOut);
-            sciTaskCallFun.setJob(dataOut.getName() + "= mult(" +
-                dataIn.getName() + "," + dataIn.getName() + ");");
+            sciTaskCallFun.addDataOut("z");
+            sciTaskCallFun.setJob("z" + "= mult(" + dataIn.getName() + "," +
+                dataIn.getName() + ");");
             sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
             sciResult = sciEngine.execute(sciTaskCallFun);
-            System.out.println(sciResult.get(dataOut.getName()));
+            System.out.println(sciResult.get("z"));
         }
 
         for (int i = 0; i < arrayKey.length; i++) {
@@ -117,6 +116,7 @@ public class SciTestLibrary {
             } catch (RuntimeException e) {
             }
         }
+
         System.exit(0);
     }
 

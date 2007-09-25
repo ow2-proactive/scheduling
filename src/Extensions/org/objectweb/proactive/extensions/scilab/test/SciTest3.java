@@ -38,15 +38,15 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
 import org.objectweb.proactive.extensions.scilab.SciEngine;
-import org.objectweb.proactive.extensions.scilab.SciResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
 public class SciTest3 {
     private String[] arrayEngine;
-    private HashMap mapEngine;
+    private HashMap<String, SciEngine> mapEngine;
     private int countEngine = 0;
 
     public SciTest3(String nameVN, String pathDescriptor, String[] arrayEngine) {
@@ -54,8 +54,6 @@ public class SciTest3 {
         this.arrayEngine = arrayEngine;
         SciData m1 = new SciDoubleMatrix("a", 1, 1, new double[] { 10 });
         SciData m2 = new SciDoubleMatrix("b", 1, 1, new double[] { 20 });
-        SciData m3 = new SciData("x");
-        SciData m4 = new SciData("y");
 
         //Deployment
         mapEngine = SciDeployEngine.deploy(nameVN, pathDescriptor, arrayEngine);
@@ -80,34 +78,34 @@ public class SciTest3 {
         SciTask task1 = new SciTask("id1");
         task1.addDataIn(m1);
         task1.addDataIn(m2);
-        task1.addDataOut(m3);
+        task1.addDataOut("x");
         task1.setJob("x = a+b;");
 
         sciEngine = (SciEngine) mapEngine.get(this.getNextEngine());
 
         //asynchronous call
-        SciResult result1 = sciEngine.execute(task1);
+        GeneralResult result1 = sciEngine.execute(task1);
 
         SciTask task3 = new SciTask("id3");
         task3.addDataIn(m1);
-        task3.addDataOut(m1);
+        task3.addDataOut("a");
         task3.setJob("a = a*2;");
 
         sciEngine = (SciEngine) mapEngine.get(this.getNextEngine());
         //asynchronous call
-        SciResult result3 = sciEngine.execute(task3);
+        GeneralResult result3 = sciEngine.execute(task3);
 
         SciTask task2 = new SciTask("id2");
 
         //wait value
-        task2.addDataIn(result1.get("x"));
+        task2.addDataIn((SciData) result1.get("x").getData());
         task2.addDataIn(m2);
-        task2.addDataOut(m4);
+        task2.addDataOut("y");
         task2.setJob("y = x+b;");
 
         sciEngine = (SciEngine) mapEngine.get(this.getNextEngine());
         //asynchronous call
-        SciResult result2 = sciEngine.execute(task2);
+        GeneralResult result2 = sciEngine.execute(task2);
 
         System.out.println(result1.get("x").toString());
         System.out.println(result3.get("a").toString());
@@ -123,6 +121,7 @@ public class SciTest3 {
         if (countEngine == mapEngine.size()) {
             countEngine = 0;
         }
+
         return arrayEngine[countEngine];
     }
 

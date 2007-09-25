@@ -32,10 +32,10 @@ package org.objectweb.proactive.extensions.scilab.util;
 
 import javasci.SciDoubleMatrix;
 
-import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
+import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.SciTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
 
 
@@ -60,12 +60,13 @@ public class MultEventListener implements SciEventListener {
     }
 
     public void actionPerformed(SciEvent evt) {
-        SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
-        if (sciTaskInfo.getState() != SciTaskInfo.SUCCEEDED) {
-            if (sciTaskInfo.getState() == SciTaskInfo.ABORTED) {
+        GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
+        if (sciTaskInfo.getState() != GenTaskInfo.SUCCEEDED) {
+            if (sciTaskInfo.getState() == GenTaskInfo.ABORTED) {
                 System.out.println("---------------- Task:" +
                     sciTaskInfo.getIdTask() + " ABORT -----------------");
             }
+
             return;
         }
 
@@ -80,11 +81,12 @@ public class MultEventListener implements SciEventListener {
         System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() +
             " SUCCESS -----------------");
 
-        SciResult sciResult = sciTaskInfo.getSciResult();
+        GeneralResult sciResult = sciTaskInfo.getResult();
 
         //System.out.println(sciTaskInfo.getTimeGlobal() +" " + sciResult.getTimeExecution());
         SciDoubleMatrix sciSubMatrix = (SciDoubleMatrix) sciResult.getList()
-                                                                  .get(0);
+                                                                  .get(0)
+                                                                  .getData();
         int iTask = Integer.parseInt(sciSubMatrix.getName().substring(1));
         double[] subMatrix = sciSubMatrix.getData();
 

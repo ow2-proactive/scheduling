@@ -101,12 +101,13 @@ public class SciTestParMandel {
             writer.println(nbEngine + " " + xres + " " + yres + " " +
                 precision + " " + nbBloc + " " + (endTime - startTime));
 
-            /*for(int k=0; k<mandelResult.getNbRow(); k++){
-                    System.out.println("");
-                    for(int j=0; j<mandelResult.getNbCol(); j++){
-                            System.out.print(result[k*mandelResult.getNbCol() + j]  + " ");
-                    }
-            }*/
+            for (int k = 0; k < mandelResult.getNbRow(); k++) {
+                System.out.println("");
+                for (int j = 0; j < mandelResult.getNbCol(); j++) {
+                    System.out.print(result[(k * mandelResult.getNbCol()) + j] +
+                        " ");
+                }
+            }
         }
 
         reader.close();

@@ -30,56 +30,38 @@
  */
 package org.objectweb.proactive.extensions.scilab;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javasci.SciData;
+import javasci.Scilab;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * This class represents a Scilab task
  */
-public class SciTask implements Serializable {
-    private String id;
+public class SciTask extends AbstractGeneralTask {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 1995967729621014754L;
+    private static boolean initialized = false;
     private ArrayList<SciData> listDataIn;
-    private ArrayList<SciData> listDataOut;
-    private String job;
-    private String jobInit;
 
     public SciTask(String id) {
-        this.id = id;
+        super(id);
         this.listDataIn = new ArrayList<SciData>();
-        this.listDataOut = new ArrayList<SciData>();
-    }
-
-    public String getJob() {
-        return job;
-    }
-
-    public void setJob(String job) {
-        this.job = job;
-    }
-
-    public void setJobInit(String jobInit) {
-        this.jobInit = jobInit;
-    }
-
-    public void setJob(File fileJob) throws FileNotFoundException, IOException {
-        StringBuffer strBuffer = new StringBuffer();
-
-        FileReader reader = new FileReader(fileJob);
-        int c;
-
-        while ((c = reader.read()) != -1) {
-            strBuffer.append((char) c);
-        }
-        this.job = strBuffer.toString();
-
-        reader.close();
+        this.listDataOut = new ArrayList<String>();
     }
 
     public ArrayList<SciData> getListDataIn() {
@@ -94,23 +76,62 @@ public class SciTask implements Serializable {
         this.listDataIn.add(data);
     }
 
-    public ArrayList<SciData> getListDataOut() {
-        return listDataOut;
+    public void sendListDataIn() {
+        SciData data;
+        for (int i = 0; i < listDataIn.size(); i++) {
+            data = (SciData) listDataIn.get(i);
+            Scilab.sendData(data);
+        }
     }
 
-    public void setListDataOut(ArrayList<SciData> listDataOut) {
-        this.listDataOut = listDataOut;
+    public void clearWorkspace() {
+        Scilab.Exec("clearglobal();");
+        for (int i = 0; i < listDataOut.size(); i++) {
+            Scilab.Exec("clear " + listDataOut.get(i) + ";");
+        }
     }
 
-    public void addDataOut(SciData data) {
-        this.listDataOut.add(data);
+    public List<AbstractData> receiveDataOut() {
+        ArrayList<AbstractData> results = new ArrayList<AbstractData>();
+        for (int i = 0; i < listDataOut.size(); i++) {
+            SciData data = Scilab.receiveDataByName(listDataOut.get(i));
+            results.add(new AbstractData(data));
+        }
+
+        return results;
     }
 
-    public String getId() {
-        return id;
+    public void init() {
+        if (!initialized) {
+            Scilab.init();
+        }
     }
 
-    public String getJobInit() {
-        return jobInit;
+    public boolean execute() throws TaskException {
+        String fulljob = jobInit + "\n" + job;
+        BufferedWriter out;
+        File temp;
+        boolean isValid;
+        try {
+            temp = File.createTempFile("scilab", ".sce");
+            temp.deleteOnExit();
+            out = new BufferedWriter(new FileWriter(temp));
+            out.write(fulljob);
+            out.close();
+        } catch (IOException e) {
+            throw new TaskException(e);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("->SciTask:execute:" + temp.getAbsolutePath());
+        }
+
+        isValid = Scilab.Exec("exec(''" + temp.getAbsolutePath() + "'');");
+
+        return isValid;
+    }
+
+    public String getLastMessage() {
+        // TODO not properly implemented
+        return "Scilab error code : " + Scilab.GetLastErrorCode();
     }
 }

@@ -39,6 +39,12 @@ import java.util.EventObject;
  *
  */
 public class SciEvent extends EventObject {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 3662815599418919180L;
+
     public SciEvent(Object source) {
         super(source);
     }

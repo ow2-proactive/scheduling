@@ -40,6 +40,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 
 public class IconRenderer extends DefaultTableCellRenderer {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -2879522014785077529L;
     JLabel res = new JLabel();
 
     @Override
@@ -50,6 +55,7 @@ public class IconRenderer extends DefaultTableCellRenderer {
             ImageIcon icon = (ImageIcon) value;
             res.setIcon(icon);
         }
+
         return res;
     }
 }

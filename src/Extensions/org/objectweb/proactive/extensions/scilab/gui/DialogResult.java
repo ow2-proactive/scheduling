@@ -62,6 +62,11 @@ import javax.swing.JTextField;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class DialogResult extends javax.swing.JDialog {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -803945554182445086L;
     private JPanel pnlMain;
     private JLabel lblPath;
     private JPanel pnlPath;
@@ -119,6 +124,7 @@ public class DialogResult extends javax.swing.JDialog {
                         txtInit.setEditable(false);
                         txtInit.setEnabled(false);
                     }
+
                     {
                         pnlOutParam = new JPanel();
                         BorderLayout pnlOutParamLayout = new BorderLayout();
@@ -136,6 +142,7 @@ public class DialogResult extends javax.swing.JDialog {
                         txtOutParam.setEditable(false);
                     }
                 }
+
                 {
                     pnlQuit = new JPanel();
                     FlowLayout pnlQuitLayout = new FlowLayout();
@@ -160,6 +167,7 @@ public class DialogResult extends javax.swing.JDialog {
                             }
                         });
                 }
+
                 {
                     pnlPath = new JPanel();
                     pnlMain.add(pnlPath, BorderLayout.NORTH);

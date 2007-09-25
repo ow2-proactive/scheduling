@@ -30,30 +30,29 @@
  */
 package org.objectweb.proactive.extensions.scilab.test;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import javasci.SciData;
-
-import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.AbstractData;
+import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.SciTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
 
 
 public class SciTest2 {
     private ScilabService scilab;
 
-    public void displayResult(SciTaskInfo scitaskInfo) {
-        SciResult sciResult = scitaskInfo.getSciResult();
-        ArrayList listResult;
-        listResult = sciResult.getList();
+    public void displayResult(GenTaskInfo scitaskInfo) {
+        GeneralResult sciResult = scitaskInfo.getResult();
+        List<AbstractData> listResult = sciResult.getList();
 
-        for (int i = 0; i < listResult.size(); i++) {
-            SciData result = (SciData) listResult.get(i);
-            System.out.println(result.toString());
+        for (AbstractData data : listResult) {
+            System.out.println(data);
         }
+
         scilab.exit();
         System.exit(0);
     }
@@ -64,18 +63,18 @@ public class SciTest2 {
 
         scilab.addEventListenerTask(new SciEventListener() {
                 public void actionPerformed(SciEvent evt) {
-                    SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
+                    GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
-                    if (sciTaskInfo.getState() == SciTaskInfo.SUCCEEDED) {
+                    if (sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) {
                         displayResult(sciTaskInfo);
                         return;
                     }
                 }
             });
 
-        SciTask task = new SciTask("id");
+        AbstractGeneralTask task = new SciTask("id");
         task.setJobInit("n = 10;");
-        task.addDataOut(new SciData("n"));
+        task.addDataOut("n");
         task.setJob("n = n+1;");
         System.out.println("Job : " + task.getJob());
         scilab.sendTask(task);

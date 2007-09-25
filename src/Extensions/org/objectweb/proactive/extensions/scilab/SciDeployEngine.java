@@ -59,8 +59,10 @@ public class SciDeployEngine {
      * @return list of virtual node contained in the deployment descriptor
      */
     public static String[] getListVirtualNode(String pathDescriptor) {
-        logger.debug("->SciDeployEngine In:getListVirtualNode:" +
-            pathDescriptor);
+        if (logger.isDebugEnabled()) {
+            logger.debug("->SciDeployEngine In:getListVirtualNode:" +
+                pathDescriptor);
+        }
 
         ProActiveDescriptor desc;
         VirtualNode[] arrayVn;
@@ -91,6 +93,7 @@ public class SciDeployEngine {
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
+
         return -1;
     }
 
@@ -102,7 +105,10 @@ public class SciDeployEngine {
      */
     public synchronized static HashMap<String, SciEngine> deploy(
         String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine) {
-        logger.debug("->SciDeployEngine In:deploy:" + pathDescriptor);
+        if (logger.isDebugEnabled()) {
+            logger.debug("->SciDeployEngine In:deploy:" + pathDescriptor);
+        }
+
         ProActiveDescriptor desc;
         VirtualNode vn;
         Node[] nodes;
@@ -125,6 +131,7 @@ public class SciDeployEngine {
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
+
         return mapEngine;
     }
 
@@ -155,7 +162,10 @@ public class SciDeployEngine {
      */
     public static SciEngine deploy(String idEngine)
         throws ActiveObjectCreationException, NodeException {
-        logger.debug("->SciDeployEngine In:deploy");
+        if (logger.isDebugEnabled()) {
+            logger.debug("->SciDeployEngine In:deploy");
+        }
+
         Object[] param = new Object[] { idEngine };
         SciEngine sciEngine = (SciEngine) ProActive.newActive(SciEngine.class.getName(),
                 param);

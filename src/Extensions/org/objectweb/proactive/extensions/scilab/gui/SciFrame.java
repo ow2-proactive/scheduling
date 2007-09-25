@@ -49,13 +49,14 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
-
-import javasci.SciData;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -80,15 +81,22 @@ import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
+import org.objectweb.proactive.extensions.scilab.AbstractData;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
+import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEngineInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.SciTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
 
 
 public class SciFrame extends javax.swing.JFrame {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 1925232783263309759L;
     private JMenuBar menuBar;
     private JSplitPane splitMain2;
     private JScrollPane scrollTreeEngine;
@@ -184,30 +192,30 @@ public class SciFrame extends javax.swing.JFrame {
 
         service.addEventListenerTask(new SciEventListener() {
                 public void actionPerformed(SciEvent evt) {
-                    SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
+                    GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
-                    if (sciTaskInfo.getState() == SciTaskInfo.PENDING) {
+                    if (sciTaskInfo.getState() == GenTaskInfo.PENDING) {
                         updateTableTaskWait(sciTaskInfo);
                         return;
                     }
 
-                    if (sciTaskInfo.getState() == SciTaskInfo.CANCELLED) {
+                    if (sciTaskInfo.getState() == GenTaskInfo.CANCELLED) {
                         updateTableTaskCancel(sciTaskInfo);
                         return;
                     }
 
-                    if (sciTaskInfo.getState() == SciTaskInfo.RUNNING) {
+                    if (sciTaskInfo.getState() == GenTaskInfo.RUNNING) {
                         updateTableTaskRun(sciTaskInfo);
                         return;
                     }
 
-                    if (sciTaskInfo.getState() == SciTaskInfo.KILLED) {
+                    if (sciTaskInfo.getState() == GenTaskInfo.KILLED) {
                         updateTableTaskKill(sciTaskInfo);
                         return;
                     }
 
-                    if ((sciTaskInfo.getState() == SciTaskInfo.SUCCEEDED) ||
-                            (sciTaskInfo.getState() == SciTaskInfo.ABORTED)) {
+                    if ((sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) ||
+                            (sciTaskInfo.getState() == GenTaskInfo.ABORTED)) {
                         updateTableTaskEnd(sciTaskInfo);
                         return;
                     }
@@ -299,6 +307,7 @@ public class SciFrame extends javax.swing.JFrame {
 
                     lblTaskWait.setText("Pending Tasks");
                 }
+
                 scrollTaskWait = new JScrollPane();
                 pnlTaskWait.add(scrollTaskWait, BorderLayout.CENTER);
                 scrollTaskWait.setPreferredSize(new java.awt.Dimension(690, 135));
@@ -309,6 +318,12 @@ public class SciFrame extends javax.swing.JFrame {
                         });
 
                 tableTaskWait = new JTable() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = -5375355976633702829L;
+
                             @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
@@ -357,6 +372,7 @@ public class SciFrame extends javax.swing.JFrame {
                         });
                 }
             }
+
             {
                 pnlTaskRun = new JPanel();
                 splitTask2.add(pnlTaskRun, JSplitPane.BOTTOM);
@@ -375,6 +391,12 @@ public class SciFrame extends javax.swing.JFrame {
                         });
 
                 tableTaskRun = new JTable() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = -7868936623193687294L;
+
                             @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
@@ -425,6 +447,7 @@ public class SciFrame extends javax.swing.JFrame {
                             }
                         });
                 }
+
                 pnlLblTaskRun = new JPanel();
                 pnlTaskRun.add(pnlLblTaskRun, BorderLayout.NORTH);
                 pnlLblTaskRun.setBackground(new java.awt.Color(96, 106, 173));
@@ -434,6 +457,7 @@ public class SciFrame extends javax.swing.JFrame {
                 lblTaskRun.setFont(new Font("Tahoma", Font.BOLD, 13));
                 lblTaskRun.setText("Executing Tasks");
             }
+
             {
                 pnlTaskEnd = new JPanel();
                 splitTask1.add(pnlTaskEnd, JSplitPane.BOTTOM);
@@ -452,6 +476,12 @@ public class SciFrame extends javax.swing.JFrame {
                         });
 
                 tableTaskEnd = new JTable() {
+
+                            /**
+                                         *
+                                         */
+                            private static final long serialVersionUID = -5498963708742304900L;
+
                             @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
@@ -499,6 +529,7 @@ public class SciFrame extends javax.swing.JFrame {
                             }
                         });
                 }
+
                 pnlLblTaskEnd = new JPanel();
                 pnlTaskEnd.add(pnlLblTaskEnd, BorderLayout.NORTH);
                 pnlLblTaskEnd.setBackground(new java.awt.Color(96, 106, 173));
@@ -508,6 +539,7 @@ public class SciFrame extends javax.swing.JFrame {
                 lblTaskEnd.setFont(new Font("Tahoma", Font.BOLD, 13));
                 lblTaskEnd.setText("Terminated Tasks");
             }
+
             {
                 pnlMainLog = new JPanel();
                 splitMain1.add(pnlMainLog, JSplitPane.BOTTOM);
@@ -534,6 +566,12 @@ public class SciFrame extends javax.swing.JFrame {
                         pnlLogo.setSize(802, 60);
                         pnlLogo.setPreferredSize(new java.awt.Dimension(802, 60));
                         pnlProActive = new JPanel() {
+
+                                    /**
+                                                         *
+                                                         */
+                                    private static final long serialVersionUID = 2706641770975042036L;
+
                                     @Override
                                     public void paintComponent(Graphics g) {
                                         super.paintComponent(g);
@@ -550,6 +588,12 @@ public class SciFrame extends javax.swing.JFrame {
                                 200, 30));
                         pnlProActive.setSize(200, 70);
                         pnlScilab = new JPanel() {
+
+                                    /**
+                                                         *
+                                                         */
+                                    private static final long serialVersionUID = 590057625154204438L;
+
                                     @Override
                                     public void paintComponent(Graphics g) {
                                         super.paintComponent(g);
@@ -566,6 +610,7 @@ public class SciFrame extends javax.swing.JFrame {
                                 70));
                         pnlScilab.setSize(125, 70);
                     }
+
                     {
                         pnlBtnClear = new JPanel();
                         BorderLayout pnlBtnClearLayout = new BorderLayout();
@@ -585,6 +630,7 @@ public class SciFrame extends javax.swing.JFrame {
                     }
                 }
             }
+
             menuBar = new JMenuBar();
             setJMenuBar(menuBar);
             menuCommand = new JMenu();
@@ -757,9 +803,9 @@ public class SciFrame extends javax.swing.JFrame {
             String idTask = (String) this.tableTaskWaitModel.getValueAt(this.tableTaskWait.getSelectedRow(),
                     0);
 
-            ArrayList<SciTaskInfo> listTask = service.getListTaskWait();
+            ArrayList<GenTaskInfo> listTask = service.getListTaskWait();
 
-            SciTaskInfo sciTaskInfo = null;
+            GenTaskInfo sciTaskInfo = null;
             int i;
             for (i = 0; i < listTask.size(); i++) {
                 sciTaskInfo = listTask.get(i);
@@ -773,7 +819,7 @@ public class SciFrame extends javax.swing.JFrame {
             }
 
             this.dialogResult.setPathScript(sciTaskInfo.getPathScript());
-            this.dialogResult.setJobInit(sciTaskInfo.getSciTask().getJobInit());
+            this.dialogResult.setJobInit(sciTaskInfo.getTask().getJobInit());
             this.dialogResult.setDataOut("");
             this.dialogResult.setSaveEnable(false);
 
@@ -787,9 +833,9 @@ public class SciFrame extends javax.swing.JFrame {
             String idTask = (String) this.tableTaskRunModel.getValueAt(this.tableTaskRun.getSelectedRow(),
                     0);
 
-            SciTaskInfo sciTaskInfo = service.getMapTaskRun().get(idTask);
+            GenTaskInfo sciTaskInfo = service.getMapTaskRun().get(idTask);
             this.dialogResult.setPathScript(sciTaskInfo.getPathScript());
-            this.dialogResult.setJobInit(sciTaskInfo.getSciTask().getJobInit());
+            this.dialogResult.setJobInit(sciTaskInfo.getTask().getJobInit());
             this.dialogResult.setDataOut("");
             this.dialogResult.setSaveEnable(false);
 
@@ -803,14 +849,27 @@ public class SciFrame extends javax.swing.JFrame {
             String idTask = (String) this.tableTaskEndModel.getValueAt(this.tableTaskEnd.getSelectedRow(),
                     0);
 
-            SciTaskInfo sciTaskInfo = service.getTaskEnd(idTask);
+            GenTaskInfo sciTaskInfo = service.getTaskEnd(idTask);
             this.dialogResult.setPathScript(sciTaskInfo.getPathScript());
-            this.dialogResult.setJobInit(sciTaskInfo.getSciTask().getJobInit());
+            this.dialogResult.setJobInit(sciTaskInfo.getTask().getJobInit());
 
             String strResult = "";
-            ArrayList<SciData> listResult = sciTaskInfo.getSciResult().getList();
-            for (int i = 0; i < listResult.size(); i++) {
-                strResult += (listResult.get(i).toString() + "\n");
+            GeneralResult res = sciTaskInfo.getResult();
+            if (res.isException()) {
+                if (res.hasMessage()) {
+                    strResult = res.getMessage() +
+                        System.getProperty("line.separator");
+                }
+
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw, true);
+                res.getException().printStackTrace(pw);
+                strResult += sw.toString();
+            } else {
+                List<AbstractData> listResult = sciTaskInfo.getResult().getList();
+                for (int i = 0; i < listResult.size(); i++) {
+                    strResult += (listResult.get(i).toString() + "\n");
+                }
             }
 
             this.dialogResult.setSaveEnable(true);
@@ -882,7 +941,7 @@ public class SciFrame extends javax.swing.JFrame {
         }
 
         String idTask = (String) this.tableTaskEndModel.getValueAt(i, 0);
-        SciTaskInfo sciTaskInfo = service.getTaskEnd(idTask);
+        GenTaskInfo sciTaskInfo = service.getTaskEnd(idTask);
 
         if (this.chooserSave.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
@@ -894,10 +953,11 @@ public class SciFrame extends javax.swing.JFrame {
         }
 
         String strResult = "";
-        ArrayList<SciData> listResult = sciTaskInfo.getSciResult().getList();
+        List<AbstractData> listResult = sciTaskInfo.getResult().getList();
         for (i = 0; i < listResult.size(); i++) {
             strResult += (listResult.get(i).toString() + "\n");
         }
+
         try {
             FileWriter fw = new FileWriter(f);
             fw.write(strResult);
@@ -972,19 +1032,19 @@ public class SciFrame extends javax.swing.JFrame {
             return;
         }
 
-        int priority = SciTaskInfo.NORMAL;
+        int priority = GenTaskInfo.NORMAL;
 
         if (dialogTask.getTaskPriority().equals("Low")) {
-            priority = SciTaskInfo.LOW;
+            priority = GenTaskInfo.LOW;
         } else if (dialogTask.getTaskPriority().equals("High")) {
-            priority = SciTaskInfo.HIGH;
+            priority = GenTaskInfo.HIGH;
         }
 
         try {
-            service.sendTask(dialogTask.getPath(), dialogTask.getJobInit(),
+            service.sendTask(dialogTask.getFile(), dialogTask.getJobInit(),
                 dialogTask.getDataOut(), priority);
         } catch (IOException e) {
-            txtLog.append("->Path Error :" + dialogTask.getPath() + "\n");
+            txtLog.append("->Path Error :" + dialogTask.getFile() + "\n");
         }
     }
 
@@ -1067,12 +1127,12 @@ public class SciFrame extends javax.swing.JFrame {
         }
     }
 
-    private void updateTableTaskWait(SciTaskInfo sciTaskInfo) {
+    private void updateTableTaskWait(GenTaskInfo sciTaskInfo) {
         String strPriority;
 
-        if (sciTaskInfo.getPriority() == SciTaskInfo.HIGH) {
+        if (sciTaskInfo.getPriority() == GenTaskInfo.HIGH) {
             strPriority = "High";
-        } else if (sciTaskInfo.getPriority() == SciTaskInfo.NORMAL) {
+        } else if (sciTaskInfo.getPriority() == GenTaskInfo.NORMAL) {
             strPriority = "Normal";
         } else {
             strPriority = "Low";
@@ -1089,7 +1149,7 @@ public class SciFrame extends javax.swing.JFrame {
             "\n");
     }
 
-    private void updateTableTaskCancel(SciTaskInfo sciTaskInfo) {
+    private void updateTableTaskCancel(GenTaskInfo sciTaskInfo) {
         String idTask;
         for (int i = 0; i < this.tableTaskWaitModel.getRowCount(); i++) {
             idTask = (String) this.tableTaskWaitModel.getValueAt(i, 0);
@@ -1101,11 +1161,12 @@ public class SciFrame extends javax.swing.JFrame {
                 break;
             }
         }
+
         txtLog.append("->Cancel Scilab Task :" + sciTaskInfo.getIdTask() +
             "\n");
     }
 
-    private void updateTableTaskRun(SciTaskInfo sciTaskInfo) {
+    private void updateTableTaskRun(GenTaskInfo sciTaskInfo) {
         String idTask;
 
         for (int i = 0; i < this.tableTaskWaitModel.getRowCount(); i++) {
@@ -1128,7 +1189,7 @@ public class SciFrame extends javax.swing.JFrame {
             "\n");
     }
 
-    private void updateTableTaskKill(SciTaskInfo sciTaskInfo) {
+    private void updateTableTaskKill(GenTaskInfo sciTaskInfo) {
         String idTask;
         for (int i = 0; i < this.tableTaskRunModel.getRowCount(); i++) {
             idTask = (String) this.tableTaskRunModel.getValueAt(i, 0);
@@ -1144,7 +1205,7 @@ public class SciFrame extends javax.swing.JFrame {
         }
     }
 
-    private void updateTableTaskEnd(SciTaskInfo sciTaskInfo) {
+    private void updateTableTaskEnd(GenTaskInfo sciTaskInfo) {
         String idTask;
         for (int i = 0; i < this.tableTaskRunModel.getRowCount(); i++) {
             idTask = (String) this.tableTaskRunModel.getValueAt(i, 0);
@@ -1156,7 +1217,7 @@ public class SciFrame extends javax.swing.JFrame {
 
         String strTmp;
 
-        if (sciTaskInfo.getState() == SciTaskInfo.SUCCEEDED) {
+        if (sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) {
             strTmp = "img/successTask.gif";
             setStateTreeNode(sciTaskInfo.getIdEngine(), TreeEngineNode.VALID);
         } else {

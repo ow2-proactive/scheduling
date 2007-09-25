@@ -32,14 +32,14 @@ package org.objectweb.proactive.extensions.scilab.monitor;
 
 import java.io.File;
 
-import org.objectweb.proactive.extensions.scilab.SciResult;
-import org.objectweb.proactive.extensions.scilab.SciTask;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
+import org.objectweb.proactive.extensions.scilab.GeneralTask;
 
 
 /**
  * SciTaskInfo contains all methods to access to informations about a Scilab task
  */
-public class SciTaskInfo {
+public class GenTaskInfo {
     public static final int LOW = 0;
     public static final int NORMAL = 1;
     public static final int HIGH = 2;
@@ -54,13 +54,13 @@ public class SciTaskInfo {
     private int state;
     private String idEngine;
     private File fileScript;
-    private SciTask sciTask;
-    private SciResult sciResult;
+    private GeneralTask genTask;
+    private GeneralResult genResult;
     private long dateStart;
     private long dateEnd;
 
-    public SciTaskInfo(SciTask sciTask) {
-        this.sciTask = sciTask;
+    public GenTaskInfo(GeneralTask genTask) {
+        this.genTask = genTask;
         this.dateStart = System.currentTimeMillis();
     }
 
@@ -72,20 +72,20 @@ public class SciTaskInfo {
         this.priority = priority;
     }
 
-    public SciTask getSciTask() {
-        return sciTask;
+    public GeneralTask getTask() {
+        return genTask;
     }
 
-    public SciResult getSciResult() {
-        return sciResult;
+    public GeneralResult getResult() {
+        return genResult;
     }
 
-    public void setSciResult(SciResult sciResult) {
-        this.sciResult = sciResult;
+    public void setResult(GeneralResult genResult) {
+        this.genResult = genResult;
     }
 
     public String getIdTask() {
-        return sciTask.getId();
+        return genTask.getId();
     }
 
     public int getState() {
@@ -113,7 +113,7 @@ public class SciTaskInfo {
     }
 
     public long getTimeExecution() {
-        return this.sciResult.getTimeExecution();
+        return this.genResult.getTimeExecution();
     }
 
     public long getDateStart() {

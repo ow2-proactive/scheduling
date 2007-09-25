@@ -54,6 +54,11 @@ import javax.swing.filechooser.FileFilter;
 
 
 public class DialogTask extends javax.swing.JDialog {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 1087324934691115701L;
     private JPanel pnlPath;
     private JLabel lblPath;
     private JTextField txtOutParam;
@@ -77,6 +82,7 @@ public class DialogTask extends javax.swing.JDialog {
     private JPanel pnlInit;
     public static final int VALIDATE = 1;
     public static final int CANCEL = 0;
+    private File scriptFile;
     private int state;
 
     public DialogTask(JFrame frame) {
@@ -100,7 +106,8 @@ public class DialogTask extends javax.swing.JDialog {
                             }
 
                             return f.getName().endsWith(".sci") ||
-                            f.getName().endsWith(".sce");
+                            f.getName().endsWith(".sce") ||
+                            f.getName().endsWith(".m");
                         }
 
                         @Override
@@ -139,6 +146,7 @@ public class DialogTask extends javax.swing.JDialog {
                         txtInit = new JTextArea();
                         scrollInit.setViewportView(txtInit);
                     }
+
                     {
                         pnlTaskSouth = new JPanel();
                         pnlTask.add(pnlTaskSouth, BorderLayout.SOUTH);
@@ -177,12 +185,14 @@ public class DialogTask extends javax.swing.JDialog {
                                 cmbPriority.setSelectedIndex(1);
                             }
                         }
+
                         lblOutParam = new JLabel();
                         pnlTaskSouth.add(lblOutParam, BorderLayout.WEST);
                         lblOutParam.setText("Out Parameters:");
                         lblOutParam.setPreferredSize(new java.awt.Dimension(
                                 111, 17));
                     }
+
                     {
                         pnlPath = new JPanel();
                         pnlTask.add(pnlPath, BorderLayout.NORTH);
@@ -214,6 +224,7 @@ public class DialogTask extends javax.swing.JDialog {
                         pnlPath.add(pnlPathSouth, BorderLayout.SOUTH);
                     }
                 }
+
                 {
                     pnlValid = new JPanel();
                     FlowLayout pnlValidLayout = new FlowLayout();
@@ -262,8 +273,9 @@ public class DialogTask extends javax.swing.JDialog {
             return;
         }
 
-        this.txtPath.setText(this.chooserScript.getSelectedFile()
-                                               .getAbsolutePath());
+        scriptFile = this.chooserScript.getSelectedFile();
+
+        this.txtPath.setText(scriptFile.getAbsolutePath());
     }
 
     private void btnCancelActionPerformed(ActionEvent evt) {
@@ -280,8 +292,8 @@ public class DialogTask extends javax.swing.JDialog {
         return state;
     }
 
-    public String getPath() {
-        return this.txtPath.getText();
+    public File getFile() {
+        return this.scriptFile;
     }
 
     public String getJobInit() {

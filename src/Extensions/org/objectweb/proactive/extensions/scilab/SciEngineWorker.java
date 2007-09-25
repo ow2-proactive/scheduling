@@ -30,15 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scilab;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-
-import javasci.SciData;
-import javasci.Scilab;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -46,124 +39,117 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class SciEngineWorker implements Serializable {
-    private SciTask sciTask;
-    private SciResult sciResult;
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -815964410313302240L;
+    private GeneralTask genTask;
+    private GeneralResult genResult;
     private long dateStart;
     private long dateEnd;
     private boolean isStateFull = false;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
-    private static SciEngineWorker sciEngineWorker;
 
     public SciEngineWorker() {
-        Scilab.init();
     }
 
     /**
      * execute a task
      * @param sciTask Scilab task
      * @return result of the computation
+     * @throws TaskException
      */
-    public SciResult execute(SciTask sciTask) {
-        logger.debug("->SciEngineTask In:execute:" + sciTask.getId());
-        this.sciTask = sciTask;
-        this.sciResult = new SciResult(sciTask.getId());
+    public GeneralResult execute(GeneralTask genTask) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("->SciEngineWorker In:execute:" + genTask.getId());
+        }
 
-        this.setListDataToScilab();
+        this.genTask = genTask;
+        this.genResult = new GeneralResultImpl(genTask.getId());
 
         this.dateStart = System.currentTimeMillis();
         try {
+            this.genTask.init();
+            this.sendInputDataToEngine();
             if (executeJob()) {
-                getListDataToScilab();
-                this.sciResult.setState(SciResult.SUCCESS);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("->SciEngineWorker :execute : success\n");
+                }
+                this.genResult.setMessage(genTask.getLastMessage());
+                receiveOutputFromEngine();
+                this.genResult.setState(GeneralResult.SUCCESS);
             } else {
-                this.sciResult.setState(SciResult.ABORT);
-                System.out.println("->SciEngine test:execute\n");
+                this.genResult.setState(GeneralResult.ABORT);
+                this.genResult.setException(new MatlabException(
+                        "The MATLAB engine is closed"));
+                if (logger.isDebugEnabled()) {
+                    logger.debug("->SciEngineWorker :execute : abort\n");
+                }
             }
-        } catch (Exception e) {
+        } catch (TaskException e) {
             e.printStackTrace();
-            this.sciResult.setState(SciResult.ABORT);
+            this.genResult.setState(GeneralResult.ABORT);
+            this.genResult.setException(e);
         }
 
         this.dateEnd = System.currentTimeMillis();
-        this.sciResult.setTimeExecution(this.dateEnd - this.dateStart);
-        return sciResult;
+        this.genResult.setTimeExecution(this.dateEnd - this.dateStart);
+        return genResult;
     }
 
     /**
      * set In data in Scilab environment
+     * @throws TaskException
      *
      */
-    private void setListDataToScilab() {
-        ArrayList listData = this.sciTask.getListDataIn();
-
-        SciData data;
-        for (int i = 0; i < listData.size(); i++) {
-            data = (SciData) listData.get(i);
-            Scilab.sendData(data);
-        }
+    private void sendInputDataToEngine() throws TaskException {
+        genTask.sendListDataIn();
     }
 
     /**
      * clear Scilab environment
      *
      */
-    private void clearScilab() {
-        ArrayList listData = this.sciTask.getListDataOut();
-        SciData data;
-        Scilab.Exec("clearglobal();");
-        for (int i = 0; i < listData.size(); i++) {
-            data = (SciData) listData.get(i);
-            Scilab.Exec("clear " + data.getName() + ";");
+    private void clearWorkspace() {
+        try {
+            genTask.clearWorkspace();
+        } catch (TaskException e) {
+            this.genResult.setState(GeneralResult.ABORT);
+            this.genResult.setException(e);
         }
     }
 
     /**
      * retrieve results of the computation
+     * @throws TaskException
      *
      */
-    private void getListDataToScilab() {
-        ArrayList listData = this.sciTask.getListDataOut();
-        SciData data;
-        for (int i = 0; i < listData.size(); i++) {
-            data = (SciData) listData.get(i);
-            data = Scilab.receiveDataByName(data.getName());
-            this.sciResult.add(data);
+    private void receiveOutputFromEngine() throws TaskException {
+        List<AbstractData> datas = null;
+        datas = genTask.receiveDataOut();
+
+        for (AbstractData data : datas) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("->SciEngineWorker :ReceiveData : " +
+                    data.getName());
+            }
+
+            this.genResult.add(data);
         }
 
         if (!isStateFull) {
-            clearScilab();
+            clearWorkspace();
         }
     }
 
     /**
      * @return true if is a valid execution, otherwise false
+     * @throws TaskException
+     * @throws Exception
      */
-    private boolean executeJob() {
-        String job = sciTask.getJobInit() + "\n" + sciTask.getJob();
-        BufferedWriter out;
-        File temp;
-        boolean isValid;
-        try {
-            temp = File.createTempFile("scilab", ".sce");
-            temp.deleteOnExit();
-            out = new BufferedWriter(new FileWriter(temp));
-            out.write(job);
-            out.close();
-            logger.debug("->SciEngineTask:executeJob:test1:" +
-                temp.getAbsolutePath());
-            isValid = Scilab.Exec("exec(''" + temp.getAbsolutePath() + "'');");
-        } catch (IOException e) {
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    public synchronized static SciResult executeTask(SciTask sciTask) {
-        if (sciEngineWorker == null) {
-            sciEngineWorker = new SciEngineWorker();
-        }
-        return sciEngineWorker.execute(sciTask);
+    private boolean executeJob() throws TaskException {
+        return genTask.execute();
     }
 
     public void exit() {

@@ -98,13 +98,15 @@ public class SciTestParMult {
             endTime = System.currentTimeMillis();
             System.out.println(endTime - startTime);
 
-            /* System.out.println(" ");
-             for (int k = 0; k < nbRow; k++) {
-                 for (int j = 0; j < nbCol; j++) {
-                     System.out.print(m3[(k * nbCol) + j] + " ");
-                 }
-                 System.out.println(" ");
-             }*/
+            System.out.println(" ");
+            for (int k = 0; k < nbRow; k++) {
+                for (int j = 0; j < nbCol; j++) {
+                    System.out.print(m3[(k * nbCol) + j] + " ");
+                }
+
+                System.out.println(" ");
+            }
+
             writer.println(nbEngine + " " + nbRow + (endTime - startTime));
         }
 

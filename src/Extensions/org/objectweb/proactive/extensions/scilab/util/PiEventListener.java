@@ -32,10 +32,10 @@ package org.objectweb.proactive.extensions.scilab.util;
 
 import javasci.SciDoubleMatrix;
 
-import org.objectweb.proactive.extensions.scilab.SciResult;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
+import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
 import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.SciTaskInfo;
 import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
 
 
@@ -57,9 +57,9 @@ public class PiEventListener implements SciEventListener {
     }
 
     public void actionPerformed(SciEvent evt) {
-        SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
+        GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
-        if (sciTaskInfo.getState() != SciTaskInfo.SUCCEEDED) {
+        if (sciTaskInfo.getState() != GenTaskInfo.SUCCEEDED) {
 
             /*if(sciTaskInfo.getState() == SciTaskInfo.ABORT){
                     System.out.println("***************** Task:" + sciTaskInfo.getIdTask() + " ABORT ********************");
@@ -79,14 +79,15 @@ public class PiEventListener implements SciEventListener {
             " " + sciTaskInfo.getIdEngine() + " " +
             service.getMapTaskRun().size() + " SUCCESS -----------------");
 
-        SciResult sciResult = sciTaskInfo.getSciResult();
+        GeneralResult sciResult = sciTaskInfo.getResult();
 
         //System.out.println(sciTaskInfo.getTimeGlobal() +" " + sciResult.getTimeExecution());
         if (!sciResult.getId().startsWith(res.getName())) {
             return;
         }
 
-        SciDoubleMatrix sciData = (SciDoubleMatrix) sciResult.getList().get(0);
+        SciDoubleMatrix sciData = (SciDoubleMatrix) sciResult.getList().get(0)
+                                                             .getData();
         pi += sciData.getData()[0];
 
         count++;

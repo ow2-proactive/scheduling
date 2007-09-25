@@ -36,16 +36,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javasci.SciData;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
+import org.objectweb.proactive.extensions.scilab.GeneralTask;
+import org.objectweb.proactive.extensions.scilab.MatlabTask;
 import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
 import org.objectweb.proactive.extensions.scilab.SciEngine;
-import org.objectweb.proactive.extensions.scilab.SciResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
@@ -58,11 +59,16 @@ import org.objectweb.proactive.extensions.scilab.SciTask;
  * @author ProActive Team (amangin)
  */
 public class ScilabService implements Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -2572074681533287826L;
     private HashMap<String, SciEngineInfo> mapEngine;
     private ArrayList<String> listIdEngineFree;
-    private ArrayList<SciTaskInfo> listTaskWait;
-    private HashMap<String, SciTaskInfo> mapTaskRun;
-    private HashMap<String, SciTaskInfo> mapTaskEnd;
+    private ArrayList<GenTaskInfo> listTaskWait;
+    private HashMap<String, GenTaskInfo> mapTaskRun;
+    private HashMap<String, GenTaskInfo> mapTaskEnd;
     private long countIdTask;
     private long countIdEngine;
     private SciEventSource taskObservable;
@@ -76,9 +82,9 @@ public class ScilabService implements Serializable {
         this.mapEngine = new HashMap<String, SciEngineInfo>();
         this.listIdEngineFree = new ArrayList<String>();
 
-        this.listTaskWait = new ArrayList<SciTaskInfo>();
-        this.mapTaskRun = new HashMap<String, SciTaskInfo>();
-        this.mapTaskEnd = new HashMap<String, SciTaskInfo>();
+        this.listTaskWait = new ArrayList<GenTaskInfo>();
+        this.mapTaskRun = new HashMap<String, GenTaskInfo>();
+        this.mapTaskEnd = new HashMap<String, GenTaskInfo>();
 
         this.taskObservable = new SciEventSource();
         this.engineObservable = new SciEventSource();
@@ -107,7 +113,10 @@ public class ScilabService implements Serializable {
      */
     public synchronized int deployEngine(String nameVirtualNode,
         String pathDescriptor, String[] arrayIdEngine) {
-        logger.debug("->ScilabService In:deployEngine:" + nameVirtualNode);
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:deployEngine:" + nameVirtualNode);
+        }
+
         HashMap<String, SciEngine> mapNewEngine = SciDeployEngine.deploy(nameVirtualNode,
                 pathDescriptor, arrayIdEngine);
         SciEngine sciEngine;
@@ -168,43 +177,64 @@ public class ScilabService implements Serializable {
      * An event notify the user application of the effective sending .
      * @param sciTask
      */
-    public synchronized void sendTask(SciTask sciTask) {
-        logger.debug("->ScilabService In:sendTask:" + sciTask.getId());
-        SciTaskInfo sciTaskInfo = new SciTaskInfo(sciTask);
-        sciTaskInfo.setState(SciTaskInfo.PENDING);
+    public synchronized void sendTask(AbstractGeneralTask sciTask) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:sendTask:" + sciTask.getId());
+        }
+
+        GenTaskInfo sciTaskInfo = new GenTaskInfo(sciTask);
+        sciTaskInfo.setState(GenTaskInfo.PENDING);
         this.listTaskWait.add(sciTaskInfo);
         this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
         notifyAll();
     }
 
-    public synchronized void sendTask(String pathScript, String jobInit,
+    public synchronized void sendTask(File scriptFile, String jobInit,
         String[] dataOut) throws IOException {
-        this.sendTask(pathScript, jobInit, dataOut, SciTaskInfo.NORMAL);
+        this.sendTask(scriptFile, jobInit, dataOut, GenTaskInfo.NORMAL);
     }
 
-    public synchronized void sendTask(String pathScript, String jobInit,
+    public synchronized void sendTask(File scriptFile, String jobInit,
         String[] dataOut, int Priority) throws IOException {
-        logger.debug("->ScilabService In:sendTask");
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:sendTask");
+        }
 
-        SciTask sciTask = new SciTask("Task" + this.countIdTask++);
+        String name = scriptFile.getName();
+        String ext = name.substring(name.lastIndexOf('.'));
+        GeneralTask task = null;
 
-        File f = new File(pathScript);
-
-        sciTask.setJob(f);
-        sciTask.setJobInit(jobInit);
+        if (ext.equals(".m")) {
+            task = new MatlabTask("Task" + this.countIdTask++);
+            if (logger.isDebugEnabled()) {
+                logger.debug("->ScilabService :sendTask MatlabTask");
+            }
+        } else {
+            task = new SciTask("Task" + this.countIdTask++);
+            if (logger.isDebugEnabled()) {
+                logger.debug("->ScilabService :sendTask SciTask");
+            }
+        }
 
         for (int i = 0; i < dataOut.length; i++) {
-            logger.debug("->ScilabService DataOut:sendTask:" + dataOut[i]);
+            if (logger.isDebugEnabled()) {
+                logger.debug("->ScilabService :sendTask DataOut:" + dataOut[i]);
+            }
+
             if (dataOut[i].trim().equals("")) {
                 continue;
             }
-            sciTask.addDataOut(new SciData(dataOut[i]));
+
+            task.addDataOut(dataOut[i]);
         }
 
-        SciTaskInfo sciTaskInfo = new SciTaskInfo(sciTask);
-        sciTaskInfo.setFileScript(f);
+        task.setJob(scriptFile);
+        task.setJobInit(jobInit);
 
-        sciTaskInfo.setState(SciTaskInfo.PENDING);
+        GenTaskInfo sciTaskInfo = new GenTaskInfo(task);
+        sciTaskInfo.setFileScript(scriptFile);
+
+        sciTaskInfo.setState(GenTaskInfo.PENDING);
         sciTaskInfo.setPriority(Priority);
 
         this.listTaskWait.add(sciTaskInfo);
@@ -217,9 +247,11 @@ public class ScilabService implements Serializable {
      * @param idTask
      */
     public synchronized void killTask(String idTask) {
-        logger.debug("->ScilabService In:killTask:" + idTask);
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:killTask:" + idTask);
+        }
 
-        SciTaskInfo sciTaskInfo = this.mapTaskRun.remove(idTask);
+        GenTaskInfo sciTaskInfo = this.mapTaskRun.remove(idTask);
 
         if (sciTaskInfo == null) {
             return;
@@ -235,7 +267,7 @@ public class ScilabService implements Serializable {
         sciEngineInfo.setIsActivate(isActivate);
         sciEngineInfo.setIdCurrentTask(null);
 
-        sciTaskInfo.setState(SciTaskInfo.KILLED);
+        sciTaskInfo.setState(GenTaskInfo.KILLED);
 
         this.listIdEngineFree.add(idEngine);
         this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
@@ -246,7 +278,9 @@ public class ScilabService implements Serializable {
      * @param idEngine
      */
     public synchronized void restartEngine(String idEngine) {
-        logger.debug("->ScilabService In:restartEngine:" + idEngine);
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:restartEngine:" + idEngine);
+        }
 
         SciEngineInfo sciEngineInfo = this.mapEngine.get(idEngine);
 
@@ -255,11 +289,11 @@ public class ScilabService implements Serializable {
         }
 
         String idTask = sciEngineInfo.getIdCurrentTask();
-        SciTaskInfo sciTaskInfo;
+        GenTaskInfo sciTaskInfo;
 
         if (idTask != null) {
             sciTaskInfo = this.mapTaskRun.remove(idTask);
-            sciTaskInfo.setState(SciTaskInfo.KILLED);
+            sciTaskInfo.setState(GenTaskInfo.KILLED);
             sciEngineInfo.setIdCurrentTask(null);
             this.listIdEngineFree.add(idEngine);
             this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
@@ -276,14 +310,17 @@ public class ScilabService implements Serializable {
      * @param idTask
      */
     public synchronized void cancelTask(String idTask) {
-        logger.debug("->ScilabService In:cancelTask:" + idTask);
-        SciTaskInfo sciTaskInfo;
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:cancelTask:" + idTask);
+        }
+
+        GenTaskInfo sciTaskInfo;
         for (int i = 0; i < this.listTaskWait.size(); i++) {
             sciTaskInfo = this.listTaskWait.get(i);
 
             if (idTask.equals(sciTaskInfo.getIdTask())) {
                 this.listTaskWait.remove(i);
-                sciTaskInfo.setState(SciTaskInfo.CANCELLED);
+                sciTaskInfo.setState(GenTaskInfo.CANCELLED);
                 this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
                 break;
             }
@@ -295,16 +332,22 @@ public class ScilabService implements Serializable {
      * @param idTask
      */
     public synchronized void removeTask(String idTask) {
-        logger.debug("->ScilabService In:removeTask:" + idTask);
-        SciTaskInfo sciTaskInfo = this.mapTaskEnd.remove(idTask);
-        sciTaskInfo.setState(SciTaskInfo.REMOVED);
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:removeTask:" + idTask);
+        }
+
+        GenTaskInfo sciTaskInfo = this.mapTaskEnd.remove(idTask);
+        sciTaskInfo.setState(GenTaskInfo.REMOVED);
         this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
     }
 
     private synchronized void retrieveResults() {
-        logger.debug("->ScilabService In:retrieveResult");
-        SciResult sciResult;
-        SciTaskInfo sciTaskInfo;
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:retrieveResult");
+        }
+
+        GeneralResult sciResult;
+        GenTaskInfo sciTaskInfo;
         String idEngine;
         SciEngineInfo sciEngineInfo;
         Object[] keys;
@@ -313,10 +356,12 @@ public class ScilabService implements Serializable {
             keys = this.mapTaskRun.keySet().toArray();
             for (int i = 0; i < keys.length; i++) {
                 sciTaskInfo = this.mapTaskRun.get(keys[i]);
-                sciResult = sciTaskInfo.getSciResult();
+                sciResult = sciTaskInfo.getResult();
                 if (!ProActive.isAwaited(sciResult)) {
-                    logger.debug("->ScilabService loop:retrieveResult:" +
-                        keys[i]);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("->ScilabService loop:retrieveResult:" +
+                            keys[i]);
+                    }
 
                     this.mapTaskRun.remove(keys[i]);
                     sciTaskInfo.setState(sciResult.getState());
@@ -332,6 +377,7 @@ public class ScilabService implements Serializable {
                     notifyAll();
                 }
             }
+
             try {
                 wait(1000);
             } catch (InterruptedException e) {
@@ -339,9 +385,12 @@ public class ScilabService implements Serializable {
         }
     }
 
-    private SciTaskInfo getNextTask() {
-        logger.debug("->ScilabService loop:getNextTask");
-        SciTaskInfo sciTaskInfo;
+    private GenTaskInfo getNextTask() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService loop:getNextTask");
+        }
+
+        GenTaskInfo sciTaskInfo;
 
         if (this.listTaskWait.size() == 0) {
             return null;
@@ -350,7 +399,7 @@ public class ScilabService implements Serializable {
         for (int i = 0; i < this.listTaskWait.size(); i++) {
             sciTaskInfo = this.listTaskWait.get(i);
 
-            if (sciTaskInfo.getPriority() == SciTaskInfo.HIGH) {
+            if (sciTaskInfo.getPriority() == GenTaskInfo.HIGH) {
                 return this.listTaskWait.remove(i);
             }
         }
@@ -358,7 +407,7 @@ public class ScilabService implements Serializable {
         for (int i = 0; i < this.listTaskWait.size(); i++) {
             sciTaskInfo = this.listTaskWait.get(i);
 
-            if (sciTaskInfo.getPriority() == SciTaskInfo.NORMAL) {
+            if (sciTaskInfo.getPriority() == GenTaskInfo.NORMAL) {
                 return this.listTaskWait.remove(i);
             }
         }
@@ -367,7 +416,10 @@ public class ScilabService implements Serializable {
     }
 
     private SciEngineInfo getNextEngine() {
-        logger.debug("->ScilabService loop:getNextEngine");
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService loop:getNextEngine");
+        }
+
         String idEngine;
         SciEngineInfo sciEngineInfo;
         BooleanWrapper isActivate;
@@ -378,34 +430,56 @@ public class ScilabService implements Serializable {
             idEngine = this.listIdEngineFree.remove(0);
             sciEngineInfo = mapEngine.get(idEngine);
             isActivate = sciEngineInfo.getIsActivate();
-            logger.debug("->ScilabService test0:getNextEngine:" + idEngine);
+            if (logger.isDebugEnabled()) {
+                logger.debug("->ScilabService test0:getNextEngine:" + idEngine);
+            }
+
             if (ProActive.isAwaited(isActivate)) {
-                logger.debug("->ScilabService test1:getNextEngine:" + idEngine);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("->ScilabService test1:getNextEngine:" +
+                        idEngine);
+                }
+
                 this.listIdEngineFree.add(idEngine);
             } else if (isActivate.booleanValue()) {
-                logger.debug("->ScilabService test2:getNextEngine:" + idEngine);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("->ScilabService test2:getNextEngine:" +
+                        idEngine);
+                }
+
                 return sciEngineInfo;
             } else {
-                logger.debug("->ScilabService test3:getNextEngine:" + idEngine);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("->ScilabService test3:getNextEngine:" +
+                        idEngine);
+                }
+
                 this.listIdEngineFree.add(idEngine);
                 SciEngine sciEngine = sciEngineInfo.getSciEngine();
                 sciEngineInfo.setIsActivate(sciEngine.activate());
             }
+
             i++;
         }
+
         return null;
     }
 
     private synchronized void executeTasks() {
-        logger.debug("->ScilabService In:executeTasks");
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:executeTasks");
+        }
 
-        SciTaskInfo sciTaskInfo;
+        GenTaskInfo sciTaskInfo;
         SciEngineInfo sciEngineInfo;
 
         while (true) {
             if (this.listTaskWait.size() == 0) {
                 try {
-                    logger.debug("->ScilabService test0:executeTask");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("->ScilabService test0:executeTask");
+                    }
+
                     wait();
                 } catch (InterruptedException e) {
                 }
@@ -416,20 +490,28 @@ public class ScilabService implements Serializable {
             sciEngineInfo = this.getNextEngine();
             if (sciEngineInfo == null) {
                 try {
-                    logger.debug("->ScilabService test1:executeTask");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("->ScilabService test1:executeTask");
+                    }
+
                     wait(1000);
                 } catch (InterruptedException e) {
                 }
+
                 continue;
             }
 
             sciTaskInfo = this.getNextTask();
             if (sciTaskInfo == null) {
                 try {
-                    logger.debug("->ScilabService test2:executeTask");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("->ScilabService test2:executeTask");
+                    }
+
                     wait(1000);
                 } catch (InterruptedException e) {
                 }
+
                 continue;
             }
 
@@ -438,19 +520,22 @@ public class ScilabService implements Serializable {
     }
 
     private synchronized void executeTask(SciEngineInfo sciEngineInfo,
-        SciTaskInfo sciTaskInfo) {
-        logger.debug("->ScilabService In:executeTask");
-        SciResult sciResult;
+        GenTaskInfo sciTaskInfo) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:executeTask");
+        }
+
+        GeneralResult genResult;
         SciEngine sciEngine;
 
         sciEngineInfo.setIdCurrentTask(sciTaskInfo.getIdTask());
 
         sciEngine = sciEngineInfo.getSciEngine();
         sciTaskInfo.setIdEngine(sciEngineInfo.getIdEngine());
-        sciTaskInfo.setState(SciTaskInfo.RUNNING);
-        sciResult = sciEngine.execute(sciTaskInfo.getSciTask());
+        sciTaskInfo.setState(GenTaskInfo.RUNNING);
+        genResult = sciEngine.execute(sciTaskInfo.getTask());
 
-        sciTaskInfo.setSciResult(sciResult);
+        sciTaskInfo.setResult(genResult);
         this.mapTaskRun.put(sciTaskInfo.getIdTask(), sciTaskInfo);
         this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
         notifyAll();
@@ -489,7 +574,7 @@ public class ScilabService implements Serializable {
      * @param idTask of the terminated task
      * @return return the task
      */
-    public synchronized SciTaskInfo getTaskEnd(String idTask) {
+    public synchronized GenTaskInfo getTaskEnd(String idTask) {
         return mapTaskEnd.get(idTask);
     }
 
@@ -505,16 +590,16 @@ public class ScilabService implements Serializable {
      * @return a Map of terminated task
      */
     @SuppressWarnings("unchecked")
-    public synchronized HashMap<String, SciTaskInfo> getMapTaskEnd() {
-        return (HashMap<String, SciTaskInfo>) mapTaskEnd.clone();
+    public synchronized HashMap<String, GenTaskInfo> getMapTaskEnd() {
+        return (HashMap<String, GenTaskInfo>) mapTaskEnd.clone();
     }
 
     /**
      * @return a Map of running task
      */
     @SuppressWarnings("unchecked")
-    public synchronized HashMap<String, SciTaskInfo> getMapTaskRun() {
-        return (HashMap<String, SciTaskInfo>) mapTaskRun.clone();
+    public synchronized HashMap<String, GenTaskInfo> getMapTaskRun() {
+        return (HashMap<String, GenTaskInfo>) mapTaskRun.clone();
     }
 
     /**
@@ -529,8 +614,8 @@ public class ScilabService implements Serializable {
      * @return a List of pending tasks
      */
     @SuppressWarnings("unchecked")
-    public synchronized ArrayList<SciTaskInfo> getListTaskWait() {
-        return (ArrayList<SciTaskInfo>) listTaskWait.clone();
+    public synchronized ArrayList<GenTaskInfo> getListTaskWait() {
+        return (ArrayList<GenTaskInfo>) listTaskWait.clone();
     }
 
     /**
@@ -538,7 +623,10 @@ public class ScilabService implements Serializable {
      *
      */
     public synchronized void exit() {
-        logger.debug("->ScilabService In:exit");
+        if (logger.isDebugEnabled()) {
+            logger.debug("->ScilabService In:exit");
+        }
+
         SciEngineInfo sciEngineInfo;
         SciEngine sciEngine;
 

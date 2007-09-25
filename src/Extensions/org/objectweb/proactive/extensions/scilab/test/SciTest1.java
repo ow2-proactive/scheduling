@@ -30,15 +30,16 @@
  */
 package org.objectweb.proactive.extensions.scilab.test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.scilab.AbstractData;
+import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
 import org.objectweb.proactive.extensions.scilab.SciEngine;
-import org.objectweb.proactive.extensions.scilab.SciResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
@@ -53,7 +54,7 @@ public class SciTest1 {
         task.addDataIn(m1);
         task.addDataIn(m2);
         task.addDataIn(m3);
-        task.addDataOut(m3);
+        task.addDataOut("x");
         task.setJob("x = a+b;");
 
         // local deployment
@@ -64,13 +65,11 @@ public class SciTest1 {
             System.out.println("->Scilab engine is not activate");
         }
 
-        SciResult sciResult = engine.execute(task);
-        ArrayList listResult = sciResult.getList();
+        GeneralResult sciResult = engine.execute(task);
+        List<AbstractData> listResult = sciResult.getList();
 
-        SciData result;
-        for (int i = 0; i < listResult.size(); i++) {
-            result = (SciData) listResult.get(i);
-            System.out.println(result);
+        for (AbstractData data : listResult) {
+            System.out.println(data);
         }
 
         engine.exit();

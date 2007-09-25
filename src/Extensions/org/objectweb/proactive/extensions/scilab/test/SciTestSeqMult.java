@@ -88,6 +88,7 @@ public class SciTestSeqMult {
             Scilab.Exec("C=A*B;");
 
             SciData sciResult = Scilab.receiveDataByName("C");
+            System.out.println(sciResult);
             endTime = System.currentTimeMillis();
 
             System.out.println(endTime - startTime);
