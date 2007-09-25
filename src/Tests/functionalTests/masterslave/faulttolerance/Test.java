@@ -53,7 +53,7 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource(
             "/functionalTests/masterslave/faulttolerance/MasterSlaveFT.xml");
-    private Master master;
+    private Master<A, Integer> master;
     private List<A> tasks;
     private ProActiveDescriptorInternal pad;
     private VirtualNode vn1;
@@ -93,7 +93,7 @@ public class Test extends FunctionalTest {
 
         this.vn2 = this.pad.getVirtualNode("VN2");
 
-        master = new ProActiveMaster();
+        master = new ProActiveMaster<A, Integer>();
         master.addResources(this.vn1);
         master.addResources(this.vn2);
         master.setResultReceptionOrder(Master.OrderingMode.SubmitionOrder);

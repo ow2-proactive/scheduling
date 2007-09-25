@@ -35,6 +35,11 @@ import org.objectweb.proactive.extra.masterslave.interfaces.Task;
 
 
 public class A implements Task<Integer> {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -7987484979718521364L;
     private int taskcounter;
     private long delay;
     private boolean exception;
@@ -52,11 +57,13 @@ public class A implements Task<Integer> {
     public Integer run(SlaveMemory memory) throws Exception {
         if (exception) {
             int a = 1 / 0;
+            System.out.println(a);
         }
 
         if (delay > 0) {
             Thread.sleep(delay);
         }
+
         return taskcounter;
     }
 }

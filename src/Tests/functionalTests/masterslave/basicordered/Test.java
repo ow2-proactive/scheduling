@@ -50,7 +50,7 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource(
             "/functionalTests/masterslave/MasterSlave.xml");
-    private Master master;
+    private Master<A, Integer> master;
     private List<A> tasks;
     public static final int NB_TASKS = 4;
 
@@ -75,7 +75,7 @@ public class Test extends FunctionalTest {
             tasks.add(t);
         }
 
-        master = new ProActiveMaster();
+        master = new ProActiveMaster<A, Integer>();
         master.addResources(descriptor);
         master.setResultReceptionOrder(Master.OrderingMode.SubmitionOrder);
     }
