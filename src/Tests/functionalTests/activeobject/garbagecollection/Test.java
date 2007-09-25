@@ -72,18 +72,11 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        assertTrue(A.deadCounter.getValue() == 0);
+        assertTrue(A.countCollected() == 0);
         buildGraph();
-        int prevCounter = 0;
-        while (A.deadCounter.getValue() != 5) {
+        while (A.countCollected() != 5) {
             System.gc();
-            synchronized (A.deadCounter) {
-                A.deadCounter.wait(500);
-            }
-            int newCounter = A.deadCounter.getValue();
-            if (newCounter != prevCounter) {
-                prevCounter = newCounter;
-            }
+            Thread.sleep(500);
         }
     }
 
