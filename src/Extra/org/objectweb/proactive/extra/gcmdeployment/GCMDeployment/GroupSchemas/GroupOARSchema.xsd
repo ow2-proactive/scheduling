@@ -2,46 +2,58 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
-	<!--oarProcess-->
-	<complexType name="oarProcessType">
+	<complexType name="oarGroupType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="oarOption" type="paext:oarOptionType" />
+					<element name="resource" type="paext:oarResourceType" minOccurs="0" />
+					<element name="scriptPath" type="pa:pathElementType" minOccurs="0" />
+					<element name="directory" type="pa:pathElementType" minOccurs="0" />
+					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
 				</sequence>
 				<attribute name="bookedNodesAccess" use="optional">
 					<simpleType>
 						<restriction base="string">
 							<enumeration value="rsh" />
 							<enumeration value="ssh" />
+							<enumeration value="oarsh" />
 						</restriction>
 					</simpleType>
 				</attribute>
-				<attribute name="interactive"
-					type="pa:BooleanOrVariableType" use="optional" />
+				<attribute name="interactive" type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
+				<attribute name="type" use="optional">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="deploy" />
+							<enumeration value="besteffort" />
+							<enumeration value="cosystem" />
+							<enumeration value="checkpoint" />
+							<enumeration value="timesharing" />
+						</restriction>
+					</simpleType>
+				</attribute>
 			</extension>
 		</complexContent>
 	</complexType>
-	
-	<!--oarOption-->
-	<complexType name="oarOptionType">
-		<all>
-			<element name="resources" type="pa:TextOrVariableType"
-				minOccurs="0" />
-			<!--<element name="properties" type="string" minOccurs="0"/>-->
-			<element name="scriptPath" type="pa:pathElementType"
-				minOccurs="0" />
-		</all>
+
+	<complexType name="oarResourceType">
+		<simpleContent>
+			<extension base="pa:TextOrVariableType">
+				<attribute name="nodes" type="pa:PosintOrVariableType" use="optional"></attribute>
+				<attribute name="cpu" type="pa:PosintOrVariableType" use="optional"></attribute>
+				<attribute name="core" type="pa:PosintOrVariableType" use="optional"></attribute>
+			</extension>
+		</simpleContent>
 	</complexType>
 
-	<element name="oarGroup" type="paext:oarProcessType" substitutionGroup="pa:abstractShElement"/>
+	<element name="oarGroup" type="paext:oarGroupType" substitutionGroup="pa:abstractShElement" />
 
 </schema>

@@ -16,10 +16,16 @@ import org.w3c.dom.NodeList;
 public class GroupOARParser extends AbstractGroupParser {
     private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
     private static final String NODE_NAME_RESOURCES = "resources";
-    private static final String XPATH_OAR_OPTION = "oarOption";
+    private static final String NODE_NAME_DIRECTORY = "directory";
+    private static final String NODE_NAME_STDOUT = "stdout";
+    private static final String NODE_NAME_STDERR = "stderr";
     private static final String ATTR_BOOKED_NODES_ACCESS = "bookedNodesAccess";
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_INTERACTIVE = "interactive";
+    private static final String ATTR_TYPE = "type";
+    private static final String ATTR_RESOURCES_NODES = "nodes";
+    private static final String ATTR_RESOURCES_CPU = "nodes";
+    private static final String ATTR_RESOURCES_CORE = "nodes";
     private static final String NODE_NAME = "oarProcess";
 
     @Override
@@ -58,31 +64,56 @@ public class GroupOARParser extends AbstractGroupParser {
             oarGroup.setAccessProtocol(accessProtocol);
         }
 
-        //
-        // Parse options
-        //
-        try {
-            Node optionNode = (Node) xpath.evaluate(XPATH_OAR_OPTION,
-                    groupNode, XPathConstants.NODE);
+        String type = GCMParserHelper.getAttributeValue(groupNode, ATTR_TYPE);
+        if (type != null) {
+            oarGroup.setType(type);
+        }
 
-            NodeList childNodes = optionNode.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); ++i) {
-                Node childNode = childNodes.item(i);
-                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                String nodeName = childNode.getNodeName();
-                if (nodeName.equals(NODE_NAME_RESOURCES)) {
-                    oarGroup.setResources(GCMParserHelper.getElementValue(
-                            childNode));
-                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
-                    PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                    oarGroup.setScriptLocation(path);
-                }
+        //
+        // Parse child nodes
+        //
+        NodeList childNodes = groupNode.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); ++i) {
+            Node childNode = childNodes.item(i);
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
             }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
+
+            String nodeName = childNode.getNodeName();
+            if (nodeName.equals(NODE_NAME_RESOURCES)) {
+                String elementValue = GCMParserHelper.getElementValue(childNode);
+                if (elementValue != null) {
+                    oarGroup.setResources(elementValue);
+                } else {
+                    String nodes = GCMParserHelper.getAttributeValue(childNode,
+                            ATTR_RESOURCES_NODES);
+                    if (nodes != null) {
+                        oarGroup.setNodes(nodes);
+                    }
+                    String cpu = GCMParserHelper.getAttributeValue(childNode,
+                            ATTR_RESOURCES_CPU);
+                    if (cpu != null) {
+                        oarGroup.setCpu(cpu);
+                    }
+                    String core = GCMParserHelper.getAttributeValue(childNode,
+                            ATTR_RESOURCES_CORE);
+                    if (core != null) {
+                        oarGroup.setCore(core);
+                    }
+                }
+            } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
+                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
+                oarGroup.setScriptLocation(path);
+            } else if (nodeName.equals(NODE_NAME_DIRECTORY)) {
+                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
+                oarGroup.setDirectory(path);
+            } else if (nodeName.equals(NODE_NAME_STDOUT)) {
+                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
+                oarGroup.setStdOutFile(path);
+            } else if (nodeName.equals(NODE_NAME_STDERR)) {
+                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
+                oarGroup.setStdErrFile(path);
+            }
         }
     }
 }

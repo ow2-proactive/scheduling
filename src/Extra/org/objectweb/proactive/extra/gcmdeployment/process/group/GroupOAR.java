@@ -14,6 +14,13 @@ public class GroupOAR extends AbstractGroup {
     protected String queueName;
     protected String accessProtocol;
     private PathElement scriptLocation;
+    private PathElement directory;
+    private PathElement stdOutFile;
+    private PathElement stdErrFile;
+    private String type = "deploy";
+    private String nodes = "1";
+    private String cpu = null;
+    private String core = null;
 
     @Override
     public List<String> internalBuildCommands() {
@@ -59,5 +66,33 @@ public class GroupOAR extends AbstractGroup {
 
     public void setScriptLocation(PathElement location) {
         this.scriptLocation = location;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setNodes(String nodes) {
+        this.nodes = nodes;
+    }
+
+    public void setCpu(String cpu) {
+        this.cpu = cpu;
+    }
+
+    public void setCore(String core) {
+        this.core = core;
+    }
+
+    public void setDirectory(PathElement directory) {
+        this.directory = directory;
+    }
+
+    public void setStdOutFile(PathElement stdOutFile) {
+        this.stdOutFile = stdOutFile;
+    }
+
+    public void setStdErrFile(PathElement stdErrFile) {
+        this.stdErrFile = stdErrFile;
     }
 }
