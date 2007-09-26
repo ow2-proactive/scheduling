@@ -33,30 +33,28 @@ import java.io.IOException;
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
 
+
 public class ProActiveRemoteFile implements RemoteFile {
+    public void countReference(FileServer fserver) {
+        // TODO Auto-generated method stub
+    }
 
-	public void countReference(FileServer fserver) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void discountReference(FileServer fserver) {
+        // TODO Auto-generated method stub
+    }
 
-	public void discountReference(FileServer fserver) {
-		// TODO Auto-generated method stub
-		
-	}
+    public String getMD5Hash() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public String getMD5Hash() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public long length() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	public long length() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public boolean saveAs(File f) throws IOException {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public boolean saveAs(File f) throws IOException {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }
