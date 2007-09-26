@@ -91,11 +91,16 @@ public class SciTask extends AbstractGeneralTask {
         }
     }
 
-    public List<AbstractData> receiveDataOut() {
+    public List<AbstractData> receiveDataOut() throws ScilabException {
         ArrayList<AbstractData> results = new ArrayList<AbstractData>();
         for (int i = 0; i < listDataOut.size(); i++) {
-            SciData data = Scilab.receiveDataByName(listDataOut.get(i));
-            results.add(new AbstractData(data));
+            if (Scilab.ExistVar(listDataOut.get(i))) {
+                SciData data = Scilab.receiveDataByName(listDataOut.get(i));
+                results.add(new AbstractData(data));
+            } else {
+                throw new ScilabException("Variable " + listDataOut.get(i) +
+                    " cannot be found in the environment");
+            }
         }
 
         return results;

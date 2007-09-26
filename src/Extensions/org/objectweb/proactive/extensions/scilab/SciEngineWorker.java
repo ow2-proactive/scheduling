@@ -81,8 +81,14 @@ public class SciEngineWorker implements Serializable {
                 this.genResult.setState(GeneralResult.SUCCESS);
             } else {
                 this.genResult.setState(GeneralResult.ABORT);
-                this.genResult.setException(new MatlabException(
-                        "The MATLAB engine is closed"));
+                if (this.genTask instanceof MatlabTask) {
+                    this.genResult.setException(new MatlabException(
+                            "The MATLAB engine is closed"));
+                } else {
+                    this.genResult.setMessage("Error inside Scilab script." +
+                        System.getProperty("line.separator") +
+                        genTask.getLastMessage());
+                }
                 if (logger.isDebugEnabled()) {
                     logger.debug("->SciEngineWorker :execute : abort\n");
                 }

@@ -865,6 +865,11 @@ public class SciFrame extends javax.swing.JFrame {
                 PrintWriter pw = new PrintWriter(sw, true);
                 res.getException().printStackTrace(pw);
                 strResult += sw.toString();
+            } else if (res.getState() == GeneralResult.ABORT) {
+                if (res.hasMessage()) {
+                    strResult = res.getMessage() +
+                        System.getProperty("line.separator");
+                }
             } else {
                 List<AbstractData> listResult = sciTaskInfo.getResult().getList();
                 for (int i = 0; i < listResult.size(); i++) {
