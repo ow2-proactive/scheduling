@@ -24,8 +24,8 @@ public abstract class AbstractGroup implements Group {
         try {
             this.hostInfo = (HostInfo) ((group.hostInfo != null)
                 ? Utils.makeDeepCopy(group.hostInfo) : null);
-            this.commandPath = (commandPath != null) ? new String(commandPath)
-                                                     : null;
+            this.commandPath = (group.commandPath != null)
+                ? new String(group.commandPath) : null;
             this.env = (group.env != null) ? new String(group.env) : null;
             this.id = (group.id != null) ? new String(group.id) : null;
         } catch (IOException e) {
