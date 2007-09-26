@@ -67,7 +67,6 @@ public class VNActivator implements Serializable, RunActive,
         this.pause = pause;
     }
 
-    @Override
     public void initActivity(Body body) {
         ProActive.setImmediateService("nodeCreated");
 
@@ -75,7 +74,6 @@ public class VNActivator implements Serializable, RunActive,
         AOCreators = Executors.newFixedThreadPool(concurrency);
     }
 
-    @Override
     public void runActivity(Body body) {
 
         /*
@@ -159,7 +157,6 @@ public class VNActivator implements Serializable, RunActive,
             this.node = node;
         }
 
-        @Override
         public void run() {
             try {
                 String nodeUrl = node.getNodeInformation().getURL();

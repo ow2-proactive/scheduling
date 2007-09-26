@@ -32,7 +32,6 @@ public class CPUBurner implements Serializable, InitActive {
         manager.resultAvailable(new Result(id, null));
     }
 
-    @Override
     public void initActivity(Body body) {
         ProActive.setImmediateService("getId");
     }

@@ -29,7 +29,6 @@ public class Manager implements Serializable, InitActive, RunActive {
         // No-args constructor
     }
 
-    @Override
     public void initActivity(Body body) {
         slaves = new HashMap<Integer, CPUBurner>();
         iteration = 0;
@@ -41,7 +40,6 @@ public class Manager implements Serializable, InitActive, RunActive {
      * nodeAvailable or resultAvailable can be prioritized by changing the
      * runActivity.
      */
-    @Override
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (body.isActive()) {
