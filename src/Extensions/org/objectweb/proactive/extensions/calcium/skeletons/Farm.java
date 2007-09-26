@@ -30,7 +30,8 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
-import java.util.Stack;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 
 /**
@@ -38,16 +39,21 @@ import java.util.Stack;
  * A task will execute the child skeleton.
  *
  * @author The ProActive Team (mleyton)
- *
  */
-public class Farm<P, R> implements Skeleton<P, R> {
+@PublicAPI
+public class Farm<P extends java.io.Serializable, R extends java.io.Serializable>
+    implements Skeleton<P, R> {
     Skeleton<P, R> child;
 
     public Farm(Skeleton<P, R> child) {
         this.child = child;
     }
 
-    public Stack<Instruction> getInstructionStack() {
-        return child.getInstructionStack();
+    public Farm(Execute<P, R> muscle) {
+        this.child = new Seq<P, R>(muscle);
+    }
+
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 }

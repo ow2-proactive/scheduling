@@ -30,48 +30,36 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.blast;
 
-import java.net.URL;
+import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
+import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
-public class ExecuteFormatQuery extends AbstractExecuteCommand
-    implements Execute<BlastParameters, BlastParameters> {
+@StateFul(value = false)
+public class ExecuteFormatQuery implements Execute<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public BlastParameters execute(BlastParameters param)
-        throws EnvironmentException {
+    public BlastParams execute(SkeletonSystem system, BlastParams param)
+        throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("Formating query file:" +
-                param.getQueryFile().getAbsolutePath());
+            logger.debug("Executing Format Query");
         }
 
-        super.execProcess(param.getFormatQueryString(),
-            param.getWorkingDirectory());
+        //Put the native program in the wspace
+        WSpace wspace = system.getWorkingSpace();
+        File formatDB = wspace.copyInto(param.formatProg);
 
+        //Execute the native command
+        String args = param.getFormatQueryString();
+        system.execCommand(formatDB, args);
+
+        //TODO keep a reference on the index files??????????
         return param;
-    }
-
-    @Override
-    public URL getProgramURL() throws EnvironmentException {
-        String osName = System.getProperty("os.name");
-
-        if (!osName.equals("Linux")) {
-            throw new EnvironmentException("Linux machines are required");
-        }
-
-        URL url = Blast.class.getClass()
-                             .getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/formatdb");
-
-        if (url == null) {
-            throw new MuscleException("Unable to find formatdb binary");
-        }
-
-        return url;
     }
 }

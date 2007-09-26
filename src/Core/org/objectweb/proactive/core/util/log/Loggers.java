@@ -139,11 +139,13 @@ public interface Loggers {
     // Skeleton loggers
     static final public String SKELETONS = CORE + ".skeletons";
     static final public String SKELETONS_STRUCTURE = SKELETONS + ".structure";
-    static final public String SKELETONS_MANAGER = SKELETONS + ".manager";
-    static final public String SKELETONS_KERNEL = SKELETONS + ".kernel";
+    static final public String SKELETONS_ENVIRONMENT = SKELETONS +
+        ".environment";
+    static final public String SKELETONS_KERNEL = SKELETONS + ".taskpool";
     static final public String SKELETONS_APPLICATION = SKELETONS +
         ".application";
     static final public String SKELETONS_DIAGNOSIS = SKELETONS + ".diagnosis";
+    static final public String SKELETONS_SYSTEM = SKELETONS + ".system";
     static final public String SCHEDULER = CORE + ".scheduler";
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
 

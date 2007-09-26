@@ -31,13 +31,26 @@
 package org.objectweb.proactive.extensions.calcium.examples.blast;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
-public class DivideDBCondition implements Condition<BlastParameters> {
-    public boolean evalCondition(BlastParameters param) {
-        File file = param.getDatabaseFile();
-        return file.length() > param.getMaxDBSize();
+public class DivideDBCondition implements Condition<BlastParams> {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
+
+    public boolean evalCondition(SkeletonSystem system, BlastParams param)
+        throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Evaluating DB divition condition");
+        }
+
+        File file = param.dbFile;
+
+        return file.length() > param.maxDBSize;
     }
 }

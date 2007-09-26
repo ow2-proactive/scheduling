@@ -31,10 +31,11 @@
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class ChallengeDivideCondition implements Condition<Challenge> {
-    public boolean evalCondition(Challenge params) {
+    public boolean evalCondition(SkeletonSystem system, Challenge params) {
         return (params.max - params.min) > params.solvableSize;
     }
 }

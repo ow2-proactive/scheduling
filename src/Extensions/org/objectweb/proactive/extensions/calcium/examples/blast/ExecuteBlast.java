@@ -30,54 +30,40 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.blast;
 
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
+import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
-public class ExecuteBlast extends AbstractExecuteCommand implements Execute<BlastParameters, BlastParameters> {
+@StateFul(value = false)
+public class ExecuteBlast implements Execute<BlastParams, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public BlastParameters execute(BlastParameters param)
-        throws EnvironmentException {
+    public File execute(SkeletonSystem system, BlastParams param)
+        throws EnvironmentException, IOException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Executing Blast. Database=" +
-                param.getDatabaseFile().getAbsolutePath() + " Query=" +
-                param.getQueryFile().getAbsoluteFile());
+            logger.debug("Executing Blast");
         }
 
-        super.execProcess(param.getBlastParemeterString(),
-            param.getWorkingDirectory());
+        //Put the native program in the wspace
+        WSpace wspace = system.getWorkingSpace();
+        File blastProg = wspace.copyInto(param.blastProg);
 
-        return param;
-    }
+        //Create a reference to a file in the wspace
+        File result = wspace.newFile("result.blast");
+        String args = param.getBlastParemeterString(result);
 
-    @Override
-    public URL getProgramURL() throws EnvironmentException {
+        //Execute the native blast
+        system.execCommand(blastProg, args);
 
-        /*
-        String osName=System.getProperty("os.name");
-        String osArch=System.getProperty("os.arch");
-        String osVersion=System.getProperty("os.version");
-        */
-        String osName = System.getProperty("os.name");
-
-        if (!osName.equals("Linux")) {
-            throw new EnvironmentException("Linux machines are required");
-        }
-
-        URL url = Blast.class.getClass()
-                             .getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/blastall");
-
-        if (url == null) {
-            throw new MuscleException("Unable to find formatdb binary");
-        }
-
-        return url;
+        return result;
     }
 }

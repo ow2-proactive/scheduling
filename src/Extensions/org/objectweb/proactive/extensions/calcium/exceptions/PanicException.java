@@ -42,4 +42,12 @@ public class PanicException extends Exception {
     public PanicException(String msg) {
         super(msg);
     }
+
+    public PanicException(String msg, Throwable t) {
+        super(msg, t);
+    }
+
+    public PanicException(Throwable t) {
+        super(t);
+    }
 }

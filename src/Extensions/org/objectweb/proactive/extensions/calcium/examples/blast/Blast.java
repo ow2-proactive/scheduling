@@ -33,14 +33,15 @@ package org.objectweb.proactive.extensions.calcium.examples.blast;
 import java.io.File;
 
 import org.objectweb.proactive.extensions.calcium.Calcium;
-import org.objectweb.proactive.extensions.calcium.MultiThreadedManager;
-import org.objectweb.proactive.extensions.calcium.ResourceManager;
 import org.objectweb.proactive.extensions.calcium.Stream;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.NQueens;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
+import org.objectweb.proactive.extensions.calcium.skeletons.Fork;
 import org.objectweb.proactive.extensions.calcium.skeletons.Pipe;
 import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
@@ -48,58 +49,52 @@ import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
 
 
 public class Blast {
-    Skeleton<BlastParameters, BlastParameters> root;
+    Skeleton<BlastParams, File> root;
 
     public Blast() {
-        /*
-         * Blast a database
-         * 2.1 Format the database
-         * 2.2 Format the database
-         * 2.3 Blast the database
-         * 2.4 Cleanup
-         */
-        Pipe<BlastParameters, BlastParameters> blastPipe = new Pipe<BlastParameters, BlastParameters>(new Seq<BlastParameters, BlastParameters>(
-                    new ExecuteFormatDB()),
-                new Seq<BlastParameters, BlastParameters>(new ExecuteFormatQuery()),
-                new Seq<BlastParameters, BlastParameters>(new ExecuteBlast()),
-                new Seq<BlastParameters, BlastParameters>(new CleanBlast()));
+        /* Format the query and database files */
+        Pipe<BlastParams, BlastParams> formatFork = new Pipe<BlastParams, BlastParams>(new ExecuteFormatDB(),
+                new ExecuteFormatQuery());
 
-        /* 1   Divide the database
-         * 2   Blast the database with the query
-         * 3   Conquer the query results  */
-        root = new DaC<BlastParameters, BlastParameters>(new DivideDB(),
+        /* Blast a database
+         * 2.1 Format the database
+         * 2.2 Blast the database */
+        Pipe<BlastParams, File> blastPipe = new Pipe<BlastParams, File>(formatFork,
+                new Seq<BlastParams, File>(new ExecuteBlast()));
+
+        /* 1 Divide the database
+         * 2 Blast the database with the query
+         * 3 Conquer the query results  */
+        root = new DaC<BlastParams, File>(new DivideDB(),
                 new DivideDBCondition(), blastPipe, new ConquerResults());
     }
 
     public static void main(String[] args) throws Exception {
-        BlastParameters param = new BlastParameters(new File("/tmp/blast.query"),
-                new File("/tmp/blast.db"), true, 100 * 1024);
-        param.setRootParameter(true);
+        BlastParams param = new BlastParams(new File("/home/mleyton/query.nt"),
+                new File("/home/mleyton/db.nt"), true, 100 * 1024);
+
         Blast blast = new Blast();
-        blast.start(param);
+        blast.solve(param);
     }
 
-    private void start(BlastParameters parameters)
+    private void solve(BlastParams parameters)
         throws InterruptedException, PanicException {
         String descriptor = NQueens.class.getResource("LocalDescriptor.xml")
                                          .getPath();
 
         //descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
-        ResourceManager manager = new MultiThreadedManager(8);
+        //new ProActiveEnvironment(descriptor, "local");
+        EnvironmentFactory envfactory = new MultiThreadedEnvironment(1);
 
-        //new MonoThreadedManager();
-        //new ProActiveThreadedManager(descriptor, "local");
-        //new ProActiveManager(descriptor, "local");
-        Calcium calcium = new Calcium(manager);
-        Stream<BlastParameters, BlastParameters> stream = calcium.newStream(root);
-        Future<BlastParameters> future = stream.input(parameters);
+        Calcium calcium = new Calcium(envfactory);
+        Stream<BlastParams, File> stream = calcium.newStream(root);
+        Future<File> future = stream.input(parameters);
         calcium.boot();
 
         try {
-            BlastParameters res = future.get();
-            File outPutFile = res.getOutPutFile();
-            System.out.println("Result in:" + outPutFile.getAbsolutePath() +
-                +outPutFile.length() + " [bytes]");
+            File res = future.get();
+            System.out.println("Result in:" + res + " " + res.length() +
+                " [bytes]");
             System.out.println(future.getStats());
         } catch (MuscleException e) {
             e.printStackTrace();

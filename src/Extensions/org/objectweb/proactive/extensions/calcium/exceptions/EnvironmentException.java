@@ -45,4 +45,8 @@ public class EnvironmentException extends Exception {
     public EnvironmentException(String msg) {
         super(msg);
     }
+
+    public EnvironmentException(Exception e) {
+        super(e);
+    }
 }

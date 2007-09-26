@@ -36,49 +36,45 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.Skernel;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
+import org.objectweb.proactive.extensions.calcium.task.Task;
+import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
+import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
 /**
  * This class provides a Facade access to the kernel.
  * Since the kernel handles tasks for multiple streams at the same
  * time, this class is in charge of redirecting:
- *  -Tasks from streams into the kernel
- *  -Tasks comming out from the kernel into their respective streams.
+ *  -Tasks from streams into the taskpool
+ *  -Tasks comming out from the taskpool into their respective streams.
  *
  * @author The ProActive Team (mleyton)
  */
-public class Facade {
+class Facade {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
-    private Skernel skernel;
+    private TaskPool taskpool;
     private FutureUpdateThread results;
     private PanicException panic;
     private int counter;
 
-    public Facade() {
-        this.skernel = null;
-        this.results = null;
+    Facade(TaskPool taskpool) {
+        this.taskpool = taskpool;
+        this.results = new FutureUpdateThread();
         this.panic = null;
         this.counter = 0;
     }
 
-    public synchronized void putTask(Task<?> task, FutureImpl<?> future)
-        throws InterruptedException, PanicException {
-        while (skernel == null) {
-            wait();
-        }
-
-        task.setFamily(counter * (-1));
+    synchronized void putTask(Task<?> task, FutureImpl<?> future)
+        throws PanicException {
+        task.taskId.setFamilyId(counter * (-1));
         counter++;
-        skernel.addReadyTask(task);
+        taskpool.addReadyRootTask(task);
         results.put(future);
     }
 
-    public synchronized void setSkernel(Skernel skernel) {
-        this.skernel = skernel;
-        this.results = new FutureUpdateThread();
+    synchronized void boot() {
         results.start();
         notifyAll();
     }
@@ -87,13 +83,15 @@ public class Facade {
      * This class stores references to the futures, and updates
      * the references once the results are available.
      *
-     * @author mleyton
+     * @author The ProActive Team (mleyton)
      */
     class FutureUpdateThread extends Thread {
         Hashtable<Integer, FutureImpl<?>> pending;
+        boolean shutdown;
 
         public FutureUpdateThread() {
             pending = new Hashtable<Integer, FutureImpl<?>>();
+            shutdown = false;
         }
 
         /**
@@ -113,29 +111,30 @@ public class Facade {
         }
 
         private synchronized void updateFuture(Task<?> task) {
-            if (!pending.containsKey(task.getId())) {
-                logger.error("No future is waiting for task:" + task.getId());
+            if (!pending.containsKey(task.taskId.getId())) {
+                logger.error("No future is waiting for task:" +
+                    task.taskId.getId());
                 return;
             }
 
-            FutureImpl<?> future = pending.remove(task.getId());
+            FutureImpl<?> future = pending.remove(task.taskId.getId());
             future.setFinishedTask(task);
         }
 
         /**
-         * @return The number of total elements on this structure.
+         * @return The number of total elements in this structure.
          */
-        public synchronized int size() {
+        synchronized int size() {
             return pending.size();
         }
 
         @Override
         public void run() {
-            //TODO add terminatino condition
-            while (panic == null) {
+            //TODO add termination condition
+            while ((panic == null) || shutdown) {
                 Task<?> taskResult = null;
                 try {
-                    taskResult = (Task<?>) skernel.getResult();
+                    taskResult = (Task<?>) taskpool.getResult();
                 } catch (PanicException ex) {
                     //logger.error("Facade has encounterd skernel panic! Stopping future update thread");
                     ex.printStackTrace();
@@ -150,5 +149,14 @@ public class Facade {
                 results.updateFuture(taskResult);
             }
         }
+
+        public void shutdown() {
+            shutdown = true;
+        }
+    }
+
+    public void shutdown() {
+        results.shutdown();
+        //TODO finish the shutdown
     }
 }

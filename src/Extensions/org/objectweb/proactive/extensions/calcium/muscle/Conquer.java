@@ -30,9 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
-import java.util.Vector;
-
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
@@ -44,7 +42,7 @@ import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentExceptio
  *
  * @param <P,R>
  */
-public interface Conquer<Y, R> extends Muscle<Vector<Y>, R> {
-    public R conquer(Vector<Y> param)
-        throws RuntimeException, EnvironmentException;
+public interface Conquer<Y, R> extends Muscle<Y[], R> {
+    public R conquer(SkeletonSystem system, Y[] param)
+        throws Exception;
 }

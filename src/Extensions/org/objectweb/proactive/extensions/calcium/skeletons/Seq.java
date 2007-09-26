@@ -30,12 +30,8 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
-import java.util.Stack;
-
-import org.objectweb.proactive.extensions.calcium.Task;
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
-import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 
 
 /**
@@ -47,31 +43,19 @@ import org.objectweb.proactive.extensions.calcium.statistics.Timer;
  *
  * @param <P>
  */
-public class Seq<P, R> implements Skeleton<P, R>, Instruction<P, R> {
+@PublicAPI
+public class Seq<P extends java.io.Serializable, R extends java.io.Serializable>
+    implements Skeleton<P, R> {
     Execute<P, R> secCode;
-    int muscleId;
 
+    //int muscleId;
     public Seq(Execute<P, R> secCode) {
         this.secCode = secCode;
-        muscleId = 0;
+        //muscleId = 0;
     }
 
-    public Stack<Instruction> getInstructionStack() {
-        Stack<Instruction> v = new Stack<Instruction>();
-        v.add(this);
-        return v;
-    }
-
-    public Task<R> compute(Task<P> t)
-        throws RuntimeException, EnvironmentException {
-        Timer timer = new Timer();
-        R resultObject = secCode.execute(t.getObject());
-        timer.stop();
-
-        Task<R> newtask = t.reBirth(resultObject);
-
-        t.getStats().getWorkout().track(secCode, timer);
-        return newtask;
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

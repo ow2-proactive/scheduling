@@ -30,12 +30,9 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
-import java.util.Stack;
-import java.util.Vector;
-
-import org.objectweb.proactive.extensions.calcium.Task;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
-import org.objectweb.proactive.extensions.calcium.statistics.Timer;
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 
 /**
@@ -47,7 +44,8 @@ import org.objectweb.proactive.extensions.calcium.statistics.Timer;
  *
  * @param <P>
  */
-public class While<P> implements Instruction<P, P>, Skeleton<P, P> {
+@PublicAPI
+public class While<P extends java.io.Serializable> implements Skeleton<P, P> {
     Condition<P> cond;
     Skeleton<P, P> child;
 
@@ -56,31 +54,12 @@ public class While<P> implements Instruction<P, P>, Skeleton<P, P> {
         this.child = child;
     }
 
-    public Stack<Instruction> getInstructionStack() {
-        Stack<Instruction> v = new Stack<Instruction>();
-        v.add(this);
-        return v;
+    public While(Condition<P> cond, Execute<P, P> muscle) {
+        this.cond = cond;
+        this.child = new Seq<P, P>(muscle);
     }
 
-    public Task<P> compute(Task<P> task) throws Exception {
-        Timer timer = new Timer();
-        boolean evalCondition = cond.evalCondition(task.getObject());
-        timer.stop();
-        task.getStats().getWorkout().track(cond, timer);
-
-        if (evalCondition) {
-            //Get Child stack
-            Vector<Instruction> childStack = child.getInstructionStack();
-
-            //Add me to evaluate while condition after executing child
-            childStack.add(0, this);
-
-            //Add new elements to the task's stack
-            Vector<Instruction> taskStack = task.getStack();
-            taskStack.addAll(childStack);
-            task.setStack(taskStack);
-        }
-
-        return task;
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 }

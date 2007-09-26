@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.Result;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.SolveBoard;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class SolveBT1 extends SolveBoard {
@@ -40,7 +41,7 @@ public class SolveBT1 extends SolveBoard {
         super();
     }
 
-    public Result execute(Board board) {
+    public Result execute(SkeletonSystem system, Board board) {
         n1 = board.n - 1;
         n2 = n1 - 1;
         BoardBT1 boardBT1 = (BoardBT1) board;

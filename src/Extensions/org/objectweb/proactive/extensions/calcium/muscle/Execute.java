@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
@@ -43,5 +43,5 @@ import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentExceptio
  * @param <T>
  */
 public interface Execute<P, R> extends Muscle<P, R> {
-    public R execute(P param) throws RuntimeException, EnvironmentException;
+    public R execute(SkeletonSystem system, P param) throws Exception;
 }

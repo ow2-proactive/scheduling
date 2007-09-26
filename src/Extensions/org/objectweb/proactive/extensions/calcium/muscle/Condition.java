@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
@@ -43,6 +43,6 @@ import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentExceptio
  *
  */
 public interface Condition<P> extends Muscle<P, Boolean> {
-    public boolean evalCondition(P param)
-        throws RuntimeException, EnvironmentException;
+    public boolean evalCondition(SkeletonSystem system, P param)
+        throws Exception;
 }

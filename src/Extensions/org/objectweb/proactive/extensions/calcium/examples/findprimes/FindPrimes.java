@@ -34,12 +34,12 @@ import java.io.Serializable;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.Calcium;
-import org.objectweb.proactive.extensions.calcium.ResourceManager;
 import org.objectweb.proactive.extensions.calcium.Stream;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
-import org.objectweb.proactive.extensions.calcium.proactive.ProActiveThreadedManager;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
 import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
@@ -66,8 +66,7 @@ public class FindPrimes implements Serializable {
         String descriptor = FindPrimes.class.getResource("LocalDescriptor.xml")
                                             .getPath();
 
-        ResourceManager manager = new ProActiveThreadedManager(descriptor,
-                "local");
+        EnvironmentFactory manager = new MultiThreadedEnvironment(1);
 
         //new MonoThreadedManager();
         //new MultiThreadedManager(5);

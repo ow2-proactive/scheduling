@@ -32,10 +32,11 @@ package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class SolveChallenge implements Execute<Challenge, Primes> {
-    public Primes execute(Challenge param)
+    public Primes execute(SkeletonSystem system, Challenge param)
         throws RuntimeException, EnvironmentException {
         Primes primes = new Primes();
 

@@ -66,11 +66,12 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.security.psm = DEBUG, CONSOLE
 
 #log4j.logger.proactive.skeletons = DEBUG, CONSOLE
-#log4j.logger.proactive.skeletons.kernel = DEBUG, CONSOLE
+#log4j.logger.proactive.skeletons.taskpool = DEBUG, CONSOLE
 #log4j.logger.proactive.skeletons.structure = DEBUG, CONSOLE
-#log4j.logger.proactive.skeletons.manager = DEBUG, CONSOLE
+#log4j.logger.proactive.skeletons.environment = DEBUG, CONSOLE
 #log4j.logger.proactive.skeletons.application = DEBUG, CONSOLE
 #log4j.logger.proactive.skeletons.diagnosis	 = DEBUG, CONSOLE
+#log4j.logger.proactive.skeletons.system = DEBUG, CONSOLE
 
 #log4j.logger.proactive.scheduler = DEBUG, CONSOLE
 #log4j.logger.proactive.resourceManager = DEBUG, CONSOLE

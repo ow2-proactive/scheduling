@@ -30,14 +30,14 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.nqueens;
 
-import java.util.Vector;
-
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class ConquerBoard implements Conquer<Result, Result> {
-    public Result conquer(Vector<Result> result) {
-        Result r = new Result(result.get(0).n);
+    public Result conquer(SkeletonSystem system, Result[] result) {
+        Result r = new Result(result[0].n);
+
         for (Result b : result) {
             for (int i = 0; i < r.n; i++) {
                 r.solutions[i] += b.solutions[i];

@@ -31,13 +31,13 @@
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
 import java.util.Collections;
-import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class ConquerChallenge implements Conquer<Primes, Primes> {
-    public Primes conquer(Vector<Primes> p) {
+    public Primes conquer(SkeletonSystem system, Primes[] p) {
         Primes conquered = new Primes();
 
         for (Primes param : p) {

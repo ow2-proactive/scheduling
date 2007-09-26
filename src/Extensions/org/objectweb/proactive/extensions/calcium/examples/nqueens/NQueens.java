@@ -31,18 +31,17 @@
 package org.objectweb.proactive.extensions.calcium.examples.nqueens;
 
 import java.io.Serializable;
-import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.Calcium;
-import org.objectweb.proactive.extensions.calcium.MultiThreadedManager;
-import org.objectweb.proactive.extensions.calcium.ResourceManager;
 import org.objectweb.proactive.extensions.calcium.Stream;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
+import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.DivideBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.SolveBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.DivideBT2;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.SolveBT2;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
-import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.monitor.Monitor;
 import org.objectweb.proactive.extensions.calcium.monitor.SimpleLogMonitor;
@@ -55,15 +54,15 @@ import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
 public class NQueens implements Serializable {
     public Skeleton<Board, Result> root;
 
-    public static void main(String[] args)
-        throws InterruptedException, PanicException {
+    public static void main(String[] args) throws Exception {
         NQueens nq = new NQueens();
+
         if (args.length != 5) {
-            nq.start(16, 15, 10,
+            nq.solve(16, 14, 10,
                 NQueens.class.getResource("LocalDescriptor.xml").getPath(),
                 "local");
         } else {
-            nq.start(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
+            nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
                 Integer.parseInt(args[2]), args[3], args[4]);
         }
     }
@@ -81,37 +80,27 @@ public class NQueens implements Serializable {
         root = new Fork<Board, Result>(new ConquerBoard(), BT1, BT2);
     }
 
-    public void start(int boardSize, int solvableSize, int times,
-        String descriptor, String virtualNode)
-        throws InterruptedException, PanicException {
-        ResourceManager manager = new MultiThreadedManager(10);
+    public void solve(int boardSize, int solvableSize, int times,
+        String descriptor, String virtualNode) throws Exception {
+        EnvironmentFactory manager = new MultiThreadedEnvironment(2);
 
-        //new MonoThreadedManager();
-        //new ProActiveThreadedManager(descriptor, virtualNode);
-        //new ProActiveManager(descriptor, virtualNode);
+        //EnvironmentFactory manager = new ProActiveEnvironment(descriptor, virtualNode);
         Calcium calcium = new Calcium(manager);
-        Monitor monitor = new SimpleLogMonitor(calcium, 5);
+        Monitor monitor = new SimpleLogMonitor(calcium, 1);
         monitor.start();
         calcium.boot();
 
         Stream<Board, Result> stream = calcium.newStream(root);
-        Vector<Future<Result>> futures = new Vector<Future<Result>>(times);
 
         for (int i = 0; i < times; i++) {
-            Future<Result> f = stream.input(new Board(boardSize, solvableSize));
-            futures.add(f);
+            stream.submit(new Board(boardSize, solvableSize));
         }
 
         try {
-            for (Future<Result> future : futures) {
+            for (; times > 0; times--) {
+                Future<Result> future = stream.retrieve();
                 Result res = future.get();
-                long total = 0;
-                for (int i = 0; i < res.solutions.length; i++) {
-                    System.out.print(res.solutions[i] + "|");
-                    total += res.solutions[i];
-                }
-                System.out.println();
-                System.out.println("Total=" + total);
+                System.out.println(res);
                 System.out.println(future.getStats());
             }
         } catch (MuscleException e) {

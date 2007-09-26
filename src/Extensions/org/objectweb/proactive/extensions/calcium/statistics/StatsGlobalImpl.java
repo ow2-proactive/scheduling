@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.statistics;
 
-import org.objectweb.proactive.extensions.calcium.Task;
+import org.objectweb.proactive.extensions.calcium.task.Task;
 
 
 /**
@@ -91,7 +91,7 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal {
 
         return "Queue Lengths:  " + readyNewQueueLength + "/" +
         readyQueueLength + "R " + processingQueueLength + "P " +
-        waitingQueueLength + "W " + resultsQueueLength + "F" + ls +
+        waitingQueueLength + "W " + resultsQueueLength + "F" + ", " +
         /*
         "Average Times:  "+getAverageReadyTime()+"R "+getAverageProcessingTime()+"P "+
         getAverageWaitingTime()+"W "+getAverageResultsTime()+"F "+

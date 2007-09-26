@@ -34,10 +34,11 @@ import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class DivideBT1 implements Divide<Board, Board> {
-    public Vector<Board> divide(Board board) {
+    public Vector<Board> divide(SkeletonSystem system, Board board) {
         if (board.isRootBoard()) {
             return initDivideBT1(board);
         }

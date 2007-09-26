@@ -36,59 +36,65 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
-public class ConquerResults implements Conquer<BlastParameters, BlastParameters> {
+public class ConquerResults implements Conquer<File, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public BlastParameters conquer(Vector<BlastParameters> param) {
-        try {
-            BufferedWriter bw;
-
-            //TODO check param.get used to be parent
-            BlastParameters bp = new BlastParameters(null, null, false, 0);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Conquering results into File: " +
-                    param.get(0).getOutPutFile().getAbsolutePath());
-            }
-
-            bw = new BufferedWriter(new FileWriter(param.get(0).getOutPutFile()));
-
-            for (BlastParameters p : param) {
-                appendTo(bw, p.getOutPutFile());
-                p.getOutPutFile().delete(); //delete partial results
-                p.getDatabaseFile().delete(); //delete partial files
-            }
-
-            bw.close();
-            return bp;
-        } catch (Exception e) {
-            throw new MuscleException(e);
+    public File conquer(SkeletonSystem system, File[] param)
+        throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Conquering Results");
         }
+
+        WSpace wspace = system.getWorkingSpace();
+
+        //Create a reference on the result merged file
+        File merged = wspace.newFile("merged.result");
+
+        //Merge the files
+        mergeFiles(merged, param);
+
+        //Return the result
+        return merged;
     }
 
-    private void appendTo(BufferedWriter bw, File dest)
+    /**
+     * This method takes a list of files and copies their content into a new
+     * file, merging them all together.
+     *
+     * @param merged
+     *            The output file, which will hold the merged result.
+     * @param files
+     *            The list of files to merge.
+     *
+     * @throws IOException
+     */
+    private void mergeFiles(File merged, File[] files)
         throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(dest));
-
         if (logger.isDebugEnabled()) {
-            logger.debug("Conquering File: " + dest.getAbsolutePath() + " " +
-                dest.length() + "[bytes]");
+            logger.debug("Conquering results into File: " + merged);
         }
 
-        String line = br.readLine();
-        while (line != null) {
-            bw.write(line + System.getProperty("line.separator"));
-            line = br.readLine();
+        BufferedWriter bw = new BufferedWriter(new FileWriter(merged));
+        for (File f : files) {
+            BufferedReader br = new BufferedReader(new FileReader(f));
+
+            String line = br.readLine();
+            while (line != null) {
+                bw.write(line + System.getProperty("line.separator"));
+                line = br.readLine();
+            }
+            br.close();
         }
-        br.close();
+
+        bw.close();
     }
 }

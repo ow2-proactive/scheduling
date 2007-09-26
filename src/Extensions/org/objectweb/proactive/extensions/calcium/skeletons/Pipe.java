@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
-import java.util.Stack;
+import java.io.Serializable;
 import java.util.Vector;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 
 /**
@@ -40,18 +43,29 @@ import java.util.Vector;
  *
  * @author The ProActive Team (mleyton)
  */
-public class Pipe<P, R> implements Skeleton<P, R> {
+@PublicAPI
+public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable>
+    implements Skeleton<P, R> {
     Vector<Skeleton<?, ?>> stages;
 
-    public <X>Pipe(Skeleton<P, X> child1, Skeleton<X, R> child2) {
+    public <X extends Serializable>Pipe(Skeleton<P, X> child1,
+        Skeleton<X, R> child2) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(child1);
         stages.add(child2);
     }
 
-    public <X, Y>Pipe(Skeleton<P, X> child1, Skeleton<X, Y> child2,
-        Skeleton<Y, R> child3) {
+    public <X extends Serializable>Pipe(Execute<P, X> child1,
+        Execute<X, R> child2) {
+        stages = new Vector<Skeleton<?, ?>>();
+
+        stages.add(new Seq<P, X>(child1));
+        stages.add(new Seq<X, R>(child2));
+    }
+
+    public <X extends Serializable, Y extends Serializable>Pipe(
+        Skeleton<P, X> child1, Skeleton<X, Y> child2, Skeleton<Y, R> child3) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(child1);
@@ -59,8 +73,18 @@ public class Pipe<P, R> implements Skeleton<P, R> {
         stages.add(child3);
     }
 
-    public <X, Y, Z>Pipe(Skeleton<P, X> child1, Skeleton<X, Y> child2,
-        Skeleton<Y, Z> child3, Skeleton<Z, R> child4) {
+    public <X extends Serializable, Y extends Serializable>Pipe(
+        Execute<P, X> child1, Execute<X, Y> child2, Execute<Y, R> child3) {
+        stages = new Vector<Skeleton<?, ?>>();
+
+        stages.add(new Seq<P, X>(child1));
+        stages.add(new Seq<X, Y>(child2));
+        stages.add(new Seq<Y, R>(child3));
+    }
+
+    public <X extends Serializable, Y extends Serializable, Z extends Serializable>Pipe(
+        Skeleton<P, X> child1, Skeleton<X, Y> child2, Skeleton<Y, Z> child3,
+        Skeleton<Z, R> child4) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(child1);
@@ -69,25 +93,18 @@ public class Pipe<P, R> implements Skeleton<P, R> {
         stages.add(child4);
     }
 
-    /*public Pipe(Skeleton<T>... args){
-            this(Arrays.asList(args));
+    public <X extends Serializable, Y extends Serializable, Z extends Serializable>Pipe(
+        Execute<P, X> child1, Execute<X, Y> child2, Execute<Y, Z> child3,
+        Execute<Z, R> child4) {
+        stages = new Vector<Skeleton<?, ?>>();
+
+        stages.add(new Seq<P, X>(child1));
+        stages.add(new Seq<X, Y>(child2));
+        stages.add(new Seq<Y, Z>(child3));
+        stages.add(new Seq<Z, R>(child4));
     }
 
-    public Pipe(List<Skeleton<T>> stages){
-            if(stages.size() <=0 ) {
-                    throw new IllegalArgumentException("Pipe must have at least one stage");
-            }
-            this.stages = new Vector<Skeleton<T>>();
-            this.stages.addAll(stages);
-    }        */
-    public Stack<Instruction> getInstructionStack() {
-        Stack<Instruction> instruction = new Stack<Instruction>();
-
-        //the last go into the stack first
-        for (int i = stages.size() - 1; i >= 0; i--) {
-            instruction.addAll(stages.get(i).getInstructionStack());
-        }
-
-        return instruction;
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 }

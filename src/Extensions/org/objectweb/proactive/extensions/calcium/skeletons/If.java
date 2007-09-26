@@ -30,12 +30,8 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
-import java.util.Stack;
-import java.util.Vector;
-
-import org.objectweb.proactive.extensions.calcium.Task;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
-import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 
 
 /**
@@ -47,7 +43,9 @@ import org.objectweb.proactive.extensions.calcium.statistics.Timer;
  *
  * @param <P,R>
  */
-public class If<P, R> implements Skeleton<P, R>, Instruction<P, P> {
+@PublicAPI
+public class If<P extends java.io.Serializable, R extends java.io.Serializable>
+    implements Skeleton<P, R> {
     Condition<P> cond;
     Skeleton<P, ?> ifChild;
     Skeleton<P, ?> elseChild;
@@ -59,29 +57,7 @@ public class If<P, R> implements Skeleton<P, R>, Instruction<P, P> {
         this.elseChild = elseChild;
     }
 
-    public Stack<Instruction> getInstructionStack() {
-        Stack<Instruction> v = new Stack<Instruction>();
-        v.add(this);
-        return v;
-    }
-
-    public Task<P> compute(Task<P> t) throws Exception {
-        Vector<Instruction> childStack;
-        Timer timer = new Timer();
-        boolean evalCondition = cond.evalCondition(t.getObject());
-        timer.stop();
-
-        if (evalCondition) {
-            childStack = ifChild.getInstructionStack();
-        } else {
-            childStack = elseChild.getInstructionStack();
-        }
-
-        Vector<Instruction> taskStack = t.getStack();
-        taskStack.addAll(childStack);
-        t.setStack(taskStack);
-        t.getStats().getWorkout().track(cond, timer);
-
-        return t;
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 }

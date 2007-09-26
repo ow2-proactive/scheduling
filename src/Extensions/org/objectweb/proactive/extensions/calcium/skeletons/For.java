@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
-import java.util.Stack;
-import java.util.Vector;
-
-import org.objectweb.proactive.extensions.calcium.Task;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 
-public class For<P> implements Instruction<P, P>, Skeleton<P, P> {
+@PublicAPI
+public class For<P extends java.io.Serializable> implements Skeleton<P, P> {
     Skeleton<P, P> child;
     int times;
 
@@ -45,24 +44,12 @@ public class For<P> implements Instruction<P, P>, Skeleton<P, P> {
         this.times = times;
     }
 
-    public Stack<Instruction> getInstructionStack() {
-        Stack<Instruction> v = new Stack<Instruction>();
-        v.add(this);
-        return v;
+    public For(int times, Execute<P, P> muscle) {
+        this.child = new Seq<P, P>(muscle);
+        this.times = times;
     }
 
-    public Task<P> compute(Task<P> task) throws Exception {
-        if (times > 0) {
-            //Get Child stack
-            Vector<Instruction> childStack = child.getInstructionStack();
-
-            //Add the For with one less time to execute
-            childStack.add(0, new For<P>(times - 1, child));
-
-            Vector<Instruction> taskStack = task.getStack();
-            taskStack.addAll(childStack);
-            task.setStack(taskStack);
-        }
-        return task;
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 }

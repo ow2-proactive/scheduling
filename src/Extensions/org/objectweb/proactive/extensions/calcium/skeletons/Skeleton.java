@@ -31,22 +31,22 @@
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
 import java.io.Serializable;
-import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * This class is used to mark an object as a skeleton.
- * A skeleton is able to return the stack of instructions
- * nested inside the skeleton.
- * @author The ProActive Team (mleyton)
+ * A skeleton is a vistable object (see visitor pattern).
  *
+ * @author The ProActive Team (mleyton)
  */
-public interface Skeleton<T, R> extends Serializable {
+@PublicAPI
+public interface Skeleton<P extends Serializable, R extends Serializable> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
 
-    Stack<Instruction> getInstructionStack();
+    void accept(SkeletonVisitor visitor);
 }

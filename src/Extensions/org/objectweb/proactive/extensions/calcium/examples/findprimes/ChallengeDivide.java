@@ -33,10 +33,11 @@ package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class ChallengeDivide implements Divide<Challenge, Challenge> {
-    public Vector<Challenge> divide(Challenge param) {
+    public Vector<Challenge> divide(SkeletonSystem system, Challenge param) {
         Challenge ttUp = new Challenge(1 + param.min +
                 ((param.max - param.min) / 2), param.max, param.solvableSize);
 

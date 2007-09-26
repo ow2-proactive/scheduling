@@ -30,19 +30,39 @@
  */
 package org.objectweb.proactive.extensions.calcium.futures;
 
-import org.objectweb.proactive.extensions.calcium.Task;
+import java.io.File;
+import java.util.concurrent.BlockingQueue;
+
+import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.statistics.Stats;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extensions.calcium.task.Task;
+import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
 
 
+/**
+ * This class is an implementation of an simple future object.
+ * The class is not serializable on purpose.
+ *
+ * @author The ProActive Team (mleyton)
+ *
+ * @param <R> The type of the parameter for which this future stands.
+ */
 public class FutureImpl<R> implements Future<R> {
     Task<R> task;
     int taskId;
+    BlockingQueue<Future<R>> callback;
+    FileServer fserver;
+    File outDir;
 
-    public FutureImpl(int taskId) {
+    public FutureImpl(int taskId, FileServer fserver, File outRootDir) {
         this.task = null;
         this.taskId = taskId;
+        this.fserver = fserver;
+        this.outDir = SkeletonSystemImpl.newRandomNamedDirIn(outRootDir);
+        this.outDir.mkdir();
     }
 
     @Override
@@ -94,6 +114,22 @@ public class FutureImpl<R> implements Future<R> {
     public synchronized void setFinishedTask(Task<?> task) {
         this.task = (Task<R>) task;
 
+        if (!task.hasException()) {
+            try {
+                TaskFiles.stageOutput(fserver, task.getObject(), outDir);
+            } catch (Exception e) {
+                task.setException(e);
+            }
+        }
+
+        if (callback != null) {
+            callback.add(this);
+        }
+
         notifyAll();
+    }
+
+    public synchronized void setCallBackQueue(BlockingQueue<Future<R>> callback) {
+        this.callback = callback;
     }
 }

@@ -35,10 +35,11 @@ import java.util.Vector;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class DivideBT2 implements Divide<Board, Board> {
-    public Vector<Board> divide(Board board)
+    public Vector<Board> divide(SkeletonSystem system, Board board)
         throws RuntimeException, EnvironmentException {
         if (board.isRootBoard()) {
             return initDivideBT2(board);

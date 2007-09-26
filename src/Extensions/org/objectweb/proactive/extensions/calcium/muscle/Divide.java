@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
-import java.util.Vector;
+import java.util.Collection;
 
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentExceptio
  *
  * @param <P,X>
  */
-public interface Divide<P, X> extends Muscle<P, Vector<X>> {
-    public Vector<X> divide(P param)
-        throws RuntimeException, EnvironmentException;
+public interface Divide<P, X> extends Muscle<P, Collection<X>> {
+    public Collection<X> divide(SkeletonSystem system, P param)
+        throws Exception;
 }

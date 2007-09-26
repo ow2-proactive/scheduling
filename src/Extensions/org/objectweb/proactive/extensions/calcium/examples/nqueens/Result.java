@@ -46,4 +46,14 @@ public class Result implements Serializable {
             solutions[i] = 0;
         }
     }
+
+    public String toString() {
+        long total = 0;
+        String res = "";
+        for (long s : solutions) {
+            res += (s + "|");
+            total += s;
+        }
+        return total + "=" + res;
+    }
 }

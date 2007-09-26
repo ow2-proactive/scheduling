@@ -87,7 +87,7 @@ public class LargerQueueImpl extends TaskQueue {
     }
 
     /**
-     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#size()
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#length()
      */
     @Override
     public IntMutableWrapper size() {

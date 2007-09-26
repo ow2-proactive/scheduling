@@ -41,34 +41,34 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
-public class DivideDB implements Divide<BlastParameters, BlastParameters> {
+public class DivideDB implements Divide<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public Vector<BlastParameters> divide(BlastParameters param) {
+    public Vector<BlastParams> divide(SkeletonSystem system, BlastParams param)
+        throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("Dividing database file:" +
-                param.getDatabaseFile().getAbsolutePath());
+            logger.debug("Dividing database file");
         }
 
-        Vector<BlastParameters> children = new Vector<BlastParameters>();
+        //Divide the file
+        Vector<File> files = divideFile(system.getWorkingSpace(), param.dbFile,
+                param.divideDBInto);
 
-        Vector<File> files = null;
-        try {
-            files = divideFile(param.getDatabaseFile(), param.getDivideDBInto());
-        } catch (IOException e) {
-            throw new MuscleException(e);
-        }
-
+        //Create a new object for each file
+        Vector<BlastParams> children = new Vector<BlastParams>();
         for (File newDBFile : files) {
-            BlastParameters newParam = new BlastParameters(param.getQueryFile(),
-                    newDBFile, param.isNucleotide(), param.getMaxDBSize());
-
-            //TODO send the files somewhere?
+            BlastParams newParam = new BlastParams(param);
+            newParam.dbFile = newDBFile;
             children.add(newParam);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Dividing database file done");
         }
 
         return children;
@@ -80,19 +80,23 @@ public class DivideDB implements Divide<BlastParameters, BlastParameters> {
      * the each sequeneces will be stored in a different file.
      * Note that sequences are undividable, thus the length of the divided
      * files will vary.
+     * @param space
      *
      * @param file The file to split.
      * @param numParts The number of parts to split into.
      * @return A vector containing File representations of the divided files.
      * @throws IOException In case there are reading/writing problems.
      */
-    private static Vector<File> divideFile(File file, int numParts)
-        throws IOException {
+    private static Vector<File> divideFile(WSpace wspace, File file,
+        int numParts) throws IOException {
+        Vector<File> children = new Vector<File>();
+
         //Create the ouput files
         BufferedWriter[] bw = new BufferedWriter[numParts];
         for (int i = 0; i < bw.length; i++) {
-            bw[i] = new BufferedWriter(new FileWriter(file.getAbsolutePath() +
-                        "." + i));
+            File f = wspace.newFile(file.getName() + "-" + i);
+            bw[i] = new BufferedWriter(new FileWriter(f));
+            children.add(f);
         }
 
         //Read from the file and write to the output files
@@ -107,14 +111,13 @@ public class DivideDB implements Divide<BlastParameters, BlastParameters> {
 
         //Cleanup and set return values
         br.close();
-        Vector<File> children = new Vector<File>();
-        for (i = 0; i < numParts; i++) {
+        for (i = numParts - 1; i >= 0; i--) {
             bw[i].close();
-            File f = new File(file.getAbsolutePath() + "." + i);
-            if (f.length() > 0) {
-                children.add(f);
-            } else {
+
+            File f = children.get(i);
+            if (f.length() <= 0) {
                 f.delete();
+                children.remove(i);
             }
         }
         return children;
@@ -156,11 +159,12 @@ public class DivideDB implements Divide<BlastParameters, BlastParameters> {
         return null;
     }
 
-    public static void main(String[] args) throws IOException {
-        Vector<File> files = divideFile(new File("/tmp/10"), 3);
-        for (File f : files) {
-            System.out.println(f.getAbsolutePath() + " " + f.length() +
-                "[bytes]");
+    /*
+        public static void main(String[] args) throws IOException {
+            Vector<File> files = divideFile(new File("/tmp/10"), 3);
+            for (File f : files) {
+                System.out.println(f.getAbsolutePath() + " " + f.length() +  "[bytes]");
+            }
         }
-    }
+        */
 }

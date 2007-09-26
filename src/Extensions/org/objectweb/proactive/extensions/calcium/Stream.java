@@ -30,51 +30,77 @@
  */
 package org.objectweb.proactive.extensions.calcium;
 
-import java.util.Stack;
+import java.io.File;
 import java.util.Vector;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
-import org.objectweb.proactive.extensions.calcium.skeletons.Instruction;
+import org.objectweb.proactive.extensions.calcium.skeletons.InstructionBuilderVisitor;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
+import org.objectweb.proactive.extensions.calcium.task.Task;
+import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
+import org.objectweb.proactive.extensions.calcium.task.TaskPriority;
 
 
-public class Stream<T, R> {
+@PublicAPI
+public class Stream<T extends java.io.Serializable, R extends java.io.Serializable> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
     private int streamId;
     private Facade facade;
     private Skeleton<T, R> skeleton;
     private int streamPriority;
+    private FileServer fserver;
+    private File outDir;
+    BlockingQueue<Future<R>> list;
 
-    protected Stream(Facade facade, Skeleton<T, R> skeleton) {
+    Stream(Facade facade, FileServer fserver, Skeleton<T, R> skeleton,
+        File outDir) {
         this.streamId = (int) (Math.random() * Integer.MAX_VALUE);
         this.skeleton = skeleton;
         this.facade = facade;
-        this.streamPriority = Task.DEFAULT_PRIORITY;
+        this.fserver = fserver;
+        this.outDir = outDir;
+        this.streamPriority = TaskPriority.DEFAULT_PRIORITY;
+        this.list = new LinkedBlockingQueue<Future<R>>();
     }
 
     /**
      * Inputs a new T to be computed.
      * @param param The T to be computed.
      * @throws PanicException
-     * @throws InterruptedException
      */
-    public Future<R> input(T param) throws InterruptedException, PanicException {
+    @SuppressWarnings("unchecked")
+    public Future<R> input(T param) throws PanicException, PanicException {
+        //Replace references to File with ProxyFile
+        try {
+            param = (T) TaskFiles.stageInput(fserver, param);
+        } catch (Exception e) {
+            throw new PanicException(e);
+        }
+
         //Put the parameters in a Task container
         Task<T> task = new Task<T>(param);
+        InstructionBuilderVisitor builder = new InstructionBuilderVisitor();
 
-        Stack<Instruction> instructionStack = skeleton.getInstructionStack();
-        task.setStack(instructionStack);
-        task.setPriority(streamPriority);
+        skeleton.accept(builder);
 
-        FutureImpl<R> future = new FutureImpl<R>(task.getId());
+        task.setStack(builder.stack);
+        task.setPriority(new TaskPriority(streamPriority));
+
+        FutureImpl<R> future = new FutureImpl<R>(task.taskId.getId(), fserver,
+                outDir);
         facade.putTask(task, future);
 
-        return (Future<R>) future;
+        return future;
     }
 
     /**
@@ -90,5 +116,56 @@ public class Stream<T, R> {
             vector.add(input(param));
 
         return vector;
+    }
+
+    /**
+     * Inputs a new T to be computed. Once the computation is finished
+     * the future holding the result will be stored in the blocking queue.
+     *
+     * @param param The parameter to compute
+     * @param queue  The queue to put the future once the result is available.
+     * @return The future without the result.
+     * @throws PanicException
+     */
+    @SuppressWarnings("unchecked")
+    public void input(T param, BlockingQueue<Future<R>> queue)
+        throws PanicException {
+        FutureImpl<R> future = (FutureImpl) this.input(param);
+        future.setCallBackQueue(queue);
+    }
+
+    /**
+     * Inputs a new T to be computed. Once the computation is finished
+     * the future holding the result will be available by invoking the
+     * {@link #retrieve(long, TimeUnit) waitForAny} method.
+     * @param param  The parameter to compute
+     * @throws PanicException
+     */
+    public void submit(T param) throws PanicException {
+        FutureImpl<R> future = (FutureImpl) this.input(param);
+        future.setCallBackQueue(list);
+    }
+
+    /**
+     * This method can be used to block for a future holding a result.
+     * For each parameter submited into the stream using the {@link #submit(T) submit} method,
+     * a future holding the already available result can be obtained with this method.
+     * @param timeout how long to wait before giving up, in units of
+     * <tt>unit</tt>
+     * @param unit a <tt>TimeUnit</tt> determining how to interpret the
+     * <tt>timeout</tt> parameter
+     * @return The first available result.
+     * @throws InterruptedException
+     */
+    public Future<R> retrieve(long timeout, TimeUnit unit)
+        throws InterruptedException {
+        return list.poll(timeout, unit);
+    }
+
+    /**
+     * Like {@link #retrieve(long, TimeUnit) retrieve} but waits indefenetly.
+     */
+    public Future<R> retrieve() throws InterruptedException {
+        return list.take();
     }
 }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.calcium.examples.nqueens;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class DivideCondition implements Condition<Board> {
@@ -40,14 +41,12 @@ public class DivideCondition implements Condition<Board> {
      * @param board
      * @return true if board should be divided, false otherwise
      */
-    public boolean evalCondition(Board board) {
-        if (board.isRootBoard()) {
+    public boolean evalCondition(SkeletonSystem system, Board board) {
+        if (board.isRootBoard() ||
+                ((board.row + board.solvableSize) < board.n)) {
             return true;
-        } else {
-            if ((board.row + board.solvableSize) < board.n) {
-                return true;
-            }
         }
+
         return false;
     }
 }

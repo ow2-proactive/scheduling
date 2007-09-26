@@ -30,10 +30,12 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
+import java.io.Serializable;
 import java.util.Stack;
 
-import org.objectweb.proactive.extensions.calcium.Task;
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.calcium.instructions.Instruction;
+import org.objectweb.proactive.extensions.calcium.instructions.MapInst;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 
@@ -49,34 +51,23 @@ import org.objectweb.proactive.extensions.calcium.muscle.Divide;
  * @author The ProActive Team (mleyton)
  *
  */
-public class Map<P, R> implements Skeleton<P, R>, Instruction<P, P> {
+@PublicAPI
+public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
+    implements Skeleton<P, R> {
     Divide<P, ?> div;
-    Skeleton child;
+    Skeleton<?, ?> child;
     Conquer<?, R> conq;
-    ConquerInst<?, R> conquerInst;
-    DivideSIMD<?, R> divideInst;
 
     @SuppressWarnings("unchecked")
-    public <X, Y>Map(Divide<P, X> div, Skeleton<X, Y> child, Conquer<Y, R> conq) {
+    public <X extends Serializable, Y extends Serializable>Map(
+        Divide<P, X> div, Skeleton<X, Y> child, Conquer<Y, R> conq) {
         this.div = div;
         this.child = child;
         this.conq = conq;
-
-        conquerInst = new ConquerInst<Y, R>(conq);
-        divideInst = new DivideSIMD(div, child.getInstructionStack());
     }
 
-    public Stack<Instruction> getInstructionStack() {
-        Stack<Instruction> v = new Stack<Instruction>();
-        v.add(this);
-
-        return v;
-    }
-
-    public Task<P> compute(Task<P> t) throws EnvironmentException {
-        t.pushInstruction(conquerInst);
-        t.pushInstruction(divideInst);
-        return t;
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

@@ -31,35 +31,36 @@
 package org.objectweb.proactive.extensions.calcium;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.calcium.ResourceManager;
-import org.objectweb.proactive.extensions.calcium.Skernel;
 import org.objectweb.proactive.extensions.calcium.Stream;
+import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
+import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
+import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
 /**
  * This class corresponds to the entry point of the skeleton framework.
  *
- * In order to instantiate this class, a resource Manager must be provided.
- * This Manager must extend the AbstractManager class. The skeleton
- * kernel can be used with different Managers, for example: Monothreaded, Multihreaded
- * or Distributed (ProActive).
- *
+ * In order to instantiate this class, an Environment Factory must be provided.
+ * The Enviroment Factory must implement the EnvironmentFactory class. The skeleton
+ * kernel can be used with different Environment Factories, for example: MultihreadedEnvironment (Parallel)
+ * or ProActiveEnvironment (Distributed).
  *
  * @author The ProActive Team (mleyton)
- *
  */
 @PublicAPI
 public class Calcium {
     private Facade facade;
-    private Skernel skernel;
-    private ResourceManager manager;
+    private TaskPool taskpool;
+    private FileServer fserver;
+    EnvironmentFactory environment;
 
-    public Calcium(ResourceManager manager) {
-        this.skernel = new Skernel();
-        this.facade = new Facade();
-        this.manager = manager;
+    public Calcium(EnvironmentFactory environment) {
+        this.taskpool = environment.getTaskPool();
+        this.environment = environment;
+        this.facade = new Facade(taskpool);
+        this.fserver = environment.getFileServer();
     }
 
     /**
@@ -76,23 +77,26 @@ public class Calcium {
      * @param <T> Th
      * @return A Stream that can input and output T from the framework.
      */
-    public <T, R> Stream<T, R> newStream(Skeleton<T, R> root) {
-        return new Stream<T, R>(facade, root);
+    public <T extends java.io.Serializable, R extends java.io.Serializable> Stream<T, R> newStream(
+        Skeleton<T, R> root) {
+        return new Stream<T, R>(facade, fserver, root,
+            environment.getOutPutDir());
     }
 
     public void boot() {
-        skernel = manager.boot(skernel);
-        facade.setSkernel(skernel);
+        facade.boot();
+        environment.start();
     }
 
     public void shutdown() {
-        manager.shutdown();
+        facade.shutdown();
+        environment.shutdown();
     }
 
     /**
      * @return The current status of the global statistics.
      */
     public StatsGlobal getStatsGlobal() {
-        return skernel.getStatsGlobal();
+        return taskpool.getStatsGlobal();
     }
 }

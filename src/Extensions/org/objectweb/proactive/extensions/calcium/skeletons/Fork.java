@@ -35,89 +35,139 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.objectweb.proactive.extensions.calcium.Task;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.extensions.calcium.instructions.Instruction;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
+import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
+import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
- * This skeleton represents Parallelism (data parallelism).
- * The parameter recieved by this skeleton will be copied
- * and passed to it's sub skeletons.
+ * This skeleton represents MDMI parallelism. The parameter recieved by this
+ * skeleton will be divided and passed to it's sub skeleton instructions.
  *
- * The reduction of the results will be performed by the
- * Conquer objects required as a parameter.
+ * The reduction of the results will be performed by the Conquer objects
+ * required as a parameters.
  *
  * @author The ProActive Team (mleyton)
  *
- * @param <P>
+ * @param
+ * <P>
  */
-public class Fork<P, R> implements Skeleton<P, R>, Instruction<P, P> {
+@PublicAPI
+public class Fork<P extends java.io.Serializable, R extends java.io.Serializable>
+    implements Skeleton<P, R> {
     Divide<P, ?> div;
     Conquer<?, R> conq;
-    Vector<Stack<Instruction>> instList;
+    List<Skeleton> subSkelList;
 
     /**
-     * Creates a Fork skeleton structure. The default divition of the parameters
-     * corresponds to a deep copy, ie each sub-skeleton recieves a copy of the parameter.
-     * If the deepcopy is inefficiente (because it uses serialization), use the alternative
-     * constructure and provide a custom Divide method.
+     * This constructor uses the Fork's default Divide and Conquer.
      *
-     * @param conq Conqueres the computed results into a single one.
-     * @param conq The conquering (reduction) used to consolidate the results
-     * of the sub-skeletons into a single result.
-     * @param stages The sub-skeletons that can be computed in parallel.
+     * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultDivide
+     * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultConquer
+     *
+     * @param args
+     *            The multiple instructions (skeletons) that will be executed on
+     *            each copy of the parameter
+     *            <P>
      */
-    public <X>Fork(Conquer<X, R> conq, Skeleton<P, X>... args) {
-        this(null, Arrays.asList(args), conq);
-        this.div = new ForkDefaultDivide<P>(args.length);
+    public Fork(Skeleton<P, R>... args) {
+        forkInit(new ForkDefaultDivide<P>(args.length), Arrays.asList(args),
+            new ForkDefaultConquer<R>());
     }
 
     /**
-     * Creates a Fork skeleton structure, allowing a custom divide method.
-     * The number of elemenents returned by the divide method must be
-     * the same as the number of stages, or a MuscleException error will be
-     * generated at runtime.
+     * This constructor uses the Fork's default Divide and Conquer.
      *
-     * @param div The custom divide method.
-     * @param sekelList The sub-skeletons that can be computed in parallel.
-     * @param conq The conquering (reduction) used to consolidate the results
-     * of the sub-skeletons into a single result.
+     * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultDivide
+     * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultConquer
+     *
+     * @param args
+     *            The multiple instructions that will be executed on each copy
+     *            of the parameter
+     *            <P>
      */
-    public <X, Y>Fork(Divide<P, X> div, List<Skeleton<X, Y>> sekelList,
-        Conquer<Y, R> conq) {
-        if (sekelList.size() <= 0) {
+    public Fork(Execute<P, R>... args) {
+        ArrayList<Skeleton<P, R>> list = new ArrayList<Skeleton<P, R>>();
+        for (Execute<P, R> e : args) {
+            list.add(new Seq<P, R>(e));
+        }
+
+        forkInit(new ForkDefaultDivide<P>(args.length), list,
+            new ForkDefaultConquer<R>());
+    }
+
+    /**
+     * Creates a Fork skeleton structure. The default divition of the parameters
+     * corresponds to a deep copy, ie each sub-skeleton recieves a copy of the
+     * parameter. If the deepcopy is inefficiente (because it uses
+     * serialization), use the alternative constructure and provide a custom
+     * Divide method.
+     *
+     * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultDivide
+     *
+     * @param conq
+     *            Conqueres the computed results into a single one.
+     * @param conq
+     *            The conquering (reduction) used to consolidate the results of
+     *            the sub-skeletons into a single result.
+     * @param stages
+     *            The sub-skeletons that can be computed in parallel.
+     */
+    public <X extends Serializable>Fork(Conquer<X, R> conq,
+        Skeleton<P, X>... args) {
+        forkInit(new ForkDefaultDivide<P>(args.length), Arrays.asList(args),
+            conq);
+    }
+
+    /**
+     * Creates a Fork skeleton structure, allowing a custom divide method. The
+     * number of elemenents returned by the divide method must be the same as
+     * the number of stages, or a MuscleException error will be generated at
+     * runtime.
+     *
+     * @param div
+     *            The custom divide method.
+     * @param skelList
+     *            The sub-skeletons that can be computed in parallel.
+     * @param conq
+     *            The conquering (reduction) used to consolidate the results of
+     *            the sub-skeletons into a single result.
+     */
+    public <X extends Serializable, Y extends Serializable>Fork(
+        Conquer<Y, R> conq, Divide<P, X> div, Skeleton<X, Y>... skelList) {
+        forkInit(div, Arrays.asList(skelList), conq);
+    }
+
+    private <X extends Serializable, Y extends Serializable> void forkInit(
+        Divide<P, X> div, List<Skeleton<X, Y>> skelList, Conquer<Y, R> conq) {
+        if (skelList.size() <= 0) {
             throw new IllegalArgumentException(
                 "Fork must have at least one instruction");
         }
 
         this.div = div;
         this.conq = conq;
-        this.instList = new Vector<Stack<Instruction>>();
-        for (Skeleton<X, Y> skel : sekelList) {
-            this.instList.add(skel.getInstructionStack());
+        this.subSkelList = new ArrayList<Skeleton>();
+        for (Skeleton<X, Y> skel : skelList) {
+            this.subSkelList.add(skel);
         }
     }
 
-    public Stack<Instruction> getInstructionStack() {
-        Stack<Instruction> v = new Stack<Instruction>();
-        v.add(this);
-
-        return v;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Task<P> compute(Task<P> t) throws EnvironmentException {
-        t.pushInstruction(new ConquerInst(conq));
-        t.pushInstruction(new DivideMIMD(div, instList));
-
-        return t;
+    public void accept(SkeletonVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override
@@ -126,10 +176,12 @@ public class Fork<P, R> implements Skeleton<P, R>, Instruction<P, P> {
     }
 
     /**
-     * This is the default divide behaviour for Fork.
-     * It simply deep copies the parameters N times.
+     * This is the default divide behaviour for Fork. It simply deep copies the
+     * parameters N times.
+     *
      * @author The ProActive Team (mleyton)
      */
+    @StateFul(value = false)
     static public class ForkDefaultDivide<T> implements Divide<T, T> {
         int number;
 
@@ -137,37 +189,32 @@ public class Fork<P, R> implements Skeleton<P, R>, Instruction<P, P> {
             this.number = number;
         }
 
-        public Vector<T> divide(T param) throws EnvironmentException {
+        public Vector<T> divide(SkeletonSystem system, T param)
+            throws EnvironmentException {
             Vector<T> vector;
             try {
-                vector = deepCopy(param, number);
+                vector = Stateness.deepCopy(param, number);
             } catch (Exception e) {
                 logger.error("Unable to make a deep copy:" + e.getMessage());
-                throw new EnvironmentException(e.getMessage());
+                throw new EnvironmentException(e);
             }
             return vector;
         }
+    }
 
-        @SuppressWarnings("unchecked")
-        private Vector<T> deepCopy(T o, int n)
-            throws IOException, ClassNotFoundException {
-            // serialize Object into byte array
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(o);
-            byte[] buf = baos.toByteArray();
-            oos.close();
-
-            // deserialize byte array
-            Vector<T> vector = new Vector<T>(n);
-            while (n-- > 0) {
-                ByteArrayInputStream bais = new ByteArrayInputStream(buf);
-                ObjectInputStream ois = new ObjectInputStream(bais);
-                vector.add((T) ois.readObject());
-                ois.close();
-            }
-
-            return vector;
+    /**
+     * This class is the default Conquer method for Fork. To reduce the results
+     * of the computation, this divide simply chooses a result parameter at
+     * random.
+     *
+     * @author The ProActive Team (mleyton)
+     *
+     * @param <T>
+     */
+    static public class ForkDefaultConquer<T> implements Conquer<T, T> {
+        public T conquer(SkeletonSystem system, T[] param)
+            throws RuntimeException, EnvironmentException {
+            return param[0];
         }
     }
 }
