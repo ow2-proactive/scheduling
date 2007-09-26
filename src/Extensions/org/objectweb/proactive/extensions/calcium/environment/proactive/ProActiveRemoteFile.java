@@ -30,46 +30,33 @@ package org.objectweb.proactive.extensions.calcium.environment.proactive;
 import java.io.File;
 import java.io.IOException;
 
-import org.objectweb.proactive.extensions.calcium.system.InternalPerFile;
+import org.objectweb.proactive.extensions.calcium.environment.FileServer;
+import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
 
+public class ProActiveRemoteFile implements RemoteFile {
 
-public class ProActiveRemoteFile implements InternalPerFile {
-    public File getOriginalFileLocation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	public void countReference(FileServer fserver) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    public void setPermanentLocation(File file) {
-        // TODO Auto-generated method stub
-    }
+	public void discountReference(FileServer fserver) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    public boolean copyFrom(File localSrc) throws IOException {
-        // TODO Auto-generated method stub
-        return false;
-    }
+	public String getMD5Hash() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    public boolean saveAs(File localDest) throws IOException {
-        // TODO Auto-generated method stub
-        return false;
-    }
+	public long length() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
-    public boolean exists() throws IOException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean hasChanged() throws IOException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean remove() throws IOException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public long size() throws IOException {
-        // TODO Auto-generated method stub
-        return 0;
-    }
+	public boolean saveAs(File f) throws IOException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
