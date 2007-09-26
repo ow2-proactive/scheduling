@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
@@ -9,7 +10,7 @@ public class GroupOAR extends AbstractGroup {
     protected String resources;
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;
-    protected String weight = "2";
+    protected String OARSUB = "oarsub";
     protected String interactive = "false";
     protected String queueName;
     protected String accessProtocol;
@@ -18,14 +19,56 @@ public class GroupOAR extends AbstractGroup {
     private PathElement stdOutFile;
     private PathElement stdErrFile;
     private String type = "deploy";
-    private String nodes = "1";
+    private String nodes = null;
     private String cpu = null;
     private String core = null;
 
     @Override
     public List<String> internalBuildCommands() {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuffer commandBuf = new StringBuffer(OARSUB);
+
+        commandBuf.append(" --type=");
+        commandBuf.append(type);
+
+        if (interactive.equalsIgnoreCase("true")) {
+            commandBuf.append(" --interactive");
+        }
+
+        if (queueName != null) {
+            commandBuf.append(" --queue=");
+            commandBuf.append(queueName);
+        }
+
+        String resources = computeResourcesString();
+
+        if (resources != null) {
+            commandBuf.append(" --resource=");
+            commandBuf.append(resources);
+        }
+
+        if (directory != null) {
+            commandBuf.append(" --directory=");
+            commandBuf.append(directory);
+        }
+
+        if (stdOutFile != null) {
+            commandBuf.append(" --stdout=");
+            commandBuf.append(stdOutFile.toString());
+        }
+
+        if (stdErrFile != null) {
+            commandBuf.append(" --stderr=");
+            commandBuf.append(stdErrFile.toString());
+        }
+
+        // argument - must be last append
+        commandBuf.append(" ");
+        commandBuf.append(scriptLocation.toString());
+
+        List<String> res = new ArrayList<String>();
+        res.add(commandBuf.toString());
+
+        return res;
     }
 
     public void setInteractive(String interactive) {
@@ -41,27 +84,7 @@ public class GroupOAR extends AbstractGroup {
     }
 
     public void setResources(String res) {
-        if (res != null) {
-            this.resources = res;
-            parseRes(res);
-        }
-    }
-
-    /**
-     * @param res
-     */
-    private void parseRes(String res) {
-        String[] resTab = res.split(",");
-        for (int i = 0; i < resTab.length; i++) {
-            if (!(resTab[i].indexOf("nodes") < 0)) {
-                hostNumber = resTab[i].substring(resTab[i].indexOf("=") + 1,
-                        resTab[i].length());
-            }
-            if (!(resTab[i].indexOf("weight") < 0)) {
-                weight = resTab[i].substring(resTab[i].indexOf("=") + 1,
-                        resTab[i].length());
-            }
-        }
+        this.resources = res;
     }
 
     public void setScriptLocation(PathElement location) {
@@ -94,5 +117,25 @@ public class GroupOAR extends AbstractGroup {
 
     public void setStdErrFile(PathElement stdErrFile) {
         this.stdErrFile = stdErrFile;
+    }
+
+    protected String computeResourcesString() {
+        if (resources != null) {
+            return resources;
+        }
+
+        StringBuffer resourcesBuf = new StringBuffer();
+
+        if (nodes != null) {
+            resourcesBuf.append("/nodes=" + nodes);
+        }
+        if (cpu != null) {
+            resourcesBuf.append("/cpu=" + cpu);
+        }
+        if (core != null) {
+            resourcesBuf.append("/core=" + core);
+        }
+
+        return resourcesBuf.toString();
     }
 }
