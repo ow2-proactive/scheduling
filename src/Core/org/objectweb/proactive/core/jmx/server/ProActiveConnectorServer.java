@@ -41,7 +41,7 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
@@ -150,7 +150,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         try {
             paServer = new ProActiveServerImpl();
             paServer.setMBeanServer(mbs);
-            paServer = (ProActiveServerImpl) ProActive.turnActive(paServer);
+            paServer = (ProActiveServerImpl) ProActiveObject.turnActive(paServer);
             id = paServer.getUniqueID();
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -166,7 +166,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         String path = this.address.getURLPath();
         int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
         String url = path.substring(index);
-        ProActive.register(this.paServer, url);
+        ProActiveObject.register(this.paServer, url);
         state = STARTED;
     }
 

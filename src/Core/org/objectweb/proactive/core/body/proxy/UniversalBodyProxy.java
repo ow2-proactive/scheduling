@@ -39,7 +39,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -173,7 +173,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             }
 
             if (GarbageCollector.dgcIsEnabled()) {
-                ((AbstractBody) ProActive.getBodyOnThis()).updateReference(this);
+                ((AbstractBody) ProActiveObject.getBodyOnThis()).updateReference(this);
             }
         }
     }

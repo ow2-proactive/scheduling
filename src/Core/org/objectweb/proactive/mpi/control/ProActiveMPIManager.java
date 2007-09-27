@@ -37,7 +37,8 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
@@ -116,7 +117,7 @@ public class ProActiveMPIManager implements Serializable {
                 for (int j = 0; j < params.length; j++) {
                     params[j] = new Object[] {
                             "ProActiveMPIComm",
-                            (ProActiveMPIManager) ProActive.getStubOnThis(),
+                            (ProActiveMPIManager) ProActiveObject.getStubOnThis(),
                             new Integer(currentJobNumber)
                         };
                 }
@@ -131,7 +132,7 @@ public class ProActiveMPIManager implements Serializable {
                 MPI_IMPL_LOGGER.info("[MANAGER] Initialize remote environments");
                 // initialize queues & semaphores and start thread
                 Ack ack = spmdCouplingProxy.initEnvironment();
-                ProActive.waitFor(ack);
+                ProFuture.waitFor(ack);
                 MPI_IMPL_LOGGER.info(
                     "[MANAGER] Activate remote thread for communication");
                 // once environment is ready, start thread to get mpi process rank  
@@ -257,7 +258,7 @@ public class ProActiveMPIManager implements Serializable {
                     for (int i = 0; i < parameters.length; i++) {
                         Object[] params = (Object[]) parameters[i];
                         if (params != null) {
-                            proxyList[i] = ProActive.newActive(cl, params,
+                            proxyList[i] = ProActiveObject.newActive(cl, params,
                                     orderedNodes[i]);
                         }
                     }

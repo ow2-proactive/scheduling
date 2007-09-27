@@ -33,7 +33,7 @@ package functionalTests.mpi;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -68,7 +68,7 @@ public class TestMPISpmd extends FunctionalTest {
             logger.debug("Loading descriptor from: " + XML_FILE);
         }
 
-        pad = ProActive.getProactiveDescriptor(XML_FILE);
+        pad = ProDeployment.getProactiveDescriptor(XML_FILE);
 
         VirtualNode testNode = pad.getVirtualNode("CPI");
         this.mpi_spmd = MPI.newMPISpmd(testNode);

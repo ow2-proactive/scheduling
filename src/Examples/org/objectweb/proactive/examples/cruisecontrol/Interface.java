@@ -95,21 +95,21 @@ public class Interface {
     public void initialize() {
         Object[] arg;
         arg = new Object[1];
-        arg[0] = org.objectweb.proactive.ProActive.getStubOnThis();
+        arg[0] = org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
 
         //System.out.println("initialize Method");
         try {
-            activeSpeed = (CarModel) org.objectweb.proactive.ProActive.newActive(CarModel.class.getName(),
+            activeSpeed = (CarModel) org.objectweb.proactive.api.ProActiveObject.newActive(CarModel.class.getName(),
                     arg);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
         }
 
-        arg[0] = org.objectweb.proactive.ProActive.getStubOnThis();
+        arg[0] = org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
 
         try {
-            activeCruise = (CruiseControl) org.objectweb.proactive.ProActive.newActive(CruiseControl.class.getName(),
+            activeCruise = (CruiseControl) org.objectweb.proactive.api.ProActiveObject.newActive(CruiseControl.class.getName(),
                     arg);
         } catch (Exception e) {
             e.printStackTrace();

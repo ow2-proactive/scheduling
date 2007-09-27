@@ -35,7 +35,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -109,7 +109,7 @@ public class Domain implements Serializable {
         this.display = dp;
         this.maxIter = maxIter;
         this.neighbours = (Domain) ProSPMD.getSPMDGroup();
-        this.asyncRefToSelf = (Domain) ProActive.getStubOnThis();
+        this.asyncRefToSelf = (Domain) ProActiveObject.getStubOnThis();
         ProSPMD.barrier("INIT"); // first barrier, needed to have all objects synchronized before running 
         this.asyncRefToSelf.sendValueToNeighbours();
         this.currentForce = new Force(); // initialize the force to 0.

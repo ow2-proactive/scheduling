@@ -31,7 +31,8 @@
 package org.objectweb.proactive.examples.timit.jacobi;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.Startable;
 import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
@@ -102,13 +103,13 @@ public class Launcher implements Startable {
             VirtualNode vnode;
 
             // create nodes
-            this.pad = ProActive.getProactiveDescriptor(desc);
+            this.pad = ProDeployment.getProactiveDescriptor(desc);
             this.pad.activateMappings();
             vnode = this.pad.getVirtualNode("Workers");
             nodes = vnode.getNodes();
             // create workers
             for (int i = 0; i < nbWorker; i++) {
-                this.workers[i] = (Worker) (ProActive.newActive(Worker.class.getName(),
+                this.workers[i] = (Worker) (ProActiveObject.newActive(Worker.class.getName(),
                         new Object[] {
                             new Integer(i), new Double(Launcher.boudaryValue),
                             new Integer(maxIter), new Integer(nbWorker)

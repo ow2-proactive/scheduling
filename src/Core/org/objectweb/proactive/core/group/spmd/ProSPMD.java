@@ -33,11 +33,11 @@ package org.objectweb.proactive.core.group.spmd;
 import java.lang.reflect.InvocationTargetException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -144,12 +144,12 @@ public class ProSPMD {
         Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
-        Group g = ProActiveGroup.getGroup(result);
+        Object result = ProGroup.newGroup(className);
+        Group g = ProGroup.getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                g.add(ProActive.newActive(className, params[i],
+                g.add(ProActiveObject.newActive(className, params[i],
                         nodeList[i % nodeList.length]));
             }
         }
@@ -265,8 +265,8 @@ public class ProSPMD {
     public static Object newSPMDGroupInParallel(String className,
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException {
-        Object result = ProActiveGroup.newGroup(className);
-        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+        Object result = ProGroup.newGroup(className);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProGroup.getGroup(result);
 
         proxy.createMemberWithMultithread(className, null, params, nodeList);
 
@@ -292,7 +292,7 @@ public class ProSPMD {
      * @return the SPMD group of this
      */
     public static Object getSPMDGroup() {
-        AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();
+        AbstractBody body = (AbstractBody) ProActiveObject.getBodyOnThis();
         return body.getSPMDGroup();
     }
 
@@ -301,7 +301,7 @@ public class ProSPMD {
      * @return a size (int)
      */
     public static int getMySPMDGroupSize() {
-        return ProActiveGroup.getGroup(ProSPMD.getSPMDGroup()).size();
+        return ProGroup.getGroup(ProSPMD.getSPMDGroup()).size();
     }
 
     /**
@@ -309,8 +309,8 @@ public class ProSPMD {
      * @return the index of the object
      */
     public static int getMyRank() {
-        return ProActiveGroup.getGroup(ProSPMD.getSPMDGroup())
-                             .indexOf(ProActive.getStubOnThis());
+        return ProGroup.getGroup(ProSPMD.getSPMDGroup())
+                             .indexOf(ProActiveObject.getStubOnThis());
     }
 
     /**
@@ -330,13 +330,13 @@ public class ProSPMD {
     public static void barrier(String barrierName, Object group) {
         try {
             // add the barrier into the tag list
-            AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();
+            AbstractBody body = (AbstractBody) ProActiveObject.getBodyOnThis();
             body.getProActiveSPMDGroupManager().addToBarrierTags(barrierName);
             // set the number of awaited message barriers
             body.getProActiveSPMDGroupManager()
-                .setAwaitedBarrierCalls(barrierName, ProActiveGroup.size(group));
+                .setAwaitedBarrierCalls(barrierName, ProGroup.size(group));
             // send the barrier messages
-            ProxyForGroup proxy = (ProxyForGroup) ProActiveGroup.getGroup(group);
+            ProxyForGroup proxy = (ProxyForGroup) ProGroup.getGroup(group);
             proxy.reify(new MethodCallBarrier(barrierName));
         } catch (InvocationTargetException e) {
             System.err.println(
@@ -351,7 +351,7 @@ public class ProSPMD {
      */
     public static void barrier(String[] methodNames) {
         try {
-            (ProActive.getStubOnThis()).getProxy()
+            (ProActiveObject.getStubOnThis()).getProxy()
              .reify(new MethodCallBarrierWithMethodName(methodNames));
         } catch (InvocationTargetException e) {
             System.err.println(

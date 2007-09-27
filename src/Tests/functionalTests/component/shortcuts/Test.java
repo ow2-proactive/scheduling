@@ -39,7 +39,7 @@ import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1;
@@ -84,7 +84,7 @@ public class Test extends ComponentTest {
         result1 = ((I1) systemWithoutWrapping.getFcInterface("i1")).processInputMessage(new Message(
                     "foo"));
         // waiting for the future is only for having an ordered logging output
-        ProActive.waitFor(result1);
+        ProFuture.waitFor(result1);
         Thread.sleep(2000);
 
         //System.out.println("testing wrapped system without shortcuts");
@@ -95,14 +95,14 @@ public class Test extends ComponentTest {
 
         result2 = ((I1) systemWithWrappingWithoutShortcuts.getFcInterface("i1")).processInputMessage(new Message(
                     "foo"));
-        ProActive.waitFor(result2);
+        ProFuture.waitFor(result2);
         Thread.sleep(2000);
 
         //System.out.println("testing wrapped system with shortcuts -- fist invocation");
         // first call, which performs tensioning
         result3 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message(
                     "foo"));
-        ProActive.waitFor(result3);
+        ProFuture.waitFor(result3);
         Thread.sleep(2000);
 
         Fractal.getLifeCycleController(systemWithWrappingWithShortcuts).stopFc();
@@ -112,7 +112,7 @@ public class Test extends ComponentTest {
         //System.out.println("testing wrapped system with shortcuts -- second invocation");
         result4 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message(
                     "foo"));
-        ProActive.waitFor(result4);
+        ProFuture.waitFor(result4);
         Thread.sleep(2000);
 
         // TODO_M manage shortcuts with reconfigurations
@@ -124,13 +124,13 @@ public class Test extends ComponentTest {
         // a shortcut is now realized. Compare with previous result
         //        result6 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message("foo"));
         Assert.assertEquals(expectedResult,
-            ((Message) ProActive.getFutureValue(result4)).getMessage());
+            ((Message) ProFuture.getFutureValue(result4)).getMessage());
         Assert.assertEquals(expectedResult,
-            ((Message) ProActive.getFutureValue(result3)).getMessage());
+            ((Message) ProFuture.getFutureValue(result3)).getMessage());
         Assert.assertEquals(expectedResult,
-            ((Message) ProActive.getFutureValue(result2)).getMessage());
+            ((Message) ProFuture.getFutureValue(result2)).getMessage());
         Assert.assertEquals(expectedResult,
-            ((Message) ProActive.getFutureValue(result1)).getMessage());
+            ((Message) ProFuture.getFutureValue(result1)).getMessage());
     }
 
     private void initializeComponentSystems() throws Exception {

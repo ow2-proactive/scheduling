@@ -31,9 +31,9 @@
 package functionalTests.group.exception;
 
 import org.junit.Before;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -67,7 +67,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(),
                 params, nodes);
 
         this.resultTypedGroup = this.typedGroup.asynchronousCallException();
@@ -76,8 +76,8 @@ public class Test extends FunctionalTest {
         assertTrue(resultTypedGroup != null);
         // System.err.println(
         //        "the result group containing exception is not build");
-        Group group = ProActiveGroup.getGroup(this.typedGroup);
-        Group groupOfResult = ProActiveGroup.getGroup(this.resultTypedGroup);
+        Group group = ProGroup.getGroup(this.typedGroup);
+        Group groupOfResult = ProGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupOfResult.size() == group.size());
@@ -99,7 +99,7 @@ public class Test extends FunctionalTest {
         //        System.err.println(
         //                "the ExceptionListException hasn't the right size");
         A resultOfResultGroup = (A) this.resultTypedGroup.asynchronousCall();
-        Group groupOfResultResult = ProActiveGroup.getGroup(resultOfResultGroup);
+        Group groupOfResultResult = ProGroup.getGroup(resultOfResultGroup);
 
         // has the result-result group the correct size ?
         assertTrue(groupOfResultResult.size() == groupOfResult.size());

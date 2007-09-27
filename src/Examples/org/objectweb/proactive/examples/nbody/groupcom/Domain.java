@@ -35,9 +35,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
@@ -92,8 +92,8 @@ public class Domain implements Serializable {
      */
     public void init(Domain domainGroup, Displayer dp, Maestro master) {
         this.neighbours = domainGroup;
-        Group g = ProActiveGroup.getGroup(neighbours);
-        g.remove(ProActive.getStubOnThis()); // no need to send information to self
+        Group g = ProGroup.getGroup(neighbours);
+        g.remove(ProActiveObject.getStubOnThis()); // no need to send information to self
         this.nbvalues = g.size(); // number of expected values to receive.
         this.values = new Planet[nbvalues + 1]; // leave empty slot for self
         this.display = dp;

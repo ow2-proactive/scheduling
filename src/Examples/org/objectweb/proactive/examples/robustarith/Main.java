@@ -32,7 +32,8 @@ package org.objectweb.proactive.examples.robustarith;
 
 import java.math.BigInteger;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -79,10 +80,10 @@ public class Main {
             };
 
         //ProActive.tryWithCatch(java.io.IOException.class);
-        ProActive.tryWithCatch(Exception.class);
+        ProException.tryWithCatch(Exception.class);
         try {
             String path = (args.length == 0) ? "descriptors/Matrix.xml" : args[0];
-            ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file:" +
+            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor("file:" +
                     path);
             VirtualNode dispatcher = pad.getVirtualNode("matrixNode");
             dispatcher.activate();
@@ -90,11 +91,11 @@ public class Main {
             Sum s = new Sum(nodes);
             Ratio r = s.eval(f, 0, 40);
             System.out.println(r);
-            ProActive.endTryWithCatch();
+            ProException.endTryWithCatch();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            ProActive.removeTryWithCatch();
+            ProException.removeTryWithCatch();
         }
         System.exit(0);
     }

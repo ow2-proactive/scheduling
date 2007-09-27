@@ -79,7 +79,7 @@ import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -536,7 +536,7 @@ public class ProActiveSecurity {
     }
 
     public static X509Certificate getMyCertificate() {
-        ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         if (psm != null) {
             return psm.getCertificate();
         }

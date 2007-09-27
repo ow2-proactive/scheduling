@@ -39,10 +39,10 @@ import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -81,7 +81,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (forBalancing.indexOf(oLB) < 0) {
@@ -113,7 +113,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 String itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (!forBalancing.contains(oLB)) {
@@ -142,7 +142,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/robinhood";
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (!forStealing.contains(oLB)) {
@@ -175,7 +175,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (!forStealing.contains(oLB)) {
@@ -311,7 +311,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
     }
 
     public void runActivity(Body body) {
-        this.myThis = (P2PLoadBalancer) ProActive.getStubOnThis();
+        this.myThis = (P2PLoadBalancer) ProActiveObject.getStubOnThis();
         this.balancerName = "robinhood";
 
         /* Updating the node reference */
@@ -329,7 +329,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             String itAddress = body.getNodeURL();
             itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                 "/" + this.balancerName;
-            ProActive.register(myThis, itAddress);
+            ProActiveObject.register(myThis, itAddress);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -343,7 +343,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
 
     public void killMePlease() {
         lm.killMePlease();
-        ProActive.terminateActiveObject(myThis, true);
+        ProActiveObject.terminateActiveObject(myThis, true);
     }
 
     public void init() {

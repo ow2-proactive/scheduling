@@ -31,7 +31,7 @@
 package functionalTests.activeobject.locationserver;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -62,16 +62,16 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         String serverUrl = PAProperties.PA_LOCATION_SERVER_RMI.getValue();
 
-        this.server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
+        this.server = (SimpleLocationServer) ProActiveObject.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
 
         Thread.sleep(3000);
 
-        this.a = (A) ProActive.newActive(A.class.getName(), null,
+        this.a = (A) ProActiveObject.newActive(A.class.getName(), null,
                 new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
                 LocationServerMetaObjectFactory.newInstance());
 
-        this.migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
+        this.migratableA = (MigratableA) ProActiveObject.newActive(MigratableA.class.getName(),
                 null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
                 LocationServerMetaObjectFactory.newInstance());
 

@@ -35,8 +35,8 @@ import java.net.URISyntaxException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
@@ -202,7 +202,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
     protected void register() {
         try {
             logger.info("Attempt at binding : " + url);
-            ProActive.register(ProActive.getStubOnThis(), url);
+            ProActiveObject.register(ProActiveObject.getStubOnThis(), url);
             logger.info("Location Server bound in registry : " + url);
         } catch (Exception e) {
             logger.fatal("Cannot bind in registry - aborting " + url);
@@ -222,10 +222,10 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
 
         try {
             if (args.length == 1) {
-                server = (MixedLocationServer) ProActive.newActive(MixedLocationServer.class.getName(),
+                server = (MixedLocationServer) ProActiveObject.newActive(MixedLocationServer.class.getName(),
                         arg, NodeFactory.getNode(args[0]));
             } else {
-                server = (MixedLocationServer) ProActive.newActive(MixedLocationServer.class.getName(),
+                server = (MixedLocationServer) ProActiveObject.newActive(MixedLocationServer.class.getName(),
                         arg);
             }
         } catch (Exception e) {

@@ -39,12 +39,13 @@ import java.util.Map;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 
 
@@ -128,7 +129,7 @@ public class PiBBP implements Serializable {
     public String runParallel() {
         try {
             // create a group of computers on the current host
-            piComputer = (PiComputer) ProActiveGroup.newGroup(PiComputer.class.getName(),
+            piComputer = (PiComputer) ProGroup.newGroup(PiComputer.class.getName(),
                     new Object[][] {
                         new Object[] { new Integer(nbDecimals_) },
                         new Object[] { new Integer(nbDecimals_) }
@@ -152,7 +153,7 @@ public class PiBBP implements Serializable {
             // *************************************************************/
             System.out.println("\nStarting deployment of virtual nodes");
             // parse the descriptor file
-            deploymentDescriptor_ = ProActive.getProactiveDescriptor(
+            deploymentDescriptor_ = ProDeployment.getProactiveDescriptor(
                     "../descriptors/" + deploymentDescriptorLocation_);
             deploymentDescriptor_.activateMappings();
             VirtualNode computersVN = deploymentDescriptor_.getVirtualNode(
@@ -167,7 +168,7 @@ public class PiBBP implements Serializable {
                 "\nCreating a group of computers on the given virtual node ...");
 
             // create a group of computers on the virtual node computersVN
-            piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(PiComputer.class.getName(),
+            piComputer = (PiComputer) ProGroup.newGroupInParallel(PiComputer.class.getName(),
                     new Object[] { new Integer(nbDecimals_) },
                     computersVN.getNodes());
 
@@ -200,7 +201,7 @@ public class PiBBP implements Serializable {
             Map context = new HashMap();
 
             /*Deploying runtimes*/
-            ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(arg3);
+            ProActiveDescriptor deploymentDescriptor = ProDeployment.getProactiveDescriptor(arg3);
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
             int nbNodes = deploymentDescriptor.getVirtualNode("computers-vn")
@@ -262,7 +263,7 @@ public class PiBBP implements Serializable {
      * @return the value of PI
      */
     public String computeOnGroup(PiComp piComputers) {
-        int nbNodes = ProActiveGroup.getGroup(piComputers).size();
+        int nbNodes = ProGroup.getGroup(piComputers).size();
         System.out.println("\nUsing " + nbNodes +
             " PiComputers for the computation\n");
 
@@ -278,7 +279,7 @@ public class PiBBP implements Serializable {
 
         // scatter group data, so that independent intervals are sent as
         // parameters to each PiComputer instance
-        ProActiveGroup.setScatterGroup(intervals);
+        ProGroup.setScatterGroup(intervals);
 
         //*************************************************************
         // * computation
@@ -289,7 +290,7 @@ public class PiBBP implements Serializable {
         // invocation on group, parameters are scattered, result is a
         // group
         Result results = piComputers.compute(intervals);
-        Group resultsGroup = ProActiveGroup.getGroup(results);
+        Group resultsGroup = ProGroup.getGroup(results);
 
         // the following is displayed because the "compute" operation is
         // asynchronous (non-blocking)
@@ -351,7 +352,7 @@ public class PiBBP implements Serializable {
         try {
             //            PiBBP piApplication = new PiBBP(args);
             //            piApplication.start();
-            PiBBP piApplication = (PiBBP) ProActive.newActive(PiBBP.class.getName(),
+            PiBBP piApplication = (PiBBP) ProActiveObject.newActive(PiBBP.class.getName(),
                     new Object[] { args });
 
             if (piApplication.isWebService()) {

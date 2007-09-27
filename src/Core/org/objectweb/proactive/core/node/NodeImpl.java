@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -310,7 +310,7 @@ public class NodeImpl implements Node, Serializable {
             } else {
                 try {
                     // reify for remote terminate
-                    ProActive.terminateActiveObject(ProActive.createStubObject(
+                    ProActiveObject.terminateActiveObject(MOP.createStubObject(
                             Object.class.getName(), body), true);
                 } catch (MOPException e) {
                     throw new IOException(

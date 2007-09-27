@@ -2,7 +2,7 @@ package functionalTests.jmx.mbean;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 
@@ -12,7 +12,7 @@ public class A implements Serializable {
     }
 
     public boolean existBodyWrapperMBean() {
-        return (ProActive.getBodyOnThis().getMBean() != null);
+        return (ProActiveObject.getBodyOnThis().getMBean() != null);
     }
 
     public boolean existProActiveRuntimeWrapperMBean() {

@@ -32,7 +32,7 @@ package functionalTests.activeobject.node.getactiveobject;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 public class A implements Serializable {
@@ -55,6 +55,6 @@ public class A implements Serializable {
     }
 
     public String getNodeUrl() {
-        return ProActive.getBodyOnThis().getNodeURL();
+        return ProActiveObject.getBodyOnThis().getNodeURL();
     }
 }

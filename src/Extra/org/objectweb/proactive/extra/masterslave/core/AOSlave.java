@@ -36,9 +36,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -163,12 +164,12 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * {@inheritDoc}
      */
     public void initActivity(final Body body) {
-        stubOnThis = ProActive.getStubOnThis();
+        stubOnThis = ProActiveObject.getStubOnThis();
         isSleeping = false;
         terminated = false;
-        ProActive.setImmediateService("getName");
-        ProActive.setImmediateService("heartBeat");
-        ProActive.setImmediateService("terminate");
+        ProActiveObject.setImmediateService("getName");
+        ProActiveObject.setImmediateService("heartBeat");
+        ProActiveObject.setImmediateService("terminate");
     }
 
     /**
@@ -192,7 +193,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         TaskIntern<Serializable> currentTask = provider.getTask((Slave) stubOnThis,
                 name);
         // we make sure that we have the real task object and not a future)
-        currentTask = (TaskIntern<Serializable>) ProActive.getFutureValue(currentTask);
+        currentTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(currentTask);
         return currentTask;
     }
 
@@ -246,7 +247,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
 
                         // We send the result back to the master
                         newTask = provider.sendResultAndGetTask(result, name);
-                        newTask = (TaskIntern<Serializable>) ProActive.getFutureValue(newTask);
+                        newTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(newTask);
                     } else {
                         // if the task is null, we automatically sleep
                         isSleeping = true;
@@ -282,7 +283,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         }
 
         this.terminated = true;
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
         if (logger.isDebugEnabled()) {
             logger.debug(name + " terminated...");
         }

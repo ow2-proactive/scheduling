@@ -33,7 +33,7 @@ package org.objectweb.proactive.extensions.calcium;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
@@ -145,7 +145,7 @@ class Facade {
 
                 //TODO Temporary ProActive generics bug workaround 
                 //This is the supelec trick
-                taskResult = (Task<?>) ProActive.getFutureValue(taskResult);
+                taskResult = (Task<?>) ProFuture.getFutureValue(taskResult);
                 results.updateFuture(taskResult);
             }
         }

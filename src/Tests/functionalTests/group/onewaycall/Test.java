@@ -33,8 +33,8 @@ package functionalTests.group.onewaycall;
 import java.util.Iterator;
 
 import org.junit.Before;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -56,7 +56,7 @@ public class Test extends FunctionalTest {
         this.typedGroup.onewayCall();
 
         boolean allOnewayCallDone = true;
-        Group group = ProActiveGroup.getGroup(this.typedGroup);
+        Group group = ProGroup.getGroup(this.typedGroup);
         Iterator it = group.iterator();
         while (it.hasNext()) {
             allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
@@ -77,12 +77,12 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(),
                 params, nodes);
-        ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
+        ProGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
         boolean NoOnewayCallDone = true;
-        Group group = ProActiveGroup.getGroup(this.typedGroup);
+        Group group = ProGroup.getGroup(this.typedGroup);
         Iterator it = group.iterator();
         while (it.hasNext()) {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();

@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -64,8 +64,8 @@ public abstract class Task implements Serializable, Comparable {
      * Set the immediate services for this active object
      */
     public int setImmediateServices() {
-        ProActive.setImmediateService("setBestKnownResult");
-        ProActive.setImmediateService("immediateTerminate");
+        ProActiveObject.setImmediateService("setBestKnownResult");
+        ProActiveObject.setImmediateService("immediateTerminate");
         return 0; // for synchronous call
     }
 
@@ -155,6 +155,6 @@ public abstract class Task implements Serializable, Comparable {
      * Terminate this task.
      */
     public void immediateTerminate() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 }

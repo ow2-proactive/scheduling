@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -99,7 +99,7 @@ public class TestAPI extends FunctionalTest {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }
 
-        pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
         VirtualNode testVNodePush = pad.getVirtualNode("testPush");

@@ -56,7 +56,8 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -80,7 +81,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -754,7 +755,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     public static Component getComponentRepresentativeOnThis() {
         ComponentBody componentBody;
         try {
-            componentBody = (ComponentBody) ProActive.getBodyOnThis();
+            componentBody = (ComponentBody) ProActiveObject.getBodyOnThis();
         } catch (ClassCastException e) {
             logger.error(
                 "Cannot get a component representative from the current object, because this object is not a component");
@@ -781,7 +782,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             throw new IllegalArgumentException(
                 "This method can only register ProActive components");
         }
-        ProActive.register(ref, url);
+        ProActiveObject.register(ref, url);
     }
 
     /**
@@ -805,7 +806,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
 
             b = (UniversalBody) RemoteObjectHelper.generatedObjectStub(rmo);
 
-            StubObject stub = (StubObject) ProActive.createStubObject(ProActiveComponentRepresentative.class.getName(),
+            StubObject stub = (StubObject) MOP.createStubObject(ProActiveComponentRepresentative.class.getName(),
                     b);
 
             return ProActiveComponentRepresentativeFactory.instance()
@@ -897,7 +898,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
 
         // 3 possibilities : either the component is created on a node (or
         // null), it is created on a virtual node, or on multiple nodes
-        ao = ProActive.newActive(contentDesc.getClassName(), null,
+        ao = ProActiveObject.newActive(contentDesc.getClassName(), null,
                 contentDesc.getConstructorParameters(), node,
                 contentDesc.getActivity(), contentDesc.getFactory());
 
@@ -963,7 +964,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 components = ProActiveComponentGroup.newNFComponentRepresentativeGroup((ComponentType) type,
                         controllerDesc);
             }
-            List<Component> componentsList = ProActiveGroup.getGroup(components);
+            List<Component> componentsList = ProGroup.getGroup(components);
             if (Constants.PRIMITIVE.equals(controllerDesc.getHierarchicalType())) {
                 if (contentDesc.length > 1) { // cyclic
                                               // node

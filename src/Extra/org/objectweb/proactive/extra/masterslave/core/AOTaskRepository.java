@@ -14,7 +14,7 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.masterslave.TaskAlreadySubmittedException;
@@ -251,7 +251,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
      * {@inheritDoc}
      */
     public boolean terminate() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
         return true;
     }
 }

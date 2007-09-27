@@ -42,8 +42,9 @@ import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -75,9 +76,9 @@ public class FileTransferService implements ProActiveInternalObject {
     }
 
     public int setImmediateSevices() {
-        ProActive.setImmediateService("requestFileTransfer",
+        ProActiveObject.setImmediateService("requestFileTransfer",
             new Class[] { FileTransferRequest.class });
-        ProActive.setImmediateService("getFileTransferRequestStatus",
+        ProActiveObject.setImmediateService("getFileTransferRequestStatus",
             new Class[] { FileTransferRequest.class });
         return 0; // synchronous call
     }
@@ -272,7 +273,7 @@ public class FileTransferService implements ProActiveInternalObject {
                     ftsRemote.closeForwardingService(dstFile, e);
                     return new OperationStatus(new ProActiveException(
                             "Can not send file block to:" +
-                            ProActive.getActiveObjectNodeUrl(ftsRemote), e));
+                            ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e));
                 }
             }
         }
@@ -286,11 +287,11 @@ public class FileTransferService implements ProActiveInternalObject {
             ftsRemote.closeForwardingService(dstFile, e);
             return new OperationStatus(new ProActiveException(
                     "Can not send File to:" +
-                    ProActive.getActiveObjectNodeUrl(ftsRemote), e));
+                    ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e));
         }
 
         //Close the remote/local buffers
-        ProActive.waitFor(ftsRemote.closeWrite(dstFile));
+        ProFuture.waitFor(ftsRemote.closeWrite(dstFile));
         closeRead(srcFile);
         ftsRemote.closeForwardingService(dstFile); //sync-call
 
@@ -429,13 +430,13 @@ public class FileTransferService implements ProActiveInternalObject {
         OperationStatus opstat = null;
 
         //if the future is allready here, don't bother making a request for the file transfer
-        if (ProActive.isAwaited(parentOpStat)) {
+        if (ProFuture.isAwaited(parentOpStat)) {
             if (logger.isDebugEnabled()) {
                 logger.debug(
                     "File transfer request will be handled using forwarding");
             }
             srcFTS.requestFileTransfer(ftr); //immediate service call
-            ProActive.waitFor(parentOpStat); //we wait for the original file transfer to finish
+            ProFuture.waitFor(parentOpStat); //we wait for the original file transfer to finish
             if (parentOpStat.hasException()) { //if the original file transfer had an error we propagate it
                 srcFTS.getFileTransferRequestStatus(ftr); //we need to remove the desubmit the ftr
                 return parentOpStat;
@@ -453,8 +454,8 @@ public class FileTransferService implements ProActiveInternalObject {
                 logger.debug("File transfer request will be handled directly");
             }
 
-            String myNodeURL = ProActive.getActiveObjectNodeUrl(meFTS);
-            String srcNodeURL = ProActive.getActiveObjectNodeUrl(ftr.getSourceFTS());
+            String myNodeURL = ProActiveObject.getActiveObjectNodeUrl(meFTS);
+            String srcNodeURL = ProActiveObject.getActiveObjectNodeUrl(ftr.getSourceFTS());
 
             //If the file is not here, we get a FTS AO in the source node.
             if (!myNodeURL.equals(srcNodeURL)) {

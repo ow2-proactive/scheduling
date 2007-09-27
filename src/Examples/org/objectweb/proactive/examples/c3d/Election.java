@@ -34,9 +34,9 @@ import java.io.Serializable;
 import java.util.Vector;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
@@ -146,7 +146,7 @@ public class Election implements RunActive, Serializable {
 
     /** Destroy the Active Object */
     public void terminate() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     /** Class to register votes, and then determine a winner.

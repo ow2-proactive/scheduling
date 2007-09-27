@@ -37,6 +37,7 @@ import javax.management.MBeanServer;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
@@ -69,7 +70,7 @@ public class ProActiveServerImpl implements Serializable,
         ProActiveConnection client = null;
         try {
             client = new ProActiveConnection(this.mbeanServer);
-            client = (ProActiveConnection) ProActive.turnActive(client);
+            client = (ProActiveConnection) ProActiveObject.turnActive(client);
             return client;
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -96,7 +97,7 @@ public class ProActiveServerImpl implements Serializable,
 
     public UniqueID getUniqueID() {
         if (id == null) {
-            id = ProActive.getBodyOnThis().getID();
+            id = ProActiveObject.getBodyOnThis().getID();
         }
         return id;
     }

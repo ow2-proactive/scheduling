@@ -34,8 +34,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProMigration;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -74,7 +75,7 @@ public class Agent implements InitActive, RunActive, EndActive,
         try {
             //System.out.println("getNodeName called");
             //return the name of the Node
-            return ProActive.getBodyOnThis().getNodeURL().toUpperCase();
+            return ProActiveObject.getBodyOnThis().getNodeURL().toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
             return "getNodeName failed";
@@ -84,7 +85,7 @@ public class Agent implements InitActive, RunActive, EndActive,
     public void moveTo(String nodeURL) throws Exception {
         //try {
         logger.info(" I am going to migate");
-        ProActive.migrateTo(nodeURL);
+        ProMigration.migrateTo(nodeURL);
         // System.out.println("migration done");
         //    } catch (Exception e) {
         //      e.printStackTrace();
@@ -92,7 +93,7 @@ public class Agent implements InitActive, RunActive, EndActive,
     }
 
     public void endBodyActivity() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     public void initActivity(Body body) {

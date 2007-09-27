@@ -16,7 +16,7 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
@@ -77,7 +77,7 @@ public class JMXNotificationManager implements NotificationListener {
 
         try {
             // Initalise the JMXNotificationListener which is an active object listening all needed MBeans
-            this.notificationlitener = (JMXNotificationListener) ProActive.newActive(JMXNotificationListener.class.getName(),
+            this.notificationlitener = (JMXNotificationListener) ProActiveObject.newActive(JMXNotificationListener.class.getName(),
                     new Object[] {  });
         } catch (ActiveObjectCreationException e) {
             logger.error("Can't create the JMX notifications listener active object",

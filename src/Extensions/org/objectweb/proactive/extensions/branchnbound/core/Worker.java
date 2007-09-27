@@ -35,9 +35,10 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -90,11 +91,11 @@ public class Worker implements Serializable {
         try {
             // Activing the task
             if (this.workerNodeUrl == null) {
-                this.workerNodeUrl = ProActive.getBodyOnThis().getNodeURL();
+                this.workerNodeUrl = ProActiveObject.getBodyOnThis().getNodeURL();
             }
-            activedTask = (Task) ProActive.turnActive(ProActive.getFutureValue(
+            activedTask = (Task) ProActiveObject.turnActive(ProFuture.getFutureValue(
                         task), workerNodeUrl);
-            activedTask.setWorker((Worker) ProActive.getStubOnThis());
+            activedTask.setWorker((Worker) ProActiveObject.getStubOnThis());
             this.currentTask = activedTask;
             this.currentTask.setImmediateServices();
         } catch (ActiveObjectCreationException e) {
@@ -130,8 +131,8 @@ public class Worker implements Serializable {
      * @param workerGroup the group of workers.
      */
     public void setWorkerGroup(Worker workerGroup) {
-        Group group = ProActiveGroup.getGroup(workerGroup);
-        group.remove(ProActive.getStubOnThis());
+        Group group = ProGroup.getGroup(workerGroup);
+        group.remove(ProActiveObject.getStubOnThis());
         this.selfWorkerGroup = workerGroup;
     }
 

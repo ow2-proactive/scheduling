@@ -44,10 +44,10 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
@@ -317,7 +317,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return add succesfull
      */
     public Vector<String> add(P2PService peer) {
-        return this.add(buildCorrectUrl(ProActive.getActiveObjectNodeUrl(peer)),
+        return this.add(buildCorrectUrl(ProActiveObject.getActiveObjectNodeUrl(peer)),
             peer);
     }
 
@@ -389,7 +389,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     public void remove(P2PService peer, Vector<String> acquaintancesURLs) {
         boolean result = this.acquaintances.remove(peer,
-                buildCorrectUrl(ProActive.getActiveObjectNodeUrl(peer)));
+                buildCorrectUrl(ProActiveObject.getActiveObjectNodeUrl(peer)));
         if (acquaintancesURLs != null) {
             this.addToPreferedAcq(acquaintancesURLs);
         }

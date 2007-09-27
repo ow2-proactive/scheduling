@@ -37,7 +37,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extra.masterslave.ProActiveMaster;
@@ -87,7 +87,7 @@ public class Test extends FunctionalTest {
             tasks.add(t);
         }
 
-        this.pad = ProActive.getProactiveDescriptor(descriptor.getPath());
+        this.pad = ProDeployment.getProactiveDescriptor(descriptor.getPath());
         this.pad.activateMappings();
         this.vn1 = this.pad.getVirtualNode("VN1");
 

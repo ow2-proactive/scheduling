@@ -34,8 +34,8 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -68,7 +68,7 @@ public class FileTransferEngine implements ProActiveInternalObject {
             return ftsPool.remove(0);
         }
 
-        FileTransferService localFTS = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
+        FileTransferService localFTS = (FileTransferService) ProActiveObject.newActive(FileTransferService.class.getName(),
                 null);
         setImmediateServices(localFTS);
 
@@ -78,7 +78,7 @@ public class FileTransferEngine implements ProActiveInternalObject {
     //TODO improove this method to getFTS on remote nodes from a pool
     public FileTransferService getFTS(Node node)
         throws ActiveObjectCreationException, NodeException {
-        FileTransferService remoteFTS = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
+        FileTransferService remoteFTS = (FileTransferService) ProActiveObject.newActive(FileTransferService.class.getName(),
                 null, node);
 
         setImmediateServices(remoteFTS);
@@ -87,7 +87,7 @@ public class FileTransferEngine implements ProActiveInternalObject {
 
     public FileTransferService getFTS(String srcNodeURL)
         throws ActiveObjectCreationException, NodeException {
-        FileTransferService remoteFTS = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
+        FileTransferService remoteFTS = (FileTransferService) ProActiveObject.newActive(FileTransferService.class.getName(),
                 null, srcNodeURL);
 
         setImmediateServices(remoteFTS);
@@ -106,7 +106,7 @@ public class FileTransferEngine implements ProActiveInternalObject {
     static synchronized public FileTransferEngine getFileTransferEngine() {
         if (singletonFTE == null) {
             try {
-                singletonFTE = (FileTransferEngine) ProActive.newActive(FileTransferEngine.class.getName(),
+                singletonFTE = (FileTransferEngine) ProActiveObject.newActive(FileTransferEngine.class.getName(),
                         null);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -119,7 +119,7 @@ public class FileTransferEngine implements ProActiveInternalObject {
     public synchronized static FileTransferEngine getFileTransferEngine(
         Node node) {
         try {
-            return (FileTransferEngine) ProActive.lookupActive(FileTransferEngine.class.getName(),
+            return (FileTransferEngine) ProActiveObject.lookupActive(FileTransferEngine.class.getName(),
                 node.getNodeInformation().getURL());
         } catch (Exception e) {
             e.printStackTrace();

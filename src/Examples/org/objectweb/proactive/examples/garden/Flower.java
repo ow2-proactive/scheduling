@@ -89,17 +89,17 @@ public class Flower {
             }
             logger.info("Node 1 : " + nodeName1);
             logger.info("Node 2 : " + nodeName2);
-            Flower a = (Flower) org.objectweb.proactive.ProActive.newActive(Flower.class.getName(),
+            Flower a = (Flower) org.objectweb.proactive.api.ProActiveObject.newActive(Flower.class.getName(),
                     new Object[] { "Amaryllis - LOCAL" });
-            Flower b = (Flower) org.objectweb.proactive.ProActive.newActive(Flower.class.getName(),
+            Flower b = (Flower) org.objectweb.proactive.api.ProActiveObject.newActive(Flower.class.getName(),
                     new Object[] { "Bouton d'Or - LOCAL" });
-            Flower c = (Flower) org.objectweb.proactive.ProActive.newActive(Flower.class.getName(),
+            Flower c = (Flower) org.objectweb.proactive.api.ProActiveObject.newActive(Flower.class.getName(),
                     new Object[] { "Coquelicot - vm1" }, nodeName1);
-            Flower d = (Flower) org.objectweb.proactive.ProActive.newActive(Flower.class.getName(),
+            Flower d = (Flower) org.objectweb.proactive.api.ProActiveObject.newActive(Flower.class.getName(),
                     new Object[] { "Daliah - vm1" }, nodeName1);
-            Flower e = (Flower) org.objectweb.proactive.ProActive.newActive(Flower.class.getName(),
+            Flower e = (Flower) org.objectweb.proactive.api.ProActiveObject.newActive(Flower.class.getName(),
                     new Object[] { "Eglantine - vm2" }, nodeName2);
-            Flower f = (Flower) org.objectweb.proactive.ProActive.newActive(Flower.class.getName(),
+            Flower f = (Flower) org.objectweb.proactive.api.ProActiveObject.newActive(Flower.class.getName(),
                     new Object[] { "Rose - vm2" }, nodeName2);
 
             // Now let's test all setups

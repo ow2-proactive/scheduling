@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -291,7 +291,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                         creatorID).clone());
                 if ((bodiesToContinue != null) &&
                         (bodiesToContinue.size() != 0)) {
-                    ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+                    ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
 
                     // lazy starting of the AC thread
                     if (!this.queueAC.isAlive()) {
@@ -640,7 +640,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 int remainingSends = dests.size();
                 Reply toSend = null;
                 ProActiveSecurityManager psm = (remainingSends > 1)
-                    ? (((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager())
+                    ? (((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager())
                     : null;
 
                 for (int i = 0; i < dests.size(); i++) {

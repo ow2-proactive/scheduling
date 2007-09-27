@@ -32,7 +32,7 @@ package functionalTests.component.creation;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 /**
@@ -63,7 +63,7 @@ public class ComponentA implements Serializable, ComponentInfo {
     }
 
     public String getNodeUrl() {
-        return ProActive.getBodyOnThis().getNodeURL();
+        return ProActiveObject.getBodyOnThis().getNodeURL();
     }
 
     /* (non-Javadoc)

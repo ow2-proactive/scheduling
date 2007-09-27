@@ -32,8 +32,8 @@ package org.objectweb.proactive.core.exceptions;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 /**
@@ -47,7 +47,7 @@ public class NonFunctionalException extends RuntimeException
 
     public NonFunctionalException(String message, Throwable cause) {
         super(message, cause);
-        nodeURL = ProActive.getBodyOnThis().getNodeURL();
+        nodeURL = ProActiveObject.getBodyOnThis().getNodeURL();
     }
 
     public String getNodeURL() {

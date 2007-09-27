@@ -70,14 +70,14 @@ public class Client {
         String urlAsString = "//" + serverHostName + "/theServer";
         logger.info("Client " + clientName + " is looking up server at " +
             urlAsString);
-        this.theServer = (Server) org.objectweb.proactive.ProActive.lookupActive(Server.class.getName(),
+        this.theServer = (Server) org.objectweb.proactive.api.ProActiveObject.lookupActive(Server.class.getName(),
                 urlAsString);
         logger.info("Client " + this.myName + " successfully found the server");
     }
 
     public void init() {
         // Registers myself with the server
-        Client myself = (Client) org.objectweb.proactive.ProActive.getStubOnThis();
+        Client myself = (Client) org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
         if (myself != null) {
             theServer.register(myself);
         } else {
@@ -115,7 +115,7 @@ public class Client {
 
         try {
             // Creates an active object for the client
-            Client theClient = (Client) org.objectweb.proactive.ProActive.newActive(Client.class.getName(),
+            Client theClient = (Client) org.objectweb.proactive.api.ProActiveObject.newActive(Client.class.getName(),
                     new Object[] { clientName, serverHostName });
             theClient.init();
             Thread t = new Thread(new RunClient(theClient));

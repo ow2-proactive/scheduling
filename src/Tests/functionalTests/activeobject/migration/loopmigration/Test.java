@@ -31,7 +31,7 @@
 package functionalTests.activeobject.migration.loopmigration;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
@@ -55,7 +55,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         node1 = TestNodes.getSameVMNode().getNodeInformation().getURL();
         node2 = TestNodes.getLocalVMNode().getNodeInformation().getURL();
-        a = (A) ProActive.newActive(A.class.getName(),
+        a = (A) ProActiveObject.newActive(A.class.getName(),
                 new Object[] { node1, node2 }, node1);
 
         assertFalse(a.isException());

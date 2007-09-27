@@ -31,7 +31,7 @@
 package functionalTests.descriptor.defaultnodes;
 
 import org.junit.Test;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -77,7 +77,7 @@ public class TestNodes extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+        proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
                 XML_LOCATION);
         proActiveDescriptor.activateMappings();
         TestNodes.virtualNodes = proActiveDescriptor.getVirtualNodes();

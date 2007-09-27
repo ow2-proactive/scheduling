@@ -30,7 +30,7 @@
  */
 package performanceTests.simple;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
@@ -85,7 +85,7 @@ public class Callee implements java.io.Serializable {
      * called to terminate its activity.
      */
     public boolean kill() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
         return true;
     }
 }

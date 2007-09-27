@@ -39,9 +39,9 @@ import java.util.Hashtable;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -81,12 +81,12 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
         this.manager = manager;
         this.jobID = jobNum.intValue();
         target = new ProActiveMPIComm(libName,
-                ProActive.getBodyOnThis().getID().hashCode());
+                ProActiveObject.getBodyOnThis().getID().hashCode());
     }
 
     public void initActivity(Body body) {
         // update proxy ref 
-        this.target.setMyProxy((ProActiveMPICoupling) ProActive.getStubOnThis(),
+        this.target.setMyProxy((ProActiveMPICoupling) ProActiveObject.getStubOnThis(),
             this.manager, this.jobID);
     }
 
@@ -95,7 +95,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     ///////////////////////////////
     public void registerProcess(int rank) {
         this.manager.register(this.jobID, rank,
-            (ProActiveMPICoupling) ProActive.getStubOnThis());
+            (ProActiveMPICoupling) ProActiveObject.getStubOnThis());
     }
 
     public void register() {
@@ -197,7 +197,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     ////  GETTER METHODS   ////
     ///////////////////////////
     public Node getNode() throws NodeException {
-        return NodeFactory.getNode(ProActive.getBodyOnThis().getNodeURL());
+        return NodeFactory.getNode(ProActiveObject.getBodyOnThis().getNodeURL());
     }
 
     public void allSendToMpi(int jobID, ProActiveMPIData m_r) {
@@ -232,7 +232,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
 
             // if the corresponding object exists, its a -ProSpmd object- or a -proxy-
             if (proSpmdGroup != null) {
-                Group g = ProActiveGroup.getGroup(proSpmdByClasses.get(
+                Group g = ProGroup.getGroup(proSpmdByClasses.get(
                             m_r.getClazz()));
 
                 // its a ProSpmd Object

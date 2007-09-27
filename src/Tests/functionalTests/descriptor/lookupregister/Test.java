@@ -30,7 +30,8 @@
  */
 package functionalTests.descriptor.lookupregister;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -65,13 +66,13 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        proActiveDescriptorAgent = ProActive.getProactiveDescriptor("file:" +
+        proActiveDescriptorAgent = ProDeployment.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
-        ProActive.newActive(A.class.getName(), new Object[] { "local" },
+        ProActiveObject.newActive(A.class.getName(), new Object[] { "local" },
             vnAgent.getNode());
-        VirtualNode vnLookup = ProActive.lookupVirtualNode(URIBuilder.buildURIFromProperties(
+        VirtualNode vnLookup = ProDeployment.lookupVirtualNode(URIBuilder.buildURIFromProperties(
                     "localhost", "Agent").toString());
         a = (A) vnLookup.getUniqueAO();
 

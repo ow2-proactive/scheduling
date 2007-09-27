@@ -36,7 +36,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureResult;
@@ -265,7 +265,7 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     protected Reply createReply(Body targetBody, FutureResult result) {
-        ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
 
         return new ReplyImpl(targetBody.getID(), this.sequenceNumber,
             this.methodName, result, psm);
@@ -315,7 +315,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
     protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException {
-        ProActiveSecurityManager psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         if (psm != null) {
             this.crypt(psm, destinationBody);
         }

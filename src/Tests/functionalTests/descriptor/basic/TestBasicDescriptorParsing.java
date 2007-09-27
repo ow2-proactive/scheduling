@@ -1,7 +1,7 @@
 package functionalTests.descriptor.basic;
 
 import org.junit.Test;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 
 
 public class TestBasicDescriptorParsing {
@@ -11,7 +11,7 @@ public class TestBasicDescriptorParsing {
                                         .getResource("javaproperty_ERROR.xml")
                                         .getPath();
 
-        Object proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+        Object proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
                 descriptorLocation);
     }
 }

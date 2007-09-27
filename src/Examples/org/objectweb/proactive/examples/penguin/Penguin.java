@@ -31,8 +31,9 @@
 package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProMigration;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.Destination;
 import org.objectweb.proactive.core.migration.MigrationStrategyImpl;
@@ -69,11 +70,11 @@ public class Penguin implements org.objectweb.proactive.RunActive,
     }
 
     public void rebuild() {
-        Body body = ProActive.getBodyOnThis();
+        Body body = ProActiveObject.getBodyOnThis();
         myFrame = new PenguinFrame(face, body.getNodeURL(), index);
         //System.out.println("Penguin is here");
         sendMessageToControler("I just got in node " +
-            ProActive.getBodyOnThis().getNodeURL());
+            ProActiveObject.getBodyOnThis().getNodeURL());
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -103,7 +104,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
         } catch (Exception e) {
             e.printStackTrace();
         }
-        myStrategyManager = new org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) org.objectweb.proactive.ProActive.getBodyOnThis());
+        myStrategyManager = new org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) org.objectweb.proactive.api.ProActiveObject.getBodyOnThis());
         myStrategyManager.onDeparture("clean");
         myStrategy = new MigrationStrategyImpl();
         itinerary = s;
@@ -149,7 +150,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
                     if ((r != null) &&
                             !NodeFactory.isNodeLocal(NodeFactory.getNode(
                                     r.getDestination()))) {
-                        ProActive.migrateTo(r.getDestination());
+                        ProMigration.migrateTo(r.getDestination());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -201,7 +202,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
 
     public String call() {
         return "[" + name + "] : I am working on node " +
-        ProActive.getBodyOnThis().getNodeURL();
+        ProActiveObject.getBodyOnThis().getNodeURL();
     }
 
     public void chainedCall() {
@@ -233,7 +234,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
             System.exit(-1);
         }
         try {
-            Penguin n = (Penguin) org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(),
+            Penguin n = (Penguin) org.objectweb.proactive.api.ProActiveObject.newActive(Penguin.class.getName(),
                     null);
 
             //	Penguin n2 = (Penguin)org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(), null);
@@ -242,7 +243,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
             //	n.startItinerary();
             Object[] param = new Object[1];
             param[0] = n;
-            org.objectweb.proactive.ProActive.newActive(PenguinMessageReceiver.class.getName(),
+            org.objectweb.proactive.api.ProActiveObject.newActive(PenguinMessageReceiver.class.getName(),
                 param, (org.objectweb.proactive.core.node.Node) null);
             //	n.setOther(n2);
             //	n2.setOther(null);

@@ -30,7 +30,9 @@
  */
 package functionalTests.ft.cic;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
@@ -75,25 +77,25 @@ public class Test extends FunctionalTest {
         VirtualNode vnode;
 
         //	create nodes
-        pad = ProActive.getProactiveDescriptor(Test.FT_XML_LOCATION_UNIX);
+        pad = ProDeployment.getProactiveDescriptor(Test.FT_XML_LOCATION_UNIX);
         pad.activateMappings();
         vnode = pad.getVirtualNode("Workers");
         Node[] nodes = vnode.getNodes();
 
-        Agent a = (Agent) ProActive.newActive(Agent.class.getName(),
+        Agent a = (Agent) ProActiveObject.newActive(Agent.class.getName(),
                 new Object[0], nodes[0]);
-        Agent b = (Agent) ProActive.newActive(Agent.class.getName(),
+        Agent b = (Agent) ProActiveObject.newActive(Agent.class.getName(),
                 new Object[0], nodes[1]);
 
         // not ft !
-        Collector c = (Collector) ProActive.newActive(Collector.class.getName(),
+        Collector c = (Collector) ProActiveObject.newActive(Collector.class.getName(),
                 new Object[0]);
 
         // a *normal* ServiceFailedCalleeNFE could appear; ignore ot for test
-        ProActive.addNFEListenerOnAO(a,
+        ProException.addNFEListenerOnAO(a,
             new TypedNFEListener(ServiceFailedCalleeNFE.class,
                 NFEListener.NOOP_LISTENER));
-        ProActive.addNFEListenerOnAO(b,
+        ProException.addNFEListenerOnAO(b,
             new TypedNFEListener(ServiceFailedCalleeNFE.class,
                 NFEListener.NOOP_LISTENER));
 

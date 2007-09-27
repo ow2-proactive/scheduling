@@ -36,7 +36,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -146,7 +146,7 @@ public class Test extends FunctionalTest {
         Thread.sleep(7000);
         this.process.startProcess();
         Thread.sleep(7000);
-        this.pad = ProActive.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);
+        this.pad = ProDeployment.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);
         this.pad.activateMappings();
         VirtualNode vn = this.pad.getVirtualNode("p2pvn");
         this.nodeTab = vn.getNodes();

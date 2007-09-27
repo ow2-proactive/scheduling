@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.philosophers;
 import java.awt.GridBagConstraints;
 
 import org.objectweb.proactive.ObjectForSynchronousCall;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 /**
@@ -100,11 +100,11 @@ public class DinnerLayout {
          */
         Object[] params; // the papdc arg holder
         params = new Object[1];
-        params[0] = org.objectweb.proactive.ProActive.getStubOnThis();
+        params[0] = org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
 
         // Creates the Table 
         try {
-            manager = (Table) org.objectweb.proactive.ProActive.newActive(Table.class.getName(),
+            manager = (Table) org.objectweb.proactive.api.ProActiveObject.newActive(Table.class.getName(),
                     params, url);
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,12 +116,12 @@ public class DinnerLayout {
         // Creates the philosophers    
         params = new Object[3];
         params[1] = manager;
-        params[2] = ProActive.getStubOnThis();
+        params[2] = ProActiveObject.getStubOnThis();
 
         for (int n = 0; n < 5; n++) {
             params[0] = new Integer(n);
             try {
-                phils[n] = (Philosopher) org.objectweb.proactive.ProActive.newActive(Philosopher.class.getName(),
+                phils[n] = (Philosopher) org.objectweb.proactive.api.ProActiveObject.newActive(Philosopher.class.getName(),
                         params);
             } catch (Exception e) {
                 e.printStackTrace();

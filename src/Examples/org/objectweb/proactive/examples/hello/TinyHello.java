@@ -34,6 +34,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
@@ -72,7 +73,7 @@ public class TinyHello implements java.io.Serializable {
      * @param args must contain the name of an xml descriptor */
     public static void main(String[] args) throws Exception {
         // Creates an active instance of class Tiny on the local node
-        TinyHello tiny = (TinyHello) ProActive.newActive(TinyHello.class.getName(), // the class to deploy
+        TinyHello tiny = (TinyHello) ProActiveObject.newActive(TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
             ); // which jvm should be used to hold the Active Object
 

@@ -32,9 +32,9 @@ package org.objectweb.proactive.benchmarks.timit.util;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 
 
 /**
@@ -80,8 +80,8 @@ public class TimItManager implements Serializable {
         if (this.timitReductor == null) {
             return;
         }
-        if (ProActiveGroup.isGroup(timed)) {
-            this.groupSize = ProActiveGroup.size(timed);
+        if (ProGroup.isGroup(timed)) {
+            this.groupSize = ProGroup.size(timed);
         } else {
             this.groupSize = 1;
         }
@@ -120,7 +120,7 @@ public class TimItManager implements Serializable {
             return;
         }
         this.benchStats = this.timitReductor.getStatistics();
-        ProActive.waitFor(this.benchStats);
+        ProFuture.waitFor(this.benchStats);
     }
 
     /**
@@ -145,7 +145,7 @@ public class TimItManager implements Serializable {
             return null;
         }
         this.benchStats = this.timitReductor.getStatistics();
-        ProActive.waitFor(this.benchStats);
+        ProFuture.waitFor(this.benchStats);
         return this.benchStats;
     }
 }

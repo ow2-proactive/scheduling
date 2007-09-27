@@ -31,7 +31,8 @@
 package functionalTests.activeobject.futuremonitoring;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.body.future.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -53,9 +54,9 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         // With AC
         boolean exception = false;
-        A a1 = (A) ProActive.newActive(A.class.getName(), null, this.node1);
+        A a1 = (A) ProActiveObject.newActive(A.class.getName(), null, this.node1);
         A future = a1.sleepForever();
-        A a2 = (A) ProActive.newActive(A.class.getName(), null, this.node2);
+        A a2 = (A) ProActiveObject.newActive(A.class.getName(), null, this.node2);
         A ac = a2.wrapFuture(future);
         a2.crash();
         try {
@@ -68,7 +69,7 @@ public class Test extends FunctionalTest {
 
         // Without AC
         exception = false;
-        A a1bis = (A) ProActive.newActive(A.class.getName(), null, this.node1);
+        A a1bis = (A) ProActiveObject.newActive(A.class.getName(), null, this.node1);
         a1bis.crash();
         try {
             //System.out.println(future);
@@ -84,7 +85,7 @@ public class Test extends FunctionalTest {
         /* This must be done before initializing ProActive, and the monitoring */
         System.setProperty("proactive.futuremonitoring.ttm", "500");
 
-        ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+        ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
         pad.activateMappings();
         VirtualNode vn = pad.getVirtualNode("VN");
         assertTrue(vn.getMinNumberOfNodes() <= vn.getNumberOfCreatedNodesAfterDeployment());

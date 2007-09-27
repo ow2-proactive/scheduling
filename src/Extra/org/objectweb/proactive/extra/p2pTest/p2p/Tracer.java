@@ -2,7 +2,7 @@ package org.objectweb.proactive.extra.p2pTest.p2p;
 
 import java.util.Hashtable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extra.p2pTest.messages.TracerWithCallbackMessage;
@@ -44,7 +44,7 @@ public class Tracer implements java.io.Serializable {
     public static void dumpP2PNetwork(String addr) {
         Dumper dumper = null;
         try {
-            dumper = (Dumper) ProActive.newActive(Dumper.class.getName(),
+            dumper = (Dumper) ProActiveObject.newActive(Dumper.class.getName(),
                     new Object[] {  });
             Dumper.requestAcquaintances(addr, dumper);
         } catch (Exception e) {
@@ -64,7 +64,7 @@ public class Tracer implements java.io.Serializable {
             }
             distP2PService.dumpAcquaintances(new TracerWithCallbackMessage(
                     TTL, UniversalUniqueID.randomUUID(),
-                    (Tracer) ProActive.getStubOnThis()));
+                    (Tracer) ProActiveObject.getStubOnThis()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -120,7 +120,7 @@ public class Tracer implements java.io.Serializable {
             dumpP2PNetwork(addr);
         } else if (args[1].equalsIgnoreCase("trace")) {
             try {
-                Tracer t = (Tracer) ProActive.newActive(Tracer.class.getName(),
+                Tracer t = (Tracer) ProActiveObject.newActive(Tracer.class.getName(),
                         null);
 
                 Node distNode = NodeFactory.getNode(addr);

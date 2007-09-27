@@ -30,7 +30,7 @@
  */
 package functionalTests.stub.abstractclass;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.URIBuilder;
 
@@ -47,13 +47,13 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        Factory f = (Factory) ProActive.newActive(Factory.class.getName(),
+        Factory f = (Factory) ProActiveObject.newActive(Factory.class.getName(),
                 new Object[] {  });
-        ProActive.register(f,
+        ProActiveObject.register(f,
             URIBuilder.buildURIFromProperties("localhost", "myFactory")
                       .toString());
 
-        Factory factory = (Factory) ProActive.lookupActive(Factory.class.getName(),
+        Factory factory = (Factory) ProActiveObject.lookupActive(Factory.class.getName(),
                 URIBuilder.buildURIFromProperties("localhost", "myFactory")
                           .toString());
         AbstractClass abstractClass = factory.getWidget(NodeFactory.getDefaultNode());

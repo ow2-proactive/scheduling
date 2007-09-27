@@ -38,9 +38,9 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -311,7 +311,7 @@ public class SubMatrix implements Serializable {
      */
     public void buildNeighborhood() {
         this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
-        Group allSubMatrix = ProActiveGroup.getGroup(this.matrix);
+        Group allSubMatrix = ProGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
             topology = new Plan(allSubMatrix, Jacobi.HEIGHT, Jacobi.WIDTH);
@@ -321,14 +321,14 @@ public class SubMatrix implements Serializable {
             e.printStackTrace();
         }
 
-        this.asyncRefToMe = (SubMatrix) ProActive.getStubOnThis();
+        this.asyncRefToMe = (SubMatrix) ProActiveObject.getStubOnThis();
         this.north = (SubMatrix) topology.up(this.asyncRefToMe);
         this.south = (SubMatrix) topology.down(this.asyncRefToMe);
         this.west = (SubMatrix) topology.left(this.asyncRefToMe);
         this.east = (SubMatrix) topology.right(this.asyncRefToMe);
 
         try {
-            this.neighbors = (SubMatrix) ProActiveGroup.newGroup(SubMatrix.class.getName());
+            this.neighbors = (SubMatrix) ProGroup.newGroup(SubMatrix.class.getName());
         } catch (ClassNotReifiableException e) {
             logger.error(
                 "[JACOBI] ** ClassNotReifiableException ** - Unable to build the neighbors group");
@@ -338,7 +338,7 @@ public class SubMatrix implements Serializable {
                 "[JACOBI] ** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
-        Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors);
+        Group neighborsGroup = ProGroup.getGroup(this.neighbors);
 
         if (this.north == null) {
             this.northNeighborBorder = this.buildFakeBorder(this.width);

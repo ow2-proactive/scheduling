@@ -31,7 +31,7 @@
 package functionalTests.activeobject.node.getactiveobject;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -58,7 +58,7 @@ public class Test extends FunctionalTest {
             new TestNodes().action();
             node = TestNodes.getLocalVMNode();
         }
-        ProActive.newActive(A.class.getName(), new Object[] { "toto" }, node);
+        ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" }, node);
         // Thread.sleep(3000);
         a = (A) node.getActiveObjects(A.class.getName())[0];
 

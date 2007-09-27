@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
 import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService;
 
@@ -151,7 +152,7 @@ public class TimItBasicReductor {
                 this.generateAllStatistics();
             }
 
-            ProActive.terminateActiveObject(true);
+            ProActiveObject.terminateActiveObject(true);
         }
 
         // This is used to make the method synchronous
@@ -267,7 +268,7 @@ public class TimItBasicReductor {
         return result + "_" +
         ("".equals(TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) ? ""
                                                                       : TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) +
-        "_" + ProActive.getBodyOnThis().getID().shortString() +
+        "_" + ProActiveObject.getBodyOnThis().getID().shortString() +
         TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_SUFFIX;
     }
 

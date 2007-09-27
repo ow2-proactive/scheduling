@@ -33,7 +33,7 @@ package org.objectweb.proactive.mpi.control;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -228,7 +228,7 @@ public class ProActiveMPIComm {
                             count++;
                             if ((count % 1000) == 0) {
                                 // wait for old acknowledge
-                                ProActive.waitFor(ack);
+                                ProFuture.waitFor(ack);
                                 // create new Acknowledge
                                 ack = myProxy.sendToMpi(jobRecver, m_r, false);
                             } else {

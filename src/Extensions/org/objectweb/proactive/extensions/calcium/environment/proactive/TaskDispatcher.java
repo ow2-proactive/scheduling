@@ -29,7 +29,7 @@ package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -72,7 +72,7 @@ public class TaskDispatcher extends Thread {
 
         while (!shutdown) {
             Task task = taskpool.getReadyTask(0);
-            task = (Task) ProActive.getFutureValue(task);
+            task = (Task) ProFuture.getFutureValue(task);
 
             if (task != null) {
                 //block until there is an available interpreter

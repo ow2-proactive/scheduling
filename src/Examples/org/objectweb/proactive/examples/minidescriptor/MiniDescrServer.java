@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.minidescriptor;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -57,7 +57,7 @@ public class MiniDescrServer {
         logger.info("-+-+-+-+-+-+-+- MiniDescrServer launched -+-+-+-+-+-+-+-");
 
         try {
-            pad = ProActive.getProactiveDescriptor(location);
+            pad = ProDeployment.getProactiveDescriptor(location);
             virtualnode = pad.getVirtualNode("MiniVNServer");
         } catch (ProActiveException e) {
             e.printStackTrace();

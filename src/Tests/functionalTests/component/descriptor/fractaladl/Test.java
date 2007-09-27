@@ -40,11 +40,12 @@ import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1Multicast;
@@ -99,7 +100,7 @@ public class Test extends ComponentTest {
         //        Component c = Registry.instance().getComponent("parallel");
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
-        deploymentDescriptor = ProActive.getProactiveDescriptor(Test.class.getResource(
+        deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/descriptor/deploymentDescriptor.xml")
                                                                           .getPath());
         context.put("deployment-descriptor", deploymentDescriptor);
@@ -125,7 +126,7 @@ public class Test extends ComponentTest {
             }
         }
         StringBuffer resulting_msg = new StringBuffer();
-        Object futureValue = ProActive.getFutureValue(messages);
+        Object futureValue = ProFuture.getFutureValue(messages);
         Message m = (Message) ((Group) futureValue).getGroupByType();
 
         //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
@@ -156,10 +157,10 @@ public class Test extends ComponentTest {
 
     private int append(StringBuffer buffer, Message message) {
         int nb_messages = 0;
-        if (ProActiveGroup.isGroup(message)) {
-            for (int i = 0; i < ProActiveGroup.size(message); i++) {
+        if (ProGroup.isGroup(message)) {
+            for (int i = 0; i < ProGroup.size(message); i++) {
                 nb_messages += append(buffer,
-                    (Message) ProActiveGroup.get(message, i));
+                    (Message) ProGroup.get(message, i));
             }
         } else {
             buffer.append(message.getMessage());

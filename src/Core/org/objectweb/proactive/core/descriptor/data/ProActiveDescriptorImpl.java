@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
@@ -343,7 +343,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
 
                 //System.out.println("new id generated : " + jobID);
             } else {
-                this.jobID = ProActive.getJobId();
+                this.jobID = ProActiveObject.getJobId();
 
                 //System.out.println("using runtime id : " + jobID);
             }

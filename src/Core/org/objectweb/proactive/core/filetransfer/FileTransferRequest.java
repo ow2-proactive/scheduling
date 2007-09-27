@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.filetransfer;
 import java.io.File;
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 
 
@@ -76,11 +76,11 @@ public class FileTransferRequest implements Serializable {
     }
 
     public void waitForOperation() {
-        ProActive.waitFor(operationFuture);
+        ProFuture.waitFor(operationFuture);
     }
 
     public boolean isAwaited() {
-        return ProActive.isAwaited(operationFuture);
+        return ProFuture.isAwaited(operationFuture);
     }
 
     public File getDstFile() {

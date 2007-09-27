@@ -37,7 +37,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -122,7 +122,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         vc.setVariableFromProgram("HOST_NAME", hostName,
             VariableContractType.DescriptorDefaultVariable);
 
-        pad = ProActive.getProactiveDescriptor(XML_LOCATION, vc);
+        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION, vc);
 
         // we restore the old state of the schema validation
         System.setProperty("schema.validation", validatingProperyOld);

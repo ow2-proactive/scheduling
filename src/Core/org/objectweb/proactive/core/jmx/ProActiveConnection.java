@@ -56,8 +56,8 @@ import javax.management.ObjectName;
 import javax.management.QueryExp;
 import javax.management.ReflectionException;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.listeners.ListenerAdapter;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
@@ -545,6 +545,6 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     }
 
     public UniqueID getUniqueID() {
-        return ProActive.getBodyOnThis().getID();
+        return ProActiveObject.getBodyOnThis().getID();
     }
 }

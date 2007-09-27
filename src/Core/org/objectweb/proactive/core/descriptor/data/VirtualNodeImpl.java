@@ -45,7 +45,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.Notification;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -186,7 +187,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     // Security
     private ProActiveSecurityManager proactiveSecurityManager;
-    protected String jobID = ProActive.getJobId();
+    protected String jobID = ProActiveObject.getJobId();
 
     // FAULT TOLERANCE
     private FaultToleranceService ftService;
@@ -931,7 +932,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             try {
                 //if registered in any regigistry, unregister everything
                 if (this.registration) {
-                    ProActive.unregisterVirtualNode(this);
+                    ProDeployment.unregisterVirtualNode(this);
                 }
                 //else unregister just in the local runtime
                 else {
@@ -1238,7 +1239,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                 try {
                     url = defaultRuntime.createLocalNode(nodeName, false,
-                            siblingPSM, this.getName(), ProActive.getJobId());
+                            siblingPSM, this.getName(), ProActiveObject.getJobId());
                     registrationAttempts = 0;
                 } catch (AlreadyBoundException e) {
                     registrationAttempts--;
@@ -1543,7 +1544,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             //  	ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
             //  	part.registerVirtualnode(this.name,false);
-            ProActive.registerVirtualNode(this, this.registrationProtocol, false);
+            ProDeployment.registerVirtualNode(this, this.registrationProtocol, false);
         } catch (NodeException e) {
             logger.error(e.getMessage());
         } catch (ProActiveException e) {

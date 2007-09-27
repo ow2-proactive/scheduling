@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProException;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -27,10 +27,10 @@ public class AcquaintancesWrapper implements Serializable {
 
     public AcquaintancesWrapper() {
         try {
-            acquaintances_active = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
-            ProActive.addNFEListenerOnGroup(this.acquaintances_active,
+            acquaintances_active = (P2PService) ProGroup.newGroup(P2PService.class.getName());
+            ProException.addNFEListenerOnGroup(this.acquaintances_active,
                 new AutomaticPurgeGroup());
-            this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances_active);
+            this.groupOfAcquaintances = ProGroup.getGroup(acquaintances_active);
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

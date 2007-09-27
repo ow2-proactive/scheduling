@@ -33,8 +33,8 @@ package functionalTests.activeobject.request.immediateservice;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 public class A implements Serializable, RunActive {
@@ -53,7 +53,7 @@ public class A implements Serializable, RunActive {
     }
 
     public void runActivity(Body body) {
-        ProActive.setImmediateService("getObject");
+        ProActiveObject.setImmediateService("getObject");
         while (body.isActive()) {
             //do nothing
         }

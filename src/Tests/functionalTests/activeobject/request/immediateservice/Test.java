@@ -31,7 +31,8 @@
 package functionalTests.activeobject.request.immediateservice;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -47,15 +48,15 @@ public class Test extends FunctionalTest {
 
     @Before
     public void action() throws Exception {
-        a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
+        a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
         // getObject is set as an IS in the runActivity of A
         dum = a.getObject();
-        ProActive.terminateActiveObject(a, true);
+        ProActiveObject.terminateActiveObject(a, true);
     }
 
     @org.junit.Test
     public void postConditions() throws Exception {
-        if (!ProActive.isAwaited(dum)) {
+        if (!ProFuture.isAwaited(dum)) {
             assertTrue(dum.getName().equals("toto"));
             return;
         }

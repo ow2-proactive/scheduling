@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
@@ -52,11 +52,11 @@ public class LoadBalancing {
         LoadBalancer lb = null;
 
         try {
-            ir = (InformationRecover) ProActive.newActive(InformationRecover.class.getName(),
+            ir = (InformationRecover) ProActiveObject.newActive(InformationRecover.class.getName(),
                     null);
 
             for (int i = 0; i < nodes.length; i++) {
-                lb = (LoadBalancer) ProActive.newActive(LoadBalancer.class.getName(),
+                lb = (LoadBalancer) ProActiveObject.newActive(LoadBalancer.class.getName(),
                         new Object[] { mf }, nodes[i]);
                 loadBalancers.add(lb);
 
@@ -83,7 +83,7 @@ public class LoadBalancing {
         activated = true;
 
         try {
-            ir = (InformationRecover) ProActive.newActive(InformationRecover.class.getName(),
+            ir = (InformationRecover) ProActiveObject.newActive(InformationRecover.class.getName(),
                     null);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -95,12 +95,12 @@ public class LoadBalancing {
     public static void kill() {
         activated = false;
 
-        ProActive.terminateActiveObject(ir, true);
+        ProActiveObject.terminateActiveObject(ir, true);
         LoadBalancer lb;
         Iterator<LoadBalancer> it = loadBalancers.iterator();
         while (it.hasNext()) {
             lb = it.next();
-            ProActive.terminateActiveObject(lb, true);
+            ProActiveObject.terminateActiveObject(lb, true);
         }
     }
 
@@ -110,7 +110,7 @@ public class LoadBalancing {
         }
 
         try {
-            LoadBalancer lb = (LoadBalancer) ProActive.newActive(LoadBalancer.class.getName(),
+            LoadBalancer lb = (LoadBalancer) ProActiveObject.newActive(LoadBalancer.class.getName(),
                     new Object[] { mf }, node);
             loadBalancers.add(lb);
             lb.init(loadBalancers, ir);

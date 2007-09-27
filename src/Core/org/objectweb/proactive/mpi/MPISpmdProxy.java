@@ -35,7 +35,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.NodeException;
@@ -60,7 +60,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
      */
     public MPISpmdProxy(VirtualNode vn) throws RuntimeException {
         try {
-            target = (MPISpmdImpl) ProActive.newActive(MPISpmdImpl.class.getName(),
+            target = (MPISpmdImpl) ProActiveObject.newActive(MPISpmdImpl.class.getName(),
                     new Object[] { vn });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -87,7 +87,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
             setStatus(MPIConstants.MPI_RUNNING);
             return target.startMPI();
         } else {
-            ProActive.terminateActiveObject(target, true);
+            ProActiveObject.terminateActiveObject(target, true);
             throw new IllegalMPIStateException(
                 "!!! ERROR: cannot start MPI process " + this.name +
                 " Caused by: MPI process has already been started once ");
@@ -111,7 +111,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
             target.reinitProcess();
             return target.startMPI();
         } else {
-            ProActive.terminateActiveObject(target, true);
+            ProActiveObject.terminateActiveObject(target, true);
             throw new IllegalMPIStateException(
                 "!!! ERROR: cannot restart MPI process " + this.name +
                 " Caused by: no mpi process has been started once before");
@@ -137,7 +137,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         }
         // UNSTARTED status
         else {
-            ProActive.terminateActiveObject(target, true);
+            ProActiveObject.terminateActiveObject(target, true);
             throw new IllegalMPIStateException(
                 "!!! ERROR: cannot kill MPI process " + this.name +
                 " Caused by: no mpi process has been started once before!");

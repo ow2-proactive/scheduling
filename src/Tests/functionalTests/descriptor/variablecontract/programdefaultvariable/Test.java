@@ -34,7 +34,7 @@ import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContract;
@@ -107,7 +107,7 @@ public class Test extends FunctionalTest {
         }
 
         //test_var3=value3
-        pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
+        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
 
         variableContract = pad.getVariableContract();
 

@@ -33,9 +33,9 @@ package org.objectweb.proactive.core.body;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 
 
@@ -86,7 +86,7 @@ public class Context implements Serializable {
         if (this.currentRequest != null) {
             try {
                 UniversalBody caller = currentRequest.getSender();
-                return ProActive.createStubObject(caller.getReifiedClassName(),
+                return MOP.createStubObject(caller.getReifiedClassName(),
                     caller);
             } catch (MOPException e) {
                 throw new ProActiveRuntimeException(

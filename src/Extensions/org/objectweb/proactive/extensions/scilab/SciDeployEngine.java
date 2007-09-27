@@ -34,7 +34,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -68,7 +69,7 @@ public class SciDeployEngine {
         VirtualNode[] arrayVn;
         String[] arrayNameVn = null;
         try {
-            desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
+            desc = ProDeployment.getProactiveDescriptor("file:" + pathDescriptor);
             arrayVn = desc.getVirtualNodes();
             arrayNameVn = new String[arrayVn.length];
 
@@ -87,7 +88,7 @@ public class SciDeployEngine {
         ProActiveDescriptor desc;
         VirtualNode vn;
         try {
-            desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
+            desc = ProDeployment.getProactiveDescriptor("file:" + pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             return vn.getNbMappedNodes();
         } catch (ProActiveException e) {
@@ -116,7 +117,7 @@ public class SciDeployEngine {
         HashMap<String, SciEngine> mapEngine = new HashMap<String, SciEngine>();
 
         try {
-            desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
+            desc = ProDeployment.getProactiveDescriptor("file:" + pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             vn.activate();
             nodes = vn.getNodes();
@@ -146,7 +147,7 @@ public class SciDeployEngine {
     private synchronized static SciEngine deploy(String idEngine,
         Node currentNode) throws ActiveObjectCreationException, NodeException {
         Object[] param = new Object[] { idEngine };
-        SciEngine sciEngine = (SciEngine) ProActive.newActive(SciEngine.class.getName(),
+        SciEngine sciEngine = (SciEngine) ProActiveObject.newActive(SciEngine.class.getName(),
                 param, currentNode);
         mapNode.put(idEngine, currentNode);
         sciEngine.setImmediateServices();
@@ -167,7 +168,7 @@ public class SciDeployEngine {
         }
 
         Object[] param = new Object[] { idEngine };
-        SciEngine sciEngine = (SciEngine) ProActive.newActive(SciEngine.class.getName(),
+        SciEngine sciEngine = (SciEngine) ProActiveObject.newActive(SciEngine.class.getName(),
                 param);
         sciEngine.setImmediateServices();
         return sciEngine;

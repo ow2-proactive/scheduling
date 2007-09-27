@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -81,7 +81,7 @@ public class Start {
         Domain domainGroup = null;
         try {
             // Create a group containing all the Domain in the simulation 
-            domainGroup = (Domain) ProActiveGroup.newGroup(Domain.class.getName(),
+            domainGroup = (Domain) ProGroup.newGroup(Domain.class.getName(),
                     constructorParams, nodes);
         } catch (ClassNotReifiableException e) {
             killsupport.abort(e);

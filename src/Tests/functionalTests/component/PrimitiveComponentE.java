@@ -38,9 +38,9 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -54,7 +54,7 @@ public class PrimitiveComponentE implements I1, BindingController {
             I2.class.getName());
 
     // ref on the Group
-    Group i2Group = ProActiveGroup.getGroup(i2);
+    Group i2Group = ProGroup.getGroup(i2);
 
     public void bindFc(String clientItfName, Object serverItf)
         throws NoSuchInterfaceException, IllegalBindingException,

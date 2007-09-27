@@ -31,7 +31,7 @@
 package functionalTests.activeobject.loopmixedlocation;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -63,13 +63,13 @@ public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         String serverUrl = PAProperties.PA_LOCATION_SERVER_RMI.getValue();
-        server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
+        server = (SimpleLocationServer) ProActiveObject.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
-        a = (A) ProActive.newActive(A.class.getName(), null,
+        a = (A) ProActiveObject.newActive(A.class.getName(), null,
                 new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
                 MixedLocationMetaObjectFactory.newInstance());
-        migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
+        migratableA = (MigratableA) ProActiveObject.newActive(MigratableA.class.getName(),
                 null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
                 MixedLocationMetaObjectFactory.newInstance());
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();

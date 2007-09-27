@@ -31,7 +31,8 @@
 package functionalTests.timit.timers.basic;
 
 import org.junit.After;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicReductor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -48,19 +49,19 @@ public class Test extends FunctionalTest {
 
     public void initTest() throws Exception {
         // Access the nodes of the descriptor file
-        descriptorPad = ProActive.getProactiveDescriptor(this.getClass()
+        descriptorPad = ProDeployment.getProactiveDescriptor(this.getClass()
                                                              .getResource("/functionalTests/timit/timers/basic/descriptor.xml")
                                                              .getPath());
         descriptorPad.activateMappings();
         VirtualNode vnode = descriptorPad.getVirtualNodes()[0];
         Node[] nodes = vnode.getNodes();
 
-        this.a1 = (ActiveObjectClass) ProActive.newActive(ActiveObjectClass.class.getName(),
+        this.a1 = (ActiveObjectClass) ProActiveObject.newActive(ActiveObjectClass.class.getName(),
                 new Object[] { "a1" }, nodes[0]);
-        this.a1bis = (ActiveObjectClass) ProActive.newActive(ActiveObjectClass.class.getName(),
+        this.a1bis = (ActiveObjectClass) ProActiveObject.newActive(ActiveObjectClass.class.getName(),
                 new Object[] { "a1bis" }, nodes[1]);
         // Provide the remote reference of a1 and a1bis to a2
-        this.a2 = (ActiveObjectClass) ProActive.newActive(ActiveObjectClass.class.getName(),
+        this.a2 = (ActiveObjectClass) ProActiveObject.newActive(ActiveObjectClass.class.getName(),
                 new Object[] { this.a1, this.a1bis, "a2" }, nodes[1]);
         // In order to test the value of the WaitForRequest timer
         // the main will wait a WAITING_TIME, therefore the a2 will be in

@@ -37,7 +37,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
@@ -80,7 +81,7 @@ public class Test extends FunctionalTest {
         }
         searchAndReplace(oldFilePath, newFilePath, "proactive.home",
             proactiveDir);
-        descriptor = ProActive.getProactiveDescriptor(getClass()
+        descriptor = ProDeployment.getProactiveDescriptor(getClass()
                                                           .getResource("/functionalTests/runtime/classloader/deployment-tmp.xml")
                                                           .getPath());
         descriptor.activateMappings();
@@ -88,7 +89,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        A a = (A) ProActive.newActive("functionalTests.runtime.classloader.A",
+        A a = (A) ProActiveObject.newActive("functionalTests.runtime.classloader.A",
                 new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
         a.createActiveObjectB();
 

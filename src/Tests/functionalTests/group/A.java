@@ -33,8 +33,9 @@ package functionalTests.group;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProMigration;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -92,7 +93,7 @@ public class A implements InitActive, RunActive, EndActive,
     public String getNodeName() {
         try {
             //return the name of the Node
-            return ProActive.getBodyOnThis().getNodeURL().toUpperCase();
+            return ProActiveObject.getBodyOnThis().getNodeURL().toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
             return "getNodeName failed";
@@ -101,12 +102,12 @@ public class A implements InitActive, RunActive, EndActive,
 
     public void moveTo(String nodeURL) throws Exception {
         // System.out.println(" I am going to migate");
-        ProActive.migrateTo(nodeURL);
+        ProMigration.migrateTo(nodeURL);
         // System.out.println("migration done");
     }
 
     public void endBodyActivity() throws Exception {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     public void initActivity(Body body) {

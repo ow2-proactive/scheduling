@@ -2,7 +2,7 @@ package org.objectweb.proactive.p2p.v2.service.messages;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
@@ -27,15 +27,15 @@ public class ExplorationMessage extends BreadthFirstMessage
                 if (result == null) {
                     logger.info("ExplorationMessage me = " +
                         P2PService.getHostNameAndPortFromUrl(
-                            ProActive.getActiveObjectNodeUrl(target.stubOnThis)) +
+                            ProActiveObject.getActiveObjectNodeUrl(target.stubOnThis)) +
                         " adding " +
                         P2PService.getHostNameAndPortFromUrl(
-                            ProActive.getActiveObjectNodeUrl(this.sender)));
+                            ProActiveObject.getActiveObjectNodeUrl(this.sender)));
                     //indeed, the peer really wants us
                     //     target.registerRequest(this.sender);
                     target.getAcquaintanceManager()
                           .startAcquaintanceHandShake(P2PService.getHostNameAndPortFromUrl(
-                            ProActive.getActiveObjectNodeUrl(this.sender)),
+                            ProActiveObject.getActiveObjectNodeUrl(this.sender)),
                         this.sender);
                 }
             } catch (Exception e) {

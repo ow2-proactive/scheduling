@@ -34,8 +34,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 
 
@@ -57,8 +57,8 @@ public class PiUtil {
     static public Interval dividePI(int length, int scale)
         throws ClassNotReifiableException, ClassNotFoundException {
         int intervalSize = scale / length;
-        Interval intervals = (Interval) ProActiveGroup.newGroup(Interval.class.getName());
-        Group intervals_group = ProActiveGroup.getGroup(intervals);
+        Interval intervals = (Interval) ProGroup.newGroup(Interval.class.getName());
+        Group intervals_group = ProGroup.getGroup(intervals);
         for (int i = 0; i < length; i++) {
             int beginning = i * intervalSize;
             int end = ((i == (length - 1)) ? scale
@@ -75,7 +75,7 @@ public class PiUtil {
      */
     static public Result conquerPI(Result results) {
         // get a group view on the results
-        Group resultsGroup = ProActiveGroup.getGroup(results);
+        Group resultsGroup = ProGroup.getGroup(results);
 
         // sum the results
         Result total = new Result(new BigDecimal(0), 0);

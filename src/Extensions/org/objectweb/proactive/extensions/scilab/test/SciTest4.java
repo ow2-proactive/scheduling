@@ -39,7 +39,7 @@ import java.io.PrintWriter;
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciEngineWorker;
 import org.objectweb.proactive.extensions.scilab.SciTask;
@@ -56,7 +56,7 @@ public class SciTest4 {
             return;
         }
 
-        SciEngineWorker sciEngineWorker = (SciEngineWorker) ProActive.newActive(SciEngineWorker.class.getName(),
+        SciEngineWorker sciEngineWorker = (SciEngineWorker) ProActiveObject.newActive(SciEngineWorker.class.getName(),
                 null);
 
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));

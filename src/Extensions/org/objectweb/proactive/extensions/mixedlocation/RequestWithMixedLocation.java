@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extensions.mixedlocation;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -121,7 +121,7 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
         }
         UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
         logger.debug("backupSolution() server has sent an answer");
-        ProActive.waitFor(mobile);
+        ProFuture.waitFor(mobile);
         return mobile;
     }
 }

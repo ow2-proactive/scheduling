@@ -38,7 +38,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
@@ -202,7 +202,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
      */
     public static void main(String[] args) {
         try {
-            ProActiveDescriptorInternal pad = ProActive.getProactiveDescriptor(
+            ProActiveDescriptorInternal pad = ProDeployment.getProactiveDescriptor(
                     "/user/rquilici/home/ProActive/descriptors/nqueen.xml");
             pad.activateMappings();
         } catch (ProActiveException e) {

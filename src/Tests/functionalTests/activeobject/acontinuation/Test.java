@@ -32,7 +32,8 @@ package functionalTests.activeobject.acontinuation;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
@@ -74,7 +75,7 @@ public class Test extends FunctionalTest {
         @Override
         public void run() {
             try {
-                a = (A) ProActive.newActive(A.class.getName(),
+                a = (A) ProActiveObject.newActive(A.class.getName(),
                         new Object[] { "principal" });
                 //test future by result
                 a.initFirstDeleguate();
@@ -83,23 +84,23 @@ public class Test extends FunctionalTest {
                 Vector<Id> v = new Vector<Id>(2);
                 v.add(idDeleguate);
                 v.add(idPrincipal);
-                if (ProActive.waitForAny(v) == 0) {
+                if (ProFuture.waitForAny(v) == 0) {
                     futureByResult = false;
                 } else {
                     futureByResult = true;
                 }
 
                 //test future passed as parameter
-                b = (A) ProActive.newActive(A.class.getName(),
+                b = (A) ProActiveObject.newActive(A.class.getName(),
                         new Object[] { "dummy" });
                 idPrincipal = b.getIdforFuture();
                 a.forwardID(idPrincipal);
                 //Test non-blocking when future passed as parameter
-                A c = (A) ProActive.newActive(A.class.getName(),
+                A c = (A) ProActiveObject.newActive(A.class.getName(),
                         new Object[] { "c" });
-                A d = (A) ProActive.newActive(A.class.getName(),
+                A d = (A) ProActiveObject.newActive(A.class.getName(),
                         new Object[] { "d" });
-                A e = (A) ProActive.newActive(A.class.getName(),
+                A e = (A) ProActiveObject.newActive(A.class.getName(),
                         new Object[] { "e" });
 
                 A de = d.getA(e);
@@ -107,7 +108,7 @@ public class Test extends FunctionalTest {
                 lastA = e.getA(cde);
 
                 //test multiple wrapped futures with multiples AC destinations
-                A f = (A) ProActive.newActive(A.class.getName(),
+                A f = (A) ProActiveObject.newActive(A.class.getName(),
                         new Object[] { "f" });
                 c.initSecondDeleguate();
                 A t = c.delegatedGetA(d);

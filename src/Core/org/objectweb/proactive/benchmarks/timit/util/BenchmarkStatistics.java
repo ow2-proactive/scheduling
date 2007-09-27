@@ -32,7 +32,6 @@ package org.objectweb.proactive.benchmarks.timit.util;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-
 import org.objectweb.proactive.ProActive;
 
 

@@ -31,7 +31,8 @@
 package org.objectweb.proactive.examples.matrix;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -57,7 +58,7 @@ public class Main {
         ProActiveDescriptor proActiveDescriptor = null;
         String[] nodesList = null;
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
                     args[1]);
             proActiveDescriptor.activateMappings();
             VirtualNode vn1 = proActiveDescriptor.getVirtualNode("matrixNode");
@@ -72,7 +73,7 @@ public class Main {
         Launcher l = null;
 
         try {
-            l = (Launcher) ProActive.newActive(Launcher.class.getName(),
+            l = (Launcher) ProActiveObject.newActive(Launcher.class.getName(),
                     new Object[] { nodesList }); //,targetNode);
         } catch (Exception e) {
             logger.error("\nUnable to create the Launcher !!!!!\n");

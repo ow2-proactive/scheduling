@@ -30,7 +30,8 @@
  */
 package org.objectweb.proactive.examples.timit.example1;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
 import org.objectweb.proactive.benchmarks.timit.util.observing.Event;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
@@ -38,7 +39,6 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEv
 import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEventObserver;
 import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultEventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultEventObserver;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 
 
@@ -100,7 +100,7 @@ public class Worker extends Timed {
     public void start() {
         this.rank = ProSPMD.getMyRank();
         this.workers = (Worker) ProSPMD.getSPMDGroup();
-        this.workersArray = (Worker[]) ProActiveGroup.getGroup(this.workers)
+        this.workersArray = (Worker[]) ProGroup.getGroup(this.workers)
                                                      .toArray(new Worker[0]);
         this.groupSize = ProSPMD.getMySPMDGroupSize();
 
@@ -206,7 +206,7 @@ public class Worker extends Timed {
      * @see org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher
      */
     public void terminate() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     /** A simple messaging method */

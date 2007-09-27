@@ -32,7 +32,7 @@ package functionalTests.ft;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 public class Collector implements Serializable {
@@ -62,7 +62,7 @@ public class Collector implements Serializable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return ((Collector) ProActive.getStubOnThis()).getResult();
+            return ((Collector) ProActiveObject.getStubOnThis()).getResult();
         } else {
             return new ReInt(this.result);
         }

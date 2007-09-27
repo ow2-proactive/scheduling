@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.nbody.simple;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -74,7 +74,7 @@ public class Start {
                 };
             try {
                 // Create all the Domains used in the simulation 
-                domainArray[i] = (Domain) ProActive.newActive(Domain.class.getName(),
+                domainArray[i] = (Domain) ProActiveObject.newActive(Domain.class.getName(),
                         constructorParams, nodes[(i + 1) % nodes.length]);
             } catch (ActiveObjectCreationException e) {
                 killsupport.abort(e);
@@ -88,7 +88,7 @@ public class Start {
         // Create a maestro, which will orchestrate the whole simulation, synchronizing the computations of the Domains
         Maestro maestro = null;
         try {
-            maestro = (Maestro) ProActive.newActive(Maestro.class.getName(),
+            maestro = (Maestro) ProActiveObject.newActive(Maestro.class.getName(),
                     new Object[] { domainArray, new Integer(maxIter), killsupport },
                     nodes[0]);
         } catch (ActiveObjectCreationException e) {

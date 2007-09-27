@@ -57,7 +57,7 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
         try {
             /* le Layout est necessairement actif, puisqu'il est referenc? par tous les autres objets.
              */
-            theLayout = (DinnerLayout) org.objectweb.proactive.ProActive.turnActive(theLayout);
+            theLayout = (DinnerLayout) org.objectweb.proactive.api.ProActiveObject.turnActive(theLayout);
             if (url != null) {
                 theLayout.setNode(url);
             }
@@ -65,7 +65,7 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
             /*
              * Builds the active Table and Philosophers:
              */
-            org.objectweb.proactive.ProActive.waitFor(theLayout.init());
+            org.objectweb.proactive.api.ProFuture.waitFor(theLayout.init());
             theLayout.activateButtons();
             receiveMessage("Objects activated...");
         } catch (Exception ex) {

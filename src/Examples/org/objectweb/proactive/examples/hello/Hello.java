@@ -34,6 +34,8 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -75,13 +77,13 @@ public class Hello implements java.io.Serializable {
      * @param args must contain the name of an xml descriptor */
     public static void main(String[] args) throws Exception {
         // Access the nodes of the descriptor file
-        ProActiveDescriptor descriptorPad = ProActive.getProactiveDescriptor(args[0]);
+        ProActiveDescriptor descriptorPad = ProDeployment.getProactiveDescriptor(args[0]);
         descriptorPad.activateMappings();
         VirtualNode vnode = descriptorPad.getVirtualNode("Hello");
         Node[] nodes = vnode.getNodes();
 
         // Creates an active instance of class Hello2 on the local node
-        Hello hello = (Hello) ProActive.newActive(Hello.class.getName(), // the class to deploy
+        Hello hello = (Hello) ProActiveObject.newActive(Hello.class.getName(), // the class to deploy
                 null, // the arguments to pass to the constructor, here none
                 nodes[0]); // which jvm should be used to hold the Active Object
 

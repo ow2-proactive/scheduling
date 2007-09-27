@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.descriptor.services;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
@@ -123,7 +123,7 @@ public class ServiceThread extends Thread {
                     Vector nodes;
                     try {
                         Vector future = p2pNodesLookup.getAndRemoveNodes();
-                        nodes = (Vector) ProActive.getFutureValue(future);
+                        nodes = (Vector) ProFuture.getFutureValue(future);
                     } catch (Exception e) {
                         loggerDeployment.debug("Couldn't contact the lookup", e);
                         continue;

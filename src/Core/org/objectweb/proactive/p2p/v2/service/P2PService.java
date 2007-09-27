@@ -39,9 +39,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
@@ -169,7 +169,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     /**
      * The empty constructor.
      *
-     * @see org.objectweb.proactive.ProActive
+     * @see org.objectweb.proactive.api.ProActiveObject
      */
     public P2PService() {
         // empty
@@ -287,9 +287,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         P2PNodeLookup lookup_active = null;
         try {
-            lookup_active = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
+            lookup_active = (P2PNodeLookup) ProActiveObject.newActive(P2PNodeLookup.class.getName(),
                     params, this.p2pServiceNode);
-            ProActive.enableAC(lookup_active);
+            ProActiveObject.enableAC(lookup_active);
             if (numberOfNodes == MAX_NODE) {
                 this.waitingMaximunNodesLookup.add(lookup_active);
             } else {
@@ -513,20 +513,20 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         logger.debug("P2P Service running in p2pServiceNode: " +
             this.p2pServiceNode.getNodeInformation().getURL());
 
-        this.stubOnThis = (P2PService) ProActive.getStubOnThis();
+        this.stubOnThis = (P2PService) ProActiveObject.getStubOnThis();
 
         Object[] params = new Object[1];
         params[0] = this.stubOnThis;
         try {
             // Active acquaintances
-            this.acquaintanceManager_active = (P2PAcquaintanceManager) ProActive.newActive(P2PAcquaintanceManager.class.getName(),
+            this.acquaintanceManager_active = (P2PAcquaintanceManager) ProActiveObject.newActive(P2PAcquaintanceManager.class.getName(),
                     params, this.p2pServiceNode);
             logger.debug("P2P acquaintance manager activated");
 
             // logger.debug("Got active group reference");
 
             // Active Node Manager
-            this.nodeManager = (P2PNodeManager) ProActive.newActive(P2PNodeManager.class.getName(),
+            this.nodeManager = (P2PNodeManager) ProActiveObject.newActive(P2PNodeManager.class.getName(),
                     null, this.p2pServiceNode);
             logger.debug("P2P node manager activated");
         } catch (ActiveObjectCreationException e) {

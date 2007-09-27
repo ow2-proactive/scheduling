@@ -33,8 +33,8 @@ package functionalTests.group.result;
 import java.util.Iterator;
 
 import org.junit.Before;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -57,8 +57,8 @@ public class Test extends FunctionalTest {
         this.resultTypedGroup.onewayCall();
         this.resultResultTypedGroup = this.resultTypedGroup.asynchronousCall();
 
-        Group group = ProActiveGroup.getGroup(this.resultTypedGroup);
-        Group groupResult = ProActiveGroup.getGroup(this.resultResultTypedGroup);
+        Group group = ProGroup.getGroup(this.resultTypedGroup);
+        Group groupResult = ProGroup.getGroup(this.resultResultTypedGroup);
 
         // was the oneway call on the result group ok ?
         boolean allOnewayCallDone = true;
@@ -93,12 +93,12 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        A typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params,
+        A typedGroup = (A) ProGroup.newGroup(A.class.getName(), params,
                 nodes);
         this.resultTypedGroup = typedGroup.asynchronousCall();
 
         boolean NoOnewayCallDone = true;
-        Group group = ProActiveGroup.getGroup(this.resultTypedGroup);
+        Group group = ProGroup.getGroup(this.resultTypedGroup);
         Iterator it = group.iterator();
         while (it.hasNext()) {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();

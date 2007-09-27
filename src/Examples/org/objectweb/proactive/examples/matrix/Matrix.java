@@ -32,9 +32,9 @@ package org.objectweb.proactive.examples.matrix;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -76,7 +76,7 @@ public class Matrix implements java.io.Serializable {
         int width = 0;
         Matrix result = null;
 
-        int size = ProActiveGroup.size(mr);
+        int size = ProGroup.size(mr);
 
         /*        for (int i = 0 ; i < size ; i++) {
            System.out.println("MATRIX : INIT ::  " + ((FutureProxy)ProActiveGroup.get(mr,i)));
@@ -104,7 +104,7 @@ public class Matrix implements java.io.Serializable {
         tab = new double[this.width][];
 
         for (int i = 0; i < size; i++) {
-            result = ((Matrix) ProActiveGroup.get(mr, i));
+            result = ((Matrix) ProGroup.get(mr, i));
 
             // 	    result = ((Matrix)
             // 		      ((FutureProxy)ProActiveGroup.get(mr,i))
@@ -123,16 +123,16 @@ public class Matrix implements java.io.Serializable {
         int width = 0;
         Matrix result = null;
 
-        int size = ProActiveGroup.size(mr);
+        int size = ProGroup.size(mr);
 
         for (int i = 0; i < size; i++) {
-            width += ((Matrix) ((FutureProxy) ProActiveGroup.get(mr, i)).getResult()).getWidth();
+            width += ((Matrix) ((FutureProxy) ProGroup.get(mr, i)).getResult()).getWidth();
         }
 
-        height = ((Matrix) ((FutureProxy) ProActiveGroup.get(mr, 0)).getResult()).getHeight();
+        height = ((Matrix) ((FutureProxy) ProGroup.get(mr, 0)).getResult()).getHeight();
         tab = new double[width][];
         for (int i = 0; i < size; i++) {
-            result = ((Matrix) ((FutureProxy) ProActiveGroup.get(mr, i)).getResult());
+            result = ((Matrix) ((FutureProxy) ProGroup.get(mr, i)).getResult());
             width = result.getWidth();
             for (int j = 0; j < width; j++) {
                 tab[index] = result.getColumn(j);
@@ -276,7 +276,7 @@ public class Matrix implements java.io.Serializable {
         params[0] = d;
 
         try {
-            vsm = (Matrix) ProActive.newActive("org.objectweb.proactive.examples.matrix.Matrix",
+            vsm = (Matrix) ProActiveObject.newActive("org.objectweb.proactive.examples.matrix.Matrix",
                     params, node);
         } catch (ActiveObjectCreationException e) {
             logger.error(
@@ -338,7 +338,7 @@ public class Matrix implements java.io.Serializable {
         }
 
         try {
-            result = (Matrix) ProActiveGroup.newGroup("org.objectweb.proactive.examples.matrix.Matrix",
+            result = (Matrix) ProGroup.newGroup("org.objectweb.proactive.examples.matrix.Matrix",
                     params, nodeList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -427,7 +427,7 @@ public class Matrix implements java.io.Serializable {
             po[0] = d;
 
             try {
-                result[i] = (Matrix) ProActive.newActive("org.objectweb.proactive.examples.matrix.Matrix",
+                result[i] = (Matrix) ProActiveObject.newActive("org.objectweb.proactive.examples.matrix.Matrix",
                         po, nodeList[i]);
             } catch (Exception e) {
                 e.printStackTrace();

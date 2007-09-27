@@ -36,11 +36,11 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1;
@@ -124,9 +124,9 @@ public class Test extends ComponentTest {
         message = msg1.append(MESSAGE);
 
         StringBuffer resulting_msg = new StringBuffer();
-        int message_size = ProActiveGroup.size(message);
+        int message_size = ProGroup.size(message);
         for (int i = 0; i < message_size; i++) {
-            resulting_msg.append(((Message) ProActiveGroup.get(message, i)).toString());
+            resulting_msg.append(((Message) ProGroup.get(message, i)).toString());
         }
 
         // this --> primitiveA --> primitiveB --> primitiveA --> this  (message goes through composite components)

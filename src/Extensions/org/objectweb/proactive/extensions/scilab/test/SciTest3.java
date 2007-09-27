@@ -36,7 +36,7 @@ import java.util.Vector;
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
@@ -63,7 +63,7 @@ public class SciTest3 {
             listStateEngine.add(((SciEngine) mapEngine.get(arrayEngine[i])).activate());
         }
 
-        ProActive.waitForAll(listStateEngine);
+        ProFuture.waitForAll(listStateEngine);
 
         for (int i = 0; i < mapEngine.size(); i++) {
             if (!listStateEngine.get(i).booleanValue()) {

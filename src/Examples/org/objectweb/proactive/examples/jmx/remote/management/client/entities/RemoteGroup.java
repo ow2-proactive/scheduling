@@ -36,8 +36,8 @@ import java.util.Vector;
 
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.examples.jmx.remote.management.events.EntitiesEventListener;
@@ -82,8 +82,8 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
             throw new GroupAlreadyExistsException();
         }
         try {
-            this.entities = (ManageableEntity) ProActiveGroup.newGroup(ManageableEntity.class.getName());
-            this.gEntities = ProActiveGroup.getGroup(this.entities);
+            this.entities = (ManageableEntity) ProGroup.newGroup(ManageableEntity.class.getName());
+            this.gEntities = ProGroup.getGroup(this.entities);
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

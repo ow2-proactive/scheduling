@@ -31,7 +31,7 @@
 package functionalTests.component.immediateservice;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.component.body.ComponentInitActive;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
@@ -43,9 +43,9 @@ public class A implements Itf, ComponentInitActive {
      * Initialize the immediate service method in the initComponentActivity
      */
     public void initComponentActivity(Body body) {
-        ProActive.setImmediateService("immediateMethod",
+        ProActiveObject.setImmediateService("immediateMethod",
             new Class[] { String.class });
-        ProActive.setImmediateService("immediateStopLoopMethod");
+        ProActiveObject.setImmediateService("immediateStopLoopMethod");
         //ProActive.setImmediateService("startFc");
     }
 

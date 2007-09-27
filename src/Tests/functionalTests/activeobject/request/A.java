@@ -34,8 +34,8 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
@@ -59,7 +59,7 @@ public class A implements Serializable, RunActive {
 
     public void initDeleguate() {
         try {
-            this.delegate = (A) ProActive.newActive(A.class.getName(),
+            this.delegate = (A) ProActiveObject.newActive(A.class.getName(),
                     new Object[0]);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -108,6 +108,6 @@ public class A implements Serializable, RunActive {
     }
 
     public void exit() throws Exception {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 }

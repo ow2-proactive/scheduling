@@ -30,7 +30,7 @@
  */
 package functionalTests.activeobject.context;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
@@ -45,14 +45,14 @@ public class A implements java.io.Serializable {
     private A stubOnCaller;
 
     public boolean init(String name) {
-        this.myID = ProActive.getBodyOnThis().getID();
-        ProActive.setImmediateService("immediateService");
+        this.myID = ProActiveObject.getBodyOnThis().getID();
+        ProActiveObject.setImmediateService("immediateService");
         this.name = new StringWrapper(name);
         return (this.myID != null);
     }
 
     public BooleanWrapper standardService(UniqueID caller) {
-        Context current = ProActive.getContext();
+        Context current = ProActiveObject.getContext();
         Request r = current.getCurrentRequest();
         return new BooleanWrapper((r != null) &&
             (current.getBody().getID().equals(myID)) &&
@@ -61,7 +61,7 @@ public class A implements java.io.Serializable {
     }
 
     public BooleanWrapper immediateService(UniqueID caller) {
-        Context current = ProActive.getContext();
+        Context current = ProActiveObject.getContext();
         Request r = current.getCurrentRequest();
         return new BooleanWrapper((r != null) &&
             (current.getBody().getID().equals(myID)) &&
@@ -81,7 +81,7 @@ public class A implements java.io.Serializable {
     }
 
     public void setStubOnCaller() {
-        this.stubOnCaller = (A) ProActive.getContext().getStubOnCaller();
+        this.stubOnCaller = (A) ProActiveObject.getContext().getStubOnCaller();
     }
 
     public StringWrapper getCallerName() {
@@ -93,7 +93,7 @@ public class A implements java.io.Serializable {
     }
 
     public BooleanWrapper testHalfBodyCaller() {
-        Context c = ProActive.getContext();
+        Context c = ProActiveObject.getContext();
         try {
             // caller is a halfbody
             Object o = c.getStubOnCaller();

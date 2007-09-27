@@ -66,7 +66,8 @@ import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -211,7 +212,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
     }
 
     public void go(ProActiveDescriptor pad) {
-        me = (C3DUser) org.objectweb.proactive.ProActive.getStubOnThis();
+        me = (C3DUser) org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
 
         // Creates the user Frame  
         vnDispatcher = pad.getVirtualNode("Dispatcher");
@@ -222,7 +223,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
     }
 
     public void rebuild() {
-        me = (C3DUser) org.objectweb.proactive.ProActive.getStubOnThis();
+        me = (C3DUser) org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
         userframe = new UserFrame(me);
         userframe.createPanelAfterMigration(dispatcher_host, s_username);
     }
@@ -279,7 +280,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
                     argv[0]);
             proActiveDescriptor.activateMappings();
         } catch (Exception e) {
@@ -293,7 +294,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         Object[] params = { new Boolean(false), new Boolean(false), "" };
 
         try {
-            C3DUser c3duser = (C3DUser) org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DUser",
+            C3DUser c3duser = (C3DUser) org.objectweb.proactive.api.ProActiveObject.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DUser",
                     params, node.getNodeInformation().getURL());
 
             c3duser.go(proActiveDescriptor);
@@ -546,7 +547,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
     }
 
     public void terminate() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     public class UserFrame extends Frame implements ActionListener,

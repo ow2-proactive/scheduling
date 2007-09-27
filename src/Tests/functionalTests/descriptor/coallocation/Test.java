@@ -30,7 +30,7 @@
  */
 package functionalTests.descriptor.coallocation;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+        proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         // We activate the mapping in reverse order
         // when two vns refer to the same vm, the first vn which creates the vm becomes the creator of the vm

@@ -6,9 +6,11 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProException;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
@@ -16,7 +18,6 @@ import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousExcept
 import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -110,12 +111,12 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         try {
-            slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
-            slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
-            stubOnThis = (AOPinger) ProActive.getStubOnThis();
+            slaveGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
+            slaveGroup = ProGroup.getGroup(slaveGroupStub);
+            stubOnThis = (AOPinger) ProActiveObject.getStubOnThis();
             body.setImmediateService("terminate");
 
-            ProActive.addNFEListenerOnGroup(slaveGroupStub,
+            ProException.addNFEListenerOnGroup(slaveGroupStub,
                 new DetectMissingGroup());
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();

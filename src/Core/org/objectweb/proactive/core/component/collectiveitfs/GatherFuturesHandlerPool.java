@@ -35,7 +35,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
 
@@ -74,7 +74,7 @@ public class GatherFuturesHandlerPool {
     GatherFuturesHandler create()
         throws ActiveObjectCreationException, NodeException {
         //			System.out.println("CREATED " + ++created );
-        return (GatherFuturesHandler) ProActive.newActive(GatherFuturesHandler.class.getName(),
+        return (GatherFuturesHandler) ProActiveObject.newActive(GatherFuturesHandler.class.getName(),
             new Object[] {  });
     }
 
@@ -83,7 +83,7 @@ public class GatherFuturesHandlerPool {
     }
 
     void expire(GatherFuturesHandler handler) {
-        ProActive.terminateActiveObject(handler, false);
+        ProActiveObject.terminateActiveObject(handler, false);
     }
 
     public synchronized GatherFuturesHandler borrowFuturesHandler()

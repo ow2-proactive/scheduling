@@ -33,7 +33,8 @@ package org.objectweb.proactive.core.descriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProLauncher;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.MainDefinition;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
@@ -77,7 +78,7 @@ public class Launcher {
         String filePathWithoutSpaces = fileDescriptorPath.replaceAll(" ", "%20");
 
         // parse and reify the descriptor
-        pad = ProActive.getProactiveDescriptor(filePathWithoutSpaces);
+        pad = ProDeployment.getProactiveDescriptor(filePathWithoutSpaces);
         activated = false;
     }
 
@@ -104,7 +105,7 @@ public class Launcher {
                 VirtualNodeInternal virtualNode = virtualNodes[j];
                 Node node = virtualNode.getNode();
 
-                ProActive.newMain(mainDefinition.getMainClass(),
+                ProLauncher.newMain(mainDefinition.getMainClass(),
                     mainDefinition.getParameters(), node);
             }
         }

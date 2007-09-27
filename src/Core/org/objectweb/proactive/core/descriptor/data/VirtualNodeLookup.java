@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import javax.management.Notification;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
@@ -142,7 +142,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                                               .toString();
                 //		this.remoteProActiveRuntime = RuntimeFactory.getRuntime(urlForLookup,lookupProtocol);
                 //		this.virtualNode = remoteProActiveRuntime.getVirtualNode(this.name);
-                this.virtualNode = ProActive.lookupVirtualNode(urlForLookup)
+                this.virtualNode = ProDeployment.lookupVirtualNode(urlForLookup)
                                             .getVirtualNodeInternal();
                 isActivated = true;
             } catch (ProActiveException e) {

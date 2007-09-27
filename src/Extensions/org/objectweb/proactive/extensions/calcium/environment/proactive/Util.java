@@ -29,7 +29,8 @@ package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -49,7 +50,7 @@ public class Util {
             logger.debug("Creating Active Object TaskPool.");
         }
 
-        ActiveTaskPool aom = (ActiveTaskPool) ProActive.newActive(ActiveTaskPool.class.getName(),
+        ActiveTaskPool aom = (ActiveTaskPool) ProActiveObject.newActive(ActiveTaskPool.class.getName(),
                 new Object[] {  }, node);
 
         return aom;
@@ -61,7 +62,7 @@ public class Util {
             logger.debug("Creating Active Interpreter Pool.");
         }
 
-        ActiveInterpreterPool aip = (ActiveInterpreterPool) ProActive.newActive(ActiveInterpreterPool.class.getName(),
+        ActiveInterpreterPool aip = (ActiveInterpreterPool) ProActiveObject.newActive(ActiveInterpreterPool.class.getName(),
                 new Object[] {  }, node);
 
         return aip;
@@ -75,7 +76,7 @@ public class Util {
 
         Object[][] params = new Object[nodes.length][0];
 
-        AOInterpreter[] aip = (AOInterpreter[]) ProActive.newActiveInParallel(AOInterpreter.class.getName(),
+        AOInterpreter[] aip = (AOInterpreter[]) ProActiveObject.newActiveInParallel(AOInterpreter.class.getName(),
                 params, nodes);
 
         return aip;
@@ -83,7 +84,7 @@ public class Util {
 
     static public Node[] getNodes(String descriptorPath, String virtualNodeName)
         throws ProActiveException {
-        ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorPath);
+        ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(descriptorPath);
 
         return getNodes(pad, virtualNodeName);
     }

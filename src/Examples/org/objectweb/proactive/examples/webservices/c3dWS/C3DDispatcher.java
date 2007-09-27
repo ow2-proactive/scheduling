@@ -61,7 +61,8 @@ import java.util.Hashtable;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -264,7 +265,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      */
     public void init() {
         try {
-            C3DDispatcher d = (C3DDispatcher) org.objectweb.proactive.ProActive.getStubOnThis();
+            C3DDispatcher d = (C3DDispatcher) org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
 
             /* Initializes the pixel array holding the whole image */
 
@@ -293,7 +294,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             engine = new C3DRenderingEngine[engines];
 
             for (int i = 0; i < rendererNodes.length; i++) {
-                C3DRenderingEngine tmp = (C3DRenderingEngine) ProActive.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DRenderingEngine",
+                C3DRenderingEngine tmp = (C3DRenderingEngine) ProActiveObject.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DRenderingEngine",
                         param, rendererNodes[i]);
 
                 //String nodeURL = nodeTab[i].getNodeInformation().getURL();
@@ -1052,7 +1053,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         Node node = null;
 
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
                     argv[0]);
             proActiveDescriptor.activateMappings();
 
@@ -1075,7 +1076,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         node = dispatcher.getNode();
 
         try {
-            C3DDispatcher c3dd = (C3DDispatcher) ProActive.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher",
+            C3DDispatcher c3dd = (C3DDispatcher) ProActiveObject.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher",
                     param, node);
 
             //Expose the dispatcher as a web service

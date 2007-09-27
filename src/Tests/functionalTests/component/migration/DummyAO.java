@@ -39,7 +39,7 @@ import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -58,7 +58,7 @@ public class DummyAO implements Serializable {
     public boolean go() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
-        ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(Test.class.getResource(
+        ProActiveDescriptor deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/descriptor/deploymentDescriptor.xml")
                                                                                               .getPath());
         context.put("deployment-descriptor", deploymentDescriptor);

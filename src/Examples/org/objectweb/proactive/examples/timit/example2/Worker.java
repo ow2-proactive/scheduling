@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.examples.timit.example2;
 
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.benchmarks.timit.util.TimItStore;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
 import org.objectweb.proactive.benchmarks.timit.util.TimerCounter;
@@ -38,7 +39,6 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEvent;
 import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEventObserver;
 import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultEventObserver;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 
 
@@ -103,7 +103,7 @@ public class Worker extends Timed {
     public void start() {
         this.rank = ProSPMD.getMyRank();
         this.workers = (Worker) ProSPMD.getSPMDGroup();
-        this.workersArray = (Worker[]) ProActiveGroup.getGroup(this.workers)
+        this.workersArray = (Worker[]) ProGroup.getGroup(this.workers)
                                                      .toArray(new Worker[0]);
         this.groupSize = ProSPMD.getMySPMDGroupSize();
 

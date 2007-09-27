@@ -38,7 +38,8 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -222,7 +223,7 @@ public class Main {
             for (Iterator<String> iter = parsed.xmlDescriptor.iterator();
                     iter.hasNext();) {
                 String descriptor = iter.next();
-                ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptor);
+                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(descriptor);
                 pads.add(pad);
                 VirtualNode[] currentVNs = pad.getVirtualNodes();
                 pad.activateMappings();
@@ -281,7 +282,7 @@ public class Main {
         long computationTime = System.currentTimeMillis();
         Result result = manager.start();
         System.out.println("Manager started ...");
-        ProActive.waitFor(result);
+        ProFuture.waitFor(result);
         computationTime = System.currentTimeMillis() - computationTime;
         System.out.println("The best solution is:\n" + result +
             " and the total time " + computationTime + " " +

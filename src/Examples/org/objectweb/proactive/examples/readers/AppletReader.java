@@ -53,7 +53,7 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
         receiveMessage("Creating active objects");
         try {
             display = new ReaderDisplay(this);
-            display = (ReaderDisplay) org.objectweb.proactive.ProActive.turnActive(display);
+            display = (ReaderDisplay) org.objectweb.proactive.api.ProActiveObject.turnActive(display);
             receiveMessage("Running...");
         } catch (Exception e) {
             e.printStackTrace();

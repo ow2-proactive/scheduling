@@ -30,7 +30,8 @@
  */
 package functionalTests.activeobject.acontinuation;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 
 
 public class A implements java.io.Serializable {
@@ -52,13 +53,13 @@ public class A implements java.io.Serializable {
     }
 
     public void initFirstDeleguate() throws Exception {
-        this.deleguate = (A) ProActive.newActive(A.class.getName(),
+        this.deleguate = (A) ProActiveObject.newActive(A.class.getName(),
                 new Object[] { "deleguate1" });
         deleguate.initSecondDeleguate();
     }
 
     public void initSecondDeleguate() throws Exception {
-        this.deleguate = (A) ProActive.newActive(A.class.getName(),
+        this.deleguate = (A) ProActiveObject.newActive(A.class.getName(),
                 new Object[] { "deleguate2" });
     }
 
@@ -107,7 +108,7 @@ public class A implements java.io.Serializable {
             deleguate.forwardID(id);
         }
 
-        isFuture = ProActive.isAwaited(id);
+        isFuture = ProFuture.isAwaited(id);
         idSent = id;
     }
 

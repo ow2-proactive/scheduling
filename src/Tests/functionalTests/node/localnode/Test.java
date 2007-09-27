@@ -31,7 +31,7 @@
 package functionalTests.node.localnode;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -50,7 +50,7 @@ public class Test extends FunctionalTest {
      */
     @Before
     public void initTest() throws Exception {
-        this.ao = (A) ProActive.newActive(A.class.getName(),
+        this.ao = (A) ProActiveObject.newActive(A.class.getName(),
                 new Object[] { "bernard Lavilliers" });
     }
 
@@ -61,6 +61,6 @@ public class Test extends FunctionalTest {
 
         assertTrue(aoNode.getProperty("test").compareTo("bernard Lavilliers") == 0);
 
-        ProActive.terminateActiveObject(this.ao, false);
+        ProActiveObject.terminateActiveObject(this.ao, false);
     }
 }

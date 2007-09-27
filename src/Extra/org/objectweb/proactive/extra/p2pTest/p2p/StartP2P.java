@@ -3,7 +3,8 @@ package org.objectweb.proactive.extra.p2pTest.p2p;
 import java.io.Serializable;
 import java.util.Random;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -27,7 +28,7 @@ public class StartP2P {
     public void startP2PNetworkWithPAD(String proActiveDescriptor) {
         ProActiveDescriptor pad = null;
         try {
-            pad = ProActive.getProactiveDescriptor(proActiveDescriptor);
+            pad = ProDeployment.getProactiveDescriptor(proActiveDescriptor);
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(pad));
         } catch (ProActiveException e) {
             e.printStackTrace();
@@ -55,7 +56,7 @@ public class StartP2P {
                 "���������������������������Starting Entry Node���������������������������");
             Node entryNode = vn0.getNode();
 
-            P2PLauncher entryp2pLauncher = (P2PLauncher) ProActive.newActive(P2PLauncher.class.getName(),
+            P2PLauncher entryp2pLauncher = (P2PLauncher) ProActiveObject.newActive(P2PLauncher.class.getName(),
                     new Object[] { arg0 }, entryNode);
             entryp2pLauncher.start();
             Thread.sleep(10000);
@@ -63,7 +64,7 @@ public class StartP2P {
             System.out.println(
                 "���������������������������Starting Others Entry Nodes���������������������������");
             for (Node othersEntryNodes : vn1.getNodes()) {
-                P2PLauncher p2pLauncher = (P2PLauncher) ProActive.newActive(P2PLauncher.class.getName(),
+                P2PLauncher p2pLauncher = (P2PLauncher) ProActiveObject.newActive(P2PLauncher.class.getName(),
                         new Object[] { arg0 + s }, othersEntryNodes);
                 p2pLauncher.start();
                 Thread.sleep(10000);
@@ -77,7 +78,7 @@ public class StartP2P {
                     entryPoint[(i + 2) % entryPoint.length];
                 System.out.println(
                     "���������������������������Starting Others Nodes���������������������������");
-                P2PLauncher p2pLauncher = (P2PLauncher) ProActive.newActive(P2PLauncher.class.getName(),
+                P2PLauncher p2pLauncher = (P2PLauncher) ProActiveObject.newActive(P2PLauncher.class.getName(),
                         new Object[] { arg0 + s }, node);
                 p2pLauncher.start();
                 Thread.sleep(10000);

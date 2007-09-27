@@ -35,10 +35,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -108,7 +109,7 @@ public class Launcher {
                 }
 
                 // Send the number of iterations to the first worker
-                Worker firstWorker = (Worker) ProActiveGroup.getGroup(workers)
+                Worker firstWorker = (Worker) ProGroup.getGroup(workers)
                                                             .get(0);
                 wrappedResult = firstWorker.start(numOfIterations);
                 result = wrappedResult.doubleValue();
@@ -130,7 +131,7 @@ public class Launcher {
     private static Node[] provideNodes(String descriptorUrl) {
         try {
             // Common stuff about ProActive deployement
-            pad = ProActive.getProactiveDescriptor(descriptorUrl);
+            pad = ProDeployment.getProactiveDescriptor(descriptorUrl);
 
             pad.activateMappings();
             VirtualNode vnode = pad.getVirtualNodes()[0];

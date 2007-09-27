@@ -47,7 +47,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -172,7 +172,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         this.c3dDispatcher = null;
         // First try with the provided url, if the user entered the exact url for the dispatcher
         try {
-            this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
+            this.c3dDispatcher = (Dispatcher) ProActiveObject.lookupActive(C3DDispatcher.class.getName(),
                     url);
             setVisible(false);
             return;
@@ -184,7 +184,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         // Second, check the url given does map to a machine, and get list of registered objects on it
         try {
             hostName = URIBuilder.getHostNameFromUrl(url);
-            registeredObjects = ProActive.listActive(url);
+            registeredObjects = ProActiveObject.listActive(url);
         } catch (IOException e) {
             treatException(e,
                 "Sorry, could not find a registered C3DDispatcher on host \"" +
@@ -198,7 +198,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
             if (name.equals("Dispatcher") && (name.indexOf("_VN") == -1)) { // replace by (java 1.5 String.contains)
                 try {
-                    this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
+                    this.c3dDispatcher = (Dispatcher) ProActiveObject.lookupActive(C3DDispatcher.class.getName(),
                             registeredObjects[i]);
                     setVisible(false);
                     return;

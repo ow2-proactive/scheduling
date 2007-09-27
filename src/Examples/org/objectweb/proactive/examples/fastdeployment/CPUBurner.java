@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.annotation.Cache;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 
@@ -33,7 +33,7 @@ public class CPUBurner implements Serializable, InitActive {
     }
 
     public void initActivity(Body body) {
-        ProActive.setImmediateService("getId");
+        ProActiveObject.setImmediateService("getId");
     }
 
     @Cache

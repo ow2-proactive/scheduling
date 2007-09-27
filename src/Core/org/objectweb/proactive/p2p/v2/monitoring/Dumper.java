@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -398,7 +398,7 @@ public class Dumper {
             d.dumpForPeerSim();
         } else {
             try {
-                d = (Dumper) ProActive.newActive(Dumper.class.getName(), null);
+                d = (Dumper) ProActiveObject.newActive(Dumper.class.getName(), null);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {

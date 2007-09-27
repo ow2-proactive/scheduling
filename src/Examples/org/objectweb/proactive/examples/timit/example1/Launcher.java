@@ -31,7 +31,8 @@
 package org.objectweb.proactive.examples.timit.example1;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.Startable;
 import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
@@ -81,7 +82,7 @@ public class Launcher implements Startable {
     public void start(String[] args) {
         try {
             // Common stuff about ProActive deployement
-            this.pad = ProActive.getProactiveDescriptor(args[0]);
+            this.pad = ProDeployment.getProactiveDescriptor(args[0]);
             int np = Integer.valueOf(args[1]).intValue();
 
             this.pad.activateMappings();
@@ -139,7 +140,7 @@ public class Launcher implements Startable {
      */
     public void kill() {
         this.workers.terminate();
-        ProActive.waitForPotentialException();
+        ProException.waitForPotentialException();
     }
 
     public void masterKill() {

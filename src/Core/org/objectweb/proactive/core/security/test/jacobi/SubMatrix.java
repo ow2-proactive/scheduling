@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.core.security.test.jacobi;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -303,7 +303,7 @@ public class SubMatrix {
      */
     public void buildNeighborhood_MethodBarrier() {
         this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
-        Group allSubMatrix = ProActiveGroup.getGroup(this.matrix);
+        Group allSubMatrix = ProGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
@@ -313,7 +313,7 @@ public class SubMatrix {
             e.printStackTrace();
         }
 
-        this.me = (SubMatrix) ProActive.getStubOnThis();
+        this.me = (SubMatrix) ProActiveObject.getStubOnThis();
         this.north = (SubMatrix) topology.up(me);
         this.south = (SubMatrix) topology.down(me);
         this.west = (SubMatrix) topology.left(me);
@@ -362,7 +362,7 @@ public class SubMatrix {
      */
     public void buildNeighborhood_NeighborBarrier() {
         this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
-        Group allSubMatrix = ProActiveGroup.getGroup(this.matrix);
+        Group allSubMatrix = ProGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
@@ -372,14 +372,14 @@ public class SubMatrix {
             e.printStackTrace();
         }
 
-        this.me = (SubMatrix) ProActive.getStubOnThis();
+        this.me = (SubMatrix) ProActiveObject.getStubOnThis();
         this.north = (SubMatrix) topology.up(me);
         this.south = (SubMatrix) topology.down(me);
         this.west = (SubMatrix) topology.left(me);
         this.east = (SubMatrix) topology.right(me);
 
         try {
-            this.neighbors = (SubMatrix) ProActiveGroup.newGroup(SubMatrix.class.getName());
+            this.neighbors = (SubMatrix) ProGroup.newGroup(SubMatrix.class.getName());
         } catch (ClassNotReifiableException e) {
             System.err.println(
                 "** ClassNotReifiableException ** - Unable to build the neighbors group");
@@ -389,7 +389,7 @@ public class SubMatrix {
                 "** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
-        Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors);
+        Group neighborsGroup = ProGroup.getGroup(this.neighbors);
 
         if (this.north == null) {
             this.northNeighborBorder = this.buildFakeBorder(this.width);
@@ -423,7 +423,7 @@ public class SubMatrix {
      */
     public void buildNeighborhood_TotalBarrier() {
         this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
-        Group allSubMatrix = ProActiveGroup.getGroup(this.matrix);
+        Group allSubMatrix = ProGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
@@ -433,7 +433,7 @@ public class SubMatrix {
             e.printStackTrace();
         }
 
-        this.me = (SubMatrix) ProActive.getStubOnThis();
+        this.me = (SubMatrix) ProActiveObject.getStubOnThis();
         this.north = (SubMatrix) topology.up(me);
         this.south = (SubMatrix) topology.down(me);
         this.west = (SubMatrix) topology.left(me);

@@ -50,12 +50,15 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
+import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
@@ -65,12 +68,14 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.Proxy;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
@@ -1048,7 +1053,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @return the size of of the SPMD group
      */
     public int getSPMDGroupSize() {
-        return ProActiveGroup.size(this.getSPMDGroup());
+        return ProGroup.size(this.getSPMDGroup());
     }
 
     /**
@@ -1109,4 +1114,28 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
         }
     }
+
+	/**
+	 * @param obj
+	 * @return
+	 */
+	public static UniversalBody getRemoteBody(Object obj) {
+	    // Check if obj is really a reified object
+	    if (!(MOP.isReifiedObject(obj))) {
+	        throw new ProActiveRuntimeException("The given object " + obj +
+	            " is not a reified object");
+	    }
+	
+	    // Find the appropriate remoteBody
+	    org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
+	
+	    if (myProxy == null) {
+	        throw new ProActiveRuntimeException(
+	            "Cannot find a Proxy on the stub object: " + obj);
+	    }
+	
+	    BodyProxy myBodyProxy = (BodyProxy) myProxy;
+	    UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+	    return body;
+	}
 }

@@ -32,8 +32,8 @@ package org.objectweb.proactive.examples.nbody.groupcom;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -81,7 +81,7 @@ public class Start {
         Domain domainGroup = null;
         try {
             // Create all the Domains as part of a Group
-            domainGroup = (Domain) ProActiveGroup.newGroup(Domain.class.getName(),
+            domainGroup = (Domain) ProGroup.newGroup(Domain.class.getName(),
                     constructorParams, nodes);
         } catch (ClassNotReifiableException e) {
             killsupport.abort(e);
@@ -98,7 +98,7 @@ public class Start {
         Maestro maestro = null;
         try {
             // Supervizes the synchronisations
-            maestro = (Maestro) ProActive.newActive(Maestro.class.getName(),
+            maestro = (Maestro) ProActiveObject.newActive(Maestro.class.getName(),
                     new Object[] { domainGroup, new Integer(maxIter), killsupport },
                     nodes[nodes.length - 1]);
         } catch (ActiveObjectCreationException e) {

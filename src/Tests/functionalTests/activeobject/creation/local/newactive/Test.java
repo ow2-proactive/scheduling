@@ -32,7 +32,7 @@ package functionalTests.activeobject.creation.local.newactive;
 
 import java.net.InetAddress;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
@@ -50,7 +50,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
+        a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
         name = a.getName();
         nodeUrl = a.getNodeUrl();
 

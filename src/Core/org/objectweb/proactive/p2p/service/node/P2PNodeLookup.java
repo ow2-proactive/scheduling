@@ -38,10 +38,11 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProMigration;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
@@ -248,7 +249,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      * @return whether the nodes accessor is active or not.
      */
     public boolean isActive() {
-        return ProActive.getBodyOnThis().isActive();
+        return ProActiveObject.getBodyOnThis().isActive();
     }
 
     /**
@@ -270,7 +271,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      * @return A Collection of nodes.
      */
     public Vector getNodes() {
-        Service service = new Service(ProActive.getBodyOnThis());
+        Service service = new Service(ProActiveObject.getBodyOnThis());
         while (!this.allArrived()) {
             this.localP2pService.askingNode(TTL, null, this.localP2pService,
                 this.numberOfAskedNodes - this.acquiredNodes, stub,
@@ -282,7 +283,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 service.serveOldest();
             }
         }
-        return ((P2PNodeLookup) ProActive.getStubOnThis()).getAndRemoveNodes();
+        return ((P2PNodeLookup) ProActiveObject.getStubOnThis()).getAndRemoveNodes();
     }
 
     /**
@@ -292,7 +293,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      */
     public Vector getNodes(long timeout) {
         long endTime = System.currentTimeMillis() + timeout;
-        Service service = new Service(ProActive.getBodyOnThis());
+        Service service = new Service(ProActiveObject.getBodyOnThis());
         while (!this.allArrived() && (System.currentTimeMillis() < endTime)) {
             this.localP2pService.askingNode(TTL, null, this.localP2pService,
                 this.numberOfAskedNodes - this.acquiredNodes, stub,
@@ -307,7 +308,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 service.serveOldest();
             }
         }
-        return ((P2PNodeLookup) ProActive.getStubOnThis()).getAndRemoveNodes();
+        return ((P2PNodeLookup) ProActiveObject.getStubOnThis()).getAndRemoveNodes();
     }
 
     /**
@@ -317,7 +318,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      */
     public void moveTo(String nodeUrl) {
         try {
-            ProActive.migrateTo(nodeUrl);
+            ProMigration.migrateTo(nodeUrl);
         } catch (Exception e) {
             logger.fatal("Couldn't migrate the node lookup to " + nodeUrl, e);
         }
@@ -331,7 +332,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        this.stub = (P2PNodeLookup) ProActive.getStubOnThis();
+        this.stub = (P2PNodeLookup) ProActiveObject.getStubOnThis();
         try {
             this.paRuntime = RuntimeFactory.getDefaultRuntime();
             this.parUrl = this.paRuntime.getURL();

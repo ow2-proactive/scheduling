@@ -30,7 +30,7 @@
  */
 package functionalTests.runtime.classloader;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 /**
@@ -42,7 +42,7 @@ public class A {
     }
 
     public void createActiveObjectB() throws Exception {
-        Object ao = ProActive.newActive("functionalTests.runtime.classloader.B",
+        Object ao = ProActiveObject.newActive("functionalTests.runtime.classloader.B",
                 new Object[] { "dummy" });
     }
 }

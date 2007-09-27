@@ -50,6 +50,7 @@ import javassist.NotFoundException;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.component.ItfStubObject;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
@@ -341,7 +342,7 @@ public class RepresentativeInterfaceClassGenerator
 
             if (returnType != CtClass.voidType) {
                 if ((itfType != null) && itfType.isFcMulticastItf()) {
-                    preWrap = ProActiveGroup.class.getName() + ".getGroup(";
+                    preWrap = ProGroup.class.getName() + ".getGroup(";
                     postWrap = ")";
                 } else if (!returnType.isPrimitive()) {
                     preWrap = "(" + returnType.getName() + ")";

@@ -46,7 +46,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -163,7 +165,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     public void addResources(final URL descriptorURL) {
         if (!isTerminated) {
             try {
-                ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
+                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
                 for (VirtualNode vn : pad.getVirtualNodes()) {
                     addResources(vn);
                 }
@@ -181,7 +183,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
         final String virtualNodeName) {
         if (!isTerminated) {
             try {
-                ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptorURL.toExternalForm());
+                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
                 addResources(pad.getVirtualNode(virtualNodeName));
             } catch (ProActiveException e) {
                 logger.error("Couldn't add the specified resources.");
@@ -232,7 +234,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
 
                 // Creates the slave which will automatically connect to the master
                 slaves.put(slavename,
-                    (Slave) ProActive.newActive(AOSlave.class.getName(),
+                    (Slave) ProActiveObject.newActive(AOSlave.class.getName(),
                         new Object[] { slavename, provider, initialMemory },
                         node));
                 if (logger.isDebugEnabled()) {
@@ -251,7 +253,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
      * {@inheritDoc}
      */
     public void initActivity(final Body body) {
-        stubOnThis = ProActive.getStubOnThis();
+        stubOnThis = ProActiveObject.getStubOnThis();
         slaveNameCounter = 0;
         slaves = new HashMap<String, Slave>();
         vnlist = new Vector<VirtualNode>();
@@ -309,7 +311,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             for (Entry<String, Slave> slave : slaves.entrySet()) {
                 try {
                     BooleanWrapper term = slave.getValue().terminate();
-                    ProActive.waitFor(term);
+                    ProFuture.waitFor(term);
                     if (logger.isDebugEnabled()) {
                         logger.debug(slave.getKey() + " freed.");
                     }
@@ -332,7 +334,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             }
 
             // finally we terminate this active object
-            ProActive.terminateActiveObject(true);
+            ProActiveObject.terminateActiveObject(true);
             // success
             if (logger.isDebugEnabled()) {
                 logger.debug("SlaveManager terminated...");

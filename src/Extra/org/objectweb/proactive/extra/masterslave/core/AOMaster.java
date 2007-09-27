@@ -42,15 +42,17 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProException;
+import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -275,7 +277,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             launchedTasks.add(taskId);
             slavesActivity.put(slaveName, taskId);
             TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
-            TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) ProActive.getFutureValue(taskfuture);
+            TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(taskfuture);
             repository.saveTask(taskId);
 
             return realTask;
@@ -287,7 +289,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
-        stubOnThis = ProActive.getStubOnThis();
+        stubOnThis = ProActiveObject.getStubOnThis();
         // General initializations
         terminated = false;
         // Queues
@@ -296,21 +298,21 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         resultQueue = new ResultQueue<Serializable>(Master.OrderingMode.CompletionOrder);
 
         // Ignore NFEs occurring on ourself (send reply exceptions on dead slaves)
-        ProActive.getBodyOnThis().addNFEListener(NFEListener.NOOP_LISTENER);
+        ProActiveObject.getBodyOnThis().addNFEListener(NFEListener.NOOP_LISTENER);
 
         // Slaves
         try {
             // Slave Group
-            slaveGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
-            slaveGroup = ProActiveGroup.getGroup(slaveGroupStub);
+            slaveGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
+            slaveGroup = ProGroup.getGroup(slaveGroupStub);
             // we ignore NFE on this group (the pinger is responsible for it)
-            ProActive.addNFEListenerOnGroup(slaveGroupStub,
+            ProException.addNFEListenerOnGroup(slaveGroupStub,
                 NFEListener.NOOP_LISTENER);
             // Group of sleeping slaves
-            sleepingGroupStub = (Slave) ProActiveGroup.newGroup(AOSlave.class.getName());
-            sleepingGroup = ProActiveGroup.getGroup(sleepingGroupStub);
+            sleepingGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
+            sleepingGroup = ProGroup.getGroup(sleepingGroupStub);
             // we ignore NFE on this group (the pinger is responsible for it)
-            ProActive.addNFEListenerOnGroup(sleepingGroupStub,
+            ProException.addNFEListenerOnGroup(sleepingGroupStub,
                 NFEListener.NOOP_LISTENER);
             slavesActivity = new HashMap<String, Long>();
             slavesByName = new HashMap<String, Slave>();
@@ -323,11 +325,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
         try {
             // The resource manager
-            smanager = (AOSlaveManager) ProActive.newActive(AOSlaveManager.class.getName(),
+            smanager = (AOSlaveManager) ProActiveObject.newActive(AOSlaveManager.class.getName(),
                     new Object[] { stubOnThis, initialMemory });
 
             // The slave pinger
-            pinger = (SlaveWatcher) ProActive.newActive(AOPinger.class.getName(),
+            pinger = (SlaveWatcher) ProActiveObject.newActive(AOPinger.class.getName(),
                     new Object[] { stubOnThis });
         } catch (ActiveObjectCreationException e1) {
             e1.printStackTrace();
@@ -492,7 +494,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * Serve the pending waitXXX method
      */
     protected void servePending() {
-        Body body = ProActive.getBodyOnThis();
+        Body body = ProActiveObject.getBodyOnThis();
         Request req = pendingRequest;
         pendingRequest = null;
         body.serve(req);
@@ -525,7 +527,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     public void solveIds(final List<Long> taskIds) {
         logger.debug("Adding " + taskIds.size() + " tasks by " +
             Thread.currentThread() + " and body is " +
-            ProActive.getContext().getBody());
+            ProActiveObject.getContext().getBody());
 
         for (Long taskId : taskIds) {
             solve(taskId);
@@ -576,9 +578,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         }
 
         // We terminate the pinger
-        ProActive.waitFor(pinger.terminate());
+        ProFuture.waitFor(pinger.terminate());
         // We terminate the slave manager
-        ProActive.waitFor(smanager.terminate(freeResources));
+        ProFuture.waitFor(smanager.terminate(freeResources));
         if (logger.isDebugEnabled()) {
             logger.debug("Master terminated...");
         }

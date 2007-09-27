@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.examples.timit.jacobi;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
 import org.objectweb.proactive.benchmarks.timit.util.TimerCounter;
@@ -203,7 +203,7 @@ public class Worker extends Timed implements java.io.Serializable {
         this.subTemp = new double[subMatrixSize][subMatrixSize];
         System.out.println("[JACOBI] worker " + this.id +
             " : submatrix intialized on " +
-            ProActive.getBodyOnThis().getNodeURL());
+            ProActiveObject.getBodyOnThis().getNodeURL());
     }
 
     /**
@@ -587,7 +587,7 @@ public class Worker extends Timed implements java.io.Serializable {
      * @see org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher
      */
     public void terminate() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     // //////////////////////////////////////////////////////////////////////////

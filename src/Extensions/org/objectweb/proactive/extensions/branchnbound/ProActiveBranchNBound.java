@@ -32,8 +32,8 @@ package org.objectweb.proactive.extensions.branchnbound;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -243,7 +243,7 @@ public class ProActiveBranchNBound {
         args[2] instanceof VirtualNode[] : args[2];
         assert args[3] instanceof String : args[3];
 
-        return (Manager) ProActive.newActive(Manager.class.getName(), args,
+        return (Manager) ProActiveObject.newActive(Manager.class.getName(), args,
             (Node) args[1]);
     }
 }

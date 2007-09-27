@@ -33,7 +33,10 @@ package org.objectweb.proactive.examples.timit.example2;
 import java.util.Iterator;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProException;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.Startable;
 import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
@@ -41,7 +44,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -78,7 +80,7 @@ public class Launcher implements Startable {
     public void start(String[] args) {
         try {
             // Common stuff about ProActive deployement
-            this.pad = ProActive.getProactiveDescriptor(args[0]);
+            this.pad = ProDeployment.getProactiveDescriptor(args[0]);
             int np = Integer.valueOf(args[1]).intValue();
 
             this.pad.activateMappings();
@@ -124,13 +126,13 @@ public class Launcher implements Startable {
     // You have to implement a kill() method called by TimIt between each run.
     // Here you can terminate all your workers as here
     public void kill() {
-        Group<Worker> gWorkers = ProActiveGroup.getGroup(workers);
+        Group<Worker> gWorkers = ProGroup.getGroup(workers);
         Iterator<Worker> it = gWorkers.iterator();
 
         while (it.hasNext()) {
-            ProActive.terminateActiveObject(it.next(), true);
+            ProActiveObject.terminateActiveObject(it.next(), true);
         }
-        ProActive.waitForPotentialException();
+        ProException.waitForPotentialException();
 
         try {
             this.pad.killall(false);

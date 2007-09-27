@@ -42,12 +42,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.bouncycastle.jce.provider.JCEBlockCipher.SEED;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicManager;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -86,7 +88,6 @@ import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
@@ -202,9 +203,8 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @since   ProActive 0.7
  * @see ProActiveDescriptorInternal
  * @see ProActiveGroup
- *
  */
-@PublicAPI
+
 public class ProActive {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);
@@ -237,6 +237,7 @@ public class ProActive {
      * @throws ClassNotFoundException
      * @throws NoSuchMethodException
      * @throws ProActiveException
+     * @deprecated
      */
     public static void newMain(String classname, String[] mainParameters,
         Node node)
@@ -252,6 +253,7 @@ public class ProActive {
      * @param node
      * @throws ClassNotFoundException
      * @throws ProActiveException
+     * @deprecated
      */
     public static void newRemote(String classname, Node node)
         throws ClassNotFoundException, ProActiveException {
@@ -266,6 +268,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object newActive(String classname,
         Object[] constructorParameters)
@@ -283,6 +286,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node URL cannot be resolved as an existing Node
+     * @deprecated
      */
     public static Object newActive(String classname,
         Object[] constructorParameters, String nodeURL)
@@ -305,6 +309,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated 
      */
     public static Object newActive(String classname,
         Object[] constructorParameters, Node node)
@@ -329,6 +334,7 @@ public class ProActive {
      * @return an array of references (possibly remote) on Stubs of the newly
      * created active objects.
      * @throws ClassNotFoundException in the case of className is not a class.
+     * @deprecated
      */
     public static Object[] newActiveInParallel(String className,
         Object[][] constructorParameters, Node[] nodes)
@@ -354,6 +360,7 @@ public class ProActive {
      * @throws NodeException happens when the given virtualNode is already
      * activated and throws an exception.
      * @throws ClassNotFoundException in the case of className is not a class.
+     * @deprecated
      */
     public static Object[] newActiveInParallel(String className,
         Object[] constructorParameters, VirtualNode virtualNode)
@@ -374,6 +381,7 @@ public class ProActive {
      * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
+     * @deprecated
      */
     public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
@@ -398,7 +406,7 @@ public class ProActive {
      * @return Object a Group of references (possibly remote) on Stubs of newly created active objects
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
-     *
+     * @deprecated
      */
     public static Object newActiveAsGroup(String className,
         Object[] constructorParameters, VirtualNode virtualNode,
@@ -429,6 +437,7 @@ public class ProActive {
      * @return a component representative of type Component
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Component newActiveComponent(String className,
         Object[] constructorParameters, Node node, Active activity,
@@ -462,6 +471,7 @@ public class ProActive {
      * @return a typed group of component representative elements, of type Component
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Component newActiveComponent(String className,
         Object[] constructorParameters, VirtualNode vn,
@@ -478,6 +488,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the existing object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target)
         throws ActiveObjectCreationException, NodeException {
@@ -494,6 +505,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the existing object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, String nodeURL)
         throws ActiveObjectCreationException, NodeException {
@@ -516,6 +528,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Node node)
         throws ActiveObjectCreationException, NodeException {
@@ -537,6 +550,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Node node, Active activity,
         MetaObjectFactory factory)
@@ -557,6 +571,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, String nameOfTargetType,
         Node node) throws ActiveObjectCreationException, NodeException {
@@ -583,6 +598,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, String nameOfTargetType,
         Node node, Active activity, MetaObjectFactory factory)
@@ -603,6 +619,7 @@ public class ProActive {
      * @return an array of references (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActiveAsGroup(Object target,
         String nameOfTargetType, VirtualNode virtualnode)
@@ -621,6 +638,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters)
@@ -641,6 +659,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node URL cannot be resolved as an existing Node
+     * @deprecated
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters, String nodeURL)
@@ -666,6 +685,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters, Node node)
@@ -697,6 +717,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters, Node node, Active activity,
@@ -785,6 +806,7 @@ public class ProActive {
      * @return an array of references (possibly remote) on Stubs of the newly
      * created active objects.
      * @throws ClassNotFoundException in the case of className is not a class.
+     * @deprecated
      */
     public static Object[] newActiveInParallel(String className,
         Class[] genericParameters, Object[][] constructorParameters,
@@ -837,6 +859,7 @@ public class ProActive {
      * @throws NodeException happens when the given virtualNode is already
      * activated and throws an exception.
      * @throws ClassNotFoundException in the case of className is not a class.
+     * @deprecated
      */
     public static Object[] newActiveInParallel(String className,
         Class[] genericParameters, Object[] constructorParameters,
@@ -888,6 +911,7 @@ public class ProActive {
      * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
+     * @deprecated
      */
     public static Object newActiveAsGroup(String classname,
         Class[] genericParameters, Object[] constructorParameters,
@@ -914,7 +938,7 @@ public class ProActive {
      * @return Object a Group of references (possibly remote) on Stubs of newly created active objects
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
-     *
+     * @deprecated
      */
     public static Object newActiveAsGroup(String classname,
         Class[] genericParameters, Object[] constructorParameters,
@@ -927,7 +951,7 @@ public class ProActive {
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
             try {
-                aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
+                aoGroup = ProGroup.getGroup(ProGroup.newGroup(
                             classname, genericParameters));
             } catch (ClassNotFoundException e) {
                 throw new ActiveObjectCreationException(
@@ -970,6 +994,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, String nameOfTargetType,
         Class[] genericParameters, Node node, Active activity,
@@ -1041,6 +1066,7 @@ public class ProActive {
      * @return a component representative of type Component
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Component newActiveComponent(String classname,
         Class[] genericParameters, Object[] constructorParameters, Node node,
@@ -1091,6 +1117,7 @@ public class ProActive {
      * @return a typed group of component representative elements, of type Component
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Component newActiveComponent(String className,
         Class[] genericParameters, Object[] constructorParameters,
@@ -1122,6 +1149,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the existing object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Class[] genericParameters)
         throws ActiveObjectCreationException, NodeException {
@@ -1140,6 +1168,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the existing object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         String nodeURL) throws ActiveObjectCreationException, NodeException {
@@ -1164,6 +1193,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         Node node) throws ActiveObjectCreationException, NodeException {
@@ -1186,6 +1216,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         Node node, Active activity, MetaObjectFactory factory)
@@ -1207,6 +1238,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         String nameOfTargetType, Node node)
@@ -1236,6 +1268,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         String nameOfTargetType, Node node, Active activity,
@@ -1295,6 +1328,7 @@ public class ProActive {
      * @return an array of references (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     * @deprecated
      */
     public static Object turnActiveAsGroup(Object target,
         Class[] genericParameters, String nameOfTargetType,
@@ -1304,7 +1338,7 @@ public class ProActive {
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
             try {
-                aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
+                aoGroup = ProGroup.getGroup(ProGroup.newGroup(
                             target.getClass().getName(), genericParameters));
             } catch (ClassNotFoundException e) {
                 throw new ActiveObjectCreationException(
@@ -1339,6 +1373,7 @@ public class ProActive {
      * The registered object will be reachable with the following url: protocol://machine_name:port/name
      * using lookupActive method. Protocol and port can be removed if default
      * @exception java.io.IOException if the remote body cannot be registered
+     * @deprecated
      */
     public static void register(Object obj, String url)
         throws java.io.IOException {
@@ -1360,6 +1395,7 @@ public class ProActive {
      * Unregisters an active object previously registered into a registry.
      * @param url the url under which the active object is registered.
      * @exception java.io.IOException if the remote object cannot be removed from the registry
+     * @deprecated
      */
     public static void unregister(String url) throws java.io.IOException {
         String protocol = URIBuilder.getProtocol(url);
@@ -1397,6 +1433,7 @@ public class ProActive {
      * @exception java.io.IOException if the remote body cannot be found under the given url
      *      or if the object found is not of type RmiRemoteBody
      * @exception ActiveObjectCreationException if the stub-proxy couple cannot be created
+     * @deprecated
      */
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
@@ -1435,6 +1472,7 @@ public class ProActive {
      * //machine_name
      * @return String [] the list of names registered on the host; if no Registry found, returns {}
      * @throws IOException If the given url does not map to a physical host, or if the connection is refused.
+     * @deprecated
      */
     public static String[] listActive(String url) throws java.io.IOException {
         String[] activeNames = null;
@@ -1456,6 +1494,7 @@ public class ProActive {
      * Return the URL of the remote <code>activeObject</code>.
      * @param activeObject the remote active object.
      * @return the URL of <code>activeObject</code>.
+     * @deprecated
      */
     public static String getActiveObjectNodeUrl(Object activeObject) {
         UniversalBody body = getRemoteBody(activeObject);
@@ -1471,6 +1510,7 @@ public class ProActive {
      * @param methodName the name of the method to call on the current active object
      * @throws IllegalArgumentException if the first argument is not a future or if
      * the method could not be found
+     * @deprecated
      */
     public static void addActionOnFuture(Object future, String methodName) {
         FutureProxy f;
@@ -1488,6 +1528,7 @@ public class ProActive {
      * Find out if the object contains an exception that should be thrown
      * @param future the future object that is examinated
      * @return true iff an exception should be thrown when accessing the object
+     * @deprecated
      */
     public static boolean isException(Object future) {
         // If the object is not reified, it cannot be a future
@@ -1512,6 +1553,7 @@ public class ProActive {
      * of blocking the caller thread asking for a result not yet available.
      * This method allows to block before the result is first used.
      * @param future object to wait for
+     * @deprecated
      */
     public static void waitFor(Object future) {
         // If the object is not reified, it cannot be a future
@@ -1538,6 +1580,7 @@ public class ProActive {
      * @param future object to wait for
      * @param timeout to wait in ms
      * @throws ProActiveException if the timeout expire
+     * @deprecated
      */
     public static void waitFor(Object future, long timeout)
         throws ProActiveException {
@@ -1562,6 +1605,7 @@ public class ProActive {
      * @return the pad located at the url given by proactive.pad system's property
      * @throws ProActiveException
      * @throws RemoteException
+     * @deprecated
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor()
         throws ProActiveException, IOException {
@@ -1585,6 +1629,7 @@ public class ProActive {
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
+     * @deprecated
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
@@ -1601,6 +1646,7 @@ public class ProActive {
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
+     * @deprecated
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract)
@@ -1613,6 +1659,9 @@ public class ProActive {
         return getProActiveDescriptor(xmlDescriptorUrl, variableContract, false);
     }
 
+    /**
+     * @deprecated 
+     */
     private static ProActiveDescriptorInternal getProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
@@ -1648,6 +1697,9 @@ public class ProActive {
         //return getProactiveDescriptor(xmlDescriptorUrl, false);
     }
 
+    /**
+     * @deprecated 
+     */
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
@@ -1669,6 +1721,7 @@ public class ProActive {
      * @return the pad found or a new pad parsed from xmlDescriptorUrl
      * @throws ProActiveException
      * @throws RemoteException
+     * @deprecated
      */
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor_new(
         String xmlDescriptorUrl, VariableContract variableContract,
@@ -1733,6 +1786,7 @@ public class ProActive {
      * @return the pad found or a new pad parsed from xmlDescriptorUrl
      * @throws ProActiveException
      * @throws RemoteException
+     * @deprecated
      */
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor_old(
         String xmlDescriptorUrl, VariableContract variableContract,
@@ -1798,6 +1852,7 @@ public class ProActive {
      * proactive.communication.protocol
      * @param replacePreviousBinding
      * @throws ProActiveException If the VirtualNode with the given name has not been yet activated or does not exist on the local runtime
+     * @deprecated
      */
     public static void registerVirtualNode(VirtualNode virtualNode,
         String registrationProtocol, boolean replacePreviousBinding)
@@ -1828,6 +1883,7 @@ public class ProActive {
      * //machine_name/name
      * @return VirtualNode The virtualNode returned by the lookup
      * @throws ProActiveException If no objects are bound with the given url
+     * @deprecated
      */
     public static VirtualNode lookupVirtualNode(String url)
         throws ProActiveException {
@@ -1843,6 +1899,7 @@ public class ProActive {
      * Calling this method removes the VirtualNode from the local runtime.
      * @param virtualNode The VirtualNode to unregister
      * @throws ProActiveException if a problem occurs whle unregistering the VirtualNode
+     * @deprecated
      */
     public static void unregisterVirtualNode(VirtualNode virtualNode)
         throws ProActiveException {
@@ -1874,6 +1931,7 @@ public class ProActive {
      * @return the body associated to the active object whose active thread is calling
      *     this method.
      * @throws ProActiveException
+     * @deprecated
      */
     public static Body getBodyOnThis() {
         return LocalBodyStore.getInstance().getContext().getBody();
@@ -1885,6 +1943,7 @@ public class ProActive {
      * the currently served request if any.
      * @return the current execution context associated to the calling thread.
      * @see org.objectweb.proactive.core.body.Context
+     * @deprecated
      */
     public static Context getContext() {
         return LocalBodyStore.getInstance().getContext();
@@ -1895,6 +1954,7 @@ public class ProActive {
      * object whose active thread is calling this method.
      * @return a Stub-Proxy couple pointing to the local body.
      * @see #getBodyOnThis
+     * @deprecated
      */
     public static StubObject getStubOnThis() {
         Body body = getBodyOnThis();
@@ -1918,6 +1978,7 @@ public class ProActive {
      * @param activeObject the active object indicating the destination of the migration.
      * @exception MigrationException if the migration fails
      * @see #getBodyOnThis
+     * @deprecated
      */
     public static void migrateTo(Object activeObject) throws MigrationException {
         migrateTo(getNodeFromURL(getNodeURLFromActiveObject(activeObject)));
@@ -1932,6 +1993,7 @@ public class ProActive {
      * @param nodeURL the url of an existing where to migrate to.
      * @exception MigrationException if the migration fails
      * @see #getBodyOnThis
+     * @deprecated
      */
     public static void migrateTo(String nodeURL) throws MigrationException {
         if (logger.isDebugEnabled()) {
@@ -1948,6 +2010,7 @@ public class ProActive {
      * @param node an existing node where to migrate to.
      * @exception MigrationException if the migration fails
      * @see #getBodyOnThis
+     * @deprecated
      */
     public static void migrateTo(Node node) throws MigrationException {
         if (logger.isDebugEnabled()) {
@@ -1971,6 +2034,7 @@ public class ProActive {
      * @param activeObject the active object indicating the destination of the migration.
      * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
+     * @deprecated
      */
     public static void migrateTo(Body bodyToMigrate, Object activeObject,
         boolean isNFRequest) throws MigrationException {
@@ -1988,6 +2052,7 @@ public class ProActive {
      * @param nodeURL the url of an existing where to migrate to.
      * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
+     * @deprecated
      */
     public static void migrateTo(Body bodyToMigrate, String nodeURL,
         boolean isNFRequest) throws MigrationException {
@@ -2003,6 +2068,7 @@ public class ProActive {
      * @param node an existing node where to migrate to.
      * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
+     * @deprecated
      */
     public static void migrateTo(Body bodyToMigrate, Node node,
         boolean isNFRequest) throws MigrationException {
@@ -2022,6 +2088,7 @@ public class ProActive {
      * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @param priority  the level of priority of the non functional request. Levels are defined in Request interface of ProActive.
      * @exception MigrationException if the migration fails
+     * @deprecated
      */
     public static void migrateTo(Body bodyToMigrate, Node node,
         boolean isNFRequest, int priority) throws MigrationException {
@@ -2049,6 +2116,7 @@ public class ProActive {
      * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
      * @param futures vector of futures
      * @return index of the available future in the vector
+     * @deprecated
      */
     public static int waitForAny(java.util.Vector futures) {
         try {
@@ -2068,6 +2136,7 @@ public class ProActive {
      * @param timeout to wait in ms
      * @return index of the available future in the vector
      * @throws ProActiveException if the timeout expires
+     * @deprecated
      */
     public static int waitForAny(java.util.Vector futures, long timeout)
         throws ProActiveException {
@@ -2104,6 +2173,7 @@ public class ProActive {
     /**
      * Blocks the calling thread until all futures in the vector are available.
      * @param futures vector of futures
+     * @deprecated
      */
     public static void waitForAll(java.util.Vector futures) {
         try {
@@ -2120,6 +2190,7 @@ public class ProActive {
      * @param futures vector of futures
      * @param timeout to wait in ms
      * @throws ProActiveException if the timeout expires
+     * @deprecated
      */
     public static void waitForAll(java.util.Vector futures, long timeout)
         throws ProActiveException {
@@ -2137,6 +2208,7 @@ public class ProActive {
      * Blocks the calling thread until the N-th of the futures in the vector is available.
      * @param futures vector of futures
      * @param n index of future to wait
+     * @deprecated
      */
     public static void waitForTheNth(java.util.Vector futures, int n) {
         waitFor(futures.get(n));
@@ -2148,6 +2220,7 @@ public class ProActive {
      * @param n
      * @param timeout to wait in ms
      * @throws ProActiveException if the timeout expires
+     * @deprecated
      */
     public static void waitForTheNth(java.util.Vector futures, int n,
         long timeout) throws ProActiveException {
@@ -2160,6 +2233,7 @@ public class ProActive {
      * @param futures a table with futures.
      * @return <code>true</code> if all futures are awaited, else <code>false
      * </code>.
+     * @deprecated
      */
     public static boolean allAwaited(java.util.Vector futures) {
         FuturePool fp = getBodyOnThis().getFuturePool();
@@ -2182,6 +2256,7 @@ public class ProActive {
      * Return false if the object <code>future</code> is available.
      * This method is recursive, i.e. if result of future is a future too,
      * <CODE>isAwaited</CODE> is called again on this result, and so on.
+     * @deprecated
      */
     public static boolean isAwaited(Object future) {
         // If the object is not reified, it cannot be a future
@@ -2209,6 +2284,7 @@ public class ProActive {
      * A wait-by-necessity occurs if future is not available.
      * This method is recursive, i.e. if result of future is a future too,
      * <CODE>getFutureValue</CODE> is called again on this result, and so on.
+     * @deprecated
      */
     public static Object getFutureValue(Object future) {
         while (true) {
@@ -2230,6 +2306,7 @@ public class ProActive {
 
     /**
      * Enable the automatic continuation mechanism for this active object.
+     * @deprecated
      */
     public static void enableAC(Object obj) throws java.io.IOException {
         UniversalBody body = getRemoteBody(obj);
@@ -2238,6 +2315,7 @@ public class ProActive {
 
     /**
      * Disable the automatic continuation mechanism for this active object.
+     * @deprecated
      */
     public static void disableAC(Object obj) throws java.io.IOException {
         UniversalBody body = getRemoteBody(obj);
@@ -2251,6 +2329,7 @@ public class ProActive {
      * The termination is then synchronous.
      * The active object dies immediatly. Else, the kill request is served as a normal request, it
      * is put on the request queue. The termination is asynchronous.
+     * @deprecated
      */
     public static void terminateActiveObject(Object ao, boolean immediate) {
         if (MOP.isReifiedObject(ao)) {
@@ -2281,6 +2360,7 @@ public class ProActive {
      * The termination is then synchronous.
      * The active object dies immediatly. Else, the kill request is served as a normal request, it
      * is put on the request queue. The termination is asynchronous.
+     * @deprecated
      */
     public static void terminateActiveObject(boolean immediate) {
         terminateActiveObject(ProActive.getStubOnThis(), immediate);
@@ -2292,6 +2372,7 @@ public class ProActive {
      * returns true.
      * @param target the pinged active object.
      * @return true if the active object is reachable, false otherwise.
+     * @deprecated
      */
     public static boolean pingActiveObject(Object target) {
         UniversalBody targetedBody = null;
@@ -2318,6 +2399,7 @@ public class ProActive {
      * current services, so it is the programmer responsibility to ensure that Immediate Services
      * do not interfere with any other methods.
      * @param methodName the name of the method
+     * @deprecated
      */
     public static void setImmediateService(String methodName) {
         getBodyOnThis().setImmediateService(methodName);
@@ -2332,6 +2414,7 @@ public class ProActive {
      * do not interfere with any other methods.
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
+     * @deprecated
      */
     public static void setImmediateService(String methodName,
         Class[] parametersTypes) {
@@ -2342,6 +2425,7 @@ public class ProActive {
      * Removes an immmediate execution for the active object obj, i.e. requests corresponding to the name
      * will be executed by the calling thread, and not added in the request queue.
      * @param methodName the name of the method
+     * @deprecated
      */
     public static void removeImmediateService(String methodName) {
         getBodyOnThis().removeImmediateService(methodName);
@@ -2352,6 +2436,7 @@ public class ProActive {
      * will be executed by the calling thread, and not added in the request queue.
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
+     * @deprecated
      */
     public static void removeImmediateService(String methodName,
         Class[] parametersTypes) {
@@ -2361,6 +2446,7 @@ public class ProActive {
     /**
      * @param obj
      * @return
+     * @deprecated
      */
     private static UniversalBody getRemoteBody(Object obj) {
         // Check if obj is really a reified object
@@ -2384,6 +2470,7 @@ public class ProActive {
 
     /**
      * @return the jobId associated with the object calling this method
+     * @deprecated
      */
     public static String getJobId() {
         return ProActive.getBodyOnThis().getJobID();
@@ -2392,6 +2479,9 @@ public class ProActive {
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
+    /**
+     * @deprecated
+     */
     private static String getNodeURLFromActiveObject(Object o)
         throws MigrationException {
         //first we check if the parameter is an active object,
@@ -2406,6 +2496,9 @@ public class ProActive {
         return destProxy.getBody().getNodeURL();
     }
 
+    /**
+     * @deprecated
+     */
     private static Node getNodeFromURL(String url) throws MigrationException {
         try {
             return NodeFactory.getNode(url);
@@ -2420,6 +2513,9 @@ public class ProActive {
     // STUB CREATION
     //
     // -------------------------------------------------------------------------------------------
+    /**
+     * @deprecated
+     */
     private static StubObject getStubForBody(Body body) {
         try {
             return createStubObject(body.getReifiedObject(),
@@ -2431,11 +2527,17 @@ public class ProActive {
         }
     }
 
+    /**
+     * @deprecated
+     */
     public static Object createStubObject(String className, UniversalBody body)
         throws MOPException {
         return createStubObject(className, null, null, new Object[] { body });
     }
 
+    /**
+     * @deprecated
+     */
     private static Object createStubObject(String className,
         Class[] genericParameters, Object[] constructorParameters, Node node,
         Active activity, MetaObjectFactory factory) throws MOPException {
@@ -2444,6 +2546,9 @@ public class ProActive {
             new Object[] { node, activity, factory, ProActive.getJobId() });
     }
 
+    /**
+     * @deprecated
+     */
     private static Object createStubObject(String className,
         Class[] genericParameters, Object[] constructorParameters,
         Object[] proxyParameters) throws MOPException {
@@ -2457,6 +2562,9 @@ public class ProActive {
         }
     }
 
+    /**
+     * @deprecated
+     */
     private static Object createStubObject(Object target,
         String nameOfTargetType, Class[] genericParameters, Node node,
         Active activity, MetaObjectFactory factory) throws MOPException {
@@ -2465,6 +2573,9 @@ public class ProActive {
             nameOfTargetType, genericParameters);
     }
 
+    /**
+     * @deprecated
+     */
     private static StubObject createStubObject(Object object,
         Object[] proxyParameters, String nameOfTargetType,
         Class[] genericParameters) throws MOPException {
@@ -2483,6 +2594,7 @@ public class ProActive {
      * This has to be called just before a try block for a single exception.
      *
      * @param c the caught exception type in the catch block
+     * @deprecated
      */
     public static void tryWithCatch(Class c) {
         tryWithCatch(new Class[] { c });
@@ -2492,6 +2604,7 @@ public class ProActive {
      * This has to be called just before a try block for many exceptions.
      *
      * @param c the caught exception types in the catch block
+     * @deprecated
      */
     public static void tryWithCatch(Class[] c) {
         ExceptionHandler.tryWithCatch(c);
@@ -2499,6 +2612,7 @@ public class ProActive {
 
     /**
      * This has to be called at the end of the try block.
+     * @deprecated
      */
     public static void endTryWithCatch() {
         ExceptionHandler.endTryWithCatch();
@@ -2507,6 +2621,7 @@ public class ProActive {
     /**
      * This has to be called at the beginning of the finally block, so
      * it requires one.
+     * @deprecated
      */
     public static void removeTryWithCatch() {
         ExceptionHandler.removeTryWithCatch();
@@ -2515,6 +2630,7 @@ public class ProActive {
     /**
      * This can be used to query a potential returned exception, and
      * throw it if it exists.
+     * @deprecated
      */
     public static void throwArrivedException() {
         ExceptionHandler.throwArrivedException();
@@ -2523,6 +2639,7 @@ public class ProActive {
     /**
      * This is used to wait for the return of every call, so that we know
      * the execution can continue safely with no pending exception.
+     * @deprecated
      */
     public static void waitForPotentialException() {
         ExceptionHandler.waitForPotentialException();
@@ -2532,6 +2649,7 @@ public class ProActive {
      * Add a listener for NFE reaching the local JVM
      *
      * @param listener The listener to add
+     * @deprecated
      */
     public static void addNFEListenerOnJVM(NFEListener listener) {
         NFEManager.addNFEListener(listener);
@@ -2541,6 +2659,7 @@ public class ProActive {
      * Remove a listener for NFE reaching the local JVM
      *
      * @param listener The listener to remove
+     * @deprecated
      */
     public static void removeNFEListenerOnJVM(NFEListener listener) {
         NFEManager.removeNFEListener(listener);
@@ -2551,6 +2670,7 @@ public class ProActive {
      *
      * @param ao The active object receiving the NFE
      * @param listener The listener to add
+     * @deprecated
      */
     public static void addNFEListenerOnAO(Object ao, NFEListener listener) {
 
@@ -2564,6 +2684,7 @@ public class ProActive {
      *
      * @param ao The active object receiving the NFE
      * @param listener The listener to remove
+     * @deprecated
      */
     public static void removeNFEListenerOnAO(Object ao, NFEListener listener) {
         UniversalBody body = getRemoteBody(ao);
@@ -2575,6 +2696,7 @@ public class ProActive {
      *
      * @param ao The active object receiving the NFE
      * @param listener The listener to add
+     * @deprecated
      */
     public static void addNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
@@ -2590,6 +2712,7 @@ public class ProActive {
      *
      * @param ao The active object receiving the NFE
      * @param listener The listener to remove
+     * @deprecated
      */
     public static void removeNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
@@ -2600,11 +2723,14 @@ public class ProActive {
         }
     }
 
+    /**
+     * @deprecated
+     */
     private static ProxyForGroup getGroupProxy(Object group) {
         ProxyForGroup pfg;
 
         try {
-            pfg = (ProxyForGroup) ProActiveGroup.getGroup(group);
+            pfg = (ProxyForGroup) ProGroup.getGroup(group);
         } catch (ClassCastException cce) {
             pfg = null;
         }
@@ -2621,6 +2747,7 @@ public class ProActive {
      *
      * @param group The group receiving the NFE
      * @param listener The listener to add
+     * @deprecated
      */
     public static void addNFEListenerOnGroup(Object group, NFEListener listener) {
         getGroupProxy(group).addNFEListener(listener);
@@ -2631,6 +2758,7 @@ public class ProActive {
      *
      * @param group The group receiving the NFE
      * @param listener The listener to remove
+     * @deprecated
      */
     public static void removeNFEListenerOnGroup(Object group,
         NFEListener listener) {
@@ -2643,6 +2771,7 @@ public class ProActive {
      * block. This waits for every call in this block to return.
      *
      * @return a collection of these exceptions
+     * @deprecated
      */
     public static Collection getAllExceptions() {
         return ExceptionHandler.getAllExceptions();
@@ -2651,6 +2780,7 @@ public class ProActive {
     /**
      * @return The node of the current active object.
      * @throws NodeException problem with the node.
+     * @deprecated
      */
     public static Node getNode() throws NodeException {
         BodyProxy destProxy = (BodyProxy) (getStubOnThis()).getProxy();

@@ -33,8 +33,8 @@ package org.objectweb.proactive.benchmarks.timit.util;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
 
@@ -135,7 +135,7 @@ public class TimItReductor implements Serializable {
         if (this.bstats != null) {
             return this.bstats;
         }
-        this.service = new Service(ProActive.getBodyOnThis());
+        this.service = new Service(ProActiveObject.getBodyOnThis());
 
         // Wait for the groupSize
         while (this.groupSize == 0) {
@@ -270,6 +270,6 @@ public class TimItReductor implements Serializable {
     }
 
     public void terminate() {
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 }

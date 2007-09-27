@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.examples.binarytree;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 
 
 public class Tree {
@@ -70,7 +70,7 @@ public class Tree {
                 display.displayMessage("[" + key + "] Creating left");
                 // Create the new node
                 try {
-                    left = (Tree) org.objectweb.proactive.ProActive.newActive(this.getClass()
+                    left = (Tree) org.objectweb.proactive.api.ProActiveObject.newActive(this.getClass()
                                                                                   .getName(),
                             new Object[] { key, value, display });
                 } catch (Exception e) {
@@ -80,7 +80,7 @@ public class Tree {
                 // Enabled Automatic Continuations
                 if (AC) {
                     try {
-                        org.objectweb.proactive.ProActive.enableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+                        org.objectweb.proactive.api.ProActiveObject.enableAC(org.objectweb.proactive.api.ProActiveObject.getStubOnThis());
                     } catch (java.io.IOException e) {
                         display.displayMessage("Automatic Continuations error!!!",
                             java.awt.Color.red);
@@ -94,7 +94,7 @@ public class Tree {
             } else {
                 display.displayMessage("[" + key + "] Creating right");
                 try {
-                    right = (Tree) org.objectweb.proactive.ProActive.newActive(this.getClass()
+                    right = (Tree) org.objectweb.proactive.api.ProActiveObject.newActive(this.getClass()
                                                                                    .getName(),
                             new Object[] { key, value, display });
                 } catch (Exception e) {
@@ -104,7 +104,7 @@ public class Tree {
                 // Enabled Automatic Continuations
                 if (AC) {
                     try {
-                        org.objectweb.proactive.ProActive.enableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+                        org.objectweb.proactive.api.ProActiveObject.enableAC(org.objectweb.proactive.api.ProActiveObject.getStubOnThis());
                     } catch (java.io.IOException e) {
                         display.displayMessage("Automatic Continuations error!!!",
                             java.awt.Color.red);
@@ -141,7 +141,7 @@ public class Tree {
         if (left != null) {
             left.delete();
         }
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     public String getKey() {
@@ -192,7 +192,7 @@ public class Tree {
     // Change Automatic Continuations state
     public void enableAC() {
         try {
-            org.objectweb.proactive.ProActive.enableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+            org.objectweb.proactive.api.ProActiveObject.enableAC(org.objectweb.proactive.api.ProActiveObject.getStubOnThis());
             if (right != null) {
                 right.enableAC();
             }
@@ -207,7 +207,7 @@ public class Tree {
 
     public void disableAC() {
         try {
-            org.objectweb.proactive.ProActive.disableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+            org.objectweb.proactive.api.ProActiveObject.disableAC(org.objectweb.proactive.api.ProActiveObject.getStubOnThis());
             if (right != null) {
                 right.disableAC();
             }

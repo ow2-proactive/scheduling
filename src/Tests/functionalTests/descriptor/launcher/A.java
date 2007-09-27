@@ -32,7 +32,7 @@ package functionalTests.descriptor.launcher;
 
 import java.io.IOException;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
@@ -63,7 +63,7 @@ public class A implements java.io.Serializable {
 
     public static void main(String[] args) {
         try {
-            ProActiveDescriptor pad = ProActive.getProactiveDescriptor();
+            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor();
 
             //System.out.println(pad) ;
             pad.activateMappings();

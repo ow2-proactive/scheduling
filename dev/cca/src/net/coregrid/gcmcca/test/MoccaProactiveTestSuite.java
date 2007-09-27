@@ -1,8 +1,5 @@
 package net.coregrid.gcmcca.test;
 
-
-
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.examples.hello.Hello;
 

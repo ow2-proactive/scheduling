@@ -40,7 +40,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -505,11 +505,11 @@ public class StartP2PService implements P2PConstants {
         }
 
         // P2PService Active Object Creation
-        this.p2pService = (P2PService) ProActive.newActive(P2PService.class.getName(),
+        this.p2pService = (P2PService) ProActiveObject.newActive(P2PService.class.getName(),
                 null, url);
 
         try {
-            ProActive.enableAC(this.p2pService);
+            ProActiveObject.enableAC(this.p2pService);
         } catch (IOException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Couldn't enable AC for the P2P service", e);

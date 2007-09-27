@@ -58,7 +58,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -213,7 +213,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     String domainURL = PAProperties.PA_RUNTIME_DOMAIN_URL.getValue();
 
                     if (domainURL != null) {
-                        SecurityEntity domain = (SecurityDomain) ProActive.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
+                        SecurityEntity domain = (SecurityDomain) ProActiveObject.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
                                 domainURL);
                         ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }

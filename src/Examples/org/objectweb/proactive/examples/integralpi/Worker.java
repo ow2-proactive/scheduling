@@ -33,8 +33,8 @@ package org.objectweb.proactive.examples.integralpi;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 
@@ -86,9 +86,9 @@ public class Worker implements Serializable {
         // ProActive initialization
         rank = ProSPMD.getMyRank();
         groupSize = ProSPMD.getMySPMDGroupSize();
-        workersArray = (Worker[]) ProActiveGroup.getGroup(ProSPMD.getSPMDGroup())
+        workersArray = (Worker[]) ProGroup.getGroup(ProSPMD.getSPMDGroup())
                                                 .toArray(new Worker[0]);
-        body = ProActive.getBodyOnThis();
+        body = ProActiveObject.getBodyOnThis();
 
         if (this.rank == 0) {
             // Call start on each other

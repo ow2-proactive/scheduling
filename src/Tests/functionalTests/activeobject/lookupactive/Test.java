@@ -30,7 +30,7 @@
  */
 package functionalTests.activeobject.lookupactive;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
@@ -46,13 +46,13 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        A a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
+        A a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
         a.register();
 
         // check lookup works
         String url = URIBuilder.buildURIFromProperties("localhost", "A")
                                .toString();
-        a = (A) ProActive.lookupActive(A.class.getName(), url);
+        a = (A) ProActiveObject.lookupActive(A.class.getName(), url);
 
         assertTrue(a != null);
         assertEquals(a.getName(), "toto");
@@ -60,7 +60,7 @@ public class Test extends FunctionalTest {
         // check listActive contains the previous lookup
         String host = URIBuilder.buildURIFromProperties("localhost", "")
                                 .toString();
-        String[] registered = ProActive.listActive(host);
+        String[] registered = ProActiveObject.listActive(host);
         assertNotNull(registered);
 
         for (int i = 0; i < registered.length; i++) {

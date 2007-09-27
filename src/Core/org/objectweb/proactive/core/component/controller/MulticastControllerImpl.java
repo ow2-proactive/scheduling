@@ -50,6 +50,7 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
@@ -62,7 +63,6 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -247,7 +247,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
     public void unbindFcMulticast(String clientItfName,
         ProActiveInterface serverItf) {
         if (multicastItfs.containsKey(clientItfName)) {
-            if (ProActiveGroup.getGroup(multicastItfs.get(clientItfName))
+            if (ProGroup.getGroup(multicastItfs.get(clientItfName))
                                   .remove(serverItf)) {
                 logger.debug(
                     "removed connected interface from multicast interface : " +
@@ -405,7 +405,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
         init();
         if (logger.isDebugEnabled()) {
             try {
-                if (!ProActiveGroup.isGroup(serverItf.getFcItfOwner())) {
+                if (!ProGroup.isGroup(serverItf.getFcItfOwner())) {
                     logger.debug("multicast binding : " + clientItfName +
                         " to : " +
                         Fractal.getNameController(serverItf.getFcItfOwner())

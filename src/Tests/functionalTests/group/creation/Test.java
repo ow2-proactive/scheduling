@@ -31,8 +31,8 @@
 package functionalTests.group.creation;
 
 import org.junit.Before;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getRemoteVMNode()
             };
 
-        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(),
                 params, nodes);
         return this.typedGroup;
     }
@@ -76,7 +76,7 @@ public class Test extends FunctionalTest {
 
         // was the group created ?
         assertTrue(typedGroup != null);
-        Group agentGroup = ProActiveGroup.getGroup(this.typedGroup);
+        Group agentGroup = ProGroup.getGroup(this.typedGroup);
 
         // has the group the right size ?
         assertTrue(agentGroup.size() == 3);

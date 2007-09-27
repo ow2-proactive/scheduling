@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.examples.jmx.remote.management.client.entities.RemoteGateway;
@@ -86,7 +86,7 @@ public class GatewayRefresher {
                     GenericTypeWrapper<Object> gtw = (GenericTypeWrapper<Object>) paConn.getAttributeAsynchronous(gateway.getOn(),
                             "Bundles");
 
-                    ProActive.waitFor(gtw);
+                    ProFuture.waitFor(gtw);
                     Object o = gtw.getObject();
                     if (o instanceof ArrayList) {
                         gateway.setBundles((ArrayList<BundleInfo>) o);

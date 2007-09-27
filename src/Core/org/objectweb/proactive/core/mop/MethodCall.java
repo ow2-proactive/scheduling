@@ -39,7 +39,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
@@ -378,7 +378,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             this.reifiedMethod.setAccessible(true);
         }
         try {
-            targetObject = ProActive.getFutureValue(targetObject);
+            targetObject = ProFuture.getFutureValue(targetObject);
             return this.reifiedMethod.invoke(targetObject,
                 this.effectiveArguments);
         } catch (IllegalAccessException e) {

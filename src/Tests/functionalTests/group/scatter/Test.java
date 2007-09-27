@@ -30,8 +30,8 @@
  */
 package functionalTests.group.scatter;
 
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -64,7 +64,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(),
                 params, nodes);
         Object[][] paramsParameter = {
                 { "AgentA" },
@@ -75,23 +75,23 @@ public class Test extends FunctionalTest {
                 TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(),
                 TestNodes.getLocalVMNode()
             };
-        this.parameterGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+        this.parameterGroup = (A) ProGroup.newGroup(A.class.getName(),
                 paramsParameter, nodesParameter);
 
-        ProActiveGroup.setScatterGroup(this.parameterGroup);
+        ProGroup.setScatterGroup(this.parameterGroup);
         this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
-        ProActiveGroup.unsetScatterGroup(this.parameterGroup);
+        ProGroup.unsetScatterGroup(this.parameterGroup);
 
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
 
-        Group group = ProActiveGroup.getGroup(this.typedGroup);
-        Group groupResult = ProActiveGroup.getGroup(this.resultTypedGroup);
+        Group group = ProGroup.getGroup(this.typedGroup);
+        Group groupResult = ProGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupResult.size() == group.size());
 
-        Group groupParameter = ProActiveGroup.getGroup(this.parameterGroup);
+        Group groupParameter = ProGroup.getGroup(this.parameterGroup);
         boolean rightRankingAndCorrectnessOfResults = true;
         for (int i = 0; i < group.size(); i++) {
             // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?

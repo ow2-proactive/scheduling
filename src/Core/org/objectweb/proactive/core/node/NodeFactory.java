@@ -34,7 +34,7 @@ import java.net.URISyntaxException;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -94,7 +94,7 @@ public class NodeFactory {
         String nodeURL = null;
 
         ProActiveRuntime defaultRuntime = null;
-        String jobID = ProActive.getJobId();
+        String jobID = ProActiveObject.getJobId();
         ProActiveSecurityManager securityManager = null;
 
         if (defaultNode == null) {

@@ -30,7 +30,7 @@
  */
 package functionalTests.descriptor.mistakes;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.xml.VariableContract;
 
@@ -55,7 +55,7 @@ public class Test extends FunctionalTest {
         // We try to parse an XML Deployment Descriptor with mistakes, an
         // exception must be thrown
         try {
-            pad = ProActive.getProactiveDescriptor(TESTMISTAKES_XML_LOCATION_UNIX);
+            pad = ProDeployment.getProactiveDescriptor(TESTMISTAKES_XML_LOCATION_UNIX);
             testSuccess = false;
         } catch (Exception e) {
             // Mistake found as expected
@@ -76,7 +76,7 @@ public class Test extends FunctionalTest {
         // released.
         VariableContract variableContract = new VariableContract();
         try {
-            pad1 = ProActive.getProactiveDescriptor(TESTVARIABLES_XML_LOCATION_UNIX,
+            pad1 = ProDeployment.getProactiveDescriptor(TESTVARIABLES_XML_LOCATION_UNIX,
                     variableContract);
             // Descriptor parsed witout mistakes
         } catch (Exception e) {

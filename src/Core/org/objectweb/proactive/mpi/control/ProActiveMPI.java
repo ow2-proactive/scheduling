@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
 
@@ -45,7 +45,7 @@ public class ProActiveMPI {
         if (manager == null) {
             // create manager
             try {
-                manager = (ProActiveMPIManager) ProActive.newActive(ProActiveMPIManager.class.getName(),
+                manager = (ProActiveMPIManager) ProActiveObject.newActive(ProActiveMPIManager.class.getName(),
                         new Object[] {  });
                 //  VectorResult vres = 
                 manager.deploy(spmdList);

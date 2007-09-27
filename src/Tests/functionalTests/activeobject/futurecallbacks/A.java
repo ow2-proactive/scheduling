@@ -2,7 +2,7 @@ package functionalTests.activeobject.futurecallbacks;
 
 import java.util.concurrent.Future;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.MutableInteger;
 
 
@@ -24,10 +24,10 @@ public class A {
 
     public void start() {
         MutableInteger slow = this.brother.slow();
-        ProActive.addActionOnFuture(slow, "myCallback");
+        ProFuture.addActionOnFuture(slow, "myCallback");
         MutableInteger fast = this.brother.fast();
-        ProActive.waitFor(fast);
-        ProActive.addActionOnFuture(fast, "myCallback");
+        ProFuture.waitFor(fast);
+        ProFuture.addActionOnFuture(fast, "myCallback");
     }
 
     public MutableInteger slow() {

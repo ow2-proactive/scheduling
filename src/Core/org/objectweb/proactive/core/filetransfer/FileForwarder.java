@@ -35,7 +35,8 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -69,7 +70,7 @@ class FileForwarder {
         servingFTS = fts; //direct reference to the object (not a stub)
 
         try { //TODO handle the exception
-            dispatcher = (FileDispatcher) ProActive.newActive(FileDispatcher.class.getName(),
+            dispatcher = (FileDispatcher) ProActiveObject.newActive(FileDispatcher.class.getName(),
                     null);
         } catch (Exception e) {
         }
@@ -213,7 +214,7 @@ class FileForwarder {
             if (file.length() > 0) {
                 OperationStatus opRes = servingFTS.sendFile(ftr.getDestinationFTS(),
                         ftr.getSrcFile(), ftr.getDstFile());
-                ProActive.waitFor(opRes); //wait for the send to finish (possibly with errors)
+                ProFuture.waitFor(opRes); //wait for the send to finish (possibly with errors)
                 if (opRes.hasException()) {
                     ftr.setDstFuture(opRes); //Update the future with the error.
                     addToHash(failedRequests, file, ftr);
@@ -267,7 +268,7 @@ class FileForwarder {
                         ftr.getDstFile()));
             }
         }
-        ProActive.waitForAll(opStat);
+        ProFuture.waitForAll(opStat);
     }
 
     public synchronized void clearNewRequests(File srcFile) {

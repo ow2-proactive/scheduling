@@ -39,8 +39,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -524,7 +524,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     BodyNonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
                             "Exception occured while serving pending request = " +
                             request.getMethodName(), e, this,
-                            ProActive.getBodyOnThis());
+                            ProActiveObject.getBodyOnThis());
                     NFEManager.fireNFE(calleeNFE, BodyImpl.this);
 
                     // Create a non functional exception encapsulating the service exception

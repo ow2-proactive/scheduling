@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -77,7 +77,7 @@ public class TimItStore {
      * @return an instance of TimerStore
      */
     synchronized public static TimItStore getInstance(Timed timed) {
-        Body body = ProActive.getBodyOnThis();
+        Body body = ProActiveObject.getBodyOnThis();
 
         if (body == null) {
             if (vmInstance == null) {

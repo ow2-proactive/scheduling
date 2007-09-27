@@ -48,13 +48,13 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -124,8 +124,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
     }
 
     public boolean isSubComponent(Component component) {
-        if (ProActiveGroup.isGroup(component)) {
-            Group<Component> group = ProActiveGroup.getGroup(component);
+        if (ProGroup.isGroup(component)) {
+            Group<Component> group = ProGroup.getGroup(component);
             for (Iterator<Component> it = group.iterator(); it.hasNext();) {
                 if (!fcSubComponents.contains(it.next())) {
                     return false;
@@ -152,9 +152,9 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         // pb is that the subComponent might not be stopped
         try {
             // could not do this invocation on a group (non reifiable return type)
-            if (ProActiveGroup.isGroup(subComponent)) {
+            if (ProGroup.isGroup(subComponent)) {
                 try {
-                    addFcSubComponent(ProActiveGroup.getGroup(subComponent));
+                    addFcSubComponent(ProGroup.getGroup(subComponent));
                 } catch (ContentControllerExceptionListException e) {
                     e.printStackTrace();
                     throw new IllegalContentException(

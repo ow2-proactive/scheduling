@@ -32,7 +32,8 @@ package functionalTests.activeobject.wrapper;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleMutableWrapper;
@@ -74,7 +75,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        this.ao = (A) ProActive.newActive(A.class.getName(), null);
+        this.ao = (A) ProActiveObject.newActive(A.class.getName(), null);
     }
 
     @org.junit.Test
@@ -95,18 +96,18 @@ public class Test extends FunctionalTest {
         this.string = this.ao.testStringWrapper();
         this.flt = this.ao.testFloatWrapper();
 
-        assertTrue(ProActive.isAwaited(this.boolMutable));
-        assertTrue(ProActive.isAwaited(this.dbleMutable));
-        assertTrue(ProActive.isAwaited(this.integerMutable));
-        assertTrue(ProActive.isAwaited(this.longNumberMutable));
-        assertTrue(ProActive.isAwaited(this.stringMutable));
-        assertTrue(ProActive.isAwaited(this.fltMutable));
-        assertTrue(ProActive.isAwaited(this.bool));
-        assertTrue(ProActive.isAwaited(this.dble));
-        assertTrue(ProActive.isAwaited(this.integer));
-        assertTrue(ProActive.isAwaited(this.longNumber));
-        assertTrue(ProActive.isAwaited(this.string));
-        assertTrue(ProActive.isAwaited(this.flt));
+        assertTrue(ProFuture.isAwaited(this.boolMutable));
+        assertTrue(ProFuture.isAwaited(this.dbleMutable));
+        assertTrue(ProFuture.isAwaited(this.integerMutable));
+        assertTrue(ProFuture.isAwaited(this.longNumberMutable));
+        assertTrue(ProFuture.isAwaited(this.stringMutable));
+        assertTrue(ProFuture.isAwaited(this.fltMutable));
+        assertTrue(ProFuture.isAwaited(this.bool));
+        assertTrue(ProFuture.isAwaited(this.dble));
+        assertTrue(ProFuture.isAwaited(this.integer));
+        assertTrue(ProFuture.isAwaited(this.longNumber));
+        assertTrue(ProFuture.isAwaited(this.string));
+        assertTrue(ProFuture.isAwaited(this.flt));
     }
 
     @After

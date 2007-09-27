@@ -35,7 +35,8 @@ import java.text.CharacterIterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -96,7 +97,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         // Create the DisplayManager
         try {
             display = new TreeDisplay(this);
-            display = (TreeDisplay) org.objectweb.proactive.ProActive.turnActive(display);
+            display = (TreeDisplay) org.objectweb.proactive.api.ProActiveObject.turnActive(display);
             treePanel.setDisplay(display);
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +106,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 
     public static void main(String[] arg) {
         try {
-            org.objectweb.proactive.ProActive.newActive(TreeApplet.class.getName(),
+            org.objectweb.proactive.api.ProActiveObject.newActive(TreeApplet.class.getName(),
                 new Object[] { "Binary Tree", new Integer(900), new Integer(600) });
         } catch (ActiveObjectCreationException e) {
         } catch (NodeException e) {
@@ -259,7 +260,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (AC) {
                         try {
-                            ProActive.disableAC(display);
+                            ProActiveObject.disableAC(display);
                             display.disableAC();
                             receiveMessage("Automatic continuation disabled...",
                                 new java.awt.Color(200, 100, 0));
@@ -268,7 +269,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                         }
                     } else {
                         try {
-                            ProActive.enableAC(display);
+                            ProActiveObject.enableAC(display);
                             display.enableAC();
                             receiveMessage("Automatic continuation enabled...",
                                 new java.awt.Color(200, 100, 0));
@@ -303,7 +304,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 
                         for (int i = 0; i < lng; i++) {
                             int key = 0;
-                            key = org.objectweb.proactive.ProActive.waitForAny(tab1);
+                            key = ProFuture.waitForAny(tab1);
                             res.add(new String[] {
                                     (String) (keys.get(
                                         vKeys.remove(key).intValue())),

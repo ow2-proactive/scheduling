@@ -31,7 +31,7 @@
 package functionalTests.timit.timers.basic;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
@@ -63,7 +63,7 @@ public class ActiveObjectClass implements java.io.Serializable {
     }
 
     public String getShortId() {
-        return ProActive.getBodyOnThis().getID().shortString();
+        return ProActiveObject.getBodyOnThis().getID().shortString();
     }
 
     public boolean checkRemoteAndLocalReference() {
@@ -74,7 +74,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      * Chekcs if the total timer is started.
      */
     public String checkIfTotalIsStarted() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActive.getBodyOnThis()
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                  .getID());
 
         // Check if the timer container is null
@@ -91,7 +91,7 @@ public class ActiveObjectClass implements java.io.Serializable {
     }
 
     public String checkIfWfrIsStopped() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActive.getBodyOnThis()
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                  .getID());
 
         // Check if the timer container is null
@@ -115,7 +115,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      * @return String The result of this test.
      */
     public String checkIfServeIsStarted() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActive.getBodyOnThis()
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                  .getID());
 
         // Check if the timer container is null
@@ -136,7 +136,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      * This method must be called once during the test
      */
     public String performSyncCallOnRemote() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActive.getBodyOnThis()
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                  .getID());
 
         // Check if the timer container is null
@@ -217,7 +217,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      * This method must be called once during the test
      */
     public String performSyncCallOnLocal() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActive.getBodyOnThis()
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                  .getID());
 
         // Check if the timer container is null
@@ -278,7 +278,7 @@ public class ActiveObjectClass implements java.io.Serializable {
     }
 
     public String performAsyncCallWithWbnOnLocal() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActive.getBodyOnThis()
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                  .getID());
 
         // Check if the timer container is null
@@ -348,9 +348,9 @@ public class ActiveObjectClass implements java.io.Serializable {
     public void terminate() {
         this.localReference = null;
         this.remoteReference = null;
-        Body b = ProActive.getBodyOnThis();
+        Body b = ProActiveObject.getBodyOnThis();
         //b.getFuturePool().disableAC();
-        ProActive.terminateActiveObject(true);
+        ProActiveObject.terminateActiveObject(true);
     }
 
     /**

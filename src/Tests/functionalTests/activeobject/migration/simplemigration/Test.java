@@ -31,7 +31,7 @@
 package functionalTests.activeobject.migration.simplemigration;
 
 import org.junit.Before;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -61,7 +61,7 @@ public class Test extends FunctionalTest {
         }
 
         localVmNode = TestNodes.getLocalVMNode();
-        a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" },
+        a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" },
                 sameVmNode);
         a.moveTo(localVmNode);
 
