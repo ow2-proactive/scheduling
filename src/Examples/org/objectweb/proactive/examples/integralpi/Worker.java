@@ -87,7 +87,7 @@ public class Worker implements Serializable {
         rank = ProSPMD.getMyRank();
         groupSize = ProSPMD.getMySPMDGroupSize();
         workersArray = (Worker[]) ProGroup.getGroup(ProSPMD.getSPMDGroup())
-                                                .toArray(new Worker[0]);
+                                          .toArray(new Worker[0]);
         body = ProActiveObject.getBodyOnThis();
 
         if (this.rank == 0) {

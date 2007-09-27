@@ -1239,7 +1239,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                 try {
                     url = defaultRuntime.createLocalNode(nodeName, false,
-                            siblingPSM, this.getName(), ProActiveObject.getJobId());
+                            siblingPSM, this.getName(),
+                            ProActiveObject.getJobId());
                     registrationAttempts = 0;
                 } catch (AlreadyBoundException e) {
                     registrationAttempts--;
@@ -1544,7 +1545,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             //  	ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
             //  	part.registerVirtualnode(this.name,false);
-            ProDeployment.registerVirtualNode(this, this.registrationProtocol, false);
+            ProDeployment.registerVirtualNode(this, this.registrationProtocol,
+                false);
         } catch (NodeException e) {
             logger.error(e.getMessage());
         } catch (ProActiveException e) {

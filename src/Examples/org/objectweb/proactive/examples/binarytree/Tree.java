@@ -71,7 +71,7 @@ public class Tree {
                 // Create the new node
                 try {
                     left = (Tree) org.objectweb.proactive.api.ProActiveObject.newActive(this.getClass()
-                                                                                  .getName(),
+                                                                                            .getName(),
                             new Object[] { key, value, display });
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -95,7 +95,7 @@ public class Tree {
                 display.displayMessage("[" + key + "] Creating right");
                 try {
                     right = (Tree) org.objectweb.proactive.api.ProActiveObject.newActive(this.getClass()
-                                                                                   .getName(),
+                                                                                             .getName(),
                             new Object[] { key, value, display });
                 } catch (Exception e) {
                     e.printStackTrace();

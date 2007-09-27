@@ -57,8 +57,8 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         assertTrue(TestNodes.getRemoteHostname() != null);
 
-        a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" },
-                TestNodes.getRemoteVMNode());
+        a = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] { "toto" }, TestNodes.getRemoteVMNode());
         name = a.getName();
         nodeUrl = a.getNodeUrl();
 

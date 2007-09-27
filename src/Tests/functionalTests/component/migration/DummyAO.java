@@ -60,7 +60,7 @@ public class DummyAO implements Serializable {
         Map context = new HashMap();
         ProActiveDescriptor deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/descriptor/deploymentDescriptor.xml")
-                                                                                              .getPath());
+                                                                                                  .getPath());
         context.put("deployment-descriptor", deploymentDescriptor);
 
         Component x = (Component) f.newComponent("functionalTests.component.migration.x",

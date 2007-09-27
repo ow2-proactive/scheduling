@@ -86,8 +86,7 @@ public class Context implements Serializable {
         if (this.currentRequest != null) {
             try {
                 UniversalBody caller = currentRequest.getSender();
-                return MOP.createStubObject(caller.getReifiedClassName(),
-                    caller);
+                return MOP.createStubObject(caller.getReifiedClassName(), caller);
             } catch (MOPException e) {
                 throw new ProActiveRuntimeException(
                     "Cannot create stub on caller : " + e);

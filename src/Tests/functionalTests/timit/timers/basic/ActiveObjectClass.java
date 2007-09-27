@@ -75,7 +75,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      */
     public String checkIfTotalIsStarted() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
-                                                                                                 .getID());
+                                                                                                       .getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -92,7 +92,7 @@ public class ActiveObjectClass implements java.io.Serializable {
 
     public String checkIfWfrIsStopped() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
-                                                                                                 .getID());
+                                                                                                       .getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -116,7 +116,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      */
     public String checkIfServeIsStarted() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
-                                                                                                 .getID());
+                                                                                                       .getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -137,7 +137,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      */
     public String performSyncCallOnRemote() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
-                                                                                                 .getID());
+                                                                                                       .getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -218,7 +218,7 @@ public class ActiveObjectClass implements java.io.Serializable {
      */
     public String performSyncCallOnLocal() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
-                                                                                                 .getID());
+                                                                                                       .getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -279,7 +279,7 @@ public class ActiveObjectClass implements java.io.Serializable {
 
     public String performAsyncCallWithWbnOnLocal() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
-                                                                                                 .getID());
+                                                                                                       .getID());
 
         // Check if the timer container is null
         if (c == null) {

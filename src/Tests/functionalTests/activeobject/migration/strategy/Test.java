@@ -57,7 +57,8 @@ public class Test extends FunctionalTest {
         nodesUrl[0] = TestNodes.getLocalVMNode().getNodeInformation().getURL();
         nodesUrl[1] = TestNodes.getSameVMNode().getNodeInformation().getURL();
         nodesUrl[2] = TestNodes.getRemoteVMNode().getNodeInformation().getURL();
-        a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { nodesUrl });
+        a = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] { nodesUrl });
 
         assertTrue(a.getCounter() == 7);
     }

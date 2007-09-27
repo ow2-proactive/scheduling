@@ -73,7 +73,7 @@ public class Test extends ComponentTest {
 
         ProActiveDescriptor deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/nonfunctional/creation/descriptor.xml")
-                                                                                              .getPath());
+                                                                                                  .getPath());
         deploymentDescriptor.activateMappings();
         VirtualNode vn = deploymentDescriptor.getVirtualNode("computers-vn");
         dummyNFComponent = cf.newNFcInstance(type_factory.createFcType(

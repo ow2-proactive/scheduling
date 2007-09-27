@@ -50,7 +50,8 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
+        a = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] { "toto" });
         name = a.getName();
         nodeUrl = a.getNodeUrl();
 

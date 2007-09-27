@@ -120,7 +120,8 @@ public class Chat implements java.io.Serializable, RunActive {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        this.addIntoDiffusionGroup((Chat) ProActiveObject.getStubOnThis(), this.name);
+        this.addIntoDiffusionGroup((Chat) ProActiveObject.getStubOnThis(),
+            this.name);
         this.writeMessage(new Message(" *** " + this.name +
                 " has joined the place"));
     }
@@ -147,7 +148,7 @@ public class Chat implements java.io.Serializable, RunActive {
             this.diffusionGroup.addIntoDiffusionGroup((Chat) ProActiveObject.getStubOnThis(),
                 this.name); // 3
             ProGroup.getGroup(this.diffusionGroup)
-                          .add((Chat) ProActiveObject.getStubOnThis()); //4
+                    .add((Chat) ProActiveObject.getStubOnThis()); //4
             this.frame.list.append(this.name + "\n");
             this.writeMessage(new Message(" *** " + this.name +
                     " has joined the place"));
@@ -181,7 +182,7 @@ public class Chat implements java.io.Serializable, RunActive {
         this.diffusionGroup.removeUserFromTheList(this.name);
         this.diffusionGroup.removeFromDiffusionGroup((Chat) ProActiveObject.getStubOnThis());
         ProGroup.getGroup(this.diffusionGroup)
-                      .remove((Chat) ProActiveObject.getStubOnThis());
+                .remove((Chat) ProActiveObject.getStubOnThis());
     }
 
     /**
@@ -310,8 +311,7 @@ public class Chat implements java.io.Serializable, RunActive {
      * Writes the name of all connected users in the list
      */
     public void writeUsersInTheList() {
-        java.util.Iterator it = ProGroup.getGroup(this.diffusionGroup)
-                                              .iterator();
+        java.util.Iterator it = ProGroup.getGroup(this.diffusionGroup).iterator();
         while (it.hasNext())
             this.frame.list.append(((Chat) it.next()).getName() + "\n");
     }
@@ -347,8 +347,8 @@ public class Chat implements java.io.Serializable, RunActive {
         try {
             Object[] param = new Object[1];
             param[0] = new String(userName);
-            chat = (Chat) ProActiveObject.newActive(Chat.class.getName(), param,
-                    (Node) null);
+            chat = (Chat) ProActiveObject.newActive(Chat.class.getName(),
+                    param, (Node) null);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

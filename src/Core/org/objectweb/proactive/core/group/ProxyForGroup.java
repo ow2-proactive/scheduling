@@ -183,7 +183,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.startXAndSkipSendRequest(ProActiveObject.getBodyOnThis()
-                                                             .getID(),
+                                                                   .getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL
@@ -237,7 +237,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.stopXAndUnskipSendRequest(ProActiveObject.getBodyOnThis()
-                                                              .getID(),
+                                                                    .getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL
@@ -946,14 +946,14 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * Waits for all members are arrived.
      */
     public void waitAll() {
-    	ProFuture.waitForAll(this.memberList);
+        ProFuture.waitForAll(this.memberList);
     }
 
     /**
      * Waits for at least one member is arrived.
      */
     public void waitOne() {
-    	ProFuture.waitForAny(this.memberList);
+        ProFuture.waitForAny(this.memberList);
     }
 
     /**
@@ -1303,11 +1303,11 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.className = className;
     }
 
-	public void setStub(StubObject stub) {
-		this.stub = stub;
-	}
+    public void setStub(StubObject stub) {
+        this.stub = stub;
+    }
 
-	public StubObject getStub() {
-		return stub;
-	}
+    public StubObject getStub() {
+        return stub;
+    }
 }

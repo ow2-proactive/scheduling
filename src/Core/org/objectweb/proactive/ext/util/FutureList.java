@@ -174,11 +174,11 @@ public class FutureList {
     }
 
     public void waitAll() {
-    	ProFuture.waitForAll(futureList);
+        ProFuture.waitForAll(futureList);
     }
 
     public void waitOne() {
-    	ProFuture.waitForAny(futureList);
+        ProFuture.waitForAny(futureList);
     }
 
     public void waitN(int n) {

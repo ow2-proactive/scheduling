@@ -58,8 +58,8 @@ public class PerformanceTest {
     private final void initTest() throws Exception {
         // Access the nodes of the descriptor file
         this.descriptorPad = ProDeployment.getProactiveDescriptor(this.getClass()
-                                                                  .getResource("/performanceTests/simple/descriptor.xml")
-                                                                  .getPath());
+                                                                      .getResource("/performanceTests/simple/descriptor.xml")
+                                                                      .getPath());
         descriptorPad.activateMappings();
         VirtualNode vnode = descriptorPad.getVirtualNodes()[0];
         this.nodes = vnode.getNodes();

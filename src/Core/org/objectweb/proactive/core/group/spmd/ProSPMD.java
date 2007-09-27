@@ -310,7 +310,7 @@ public class ProSPMD {
      */
     public static int getMyRank() {
         return ProGroup.getGroup(ProSPMD.getSPMDGroup())
-                             .indexOf(ProActiveObject.getStubOnThis());
+                       .indexOf(ProActiveObject.getStubOnThis());
     }
 
     /**

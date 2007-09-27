@@ -82,8 +82,8 @@ public class Test extends FunctionalTest {
         searchAndReplace(oldFilePath, newFilePath, "proactive.home",
             proactiveDir);
         descriptor = ProDeployment.getProactiveDescriptor(getClass()
-                                                          .getResource("/functionalTests/runtime/classloader/deployment-tmp.xml")
-                                                          .getPath());
+                                                              .getResource("/functionalTests/runtime/classloader/deployment-tmp.xml")
+                                                              .getPath());
         descriptor.activateMappings();
     }
 

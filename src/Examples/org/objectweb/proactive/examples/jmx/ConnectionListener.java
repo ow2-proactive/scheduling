@@ -77,7 +77,8 @@ public class ConnectionListener implements NotificationListener, Serializable {
         Object handback) throws IOException {
         try {
             this.connection.addNotificationListener(name,
-                (ConnectionListener) ProActiveObject.getStubOnThis(), filter, handback);
+                (ConnectionListener) ProActiveObject.getStubOnThis(), filter,
+                handback);
         } catch (NullPointerException e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());

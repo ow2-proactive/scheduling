@@ -101,7 +101,7 @@ public class Worker extends Timed {
         this.rank = ProSPMD.getMyRank();
         this.workers = (Worker) ProSPMD.getSPMDGroup();
         this.workersArray = (Worker[]) ProGroup.getGroup(this.workers)
-                                                     .toArray(new Worker[0]);
+                                               .toArray(new Worker[0]);
         this.groupSize = ProSPMD.getMySPMDGroupSize();
 
         // The defaultObserver will perform two

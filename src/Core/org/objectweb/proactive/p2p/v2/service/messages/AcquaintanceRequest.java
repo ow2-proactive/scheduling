@@ -28,7 +28,8 @@ public class AcquaintanceRequest extends Message implements Serializable {
                     " accepted");
                 this.sender.message(new AcquaintanceReply(1,
                         target.generateUuid(), target.stubOnThis,
-                        ProActiveObject.getActiveObjectNodeUrl(target.stubOnThis)));
+                        ProActiveObject.getActiveObjectNodeUrl(
+                            target.stubOnThis)));
                 //service.registerAnswer(ProActive.getActiveObjectNodeUrl(target.stubOnThis),target.stubOnThis);
             } else {
                 logger.info("Register request from " +
@@ -37,8 +38,8 @@ public class AcquaintanceRequest extends Message implements Serializable {
                 //service.registerAnswer(ProActive.getActiveObjectNodeUrl(target.stubOnThis), result);
                 this.sender.message(new AcquaintanceReply(1,
                         target.generateUuid(), target.stubOnThis,
-                        ProActiveObject.getActiveObjectNodeUrl(target.stubOnThis),
-                        result));
+                        ProActiveObject.getActiveObjectNodeUrl(
+                            target.stubOnThis), result));
             }
         }
     }

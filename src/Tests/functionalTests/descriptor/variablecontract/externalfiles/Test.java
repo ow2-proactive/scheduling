@@ -100,7 +100,8 @@ public class Test extends FunctionalTest {
 
         //test_var3=value3
         */
-        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
+        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION,
+                variableContract);
 
         variableContract = pad.getVariableContract();
 

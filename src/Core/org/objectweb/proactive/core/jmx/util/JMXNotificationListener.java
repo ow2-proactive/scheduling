@@ -69,8 +69,8 @@ public class JMXNotificationListener implements NotificationListener,
         try {
             if (connection.isRegistered(oname)) {
                 connection.removeNotificationListener(oname,
-                    (NotificationListener) ProActiveObject.getStubOnThis(), filter,
-                    handback);
+                    (NotificationListener) ProActiveObject.getStubOnThis(),
+                    filter, handback);
             }
         } catch (InstanceNotFoundException e) {
 

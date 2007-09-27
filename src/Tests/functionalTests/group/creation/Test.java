@@ -65,8 +65,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getRemoteVMNode()
             };
 
-        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(),
-                params, nodes);
+        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(), params, nodes);
         return this.typedGroup;
     }
 

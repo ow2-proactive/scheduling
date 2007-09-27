@@ -123,7 +123,8 @@ public class Test extends FunctionalTest {
         assertTrue(variableContract.getValue("bogus.property")
                                    .equals("bogus_value"));
 
-        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
+        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION,
+                variableContract);
         variableContract = pad.getVariableContract();
         variableContract.getValue("user.home")
                         .equals(System.getProperty("user.home"));

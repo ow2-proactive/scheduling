@@ -258,8 +258,8 @@ public class ProActiveMPIManager implements Serializable {
                     for (int i = 0; i < parameters.length; i++) {
                         Object[] params = (Object[]) parameters[i];
                         if (params != null) {
-                            proxyList[i] = ProActiveObject.newActive(cl, params,
-                                    orderedNodes[i]);
+                            proxyList[i] = ProActiveObject.newActive(cl,
+                                    params, orderedNodes[i]);
                         }
                     }
                     userProxyList.put(cl, proxyList);

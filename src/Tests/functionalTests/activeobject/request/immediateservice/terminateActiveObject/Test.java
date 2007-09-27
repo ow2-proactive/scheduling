@@ -45,7 +45,8 @@ public class Test extends FunctionalTest {
 
     @Before
     public void before() throws Exception {
-        b = (B) ProActiveObject.newActive(B.class.getName(), new Object[] { "blue" });
+        b = (B) ProActiveObject.newActive(B.class.getName(),
+                new Object[] { "blue" });
         b.changeColor("red");
         ProActiveObject.terminateActiveObject(b, true);
     }

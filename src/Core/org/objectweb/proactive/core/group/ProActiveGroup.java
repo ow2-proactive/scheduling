@@ -69,7 +69,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Laurent Baduel
  */
-
 @SuppressWarnings("deprecation")
 public class ProActiveGroup {
 
@@ -1118,8 +1117,8 @@ public class ProActiveGroup {
 
         if (params != null) {
             for (int i = 0; i < nodeList.length; i++) {
-                g.add(ProActiveObject.newActive(className, genericParameters, params,
-                        nodeList[i % nodeList.length]));
+                g.add(ProActiveObject.newActive(className, genericParameters,
+                        params, nodeList[i % nodeList.length]));
             }
         }
 

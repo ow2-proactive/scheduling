@@ -83,8 +83,8 @@ public class Main {
         ProException.tryWithCatch(Exception.class);
         try {
             String path = (args.length == 0) ? "descriptors/Matrix.xml" : args[0];
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor("file:" +
-                    path);
+            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+                    "file:" + path);
             VirtualNode dispatcher = pad.getVirtualNode("matrixNode");
             dispatcher.activate();
             Node[] nodes = dispatcher.getNodes();

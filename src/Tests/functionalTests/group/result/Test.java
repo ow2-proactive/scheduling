@@ -93,8 +93,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        A typedGroup = (A) ProGroup.newGroup(A.class.getName(), params,
-                nodes);
+        A typedGroup = (A) ProGroup.newGroup(A.class.getName(), params, nodes);
         this.resultTypedGroup = typedGroup.asynchronousCall();
 
         boolean NoOnewayCallDone = true;

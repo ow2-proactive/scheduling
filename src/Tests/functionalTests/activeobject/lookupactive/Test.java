@@ -46,7 +46,8 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        A a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
+        A a = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] { "toto" });
         a.register();
 
         // check lookup works

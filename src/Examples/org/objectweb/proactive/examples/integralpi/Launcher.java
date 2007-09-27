@@ -109,8 +109,7 @@ public class Launcher {
                 }
 
                 // Send the number of iterations to the first worker
-                Worker firstWorker = (Worker) ProGroup.getGroup(workers)
-                                                            .get(0);
+                Worker firstWorker = (Worker) ProGroup.getGroup(workers).get(0);
                 wrappedResult = firstWorker.start(numOfIterations);
                 result = wrappedResult.doubleValue();
                 error = result - Math.PI;

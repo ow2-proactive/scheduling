@@ -55,8 +55,8 @@ public class B {
 
     public void createActiveObjectC() throws Exception {
         ProActiveDescriptor descriptor = ProDeployment.getProactiveDescriptor(getClass()
-                                                                              .getResource("/deployment-tmp.xml")
-                                                                              .getPath());
+                                                                                  .getResource("/deployment-tmp.xml")
+                                                                                  .getPath());
         descriptor.activateMappings();
         Object ao = ProActiveObject.newActive("functionalTests.runtime.classloader.C",
                 new Object[] { "sdfasdf" },

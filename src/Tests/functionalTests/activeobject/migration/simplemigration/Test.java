@@ -61,8 +61,8 @@ public class Test extends FunctionalTest {
         }
 
         localVmNode = TestNodes.getLocalVMNode();
-        a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] { "toto" },
-                sameVmNode);
+        a = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] { "toto" }, sameVmNode);
         a.moveTo(localVmNode);
 
         assertTrue(a.getName().equals("toto"));

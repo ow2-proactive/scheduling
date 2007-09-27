@@ -116,7 +116,8 @@ public class Test extends FunctionalTest {
             VariableContractType.getType(
                 ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 
-        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
+        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION,
+                variableContract);
 
         variableContract = pad.getVariableContract();
 

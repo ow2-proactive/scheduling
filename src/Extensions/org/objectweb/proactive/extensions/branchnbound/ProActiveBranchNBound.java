@@ -243,7 +243,7 @@ public class ProActiveBranchNBound {
         args[2] instanceof VirtualNode[] : args[2];
         assert args[3] instanceof String : args[3];
 
-        return (Manager) ProActiveObject.newActive(Manager.class.getName(), args,
-            (Node) args[1]);
+        return (Manager) ProActiveObject.newActive(Manager.class.getName(),
+            args, (Node) args[1]);
     }
 }

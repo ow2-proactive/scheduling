@@ -69,7 +69,8 @@ public class SciDeployEngine {
         VirtualNode[] arrayVn;
         String[] arrayNameVn = null;
         try {
-            desc = ProDeployment.getProactiveDescriptor("file:" + pathDescriptor);
+            desc = ProDeployment.getProactiveDescriptor("file:" +
+                    pathDescriptor);
             arrayVn = desc.getVirtualNodes();
             arrayNameVn = new String[arrayVn.length];
 
@@ -88,7 +89,8 @@ public class SciDeployEngine {
         ProActiveDescriptor desc;
         VirtualNode vn;
         try {
-            desc = ProDeployment.getProactiveDescriptor("file:" + pathDescriptor);
+            desc = ProDeployment.getProactiveDescriptor("file:" +
+                    pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             return vn.getNbMappedNodes();
         } catch (ProActiveException e) {
@@ -117,7 +119,8 @@ public class SciDeployEngine {
         HashMap<String, SciEngine> mapEngine = new HashMap<String, SciEngine>();
 
         try {
-            desc = ProDeployment.getProactiveDescriptor("file:" + pathDescriptor);
+            desc = ProDeployment.getProactiveDescriptor("file:" +
+                    pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             vn.activate();
             nodes = vn.getNodes();

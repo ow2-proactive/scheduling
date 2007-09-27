@@ -102,7 +102,7 @@ public class Test extends ComponentTest {
         Map context = new HashMap();
         deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/descriptor/deploymentDescriptor.xml")
-                                                                          .getPath());
+                                                                              .getPath());
         context.put("deployment-descriptor", deploymentDescriptor);
         Component root = (Component) f.newComponent("functionalTests.component.descriptor.fractaladl.MessagePassingExample",
                 context);
@@ -159,8 +159,7 @@ public class Test extends ComponentTest {
         int nb_messages = 0;
         if (ProGroup.isGroup(message)) {
             for (int i = 0; i < ProGroup.size(message); i++) {
-                nb_messages += append(buffer,
-                    (Message) ProGroup.get(message, i));
+                nb_messages += append(buffer, (Message) ProGroup.get(message, i));
             }
         } else {
             buffer.append(message.getMessage());

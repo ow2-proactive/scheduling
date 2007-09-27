@@ -398,7 +398,8 @@ public class Dumper {
             d.dumpForPeerSim();
         } else {
             try {
-                d = (Dumper) ProActiveObject.newActive(Dumper.class.getName(), null);
+                d = (Dumper) ProActiveObject.newActive(Dumper.class.getName(),
+                        null);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {

@@ -61,7 +61,8 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     public void run() {
         try {
             this.proxyGroup.set(this.index,
-                ProActiveObject.newActive(className, genericParameters, param, node));
+                ProActiveObject.newActive(className, genericParameters, param,
+                    node));
             //			this.proxyGroup.decrementWaitedAndNotifyAll();
         } catch (Exception e) {
             e.printStackTrace();

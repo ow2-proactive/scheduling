@@ -27,8 +27,8 @@ public class ExplorationMessage extends BreadthFirstMessage
                 if (result == null) {
                     logger.info("ExplorationMessage me = " +
                         P2PService.getHostNameAndPortFromUrl(
-                            ProActiveObject.getActiveObjectNodeUrl(target.stubOnThis)) +
-                        " adding " +
+                            ProActiveObject.getActiveObjectNodeUrl(
+                                target.stubOnThis)) + " adding " +
                         P2PService.getHostNameAndPortFromUrl(
                             ProActiveObject.getActiveObjectNodeUrl(this.sender)));
                     //indeed, the peer really wants us

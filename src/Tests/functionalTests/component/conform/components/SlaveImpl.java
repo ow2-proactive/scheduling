@@ -10,8 +10,8 @@ public class SlaveImpl implements Slave {
     }
 
     public void computeOneWay(String arg, String other) {
-        System.err.println(ProActiveObject.getBodyOnThis().getNodeURL() + "Slave: " +
-            this + " arg: " + arg + " other: " + other);
+        System.err.println(ProActiveObject.getBodyOnThis().getNodeURL() +
+            "Slave: " + this + " arg: " + arg + " other: " + other);
     }
 
     public StringWrapper computeAsync(String arg, String other) {

@@ -63,7 +63,8 @@ public class Test extends FunctionalTest {
         this.vn.activate();
 
         Node node = vn.getNode();
-        ao = (A) ProActiveObject.newActive(A.class.getName(), new Object[] {  }, node);
+        ao = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] {  }, node);
     }
 
     @org.junit.Test

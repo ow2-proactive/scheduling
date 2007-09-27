@@ -50,8 +50,8 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
         // Access the nodes of the descriptor file
         descriptorPad = ProDeployment.getProactiveDescriptor(this.getClass()
-                                                             .getResource("/functionalTests/timit/timers/basic/descriptor.xml")
-                                                             .getPath());
+                                                                 .getResource("/functionalTests/timit/timers/basic/descriptor.xml")
+                                                                 .getPath());
         descriptorPad.activateMappings();
         VirtualNode vnode = descriptorPad.getVirtualNodes()[0];
         Node[] nodes = vnode.getNodes();

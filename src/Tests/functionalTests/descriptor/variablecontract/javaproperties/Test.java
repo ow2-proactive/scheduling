@@ -101,7 +101,8 @@ public class Test extends FunctionalTest {
             bogusFromDescriptor = false;
         }
 
-        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
+        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION,
+                variableContract);
 
         variableContract = pad.getVariableContract();
         //System.out.println(variableContract);

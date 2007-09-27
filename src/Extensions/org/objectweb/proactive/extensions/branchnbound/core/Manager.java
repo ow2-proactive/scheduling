@@ -202,8 +202,7 @@ public class Manager implements Serializable, InitActive {
                         args, this.nodes);
                 ProException.addNFEListenerOnGroup(this.workerGroup,
                     FailedGroupRendezVousException.AUTO_GROUP_PURGE);
-                this.freeWorkerList.addAll(ProGroup.getGroup(
-                        this.workerGroup));
+                this.freeWorkerList.addAll(ProGroup.getGroup(this.workerGroup));
                 long singleEndTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {
                     logger.info("The  Group was created in " +
@@ -562,8 +561,7 @@ public class Manager implements Serializable, InitActive {
                     logger.info("The remote Group " +
                         this.nodes[0].getVMInformation().getHostName() +
                         " was created in " + (endTime - startTime) +
-                        " ms with " +
-                        ProGroup.getGroup(tmpWorkers).size() +
+                        " ms with " + ProGroup.getGroup(tmpWorkers).size() +
                         " members");
                 }
             } else {
@@ -632,8 +630,7 @@ public class Manager implements Serializable, InitActive {
                 if (logger.isInfoEnabled()) {
                     logger.info("The remote Group " + this.vn.getName() +
                         " was created in " + (endTime - startTime) +
-                        " ms with " +
-                        ProGroup.getGroup(tmpWorkers).size() +
+                        " ms with " + ProGroup.getGroup(tmpWorkers).size() +
                         " members");
                 }
             } else {

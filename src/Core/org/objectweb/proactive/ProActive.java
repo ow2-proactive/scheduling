@@ -204,7 +204,6 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @see ProActiveDescriptorInternal
  * @see ProActiveGroup
  */
-
 public class ProActive {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);
@@ -309,7 +308,7 @@ public class ProActive {
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
-     * @deprecated 
+     * @deprecated
      */
     public static Object newActive(String classname,
         Object[] constructorParameters, Node node)
@@ -951,8 +950,8 @@ public class ProActive {
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
             try {
-                aoGroup = ProGroup.getGroup(ProGroup.newGroup(
-                            classname, genericParameters));
+                aoGroup = ProGroup.getGroup(ProGroup.newGroup(classname,
+                            genericParameters));
             } catch (ClassNotFoundException e) {
                 throw new ActiveObjectCreationException(
                     "Cannot create group of active objects" + e);
@@ -1660,7 +1659,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated 
+     * @deprecated
      */
     private static ProActiveDescriptorInternal getProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,
@@ -1698,7 +1697,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated 
+     * @deprecated
      */
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,

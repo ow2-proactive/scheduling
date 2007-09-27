@@ -11,7 +11,7 @@ public class TestBasicDescriptorParsing {
                                         .getResource("javaproperty_ERROR.xml")
                                         .getPath();
 
-        Object proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
-                descriptorLocation);
+        Object proActiveDescriptor = ProDeployment.getProactiveDescriptor(
+                "file:" + descriptorLocation);
     }
 }

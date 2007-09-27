@@ -69,7 +69,8 @@ public class Test extends FunctionalTest {
 
         // Without AC
         exception = false;
-        A a1bis = (A) ProActiveObject.newActive(A.class.getName(), null, this.node1);
+        A a1bis = (A) ProActiveObject.newActive(A.class.getName(), null,
+                this.node1);
         a1bis.crash();
         try {
             //System.out.println(future);

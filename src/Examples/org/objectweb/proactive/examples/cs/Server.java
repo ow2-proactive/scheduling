@@ -106,7 +106,8 @@ public class Server {
 
             //Server theServer = (Server) org.objectweb.proactive.ProActive.newActive(Server.class.getName(), null, null);
             // Binds the server to a specific URL
-            org.objectweb.proactive.api.ProActiveObject.register(theServer, "///theServer");
+            org.objectweb.proactive.api.ProActiveObject.register(theServer,
+                "///theServer");
 
             System.out.println("Server is ready.");
         } catch (Exception e) {

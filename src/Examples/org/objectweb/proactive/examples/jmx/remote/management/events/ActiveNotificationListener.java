@@ -68,7 +68,8 @@ public class ActiveNotificationListener implements Serializable,
         ProActiveConnection connection = entity.getConnection();
         try {
             connection.addNotificationListener(name,
-                (NotificationListener) ProActiveObject.getStubOnThis(), null, null);
+                (NotificationListener) ProActiveObject.getStubOnThis(), null,
+                null);
         } catch (InstanceNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

@@ -62,12 +62,12 @@ public class Test extends FunctionalTest {
         VirtualNode vn1 = descriptor.getVirtualNode("evn1");
         VirtualNode vn2 = descriptor.getVirtualNode("evn2");
         VirtualNode vn3 = descriptor.getVirtualNode("evn3");
-        a1 = (A) ProActiveObject.newActive(A.class.getName(), new Object[] {  },
-                vn1.getNode());
-        a2 = (A) ProActiveObject.newActive(A.class.getName(), new Object[] {  },
-                vn2.getNode());
-        a3 = (A) ProActiveObject.newActive(A.class.getName(), new Object[] {  },
-                vn3.getNode());
+        a1 = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] {  }, vn1.getNode());
+        a2 = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] {  }, vn2.getNode());
+        a3 = (A) ProActiveObject.newActive(A.class.getName(),
+                new Object[] {  }, vn3.getNode());
 
         assertTrue(a2.getTiti() == null);
         assertTrue(a2.getTata() != null);
@@ -104,7 +104,7 @@ public class Test extends FunctionalTest {
         searchAndReplace(oldFilePath, newFilePath, "proactive.home",
             proactiveDir);
         descriptor = ProDeployment.getProactiveDescriptor(getClass()
-                                                          .getResource("/functionalTests/descriptor/extendedjvm/" +
+                                                              .getResource("/functionalTests/descriptor/extendedjvm/" +
                     fileName + "-tmp.xml").getPath());
         descriptor.activateMappings();
     }

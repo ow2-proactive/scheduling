@@ -42,168 +42,167 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 public class ProMigration {
-	
-	protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+    protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
-	
-	private static Node getNodeFromURL(String url) throws MigrationException {
-	    try {
-	        return NodeFactory.getNode(url);
-	    } catch (NodeException e) {
-	        throw new MigrationException("The node of given URL " + url +
-	            " cannot be localized", e);
-	    }
-	}
-	
-	private static String getNodeURLFromActiveObject(Object o)
-	    throws MigrationException {
-	    //first we check if the parameter is an active object,
-	    if (!org.objectweb.proactive.core.mop.MOP.isReifiedObject(o)) {
-	        throw new MigrationException(
-	            "The parameter is not an active object");
-	    }
-	
-	    //now we get a reference on the remoteBody of this guy
-	    BodyProxy destProxy = (BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) o).getProxy();
-	
-	    return destProxy.getBody().getNodeURL();
-	}
-	
-	/**
-	 * Migrates the active object whose active thread is calling this method to the
-	 * given node.
-	 * This method must be called from an active object using the active thread as the
-	 * current thread will be used to find which active object is calling the method.
-	 * @param node an existing node where to migrate to.
-	 * @exception MigrationException if the migration fails
-	 * @see ProActiveObject#getBodyOnThis
-	 */
-	public static void migrateTo(Node node) throws MigrationException {
-	    if (ProMigration.logger.isDebugEnabled()) {
-	    	ProMigration.logger.debug("migrateTo " + node);
-	    }
-	    Body bodyToMigrate = ProActiveObject.getBodyOnThis();
-	    if (!(bodyToMigrate instanceof Migratable)) {
-	        throw new MigrationException(
-	            "This body cannot migrate. It doesn't implement Migratable interface");
-	    }
-	
-	    ((Migratable) bodyToMigrate).migrateTo(node);
-	}
+    private static Node getNodeFromURL(String url) throws MigrationException {
+        try {
+            return NodeFactory.getNode(url);
+        } catch (NodeException e) {
+            throw new MigrationException("The node of given URL " + url +
+                " cannot be localized", e);
+        }
+    }
 
-	/**
-	 * Migrates the active object whose active thread is calling this method to the
-	 * same location as the active object given in parameter.
-	 * This method must be called from an active object using the active thread as the
-	 * current thread will be used to find which active object is calling the method.
-	 * The object given as destination must be an active object.
-	 * @param activeObject the active object indicating the destination of the migration.
-	 * @exception MigrationException if the migration fails
-	 * @see ProActiveObject#getBodyOnThis
-	 */
-	public static void migrateTo(Object activeObject) throws MigrationException {
-	    migrateTo(ProMigration.getNodeFromURL(ProMigration.getNodeURLFromActiveObject(activeObject)));
-	}
+    private static String getNodeURLFromActiveObject(Object o)
+        throws MigrationException {
+        //first we check if the parameter is an active object,
+        if (!org.objectweb.proactive.core.mop.MOP.isReifiedObject(o)) {
+            throw new MigrationException(
+                "The parameter is not an active object");
+        }
 
-	/**
-	 * Migrates the active object whose active thread is calling this method to the
-	 * node caracterized by the given url.
-	 * This method must be called from an active object using the active thread as the
-	 * current thread will be used to find which active object is calling the method.
-	 * The url must be the url of an existing node.
-	 * @param nodeURL the url of an existing where to migrate to.
-	 * @exception MigrationException if the migration fails
-	 * @see ProActiveObject#getBodyOnThis
-	 */
-	public static void migrateTo(String nodeURL) throws MigrationException {
-	    if (ProMigration.logger.isDebugEnabled()) {
-	    	ProMigration.logger.debug("migrateTo " + nodeURL);
-	    }
-	    ProMigration.migrateTo(ProMigration.getNodeFromURL(nodeURL));
-	}
+        //now we get a reference on the remoteBody of this guy
+        BodyProxy destProxy = (BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) o).getProxy();
 
+        return destProxy.getBody().getNodeURL();
+    }
 
-	/**
-	 * Migrates the body <code>bodyToMigrate</code> to the given node.
-	 * This method can be called from any object and does not perform the migration.
-	 * Instead it generates a migration request that is sent to the targeted body.
-	 * The object given as destination must be an active object.
-	 * @param bodyToMigrate the body to migrate.
-	 * @param node an existing node where to migrate to.
-	 * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
-	 * @exception MigrationException if the migration fails
-	 */
-	public static void migrateTo(Body bodyToMigrate, Node node,
-	    boolean isNFRequest) throws MigrationException {
-	    //In the context of ProActive, migration of an active object is considered as a non functional request.
-	    //That's why "true" is set by default for the "isNFRequest" parameter.
-	    ProMigration.migrateTo(bodyToMigrate, node, true,
-	        org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
-	}
+    /**
+     * Migrates the active object whose active thread is calling this method to the
+     * given node.
+     * This method must be called from an active object using the active thread as the
+     * current thread will be used to find which active object is calling the method.
+     * @param node an existing node where to migrate to.
+     * @exception MigrationException if the migration fails
+     * @see ProActiveObject#getBodyOnThis
+     */
+    public static void migrateTo(Node node) throws MigrationException {
+        if (ProMigration.logger.isDebugEnabled()) {
+            ProMigration.logger.debug("migrateTo " + node);
+        }
+        Body bodyToMigrate = ProActiveObject.getBodyOnThis();
+        if (!(bodyToMigrate instanceof Migratable)) {
+            throw new MigrationException(
+                "This body cannot migrate. It doesn't implement Migratable interface");
+        }
 
-	/**
-	 * Migrates the body <code>bodyToMigrate</code> to the given node.
-	 * This method can be called from any object and does not perform the migration.
-	 * Instead it generates a migration request that is sent to the targeted body.
-	 * The object given as destination must be an active object.
-	 * @param bodyToMigrate the body to migrate.
-	 * @param node an existing node where to migrate to.
-	 * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
-	 * @param priority  the level of priority of the non functional request. Levels are defined in Request interface of ProActive.
-	 * @exception MigrationException if the migration fails
-	 */
-	public static void migrateTo(Body bodyToMigrate, Node node,
-	    boolean isNFRequest, int priority) throws MigrationException {
-	    if (!(bodyToMigrate instanceof Migratable)) {
-	        throw new MigrationException(
-	            "This body cannot migrate. It doesn't implement Migratable interface");
-	    }
-	
-	    Object[] arguments = { node };
-	
-	    try {
-	        BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo",
-	                new Class[] { Node.class }, arguments, isNFRequest, priority);
-	        request.send(bodyToMigrate);
-	    } catch (NoSuchMethodException e) {
-	        throw new MigrationException("Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
-	            e);
-	    } catch (java.io.IOException e) {
-	        throw new MigrationException("Cannot send the request to migrate", e);
-	    }
-	}
+        ((Migratable) bodyToMigrate).migrateTo(node);
+    }
 
-	/**
-	 * Migrates the given body to the same location as the active object given in parameter.
-	 * This method can be called from any object and does not perform the migration.
-	 * Instead it generates a migration request that is sent to the targeted body.
-	 * The object given as destination must be an active object.
-	 * @param bodyToMigrate the body to migrate.
-	 * @param activeObject the active object indicating the destination of the migration.
-	 * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
-	 * @exception MigrationException if the migration fails
-	 */
-	public static void migrateTo(Body bodyToMigrate, Object activeObject,
-	    boolean isNFRequest) throws MigrationException {
-	    ProMigration.migrateTo(bodyToMigrate,
-	    		ProMigration.getNodeFromURL(ProMigration.getNodeURLFromActiveObject(activeObject)),
-	        isNFRequest);
-	}
+    /**
+     * Migrates the active object whose active thread is calling this method to the
+     * same location as the active object given in parameter.
+     * This method must be called from an active object using the active thread as the
+     * current thread will be used to find which active object is calling the method.
+     * The object given as destination must be an active object.
+     * @param activeObject the active object indicating the destination of the migration.
+     * @exception MigrationException if the migration fails
+     * @see ProActiveObject#getBodyOnThis
+     */
+    public static void migrateTo(Object activeObject) throws MigrationException {
+        migrateTo(ProMigration.getNodeFromURL(
+                ProMigration.getNodeURLFromActiveObject(activeObject)));
+    }
 
-	/**
-	 * Migrates the given body to the node caracterized by the given url.
-	 * This method can be called from any object and does not perform the migration.
-	 * Instead it generates a migration request that is sent to the targeted body.
-	 * The object given as destination must be an active object.
-	 * @param bodyToMigrate the body to migrate.
-	 * @param nodeURL the url of an existing where to migrate to.
-	 * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
-	 * @exception MigrationException if the migration fails
-	 */
-	public static void migrateTo(Body bodyToMigrate, String nodeURL,
-	    boolean isNFRequest) throws MigrationException {
-	    ProMigration.migrateTo(bodyToMigrate, ProMigration.getNodeFromURL(nodeURL), isNFRequest);
-	}
+    /**
+     * Migrates the active object whose active thread is calling this method to the
+     * node caracterized by the given url.
+     * This method must be called from an active object using the active thread as the
+     * current thread will be used to find which active object is calling the method.
+     * The url must be the url of an existing node.
+     * @param nodeURL the url of an existing where to migrate to.
+     * @exception MigrationException if the migration fails
+     * @see ProActiveObject#getBodyOnThis
+     */
+    public static void migrateTo(String nodeURL) throws MigrationException {
+        if (ProMigration.logger.isDebugEnabled()) {
+            ProMigration.logger.debug("migrateTo " + nodeURL);
+        }
+        ProMigration.migrateTo(ProMigration.getNodeFromURL(nodeURL));
+    }
 
+    /**
+     * Migrates the body <code>bodyToMigrate</code> to the given node.
+     * This method can be called from any object and does not perform the migration.
+     * Instead it generates a migration request that is sent to the targeted body.
+     * The object given as destination must be an active object.
+     * @param bodyToMigrate the body to migrate.
+     * @param node an existing node where to migrate to.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
+     * @exception MigrationException if the migration fails
+     */
+    public static void migrateTo(Body bodyToMigrate, Node node,
+        boolean isNFRequest) throws MigrationException {
+        //In the context of ProActive, migration of an active object is considered as a non functional request.
+        //That's why "true" is set by default for the "isNFRequest" parameter.
+        ProMigration.migrateTo(bodyToMigrate, node, true,
+            org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
+    }
+
+    /**
+     * Migrates the body <code>bodyToMigrate</code> to the given node.
+     * This method can be called from any object and does not perform the migration.
+     * Instead it generates a migration request that is sent to the targeted body.
+     * The object given as destination must be an active object.
+     * @param bodyToMigrate the body to migrate.
+     * @param node an existing node where to migrate to.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
+     * @param priority  the level of priority of the non functional request. Levels are defined in Request interface of ProActive.
+     * @exception MigrationException if the migration fails
+     */
+    public static void migrateTo(Body bodyToMigrate, Node node,
+        boolean isNFRequest, int priority) throws MigrationException {
+        if (!(bodyToMigrate instanceof Migratable)) {
+            throw new MigrationException(
+                "This body cannot migrate. It doesn't implement Migratable interface");
+        }
+
+        Object[] arguments = { node };
+
+        try {
+            BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo",
+                    new Class[] { Node.class }, arguments, isNFRequest, priority);
+            request.send(bodyToMigrate);
+        } catch (NoSuchMethodException e) {
+            throw new MigrationException("Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
+                e);
+        } catch (java.io.IOException e) {
+            throw new MigrationException("Cannot send the request to migrate", e);
+        }
+    }
+
+    /**
+     * Migrates the given body to the same location as the active object given in parameter.
+     * This method can be called from any object and does not perform the migration.
+     * Instead it generates a migration request that is sent to the targeted body.
+     * The object given as destination must be an active object.
+     * @param bodyToMigrate the body to migrate.
+     * @param activeObject the active object indicating the destination of the migration.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
+     * @exception MigrationException if the migration fails
+     */
+    public static void migrateTo(Body bodyToMigrate, Object activeObject,
+        boolean isNFRequest) throws MigrationException {
+        ProMigration.migrateTo(bodyToMigrate,
+            ProMigration.getNodeFromURL(ProMigration.getNodeURLFromActiveObject(
+                    activeObject)), isNFRequest);
+    }
+
+    /**
+     * Migrates the given body to the node caracterized by the given url.
+     * This method can be called from any object and does not perform the migration.
+     * Instead it generates a migration request that is sent to the targeted body.
+     * The object given as destination must be an active object.
+     * @param bodyToMigrate the body to migrate.
+     * @param nodeURL the url of an existing where to migrate to.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
+     * @exception MigrationException if the migration fails
+     */
+    public static void migrateTo(Body bodyToMigrate, String nodeURL,
+        boolean isNFRequest) throws MigrationException {
+        ProMigration.migrateTo(bodyToMigrate,
+            ProMigration.getNodeFromURL(nodeURL), isNFRequest);
+    }
 }

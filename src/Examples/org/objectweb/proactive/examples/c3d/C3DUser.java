@@ -232,8 +232,8 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
             if (argv.length == 0) {
                 proActiveDescriptor = ProDeployment.getProactiveDescriptor();
             } else {
-                proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
-                        argv[0]);
+                proActiveDescriptor = ProDeployment.getProactiveDescriptor(
+                        "file:" + argv[0]);
             }
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");

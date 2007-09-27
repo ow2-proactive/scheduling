@@ -317,8 +317,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return add succesfull
      */
     public Vector<String> add(P2PService peer) {
-        return this.add(buildCorrectUrl(ProActiveObject.getActiveObjectNodeUrl(peer)),
-            peer);
+        return this.add(buildCorrectUrl(ProActiveObject.getActiveObjectNodeUrl(
+                    peer)), peer);
     }
 
     /**

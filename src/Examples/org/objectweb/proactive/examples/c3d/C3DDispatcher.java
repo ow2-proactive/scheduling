@@ -868,8 +868,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             if (argv.length == 0) {
                 proActiveDescriptor = ProDeployment.getProactiveDescriptor();
             } else {
-                proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
-                        argv[0]);
+                proActiveDescriptor = ProDeployment.getProactiveDescriptor(
+                        "file:" + argv[0]);
             }
 
             proActiveDescriptor.activateMappings();

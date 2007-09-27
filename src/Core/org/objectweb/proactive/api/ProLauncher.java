@@ -34,36 +34,36 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
+
 public class ProLauncher {
 
-	/**
-	 * Launches the main method of the main class through the node node
-	 * @param classname classname of the main method to launch
-	 * @param mainParameters parameters
-	 * @param node node in which launch the main method
-	 * @throws ClassNotFoundException
-	 * @throws NoSuchMethodException
-	 * @throws ProActiveException
-	 */
-	public static void newMain(String classname, String[] mainParameters,
-	    Node node)
-	    throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
-	    ProActiveRuntime part = node.getProActiveRuntime();
-	    part.launchMain(classname, mainParameters);
-	}
+    /**
+     * Launches the main method of the main class through the node node
+     * @param classname classname of the main method to launch
+     * @param mainParameters parameters
+     * @param node node in which launch the main method
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws ProActiveException
+     */
+    public static void newMain(String classname, String[] mainParameters,
+        Node node)
+        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
+        ProActiveRuntime part = node.getProActiveRuntime();
+        part.launchMain(classname, mainParameters);
+    }
 
-	/**
-	 * Creates an instance of the remote class. This instance is
-	 * created with the default constructor
-	 * @param classname
-	 * @param node
-	 * @throws ClassNotFoundException
-	 * @throws ProActiveException
-	 */
-	public static void newRemote(String classname, Node node)
-	    throws ClassNotFoundException, ProActiveException {
-	    ProActiveRuntime part = node.getProActiveRuntime();
-	    part.newRemote(classname);
-	}
-
+    /**
+     * Creates an instance of the remote class. This instance is
+     * created with the default constructor
+     * @param classname
+     * @param node
+     * @throws ClassNotFoundException
+     * @throws ProActiveException
+     */
+    public static void newRemote(String classname, Node node)
+        throws ClassNotFoundException, ProActiveException {
+        ProActiveRuntime part = node.getProActiveRuntime();
+        part.newRemote(classname);
+    }
 }

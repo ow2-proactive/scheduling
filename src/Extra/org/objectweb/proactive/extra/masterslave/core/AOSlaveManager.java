@@ -198,9 +198,11 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     public void addResources(final VirtualNode virtualnode) {
         if (!isTerminated) {
             if (!virtualnode.isActivated()) {
+                logger.warn("vn is not activated");
                 ((VirtualNodeImpl) virtualnode).addNodeCreationEventListener(this);
                 virtualnode.activate();
             } else {
+                logger.warn("vn is activated");
                 try {
                     Node[] nodes = virtualnode.getNodes();
                     addResources(Arrays.asList(nodes));
@@ -270,6 +272,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
      */
     public void nodeCreated(final NodeCreationEvent event) {
         // get the node
+        logger.warn("nodeCreated " + event.getNode());
         Node node = event.getNode();
         try {
             threadPool.execute(new SlaveCreationHandler(node));

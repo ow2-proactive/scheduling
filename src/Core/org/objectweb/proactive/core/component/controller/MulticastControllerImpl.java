@@ -248,7 +248,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
         ProActiveInterface serverItf) {
         if (multicastItfs.containsKey(clientItfName)) {
             if (ProGroup.getGroup(multicastItfs.get(clientItfName))
-                                  .remove(serverItf)) {
+                            .remove(serverItf)) {
                 logger.debug(
                     "removed connected interface from multicast interface : " +
                     clientItfName);

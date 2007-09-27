@@ -75,7 +75,7 @@ public class Test extends ComponentTest {
         System.out.println("Remote composite");
         ProActiveDescriptor deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/nonfunctional/creation/descriptor.xml")
-                                                                                              .getPath());
+                                                                                                  .getPath());
         deploymentDescriptor.activateMappings();
         VirtualNode vn = deploymentDescriptor.getVirtualNode("computers-vn");
 
