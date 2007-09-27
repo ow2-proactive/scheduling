@@ -39,7 +39,7 @@ import java.util.Vector;
  *
  * @author Laurent Baduel
  */
-public class ExceptionListException extends RuntimeException {
+public class ExceptionListException extends RuntimeException implements Iterable<ExceptionInGroup> {
 
     /** A vector implements the list */
     private Vector<ExceptionInGroup> list;
