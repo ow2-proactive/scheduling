@@ -200,8 +200,15 @@ public class ProFuture {
      * @return index of the available future in the vector
      * @throws ProActiveException if the timeout expires
      */
-    public static int waitForAny(java.util.Vector futures, long timeout)
+    public static int waitForAny(java.util.Collection futures, long timeout)
         throws ProActiveException {
+        if (futures.isEmpty()) {
+        	/*
+        	 * Yes, this return value is meaningless but at least we are
+        	 * not permanently blocked
+        	 */ 
+            return -1;
+        }
         FuturePool fp = ProActiveObject.getBodyOnThis().getFuturePool();
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
 

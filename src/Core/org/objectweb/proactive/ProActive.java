@@ -42,13 +42,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.jce.provider.JCEBlockCipher.SEED;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicManager;
 import org.objectweb.proactive.core.Constants;
@@ -63,7 +62,6 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.future.Future;
-import org.objectweb.proactive.core.body.future.FutureMonitoring;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.migration.Migratable;
@@ -88,6 +86,7 @@ import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
@@ -2139,34 +2138,7 @@ public class ProActive {
      */
     public static int waitForAny(java.util.Vector futures, long timeout)
         throws ProActiveException {
-        FuturePool fp = getBodyOnThis().getFuturePool();
-        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
-
-        for (Object future : futures) {
-            FutureMonitoring.monitorFuture(future);
-        }
-
-        synchronized (fp) {
-            while (true) {
-                java.util.Iterator it = futures.iterator();
-                int index = 0;
-
-                while (it.hasNext()) {
-                    Object current = it.next();
-
-                    if (!isAwaited(current)) {
-                        return index;
-                    }
-
-                    index++;
-                }
-                if (time.isTimeoutElapsed()) {
-                    throw new ProActiveException(
-                        "Timeout expired while waiting for future update");
-                }
-                fp.waitForReply(time.getRemainingTimeout());
-            }
-        }
+    	return ProFuture.waitForAny(futures, timeout);
     }
 
     /**
