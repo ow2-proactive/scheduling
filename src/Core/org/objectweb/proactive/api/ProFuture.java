@@ -203,10 +203,11 @@ public class ProFuture {
     public static int waitForAny(java.util.Collection futures, long timeout)
         throws ProActiveException {
         if (futures.isEmpty()) {
-        	/*
-        	 * Yes, this return value is meaningless but at least we are
-        	 * not permanently blocked
-        	 */ 
+
+            /*
+             * Yes, this return value is meaningless but at least we are
+             * not permanently blocked
+             */
             return -1;
         }
         FuturePool fp = ProActiveObject.getBodyOnThis().getFuturePool();
