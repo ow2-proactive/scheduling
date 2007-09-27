@@ -37,6 +37,7 @@ import java.util.LinkedList;
 
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.MethodCallInfo;
 
 
 /**
@@ -97,6 +98,12 @@ public abstract class MethodCallControlForGroup extends MethodCall {
     public Object execute(Object targetObject)
         throws InvocationTargetException, MethodCallExecutionFailedException {
         return null;
+    }
+
+    @Override
+    public MethodCallInfo getMethodCallInfo() {
+        return new MethodCallInfo(MethodCallInfo.CallType.OneWay,
+            MethodCallInfo.SynchronousReason.NotApplicable, null);
     }
 
     /**

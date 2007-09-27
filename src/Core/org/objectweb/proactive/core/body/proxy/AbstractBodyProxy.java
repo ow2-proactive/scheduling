@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.MethodCallInfo;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
@@ -111,6 +112,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         if (cachedMethodResult != null) {
             return cachedMethodResult;
         }
+
         return invokeOnBody(methodCall);
     }
 
@@ -124,32 +126,44 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         "toString".equals(methodCall.getName());
     }
 
+    private static boolean isHashCode(MethodCall methodCall) {
+        return (methodCall.getNumberOfParameter() == 0) &&
+        "hashCode".equals(methodCall.getName());
+    }
+
     private static Set<String> loggedSyncCalls = Collections.synchronizedSet(new HashSet<String>());
 
     private Object invokeOnBody(MethodCall methodCall)
         throws Exception, RenegotiateSessionException, Throwable {
         // Now gives the MethodCall object to the body
         try {
-            if (isOneWayCall(methodCall)) {
+            MethodCallInfo mci = methodCall.getMethodCallInfo();
+
+            if (mci.getType() == MethodCallInfo.CallType.OneWay) {
                 reifyAsOneWay(methodCall);
                 return null;
             }
-            String reason = methodCall.getSynchronousReason();
-            if (reason == null) {
+
+            if (mci.getType() == MethodCallInfo.CallType.Asynchronous) {
                 return reifyAsAsynchronous(methodCall);
             }
-            if (!isToString(methodCall) &&
-                    syncCallLogger.isEnabledFor(Level.DEBUG)) {
+
+            if (!isToString(methodCall) && !isHashCode(methodCall) &&
+                    (mci.getReason() != MethodCallInfo.SynchronousReason.Forced) &&
+                    syncCallLogger.isEnabledFor(Level.WARN)) {
                 String msg = "[WARNING: synchronous call] All calls to the method below are synchronous " +
                     "(not an error, but may lead to performance issues or deadlocks):" +
                     System.getProperty("line.separator") +
                     methodCall.getReifiedMethod() +
                     System.getProperty("line.separator") +
-                    "They are synchronous for the following reason: " + reason;
+                    "They are synchronous for the following reason: " +
+                    mci.getMessage();
+
                 if (loggedSyncCalls.add(msg)) {
-                    syncCallLogger.debug(msg);
+                    syncCallLogger.warn(msg);
                 }
             }
+
             return reifyAsSynchronous(methodCall);
         } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),
@@ -171,6 +185,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                                            .equals(((AbstractBodyProxy) proxy).getBodyID()));
                 }
             }
+
             return new Boolean(false);
         }
 

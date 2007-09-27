@@ -74,17 +74,6 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable,
         return mc.isAsynchronousWayCall();
     }
 
-    /**
-     * Returns a boolean saying whether the methode is one-way or not.
-     * Being one-way method is equivalent to <UL>
-     * <LI>having <code>void</code> as return type
-     * <LI>and not throwing any checked exceptions</UL>
-     * @return true if and only if the method call is one way
-     */
-    protected static boolean isOneWayCall(MethodCall mc) {
-        return mc.isOneWayCall();
-    }
-
     // NFEProducer implementation
     private NFEListenerList nfeListeners = null;
 
