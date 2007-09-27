@@ -88,7 +88,7 @@ public class Test extends FunctionalTest {
         }
 
         this.pad = ProDeployment.getProactiveDescriptor(descriptor.getPath());
-        //        this.pad.activateMappings();
+        this.pad.activateMappings();
         this.vn1 = this.pad.getVirtualNode("VN1");
 
         this.vn2 = this.pad.getVirtualNode("VN2");
