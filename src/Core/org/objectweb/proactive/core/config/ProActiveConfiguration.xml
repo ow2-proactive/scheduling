@@ -13,7 +13,6 @@
 		<prop key="proactive.mixedlocation.maxTimeOnSite" value="-1"/>
 		
 		<prop key="proactive.future.ac" value="true"/>
-		<prop key="proactive.future.maxdelay" value="0"/> <!-- 0: no timeout -->
 		<prop key="proactive.stack_trace" value="false"/> <!-- complete stack traces in requests -->
 		<prop key="proactive.dgc" value="false"/>
 		<prop key="proactive.exit_on_empty" value="false"/> <!-- destroy the JVM when there is no more active object -->

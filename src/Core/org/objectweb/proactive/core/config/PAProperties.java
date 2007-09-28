@@ -57,9 +57,6 @@ public enum PAProperties {
     PA_FUTUREMONITORING_TTM("proactive.futuremonitoring.ttm", false),
 
     /** TODO cdelbe Describe this property */
-    PA_FUTURE_MAXDELAY("proactive.future.maxdelay", false),
-
-    /** TODO cdelbe Describe this property */
     PA_STACKTRACE("proactive.stack_trace", true),
     PA_HOME("proactive.home", false),
     /** this property indicates the location of the log4j configuration file */

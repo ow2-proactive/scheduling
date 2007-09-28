@@ -123,12 +123,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private transient AbstractProxy originatingProxy;
 
     /**
-     * Max timeout when waiting for a future
-     * Can be set with the property proactive.future.maxdelay
-     */
-    protected static long futureMaxDelay = -1;
-
-    /**
      * The methods to call when this future is updated
      */
     private transient LocalFutureUpdateCallbacks callbacks;
@@ -276,25 +270,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * Blocks the calling thread until the future object is available.
      */
     public synchronized void waitFor() {
-        if (futureMaxDelay == -1) {
-
-            /* First time, hopefully the configuration file has been read */
-            try {
-                futureMaxDelay = Long.parseLong(PAProperties.PA_FUTURE_MAXDELAY.getValue());
-            } catch (IllegalArgumentException iea) {
-                /* The property is not set, that's not a problem */
-                futureMaxDelay = 0;
-            }
-        }
-
         try {
-            waitFor(futureMaxDelay);
+            waitFor(0);
         } catch (ProActiveException e) {
-            ProxyNonFunctionalException nfe = new FutureTimeoutException(
-                    "Exception after waiting for " + futureMaxDelay + "ms", e);
-
-            target = new FutureResult(null, null, nfe);
-            notifyAll();
+            throw new IllegalStateException("Cannot happen");
         }
     }
 
