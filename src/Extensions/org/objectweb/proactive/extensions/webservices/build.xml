@@ -7,4 +7,17 @@
 	<target name="-compile">
 		<compile_extension module="webservices" />
 	</target>
+	
+	
+	<target name="proActiveWar" depends="proActiveJar">
+		<war destfile="${PAdist.dir}/proactive.war" webxml="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/soap/web.xml" basedir="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/war-root">
+			<lib dir="${lib.dir}">
+				<include name="*.jar" />
+			</lib>
+			<lib dir="${PAdist.dir}">
+				<include name="ProActive.jar" />
+			</lib>
+		</war>
+	</target>
+	
 </project>

@@ -95,7 +95,7 @@
 
     <para>To start and stop the server, launch the start and the shutdown
     scripts in the bin directory.</para>
-
+    <!--  
     <para>We also use a SOAP engine which is the Apache SOAP engine, available
     <ulink url="http://www.apache.org/dyn/closer.cgi/ws/soap/">here</ulink> .
     This SOAP engine will be responsible of locating and calling the
@@ -107,7 +107,7 @@
 
     <para>The SOAP Engine is now installed ! You can verify, after starting
     the server that you access to the welcome page of Apache SOAP at: <ulink
-    url="http://localhost:8080/soap/index.html"></ulink>.</para>
+    url="http://localhost:8080/proactive/index.html"></ulink>.</para>
 
     <para>Now we have to install ProActive into this SOAP engine. For that,
     follow these steps:</para>
@@ -124,6 +124,10 @@
       </listitem>
     </itemizedlist>
   </sect1>
+-->
+	<para>The last part consists in generating the web archive file using the ant target called 'proActiveWar'
+	and copying it under the TOMCAT/webapps directory. Tomcat will automatically uncompress and install the web application. 
+	</para>
 
   <sect1>
     <title>Steps to expose an active object or a component as a web
@@ -324,7 +328,7 @@
         <listitem>
           <para>In the address box enter the WSDL service address, for
           example: <ulink
-          url="http://localhost:8080/soap/servlet/wsdl?id=helloWorld"></ulink>
+          url="http://localhost:8080/proactive/servlet/wsdl?id=helloWorld"></ulink>
           .When clicking the 'add reference' button, this will get the
           service's WSDL and creates the specific proxy to the service.</para>
         </listitem>
@@ -371,7 +375,7 @@ string s = hw.helloWorld ();
 
       <para>Once the dispatcher is deployed as a web service, we have a WSDL
       url: <ulink
-      url="http://localhost:8080/soap/servlet/id=C3DDispactcher"></ulink>. It
+      url="http://localhost:8080/proactive/servlet/id=C3DDispactcher"></ulink>. It
       will be usefull to construct the dispatcher client.</para>
     </sect2>
 

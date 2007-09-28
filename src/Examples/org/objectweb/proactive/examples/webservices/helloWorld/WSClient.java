@@ -38,6 +38,8 @@ import javax.xml.rpc.Service;
 import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.ServiceFactory;
 
+import org.objectweb.proactive.extensions.webservices.WSConstants;
+
 
 /**
  * @author vlegrand
@@ -55,7 +57,7 @@ public class WSClient {
             address = "http://" + address;
         }
 
-        address += "/soap/servlet/rpcrouter";
+        address += WSConstants.ROUTER;
         String namespaceURI = "helloWorld";
         String serviceName = "helloWorld";
         String portName = "helloWorld";

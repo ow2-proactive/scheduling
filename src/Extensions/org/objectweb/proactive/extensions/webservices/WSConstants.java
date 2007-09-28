@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.soap.util.xml.QName;
+import org.objectweb.proactive.extensions.webservices.soap.ProActiveProvider;
 
 
 /**
@@ -47,10 +48,12 @@ import org.apache.soap.util.xml.QName;
  * Utility constants for deploying active objects and components as Web Services
  */
 public class WSConstants {
-    public static final String PROACTIVE_PROVIDER = "org.objectweb.proactive.ext.webservices.soap.ProActiveProvider";
+    public static final String PROACTIVE_PROVIDER = ProActiveProvider.class.getName();
     public static final String PROACTIVE_STUB = "Stub";
     public static final String WSDL_FILE = "Wsdl";
-    public static final String ROUTER = "/soap/servlet/rpcrouter";
+    public static final String WEBAPP_NAME = "proactive";
+    public static final String ROUTER = "/" + WEBAPP_NAME +
+        "/servlet/rpcrouter";
     public static final String DOCUMENTATION = "ProActive Active Object";
     public static final String COMPONENT_INTERFACE = "Compoment Interface";
     public static final String URL_PUBLICATION = "URL";
