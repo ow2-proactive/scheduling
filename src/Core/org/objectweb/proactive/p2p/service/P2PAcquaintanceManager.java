@@ -46,7 +46,6 @@ import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -225,8 +224,11 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return a random acquaintance reference.
      */
     public P2PService randomPeer() {
-        int random = this.randomizer.nextInt(this.groupOfAcquaintances.size());
-        return this.groupOfAcquaintances.get(random);
+        if (this.groupOfAcquaintances.size() != 0) {
+            int random = this.randomizer.nextInt(this.groupOfAcquaintances.size());
+            return this.groupOfAcquaintances.get(random);
+        }
+        return null;
     }
 
     /**

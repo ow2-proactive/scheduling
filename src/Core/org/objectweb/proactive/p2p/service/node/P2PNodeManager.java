@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 import java.util.Iterator;
@@ -72,7 +73,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private ProActiveRuntime proactiveRuntime = null;
     private final Vector<Node> availbaleNodes = new Vector<Node>();
     private final Vector<Object> bookedNodes = new Vector<Object>();
-    private final Vector usingNodes = new Vector();
+    private final Vector<Node> usingNodes = new Vector<Node>();
     private int nodeCounter = 0;
 
     //    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
@@ -242,6 +243,13 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                 this.p2pServiceNode.getNodeInformation().getURL());
             logger.debug("ProActiveRuntime at " +
                 this.proactiveRuntime.getURL());
+        }
+        try {
+            ProActiveObject.register(ProActiveObject.getStubOnThis(),
+                URIBuilder.buildURIFromProperties("localhost", "P2PNodeManager")
+                          .toString());
+        } catch (IOException e) {
+            logger.fatal("Couldn't register the P2P node manager", e);
         }
 
         // Creating shared nodes
