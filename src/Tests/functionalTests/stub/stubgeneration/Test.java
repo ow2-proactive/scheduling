@@ -41,7 +41,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
-
 /**
  * Testing on-the-fly generation of stub classes in bytecode form
  * @author rquilici
