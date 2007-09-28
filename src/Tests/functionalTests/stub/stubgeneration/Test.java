@@ -32,6 +32,7 @@ package functionalTests.stub.stubgeneration;
 
 import java.util.Arrays;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.Utils;
 
@@ -39,6 +40,7 @@ import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+
 
 /**
  * Testing on-the-fly generation of stub classes in bytecode form
@@ -107,6 +109,10 @@ public class Test extends FunctionalTest {
                     My_DSecond_PType.class.getName()
                 }));
 
+        // test Serializable return type
+        A a = (A) ProActive.newActive(A.class.getName(), new Object[] {  });
+        assertEquals(A.RESULT, a.foo().toString());
+
         //BENCH
         //        long begin = System.currentTimeMillis();
         //        for (int i = 0; i < 1000000; i++) {
@@ -127,8 +133,10 @@ public class Test extends FunctionalTest {
         Test test = new Test();
         try {
             test.action();
-        } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("successful");
+        } catch (Throwable t) {
+            System.out.println("failed");
+            t.printStackTrace();
         } finally {
             try {
                 System.exit(0);

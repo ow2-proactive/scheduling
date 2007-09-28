@@ -31,6 +31,7 @@
 package functionalTests.stub.stubgeneration;
 
 public class A {
+    public static final String RESULT = "a serializable result";
     String name;
 
     public A() {
@@ -42,5 +43,9 @@ public class A {
 
     public String getName() {
         return name;
+    }
+
+    public java.io.Serializable foo() {
+        return RESULT;
     }
 }
