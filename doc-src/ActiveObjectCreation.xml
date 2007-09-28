@@ -931,7 +931,7 @@ ProActive.turnActive(
 		<colspec colnum="4" colname="col4" colwidth="1*"/>
 		<spanspec spanname="onetwo" namest="col1" nameend="col2"/>
           <tbody>
-            <row align="center">
+            <row>
               <entry spanname="onetwo"> <para><emphasis role="bold">Method Signature</emphasis></para> </entry>
               <entry morerows="1" valign="middle"><para><emphasis role="bold">Creation of a
               future</emphasis></para></entry>
@@ -940,7 +940,7 @@ ProActive.turnActive(
               role="bold">Asynchronous</emphasis></para></entry>
             </row>
             
-	 		<row align="center">
+	 		<row>
 				<entry><para><emphasis role="bold">Return
               type</emphasis></para></entry>
 

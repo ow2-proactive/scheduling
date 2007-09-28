@@ -37,6 +37,7 @@
 <!ENTITY WSDoc SYSTEM "WSDoc.xml">
 <!ENTITY OSGi SYSTEM "OSGi.xml">
 <!ENTITY JMX SYSTEM "Jmx.xml">
+<!ENTITY JMXMBean SYSTEM "jmxMBean.xml">
 <!ENTITY mpi SYSTEM "mpi.xml">
 <!ENTITY IC2D SYSTEM "IC2D.xml">
 <!ENTITY plugin SYSTEM "development/plugin.xml">
@@ -134,6 +135,7 @@
     &WSDoc;
     &OSGi;
     &JMX;
+   &JMXMBean;
     &mpi;
    </part>
 
