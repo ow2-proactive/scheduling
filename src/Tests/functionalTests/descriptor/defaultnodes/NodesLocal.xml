@@ -82,7 +82,7 @@
 			<processDefinition id="linuxJVM1-AC">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
+						<parameter value="-Dproactive.future.ac=true"/>
 						<parameter value="-Dproactive.test=true"/>
 					<!-- 	<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8002,server=y,suspend=n"/> -->
 					</jvmParameters>
@@ -91,7 +91,7 @@
 			<processDefinition id="linuxJVM2-AC">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
+						<parameter value="-Dproactive.future.ac=true"/>
 						<parameter value="-Dproactive.test=true"/>		
 					<!-- 	<parameter value="-Xdebug -Xrunjdwp:transport=dt_socket,address=8003,server=y,suspend=n"/> -->
 					</jvmParameters>
