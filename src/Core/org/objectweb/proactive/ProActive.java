@@ -3360,24 +3360,11 @@ public class ProActive {
     }
 
     /**
-     * Returns the number of this version
+     * Returns the version number
      *
      * @return String
      */
     public static String getProActiveVersion() {
-        return "$Id$";
-    }
-
-    public static void main(String[] args) {
-        System.out.println("ProActive " + getProActiveVersion());
-
-        System.out.println("Available properties:");
-
-        for (PAProperties p : PAProperties.values()) {
-            String type = p.isBoolean() ? "Boolean" : "String";
-            System.out.println("\t" + p.getKey());
-            System.out.println("\t\t" + type);
-            // TODO Add a short description here
-        }
+        return Main.getProActiveVersion();
     }
 }

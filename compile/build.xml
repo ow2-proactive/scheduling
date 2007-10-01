@@ -225,7 +225,7 @@
 		<!-- If it is a release, update ProActive.getVersion() -->
 		<if name="version" value="${TODAY}">
 			<else>
-				<replaceregexp file="${src.proactive.dir}/${proactive.path}/ProActive.java" match="\$ID.*\$" replace="${version}" byline="true" />
+				<replaceregexp file="${src.proactive.dir}/${proactive.path}/Main.java" match="\$ID.*\$" replace="${version}" byline="true" />
 				<replaceregexp file="${base.dir}/README_others.html" match="\$ID.*\$" replace="${version}" byline="true" />
 				<replaceregexp file="${base.dir}/README_docs.html" match="\$ID.*\$" replace="${version}" byline="true" />
 			</else>
