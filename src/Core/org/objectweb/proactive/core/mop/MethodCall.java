@@ -607,6 +607,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 } else {
                     mci.setType(MethodCallInfo.CallType.Synchronous);
                     mci.setReason(SynchronousReason.ThrowsCheckedException);
+                    mci.setMessage(cached.reason);
                 }
             } else if (cached.returnsvoid) {
                 if (getExceptionContext().isRuntimeExceptionHandled()) {
