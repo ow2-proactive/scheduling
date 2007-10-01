@@ -271,7 +271,7 @@ public class ProActive {
      * @throws ClassNotFoundException
      * @throws NoSuchMethodException
      * @throws ProActiveException
-     * @deprecated Use {@link ProLauncher#newMain(String,String[],Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProLauncher#newMain(String,String[],Node)} instead
      */
     public static void newMain(String classname, String[] mainParameters,
         Node node)
@@ -288,7 +288,7 @@ public class ProActive {
      * @param node
      * @throws ClassNotFoundException
      * @throws ProActiveException
-     * @deprecated Use {@link ProLauncher#newRemote(String,Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProLauncher#newRemote(String,Node)} instead
      */
     public static void newRemote(String classname, Node node)
         throws ClassNotFoundException, ProActiveException {
@@ -310,7 +310,7 @@ public class ProActive {
      *                if a problem occur while creating the stub or the body
      * @exception NodeException
      *                if the DefaultNode cannot be created
-     * @deprecated Use {@link ProActiveObject#newActive(String,Object[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActive(String,Object[])} instead
      */
     public static Object newActive(String classname,
         Object[] constructorParameters)
@@ -336,7 +336,7 @@ public class ProActive {
      *                if a problem occur while creating the stub or the body
      * @exception NodeException
      *                if the node URL cannot be resolved as an existing Node
-     * @deprecated Use {@link ProActiveObject#newActive(String,Object[],String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActive(String,Object[],String)} instead
      */
     public static Object newActive(String classname,
         Object[] constructorParameters, String nodeURL)
@@ -367,7 +367,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#newActive(String,Object[],Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActive(String,Object[],Node)} instead
      */
     public static Object newActive(String classname,
         Object[] constructorParameters, Node node)
@@ -402,7 +402,7 @@ public class ProActive {
      *         created active objects.
      * @throws ClassNotFoundException
      *             in the case of className is not a class.
-     * @deprecated Use {@link ProActiveObject#newActiveInParallel(String,Object[][],Node[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActiveInParallel(String,Object[][],Node[])} instead
      */
     public static Object[] newActiveInParallel(String className,
         Object[][] constructorParameters, Node[] nodes)
@@ -437,7 +437,7 @@ public class ProActive {
      *             throws an exception.
      * @throws ClassNotFoundException
      *             in the case of className is not a class.
-     * @deprecated Use {@link ProActiveObject#newActiveInParallel(String,Object[],VirtualNode)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActiveInParallel(String,Object[],VirtualNode)} instead
      */
     public static Object[] newActiveInParallel(String className,
         Object[] constructorParameters, VirtualNode virtualNode)
@@ -466,7 +466,7 @@ public class ProActive {
      *             if a problem occur while creating the stub or the body
      * @throws NodeException
      *             if the virtualnode was null
-     * @deprecated Use {@link ProGroup#newActiveAsGroup(String,Object[],VirtualNode)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newActiveAsGroup(String,Object[],VirtualNode)} instead
      */
     public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
@@ -504,7 +504,7 @@ public class ProActive {
      *             if a problem occur while creating the stub or the body
      * @throws NodeException
      *             if the virtualnode was null
-     * @deprecated Use {@link ProGroup#newActiveAsGroup(String,Object[],VirtualNode,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newActiveAsGroup(String,Object[],VirtualNode,Active,MetaObjectFactory)} instead
      */
     public static Object newActiveAsGroup(String className,
         Object[] constructorParameters, VirtualNode virtualNode,
@@ -547,7 +547,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProComponent#newActiveComponent(String,Object[],Node,Active,MetaObjectFactory,ComponentParameters)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProComponent#newActiveComponent(String,Object[],Node,Active,MetaObjectFactory,ComponentParameters)} instead
      */
     public static Component newActiveComponent(String className,
         Object[] constructorParameters, Node node, Active activity,
@@ -592,7 +592,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProComponent#newActiveComponent(String,Object[],VirtualNode,ComponentParameters)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProComponent#newActiveComponent(String,Object[],VirtualNode,ComponentParameters)} instead
      */
     public static Component newActiveComponent(String className,
         Object[] constructorParameters, VirtualNode vn,
@@ -614,7 +614,7 @@ public class ProActive {
      *                if a problem occur while creating the stub or the body
      * @exception NodeException
      *                if the DefaultNode cannot be created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object)} instead
      */
     public static Object turnActive(Object target)
         throws ActiveObjectCreationException, NodeException {
@@ -637,7 +637,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,String)} instead
      */
     public static Object turnActive(Object target, String nodeURL)
         throws ActiveObjectCreationException, NodeException {
@@ -666,7 +666,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Node)} instead
      */
     public static Object turnActive(Object target, Node node)
         throws ActiveObjectCreationException, NodeException {
@@ -699,7 +699,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Node,Active,MetaObjectFactory)} instead
      */
     public static Object turnActive(Object target, Node node, Active activity,
         MetaObjectFactory factory)
@@ -728,7 +728,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,String,Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,String,Node)} instead
      */
     public static Object turnActive(Object target, String nameOfTargetType,
         Node node) throws ActiveObjectCreationException, NodeException {
@@ -768,7 +768,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,String,Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,String,Node,Active,MetaObjectFactory)} instead
      */
     public static Object turnActive(Object target, String nameOfTargetType,
         Node node, Active activity, MetaObjectFactory factory)
@@ -801,7 +801,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProGroup#turnActiveAsGroup(Object,String,VirtualNode)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveAsGroup(Object,String,VirtualNode)} instead
      */
     public static Object turnActiveAsGroup(Object target,
         String nameOfTargetType, VirtualNode virtualnode)
@@ -830,7 +830,7 @@ public class ProActive {
      *                if a problem occur while creating the stub or the body
      * @exception NodeException
      *                if the DefaultNode cannot be created
-     * @deprecated Use {@link ProActiveObject#newActive(String,Class[],Object[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActive(String,Class[],Object[])} instead
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters)
@@ -861,7 +861,7 @@ public class ProActive {
      *                if a problem occur while creating the stub or the body
      * @exception NodeException
      *                if the node URL cannot be resolved as an existing Node
-     * @deprecated Use {@link ProActiveObject#newActive(String,Class[],Object[],String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActive(String,Class[],Object[],String)} instead
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters, String nodeURL)
@@ -897,7 +897,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#newActive(String,Class[],Object[],Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActive(String,Class[],Object[],Node)} instead
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters, Node node)
@@ -945,7 +945,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#newActive(String,Class[],Object[],Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActive(String,Class[],Object[],Node,Active,MetaObjectFactory)} instead
      */
     public static Object newActive(String classname, Class[] genericParameters,
         Object[] constructorParameters, Node node, Active activity,
@@ -1045,7 +1045,7 @@ public class ProActive {
      *         created active objects.
      * @throws ClassNotFoundException
      *             in the case of className is not a class.
-     * @deprecated Use {@link ProActiveObject#newActiveInParallel(String,Class[],Object[][],Node[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActiveInParallel(String,Class[],Object[][],Node[])} instead
      */
     public static Object[] newActiveInParallel(String className,
         Class[] genericParameters, Object[][] constructorParameters,
@@ -1106,7 +1106,7 @@ public class ProActive {
      *             throws an exception.
      * @throws ClassNotFoundException
      *             in the case of className is not a class.
-     * @deprecated Use {@link ProActiveObject#newActiveInParallel(String,Class[],Object[],VirtualNode)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#newActiveInParallel(String,Class[],Object[],VirtualNode)} instead
      */
     public static Object[] newActiveInParallel(String className,
         Class[] genericParameters, Object[] constructorParameters,
@@ -1167,7 +1167,7 @@ public class ProActive {
      *             if a problem occur while creating the stub or the body
      * @throws NodeException
      *             if the virtualnode was null
-     * @deprecated Use {@link ProGroup#newActiveAsGroup(String,Class[],Object[],VirtualNode)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newActiveAsGroup(String,Class[],Object[],VirtualNode)} instead
      */
     public static Object newActiveAsGroup(String classname,
         Class[] genericParameters, Object[] constructorParameters,
@@ -1208,7 +1208,7 @@ public class ProActive {
      *             if a problem occur while creating the stub or the body
      * @throws NodeException
      *             if the virtualnode was null
-     * @deprecated Use {@link ProGroup#newActiveAsGroup(String,Class[],Object[],VirtualNode,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newActiveAsGroup(String,Class[],Object[],VirtualNode,Active,MetaObjectFactory)} instead
      */
     public static Object newActiveAsGroup(String classname,
         Class[] genericParameters, Object[] constructorParameters,
@@ -1279,7 +1279,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,String,Class[],Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,String,Class[],Node,Active,MetaObjectFactory)} instead
      */
     public static Object turnActive(Object target, String nameOfTargetType,
         Class[] genericParameters, Node node, Active activity,
@@ -1364,7 +1364,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProComponent#newActiveComponent(String,Class[],Object[],Node,Active,MetaObjectFactory,ComponentParameters)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProComponent#newActiveComponent(String,Class[],Object[],Node,Active,MetaObjectFactory,ComponentParameters)} instead
      */
     public static Component newActiveComponent(String classname,
         Class[] genericParameters, Object[] constructorParameters, Node node,
@@ -1427,7 +1427,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProComponent#newActiveComponent(String,Class[],Object[],VirtualNode,ComponentParameters)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProComponent#newActiveComponent(String,Class[],Object[],VirtualNode,ComponentParameters)} instead
      */
     public static Component newActiveComponent(String className,
         Class[] genericParameters, Object[] constructorParameters,
@@ -1465,7 +1465,7 @@ public class ProActive {
      *                if a problem occur while creating the stub or the body
      * @exception NodeException
      *                if the DefaultNode cannot be created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Class[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Class[])} instead
      */
     public static Object turnActive(Object target, Class[] genericParameters)
         throws ActiveObjectCreationException, NodeException {
@@ -1491,7 +1491,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Class[],String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Class[],String)} instead
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         String nodeURL) throws ActiveObjectCreationException, NodeException {
@@ -1523,7 +1523,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Class[],Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Class[],Node)} instead
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         Node node) throws ActiveObjectCreationException, NodeException {
@@ -1558,7 +1558,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Class[],Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Class[],Node,Active,MetaObjectFactory)} instead
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         Node node, Active activity, MetaObjectFactory factory)
@@ -1589,7 +1589,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Class[],String,Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Class[],String,Node)} instead
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         String nameOfTargetType, Node node)
@@ -1633,7 +1633,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProActiveObject#turnActive(Object,Class[],String,Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#turnActive(Object,Class[],String,Node,Active,MetaObjectFactory)} instead
      */
     public static Object turnActive(Object target, Class[] genericParameters,
         String nameOfTargetType, Node node, Active activity,
@@ -1707,7 +1707,7 @@ public class ProActive {
      * @exception NodeException
      *                if the node was null and that the DefaultNode cannot be
      *                created
-     * @deprecated Use {@link ProGroup#turnActiveAsGroup(Object,Class[],String,VirtualNode)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#turnActiveAsGroup(Object,Class[],String,VirtualNode)} instead
      */
     public static Object turnActiveAsGroup(Object target,
         Class[] genericParameters, String nameOfTargetType,
@@ -1761,7 +1761,7 @@ public class ProActive {
      *            default
      * @exception java.io.IOException
      *                if the remote body cannot be registered
-     * @deprecated Use {@link ProActiveObject#register(Object,String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#register(Object,String)} instead
      */
     public static void register(Object obj, String url)
         throws java.io.IOException {
@@ -1786,7 +1786,7 @@ public class ProActive {
      *            the url under which the active object is registered.
      * @exception java.io.IOException
      *                if the remote object cannot be removed from the registry
-     * @deprecated Use {@link ProActiveObject#unregister(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#unregister(String)} instead
      */
     public static void unregister(String url) throws java.io.IOException {
         String protocol = URIBuilder.getProtocol(url);
@@ -1832,7 +1832,7 @@ public class ProActive {
      *                if the object found is not of type RmiRemoteBody
      * @exception ActiveObjectCreationException
      *                if the stub-proxy couple cannot be created
-     * @deprecated Use {@link ProActiveObject#lookupActive(String,String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#lookupActive(String,String)} instead
      */
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
@@ -1878,7 +1878,7 @@ public class ProActive {
      * @throws IOException
      *             If the given url does not map to a physical host, or if the
      *             connection is refused.
-     * @deprecated Use {@link ProActiveObject#listActive(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#listActive(String)} instead
      */
     public static String[] listActive(String url) throws java.io.IOException {
         String[] activeNames = null;
@@ -1902,7 +1902,7 @@ public class ProActive {
      * @param activeObject
      *            the remote active object.
      * @return the URL of <code>activeObject</code>.
-     * @deprecated Use {@link ProActiveObject#getActiveObjectNodeUrl(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#getActiveObjectNodeUrl(Object)} instead
      */
     public static String getActiveObjectNodeUrl(Object activeObject) {
         UniversalBody body = getRemoteBody(activeObject);
@@ -1921,7 +1921,7 @@ public class ProActive {
      * @throws IllegalArgumentException
      *             if the first argument is not a future or if the method could
      *             not be found
-     * @deprecated Use {@link ProFuture#addActionOnFuture(Object,String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#addActionOnFuture(Object,String)} instead
      */
     public static void addActionOnFuture(Object future, String methodName) {
         FutureProxy f;
@@ -1941,7 +1941,7 @@ public class ProActive {
      * @param future
      *            the future object that is examinated
      * @return true iff an exception should be thrown when accessing the object
-     * @deprecated Use {@link ProException#isException(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#isException(Object)} instead
      */
     public static boolean isException(Object future) {
         // If the object is not reified, it cannot be a future
@@ -1969,7 +1969,7 @@ public class ProActive {
      *
      * @param future
      *            object to wait for
-     * @deprecated Use {@link ProFuture#waitFor(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitFor(Object)} instead
      */
     public static void waitFor(Object future) {
         // If the object is not reified, it cannot be a future
@@ -2001,7 +2001,7 @@ public class ProActive {
      *            to wait in ms
      * @throws ProActiveException
      *             if the timeout expire
-     * @deprecated Use {@link ProFuture#waitFor(Object,long)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitFor(Object,long)} instead
      */
     public static void waitFor(Object future, long timeout)
         throws ProActiveException {
@@ -2030,7 +2030,7 @@ public class ProActive {
      *         property
      * @throws ProActiveException
      * @throws RemoteException
-     * @deprecated Use {@link ProDeployment#getProactiveDescriptor()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#getProactiveDescriptor()} instead
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor()
         throws ProActiveException, IOException {
@@ -2058,7 +2058,7 @@ public class ProActive {
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
-     * @deprecated Use {@link ProDeployment#getProactiveDescriptor(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#getProactiveDescriptor(String)} instead
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
@@ -2080,7 +2080,7 @@ public class ProActive {
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
-     * @deprecated Use {@link ProDeployment#getProactiveDescriptor(String,VariableContract)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#getProactiveDescriptor(String,VariableContract)} instead
      */
     public static ProActiveDescriptorInternal getProactiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract)
@@ -2094,7 +2094,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link ProDeployment#getProActiveDescriptor(String,VariableContract,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#getProActiveDescriptor(String,VariableContract,boolean)} instead
      */
     private static ProActiveDescriptorInternal getProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,
@@ -2161,7 +2161,7 @@ public class ProActive {
      * @return the pad found or a new pad parsed from xmlDescriptorUrl
      * @throws ProActiveException
      * @throws RemoteException
-     * @deprecated Use {@link ProDeployment#internalGetProActiveDescriptor_new(String,VariableContract,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#internalGetProActiveDescriptor_new(String,VariableContract,boolean)} instead
      */
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor_new(
         String xmlDescriptorUrl, VariableContract variableContract,
@@ -2233,7 +2233,7 @@ public class ProActive {
      * @return the pad found or a new pad parsed from xmlDescriptorUrl
      * @throws ProActiveException
      * @throws RemoteException
-     * @deprecated Use {@link ProDeployment#internalGetProActiveDescriptor_old(String,VariableContract,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#internalGetProActiveDescriptor_old(String,VariableContract,boolean)} instead
      */
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor_old(
         String xmlDescriptorUrl, VariableContract variableContract,
@@ -2310,7 +2310,7 @@ public class ProActive {
      * @throws ProActiveException
      *             If the VirtualNode with the given name has not been yet
      *             activated or does not exist on the local runtime
-     * @deprecated Use {@link ProDeployment#registerVirtualNode(VirtualNode,String,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#registerVirtualNode(VirtualNode,String,boolean)} instead
      */
     public static void registerVirtualNode(VirtualNode virtualNode,
         String registrationProtocol, boolean replacePreviousBinding)
@@ -2346,7 +2346,7 @@ public class ProActive {
      * @return VirtualNode The virtualNode returned by the lookup
      * @throws ProActiveException
      *             If no objects are bound with the given url
-     * @deprecated Use {@link ProDeployment#lookupVirtualNode(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#lookupVirtualNode(String)} instead
      */
     public static VirtualNode lookupVirtualNode(String url)
         throws ProActiveException {
@@ -2365,7 +2365,7 @@ public class ProActive {
      *            The VirtualNode to unregister
      * @throws ProActiveException
      *             if a problem occurs whle unregistering the VirtualNode
-     * @deprecated Use {@link ProDeployment#unregisterVirtualNode(VirtualNode)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProDeployment#unregisterVirtualNode(VirtualNode)} instead
      */
     public static void unregisterVirtualNode(VirtualNode virtualNode)
         throws ProActiveException {
@@ -2399,7 +2399,7 @@ public class ProActive {
      * @return the body associated to the active object whose active thread is
      *         calling this method.
      * @throws ProActiveException
-     * @deprecated Use {@link ProActiveObject#getBodyOnThis()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#getBodyOnThis()} instead
      */
     public static Body getBodyOnThis() {
         return LocalBodyStore.getInstance().getContext().getBody();
@@ -2412,7 +2412,7 @@ public class ProActive {
      *
      * @return the current execution context associated to the calling thread.
      * @see org.objectweb.proactive.core.body.Context
-     * @deprecated Use {@link ProActiveObject#getContext()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#getContext()} instead
      */
     public static Context getContext() {
         return LocalBodyStore.getInstance().getContext();
@@ -2424,7 +2424,7 @@ public class ProActive {
      *
      * @return a Stub-Proxy couple pointing to the local body.
      * @see #getBodyOnThis
-     * @deprecated Use {@link ProActiveObject#getStubOnThis()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#getStubOnThis()} instead
      */
     public static StubObject getStubOnThis() {
         Body body = getBodyOnThis();
@@ -2451,7 +2451,7 @@ public class ProActive {
      * @exception MigrationException
      *                if the migration fails
      * @see #getBodyOnThis
-     * @deprecated Use {@link ProMigration#migrateTo(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Object)} instead
      */
     public static void migrateTo(Object activeObject) throws MigrationException {
         migrateTo(getNodeFromURL(getNodeURLFromActiveObject(activeObject)));
@@ -2469,7 +2469,7 @@ public class ProActive {
      * @exception MigrationException
      *                if the migration fails
      * @see #getBodyOnThis
-     * @deprecated Use {@link ProMigration#migrateTo(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(String)} instead
      */
     public static void migrateTo(String nodeURL) throws MigrationException {
         if (logger.isDebugEnabled()) {
@@ -2489,7 +2489,7 @@ public class ProActive {
      * @exception MigrationException
      *                if the migration fails
      * @see #getBodyOnThis
-     * @deprecated Use {@link ProMigration#migrateTo(Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Node)} instead
      */
     public static void migrateTo(Node node) throws MigrationException {
         if (logger.isDebugEnabled()) {
@@ -2520,7 +2520,7 @@ public class ProActive {
      *            does not modify the application's computation
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link ProMigration#migrateTo(Body,Object,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,Object,boolean)} instead
      */
     public static void migrateTo(Body bodyToMigrate, Object activeObject,
         boolean isNFRequest) throws MigrationException {
@@ -2544,7 +2544,7 @@ public class ProActive {
      *            does not modify the application's computation
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link ProMigration#migrateTo(Body,String,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,String,boolean)} instead
      */
     public static void migrateTo(Body bodyToMigrate, String nodeURL,
         boolean isNFRequest) throws MigrationException {
@@ -2566,7 +2566,7 @@ public class ProActive {
      *            does not modify the application's computation
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link ProMigration#migrateTo(Body,Node,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,Node,boolean)} instead
      */
     public static void migrateTo(Body bodyToMigrate, Node node,
         boolean isNFRequest) throws MigrationException {
@@ -2595,7 +2595,7 @@ public class ProActive {
      *            are defined in Request interface of ProActive.
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link ProMigration#migrateTo(Body,Node,boolean,int)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,Node,boolean,int)} instead
      */
     public static void migrateTo(Body bodyToMigrate, Node node,
         boolean isNFRequest, int priority) throws MigrationException {
@@ -2625,7 +2625,7 @@ public class ProActive {
      * @param futures
      *            vector of futures
      * @return index of the available future in the vector
-     * @deprecated Use {@link ProFuture#waitForAny(java.util.Vector)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitForAny(java.util.Vector)} instead
      */
     public static int waitForAny(java.util.Vector futures) {
         try {
@@ -2650,7 +2650,7 @@ public class ProActive {
      * @return index of the available future in the vector
      * @throws ProActiveException
      *             if the timeout expires
-     * @deprecated Use {@link ProFuture#waitForAny(java.util.Vector,long)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitForAny(java.util.Vector,long)} instead
      */
     public static int waitForAny(java.util.Vector futures, long timeout)
         throws ProActiveException {
@@ -2662,7 +2662,7 @@ public class ProActive {
      *
      * @param futures
      *            vector of futures
-     * @deprecated Use {@link ProFuture#waitForAll(java.util.Vector)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitForAll(java.util.Vector)} instead
      */
     public static void waitForAll(java.util.Vector futures) {
         try {
@@ -2684,7 +2684,7 @@ public class ProActive {
      *            to wait in ms
      * @throws ProActiveException
      *             if the timeout expires
-     * @deprecated Use {@link ProFuture#waitForAll(java.util.Vector,long)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitForAll(java.util.Vector,long)} instead
      */
     public static void waitForAll(java.util.Vector futures, long timeout)
         throws ProActiveException {
@@ -2706,7 +2706,7 @@ public class ProActive {
      *            vector of futures
      * @param n
      *            index of future to wait
-     * @deprecated Use {@link ProFuture#waitForTheNth(java.util.Vector,int)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitForTheNth(java.util.Vector,int)} instead
      */
     public static void waitForTheNth(java.util.Vector futures, int n) {
         waitFor(futures.get(n));
@@ -2723,7 +2723,7 @@ public class ProActive {
      *            to wait in ms
      * @throws ProActiveException
      *             if the timeout expires
-     * @deprecated Use {@link ProFuture#waitForTheNth(java.util.Vector,int,long)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#waitForTheNth(java.util.Vector,int,long)} instead
      */
     public static void waitForTheNth(java.util.Vector futures, int n,
         long timeout) throws ProActiveException {
@@ -2738,7 +2738,7 @@ public class ProActive {
      *            a table with futures.
      * @return <code>true</code> if all futures are awaited, else <code>false
      * </code>.
-     * @deprecated Use {@link ProFuture#allAwaited(java.util.Vector)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#allAwaited(java.util.Vector)} instead
      */
     public static boolean allAwaited(java.util.Vector futures) {
         FuturePool fp = getBodyOnThis().getFuturePool();
@@ -2761,7 +2761,7 @@ public class ProActive {
      * Return false if the object <code>future</code> is available. This
      * method is recursive, i.e. if result of future is a future too,
      * <CODE>isAwaited</CODE> is called again on this result, and so on.
-     * @deprecated Use {@link ProFuture#isAwaited(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#isAwaited(Object)} instead
      */
     public static boolean isAwaited(Object future) {
         // If the object is not reified, it cannot be a future
@@ -2791,7 +2791,7 @@ public class ProActive {
      * too, <CODE>getFutureValue</CODE> is called again on this result, and so
      * on.
      *
-     * @deprecated Use {@link ProFuture#getFutureValue(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProFuture#getFutureValue(Object)} instead
      */
     public static Object getFutureValue(Object future) {
         while (true) {
@@ -2814,7 +2814,7 @@ public class ProActive {
 
     /**
      * Enable the automatic continuation mechanism for this active object.
-     * @deprecated Use {@link ProActiveObject#enableAC(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#enableAC(Object)} instead
      */
     public static void enableAC(Object obj) throws java.io.IOException {
         UniversalBody body = getRemoteBody(obj);
@@ -2823,7 +2823,7 @@ public class ProActive {
 
     /**
      * Disable the automatic continuation mechanism for this active object.
-     * @deprecated Use {@link ProActiveObject#disableAC(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#disableAC(Object)} instead
      */
     public static void disableAC(Object obj) throws java.io.IOException {
         UniversalBody body = getRemoteBody(obj);
@@ -2841,7 +2841,7 @@ public class ProActive {
      *            object dies immediatly. Else, the kill request is served as a
      *            normal request, it is put on the request queue. The
      *            termination is asynchronous.
-     * @deprecated Use {@link ProActiveObject#terminateActiveObject(Object,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#terminateActiveObject(Object,boolean)} instead
      */
     public static void terminateActiveObject(Object ao, boolean immediate) {
         if (MOP.isReifiedObject(ao)) {
@@ -2875,7 +2875,7 @@ public class ProActive {
      *            object dies immediatly. Else, the kill request is served as a
      *            normal request, it is put on the request queue. The
      *            termination is asynchronous.
-     * @deprecated Use {@link ProActiveObject#terminateActiveObject(boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#terminateActiveObject(boolean)} instead
      */
     public static void terminateActiveObject(boolean immediate) {
         terminateActiveObject(ProActive.getStubOnThis(), immediate);
@@ -2889,7 +2889,7 @@ public class ProActive {
      * @param target
      *            the pinged active object.
      * @return true if the active object is reachable, false otherwise.
-     * @deprecated Use {@link ProActiveObject#pingActiveObject(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#pingActiveObject(Object)} instead
      */
     public static boolean pingActiveObject(Object target) {
         UniversalBody targetedBody = null;
@@ -2918,7 +2918,7 @@ public class ProActive {
      *
      * @param methodName
      *            the name of the method
-     * @deprecated Use {@link ProActiveObject#setImmediateService(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#setImmediateService(String)} instead
      */
     public static void setImmediateService(String methodName) {
         getBodyOnThis().setImmediateService(methodName);
@@ -2937,7 +2937,7 @@ public class ProActive {
      *            the name of the method
      * @param parametersTypes
      *            the types of the parameters of the method
-     * @deprecated Use {@link ProActiveObject#setImmediateService(String,Class[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#setImmediateService(String,Class[])} instead
      */
     public static void setImmediateService(String methodName,
         Class[] parametersTypes) {
@@ -2951,7 +2951,7 @@ public class ProActive {
      *
      * @param methodName
      *            the name of the method
-     * @deprecated Use {@link ProActiveObject#removeImmediateService(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#removeImmediateService(String)} instead
      */
     public static void removeImmediateService(String methodName) {
         getBodyOnThis().removeImmediateService(methodName);
@@ -2966,7 +2966,7 @@ public class ProActive {
      *            the name of the method
      * @param parametersTypes
      *            the types of the parameters of the method
-     * @deprecated Use {@link ProActiveObject#removeImmediateService(String,Class[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#removeImmediateService(String,Class[])} instead
      */
     public static void removeImmediateService(String methodName,
         Class[] parametersTypes) {
@@ -2976,7 +2976,7 @@ public class ProActive {
     /**
      * @param obj
      * @return
-     * @deprecated Use {@link AbstractBody#getRemoteBody(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.core.body.AbstractBody#getRemoteBody(Object)} instead
      */
     private static UniversalBody getRemoteBody(Object obj) {
         // Check if obj is really a reified object
@@ -3000,7 +3000,7 @@ public class ProActive {
 
     /**
      * @return the jobId associated with the object calling this method
-     * @deprecated Use {@link ProActiveObject#getJobId()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#getJobId()} instead
      */
     public static String getJobId() {
         return ProActive.getBodyOnThis().getJobID();
@@ -3010,7 +3010,7 @@ public class ProActive {
     // -- PRIVATE METHODS -----------------------------------------------
     //
     /**
-     * @deprecated Use {@link ProMigration#getNodeURLFromActiveObject(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#getNodeURLFromActiveObject(Object)} instead
      */
     private static String getNodeURLFromActiveObject(Object o)
         throws MigrationException {
@@ -3027,7 +3027,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link ProMigration#getNodeFromURL(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#getNodeFromURL(String)} instead
      */
     private static Node getNodeFromURL(String url) throws MigrationException {
         try {
@@ -3044,7 +3044,7 @@ public class ProActive {
     //
     // -------------------------------------------------------------------------------------------
     /**
-     * @deprecated Use {@link ProActiveObject#getStubForBody(Body)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#getStubForBody(Body)} instead
      */
     private static StubObject getStubForBody(Body body) {
         try {
@@ -3058,7 +3058,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link MOP#createStubObject(String,UniversalBody)} instead
+     * @deprecated Use {@link org.objectweb.proactive.core.mop.MOP#createStubObject(String,UniversalBody)} instead
      */
     public static Object createStubObject(String className, UniversalBody body)
         throws MOPException {
@@ -3066,7 +3066,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link MOP#createStubObject(Object,String,Class[],Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.core.mop.MOP#createStubObject(Object,String,Class[],Node,Active,MetaObjectFactory)} instead
      */
     private static Object createStubObject(String className,
         Class[] genericParameters, Object[] constructorParameters, Node node,
@@ -3077,7 +3077,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link MOP#createStubObject(String,Class[],Object[],Object[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.core.mop.MOP#createStubObject(String,Class[],Object[],Object[])} instead
      */
     private static Object createStubObject(String className,
         Class[] genericParameters, Object[] constructorParameters,
@@ -3093,7 +3093,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link MOP#createStubObject(Object,String,Class[],Node,Active,MetaObjectFactory)} instead
+     * @deprecated Use {@link org.objectweb.proactive.core.mop.MOP#createStubObject(Object,String,Class[],Node,Active,MetaObjectFactory)} instead
      */
     private static Object createStubObject(Object target,
         String nameOfTargetType, Class[] genericParameters, Node node,
@@ -3104,7 +3104,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link MOP#createStubObject(Object,Object[],String,Class[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.core.mop.MOP#createStubObject(Object,Object[],String,Class[])} instead
      */
     private static StubObject createStubObject(Object object,
         Object[] proxyParameters, String nameOfTargetType,
@@ -3125,7 +3125,7 @@ public class ProActive {
      *
      * @param c
      *            the caught exception type in the catch block
-     * @deprecated Use {@link ProException#tryWithCatch(Class)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#tryWithCatch(Class)} instead
      */
     public static void tryWithCatch(Class c) {
         tryWithCatch(new Class[] { c });
@@ -3136,7 +3136,7 @@ public class ProActive {
      *
      * @param c
      *            the caught exception types in the catch block
-     * @deprecated Use {@link ProException#tryWithCatch(Class[])} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#tryWithCatch(Class[])} instead
      */
     public static void tryWithCatch(Class[] c) {
         ExceptionHandler.tryWithCatch(c);
@@ -3144,7 +3144,7 @@ public class ProActive {
 
     /**
      * This has to be called at the end of the try block.
-     * @deprecated Use {@link ProException#endTryWithCatch()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#endTryWithCatch()} instead
      */
     public static void endTryWithCatch() {
         ExceptionHandler.endTryWithCatch();
@@ -3154,7 +3154,7 @@ public class ProActive {
      * This has to be called at the beginning of the finally block, so it
      * requires one.
      *
-     * @deprecated Use {@link ProException#removeTryWithCatch()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeTryWithCatch()} instead
      */
     public static void removeTryWithCatch() {
         ExceptionHandler.removeTryWithCatch();
@@ -3164,7 +3164,7 @@ public class ProActive {
      * This can be used to query a potential returned exception, and throw it if
      * it exists.
      *
-     * @deprecated Use {@link ProException#throwArrivedException()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#throwArrivedException()} instead
      */
     public static void throwArrivedException() {
         ExceptionHandler.throwArrivedException();
@@ -3174,7 +3174,7 @@ public class ProActive {
      * This is used to wait for the return of every call, so that we know the
      * execution can continue safely with no pending exception.
      *
-     * @deprecated Use {@link ProException#waitForPotentialException()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#waitForPotentialException()} instead
      */
     public static void waitForPotentialException() {
         ExceptionHandler.waitForPotentialException();
@@ -3185,7 +3185,7 @@ public class ProActive {
      *
      * @param listener
      *            The listener to add
-     * @deprecated Use {@link ProException#addNFEListenerOnJVM(NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnJVM(NFEListener)} instead
      */
     public static void addNFEListenerOnJVM(NFEListener listener) {
         NFEManager.addNFEListener(listener);
@@ -3196,7 +3196,7 @@ public class ProActive {
      *
      * @param listener
      *            The listener to remove
-     * @deprecated Use {@link ProException#removeNFEListenerOnJVM(NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnJVM(NFEListener)} instead
      */
     public static void removeNFEListenerOnJVM(NFEListener listener) {
         NFEManager.removeNFEListener(listener);
@@ -3209,7 +3209,7 @@ public class ProActive {
      *            The active object receiving the NFE
      * @param listener
      *            The listener to add
-     * @deprecated Use {@link ProException#addNFEListenerOnAO(Object,NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnAO(Object,NFEListener)} instead
      */
     public static void addNFEListenerOnAO(Object ao, NFEListener listener) {
 
@@ -3225,7 +3225,7 @@ public class ProActive {
      *            The active object receiving the NFE
      * @param listener
      *            The listener to remove
-     * @deprecated Use {@link ProException#removeNFEListenerOnAO(Object,NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnAO(Object,NFEListener)} instead
      */
     public static void removeNFEListenerOnAO(Object ao, NFEListener listener) {
         UniversalBody body = getRemoteBody(ao);
@@ -3239,7 +3239,7 @@ public class ProActive {
      *            The active object receiving the NFE
      * @param listener
      *            The listener to add
-     * @deprecated Use {@link ProException#addNFEListenerOnProxy(Object,NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnProxy(Object,NFEListener)} instead
      */
     public static void addNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
@@ -3258,7 +3258,7 @@ public class ProActive {
      *            The active object receiving the NFE
      * @param listener
      *            The listener to remove
-     * @deprecated Use {@link ProException#removeNFEListenerOnProxy(Object,NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnProxy(Object,NFEListener)} instead
      */
     public static void removeNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
@@ -3270,7 +3270,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link ProGroup#getGroupProxy(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#getGroupProxy(Object)} instead
      */
     private static ProxyForGroup getGroupProxy(Object group) {
         ProxyForGroup pfg;
@@ -3295,7 +3295,7 @@ public class ProActive {
      *            The group receiving the NFE
      * @param listener
      *            The listener to add
-     * @deprecated Use {@link ProException#addNFEListenerOnGroup(Object,NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnGroup(Object,NFEListener)} instead
      */
     public static void addNFEListenerOnGroup(Object group, NFEListener listener) {
         getGroupProxy(group).addNFEListener(listener);
@@ -3308,7 +3308,7 @@ public class ProActive {
      *            The group receiving the NFE
      * @param listener
      *            The listener to remove
-     * @deprecated Use {@link ProException#removeNFEListenerOnGroup(Object,NFEListener)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnGroup(Object,NFEListener)} instead
      */
     public static void removeNFEListenerOnGroup(Object group,
         NFEListener listener) {
@@ -3321,7 +3321,7 @@ public class ProActive {
      * for every call in this block to return.
      *
      * @return a collection of these exceptions
-     * @deprecated Use {@link ProException#getAllExceptions()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProException#getAllExceptions()} instead
      */
     public static Collection getAllExceptions() {
         return ExceptionHandler.getAllExceptions();
@@ -3331,7 +3331,7 @@ public class ProActive {
      * @return The node of the current active object.
      * @throws NodeException
      *             problem with the node.
-     * @deprecated Use {@link ProActiveObject#getNode()} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProActiveObject#getNode()} instead
      */
     public static Node getNode() throws NodeException {
         BodyProxy destProxy = (BodyProxy) (getStubOnThis()).getProxy();
