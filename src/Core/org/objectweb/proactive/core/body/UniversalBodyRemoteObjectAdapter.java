@@ -11,8 +11,6 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -149,18 +147,6 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
     public void updateLocation(UniqueID id, UniversalBody body)
         throws IOException {
         target.updateLocation(id, body);
-    }
-
-    public void addNFEListener(NFEListener listener) {
-        target.addNFEListener(listener);
-    }
-
-    public int fireNFE(NonFunctionalException e) {
-        return target.fireNFE(e);
-    }
-
-    public void removeNFEListener(NFEListener listener) {
-        target.removeNFEListener(listener);
     }
 
     public X509Certificate getCertificate()

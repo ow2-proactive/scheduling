@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.gc.GCTag;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.ConstructorCall;

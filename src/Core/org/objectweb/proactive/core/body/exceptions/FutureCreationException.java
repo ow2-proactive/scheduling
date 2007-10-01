@@ -28,9 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.exceptions.proxy;
+package org.objectweb.proactive.core.body.exceptions;
 
-public class FutureCreationException extends ProxyNonFunctionalException {
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+
+
+public class FutureCreationException extends ProActiveRuntimeException {
     public FutureCreationException(String message, Throwable cause) {
         super(message, cause);
     }

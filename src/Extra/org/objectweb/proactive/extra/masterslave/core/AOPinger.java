@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -9,14 +8,8 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -115,9 +108,6 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
             slaveGroup = ProGroup.getGroup(slaveGroupStub);
             stubOnThis = (AOPinger) ProActiveObject.getStubOnThis();
             body.setImmediateService("terminate");
-
-            ProException.addNFEListenerOnGroup(slaveGroupStub,
-                new DetectMissingGroup());
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -194,41 +184,8 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
         return new BooleanWrapper(true);
     }
 
-    /**
-     * Handles Non Functional Exceptions(NFE) detection
-     * @author fviale
+    /*
+     * TODO: handle exceptions with stubOnThis.slaveMissing((Slave) eig.getObject()); for each
+     * member in the ExceptionListException
      */
-    public class DetectMissingGroup implements NFEListener {
-
-        /**
-                 *
-                 */
-        private static final long serialVersionUID = -3218967627910771077L;
-
-        /**
-        * {@inheritDoc}
-        */
-        public boolean handleNFE(final NonFunctionalException nfe) {
-            Iterator<ExceptionInGroup> exceptions;
-            ExceptionListException exceptionList;
-
-            try {
-                FailedGroupRendezVousException fgrve = (FailedGroupRendezVousException) nfe;
-                exceptionList = (ExceptionListException) fgrve.getCause();
-            } catch (ClassCastException cce) {
-                return false;
-            }
-
-            synchronized (exceptionList) {
-                exceptions = exceptionList.iterator();
-
-                while (exceptions.hasNext()) {
-                    ExceptionInGroup eig = (ExceptionInGroup) exceptions.next();
-                    stubOnThis.slaveMissing((Slave) eig.getObject());
-                }
-            }
-
-            return true;
-        }
-    }
 }

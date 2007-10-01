@@ -65,7 +65,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     }
 
     @Override
-    public Reply serve(Body targetBody) throws ServeException {
+    public Reply serve(Body targetBody) {
         Reply r = super.serve(targetBody);
         return r;
     }

@@ -40,7 +40,6 @@ import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -58,17 +57,10 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
-import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
-import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
@@ -498,146 +490,35 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (request == null) {
                 return;
             }
-            try {
-                // ProActiveEvent
-                messageEventProducer.notifyListeners(request,
-                    MessageEvent.SERVING_STARTED, bodyID,
-                    getRequestQueue().size());
-                // END ProActiveEvent
+            // ProActiveEvent
+            messageEventProducer.notifyListeners(request,
+                MessageEvent.SERVING_STARTED, bodyID, getRequestQueue().size());
+            // END ProActiveEvent
 
-                // JMX Notification
-                if (!isProActiveInternalObject && (mbean != null)) {
-                    mbean.sendNotification(NotificationType.servingStarted,
-                        new Integer(getRequestQueue().size()));
-                }
+            // JMX Notification
+            if (!isProActiveInternalObject && (mbean != null)) {
+                mbean.sendNotification(NotificationType.servingStarted,
+                    new Integer(getRequestQueue().size()));
+            }
 
-                // END JMX Notification
-                Reply reply = null;
-                try {
-                    //If the request is not a "terminate Active Object" request,
-                    //it is served normally.
-                    if (!isTerminateAORequest(request)) {
-                        reply = request.serve(BodyImpl.this);
-                    }
-                } catch (ServeException e) {
-                    // Create a non functional exception encapsulating the service exception
-                    BodyNonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
-                            "Exception occured while serving pending request = " +
-                            request.getMethodName(), e, this,
-                            ProActiveObject.getBodyOnThis());
-                    NFEManager.fireNFE(calleeNFE, BodyImpl.this);
+            // END JMX Notification
+            Reply reply = null;
 
-                    // Create a non functional exception encapsulating the service exception
-                    ProxyNonFunctionalException callerNFE = new ServiceFailedCallerNFE(
-                            "Exception occured while serving pending request = " +
-                            request.getMethodName(), e);
+            //If the request is not a "terminate Active Object" request,
+            //it is served normally.
+            if (!isTerminateAORequest(request)) {
+                reply = request.serve(BodyImpl.this);
+            }
 
-                    // Create a new reply that contains this NFE instead of the result
-                    Reply replyAlternate = null;
-                    replyAlternate = request.serveAlternate(BodyImpl.this,
-                            callerNFE);
-
-                    // Send reply and stop local node if desired
-                    if (replyAlternate == null) {
-                        if (!isActive()) {
-                            return; //test if active in case of terminate() method otherwise eventProducer would be null
-                        }
-
-                        // ProActiveEvent
-                        messageEventProducer.notifyListeners(request,
-                            MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                            getRequestQueue().size());
-                        // END ProActiveEvent
-
-                        // JMX Notification
-                        if (!isProActiveInternalObject && (mbean != null)) {
-                            mbean.sendNotification(NotificationType.voidRequestServed,
-                                new Integer(getRequestQueue().size()));
-                        }
-
-                        // END JMX Notification
-                        return;
-                    }
-
-                    if (Profiling.TIMERS_COMPILED) {
-                        TimerWarehouse.startTimer(BodyImpl.this.bodyID,
-                            TimerWarehouse.SEND_REPLY);
-                    }
-
-                    // ProActiveEvent
-                    UniqueID destinationBodyId = request.getSourceBodyID();
-                    if ((destinationBodyId != null) &&
-                            (BodyImpl.this.messageEventProducer != null)) {
-                        BodyImpl.this.messageEventProducer.notifyListeners(reply,
-                            MessageEvent.REPLY_SENT, destinationBodyId,
-                            getRequestQueue().size());
-                    }
-
-                    // END ProActiveEvent
-
-                    // JMX Notification
-                    if (!isProActiveInternalObject && (mbean != null)) {
-                        mbean.sendNotification(NotificationType.replySent,
-                            new Integer(getRequestQueue().size()));
-                    }
-
-                    // END JMX Notification
-                    ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
-                    destinations.add(request.getSender());
-                    this.getFuturePool().registerDestinations(destinations);
-
-                    // FAULT-TOLERANCE
-                    if (BodyImpl.this.ftmanager != null) {
-                        BodyImpl.this.ftmanager.sendReply(replyAlternate,
-                            request.getSender());
-                    } else {
-                        replyAlternate.send(request.getSender());
-                    }
-
-                    if (Profiling.TIMERS_COMPILED) {
-                        TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
-                            TimerWarehouse.SEND_REPLY);
-                    }
-
-                    this.getFuturePool().removeDestinations();
-                    return;
-                }
-
-                if (reply == null) {
-                    if (!isActive()) {
-                        return; //test if active in case of terminate() method otherwise eventProducer would be null
-                    }
-
-                    // ProActiveEvent
-                    if (messageEventProducer != null) {
-                        messageEventProducer.notifyListeners(request,
-                            MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                            getRequestQueue().size());
-                    }
-
-                    // END ProActiveEvent
-
-                    // JMX Notification
-                    if (!isProActiveInternalObject && (mbean != null)) {
-                        mbean.sendNotification(NotificationType.voidRequestServed,
-                            new Integer(getRequestQueue().size()));
-                    }
-
-                    // END JMX Notification
-                    return;
-                }
-
-                if (Profiling.TIMERS_COMPILED) {
-                    TimerWarehouse.startTimer(BodyImpl.this.bodyID,
-                        TimerWarehouse.SEND_REPLY);
+            if (reply == null) {
+                if (!isActive()) {
+                    return; //test if active in case of terminate() method otherwise eventProducer would be null
                 }
 
                 // ProActiveEvent
-                UniqueID destinationBodyId = request.getSourceBodyID();
-                if ((destinationBodyId != null) &&
-                        (BodyImpl.this.messageEventProducer != null)) {
-                    BodyImpl.this.messageEventProducer.notifyListeners(reply,
-                        MessageEvent.REPLY_SENT, destinationBodyId,
+                if (messageEventProducer != null) {
+                    messageEventProducer.notifyListeners(request,
+                        MessageEvent.VOID_REQUEST_SERVED, bodyID,
                         getRequestQueue().size());
                 }
 
@@ -645,35 +526,57 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
                 // JMX Notification
                 if (!isProActiveInternalObject && (mbean != null)) {
-                    mbean.sendNotification(NotificationType.replySent,
+                    mbean.sendNotification(NotificationType.voidRequestServed,
                         new Integer(getRequestQueue().size()));
                 }
 
                 // END JMX Notification
-                ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
-                destinations.add(request.getSender());
-                this.getFuturePool().registerDestinations(destinations);
-
-                // FAULT-TOLERANCE
-                if (BodyImpl.this.ftmanager != null) {
-                    BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
-                } else {
-                    reply.send(request.getSender());
-                }
-                if (Profiling.TIMERS_COMPILED) {
-                    TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
-                        TimerWarehouse.SEND_REPLY);
-                }
-
-                this.getFuturePool().removeDestinations();
-            } catch (java.io.IOException e) {
-                // Create a non functional exception encapsulating the network exception
-                BodyNonFunctionalException nfe = new SendReplyCommunicationException(
-                        "Exception occured in while sending reply to request = " +
-                        request.getMethodName(), e, BodyImpl.this,
-                        request.getSourceBodyID());
-                NFEManager.fireNFE(nfe, BodyImpl.this);
+                return;
             }
+
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.startTimer(BodyImpl.this.bodyID,
+                    TimerWarehouse.SEND_REPLY);
+            }
+
+            // ProActiveEvent
+            UniqueID destinationBodyId = request.getSourceBodyID();
+            if ((destinationBodyId != null) &&
+                    (BodyImpl.this.messageEventProducer != null)) {
+                BodyImpl.this.messageEventProducer.notifyListeners(reply,
+                    MessageEvent.REPLY_SENT, destinationBodyId,
+                    getRequestQueue().size());
+            }
+
+            // END ProActiveEvent
+
+            // JMX Notification
+            if (!isProActiveInternalObject && (mbean != null)) {
+                mbean.sendNotification(NotificationType.replySent,
+                    new Integer(getRequestQueue().size()));
+            }
+
+            // END JMX Notification
+            ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
+            destinations.add(request.getSender());
+            this.getFuturePool().registerDestinations(destinations);
+
+            // FAULT-TOLERANCE
+            if (BodyImpl.this.ftmanager != null) {
+                BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
+            } else {
+                try {
+                    reply.send(request.getSender());
+                } catch (IOException e) {
+                    sendReplyExceptionsLogger.error(e, e);
+                }
+            }
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
+                    TimerWarehouse.SEND_REPLY);
+            }
+
+            this.getFuturePool().removeDestinations();
         }
 
         public void sendRequest(MethodCall methodCall, Future future,

@@ -44,7 +44,7 @@ import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.mop.MethodCallInfo.SynchronousReason;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
@@ -571,7 +571,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * Being one-way method is equivalent to <UL>
      * <LI>having <code>void</code> as return type
      * <LI>and not throwing any checked exceptions</UL>. If the caller asks
-     * for a RuntimeException or a NFE, then the call is not one way.
+     * for a RuntimeException, then the call is not one way.
      * @return true if and only if the method call is one way
      */
     public boolean isOneWayCall() {

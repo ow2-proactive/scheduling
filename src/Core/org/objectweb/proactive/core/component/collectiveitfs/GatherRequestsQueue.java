@@ -217,7 +217,7 @@ public class GatherRequestsQueue implements Serializable {
                         new GathercastTimeoutException("timeout of " + timeout +
                             " reached before invocations from all clients were received for gather invocation (method " +
                             itfTypeInvokedMethod.getMethod().toGenericString() +
-                            " on gather interface " + serverItfName), null));
+                            " on gather interface " + serverItfName)));
             }
 
             // else ignore
@@ -285,7 +285,7 @@ public class GatherRequestsQueue implements Serializable {
                                 " reached before invocations from all clients were received for gather invocation (method " +
                                 itfTypeInvokedMethod.getMethod()
                                                     .toGenericString() +
-                                " on gather interface " + serverItfName), null));
+                                " on gather interface " + serverItfName)));
                 }
             }
         }

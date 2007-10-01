@@ -50,8 +50,6 @@ import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -102,6 +100,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
     /** A pool of thread to serve the request */
     transient protected ThreadPool threadpool;
+
+    /** whether to automatically remove failing elements from the group instead of throwing an exception */
+    private boolean autoPurge = false;
 
     /* ----------------------- CONSTRUCTORS ----------------------- */
     public ProxyForGroup(String nameOfClass)
@@ -166,6 +167,29 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                 return true;
             }
         return false;
+    }
+
+    /**
+     * Remove failing elements from the group according either to a group of
+     * potential exceptions or an exception list.
+     * result == null XOR exceptionList == null
+     */
+    private void purge(Object result, ExceptionListException exceptionList) {
+        if (result != null) {
+            ProxyForGroup resultGroup = (ProxyForGroup) ((StubObject) result).getProxy();
+            for (int i = this.size() - 1; i >= 0; i--) {
+                Object res = resultGroup.get(i);
+                if ((res != null) && res instanceof Throwable) {
+                    this.remove(i);
+                }
+            }
+        }
+
+        if (exceptionList != null) {
+            for (ExceptionInGroup e : exceptionList) {
+                this.remove(e.getObject());
+            }
+        }
     }
 
     /* ------------------------ THE PROXY'S METHOD ------------------------ */
@@ -244,15 +268,26 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                 : TimerWarehouse.GROUP_ASYNC_CALL));
         }
 
-        /* Throws the exceptionList if one or more exceptions occur in the oneWayCall */
-        if ((exceptionList != null) && (exceptionList.size() != 0)) {
-            FailedGroupRendezVousException fgrve = new FailedGroupRendezVousException(
-                    "RendezVous failed in group method: " + mc.getName(),
-                    exceptionList, this);
-            NFEManager.fireNFE(fgrve, this);
+        /*
+         * Early returned exceptions are assumed to be caused by a rendez-vous failure
+         * There is a race condition, if an application exception comes back too early
+         * it can be taken for a rendez-vous failure.
+         */
+        if (this.autoPurge) {
+            purge(result, exceptionList);
+        } else if ((exceptionList != null) && (exceptionList.size() != 0)) {
+            throw exceptionList;
         }
 
         return result;
+    }
+
+    /**
+     * Set whether to automatically remove failing elements from the group
+     * instead of throwing an exception
+     */
+    public void setAutomaticPurge(boolean autoPurge) {
+        this.autoPurge = autoPurge;
     }
 
     /** Explicit destructor : Interrupts the threads in the threadpool */

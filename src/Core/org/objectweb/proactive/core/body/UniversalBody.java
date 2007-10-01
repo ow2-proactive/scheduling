@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
@@ -62,9 +61,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @see org.objectweb.proactive.Body
  * @see org.objectweb.proactive.core.body.rmi.RmiBodyAdapter
  */
-public interface UniversalBody extends NFEProducer, Job, Serializable,
-    SecurityEntity {
+public interface UniversalBody extends Job, Serializable, SecurityEntity {
     public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
+    public static Logger sendReplyExceptionsLogger = ProActiveLogger.getLogger(Loggers.EXCEPTIONS_SEND_REPLY);
 
     /**
      * Receives a request for later processing. The call to this method is non blocking

@@ -39,10 +39,10 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -238,7 +238,7 @@ public class LoadBalancer implements ProActiveInternalObject {
                         this.metric.getRanking());
                     break;
                 }
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 loadBalancers.remove((first + i) % size);
                 size--;
             }

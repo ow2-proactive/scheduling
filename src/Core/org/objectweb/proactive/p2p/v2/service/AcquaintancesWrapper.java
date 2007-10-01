@@ -2,18 +2,10 @@ package org.objectweb.proactive.p2p.v2.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.api.ProGroup;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -28,8 +20,6 @@ public class AcquaintancesWrapper implements Serializable {
     public AcquaintancesWrapper() {
         try {
             acquaintances_active = (P2PService) ProGroup.newGroup(P2PService.class.getName());
-            ProException.addNFEListenerOnGroup(this.acquaintances_active,
-                new AutomaticPurgeGroup());
             this.groupOfAcquaintances = ProGroup.getGroup(acquaintances_active);
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
@@ -96,35 +86,8 @@ public class AcquaintancesWrapper implements Serializable {
         return (String[]) urlList.toArray(new String[] {  });
     }
 
-    class AutomaticPurgeGroup implements NFEListener {
-        public boolean handleNFE(NonFunctionalException nfe) {
-            Iterator exceptions;
-            ProxyForGroup group;
-            ExceptionListException exceptionList;
-
-            try {
-                FailedGroupRendezVousException fgrve = (FailedGroupRendezVousException) nfe;
-                exceptionList = (ExceptionListException) fgrve.getCause();
-                group = fgrve.getGroup();
-            } catch (ClassCastException cce) {
-                return false;
-            }
-
-            synchronized (exceptionList) {
-                exceptions = exceptionList.iterator();
-
-                while (exceptions.hasNext()) {
-                    ExceptionInGroup eig = (ExceptionInGroup) exceptions.next();
-                    group.remove(eig.getObject());
-
-                    int index = eig.getIndex();
-                    System.out.println(
-                        "AutomaticPurgeGroup.handleNFE() removing " + index);
-                    urlList.remove(index);
-                }
-            }
-
-            return true;
-        }
-    }
+    /*
+     * TODO: handle exceptions with urlList.remove(index); for each
+     * member in the ExceptionListException
+     */
 }

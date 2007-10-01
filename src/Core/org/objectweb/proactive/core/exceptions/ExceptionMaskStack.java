@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.exceptions.manager;
+package org.objectweb.proactive.core.exceptions;
 
 import java.util.Collection;
 import java.util.Iterator;

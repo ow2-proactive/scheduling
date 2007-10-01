@@ -42,8 +42,6 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
@@ -186,19 +184,6 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.updateServer();
         this.wrappedBody = null;
         //        System.gc();
-    }
-
-    //  NFEProducer implementation
-    public void addNFEListener(NFEListener listener) {
-        this.wrappedBody.addNFEListener(listener);
-    }
-
-    public void removeNFEListener(NFEListener listener) {
-        this.wrappedBody.removeNFEListener(listener);
-    }
-
-    public int fireNFE(NonFunctionalException e) {
-        return this.wrappedBody.fireNFE(e);
     }
 
     // SECURITY

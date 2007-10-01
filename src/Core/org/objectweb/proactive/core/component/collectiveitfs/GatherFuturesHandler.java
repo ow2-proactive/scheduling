@@ -42,7 +42,7 @@ import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.representative.ItfID;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionThrower;
+import org.objectweb.proactive.core.exceptions.ExceptionThrower;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -101,8 +101,8 @@ public class GatherFuturesHandler implements RunActive, Serializable {
     }
 
     public void setFutureOfGatheredInvocation(FutureResult future) {
-        if (future.getExceptionToRaise() != null) {
-            exceptionToRaise = future.getExceptionToRaise();
+        if (future.getException() != null) {
+            exceptionToRaise = future.getException();
         } else {
             // no cast for futures ==> need to get the result before casting
             resultOfGatheredInvocation = (List<?>) future.getResult();

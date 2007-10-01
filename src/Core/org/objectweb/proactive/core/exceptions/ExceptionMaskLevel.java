@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.exceptions.manager;
+package org.objectweb.proactive.core.exceptions;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +37,6 @@ import java.util.LinkedList;
 
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.future.FutureResult;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 
 public class ExceptionMaskLevel {
@@ -58,7 +57,6 @@ public class ExceptionMaskLevel {
     private boolean catchRuntimeException;
 
     /* Do we catch a Non Functional Exception */
-    /* TODO: private boolean catchNFE; */
     ExceptionMaskLevel(ExceptionMaskStack parent, Class[] exceptions) {
         for (int i = 0; i < exceptions.length; i++) {
             if (!Throwable.class.isAssignableFrom(exceptions[i])) {
@@ -158,14 +156,7 @@ public class ExceptionMaskLevel {
         FutureResult res = f.getFutureResult();
 
         if (res != null) {
-            NonFunctionalException nfe = res.getNFE();
-            if ((nfe != null) && isExceptionTypeCaught(nfe.getClass())) {
-                synchronized (caughtExceptions) {
-                    caughtExceptions.add(nfe);
-                }
-            }
-
-            Throwable exception = f.getFutureResult().getExceptionToRaise();
+            Throwable exception = f.getFutureResult().getException();
             if (exception != null) {
                 synchronized (caughtExceptions) {
                     caughtExceptions.add(exception);

@@ -729,53 +729,6 @@ pad.killall(boolean softly);
     } <emphasis role="bold">finally</emphasis> { 
        ProActive.removeTryWithCatch();
     // At the beginning of the <emphasis role="bold">finally</emphasis> }</programlisting>
-
-    <para><emphasis role="bold">Non-Functional Exceptions</emphasis></para>
-
-    <para>Adding a handler to an active object on its side:</para>
-
-    <programlisting lang="java">ProActive.addNFEListenerOnAO(myAO, <emphasis
-        role="bold">new</emphasis> NFEListener() { <emphasis role="bold">
-
-  public boolean</emphasis> handleNFE(NonFunctionalException nfe) { 
-      // Do something with the exception... 
-      // Return true if we were able to handle it
-      <emphasis role="bold">return true</emphasis>; 
-     } 
-  });</programlisting>
-
-    <para>Handlers can also be added to the client side of an active object
-    with</para>
-
-    <programlisting lang="java">ProActive.addNFEListenerOnProxy(ao, handler)</programlisting>
-
-    <para>or to a JVM with</para>
-
-    <programlisting lang="java">ProActive.addNFEListenerOnJVM(handler)</programlisting>
-
-    <para>These handlers can also be removed with</para>
-
-    <programlisting lang="java">ProActive.removeNFEListenerOnAO(ao, handler),
-ProActive.removeNFEListenerOnProxy(ao, handler),
-ProActive.removeNFEListenerOnJVM(handler)</programlisting>
-
-    <para>It's possible to define an handler only for some exception types,
-    for example:</para>
-
-    <programlisting lang="java">ProActive.addNFEListenerOnJVM(<emphasis
-        role="bold">new</emphasis> TypedNFEListener(
-    SendRequestCommunicationException.<emphasis role="bold">class</emphasis>,
-    <emphasis role="bold">new</emphasis> NFEListener() { 
-         <emphasis role="bold">public boolean</emphasis> handleNFE(NonFunctionalException e) { 
-            // Do something with the SendRequestCommunicationException... 
-            // Return true if we were able to handle it <emphasis role="bold">
-            return true</emphasis>; 
-            } }
-    ));</programlisting>
-
-    <para>The behaviour of the default handler (if none could handle the
-    exception) is to throw the exception if it's on the proxy side, or log it
-    if it's on the body side.</para>
   </sect1>
 
   <sect1>

@@ -37,6 +37,7 @@ import java.security.cert.X509Certificate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureResult;
@@ -44,8 +45,6 @@ import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
@@ -64,7 +63,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 public class RequestImpl extends MessageImpl implements Request,
     java.io.Serializable {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
-    public static Logger loggerNFE = ProActiveLogger.getLogger(Loggers.NFE);
+    private static final Logger oneWayExceptionsLogger = ProActiveLogger.getLogger(Loggers.EXCEPTIONS_ONE_WAY);
     protected MethodCall methodCall;
     protected boolean ciphered;
 
@@ -175,36 +174,30 @@ public class RequestImpl extends MessageImpl implements Request,
         return this.sender;
     }
 
-    public Reply serve(Body targetBody) throws ServeException {
+    public Reply serve(Body targetBody) {
         if (logger.isDebugEnabled()) {
             logger.debug("Serving " + this.getMethodName());
         }
-        FutureResult result = serveInternal(targetBody);
+        FutureResult result;
+        try {
+            result = serveInternal(targetBody);
+        } catch (ServeException e) {
+            /* Non Functional Exception */
+            result = new FutureResult(null, new ProActiveRuntimeException(e));
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("result: " + result);
         }
-        if (this.isOneWay) { // || (sender == null)) {
+        if (this.isOneWay) {
+            Throwable exception = result.getException();
+            if (exception != null) {
+                oneWayExceptionsLogger.error(exception, exception);
+            }
             return null;
         }
         result.augmentException(this.stackTrace);
         this.stackTrace = null;
         return createReply(targetBody, result);
-    }
-
-    public Reply serveAlternate(Body targetBody, ProxyNonFunctionalException nfe) {
-        if (loggerNFE.isDebugEnabled()) {
-            loggerNFE.debug("*** Serving an alternate version of " +
-                this.getMethodName());
-            if (nfe != null) {
-                loggerNFE.debug("*** Result  " + nfe.getClass().getName());
-            } else {
-                loggerNFE.debug("*** Result null");
-            }
-        }
-        if (this.isOneWay) { // || (sender == null)) {
-            return null;
-        }
-        return createReply(targetBody, new FutureResult(null, null, nfe));
     }
 
     public boolean hasBeenForwarded() {
@@ -246,22 +239,14 @@ public class RequestImpl extends MessageImpl implements Request,
         Object result = null;
         Throwable exception = null;
         try {
-            //loggerNFE.warn("CALL to " + targetBody);
             result = this.methodCall.execute(targetBody.getReifiedObject());
         } catch (MethodCallExecutionFailedException e) {
-            // e.printStackTrace();
-            throw new ServeException("serve method " +
-                this.methodCall.getReifiedMethod().toString() + " failed", e);
+            throw new ServeException("Error while serving", e);
         } catch (java.lang.reflect.InvocationTargetException e) {
             exception = e.getTargetException();
-            if (this.isOneWay) {
-                throw new ServeException("serve method " +
-                    this.methodCall.getReifiedMethod().toString() + " failed",
-                    exception);
-            }
         }
 
-        return new FutureResult(result, exception, null);
+        return new FutureResult(result, exception);
     }
 
     protected Reply createReply(Body targetBody, FutureResult result) {

@@ -32,12 +32,8 @@ package functionalTests.ft.pml;
 
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.manager.TypedNFEListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 
@@ -89,14 +85,6 @@ public class Test extends FunctionalTest {
         // not ft !
         Collector c = (Collector) ProActiveObject.newActive(Collector.class.getName(),
                 new Object[0]);
-
-        // a *normal* ServiceFailedCalleeNFE could appear; ignore ot for test
-        ProException.addNFEListenerOnAO(a,
-            new TypedNFEListener(ServiceFailedCalleeNFE.class,
-                NFEListener.NOOP_LISTENER));
-        ProException.addNFEListenerOnAO(b,
-            new TypedNFEListener(ServiceFailedCalleeNFE.class,
-                NFEListener.NOOP_LISTENER));
 
         a.initCounter(1);
         b.initCounter(1);

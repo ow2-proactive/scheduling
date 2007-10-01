@@ -182,21 +182,6 @@ package org.objectweb.proactive.core.body.ibis;
 //        this.body = newBody;
 //    }
 //
-//    //-------------------------------------
-//    //  NFEProducer implementation
-//    //-------------------------------------
-//    public void addNFEListener(NFEListener listener) {
-//        body.addNFEListener(listener);
-//    }
-//
-//    public void removeNFEListener(NFEListener listener) {
-//        body.removeNFEListener(listener);
-//    }
-//
-//    public int fireNFE(NonFunctionalException e) {
-//        return body.fireNFE(e);
-//    }
-//
 //    //
 //    // -- PRIVATE METHODS -----------------------------------------------
 //    //

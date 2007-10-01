@@ -48,7 +48,6 @@ public interface Loggers {
     static final public String MOP = CORE + ".mop";
     public static final String SYNC_CALL = CORE + ".sync_call";
     static final public String GROUPS = CORE + ".groups";
-    public static final String NFE = CORE + ".nfe";
     public static final String GC = CORE + ".gc";
     public static final String HTTP_TRANSPORT = CORE +
         ".communication.transport.http";
@@ -179,4 +178,10 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
+
+    // Exceptions
+    public static final String EXCEPTIONS = CORE + ".exceptions";
+    public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
+    public static final String EXCEPTIONS_SEND_REPLY = EXCEPTIONS +
+        ".send_reply";
 }

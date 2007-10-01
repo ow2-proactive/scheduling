@@ -389,7 +389,7 @@
 
 			<delete dir="${junit.dir}" />
 			<mkdir dir="${junit.dir}" />
-			<junit printsummary="yes" forkmode="perTest" showoutput="true">
+			<junit printsummary="yes" forkmode="perTest" showoutput="false">
 				<jvmarg value="-Dproactive.dir=${base.dir}" />
 
 				<classpath>

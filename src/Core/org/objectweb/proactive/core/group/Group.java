@@ -203,6 +203,12 @@ public interface Group<E> extends List<E> {
      */
     public Group range(int begin, int end);
 
+    /**
+     * Set whether to automatically remove failing elements from the group
+     * instead of throwing an exception
+     */
+    public void setAutomaticPurge(boolean autoPurge);
+
     // Map class style methods
 
     /**

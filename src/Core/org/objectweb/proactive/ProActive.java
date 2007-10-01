@@ -66,7 +66,6 @@ import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.component.ComponentParameters;
@@ -82,12 +81,9 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorHandler;
 import org.objectweb.proactive.core.descriptor.parser.JaxpDescriptorParser;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
@@ -182,19 +178,6 @@ import org.objectweb.proactive.core.xml.VariableContract;
  *
  * <pre>
  * getProactiveDescriptor(String)
- * </pre>
- *
- * </p>
- * <p>
- * <a href="../../../../html/exceptions.html">Non Functionnal Exceptions</a>
- *
- * <pre>
- * addNFEListenerOnAO(Object, NFEListener)
- * addNFEListenerOnJVM(NFEListener)
- * addNFEListenerOnProxy(Object, NFEListener)
- * removeNFEListenerOnAO(Object, NFEListener)
- * removeNFEListenerOnJVM(NFEListener)
- * removeNFEListenerOnProxy(Object, NFEListener)
  * </pre>
  *
  * </p>
@@ -3178,141 +3161,6 @@ public class ProActive {
      */
     public static void waitForPotentialException() {
         ExceptionHandler.waitForPotentialException();
-    }
-
-    /**
-     * Add a listener for NFE reaching the local JVM
-     *
-     * @param listener
-     *            The listener to add
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnJVM(NFEListener)} instead
-     */
-    public static void addNFEListenerOnJVM(NFEListener listener) {
-        NFEManager.addNFEListener(listener);
-    }
-
-    /**
-     * Remove a listener for NFE reaching the local JVM
-     *
-     * @param listener
-     *            The listener to remove
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnJVM(NFEListener)} instead
-     */
-    public static void removeNFEListenerOnJVM(NFEListener listener) {
-        NFEManager.removeNFEListener(listener);
-    }
-
-    /**
-     * Add a listener for NFE reaching a given active object
-     *
-     * @param ao
-     *            The active object receiving the NFE
-     * @param listener
-     *            The listener to add
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnAO(Object,NFEListener)} instead
-     */
-    public static void addNFEListenerOnAO(Object ao, NFEListener listener) {
-
-        /* Security hazard: arbitrary code execution by the ao... */
-        UniversalBody body = getRemoteBody(ao);
-        body.addNFEListener(listener);
-    }
-
-    /**
-     * Remove a listener for NFE reaching a given active object
-     *
-     * @param ao
-     *            The active object receiving the NFE
-     * @param listener
-     *            The listener to remove
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnAO(Object,NFEListener)} instead
-     */
-    public static void removeNFEListenerOnAO(Object ao, NFEListener listener) {
-        UniversalBody body = getRemoteBody(ao);
-        body.removeNFEListener(listener);
-    }
-
-    /**
-     * Add a listener for NFE reaching the client side of a given active object
-     *
-     * @param ao
-     *            The active object receiving the NFE
-     * @param listener
-     *            The listener to add
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnProxy(Object,NFEListener)} instead
-     */
-    public static void addNFEListenerOnProxy(Object ao, NFEListener listener) {
-        try {
-            ((AbstractProxy) ao).addNFEListener(listener);
-        } catch (ClassCastException cce) {
-            throw new IllegalArgumentException(
-                "The object must be a proxy to an active object");
-        }
-    }
-
-    /**
-     * Remove a listener for NFE reaching the client side of a given active
-     * object
-     *
-     * @param ao
-     *            The active object receiving the NFE
-     * @param listener
-     *            The listener to remove
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnProxy(Object,NFEListener)} instead
-     */
-    public static void removeNFEListenerOnProxy(Object ao, NFEListener listener) {
-        try {
-            ((AbstractProxy) ao).removeNFEListener(listener);
-        } catch (ClassCastException cce) {
-            throw new IllegalArgumentException(
-                "The object must be a proxy to an active object");
-        }
-    }
-
-    /**
-     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#getGroupProxy(Object)} instead
-     */
-    private static ProxyForGroup getGroupProxy(Object group) {
-        ProxyForGroup pfg;
-
-        try {
-            pfg = (ProxyForGroup) ProGroup.getGroup(group);
-        } catch (ClassCastException cce) {
-            pfg = null;
-        }
-
-        if (pfg == null) {
-            throw new IllegalArgumentException("The argument must be a group");
-        }
-
-        return pfg;
-    }
-
-    /**
-     * Add a listener for NFE regarding a group.
-     *
-     * @param group
-     *            The group receiving the NFE
-     * @param listener
-     *            The listener to add
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#addNFEListenerOnGroup(Object,NFEListener)} instead
-     */
-    public static void addNFEListenerOnGroup(Object group, NFEListener listener) {
-        getGroupProxy(group).addNFEListener(listener);
-    }
-
-    /**
-     * Remove a listener for NFE regarding a group.
-     *
-     * @param group
-     *            The group receiving the NFE
-     * @param listener
-     *            The listener to remove
-     * @deprecated Use {@link org.objectweb.proactive.api.ProException#removeNFEListenerOnGroup(Object,NFEListener)} instead
-     */
-    public static void removeNFEListenerOnGroup(Object group,
-        NFEListener listener) {
-        getGroupProxy(group).removeNFEListener(listener);
     }
 
     /**

@@ -47,9 +47,6 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
-import org.objectweb.proactive.core.exceptions.manager.TypedNFEListener;
 
 /**
  * Remember if we terminated and why.
@@ -210,11 +207,6 @@ public class GarbageCollector {
         this.cycleTimestamp = 0;
         this.body = body;
         this.previouslyBusy = true;
-        if (dgcIsEnabled()) {
-            body.addNFEListener(new TypedNFEListener(
-                    SendReplyCommunicationException.class,
-                    SendReplyCommunicationExceptionHandler.instance));
-        }
     }
 
     /**

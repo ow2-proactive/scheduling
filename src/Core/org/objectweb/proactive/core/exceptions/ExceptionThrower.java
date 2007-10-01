@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.exceptions.manager;
+package org.objectweb.proactive.core.exceptions;
 
 import javassist.ClassPool;
 import javassist.CtClass;

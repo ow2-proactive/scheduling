@@ -67,7 +67,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
     }
 
     @Override
-    public Reply serve(Body targetBody) throws ServeException {
+    public Reply serve(Body targetBody) {
         MicroTimer timer = new MicroTimer();
         timer.start();
 

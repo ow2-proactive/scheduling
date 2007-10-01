@@ -45,13 +45,11 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -297,23 +295,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         launchedTasks = new HashSetQueue<Long>();
         resultQueue = new ResultQueue<Serializable>(Master.OrderingMode.CompletionOrder);
 
-        // Ignore NFEs occurring on ourself (send reply exceptions on dead slaves)
-        ProActiveObject.getBodyOnThis().addNFEListener(NFEListener.NOOP_LISTENER);
-
         // Slaves
         try {
             // Slave Group
             slaveGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
             slaveGroup = ProGroup.getGroup(slaveGroupStub);
-            // we ignore NFE on this group (the pinger is responsible for it)
-            ProException.addNFEListenerOnGroup(slaveGroupStub,
-                NFEListener.NOOP_LISTENER);
             // Group of sleeping slaves
             sleepingGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
             sleepingGroup = ProGroup.getGroup(sleepingGroupStub);
-            // we ignore NFE on this group (the pinger is responsible for it)
-            ProException.addNFEListenerOnGroup(sleepingGroupStub,
-                NFEListener.NOOP_LISTENER);
             slavesActivity = new HashMap<String, Long>();
             slavesByName = new HashMap<String, Slave>();
             slavesByNameRev = new HashMap<Slave, String>();

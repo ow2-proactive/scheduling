@@ -28,17 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.exceptions.body;
+package org.objectweb.proactive.core.body.exceptions;
+
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
-/**
- * Contrary to what Guillaume C. said.
- * @author Alexandre di Costanzo
- *
- * Created on Nov 8, 2005
- */
-public class NewActiveFailedNFE extends BodyNonFunctionalException {
-    public NewActiveFailedNFE(String message, Exception e) {
+public class SendRequestCommunicationException extends ProActiveRuntimeException {
+    public SendRequestCommunicationException(String message, Exception e) {
         super(message, e);
     }
 }

@@ -99,8 +99,7 @@ public class FutureMonitoring implements Runnable {
             if (bodyException != null) {
                 synchronized (fp) {
                     if (fp.isAwaited()) {
-                        fp.receiveReply(new FutureResult(null, bodyException,
-                                null));
+                        fp.receiveReply(new FutureResult(null, bodyException));
                     }
                 }
             }

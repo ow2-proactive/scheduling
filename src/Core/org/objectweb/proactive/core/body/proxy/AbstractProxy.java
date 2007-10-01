@@ -31,24 +31,13 @@
 package org.objectweb.proactive.core.body.proxy;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
-import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public abstract class AbstractProxy implements Proxy, java.io.Serializable,
-    NFEProducer {
-    // Get logger
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.NFE);
-
-    // table of handlers associated to proxy
-    //private HashMap proxyLevel;
-
+public abstract class AbstractProxy implements Proxy, java.io.Serializable {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -72,28 +61,5 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable,
      */
     protected static boolean isAsynchronousCall(MethodCall mc) {
         return mc.isAsynchronousWayCall();
-    }
-
-    // NFEProducer implementation
-    private NFEListenerList nfeListeners = null;
-
-    public void addNFEListener(NFEListener listener) {
-        if (nfeListeners == null) {
-            nfeListeners = new NFEListenerList();
-        }
-        nfeListeners.addNFEListener(listener);
-    }
-
-    public void removeNFEListener(NFEListener listener) {
-        if (nfeListeners != null) {
-            nfeListeners.removeNFEListener(listener);
-        }
-    }
-
-    public int fireNFE(NonFunctionalException e) {
-        if (nfeListeners != null) {
-            return nfeListeners.fireNFE(e);
-        }
-        return 0;
     }
 }

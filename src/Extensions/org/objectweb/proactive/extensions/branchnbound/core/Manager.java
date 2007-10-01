@@ -43,12 +43,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProException;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -200,8 +198,7 @@ public class Manager implements Serializable, InitActive {
                 long singleStartTime = System.currentTimeMillis();
                 this.workerGroup = (Worker) ProGroup.newGroupInParallel(Worker.class.getName(),
                         args, this.nodes);
-                ProException.addNFEListenerOnGroup(this.workerGroup,
-                    FailedGroupRendezVousException.AUTO_GROUP_PURGE);
+                ProGroup.getGroup(this.workerGroup).setAutomaticPurge(true);
                 this.freeWorkerList.addAll(ProGroup.getGroup(this.workerGroup));
                 long singleEndTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {

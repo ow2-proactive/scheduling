@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
@@ -113,7 +112,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      * Serve the request. This method is subject to wait-by-necessity mechanism.
      * @return the reply resulting from the service of this request.
      */
-    public Reply serve(Body targetBody) throws ServeException {
+    public Reply serve(Body targetBody) {
         waitForRequest();
         return wrappedRequest.serve(targetBody);
     }
@@ -232,10 +231,6 @@ public class AwaitedRequest implements Request, java.io.Serializable {
 
     public FTManager getFTManager() {
         return null;
-    }
-
-    public Reply serveAlternate(Body targetBody, ProxyNonFunctionalException nfe) {
-        return this.wrappedRequest.serveAlternate(targetBody, nfe);
     }
 
     public boolean isCiphered() {

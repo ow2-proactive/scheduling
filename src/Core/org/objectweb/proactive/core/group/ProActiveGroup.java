@@ -1583,6 +1583,22 @@ public class ProActiveGroup {
     }
 
     /**
+     * By default, when a rendez-vous fails an exception is thrown. Instead,
+     * when the automatic purge is enabled, failing objects are removed from
+     * the group
+     * @param ogroup the typed group having its behavior changed
+     * @param autoPurge the new behavior
+     */
+    public static void setAutomaticPurge(Object ogroup, boolean autoPurge) {
+        ProxyForGroup proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
+        if (proxytmp == null) {
+            throw new IllegalArgumentException("argument " +
+                ogroup.getClass().getName() + " is not a group");
+        }
+        proxytmp.setAutomaticPurge(autoPurge);
+    }
+
+    /**
      * Allows the typed group to broadcast parameters
      * @param ogroup the typed group who will change his semantic of communication.
      * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#unsetScatterGroup(Object)} instead

@@ -32,8 +32,7 @@ package org.objectweb.proactive.core.body.future;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 
 
 class ThisIsNotAnException extends Exception {
@@ -55,22 +54,13 @@ public class FutureResult implements Serializable {
     /** The exception to throw */
     private Throwable exception;
 
-    /** It may contain a NFE */
-    private ProxyNonFunctionalException nfe;
-
-    public FutureResult(Object result, Throwable exception,
-        ProxyNonFunctionalException nfe) {
+    public FutureResult(Object result, Throwable exception) {
         this.result = result;
         this.exception = exception;
-        this.nfe = nfe;
     }
 
-    public Throwable getExceptionToRaise() {
+    public Throwable getException() {
         return exception;
-    }
-
-    public ProxyNonFunctionalException getNFE() {
-        return nfe;
     }
 
     public Object getResult() {
@@ -84,9 +74,7 @@ public class FutureResult implements Serializable {
     @Override
     public String toString() {
         String str = "[";
-        if (nfe != null) {
-            str += ("nfe:" + nfe.getClass().getName());
-        } else if (exception != null) {
+        if (exception != null) {
             str += ("ex:" + exception.getClass().getName());
         } else if (result != null) {
             str += result.getClass().getName();
@@ -98,7 +86,7 @@ public class FutureResult implements Serializable {
     }
 
     public void augmentException(StackTraceElement[] stackTrace) {
-        Throwable cause = (exception == null) ? nfe : exception;
+        Throwable cause = exception;
         if ((cause != null) && (stackTrace != null)) {
             while (cause.getCause() != null) {
                 cause = cause.getCause();

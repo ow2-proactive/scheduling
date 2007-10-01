@@ -43,7 +43,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -95,7 +95,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 logger.error("[P2PLB] ActiveObjectCreationException");
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
@@ -124,7 +124,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 logger.error("[P2PLB] ActiveObjectCreationException");
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
@@ -156,7 +156,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 logger.error("[P2PLB] ActiveObjectCreationException");
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
@@ -186,7 +186,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 logger.error("[P2PLB] ActiveObjectCreationException");
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 logger.error(
                     "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
@@ -254,7 +254,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                     i) % size));
             try {
                 remoteP2Plb.getActiveObjectsFrom(myThis, ranking);
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 badRemote++;
                 forStealing.remove((first + i) % size);
                 size--;
@@ -292,7 +292,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                     i) % size));
             try {
                 remoteP2Plb.sendActiveObjectsTo(myNode, ranking);
-            } catch (NonFunctionalException e) {
+            } catch (ProActiveRuntimeException e) {
                 badRemote++;
                 forStealing.remove((first + i) % size);
                 size--;

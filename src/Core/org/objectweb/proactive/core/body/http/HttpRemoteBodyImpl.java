@@ -480,47 +480,6 @@ public class HttpRemoteBodyImpl {
     //        }
     //    }
     //
-    //    //-------------------------------------
-    //    //  NFEProducer implementation
-    //    //-------------------------------------
-    //    public void addNFEListener(NFEListener listener) throws HTTPRemoteException {
-    //        if (isLocal) {
-    //            body.addNFEListener(listener);
-    //        } else {
-    //            ArrayList<Object> paramList = new ArrayList<Object>();
-    //            paramList.add(listener);
-    //
-    //            new HttpRemoteObjectRequest("addNFEListener", paramList, bodyID, url).send();
-    //        }
-    //    }
-    //
-    //    public void removeNFEListener(NFEListener listener)
-    //        throws HTTPRemoteException {
-    //        if (isLocal) {
-    //            body.removeNFEListener(listener);
-    //        } else {
-    //            ArrayList<Object> paramList = new ArrayList<Object>();
-    //            paramList.add(listener);
-    //
-    //            new HttpRemoteObjectRequest("removeNFEListener", paramList, bodyID, url).send();
-    //        }
-    //    }
-    //
-    //    public int fireNFE(NonFunctionalException e) throws HTTPRemoteException {
-    //        if (isLocal) {
-    //            return body.fireNFE(e);
-    //        } else {
-    //            ArrayList<Object> paramList = new ArrayList<Object>();
-    //            paramList.add(e);
-    //            HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("fireNFE", paramList, bodyID, url);
-    //            br.send();
-    //            try {
-    //                return ((Integer) br.getReturnedObject()).intValue();
-    //            } catch (Exception e1) {
-    //                throw new HTTPUnexpectedException("Unexpected exception", e);
-    //            }
-    //        }
-    //    }
     //
     //    /**
     //     * @see org.objectweb.proactive.core.body.RemoteBody#changeProxiedBody(org.objectweb.proactive.Body)

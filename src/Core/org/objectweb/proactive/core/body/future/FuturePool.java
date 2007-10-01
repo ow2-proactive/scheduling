@@ -49,9 +49,6 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
@@ -660,16 +657,15 @@ public class FuturePool extends Object implements java.io.Serializable {
                     }
 
                     // send the reply
-                    try {
-                        if (ftm != null) {
-                            ftm.sendReply(toSend, dest);
-                        } else {
+                    if (ftm != null) {
+                        ftm.sendReply(toSend, dest);
+                    } else {
+                        try {
                             toSend.send(dest);
+                        } catch (IOException ioe) {
+                            UniversalBody.sendReplyExceptionsLogger.error(ioe,
+                                ioe);
                         }
-                    } catch (IOException ioe) {
-                        BodyNonFunctionalException nfe = new SendReplyCommunicationException("Exception occured in while sending reply in AC",
-                                ioe, ownerBody, dest.getID());
-                        NFEManager.fireNFE(nfe, ownerBody);
                     }
                     remainingSends--;
                 }

@@ -39,9 +39,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.manager.NFEListener;
-import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
@@ -211,29 +208,6 @@ public abstract class AbstractUniversalBody implements UniversalBody,
             this.shortcuts = new HashMap();
         }
         this.shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
-    }
-
-    // NFEProducer implementation
-    private NFEListenerList nfeListeners = null;
-
-    public void addNFEListener(NFEListener listener) {
-        if (this.nfeListeners == null) {
-            this.nfeListeners = new NFEListenerList();
-        }
-        this.nfeListeners.addNFEListener(listener);
-    }
-
-    public void removeNFEListener(NFEListener listener) {
-        if (this.nfeListeners != null) {
-            this.nfeListeners.removeNFEListener(listener);
-        }
-    }
-
-    public int fireNFE(NonFunctionalException e) {
-        if (this.nfeListeners != null) {
-            return this.nfeListeners.fireNFE(e);
-        }
-        return 0;
     }
 
     public void register(String url)

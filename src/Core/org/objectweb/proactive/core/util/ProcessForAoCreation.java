@@ -33,9 +33,6 @@ package org.objectweb.proactive.core.util;
 import java.util.Vector;
 
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.body.NewActiveFailedNFE;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -68,9 +65,7 @@ public class ProcessForAoCreation implements Runnable {
             this.result.add(ProActiveObject.newActive(this.className,
                     this.genericParameters, this.param, this.node));
         } catch (Exception e) {
-            BodyNonFunctionalException bnfe = new NewActiveFailedNFE("The activation failed",
-                    e);
-            NFEManager.fireNFE(bnfe, null);
+            e.printStackTrace();
         }
     }
 }

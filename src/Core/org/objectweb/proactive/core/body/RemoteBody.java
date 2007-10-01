@@ -126,11 +126,4 @@ package org.objectweb.proactive.core.body;
 //     * @exception java.io.IOException if an exception occured during the remote communication
 //     */
 //    public void changeProxiedBody(Body newBody) throws java.io.IOException;
-//
-//    public void addNFEListener(NFEListener listener) throws java.io.IOException;
-//
-//    public void removeNFEListener(NFEListener listener)
-//        throws java.io.IOException;
-//
-//    public int fireNFE(NonFunctionalException e) throws java.io.IOException;
 //}

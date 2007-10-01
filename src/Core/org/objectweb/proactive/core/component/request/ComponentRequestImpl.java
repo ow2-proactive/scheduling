@@ -214,7 +214,7 @@ public class ComponentRequestImpl extends RequestImpl
             }
         }
 
-        return new FutureResult(result, exception, null);
+        return new FutureResult(result, exception);
     }
 
     // intercept and delegate for preprocessing from the inputInterceptors 

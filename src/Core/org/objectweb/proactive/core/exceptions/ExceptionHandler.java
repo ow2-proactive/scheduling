@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.exceptions.manager;
+package org.objectweb.proactive.core.exceptions;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -124,8 +124,6 @@ public class ExceptionHandler {
         }
 
         if (exception instanceof Error) {
-
-            /* Maybe an Error should result in an NFE */
             throw (Error) exception;
         }
 

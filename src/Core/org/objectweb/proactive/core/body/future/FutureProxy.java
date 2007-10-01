@@ -43,12 +43,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
-import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
-import org.objectweb.proactive.core.exceptions.manager.NFEManager;
-import org.objectweb.proactive.core.exceptions.proxy.FutureTimeoutException;
-import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -208,10 +204,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         target = obj;
         ExceptionHandler.addResult(this);
         FutureMonitoring.removeFuture(this);
-        ProxyNonFunctionalException nfe = target.getNFE();
-        if (nfe != null) {
-            NFEManager.fireNFE(nfe, originatingProxy);
-        }
 
         if (this.callbacks != null) {
             this.callbacks.run();
@@ -229,7 +221,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     public synchronized Throwable getRaisedException() {
         waitFor();
-        return target.getExceptionToRaise();
+        return target.getException();
     }
 
     /**
