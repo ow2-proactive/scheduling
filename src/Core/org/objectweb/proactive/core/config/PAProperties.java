@@ -361,4 +361,8 @@ public enum PAProperties {
     public String getCmdLine() {
         return "-D" + key + '=';
     }
+
+    public boolean isBoolean() {
+        return isBoolean;
+    }
 }
