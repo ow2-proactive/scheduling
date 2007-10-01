@@ -281,7 +281,7 @@ public class ProActiveGroup {
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
-     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[],Node[])} instead         
+     * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroup(String,Object[],Node[])} instead
      */
     public static Object newGroup(String className, Object[] params,
         Node[] nodeList)
@@ -633,7 +633,7 @@ public class ProActiveGroup {
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
-	 * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[][])} instead
+         * @deprecated Use {@link org.objectweb.proactive.api.ProGroup#newGroupInParallel(String,Object[][])} instead
      */
     public static Object newGroupInParallel(String className, Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException,
