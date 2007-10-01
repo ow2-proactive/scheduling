@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -169,7 +169,7 @@ public class LoadBalancer implements ProActiveInternalObject {
                         " to " + destNode.getNodeInformation().getURL());
                 }
 
-                ProMigration.migrateTo(minBody, destNode, false);
+                ProMobileAgent.migrateTo(minBody, destNode, false);
                 informationRecover.register(this.getName(),
                     this.metric.getLoad(),
                     destNode.getNodeInformation().getURL(),

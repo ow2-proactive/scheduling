@@ -42,7 +42,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
@@ -318,7 +318,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      */
     public void moveTo(String nodeUrl) {
         try {
-            ProMigration.migrateTo(nodeUrl);
+            ProMobileAgent.migrateTo(nodeUrl);
         } catch (Exception e) {
             logger.fatal("Couldn't migrate the node lookup to " + nodeUrl, e);
         }

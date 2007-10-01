@@ -35,7 +35,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 
 
@@ -74,10 +74,10 @@ public class A implements Serializable, RunActive {
             try {
                 if (inNode1()) {
                     changeNode();
-                    ProMigration.migrateTo(node2);
+                    ProMobileAgent.migrateTo(node2);
                 } else {
                     changeNode();
-                    ProMigration.migrateTo(node1);
+                    ProMobileAgent.migrateTo(node1);
                 }
             } catch (MigrationException e) {
                 this.exceptionThrown = true;

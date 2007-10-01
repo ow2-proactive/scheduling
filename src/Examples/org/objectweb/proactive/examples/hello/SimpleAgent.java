@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.hello;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -54,7 +54,7 @@ public class SimpleAgent implements java.io.Serializable {
     /** Migrate the Active Object to a new host */
     public void moveTo(String t) {
         try {
-            ProMigration.migrateTo(t);
+            ProMobileAgent.migrateTo(t);
         } catch (Exception e) {
             e.printStackTrace();
         }

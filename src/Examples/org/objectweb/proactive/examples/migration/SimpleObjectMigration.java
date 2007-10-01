@@ -37,7 +37,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -108,7 +108,7 @@ public class SimpleObjectMigration implements Serializable {
         try {
             logger.info("SimpleObjectMigration> moveTo(" + t + ") " +
                 "% start migration");
-            ProMigration.migrateTo(t);
+            ProMobileAgent.migrateTo(t);
             logger.info("SimpleObjectMigration> moveTo(" + t + ") " +
                 "% stop migration");
         } catch (Exception e) {

@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.penguin;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.Destination;
 import org.objectweb.proactive.core.migration.MigrationStrategyImpl;
@@ -150,7 +150,7 @@ public class Penguin implements org.objectweb.proactive.RunActive,
                     if ((r != null) &&
                             !NodeFactory.isNodeLocal(NodeFactory.getNode(
                                     r.getDestination()))) {
-                        ProMigration.migrateTo(r.getDestination());
+                        ProMobileAgent.migrateTo(r.getDestination());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

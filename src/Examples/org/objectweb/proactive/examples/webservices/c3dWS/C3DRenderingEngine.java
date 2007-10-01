@@ -119,7 +119,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
      */
     public void migrateTo(String nodeTarget) {
         try {
-            org.objectweb.proactive.api.ProMigration.migrateTo(nodeTarget);
+            org.objectweb.proactive.api.ProMobileAgent.migrateTo(nodeTarget);
         } catch (Exception e) {
             e.printStackTrace();
         }

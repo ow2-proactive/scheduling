@@ -2451,7 +2451,7 @@ public class ProActive {
      * @exception MigrationException
      *                if the migration fails
      * @see #getBodyOnThis
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#migrateTo(Object)} instead
      */
     public static void migrateTo(Object activeObject) throws MigrationException {
         migrateTo(getNodeFromURL(getNodeURLFromActiveObject(activeObject)));
@@ -2469,7 +2469,7 @@ public class ProActive {
      * @exception MigrationException
      *                if the migration fails
      * @see #getBodyOnThis
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#migrateTo(String)} instead
      */
     public static void migrateTo(String nodeURL) throws MigrationException {
         if (logger.isDebugEnabled()) {
@@ -2489,7 +2489,7 @@ public class ProActive {
      * @exception MigrationException
      *                if the migration fails
      * @see #getBodyOnThis
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Node)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#migrateTo(Node)} instead
      */
     public static void migrateTo(Node node) throws MigrationException {
         if (logger.isDebugEnabled()) {
@@ -2520,7 +2520,7 @@ public class ProActive {
      *            does not modify the application's computation
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,Object,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#migrateTo(Body,Object,boolean)} instead
      */
     public static void migrateTo(Body bodyToMigrate, Object activeObject,
         boolean isNFRequest) throws MigrationException {
@@ -2544,7 +2544,7 @@ public class ProActive {
      *            does not modify the application's computation
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,String,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#migrateTo(Body,String,boolean)} instead
      */
     public static void migrateTo(Body bodyToMigrate, String nodeURL,
         boolean isNFRequest) throws MigrationException {
@@ -2566,7 +2566,7 @@ public class ProActive {
      *            does not modify the application's computation
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,Node,boolean)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#migrateTo(Body,Node,boolean)} instead
      */
     public static void migrateTo(Body bodyToMigrate, Node node,
         boolean isNFRequest) throws MigrationException {
@@ -2595,7 +2595,7 @@ public class ProActive {
      *            are defined in Request interface of ProActive.
      * @exception MigrationException
      *                if the migration fails
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#migrateTo(Body,Node,boolean,int)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#migrateTo(Body,Node,boolean,int)} instead
      */
     public static void migrateTo(Body bodyToMigrate, Node node,
         boolean isNFRequest, int priority) throws MigrationException {
@@ -3010,7 +3010,7 @@ public class ProActive {
     // -- PRIVATE METHODS -----------------------------------------------
     //
     /**
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#getNodeURLFromActiveObject(Object)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#getNodeURLFromActiveObject(Object)} instead
      */
     private static String getNodeURLFromActiveObject(Object o)
         throws MigrationException {
@@ -3027,7 +3027,7 @@ public class ProActive {
     }
 
     /**
-     * @deprecated Use {@link org.objectweb.proactive.api.ProMigration#getNodeFromURL(String)} instead
+     * @deprecated Use {@link org.objectweb.proactive.api.ProMobileAgent#getNodeFromURL(String)} instead
      */
     private static Node getNodeFromURL(String url) throws MigrationException {
         try {

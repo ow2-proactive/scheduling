@@ -35,7 +35,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -102,7 +102,7 @@ public class A implements InitActive, RunActive, EndActive,
 
     public void moveTo(String nodeURL) throws Exception {
         // System.out.println(" I am going to migate");
-        ProMigration.migrateTo(nodeURL);
+        ProMobileAgent.migrateTo(nodeURL);
         // System.out.println("migration done");
     }
 

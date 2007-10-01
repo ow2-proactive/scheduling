@@ -35,7 +35,7 @@ import java.net.URL;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.Constants;
@@ -69,7 +69,7 @@ public class MigrationControllerImpl extends AbstractProActiveController
     public void migrateTo(Node node) throws MigrationException {
         // need to migrate gathercast futures handlers active objects first
         ((ProActiveComponentImpl) owner).migrateControllersDependentActiveObjectsTo(node);
-        ProMigration.migrateTo(node);
+        ProMobileAgent.migrateTo(node);
     }
 
     public void migrateTo(URL url) throws MigrationException {

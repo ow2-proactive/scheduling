@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class ProMigration {
+public class ProMobileAgent {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
     private static Node getNodeFromURL(String url) throws MigrationException {
@@ -79,8 +79,8 @@ public class ProMigration {
      * @see ProActiveObject#getBodyOnThis
      */
     public static void migrateTo(Node node) throws MigrationException {
-        if (ProMigration.logger.isDebugEnabled()) {
-            ProMigration.logger.debug("migrateTo " + node);
+        if (ProMobileAgent.logger.isDebugEnabled()) {
+            ProMobileAgent.logger.debug("migrateTo " + node);
         }
         Body bodyToMigrate = ProActiveObject.getBodyOnThis();
         if (!(bodyToMigrate instanceof Migratable)) {
@@ -102,8 +102,8 @@ public class ProMigration {
      * @see ProActiveObject#getBodyOnThis
      */
     public static void migrateTo(Object activeObject) throws MigrationException {
-        migrateTo(ProMigration.getNodeFromURL(
-                ProMigration.getNodeURLFromActiveObject(activeObject)));
+        migrateTo(ProMobileAgent.getNodeFromURL(
+                ProMobileAgent.getNodeURLFromActiveObject(activeObject)));
     }
 
     /**
@@ -117,10 +117,10 @@ public class ProMigration {
      * @see ProActiveObject#getBodyOnThis
      */
     public static void migrateTo(String nodeURL) throws MigrationException {
-        if (ProMigration.logger.isDebugEnabled()) {
-            ProMigration.logger.debug("migrateTo " + nodeURL);
+        if (ProMobileAgent.logger.isDebugEnabled()) {
+            ProMobileAgent.logger.debug("migrateTo " + nodeURL);
         }
-        ProMigration.migrateTo(ProMigration.getNodeFromURL(nodeURL));
+        ProMobileAgent.migrateTo(ProMobileAgent.getNodeFromURL(nodeURL));
     }
 
     /**
@@ -137,7 +137,7 @@ public class ProMigration {
         boolean isNFRequest) throws MigrationException {
         //In the context of ProActive, migration of an active object is considered as a non functional request.
         //That's why "true" is set by default for the "isNFRequest" parameter.
-        ProMigration.migrateTo(bodyToMigrate, node, true,
+        ProMobileAgent.migrateTo(bodyToMigrate, node, true,
             org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
 
@@ -185,9 +185,10 @@ public class ProMigration {
      */
     public static void migrateTo(Body bodyToMigrate, Object activeObject,
         boolean isNFRequest) throws MigrationException {
-        ProMigration.migrateTo(bodyToMigrate,
-            ProMigration.getNodeFromURL(ProMigration.getNodeURLFromActiveObject(
-                    activeObject)), isNFRequest);
+        ProMobileAgent.migrateTo(bodyToMigrate,
+            ProMobileAgent.getNodeFromURL(
+                ProMobileAgent.getNodeURLFromActiveObject(activeObject)),
+            isNFRequest);
     }
 
     /**
@@ -202,7 +203,7 @@ public class ProMigration {
      */
     public static void migrateTo(Body bodyToMigrate, String nodeURL,
         boolean isNFRequest) throws MigrationException {
-        ProMigration.migrateTo(bodyToMigrate,
-            ProMigration.getNodeFromURL(nodeURL), isNFRequest);
+        ProMobileAgent.migrateTo(bodyToMigrate,
+            ProMobileAgent.getNodeFromURL(nodeURL), isNFRequest);
     }
 }

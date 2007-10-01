@@ -40,7 +40,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProGroup;
-import org.objectweb.proactive.api.ProMigration;
+import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -283,7 +283,7 @@ public class Chat implements java.io.Serializable, RunActive {
     public void migrateTo(String nodeURL) {
         this.writePrivateMessage(new Message(" *** I move to " + nodeURL));
         try {
-            ProMigration.migrateTo(nodeURL);
+            ProMobileAgent.migrateTo(nodeURL);
         } catch (MigrationException e) {
             this.writePrivateMessage(new Message(
                     " *** WARNING : Unable to move to " + nodeURL + " !"));
