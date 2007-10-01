@@ -324,8 +324,8 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       components. If you want to run a components version of c3d, try
       this:</para>
 
-      <screen>scripts/unix/components$ ./c3d.sh
-scripts/windows/components$ c3d.bat</screen>
+      <screen>scripts/unix/components$ ./c3d.sh  ../../../descriptors/components/C3D_all.xml
+scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml</screen>
 
       <para>The component binding is done through the Fractal ADL, which is a
       standard way of writing components through an xml file. You can have a
