@@ -11,7 +11,7 @@ public class Main {
      * @return String
      */
     public static String getProActiveVersion() {
-        return "$Id: ProActive.java 6404 2007-10-01 11:33:07Z cmathieu $";
+        return "$Id$";
     }
 
     public static void main(String[] args) {
