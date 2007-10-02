@@ -241,7 +241,7 @@ public class SciFrame extends javax.swing.JFrame {
     private void initGUI() {
         try {
             chooserSave = new JFileChooser();
-            chooserSave.setDialogTitle("Save Scilab Result");
+            chooserSave.setDialogTitle("Save Result");
             splitMain1 = new JSplitPane();
             getContentPane().add(splitMain1, BorderLayout.CENTER);
             splitMain1.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -255,7 +255,7 @@ public class SciFrame extends javax.swing.JFrame {
             splitMain2.setDividerSize(7);
             scrollTreeEngine = new JScrollPane();
             splitMain2.add(scrollTreeEngine, JSplitPane.LEFT);
-            rootEngine = new TreeEngineNode("Scilab Engines");
+            rootEngine = new TreeEngineNode("Engines");
             treeEngine = new JTree(rootEngine);
             treeRenderer = new TreeEngineRenderer();
             treeEngine.setCellRenderer(treeRenderer);
@@ -600,15 +600,19 @@ public class SciFrame extends javax.swing.JFrame {
 
                                         g.drawImage(Toolkit.getDefaultToolkit()
                                                            .getImage(getClass()
+                                                                         .getResource("img/MATLAB-logo.JPG")),
+                                            30, 0, this);
+                                        g.drawImage(Toolkit.getDefaultToolkit()
+                                                           .getImage(getClass()
                                                                          .getResource("img/logo_scilab1.gif")),
-                                            0, 0, this);
+                                            190, 0, this);
                                     }
                                 };
                         pnlLogo.add(pnlScilab);
 
-                        pnlScilab.setPreferredSize(new java.awt.Dimension(125,
+                        pnlScilab.setPreferredSize(new java.awt.Dimension(300,
                                 70));
-                        pnlScilab.setSize(125, 70);
+                        pnlScilab.setSize(300, 70);
                     }
 
                     {
@@ -777,7 +781,7 @@ public class SciFrame extends javax.swing.JFrame {
             this.setBounds(x, y, f.width, f.height);
             this.setIconImage(new ImageIcon(getClass()
                                                 .getResource("img/icone.png")).getImage());
-            this.setTitle("Grid Scilab ToolBox");
+            this.setTitle("Grid Scilab/Matlab ToolBox");
             this.setSize(812, 780);
         } catch (Exception e) {
             e.printStackTrace();
@@ -1026,7 +1030,7 @@ public class SciFrame extends javax.swing.JFrame {
         }
 
         if (this.service.getNbEngine() == 0) {
-            this.txtLog.append("->No Scilab Engine is launched" + "\n");
+            this.txtLog.append("->No Engine is launched" + "\n");
             return;
         }
 
@@ -1150,8 +1154,7 @@ public class SciFrame extends javax.swing.JFrame {
                 new ImageIcon(getClass().getResource("img/runTask.gif"))
             };
         this.tableTaskWaitModel.addRow(row);
-        txtLog.append("->Add new Scilab Task :" + sciTaskInfo.getIdTask() +
-            "\n");
+        txtLog.append("->Add new Task :" + sciTaskInfo.getIdTask() + "\n");
     }
 
     private void updateTableTaskCancel(GenTaskInfo sciTaskInfo) {
@@ -1167,8 +1170,7 @@ public class SciFrame extends javax.swing.JFrame {
             }
         }
 
-        txtLog.append("->Cancel Scilab Task :" + sciTaskInfo.getIdTask() +
-            "\n");
+        txtLog.append("->Cancel Task :" + sciTaskInfo.getIdTask() + "\n");
     }
 
     private void updateTableTaskRun(GenTaskInfo sciTaskInfo) {
@@ -1190,8 +1192,7 @@ public class SciFrame extends javax.swing.JFrame {
             };
 
         this.tableTaskRunModel.addRow(row);
-        txtLog.append("->Execute Scilab Task :" + sciTaskInfo.getIdTask() +
-            "\n");
+        txtLog.append("->Execute Task :" + sciTaskInfo.getIdTask() + "\n");
     }
 
     private void updateTableTaskKill(GenTaskInfo sciTaskInfo) {
@@ -1203,8 +1204,8 @@ public class SciFrame extends javax.swing.JFrame {
                 this.tableTaskRunModel.setValueAt("-", i, 3);
                 this.tableTaskRunModel.setValueAt(new ImageIcon(
                         getClass().getResource("img/stopTask.gif")), i, 4);
-                txtLog.append("->Execute Scilab Task :" +
-                    sciTaskInfo.getIdTask() + "\n");
+                txtLog.append("->Execute Task :" + sciTaskInfo.getIdTask() +
+                    "\n");
                 break;
             }
         }
@@ -1240,8 +1241,7 @@ public class SciFrame extends javax.swing.JFrame {
 
         updateTreeNodes();
 
-        txtLog.append("->Terminate Scilab Task :" + sciTaskInfo.getIdTask() +
-            "\n");
+        txtLog.append("->Terminate Task :" + sciTaskInfo.getIdTask() + "\n");
     }
 
     /**

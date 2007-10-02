@@ -94,7 +94,7 @@ public class DialogTask extends javax.swing.JDialog {
         try {
             {
                 chooserScript = new JFileChooser();
-                FileFilter filter = new FileFilter() {
+                FileFilter filter_all = new FileFilter() {
                         @Override
                         public boolean accept(File f) {
                             if (f == null) {
@@ -112,11 +112,54 @@ public class DialogTask extends javax.swing.JDialog {
 
                         @Override
                         public String getDescription() {
-                            return "Scilab Filter";
+                            return "Scilab & Matlab Files";
                         }
                     };
 
-                chooserScript.setFileFilter(filter);
+                FileFilter filter_sci = new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            if (f == null) {
+                                return false;
+                            }
+
+                            if (f.isDirectory()) {
+                                return true;
+                            }
+
+                            return f.getName().endsWith(".sci") ||
+                            f.getName().endsWith(".sce");
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return "Scilab Files";
+                        }
+                    };
+
+                FileFilter filter_mat = new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            if (f == null) {
+                                return false;
+                            }
+
+                            if (f.isDirectory()) {
+                                return true;
+                            }
+
+                            return f.getName().endsWith(".m");
+                        }
+
+                        @Override
+                        public String getDescription() {
+                            return "Matlab Files";
+                        }
+                    };
+
+                chooserScript.addChoosableFileFilter(filter_all);
+                chooserScript.addChoosableFileFilter(filter_sci);
+                chooserScript.addChoosableFileFilter(filter_mat);
             }
 
             {
@@ -245,7 +288,8 @@ public class DialogTask extends javax.swing.JDialog {
                     pnlValid.add(btnStart);
                     btnStart.setText("Start");
                     btnStart.setPreferredSize(new java.awt.Dimension(75, 22));
-                    btnStart.setToolTipText("Create et launch the defined task");
+                    btnStart.setToolTipText(
+                        "Create and launch the defined task");
                     btnStart.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent evt) {
                                 btnStartActionPerformed(evt);
@@ -261,7 +305,7 @@ public class DialogTask extends javax.swing.JDialog {
                     }
                 });
 
-            this.setTitle("Open Scilab Task");
+            this.setTitle("Open Scilab/Matlab Task");
             this.setSize(520, 354);
         } catch (Exception e) {
             e.printStackTrace();
