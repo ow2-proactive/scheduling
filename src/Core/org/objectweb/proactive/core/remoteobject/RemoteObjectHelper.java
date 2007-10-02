@@ -203,7 +203,7 @@ public class RemoteObjectHelper {
             Class adapter = ro.getAdapterClass();
 
             if (adapter != null) {
-                Adapter ad = (Adapter) adapter.newInstance();
+                Adapter<Object> ad = (Adapter<Object>) adapter.newInstance();
                 ad.setAdapter(reifiedObjectStub);
                 return ad;
             } else {

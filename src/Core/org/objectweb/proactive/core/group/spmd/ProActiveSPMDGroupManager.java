@@ -50,14 +50,14 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
      * The requests tagged with at least one of those barriers
      * will be ignored until the barrier will be released.
      */
-    private HashMap currentBarriers = new HashMap(4); // initial capacity is 4.
+    private HashMap<String, BarrierState> currentBarriers = new HashMap<String, BarrierState>(4); // initial capacity is 4.
 
     /**
      * The tags joint to the requests.
      * The requests tagged with those barriers
      * will be ignored until all those barriers will be released.
      */
-    private LinkedList barrierTags = new LinkedList();
+    private LinkedList<String> barrierTags = new LinkedList<String>();
 
     /**
      * Set the SPMD group for the active object.
@@ -91,7 +91,7 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
      * @return the state of the specified barrier
      */
     public BarrierState getBarrierStateFor(String barrierName) {
-        return (BarrierState) this.currentBarriers.get(barrierName);
+        return this.currentBarriers.get(barrierName);
     }
 
     /**
@@ -100,7 +100,7 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
      * @param nbCalls the number of awaited calls
      */
     public void setAwaitedBarrierCalls(String barrierName, int nbCalls) {
-        BarrierState bs = (BarrierState) this.currentBarriers.get(barrierName);
+        BarrierState bs = this.currentBarriers.get(barrierName);
         if (bs == null) {
             // System.out.println("First barrier \"" + this.getIDName() + "\" encountered !");
             // build and add infos about new barrier
@@ -143,7 +143,7 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
      * Return the list of barrier tags
      * @return a LinkedList containing the barrier tags
      */
-    public LinkedList getBarrierTags() {
+    public LinkedList<String> getBarrierTags() {
         return this.barrierTags;
     }
 
@@ -153,13 +153,13 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
      * @param barrierTags a list of Tag
      * @return true if barrierTags contains no tags of the current barriers, false if barrierTags contains at least one tag of the current barriers
      */
-    public boolean checkExecution(LinkedList barrierTags) {
+    public boolean checkExecution(LinkedList<String> barrierTags) {
         if (barrierTags == null) {
             return true;
         }
-        Iterator it = barrierTags.iterator();
+        Iterator<String> it = barrierTags.iterator();
         while (it.hasNext()) {
-            if (this.currentBarriers.get((String) it.next()) != null) {
+            if (this.currentBarriers.get(it.next()) != null) {
                 return false;
             }
         }

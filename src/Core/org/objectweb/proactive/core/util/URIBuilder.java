@@ -68,7 +68,6 @@ public class URIBuilder {
         String hostname;
         try {
             hostname = fromLocalhostToHostname(u.getHost());
-
             URI u2 = new URI(u.getScheme(), null, hostname, u.getPort(),
                     u.getPath(), u.getQuery(), u.getFragment());
             return u2;
@@ -321,7 +320,7 @@ public class URIBuilder {
         String temp = "";
 
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
-            temp = ((InetAddress) address).getHostAddress();
+            temp = (address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();
         }
