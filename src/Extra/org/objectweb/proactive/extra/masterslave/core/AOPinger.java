@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.masterslave.core;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -10,6 +11,8 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.group.ExceptionInGroup;
+import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -133,8 +136,20 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
             while (service.hasRequestToServe()) {
                 service.serveOldest();
             }
-
-            slaveGroupStub.heartBeat();
+            try {
+                slaveGroupStub.heartBeat();
+            } catch (Exception e) {
+                if (e instanceof ExceptionListException) {
+                    ExceptionListException ele = (ExceptionListException) e;
+                    synchronized (ele) {
+                        Iterator<ExceptionInGroup> it = ele.iterator();
+                        while (it.hasNext()) {
+                            ExceptionInGroup eig = it.next();
+                            stubOnThis.slaveMissing((Slave) eig.getObject());
+                        }
+                    }
+                }
+            }
             try {
                 Thread.sleep(pingPeriod);
             } catch (InterruptedException e) {
