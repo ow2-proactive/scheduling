@@ -3,7 +3,7 @@
 <bookinfo>
   <title>ProActive <systemitem role="VERSION" /> Documentation</title>
 
-  <subtitle>A Comprehensive Solution for Grid Computing</subtitle>
+  <subtitle>A Comprehensive Solution for Parallel, Distributed, and Multithreaded Computing</subtitle>
 
   <author>
     <surname>OASIS Research Team</surname>
@@ -18,8 +18,7 @@
   </copyright>
 
   <legalnotice id="LegalNotice">
-    <para>ProActive is a GRID Java middleware, with source code under <ulink
-    url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>. </para>
+    <para>ProActive is a GRID Java middleware, with source code under Open Source License. </para>
 
     <para>Copyright INRIA $$%%CopyrightYears%%$$.</para>
   </legalnotice>
@@ -60,8 +59,8 @@
     <title>Disclaimer</title>
 
     <para><emphasis role="bold">ProActive</emphasis> is a GRID middleware Java
-    library for parallel, distributed, and concurrent computing, also
-    featuring mobility and security in a uniform framework. With a reduced set
+    library for parallel, distributed, and concurrent computing featuring mobility
+     and security in a uniform framework. With a reduced set
     of simple primitives, ProActive provides a comprehensive API allowing the
     simplification of programming for distributed applications running on a
     Local Area Network (LAN), on a cluster of workstations, on P2P desktop
