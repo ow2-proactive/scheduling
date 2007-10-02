@@ -214,7 +214,9 @@ public class ProFuture {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
 
         for (Object future : futures) {
-            FutureMonitoring.monitorFuture(future);
+            if (ProFuture.isAwaited(future)) {
+                FutureMonitoring.monitorFuture(future);
+            }
         }
 
         synchronized (fp) {
