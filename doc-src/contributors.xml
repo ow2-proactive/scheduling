@@ -50,15 +50,31 @@
     </informaltable>
 
     <!--   Oasis team and past contributors on two columns <==> in a two column table   -->
-
-    <informaltable colsep="0" frame="none">
+	
+	
+	<informaltable colsep="0" frame="none">
       <tgroup cols="2">
         <tbody>
           <row>
             <entry align="center" valign="top">
-              <itemizedlist mark="none" role="sorted">
-                <title>OASIS Team</title>
+                <emphasis>OASIS Team</emphasis>
+   			</entry> 
 
+            <entry align="center" valign="top">
+				<emphasis>Past And External Contributors</emphasis>
+   			</entry> 
+   			</row>
+   		</tbody>
+        </tgroup>
+    </informaltable>
+    
+    <informaltable colsep="0" frame="none">
+      <tgroup cols="4">
+        <tbody>
+          <row>
+            <entry align="center" valign="top">
+              <itemizedlist mark="none" role="sorted">
+              
                 <listitem>
                   <para>
                     <personname>
@@ -198,7 +214,11 @@
                     </personname>
                   </para>
                 </listitem>
-
+				</itemizedlist>
+ 			</entry>
+ 			<entry align="center" valign="top">
+              <itemizedlist mark="none" role="sorted">
+              
                 <listitem>
                   <para>
                     <personname>
@@ -248,13 +268,93 @@
                     </personname>
                   </para>
                 </listitem>
+	
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Marcela</firstname>
+
+                      <surname>Rivera</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Paul</firstname>
+
+                      <surname>Nauomenko</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Viet</firstname>
+
+                      <surname>Dong Doan</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Ian</firstname>
+
+                      <surname>Stokes-Rees</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Fabine</firstname>
+
+                      <surname>Viale</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Cédric</firstname>
+
+                      <surname>Dalmasso</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Vladimir</firstname>
+
+                      <surname>Bodnartchouk</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Emil</firstname>
+
+                      <surname>Salageanu</surname>
+                    </personname>
+                  </para>
+                </listitem>  
               </itemizedlist>
             </entry>
 
+
             <entry align="center" valign="top">
               <itemizedlist mark="none" role="sorted">
-                <title>Past and External Contributors</title>
-
+              
                 <listitem>
                   <para>
                     <personname>
@@ -265,6 +365,66 @@
                   </para>
                 </listitem>
 
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Hejer</firstname>
+
+                      <surname>Rejeb</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Cristian</firstname>
+
+                      <surname>Ruz</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Solange</firstname>
+
+                      <surname>Ahumada</surname>
+                    </personname>
+                  </para>
+                </listitem>
+                
+                <listitem>
+                	<para>
+                    <personname>
+                      <firstname>Wasseim</firstname>
+
+                      <surname>Al-Zouabi</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                	<para>
+                    <personname>
+                      <firstname>Lionel</firstname>
+
+                      <surname>Mestre</surname>
+                    </personname>
+                  </para>
+                </listitem>
+                
+                <listitem>
+                	<para>
+                    <personname>
+                      <firstname></firstname>
+
+                      <surname>Al-Zouabi</surname>
+                    </personname>
+                  </para>
+                </listitem>
+                
                 <listitem>
                   <para>
                     <personname>
@@ -290,7 +450,7 @@
                     <personname>
                       <firstname>Juan</firstname>
 
-                      <surname>Casanova Rodriguez</surname>
+                      <surname>Rodriguez</surname>
                     </personname>
                   </para>
                 </listitem>
@@ -335,6 +495,31 @@
                   </para>
                 </listitem>
 
+                
+                </itemizedlist>
+
+		</entry>
+ 			<entry align="center" valign="top">
+              <itemizedlist mark="none" role="sorted">
+                 <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Felipe</firstname>
+
+                      <surname>Luna</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Elton</firstname>
+
+                      <surname>Mathias</surname>
+                    </personname>
+                  </para>
+                </listitem>
                 <listitem>
                   <para>
                     <personname>
