@@ -74,7 +74,6 @@ import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.Communication;
@@ -419,15 +418,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      */
     public void registerIncomingFutures() {
         // get list of futures that should be deserialized and registred "behind the ThreadStore"
-        java.util.ArrayList incomingFutures = FuturePool.getIncomingFutures();
+        java.util.ArrayList<Future> incomingFutures = FuturePool.getIncomingFutures();
 
         if (incomingFutures != null) {
             // if futurePool is not null, we are in an Active Body
             if (getFuturePool() != null) {
                 // some futures have to be registred in the local futurePool
-                java.util.Iterator it = incomingFutures.iterator();
+                java.util.Iterator<Future> it = incomingFutures.iterator();
                 while (it.hasNext()) {
-                    Future current = (Future) (it.next());
+                    Future current = it.next();
                     getFuturePool().receiveFuture(current);
                 }
                 FuturePool.removeIncomingFutures();
