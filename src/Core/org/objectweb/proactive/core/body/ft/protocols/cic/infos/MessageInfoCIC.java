@@ -32,8 +32,10 @@ package org.objectweb.proactive.core.body.ft.protocols.cic.infos;
 
 import java.util.Hashtable;
 
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
+import org.objectweb.proactive.core.util.MutableLong;
 
 
 /**
@@ -41,6 +43,12 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
  * @since 2.2
  */
 public class MessageInfoCIC implements MessageInfo {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 4847104774963985302L;
+
     // checkpointing protocol
     public char checkpointIndex;
     public char historyIndex;
@@ -51,7 +59,7 @@ public class MessageInfoCIC implements MessageInfo {
 
     // output commit protocol
     public long positionInHistory;
-    public Hashtable vectorClock;
+    public Hashtable<UniqueID, MutableLong> vectorClock;
 
     /**
      * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#getProtocolType()

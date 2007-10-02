@@ -40,7 +40,6 @@ import java.util.ListIterator;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -53,7 +52,6 @@ import org.objectweb.proactive.core.body.ft.internalmsg.GlobalStateCompletion;
 import org.objectweb.proactive.core.body.ft.internalmsg.OutputCommit;
 import org.objectweb.proactive.core.body.ft.message.HistoryUpdater;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
-import org.objectweb.proactive.core.body.ft.message.MessageLog;
 import org.objectweb.proactive.core.body.ft.message.ReplyLog;
 import org.objectweb.proactive.core.body.ft.message.RequestLog;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -85,6 +83,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols.FTManager {
 
+    /**
+         *
+         */
+    private static final long serialVersionUID = -724183839897500336L;
+
     /** Value returned by an object if the recieved message must be send again */
     public static final int RESEND_MESSAGE = -3;
 
@@ -107,20 +110,20 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     private int historyIndex; // index of the latest closed history
 
     // logged messages
-    private Hashtable requestToResend;
+    private Hashtable<Integer, Vector<RequestLog>> requestToResend;
     private int latestRequestLog;
-    private Hashtable replyToResend;
+    private Hashtable<Integer, Vector<ReplyLog>> replyToResend;
     private int latestReplyLog;
 
     // awaited request in owner request queue
-    private Vector awaitedRequests;
+    private Vector<AwaitedRequest> awaitedRequests;
 
     // pool of MessageInfo
     private MessageInfoCIC forSentRequest;
     private MessageInfoCIC forSentReply;
 
     // history
-    private Vector history;
+    private Vector<UniqueID> history;
 
     // cannot lock hisotry itself, because it is modified in synchronized blocks !
     private final Character historyLock = new Character('l');
@@ -128,7 +131,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     // protocol for output commit
     private long deliveredRequestsCounter;
     private MutableLong lastServedRequestIndex; // reference to localVectorClock[this.ownerID]
-    private Hashtable localVectorClock; // ids <-> lastServedRequest(local view)
+    private Hashtable<UniqueID, MutableLong> localVectorClock; // ids <-> lastServedRequest(local view)
     private long historyBaseIndex;
     private long lastCommitedIndex;
     private boolean completingCheckpoint; // true if the latest checkpoint is still not completed with its minimal history
@@ -146,12 +149,12 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         //this.nextMin = 0;
         this.lastRecovery = 0;
         this.checkpointTimer = System.currentTimeMillis();
-        this.requestToResend = new Hashtable();
+        this.requestToResend = new Hashtable<Integer, Vector<RequestLog>>();
         this.latestRequestLog = 0;
-        this.replyToResend = new Hashtable();
+        this.replyToResend = new Hashtable<Integer, Vector<ReplyLog>>();
         this.latestReplyLog = 0;
-        this.history = new Vector();
-        this.awaitedRequests = new Vector();
+        this.history = new Vector<UniqueID>();
+        this.awaitedRequests = new Vector<AwaitedRequest>();
         this.forSentRequest = new MessageInfoCIC();
         this.forSentReply = new MessageInfoCIC();
         this.deliveredRequestsCounter = -1;
@@ -159,7 +162,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         this.lastServedRequestIndex = new MutableLong(0);
         this.historyBaseIndex = 0;
         this.completingCheckpoint = false;
-        this.localVectorClock = new Hashtable();
+        this.localVectorClock = new Hashtable<UniqueID, MutableLong>();
         this.localVectorClock.put(this.ownerID, this.lastServedRequestIndex);
         logger.info(" CIC fault-tolerance is enabled for body " + this.ownerID);
         return 0;
@@ -226,7 +229,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
             // history closure
             this.updateHistory(mi.historyIndex);
-            //is there any corresponding awaited request ?	
+            //is there any corresponding awaited request ?
             if (!(this.updateAwaitedRequests(request))) {
                 if (FTManagerCIC.isOCEnable || this.completingCheckpoint) {
                     synchronized (historyLock) {
@@ -240,7 +243,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                     if (FTManagerCIC.isOCEnable) {
                         // set the position in history of the request
                         mi.positionInHistory = this.deliveredRequestsCounter;
-                        // update local vector clock 
+                        // update local vector clock
                         this.updateLocalVectorClock(mi.vectorClock);
                     }
                 }
@@ -289,15 +292,16 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
      * Update the local vector clock regarding the paramater.
      * if local[i]<param[i] or local[i] doesn't exist, then local[i]=param[i];
      */
-    private void updateLocalVectorClock(Hashtable vectorClock) {
-        Enumeration ids = vectorClock.keys();
+    private void updateLocalVectorClock(
+        Hashtable<UniqueID, MutableLong> vectorClock) {
+        Enumeration<UniqueID> ids = vectorClock.keys();
         MutableLong localClock;
         MutableLong senderClock = null;
         UniqueID id = null;
         while (ids.hasMoreElements()) {
-            id = (UniqueID) (ids.nextElement());
-            localClock = (MutableLong) (this.localVectorClock.get(id));
-            senderClock = (MutableLong) (vectorClock.get(id));
+            id = ids.nextElement();
+            localClock = (this.localVectorClock.get(id));
+            senderClock = (vectorClock.get(id));
             if (localClock == null) {
                 // there is no clock for the AO id
                 this.localVectorClock.put(id,
@@ -421,10 +425,10 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                         (FutureResult) Utils.makeDeepCopy(reply.getResult()),
                         null);
                 //}
-                MessageLog log = new ReplyLog(toLog,
+                ReplyLog log = new ReplyLog(toLog,
                         destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
-                    ((Vector) (this.replyToResend.get(new Integer(i)))).add(log);
+                    (this.replyToResend.get(new Integer(i))).add(log);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -463,11 +467,11 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                 request.getMethodCall().makeDeepCopyOfArguments();
                 //must reset the send counter (this request has not been forwarded)
                 request.resetSendCounter();
-                MessageLog log = new RequestLog(request,
+                RequestLog log = new RequestLog(request,
                         destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
                     //System.out.println(""+this.ownerID + " logs a request for " + destination.getID());
-                    ((Vector) (this.requestToResend.get(new Integer(i)))).add(log);
+                    this.requestToResend.get(new Integer(i)).add(log);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -501,15 +505,15 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         return 0;
     }
 
-    // Active Object is created but not started 
+    // Active Object is created but not started
     @Override
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
         CheckpointInfoCIC cic = (CheckpointInfoCIC) ci;
-        BlockingRequestQueue queue = ((AbstractBody) owner).getRequestQueue();
+        BlockingRequestQueue queue = (owner).getRequestQueue();
         int index = cic.checkpointIndex;
 
         //	reinit ft values
-        this.history = new Vector();
+        this.history = new Vector<UniqueID>();
         this.completingCheckpoint = false;
         this.lastCommitedIndex = cic.lastCommitedIndex;
         // historized requests are supposed to be "already received"
@@ -518,11 +522,11 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
         this.historyBaseIndex = cic.lastCommitedIndex + 1; //;cic.lastRcvdRequestIndex+1;
 
-        // HERE, we need a proof that running in "histo mode" is equivalent that 
+        // HERE, we need a proof that running in "histo mode" is equivalent that
         // running in normal mode from the end of the histo.
-        this.awaitedRequests = new Vector();
-        this.replyToResend = new Hashtable();
-        this.requestToResend = new Hashtable();
+        this.awaitedRequests = new Vector<AwaitedRequest>();
+        this.replyToResend = new Hashtable<Integer, Vector<ReplyLog>>();
+        this.requestToResend = new Hashtable<Integer, Vector<RequestLog>>();
         this.checkpointIndex = index;
         this.nextMax = index;
         this.checkpointTimer = System.currentTimeMillis();
@@ -533,7 +537,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         //add pending request to reuqestQueue
         Request pendingRequest = cic.pendingRequest;
 
-        //pending request could be null with OOSPMD synchronization        
+        //pending request could be null with OOSPMD synchronization
         if (pendingRequest != null) {
             queue.addToFront(pendingRequest);
         }
@@ -544,17 +548,17 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
         // building history
         // System.out.println(""+ this.ownerID + " History size : " + cic.history.size());
-        Iterator itHistory = cic.history.iterator();
+        Iterator<UniqueID> itHistory = cic.history.iterator();
         while (itHistory.hasNext()) {
-            UniqueID cur = (UniqueID) (itHistory.next());
-            Request currentAwaitedRequest = new AwaitedRequest(cur);
+            UniqueID cur = itHistory.next();
+            AwaitedRequest currentAwaitedRequest = new AwaitedRequest(cur);
             queue.add(currentAwaitedRequest);
             this.awaitedRequests.add(currentAwaitedRequest);
         }
 
         //enable communication
         //System.out.println("[CIC] enable communication");
-        ((AbstractBody) owner).acceptCommunication();
+        (owner).acceptCommunication();
 
         try {
             // update servers
@@ -591,9 +595,9 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
      */
     private boolean updateAwaitedRequests(Request r) {
         AwaitedRequest ar = null;
-        Iterator it = this.awaitedRequests.iterator();
+        Iterator<AwaitedRequest> it = this.awaitedRequests.iterator();
         while (it.hasNext()) {
-            AwaitedRequest arq = (AwaitedRequest) (it.next());
+            AwaitedRequest arq = (it.next());
             if ((arq.getAwaitedSender()).equals(r.getSourceBodyID())) {
                 ar = arq;
                 break;
@@ -633,7 +637,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
      */
     private Checkpoint checkpoint(Request pendingRequest) {
         //stop accepting communication
-        ((AbstractBody) owner).blockCommunication();
+        (owner).blockCommunication();
         // synchronized on hisotry to avoid hisot commit during checkpoint
         synchronized (this.historyLock) {
             Checkpoint c;
@@ -653,9 +657,9 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                     CheckpointInfoCIC ci = new CheckpointInfoCIC();
                     this.extendReplyLog(this.checkpointIndex + 1);
                     this.extendRequestLog(this.checkpointIndex + 1);
-                    ci.replyToResend = (Vector) (this.replyToResend.get(new Integer(this.checkpointIndex +
+                    ci.replyToResend = (this.replyToResend.get(new Integer(this.checkpointIndex +
                                 1)));
-                    ci.requestToResend = (Vector) (this.requestToResend.get(new Integer(this.checkpointIndex +
+                    ci.requestToResend = (this.requestToResend.get(new Integer(this.checkpointIndex +
                                 1)));
                     ci.pendingRequest = pendingRequest;
                     ci.checkpointIndex = this.checkpointIndex + 1;
@@ -671,27 +675,27 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
                     // Reset history only if OC is not possible
                     if (!FTManagerCIC.isOCEnable) {
-                        this.history = new Vector();
+                        this.history = new Vector<UniqueID>();
                         this.historyBaseIndex = this.deliveredRequestsCounter +
                             1;
                         this.lastCommitedIndex = this.deliveredRequestsCounter;
                     }
 
-                    // current informations must not be stored in the checkpoint 
-                    Hashtable requestToSendTMP = this.requestToResend;
+                    // current informations must not be stored in the checkpoint
+                    Hashtable<Integer, Vector<RequestLog>> requestToSendTMP = this.requestToResend;
                     this.requestToResend = null;
-                    Hashtable replyToSendTMP = this.replyToResend;
+                    Hashtable<Integer, Vector<ReplyLog>> replyToSendTMP = this.replyToResend;
                     this.replyToResend = null;
-                    Vector historyTMP = this.history;
+                    Vector<UniqueID> historyTMP = this.history;
                     this.history = null;
-                    Vector awaitedRequestTMP = this.awaitedRequests;
+                    Vector<AwaitedRequest> awaitedRequestTMP = this.awaitedRequests;
                     this.awaitedRequests = null;
 
                     // record the next history base index
                     ci.lastRcvdRequestIndex = this.deliveredRequestsCounter;
                     // checkpoint the active object
                     this.setCheckpointTag(true);
-                    c = new Checkpoint((Body) owner, this.additionalCodebase);
+                    c = new Checkpoint(owner, this.additionalCodebase);
                     // add info to checkpoint
                     c.setCheckpointInfo(ci);
 
@@ -699,7 +703,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                     this.storage.storeCheckpoint(c, this.incarnation);
                     this.setCheckpointTag(false);
 
-                    // restore current informations               
+                    // restore current informations
                     this.replyToResend = replyToSendTMP;
                     this.requestToResend = requestToSendTMP;
                     this.history = historyTMP;
@@ -721,7 +725,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                 e.printStackTrace();
             } finally {
                 // allow communication
-                ((AbstractBody) owner).acceptCommunication();
+                (owner).acceptCommunication();
             }
             return null;
         }
@@ -742,7 +746,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
             }
 
             // HISTO COMMIT
-            List histoToCommit = this.getHistoryToCommit(this.lastCommitedIndex +
+            List<UniqueID> histoToCommit = this.getHistoryToCommit(this.lastCommitedIndex +
                     1, upTo);
 
             // histo to commit could be null (ckpting during histo mode)
@@ -777,17 +781,18 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     }
 
     /*
-     * Return the current hisotry from from up to upto
+     * Return the current history from from up to upto
      */
-    private List getHistoryToCommit(long from, long upTo) {
+    private List<UniqueID> getHistoryToCommit(long from, long upTo) {
         if (from == (upTo + 1)) {
             // Activity is still in histo mode: no commit is needed
             return null;
         } else {
             int translatedFrom = (int) (from - this.historyBaseIndex);
             int translatedUpTo = (int) (upTo - this.historyBaseIndex);
-            Vector toRet = new Vector(translatedUpTo - translatedFrom);
-            Iterator itHisto = this.history.iterator();
+            Vector<UniqueID> toRet = new Vector<UniqueID>(translatedUpTo -
+                    translatedFrom);
+            Iterator<UniqueID> itHisto = this.history.iterator();
             for (int i = 0; i < translatedFrom; i++) {
                 itHisto.next();
             }
@@ -823,26 +828,26 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     private void sendLogs(CheckpointInfoCIC ci) {
         //send replies
         //System.out.println("[CIC] Sending logged messages...");
-        Vector replies = ci.replyToResend;
-        Iterator itReplies = replies.iterator();
+        Vector<ReplyLog> replies = ci.replyToResend;
+        Iterator<ReplyLog> itReplies = replies.iterator();
         while (itReplies.hasNext()) {
             //System.out.println( this.owner.getID() + "      SEND REPLY");
             UniversalBody destination = null;
             Reply r = null;
-            ReplyLog rl = (ReplyLog) (itReplies.next());
+            ReplyLog rl = (itReplies.next());
             r = rl.getReply();
             destination = rl.getDestination();
             this.sendReply(r, destination);
         }
 
         //send requests
-        Vector requests = ci.requestToResend;
-        Iterator itRequests = requests.iterator();
+        Vector<RequestLog> requests = ci.requestToResend;
+        Iterator<RequestLog> itRequests = requests.iterator();
         while (itRequests.hasNext()) {
             try {
                 //System.out.println( this.owner.getID() + "      SEND REQUEST");
                 UniversalBody destination = null;
-                RequestLog lr = (RequestLog) (itRequests.next());
+                RequestLog lr = itRequests.next();
                 Request loggedRequest = lr.getRequest();
                 destination = lr.getDestination();
                 // must create a new req : the sender must be this.owner
@@ -861,18 +866,18 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     // and identify existing AwRq in the request queue
     private void filterQueue(BlockingRequestQueue queue, CheckpointInfoCIC cic) {
         CircularArrayList internalQueue = ((BlockingRequestQueueImpl) queue).getInternalQueue();
-        ListIterator itQueue = internalQueue.listIterator();
+        ListIterator<Request> itQueue = internalQueue.listIterator();
         while (itQueue.hasNext()) {
-            Request current = (Request) (itQueue.next());
+            Request current = (itQueue.next());
             MessageInfoCIC mi = (MessageInfoCIC) current.getMessageInfo();
             if (mi == null) {
                 // is request an awaited or a non ft ?
                 if (current instanceof AwaitedRequest) {
                     // current is an awaited request that is not updated
-                    this.awaitedRequests.add(current);
+                    this.awaitedRequests.add((AwaitedRequest) current);
                 }
             } else if (mi.isOrphanFor <= cic.checkpointIndex) {
-                // current is an orpahn request 
+                // current is an orpahn request
                 // System.out.println("" + this.ownerID + " is filtering some orphan requests ...");
                 AwaitedRequest ar = new AwaitedRequest(current.getSourceBodyID());
                 itQueue.set(ar);
@@ -888,7 +893,8 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         if (this.latestRequestLog < size) {
             //the log vector must grow
             for (int j = this.latestRequestLog + 1; j <= size; j++) {
-                this.requestToResend.put(new Integer(j), new Vector());
+                this.requestToResend.put(new Integer(j),
+                    new Vector<RequestLog>());
             }
             this.latestRequestLog = size;
         }
@@ -901,7 +907,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         if (this.latestReplyLog < size) {
             //the log vector must grow
             for (int j = this.latestReplyLog + 1; j <= size; j++) {
-                this.replyToResend.put(new Integer(j), new Vector());
+                this.replyToResend.put(new Integer(j), new Vector<ReplyLog>());
             }
             this.latestReplyLog = size;
         }
@@ -943,7 +949,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         HistoryUpdater rh = this.commitHistories(this.checkpointIndex,
                 this.deliveredRequestsCounter, false, true);
 
-        // this commit close the completingCheckpoint state, indeed the 
+        // this commit close the completingCheckpoint state, indeed the
         // minimal history for the latest checkpoint has been sent.
         if (this.completingCheckpoint) {
             this.completingCheckpoint = false;
@@ -961,7 +967,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         // commit history up to upTo
         long upTo = fte.getLastIndexToRetreive();
 
-        // this hisotry must be attached to the current checkpoint, except if the current 
+        // this hisotry must be attached to the current checkpoint, except if the current
         // checkpoint is not completed with its minimal history
         int attachedIndex = (this.completingCheckpoint)
             ? (this.checkpointIndex - 1) : (this.checkpointIndex);

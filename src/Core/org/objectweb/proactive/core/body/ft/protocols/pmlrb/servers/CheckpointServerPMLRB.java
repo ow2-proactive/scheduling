@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.body.ft.protocols.pmlrb.servers;
 
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
@@ -73,7 +75,7 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
         logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing..." +
             " (used memory = " + this.getUsedMem() + " Kb)");
         UniqueID caller = c.getBodyID();
-        Object already = this.checkpointStorage.get(caller);
+        List<Checkpoint> already = this.checkpointStorage.get(caller);
 
         // delete old checkpoint if any
         if (already != null) {
@@ -81,7 +83,10 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
         }
 
         // store new checkpoint
-        this.checkpointStorage.put(c.getBodyID(), c);
+        // type compatibility : must use List of one element
+        List<Checkpoint> vc = new Vector<Checkpoint>(1);
+        vc.add(c);
+        this.checkpointStorage.put(c.getBodyID(), vc);
         // delete message logs if any
         return 0;
     }
@@ -99,7 +104,11 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastCheckpoint(org.objectweb.proactive.core.UniqueID)
      */
     public Checkpoint getLastCheckpoint(UniqueID id) throws RemoteException {
-        return (Checkpoint) this.checkpointStorage.get(id);
+        List<Checkpoint> lck = this.checkpointStorage.get(id);
+        if (lck != null) {
+            return lck.get(0);
+        }
+        return null;
     }
 
     /**
@@ -125,10 +134,13 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      */
     public void storeRequest(UniqueID receiverId, Request request)
         throws RemoteException {
-        Checkpoint c = (Checkpoint) (this.checkpointStorage.get(receiverId));
-        if (c != null) {
-            CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (c.getCheckpointInfo());
-            ci.addRequest(request);
+        List<Checkpoint> lck = this.checkpointStorage.get(receiverId);
+        if (lck != null) {
+            Checkpoint c = this.checkpointStorage.get(receiverId).get(0);
+            if (c != null) {
+                CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (c.getCheckpointInfo());
+                ci.addRequest(request);
+            }
         }
 
         //else {
@@ -143,7 +155,8 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
         throws RemoteException {
         // checkpoint could not be null : if this oa receive a repy, it thus has already
         // served a request, and has checkpointed before.
-        CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) ((Checkpoint) (this.checkpointStorage.get(receiverID))).getCheckpointInfo();
+        CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (this.checkpointStorage.get(receiverID)
+                                                                              .get(0)).getCheckpointInfo();
         ci.addReply(reply);
     }
 
@@ -158,6 +171,6 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
      */
     public void commitHistory(HistoryUpdater rh) throws RemoteException {
-        // nothing to do         
+        // nothing to do
     }
 }

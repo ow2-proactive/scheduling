@@ -41,6 +41,12 @@ import org.objectweb.proactive.core.body.reply.Reply;
  * @since ProActive 2.2
  */
 public class ReplyLog implements MessageLog {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 5153002133749379035L;
+
     // Logged message and its destination
     private UniversalBody destination;
     private Reply reply;

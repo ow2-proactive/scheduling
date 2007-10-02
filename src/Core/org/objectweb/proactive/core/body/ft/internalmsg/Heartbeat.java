@@ -42,8 +42,13 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 public class Heartbeat implements FTMessage {
 
     /**
-     * Create a new heartbeat message.
-     */
+         *
+         */
+    private static final long serialVersionUID = 1990752542736468465L;
+
+    /**
+    * Create a new heartbeat message.
+    */
     public Heartbeat() {
     }
 

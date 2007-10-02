@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.ft.servers.location;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
@@ -54,11 +55,11 @@ public class LocationServerImpl implements LocationServer {
     private FTServer server;
 
     // locations table : id <-> adapter
-    private Hashtable locations;
+    private Hashtable<UniqueID, UniversalBody> locations;
 
     public LocationServerImpl(FTServer server) {
         this.server = server;
-        this.locations = new Hashtable();
+        this.locations = new Hashtable<UniqueID, UniversalBody>();
     }
 
     /**
@@ -67,7 +68,7 @@ public class LocationServerImpl implements LocationServer {
     public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation,
         UniqueID caller) throws RemoteException {
         synchronized (this.locations) {
-            UniversalBody currentLocation = (UniversalBody) (this.locations.get(id));
+            UniversalBody currentLocation = this.locations.get(id);
             if (currentLocation == null) {
                 logger.error("[LOCATION] **ERROR** " + id +
                     " is not registered !");
@@ -92,7 +93,7 @@ public class LocationServerImpl implements LocationServer {
     public void updateLocation(UniqueID id, UniversalBody newLocation)
         throws RemoteException {
         synchronized (this.locations) {
-            UniversalBody currentLocation = (UniversalBody) (this.locations.get(id));
+            UniversalBody currentLocation = (this.locations.get(id));
             if (newLocation == null) {
                 // the body id is no more localized. Remove it from the location table
                 logger.info("[LOCATION] " + id +
@@ -119,9 +120,9 @@ public class LocationServerImpl implements LocationServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#getAllLocations()
      */
-    public ArrayList getAllLocations() throws RemoteException {
+    public List<UniversalBody> getAllLocations() throws RemoteException {
         synchronized (this.locations) {
-            return new ArrayList(locations.values());
+            return new ArrayList<UniversalBody>(locations.values());
         }
     }
 
@@ -130,7 +131,7 @@ public class LocationServerImpl implements LocationServer {
      */
     public UniversalBody getLocation(UniqueID id) throws RemoteException {
         synchronized (this.locations) {
-            return (UniversalBody) (this.locations.get(id));
+            return (this.locations.get(id));
         }
     }
 
@@ -138,6 +139,6 @@ public class LocationServerImpl implements LocationServer {
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#initialize()
      */
     public void initialize() throws RemoteException {
-        this.locations = new Hashtable();
+        this.locations = new Hashtable<UniqueID, UniversalBody>();
     }
 }

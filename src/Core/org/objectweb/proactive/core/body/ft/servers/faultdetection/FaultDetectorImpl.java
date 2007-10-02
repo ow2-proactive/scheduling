@@ -31,8 +31,8 @@
 package org.objectweb.proactive.core.body.ft.servers.faultdetection;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -162,8 +162,8 @@ public class FaultDetectorImpl implements FaultDetector {
                     }
 
                     //synchronized (FaultDetectorImpl.this.server){
-                    ArrayList al = FaultDetectorImpl.this.server.getAllLocations();
-                    Iterator it = al.iterator();
+                    List<UniversalBody> al = FaultDetectorImpl.this.server.getAllLocations();
+                    Iterator<UniversalBody> it = al.iterator();
                     logger.info("[FAULT DETECTOR] Scanning " + al.size() +
                         " objects ...");
                     while (it.hasNext()) {
@@ -175,7 +175,7 @@ public class FaultDetectorImpl implements FaultDetector {
                             it = al.iterator();
                             this.wakeUpCalled = false;
                         }
-                        UniversalBody current = (UniversalBody) (it.next());
+                        UniversalBody current = (it.next());
                         if (FaultDetectorImpl.this.server.isUnreachable(current)) {
                             FaultDetectorImpl.this.server.failureDetected(current.getID());
                             // other failures may be detected by the recoveryProcess

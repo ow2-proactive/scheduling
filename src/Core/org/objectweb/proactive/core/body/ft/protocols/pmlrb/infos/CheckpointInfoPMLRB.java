@@ -45,9 +45,15 @@ import org.objectweb.proactive.core.body.request.Request;
  * @since ProActive 3.0
  */
 public class CheckpointInfoPMLRB implements CheckpointInfo {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 5617275963859365110L;
+
     // message logs
-    private List requestLog;
-    private List replyLog;
+    private List<Request> requestLog;
+    private List<Reply> replyLog;
 
     // pending request
     private Request pending;
@@ -58,8 +64,8 @@ public class CheckpointInfoPMLRB implements CheckpointInfo {
      */
     public CheckpointInfoPMLRB(Request pendingRequest) {
         this.pending = pendingRequest;
-        this.replyLog = new ArrayList();
-        this.requestLog = new ArrayList();
+        this.replyLog = new ArrayList<Reply>();
+        this.requestLog = new ArrayList<Request>();
     }
 
     // GETTERs - SETTERs
@@ -67,19 +73,19 @@ public class CheckpointInfoPMLRB implements CheckpointInfo {
         return this.pending;
     }
 
-    public void setRequestLog(List requests) {
+    public void setRequestLog(List<Request> requests) {
         this.requestLog = requests;
     }
 
-    public void setReplyLog(List replies) {
+    public void setReplyLog(List<Reply> replies) {
         this.replyLog = replies;
     }
 
-    public List getRequestLog() {
+    public List<Request> getRequestLog() {
         return this.requestLog;
     }
 
-    public List getReplyLog() {
+    public List<Reply> getReplyLog() {
         return this.replyLog;
     }
 

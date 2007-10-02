@@ -39,8 +39,13 @@ package org.objectweb.proactive.core.body.ft.exception;
 public class ProtocolErrorException extends RuntimeException {
 
     /**
-     *
-     */
+         *
+         */
+    private static final long serialVersionUID = 2802117706897063134L;
+
+    /**
+    *
+    */
     public ProtocolErrorException() {
         super();
     }

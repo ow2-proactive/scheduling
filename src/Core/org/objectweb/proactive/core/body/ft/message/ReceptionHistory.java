@@ -35,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import org.objectweb.proactive.core.UniqueID;
+
 
 /**
  * This class represent an ordered list of reception events.
@@ -42,10 +44,16 @@ import java.util.Vector;
  * @since 3.0
  */
 public class ReceptionHistory implements Serializable {
-    // the elements of the history
-    private List elements;
 
-    // the historized index of the last element 
+    /**
+         *
+         */
+    private static final long serialVersionUID = 490062375216717743L;
+
+    // the elements of the history
+    private List<UniqueID> elements;
+
+    // the historized index of the last element
     private long lastCommited;
 
     // the historized index of the first element
@@ -59,7 +67,7 @@ public class ReceptionHistory implements Serializable {
      * Create a new reception history
      */
     public ReceptionHistory() {
-        this.elements = new Vector();
+        this.elements = new Vector<UniqueID>();
         this.lastCommited = -1;
         this.lastRecoverable = -1;
         this.base = 0;
@@ -72,10 +80,10 @@ public class ReceptionHistory implements Serializable {
     public void updateHistory(HistoryUpdater hu) {
         long toAddBase = hu.base;
         long toAddLast = hu.last;
-        List toAdd = hu.elements;
+        List<UniqueID> toAdd = hu.elements;
 
         // if there is a gap between lastCommited and toAddBase, we can
-        // suppose that this gap is commited. The current history is then 
+        // suppose that this gap is commited. The current history is then
         // replaced by toAdd
         if (toAddBase > (this.lastCommited + 1)) {
             // history is not contigue
@@ -83,8 +91,8 @@ public class ReceptionHistory implements Serializable {
             this.base = toAddBase;
             this.lastCommited = toAddLast;
         } else if (this.lastCommited < toAddLast) {
-            // history is contigue 
-            Iterator it = toAdd.iterator();
+            // history is contigue
+            Iterator<UniqueID> it = toAdd.iterator();
 
             // shift in elts up to this.lastCommited+1
             for (long i = toAddBase; i <= this.lastCommited; i++) {
@@ -144,11 +152,11 @@ public class ReceptionHistory implements Serializable {
      * stored history, stored history is replaced by recoverable history.
      * @return the recoverable history;
      */
-    public List getRecoverableHistory() {
+    public List<UniqueID> getRecoverableHistory() {
         if (this.lastCommited == this.lastRecoverable) {
             return this.elements;
         } else {
-            Vector toRet = new Vector();
+            Vector<UniqueID> toRet = new Vector<UniqueID>();
             for (int i = 0; i <= (this.lastRecoverable - this.base); i++) {
                 toRet.add(this.elements.get(i));
             }

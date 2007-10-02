@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.body.ft.servers.location;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -69,7 +69,7 @@ public interface LocationServer extends Remote {
      * Return the list of locations of all registered bodies.
      * @return the list of locations of all registered bodies.
      */
-    public ArrayList getAllLocations() throws RemoteException;
+    public List<UniversalBody> getAllLocations() throws RemoteException;
 
     /**
      * Return the current known location of a registred body.

@@ -38,8 +38,13 @@ package org.objectweb.proactive.core.body.ft.exception;
 public class NotImplementedException extends RuntimeException {
 
     /**
-     *
-     */
+         *
+         */
+    private static final long serialVersionUID = 4001870397538018429L;
+
+    /**
+    *
+    */
     public NotImplementedException() {
         super();
         // TODO Auto-generated constructor stub

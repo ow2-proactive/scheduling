@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.ft.servers.resource;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -59,7 +60,7 @@ public class ResourceServerImpl implements ResourceServer {
     private FTServer server;
 
     // list of free ProActiveRuntime
-    private ArrayList freeNodes;
+    private List<Node> freeNodes;
 
     // OR use p2p infracstructure
     private P2PService serviceP2P;
@@ -69,14 +70,14 @@ public class ResourceServerImpl implements ResourceServer {
 
     public ResourceServerImpl(FTServer server) {
         this.server = server;
-        this.freeNodes = new ArrayList();
+        this.freeNodes = new ArrayList<Node>();
         this.nodeCounter = 0;
     }
 
     public ResourceServerImpl(FTServer server, String p2pServerURL) {
         this(server);
         try {
-            Vector v = new Vector(1);
+            Vector<String> v = new Vector<String>(1);
             v.add(p2pServerURL);
             StartP2PService startServiceP2P = new StartP2PService(v);
             PAProperties.PA_P2P_PORT.setValue("2603");
@@ -116,7 +117,7 @@ public class ResourceServerImpl implements ResourceServer {
                 return null;
             }
         } else {
-            n = (Node) (this.freeNodes.get(nodeCounter % (this.freeNodes.size())));
+            n = (this.freeNodes.get(nodeCounter % (this.freeNodes.size())));
         }
         try {
             // testing free node
@@ -137,7 +138,7 @@ public class ResourceServerImpl implements ResourceServer {
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#initialize()
      */
     public void initialize() throws RemoteException {
-        this.freeNodes = new ArrayList();
+        this.freeNodes = new ArrayList<Node>();
         this.nodeCounter = 0;
     }
 }

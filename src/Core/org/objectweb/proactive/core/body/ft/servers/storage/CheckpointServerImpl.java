@@ -36,10 +36,12 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
@@ -66,7 +68,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
     protected String codebase;
 
     // The stable storage (idCheckpointer --> [list of] [checkpoints])
-    protected Hashtable checkpointStorage;
+    protected Hashtable<UniqueID, List<Checkpoint>> checkpointStorage;
 
     /**
      *
@@ -74,7 +76,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
     public CheckpointServerImpl(FTServer server) {
         this.server = server;
 
-        this.checkpointStorage = new Hashtable();
+        this.checkpointStorage = new Hashtable<UniqueID, List<Checkpoint>>();
 
         // classloader
         try {
@@ -89,7 +91,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
         }
 
         try {
-            Node n = NodeFactory.getDefaultNode();
+            NodeFactory.getDefaultNode();
         } catch (NodeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -131,6 +133,6 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#initialize()
      */
     public void initialize() throws RemoteException {
-        this.checkpointStorage = new Hashtable();
+        this.checkpointStorage = new Hashtable<UniqueID, List<Checkpoint>>();
     }
 }

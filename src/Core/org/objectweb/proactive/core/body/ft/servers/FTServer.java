@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.body.ft.servers;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
@@ -63,6 +63,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FTServer extends UnicastRemoteObject implements FaultDetector,
     LocationServer, RecoveryProcess, ResourceServer, CheckpointServer {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 7757071442311462095L;
+
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
@@ -161,7 +167,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#getAllLocations()
      */
-    public ArrayList getAllLocations() throws RemoteException {
+    public List<UniversalBody> getAllLocations() throws RemoteException {
         return this.locationServer.getAllLocations();
     }
 
@@ -254,7 +260,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
         throws RemoteException {
         //this.firstCkptCounter--;
         //if (this.firstCkptCounter < 0){
-        //    if ((this.failureCounter <= totalFailure) && 
+        //    if ((this.failureCounter <= totalFailure) &&
         //            ((ckptCounter) == numCkpt)) {
         //        this.killingQueue.addJob(
         //                new KillerJob(this,this.getLocation(c.getBodyID()),timeToWait));

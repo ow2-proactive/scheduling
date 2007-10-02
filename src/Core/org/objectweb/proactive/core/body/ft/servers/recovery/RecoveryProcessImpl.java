@@ -61,16 +61,16 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     protected FTServer server;
 
     // state table (bodyID --> state)
-    protected Hashtable bodies;
+    protected Hashtable<UniqueID, Integer> bodies;
 
     // internal pool of thread (ActiveQueue)
-    private Vector activeQueuePool;
+    private Vector<ActiveQueue> activeQueuePool;
     private int activeQueuesCounter;
 
     public RecoveryProcessImpl(FTServer server) {
         this.server = server;
-        this.bodies = new Hashtable();
-        this.activeQueuePool = new Vector();
+        this.bodies = new Hashtable<UniqueID, Integer>();
+        this.activeQueuePool = new Vector<ActiveQueue>();
         this.activeQueuesCounter = 0;
     }
 
@@ -114,14 +114,14 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
      */
     public void failureDetected(UniqueID id) throws RemoteException {
         // id is recovering ??
-        int currentState = ((Integer) this.bodies.get(id)).intValue();
+        int currentState = (this.bodies.get(id)).intValue();
         if (currentState == RUNNING) {
             // we can suppose that id is failed
             logger.info("[RECOVERY] Failure is detected for " + id);
             this.bodies.put(id, new Integer(RECOVERING));
             this.recover(id);
         } else if (currentState == RECOVERING) {
-            // id is recovering ...  do nothing  
+            // id is recovering ...  do nothing
         }
     }
 
@@ -139,7 +139,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
      */
     public void submitJob(ActiveQueueJob job) {
         synchronized (this.activeQueuePool) {
-            ((ActiveQueue) (this.activeQueuePool.get(this.activeQueuesCounter))).addJob(job);
+            ((this.activeQueuePool.get(this.activeQueuesCounter))).addJob(job);
             this.activeQueuesCounter = (this.activeQueuesCounter + 1) % (this.activeQueuePool.size());
         }
     }
@@ -152,7 +152,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
      */
     public JobBarrier submitJobWithBarrier(ActiveQueueJob job) {
         synchronized (this.activeQueuePool) {
-            JobBarrier b = ((ActiveQueue) (this.activeQueuePool.get(this.activeQueuesCounter))).addJobWithBarrier(job);
+            JobBarrier b = ((this.activeQueuePool.get(this.activeQueuesCounter))).addJobWithBarrier(job);
             this.activeQueuesCounter = (this.activeQueuesCounter + 1) % (this.activeQueuePool.size());
             return b;
         }
@@ -169,13 +169,14 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#initialize()
      */
     public void initialize() throws RemoteException {
-        this.bodies = new Hashtable();
+        this.bodies = new Hashtable<UniqueID, Integer>();
+
         // killing activeQueues
-        Iterator itAQ = this.activeQueuePool.iterator();
+        Iterator<ActiveQueue> itAQ = this.activeQueuePool.iterator();
         while (itAQ.hasNext()) {
-            ((ActiveQueue) (itAQ.next())).killMe();
+            itAQ.next().killMe();
         }
-        this.activeQueuePool = new Vector();
+        this.activeQueuePool = new Vector<ActiveQueue>();
         this.activeQueuesCounter = 0;
     }
 }

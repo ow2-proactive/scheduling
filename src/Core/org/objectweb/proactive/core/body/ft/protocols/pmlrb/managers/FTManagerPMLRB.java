@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -68,6 +67,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FTManagerPMLRB extends FTManager {
 
+    /**
+         *
+         */
+    private static final long serialVersionUID = 5766004932978465794L;
+
     /** Incarantion is not used for PML. Set to a default value */
     public static final int INC_VALUE = Integer.MAX_VALUE;
 
@@ -79,7 +83,7 @@ public class FTManagerPMLRB extends FTManager {
 
     // index of the latest received messae per senderID
     // UniqueID <-> MutableLong
-    private Hashtable latestReceivedIndex;
+    private Hashtable<UniqueID, MutableLong> latestReceivedIndex;
 
     // true if this oa is recovering
     private boolean isRecovering;
@@ -105,7 +109,7 @@ public class FTManagerPMLRB extends FTManager {
     @Override
     public int init(AbstractBody owner) throws ProActiveException {
         super.init(owner);
-        this.latestReceivedIndex = new Hashtable();
+        this.latestReceivedIndex = new Hashtable<UniqueID, MutableLong>();
         this.isRecovering = false;
         //checkpoint timer init: a checkpoint must be taken before any request service
         this.checkpointTimer = 0;
@@ -211,7 +215,7 @@ public class FTManagerPMLRB extends FTManager {
      */
     private void updateLatestRvdIndexTable(Message m) {
         // the first message from this sender?
-        MutableLong index = (MutableLong) (this.latestReceivedIndex.get(m.getSourceBodyID()));
+        MutableLong index = (this.latestReceivedIndex.get(m.getSourceBodyID()));
         MessageInfoPMLRB mi = (MessageInfoPMLRB) (m.getMessageInfo());
         if (mi == null) {
             // from a not ft
@@ -240,7 +244,7 @@ public class FTManagerPMLRB extends FTManager {
             return true;
         } else {
             long msgIndex = ((MessageInfoPMLRB) (m.getMessageInfo())).sentSequenceNumber;
-            MutableLong index = (MutableLong) (this.latestReceivedIndex.get(m.getSourceBodyID()));
+            MutableLong index = (this.latestReceivedIndex.get(m.getSourceBodyID()));
             return (index != null) && (msgIndex <= index.getValue());
         }
     }
@@ -314,29 +318,29 @@ public class FTManagerPMLRB extends FTManager {
         this.owner.registerIncomingFutures();
 
         //get messages
-        List replies = ((CheckpointInfoPMLRB) ci).getReplyLog();
-        List request = ((CheckpointInfoPMLRB) ci).getRequestLog();
+        List<Reply> replies = ((CheckpointInfoPMLRB) ci).getReplyLog();
+        List<Request> request = ((CheckpointInfoPMLRB) ci).getRequestLog();
 
         // deal with potential duplicata of request
         // duplicata of replies are not treated since they are automaticaly ignored.
-        Request potentialDuplicata = (Request) (request.get(request.size() - 1));
+        Request potentialDuplicata = request.get(request.size() - 1);
         this.potentialDuplicataSender = potentialDuplicata.getSourceBodyID();
         this.potentialDuplicataSequence = potentialDuplicata.getSequenceNumber();
 
         // add messages in the body context
-        Iterator itRequest = request.iterator();
+        Iterator<Request> itRequest = request.iterator();
         BlockingRequestQueue queue = owner.getRequestQueue();
 
         while (itRequest.hasNext()) {
-            queue.add((Request) (itRequest.next()));
+            queue.add((itRequest.next()));
         }
 
         // replies
-        Iterator itReplies = replies.iterator();
+        Iterator<Reply> itReplies = replies.iterator();
         FuturePool fp = owner.getFuturePool();
         try {
             while (itReplies.hasNext()) {
-                Reply current = (Reply) (itReplies.next());
+                Reply current = itReplies.next();
                 fp.receiveFutureValue(current.getSequenceNumber(),
                     current.getSourceBodyID(), current.getResult(), current);
             }
@@ -347,7 +351,7 @@ public class FTManagerPMLRB extends FTManager {
         //	add pending request to reuqestQueue
         Request pendingRequest = ((CheckpointInfoPMLRB) ci).getPendingRequest();
 
-        // pending request could be null 
+        // pending request could be null
         if (pendingRequest != null) {
             queue.addToFront(pendingRequest);
         }
@@ -394,7 +398,7 @@ public class FTManagerPMLRB extends FTManager {
         try {
             this.setCheckpointTag(true);
             // create a checkpoint
-            Checkpoint c = new Checkpoint((Body) owner, this.additionalCodebase);
+            Checkpoint c = new Checkpoint(owner, this.additionalCodebase);
 
             // create checkpoint info with the pending request
             CheckpointInfoPMLRB ci = new CheckpointInfoPMLRB(pending);

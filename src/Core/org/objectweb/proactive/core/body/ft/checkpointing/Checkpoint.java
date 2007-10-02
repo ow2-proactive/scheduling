@@ -40,7 +40,6 @@ import java.rmi.server.RemoteStub;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
 
@@ -53,6 +52,12 @@ import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
  * @since ProActive 2.2
  */
 public class Checkpoint implements java.io.Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -3527697223299111892L;
+
     //id of the checkpointed body
     private UniqueID bodyID;
 
@@ -61,6 +66,9 @@ public class Checkpoint implements java.io.Serializable {
 
     //additionnal infos
     private CheckpointInfo ci;
+
+    public Checkpoint() {
+    }
 
     /**
      * Create a checkpoint. The body given as parameter is serialized in this constructor.
@@ -158,7 +166,7 @@ public class Checkpoint implements java.io.Serializable {
          * Write the codebase in the stream.
          */
         @Override
-        protected void annotateClass(Class cl) throws IOException {
+        protected void annotateClass(Class<?> cl) throws IOException {
             writeObject(this.codebase);
         }
 

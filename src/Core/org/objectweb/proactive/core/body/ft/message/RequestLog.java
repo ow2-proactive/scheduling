@@ -41,6 +41,12 @@ import org.objectweb.proactive.core.body.request.Request;
  * @since ProActive 2.2
  */
 public class RequestLog implements MessageLog {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -7751680796752258654L;
+
     // Logged message and its destination
     private UniversalBody destination;
     private Request request;

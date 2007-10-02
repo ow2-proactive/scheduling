@@ -40,6 +40,11 @@ import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
  * @since ProActive 2.2
  */
 public class GlobalStateCompletion implements FTMessage {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -3950343920191825755L;
     private int index;
 
     /**
