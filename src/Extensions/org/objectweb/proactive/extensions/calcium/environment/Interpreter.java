@@ -35,7 +35,6 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
@@ -93,7 +92,7 @@ public class Interpreter implements Serializable {
 
         files.stageIn(system.getWorkingSpace());
 
-        //Stop loop if task is finished or has ready children 
+        //Stop loop if task is finished or has ready children
         while (task.hasInstruction() && !task.family.hasReadyChildTask()) {
             if (logger.isDebugEnabled()) {
                 System.out.println(task.stackToString());

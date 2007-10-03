@@ -40,7 +40,7 @@ public class RemoteObjectExposer implements Serializable {
      * @param targetRemoteObjectAdapter the adapter object that allows to implement specific behaviour like cache mechanism
      */
     public RemoteObjectExposer(String className, Object target,
-        Adapter targetRemoteObjectAdapter) {
+        Adapter<?> targetRemoteObjectAdapter) {
         this.className = className;
         this.remoteObject = new RemoteObjectImpl(className, target,
                 targetRemoteObjectAdapter);

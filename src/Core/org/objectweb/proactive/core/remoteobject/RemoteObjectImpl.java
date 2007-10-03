@@ -64,19 +64,19 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     protected Object target;
     protected String className;
     protected String proxyClassName;
-    protected Adapter adapter;
+    protected Adapter<?> adapter;
     protected ProActiveSecurityManager psm;
 
     public RemoteObjectImpl(String className, Object target) {
         this(className, target, null);
     }
 
-    public RemoteObjectImpl(String className, Object target, Adapter adapter) {
+    public RemoteObjectImpl(String className, Object target, Adapter<?> adapter) {
         this(className, target, adapter, null);
     }
 
-    public RemoteObjectImpl(String className, Object target, Adapter adapter,
-        ProActiveSecurityManager psm) {
+    public RemoteObjectImpl(String className, Object target,
+        Adapter<?> adapter, ProActiveSecurityManager psm) {
         this.target = target;
         this.className = className;
         this.proxyClassName = SynchronousProxy.class.getName();
@@ -200,7 +200,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
             if (adapter != null) {
                 //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
                 //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
-                Adapter ad = adapter.getClass().newInstance();
+                Adapter<Object> ad = adapter.getClass().newInstance();
                 ad.setAdapter(reifiedObjectStub);
                 return ad;
             } else {
@@ -238,7 +238,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
             if (adapter != null) {
                 //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
                 //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
-                Adapter ad = adapter.getClass().newInstance();
+                Adapter<Object> ad = adapter.getClass().newInstance();
                 ad.setAdapter(reifiedObjectStub);
                 return ad;
             } else {
@@ -282,7 +282,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         this.target = target;
     }
 
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         try {
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
@@ -292,7 +292,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         }
     }
 
-    public Class getAdapterClass() {
+    public Class<?> getAdapterClass() {
         if (adapter != null) {
             return adapter.getClass();
         }

@@ -69,7 +69,7 @@ public abstract class TaskQueue implements Serializable {
      * Usually a set of sub-tasks from a task which is computing.
      * @param tasks a <code>Collection</code> of <code>Task</code> classes.
      */
-    public abstract void addAll(Collection tasks);
+    public abstract void addAll(Collection<Task> tasks);
 
     /**
      * @return the number of tasks not yet computed.
@@ -111,7 +111,7 @@ public abstract class TaskQueue implements Serializable {
      * @param pendingTasks the pending tasks.
      * @param backupOutputStream the stream for backuping.
      */
-    public abstract void backupTasks(Task rootTask, Vector pendingTasks,
+    public abstract void backupTasks(Task rootTask, Vector<Task> pendingTasks,
         OutputStream backupOutputStream);
 
     /**
@@ -142,7 +142,7 @@ public abstract class TaskQueue implements Serializable {
     /**
      * @return a <code>Collection</code> with all current found results.
      */
-    public abstract Collection getAllResults();
+    public abstract Collection<Result> getAllResults();
 
     /**
      * Backuping in a stream all current found results.

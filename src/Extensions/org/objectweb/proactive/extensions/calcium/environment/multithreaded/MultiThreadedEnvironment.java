@@ -28,7 +28,6 @@
 package org.objectweb.proactive.extensions.calcium.environment.multithreaded;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;

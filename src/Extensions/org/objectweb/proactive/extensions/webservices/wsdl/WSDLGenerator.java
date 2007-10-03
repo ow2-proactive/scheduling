@@ -55,8 +55,8 @@ public class WSDLGenerator extends WSConstants {
      * @param methods The public methods allowed for this service
      * @return a String containing the Wsdl document.
      */
-    public static String getWSDL(Class c, String serviceName, String urlRouter,
-        String documentation, String[] methods) {
+    public static String getWSDL(Class<?> c, String serviceName,
+        String urlRouter, String documentation, String[] methods) {
         String namespace = serviceName;
 
         try {

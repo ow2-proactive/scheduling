@@ -37,17 +37,17 @@ import java.util.Comparator;
 public class Exercise implements Serializable {
     public final static Comparator<Exercise> compareByComputationTime = new CompareByComputationTime();
     public final static Comparator<Exercise> compareByInvokedTimes = new CompareByInvokedTimes();
-    private Class c;
+    private Class<?> c;
     private long computationTime;
     private int numberExecutedTimes;
 
-    public Exercise(Class c) {
+    public Exercise(Class<?> c) {
         this.c = c;
         computationTime = 0;
         numberExecutedTimes = 0;
     }
 
-    public Exercise(Class c, int computationTime, int numberExecutedTimes) {
+    public Exercise(Class<?> c, int computationTime, int numberExecutedTimes) {
         this.c = c;
         this.computationTime = computationTime;
         this.numberExecutedTimes = numberExecutedTimes;
@@ -56,7 +56,7 @@ public class Exercise implements Serializable {
     /**
      * @return The Class of the muscle code that corresponds to this exercise.
      */
-    public Class getMuscleClass() {
+    public Class<?> getMuscleClass() {
         return c;
     }
 

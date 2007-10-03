@@ -83,6 +83,7 @@ public class WsdlServlet extends HttpServlet {
                 return;
             }
 
+            @SuppressWarnings("unchecked")
             Hashtable table = dd.getProps();
             String wsdl = (String) table.get("Wsdl");
 

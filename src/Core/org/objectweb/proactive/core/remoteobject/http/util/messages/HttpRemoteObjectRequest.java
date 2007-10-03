@@ -35,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
@@ -56,7 +57,7 @@ public class HttpRemoteObjectRequest extends ReflectRequest
     }
 
     private String methodName;
-    private ArrayList parameters = new ArrayList();
+    private List<Object> parameters = new ArrayList<Object>();
     private UniqueID oaid;
     private RemoteObject remoteObject = null;
 
@@ -66,7 +67,7 @@ public class HttpRemoteObjectRequest extends ReflectRequest
      * @param parameters The parameters associated with the method
      * @param oaid The unique ID of targeted active object
      */
-    public HttpRemoteObjectRequest(String methodName, ArrayList parameters,
+    public HttpRemoteObjectRequest(String methodName, List<Object> parameters,
         String url) {
         super(url);
         this.methodName = methodName;

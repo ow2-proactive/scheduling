@@ -31,11 +31,8 @@
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
 import java.io.Serializable;
-import java.util.Stack;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.calcium.instructions.Instruction;
-import org.objectweb.proactive.extensions.calcium.instructions.MapInst;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 

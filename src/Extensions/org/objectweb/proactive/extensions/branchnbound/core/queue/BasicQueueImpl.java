@@ -57,11 +57,11 @@ import org.objectweb.proactive.extensions.branchnbound.core.Task;
  */
 public class BasicQueueImpl extends TaskQueue {
     private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
-    private Vector queue = new Vector();
+    private Vector<Task> queue = new Vector<Task>();
     private int hungryLevel;
     private Task rootTaskFromBackup = null;
-    private Vector pendingTasksFromBackup = new Vector();
-    private Vector allResults = new Vector();
+    private Vector<Task> pendingTasksFromBackup = new Vector<Task>();
+    private Vector<Result> allResults = new Vector<Result>();
 
     /**
      * The no args constructor for ProActive activate.
@@ -73,7 +73,7 @@ public class BasicQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addAll(java.util.Collection)
      */
     @Override
-    public void addAll(Collection tasks) {
+    public void addAll(Collection<Task> tasks) {
         if (tasks.size() > 0) {
             queue.addAll(tasks);
             if (logger.isDebugEnabled()) {
@@ -104,7 +104,7 @@ public class BasicQueueImpl extends TaskQueue {
      */
     @Override
     public Task next() {
-        return (Task) this.queue.remove(0);
+        return this.queue.remove(0);
     }
 
     /**
@@ -112,11 +112,11 @@ public class BasicQueueImpl extends TaskQueue {
      */
     @Override
     public void flushAll() {
-        queue = new Vector();
+        queue = new Vector<Task>();
         hungryLevel = 0;
         rootTaskFromBackup = null;
-        pendingTasksFromBackup = new Vector();
-        allResults = new Vector();
+        pendingTasksFromBackup = new Vector<Task>();
+        allResults = new Vector<Result>();
     }
 
     /**
@@ -143,7 +143,7 @@ public class BasicQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#backupTasks(org.objectweb.proactive.branchnbound.core.Task, java.util.Vector, java.io.OutputStream)
      */
     @Override
-    public void backupTasks(Task rootTask, Vector pendingTasks,
+    public void backupTasks(Task rootTask, Vector<Task> pendingTasks,
         OutputStream backupOutputStream) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(backupOutputStream);
@@ -180,9 +180,9 @@ public class BasicQueueImpl extends TaskQueue {
                     separationReached = true;
                 }
                 if (!separationReached) {
-                    this.pendingTasksFromBackup.add(read);
+                    this.pendingTasksFromBackup.add((Task) read);
                 } else {
-                    this.queue.add(read);
+                    this.queue.add((Task) read);
                 }
             }
             ois.close();
@@ -221,7 +221,7 @@ public class BasicQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#getAllResults()
      */
     @Override
-    public Collection getAllResults() {
+    public Collection<Result> getAllResults() {
         return this.allResults;
     }
 
@@ -252,7 +252,7 @@ public class BasicQueueImpl extends TaskQueue {
         try {
             ObjectInputStream ois = new ObjectInputStream(backupResultInputStream);
             while (ois.available() > 0) {
-                this.allResults.add(ois.readObject());
+                this.allResults.add((Result) ois.readObject());
             }
             ois.close();
             backupResultInputStream.close();

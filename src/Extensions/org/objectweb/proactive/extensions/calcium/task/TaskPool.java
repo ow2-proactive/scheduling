@@ -35,9 +35,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.PriorityQueue;
 import java.util.Vector;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;

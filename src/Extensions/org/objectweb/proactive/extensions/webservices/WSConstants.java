@@ -86,7 +86,7 @@ public class WSConstants {
     }
 
     /* A vector containing all supported types by Apache Soap */
-    protected static Vector<Class> supportedTypes = new Vector<Class>();
+    protected static Vector<Class<?>> supportedTypes = new Vector<Class<?>>();
 
     static {
         supportedTypes.addElement(String.class);

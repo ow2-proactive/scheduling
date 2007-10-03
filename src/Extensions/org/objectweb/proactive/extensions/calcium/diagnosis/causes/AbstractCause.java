@@ -46,7 +46,7 @@ public abstract class AbstractCause implements Cause {
         List<Exercise> ex = getSortedExcercise(s);
 
         for (int i = 0; i < Math.min(number, ex.size()); i++) {
-            Class c = ex.get(i).getMuscleClass();
+            Class<?> c = ex.get(i).getMuscleClass();
             try {
                 Method[] mall = c.getMethods();
                 for (Method m : mall) {

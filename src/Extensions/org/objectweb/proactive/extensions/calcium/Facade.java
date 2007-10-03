@@ -39,7 +39,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
-import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
@@ -134,7 +133,7 @@ class Facade {
             while ((panic == null) || shutdown) {
                 Task<?> taskResult = null;
                 try {
-                    taskResult = (Task<?>) taskpool.getResult();
+                    taskResult = taskpool.getResult();
                 } catch (PanicException ex) {
                     //logger.error("Facade has encounterd skernel panic! Stopping future update thread");
                     ex.printStackTrace();
@@ -143,7 +142,7 @@ class Facade {
                     return;
                 }
 
-                //TODO Temporary ProActive generics bug workaround 
+                //TODO Temporary ProActive generics bug workaround
                 //This is the supelec trick
                 taskResult = (Task<?>) ProFuture.getFutureValue(taskResult);
                 results.updateFuture(taskResult);

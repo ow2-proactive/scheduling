@@ -84,7 +84,7 @@ public class ProActiveProvider extends WSConstants implements Provider {
     public void locate(DeploymentDescriptor dd, Envelope env, Call call,
         String methodName, String targetObjectURI, SOAPContext reqContext)
         throws SOAPException {
-        //Set some properties to the context	
+        //Set some properties to the context
         HttpServlet servlet = (HttpServlet) reqContext.getProperty(Constants.BAG_HTTPSERVLET);
         HttpSession session = (HttpSession) reqContext.getProperty(Constants.BAG_HTTPSESSION);
 
@@ -96,6 +96,7 @@ public class ProActiveProvider extends WSConstants implements Provider {
         System.out.println("DD.ProviderClass: " + dd.getProviderClass());
         System.out.println("Call.MethodName: " + call.getMethodName());
 
+        @SuppressWarnings("unchecked")
         Hashtable props = dd.getProps();
         String className = dd.getProviderClass();
 
@@ -155,7 +156,7 @@ public class ProActiveProvider extends WSConstants implements Provider {
             Response resp = RPCRouter.invoke(dd, call, targetObject,
                     reqContext, resContext);
 
-            //build the enveloppe that contains the response 	
+            //build the enveloppe that contains the response
             Envelope env = resp.buildEnvelope();
             System.out.println(env);
             StringWriter sw = new StringWriter();

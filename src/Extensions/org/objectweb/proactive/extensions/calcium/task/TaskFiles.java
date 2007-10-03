@@ -256,7 +256,7 @@ public class TaskFiles implements Serializable {
             return o;
         }
 
-        Class cls = o.getClass();
+        Class<?> cls = o.getClass();
         if (cls == File.class) {
             File f = (File) o;
             ProxyFile pf = new ProxyFile(f.getParentFile(), f.getName());
@@ -273,7 +273,7 @@ public class TaskFiles implements Serializable {
         ArrayList<Field> field = Stateness.getAllInheritedFields(cls);
 
         for (Field f : field) {
-            Class c = f.getType();
+            Class<?> c = f.getType();
 
             //primitives are not Files || static vars are not considered
             if (c.isPrimitive() || Modifier.isStatic(f.getModifiers())) {
@@ -325,7 +325,7 @@ public class TaskFiles implements Serializable {
             return o;
         }
 
-        Class cls = o.getClass();
+        Class<?> cls = o.getClass();
         if (cls == ProxyFile.class) {
             ProxyFile pf = (ProxyFile) o;
             pf.setWSpace(outDir);
@@ -345,7 +345,7 @@ public class TaskFiles implements Serializable {
         ArrayList<Field> field = Stateness.getAllInheritedFields(cls);
 
         for (Field f : field) {
-            Class c = f.getType();
+            Class<?> c = f.getType();
 
             //primitives are not Files || static vars are not considered
             if (c.isPrimitive() || Modifier.isStatic(f.getModifiers())) {

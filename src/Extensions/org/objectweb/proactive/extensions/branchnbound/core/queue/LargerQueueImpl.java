@@ -56,13 +56,13 @@ import org.objectweb.proactive.extensions.branchnbound.core.Task;
  */
 public class LargerQueueImpl extends TaskQueue {
     private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
-    private Vector<Collection> queue = new Vector<Collection>();
+    private Vector<Collection<Task>> queue = new Vector<Collection<Task>>();
     private int size = 0;
     private int hungryLevel;
     private int current = 0;
-    private Vector<Object> pendingTasksFromBackup = new Vector<Object>();
+    private Vector<Task> pendingTasksFromBackup = new Vector<Task>();
     private Task rootTaskFromBackup = null;
-    private Vector<Object> allResults = new Vector<Object>();
+    private Vector<Result> allResults = new Vector<Result>();
 
     /**
      * The no args constructor for ProActive activate.
@@ -74,8 +74,8 @@ public class LargerQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addAll(java.util.Collection)
      */
     @Override
-    public void addAll(Collection tasks) {
-        tasks = (Collection) ProFuture.getFutureValue(tasks);
+    public void addAll(Collection<Task> tasks) {
+        tasks = (Collection<Task>) ProFuture.getFutureValue(tasks);
         if (tasks.size() > 0) {
             this.queue.add(tasks);
             this.size += tasks.size();
@@ -113,14 +113,14 @@ public class LargerQueueImpl extends TaskQueue {
         if (current >= this.queue.size()) {
             current = 0;
         }
-        Vector subTasks = (Vector) this.queue.get(current);
+        Vector<Task> subTasks = (Vector<Task>) this.queue.get(current);
         if (subTasks.size() == 0) {
             this.queue.remove(current);
             current++;
             return this.next();
         }
         this.size--;
-        return (Task) subTasks.remove(0);
+        return subTasks.remove(0);
     }
 
     /**
@@ -128,13 +128,13 @@ public class LargerQueueImpl extends TaskQueue {
      */
     @Override
     public void flushAll() {
-        queue = new Vector<Collection>();
+        queue = new Vector<Collection<Task>>();
         size = 0;
         hungryLevel = 0;
         current = 0;
-        pendingTasksFromBackup = new Vector<Object>();
+        pendingTasksFromBackup = new Vector<Task>();
         rootTaskFromBackup = null;
-        allResults = new Vector<Object>();
+        allResults = new Vector<Result>();
     }
 
     /**
@@ -196,9 +196,10 @@ public class LargerQueueImpl extends TaskQueue {
                     separationReached = true;
                     continue;
                 }
-                this.pendingTasksFromBackup.add(read);
+                this.pendingTasksFromBackup.add((Task) read);
             }
-            this.queue = (Vector<Collection>) ois.readObject();
+
+            this.queue = (Vector<Collection<Task>>) ois.readObject();
 
             ois.close();
             taskInputStream.close();
@@ -236,7 +237,7 @@ public class LargerQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#getAllResults()
      */
     @Override
-    public Collection<Object> getAllResults() {
+    public Collection<Result> getAllResults() {
         return this.allResults;
     }
 
@@ -267,7 +268,7 @@ public class LargerQueueImpl extends TaskQueue {
         try {
             ObjectInputStream ois = new ObjectInputStream(backupResultInputStream);
             while (ois.available() > 0) {
-                this.allResults.add(ois.readObject());
+                this.allResults.add((Result) ois.readObject());
             }
             ois.close();
             backupResultInputStream.close();

@@ -71,7 +71,7 @@ public class Manager implements Serializable, InitActive {
     private static final String backupResultFile = System.getProperty(
             "user.home") + File.separator + "framework.results.backup"; // TODO turn it configurable
     public static final String backupTaskFile = System.getProperty("user.home") +
-        File.separator + "framework.tasks.backup"; // TODO turn it configurable 
+        File.separator + "framework.tasks.backup"; // TODO turn it configurable
     private Task rootTask = null;
     private TaskQueue taskProviderQueue = null;
 
@@ -183,7 +183,7 @@ public class Manager implements Serializable, InitActive {
         logger.info("Compute the upper bound for the root task");
         this.rootTask.initUpperBound();
         logger.info("Calling for the first time split on the root task");
-        Vector subTaskList = this.rootTask.split();
+        Vector<Task> subTaskList = this.rootTask.split();
         logger.info("The ROOT task sends " + subTaskList.size());
         this.taskProviderQueue.addAll(subTaskList);
 
@@ -385,11 +385,12 @@ public class Manager implements Serializable, InitActive {
         logger.info("Total of results = " +
             this.taskProviderQueue.howManyResults());
         logger.info("Total of tasks = " + this.taskProviderQueue.size());
+
         // Set the final result
-        Collection resultsFuture = this.taskProviderQueue.getAllResults();
+        Collection<Result> resultsFuture = this.taskProviderQueue.getAllResults();
         ProFuture.waitFor(resultsFuture);
-        Result[] results = (Result[]) resultsFuture.toArray(new Result[this.taskProviderQueue.howManyResults()
-                                                                                             .intValue()]);
+        Result[] results = resultsFuture.toArray(new Result[this.taskProviderQueue.howManyResults()
+                                                                                  .intValue()]);
         return this.rootTask.gather(results);
     }
 
@@ -420,7 +421,7 @@ public class Manager implements Serializable, InitActive {
         logger.info("Compute the upper bound for the root task");
         this.rootTask.initUpperBound();
         logger.info("Calling for the first time split on the root task");
-        Vector subTaskList = this.rootTask.split();
+        Vector<Task> subTaskList = this.rootTask.split();
         logger.info("The ROOT task sends " + subTaskList.size());
         this.taskProviderQueue.addAll(subTaskList);
 

@@ -131,7 +131,7 @@ public class Worker implements Serializable {
      * @param workerGroup the group of workers.
      */
     public void setWorkerGroup(Worker workerGroup) {
-        Group group = ProGroup.getGroup(workerGroup);
+        Group<Worker> group = ProGroup.getGroup(workerGroup);
         group.remove(ProActiveObject.getStubOnThis());
         this.selfWorkerGroup = workerGroup;
     }
@@ -191,7 +191,7 @@ public class Worker implements Serializable {
      * Add a set of sub-task to the task queue.
      * @param subTaskList the set of sub-tasks.
      */
-    public void sendSubTasksToTheManager(Vector subTaskList) {
+    public void sendSubTasksToTheManager(Vector<Task> subTaskList) {
         if (logger.isDebugEnabled()) {
             logger.debug("The task sends " + subTaskList.size() + " sub tasks");
         }

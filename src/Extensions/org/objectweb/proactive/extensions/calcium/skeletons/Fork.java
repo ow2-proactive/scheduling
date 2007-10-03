@@ -30,21 +30,14 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
 import java.util.Vector;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.extensions.calcium.instructions.Instruction;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;

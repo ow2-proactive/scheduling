@@ -35,22 +35,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import org.objectweb.proactive.extensions.calcium.muscle.*;
+import org.objectweb.proactive.extensions.calcium.muscle.Condition;
+import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
+import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
+import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
 
 
 public class Workout implements Serializable {
-    public HashMap<Class, Exercise> muscleWorkout;
+    public HashMap<Class<?>, Exercise> muscleWorkout;
 
     public Workout(int initHashSize) {
-        muscleWorkout = new HashMap<Class, Exercise>(initHashSize);
+        muscleWorkout = new HashMap<Class<?>, Exercise>(initHashSize);
     }
 
     @Override
     public String toString() {
         String workout = "Workout: ";
-        java.util.Iterator<Class> it = muscleWorkout.keySet().iterator();
+        java.util.Iterator<Class<?>> it = muscleWorkout.keySet().iterator();
         while (it.hasNext()) {
-            Class muscle = it.next();
+            Class<?> muscle = it.next();
             workout += (muscle.getSimpleName() + "(" +
             muscleWorkout.get(muscle) + ") ");
         }
@@ -69,9 +73,10 @@ public class Workout implements Serializable {
     }
 
     protected void track(Workout workout) {
-        java.util.Iterator<Class> it = workout.muscleWorkout.keySet().iterator();
+        java.util.Iterator<Class<?>> it = workout.muscleWorkout.keySet()
+                                                               .iterator();
         while (it.hasNext()) {
-            Class muscle = it.next();
+            Class<?> muscle = it.next();
             if (!this.muscleWorkout.containsKey(muscle)) {
                 this.muscleWorkout.put(muscle, new Exercise(muscle.getClass()));
             }
@@ -89,14 +94,14 @@ public class Workout implements Serializable {
      * @param search The interface used as pattern.
      * @return The Exercise found for the Classes that implement the interface.
      */
-    private List<Exercise> getExercises(Class search) {
+    private List<Exercise> getExercises(Class<?> search) {
         Vector<Exercise> v = new Vector<Exercise>();
 
-        java.util.Iterator<Class> it = muscleWorkout.keySet().iterator();
+        java.util.Iterator<Class<?>> it = muscleWorkout.keySet().iterator();
         while (it.hasNext()) {
-            Class muscle = it.next();
-            Class[] interfaces = muscle.getInterfaces();
-            for (Class c : interfaces) {
+            Class<?> muscle = it.next();
+            Class<?>[] interfaces = muscle.getInterfaces();
+            for (Class<?> c : interfaces) {
                 if (c.equals(search)) {
                     v.add(muscleWorkout.get(muscle));
                 }

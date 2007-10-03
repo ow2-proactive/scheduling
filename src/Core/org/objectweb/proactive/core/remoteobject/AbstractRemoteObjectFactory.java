@@ -118,7 +118,7 @@ public abstract class AbstractRemoteObjectFactory {
             if (rof != null) {
                 return rof;
             } else {
-                Class rofClazz = remoteObjectFactories.get(protocol);
+                Class<?> rofClazz = remoteObjectFactories.get(protocol);
 
                 if (rofClazz != null) {
                     RemoteObjectFactory o = (RemoteObjectFactory) rofClazz.newInstance();

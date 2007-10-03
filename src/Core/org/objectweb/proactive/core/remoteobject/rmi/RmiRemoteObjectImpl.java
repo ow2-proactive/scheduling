@@ -161,11 +161,11 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         return this.remoteObject.getProxyName();
     }
 
-    public Class getTargetClass() throws ProActiveException, IOException {
+    public Class<?> getTargetClass() throws ProActiveException, IOException {
         return this.remoteObject.getTargetClass();
     }
 
-    public Class getAdapterClass() throws ProActiveException, IOException {
+    public Class<?> getAdapterClass() throws ProActiveException, IOException {
         return this.remoteObject.getAdapterClass();
     }
 }

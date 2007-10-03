@@ -239,7 +239,7 @@ public class ProActiveDeployer extends WSConstants {
      *  Gets the types mapping for custonize returned types
      * Only Java Beans are supported
      */
-    private static TypeMapping[] getMappings(Class c, String[] methods) {
+    private static TypeMapping[] getMappings(Class<?> c, String[] methods) {
         Vector<TypeMapping> tms = new Vector<TypeMapping>();
         Vector<String> sMethods = new Vector<String>();
 
@@ -255,13 +255,13 @@ public class ProActiveDeployer extends WSConstants {
                 mMethods.addElement(ms[i]);
             }
 
-            Enumeration e = mMethods.elements();
+            Enumeration<Method> e = mMethods.elements();
 
             while (e.hasMoreElements()) {
-                Method m = (Method) e.nextElement();
+                Method m = e.nextElement();
 
                 if (sMethods.contains(m.getName())) {
-                    Class[] parameters = m.getParameterTypes();
+                    Class<?>[] parameters = m.getParameterTypes();
 
                     for (int j = 0; j < parameters.length; j++) {
                         if (!supportedTypes.contains(parameters[j])) {
@@ -284,7 +284,7 @@ public class ProActiveDeployer extends WSConstants {
 
             for (int i = 0; i < ms.length; i++) {
                 if (!disallowedMethods.contains(ms[i].getName())) {
-                    Class[] parameters = ms[i].getParameterTypes();
+                    Class<?>[] parameters = ms[i].getParameterTypes();
                     for (int j = 0; j < parameters.length; j++) {
                         if (!supportedTypes.contains(parameters[j])) {
                             String pname = extractName(parameters[j]);
@@ -304,18 +304,18 @@ public class ProActiveDeployer extends WSConstants {
         }
 
         TypeMapping[] tmsArray = new TypeMapping[tms.size()];
-        Enumeration e = tms.elements();
+        Enumeration<TypeMapping> e = tms.elements();
 
         int i = 0;
 
         while (e.hasMoreElements()) {
-            tmsArray[i++] = (TypeMapping) e.nextElement();
+            tmsArray[i++] = e.nextElement();
         }
 
         return tmsArray;
     }
 
-    private static String getSimpleName(Class c) {
+    private static String getSimpleName(Class<?> c) {
         String cName = c.getName();
         StringTokenizer st = new StringTokenizer(cName, ".");
         String result = "";
@@ -329,7 +329,7 @@ public class ProActiveDeployer extends WSConstants {
     /*
      * Utility to construct the namespace of the type mapping
      */
-    private static String extractName(Class c) {
+    private static String extractName(Class<?> c) {
         String result = new String();
 
         Package p = c.getPackage();

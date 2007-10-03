@@ -200,7 +200,7 @@ public class RemoteObjectHelper {
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(
                     null, new Object[] { ro }));
 
-            Class adapter = ro.getAdapterClass();
+            Class<?> adapter = ro.getAdapterClass();
 
             if (adapter != null) {
                 Adapter<Object> ad = (Adapter<Object>) adapter.newInstance();

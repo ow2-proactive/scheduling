@@ -52,7 +52,7 @@ public interface RemoteObject extends SecurityEntity {
     /**
      * @return return the class of the reified object
      */
-    public Class getTargetClass();
+    public Class<?> getTargetClass();
 
     /**
      * @return return the proxy's classname of the reified object
@@ -63,5 +63,5 @@ public interface RemoteObject extends SecurityEntity {
      * @see org.objectweb.proactive.core.remoteobject.adapter.Adapter
      * @return return the <code>class</code> of the adapter of this remote object
      */
-    public Class getAdapterClass();
+    public Class<?> getAdapterClass();
 }

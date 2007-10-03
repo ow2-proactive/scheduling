@@ -80,7 +80,7 @@ public abstract class Task implements Serializable, Comparable {
      *
      * @return a collection of tasks.
      */
-    public abstract Vector split();
+    public abstract Vector<Task> split();
 
     /**
      * As defined by the user, it returns the best results.

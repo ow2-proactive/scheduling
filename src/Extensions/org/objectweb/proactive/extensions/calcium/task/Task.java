@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.extensions.calcium.task;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -43,11 +40,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
 import org.objectweb.proactive.extensions.calcium.instructions.Instruction;
-import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsImpl;
-import org.objectweb.proactive.extensions.calcium.system.ProxyFile;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
-import org.objectweb.proactive.extensions.calcium.system.WSpaceImpl;
 
 
 /**

@@ -41,7 +41,6 @@ import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
-import org.objectweb.proactive.extensions.calcium.skeletons.Fork;
 import org.objectweb.proactive.extensions.calcium.skeletons.Pipe;
 import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;

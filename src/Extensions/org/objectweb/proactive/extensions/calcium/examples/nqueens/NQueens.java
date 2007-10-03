@@ -36,7 +36,6 @@ import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
-import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.DivideBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.SolveBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.DivideBT2;

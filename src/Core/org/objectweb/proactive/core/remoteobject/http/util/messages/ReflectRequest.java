@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.remoteobject.http.util.messages;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
@@ -51,11 +52,12 @@ public abstract class ReflectRequest extends HttpMessage {
     }
 
     /**
-     * init the hashmap, that contains all the methods of  ProActiveRuntimeImpl
+     * init the hashmap, that contains all the methods of the class theclass
      * @param theclass we want to get all the methods
      * @return an HasMap containing methods and parameters
      */
-    protected static HashMap<String, Object> getHashMapReflect(Class theclass) {
+    protected static HashMap<String, Object> getHashMapReflect(
+        Class<?> theclass) {
         // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl
         // in 'Object' (value) and the name of funtions in key
         // (Warning two functions can t have the same name (for now))
@@ -93,7 +95,7 @@ public abstract class ReflectRequest extends HttpMessage {
      * @param hashobjet  ???
      * @return a Method representing the method in the ProActiveRuntime
      */
-    protected Method getMethod(String methodsearch, ArrayList paramsearch,
+    protected Method getMethod(String methodsearch, List<Object> paramsearch,
         Object hashobjet) {
         Object mret = hashobjet;
 
@@ -114,7 +116,7 @@ public abstract class ReflectRequest extends HttpMessage {
             if (sameMethodSize == 1) {
                 mret = allSameMethod.get(0);
             } else {
-                Class[] paramtypes = null;
+                Class<?>[] paramtypes = null;
                 boolean isgood = true;
                 boolean ispossible = true;
 

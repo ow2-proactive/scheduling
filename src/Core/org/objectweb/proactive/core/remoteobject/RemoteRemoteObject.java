@@ -74,7 +74,7 @@ public interface RemoteRemoteObject extends SecurityEntity {
 
     public String getProxyName() throws ProActiveException, IOException;
 
-    public Class getTargetClass() throws ProActiveException, IOException;
+    public Class<?> getTargetClass() throws ProActiveException, IOException;
 
-    public Class getAdapterClass() throws ProActiveException, IOException;
+    public Class<?> getAdapterClass() throws ProActiveException, IOException;
 }
