@@ -1,23 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="Principles">
-  <title>Principles</title>
-
-  <para>GRID computing is now a key aspect, from scientific to business
+  <title>ProActive Overview</title>
+	<para>
+         ProActive library		
+	</para>
+  <para>Grid computing is now a key aspect, from scientific to business
   applications, from large scale simulations to everyday life enterprise IT.
   After the old days of mainframes and servers with hundreds of persons
   sharing the same machines or the quite current days of the PCs with one
   person for one computer, we are just entering the era of Ubiquitous
   Computing with many computers at hand for every single individual.
-  Potentially spanning all the world and involving several thousands or
-  several hundred thousands of nodes, the programming of Grid applications
-  call for new paradigms.</para>
+  </para>
 
+	<para>
+		Grids gather large amounts of heterogeneous resources across geographically distributed
+		sites for use by virtual organizations. Resources are usually organized in groups of 
+		desktop machines and/or clusters, which are managed by different administrative domains 
+		(labs, universities, companies, etc.). The large amount of heterogeneous resources complicate the deployment task in terms of 
+		configuration and connection to remote resources. Deployment sites targeted may be specified 
+		beforehand, or automatically discovered at runtime. Each domain may have its own management and 
+		security policies. Grid applications aim to use a large number of resources, which are geographically 
+		distributed. Hence, Grid frameworks have to help applications with scalability issues, such as providing 
+		parallelism capabilities for a large number of resources. 
+	</para>
+	<para>
+		The large number of resources distributed
+		on different domains implies a high probability of faults, such as hardware failures, network downtime, 
+		or maintenance. Since a grid gathers geographically disperse and administratively independent computational sites into a large federated 
+		computing system with common interfaces, new programming models have to be defined to abstract away these complexities 
+		from programmers.
+	</para>
+	<para>
+		
+	</para>
+
+   <sect1>
+  	<title>ProActive Middleware</title>
+  	  	 	
+  	<para>
+  	
+  	ProActive is an open source Java library aiming to simplify the programming of
+  	 multithreaded, parallel, and distributed
+  	applications for Grids, multi-cores, clusters, and data-centers. It allows concurrent and parallel 
+  	programming and offers distributed and asynchronous communications, mobility, and a deployment framework. 
+  	With a small set of primitives, ProActive provides an API allowing the development of parallel 
+  	applications, which may be deployed on distributed systems and on Grids. ProActive does not
+  	require any modifications to Java or to the Java Virtual Machine (JVM) therefore allowing the deployment
+  	of applications using the ProActive API on any operating system that provides a compatible JVM. 
+  	</para>
+  
+  
+     <para><figure>
+        <title>ProActive Features</title>
+
+        <mediaobject>
+        
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="images/ProActive_Features.png" format="PNG"
+                       width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure></para>
+  
   <para>Overall, ProActive promotes a few basic and simple principles:</para>
-
   <itemizedlist>
     <listitem>
-      <para>Activites are distributed, remotely accessible objects</para>
+      <para>Activities are distributed, remotely accessible objects</para>
     </listitem>
 
     <listitem>
@@ -35,366 +85,179 @@
     </listitem>
   </itemizedlist>
 
-  <para>The ProActive Grid solution relies on systematic asynchronous method
-  calls mastering both complexity and efficiency and takes advantage of this
-  sound programming model to further propose advanced features such as groups,
-  mobility, and components. In the framework of a formal calculus, ASP
-  (Asynchronous Sequential Processes), confluence, and determinism have been
-  proved for this programming model: <xref endterm="TDO-book.abbrev"
-  linkend="TDO-book" /> and <xref endterm="CHSPOPL04.abbrev"
-  linkend="CHSPOPL04" />.</para>
-
-  <para>Asynchronous method calls with returns lead to an emerging abstraction
-  - futures - which are<indexterm>
-      <primary>Future</primary>
-    </indexterm> the expected result of a given asynchronous method call.
-  Futures turn out to be a very effective abstraction for large distributed
-  systems, preserving both low coupling and high structuring.</para>
-
-  <para>Asynchronous method calls and first-class futures are provided in the
-  unifying framework of an Active Object.</para>
-
-  <indexterm>
-    <primary>Active Object</primary>
-  </indexterm>
-
-  <sect1>
-    <title>Seamless Sequentiality, Multithreading and Distribution</title>
-
-    <para>Most of the time, activities and distribution are not known at the
-    beginning and change over time. <emphasis>[COMMENT:Transitions from what
-    to what ?]</emphasis>Seamless implies reusability and smooth and
-    incremental transitions.[<emphasis>COMMENT</emphasis>]</para>
-
-    <para><figure>
-        <title>Different computing deployment paradigms</title>
+  	<sect2>
+  		<title>Active Objects Model</title>
+  		<para>ProActive is based on the concept of an active object, which is an entity
+  		with its own configurable activity.
+		A distributed or concurrent application built using ProActive is composed of a number
+		of entities called active objects. Each active object has one distinguished 
+		element, the root, which is the only entry point to the active object. Each active object
+		has its own thread of control and is granted the ability to decide in which order to
+		serve the incoming method calls that are automatically stored in a queue of pending 
+		requests. Method calls sent to active objects are asynchronous with transparent future objects
+		and synchronization is handled by a mechanism known as wait-by-necessity. There is a
+		short rendezvous at the beginning of each asynchronous remote call, which blocks the
+		caller until the call has reached the context of the callee. More detailed information on
+		active objects will be presented in <xref>ProActiveBasis</xref>
+		</para>
+		 <para>
+		 The ProActive  solution relies on  asynchronous method
+		  calls mastering both complexity and efficiency and proposes advanced features such as groups,
+		  mobility, and components. In the framework of formal calculus, Asynchronous Sequential Processes
+		  (ASP), confluence, and determinism have been
+		  proven for this programming model: <xref endterm="TDO-book.abbrev"
+		  linkend="TDO-book" /> and <xref endterm="CHSPOPL04.abbrev"
+		  linkend="CHSPOPL04" />.</para>
+		 </sect2>
+	<sect2> <title>Implementation Language</title>
+		<para>
+			Grids gather large amount of heterogeneous resources, different processor architectures 
+			and operating systems. In this context, using a language which relies on 
+			a virtual machine allows maximum portability. ProActive is developed in Java, a 
+			cross-platform language and the compiled application may run on any operating system 
+			providing a compatible virtual machine. Moreover, ProActive only relies on standard APIs 
+			and does not use any operating-system specific routines, other than to run daemons or to 
+			interact with legacy applications. There are no modifications to the JVM nor to the 
+			semantics of the Java language, and the bytecode of the application classes is never modified.
+		</para>
+	</sect2>
+	
+	<sect2> <title> Communication through messages</title>
+		<para>
+			In ProActive, the distribution is transparent: invoking methods on remote objects
+			does not require the developer to design remote objects with an explicit remoting mechanism.
+			Therefore, the developer can concentrate on the business logic as the distribution is
+			automatically handled and transparent. Moreover, the ProActive library preserves polymorphism
+			on remote objects (through the reference stub, which is a subclass of the remote root object).
+		</para>
+		<para>
+			Communication between active objects is realized through method invocations, which are reified 
+			and passed as messages. These messages are serializable Java objects which may be compared to TCP 
+			packets. Indeed, one part of the message contains routing information towards the different elements 
+			of the library, and the other part contains the data to be communicated to the called object. 
+			Although all communications proceed through method invocations, the communication semantics depends upon 
+			the signature of the method, and the resulting communication may not always be asynchronous.
+			Three cases are possible: synchronous invocation, one-way asynchronous invocation, and asynchronous
+			invocation with future result.
+		</para>
+		<para>
+			<itemizedlist>
+				<listitem>
+				    <para>
+					Synchronous invocation - the method returns a non reifiable object: primitive type or final class:
+                    <programlisting lang="java"> boolean foo() </programlisting>
+         			
+        			the method declares a thrown exception: 
+        			<programlisting lang="java">public void bar() throws AnException </programlisting>
+					</para>
+					<para>
+					  In this case, the caller thread is blocked until the reified invocation
+				      is effectively processed and the eventual result (or exception) is returned. 
+				      It is fundamental to keep this case in mind, because some APIs define methods 
+				      which throw exceptions or return non-reifiable results. 
+				      </para>
+				</listitem>
+				<listitem>
+					<para>
+						One-way asynchronous invocation - the method does not throw any exception
+						and does not return any result: 
+							<programlisting lang="java">public void gee()</programlisting>
+						 The invocation is asynchronous and the process flow of the caller 
+						 continues once the reified invocation has been received by the active 
+						 object (in other words, once the rendezvous is finished).
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Asynchronous invocation with future result -  the return type is a reifiable type,
+						and the method does not throw any exception:
+							<programlisting lang="java">public MyReifiableType baz() </programlisting>
+						In this case, a future object is returned and the caller continues its execution 
+						flow. The active object will process the reified invocation according to its serving 
+						policy, and the future object will then be updated with the value of the result of the 
+						method execution.
+					</para>
+				</listitem>
+			</itemizedlist>
+			
+		</para>
+		<para>
+			If an invocation from an object A on an active object B  triggers another invocation 
+			on another active object C, the future result received by A may be updated with another 
+			future object. In that case, when the result is available from C, the future of B 
+			is automatically updated, and the future object in A is also update with this result 
+			value, through a mechanism called automatic continuation.
+		</para>
+	</sect2>
+	
+	<sect2>
+	 <title>Programming With Components: GCM</title>
+	 <para>
+	  Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur? [33] At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.
+	 </para>
+	 
+	 
+	</sect2>
+	
+	
+	<sect2> <title>Library features</title>
+		<para>
+			ProActive uses the  <xref linkend="implementation">Meta-Object Architecture</xref> to provide flexibility and configurability: it
+			allows the addition of meta-objects for managing new required features. Moreover, the library also
+			proposes a deployment framework, which allows the deployment of active objects on various 
+			infrastructures. The MOP architecture is represented in the next figure.
+		 <para><figure>
+        <title>MOP architecture</title>
 
         <mediaobject>
+        
           <imageobject>
             <imagedata contentwidth="100"
-                       fileref="images/proActiveModelColor.png" format="PNG"
+                       fileref="images/MetaObject_Architecture.png" format="PNG"
                        width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
+		
+		</para>
+		<para> The library may be represented in four layers: IDE, programming model,
+		deployment facilities, and non-functional features. </para>
+		<para>
+		ProActive offers IC2D, an interactive graphical enviroment for remote monitoring and control of
+		distributed applications. Due to the fact that it uses the standard (starting with the J2SE platform 5.0)
+		Java Management Extensions (JMX) technology in order to monitor distribution, IC2D can be deployed without
+		requiring changes to the JVM or Java.  
+		</para>
+		<para>
+		 The programming model consists of the active objects model which offer asynchronous communication,
+		typed group communication, and the object-oriented SPMD programming paradigm. In addition to the
+		standard object oriented programming paradigm, ProActive also proposes a component-based programming
+		paradigm, by providing an implementation of the Fractal component model geared at Grid computing. 
+		</para>
+				
+		<para>The deployment layer includes a deployment framework; it is detailed in <xref></xref>, and it allows the
+		 creation of remote active objects on various infrastructures. A scheduler is also proposed to manage the deployment
+		 of jobs. The load-balancing framework uses the migration capabilities to optimize the placement of the
+		 distributed active objects.
+		</para>
+		<para>
+			Non-functional features include a transparent fault-tolerance mechanism based on a communication-induced 
+			check-pointing protocol, a security framework for communications between remote active objects,
+			migration capabilities for the mobility of active objects, a mechanism for the management of exceptions,
+			a complete distributed garbage collector for active objects, and a mechanism for wrapping legacy code,
+			notably as a way to control and interact with MPI applications.
+		
+		</para>
+		<para>
+		 In the communication layer several protocols are provided for the communication between active objects: 
+			Java RMI as the default protocol, SSH, HTTP, tunneled RMI. It is also possible to export active objects as Web 
+			Services, which can then be accessed using the standard SOAP protocol. A file transfer mechanism is also 
+			implemented; it allows the transfer of files between active objects, for instance to send large data input files 
+			or to retrieve results files. ProActive also provides a peer-to-peer (P2P) infrastructure that allows for starting computations
+			on P2P networks by using a dynamic overlay network of JVMs. Under this framework, peers can dynamically join the network
+			and participate in the computations.
+		</para>
+		</sect2>
+</sect1>
 
-    <para>A huge gap still exists between multithreaded and distributed Java
-    applications which impedes code reuse in order to build distributed
-    applications from multithreaded applications. Both JavaRMI and JavaIDL, as
-    examples of distributed object libraries in Java, put a heavy burden on
-    the programmer because they require deep modifications of existing code in
-    order to turn local objects into remotely accessible ones. In these
-    systems, remote objects need to be accessed through some specific
-    interfaces. As a consequence, these distributed objects libraries do not
-    allow polymorphism between local and remote objects. This feature is our
-    first requirement for a Grid Computing framework. It is strongly required
-    in order to let the programmer concentrate first on modeling and
-    algorithmic issues rather than lower-level tasks such as object
-    distribution, mapping and load balancing.</para>
-  </sect1>
-
-  <sect1 id="Principles_html_active">
-    <title>Active Objects: Unifying Threads and Remote Objects</title>
-
-    <para>Active Objects are the core of the ProActive computing concept. An
-    Active Object is both a remote object (which allows to deploy it on a
-    distant host) and a thread (which gives it its own activity, its own
-    independant behaviour and in concurrency with other Active Objects
-    deployed). Given a standard object, turning it into an Active Objects
-    provides:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>location transparency</para>
-      </listitem>
-
-      <listitem>
-        <para>activity transparency</para>
-      </listitem>
-
-      <listitem>
-        <para>synchronization</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Communications to an Active Object are by default asynchronous. So,
-    an Active Object is composed of: </para>
-
-    <itemizedlist>
-      <listitem>
-        <para>a main object</para>
-      </listitem>
-
-      <listitem>
-        <para>a single thread</para>
-      </listitem>
-
-      <listitem>
-        <para>a queue of pending requests</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>As such, a reference to a remote object is equivalent to a reference
-    to a remote activity. An activity is an object ; but being in a
-    non-uniform model, not all objects are Active Objects, the majority
-    remaining standard Java objects. As there cannot be any sharing, an Active
-    Object is also a unit of computational mobility (see <xref
-    linkend="Migration" />).</para>
-
-    <note>
-      <para>The Active Object concept only requires modification of the
-      instantiation code !</para>
-    </note>
-
-    <para>On activation, an object becomes a remotely accessible entity with
-    its own thread of control: an Active Object. Here are given as example
-    three ways to transform a standard object into an Active Object:</para>
-
-    <example>
-      <title>Class-based Active Object</title>
-
-      <programlisting lang="java">Object[] params = new Object[] { new Integer (26), "astring" };
-A a = (A) ProActive.newActive("example.A", params, node); </programlisting>
-    </example>
-
-    <example>
-      <title>Instantiation-based Active Object</title>
-
-      <programlisting lang="java">public class AA extends A implements Active {}
-Object[] params = new Object[] { new Integer (26), "astring" };
-A a = (A) ProActive.newActive("example.AA", params, node); </programlisting>
-    </example>
-
-    <para>ProActive permits transforming regular objects into Active Objects
-    and for objects for which you do not have the source code; this is a
-    necessary feature in the context of code mobility.</para>
-
-    <example>
-      <title>Object-based Active Object</title>
-
-      <programlisting lang="java">A a = new A (26, "astring");
-a = (A) ProActive.turnActive(a, node) ; </programlisting>
-    </example>
-
-    <note>
-      <para>Nodes allow to control the mapping to the hosts. See <xref
-      linkend="Active_Object_On_Node" /> for an example use of a Node, and
-      <xref linkend="Descriptor_Principles" /> for a definition.</para>
-    </note>
-  </sect1>
-
-  <sect1 id="Principles_html_model">
-    <title>Model of Computation</title>
-
-    <para>Here is a summary of the computation model being used by
-    ProActive:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Heterogeneous model using passive and Active Objects</para>
-      </listitem>
-
-      <listitem>
-        <para>Systematic asynchronous communications for Active Objects</para>
-      </listitem>
-
-      <listitem>
-        <para>No shared passive object with only call-by-value between Active
-        Objects</para>
-      </listitem>
-
-      <listitem>
-        <para>Automatic continuations using a transparent delegation
-        mechanism</para>
-      </listitem>
-
-      <listitem>
-        <para>Wait-by-necessity using automatic and transparent futures</para>
-      </listitem>
-
-      <listitem>
-        <para>Centralized and explicit control using libraries of
-        abstractions</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>To compare to Java RMI, a Java remote object is not by essence an
-    activity. The fact that several threads can execute several remote method
-    calls simultaneously within a remote object does reveal that facet. When
-    writing ro.foo(p), what ro identifies is not a remote activity, but just a
-    remote object. This has several consequences, along with the presence of
-    sharing between remote objects that prevents them from being a unit of
-    computational migration.</para>
-  </sect1>
-
-  <sect1 id="Principles_html_reuse">
-    <title>Reusability and Seamless Interface: Why and How Do We Achieve
-    It?</title>
-
-    <para><emphasis>[COMMENT:Completly ambigous, ask]</emphasis>Two key
-    features:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Wait-by-necessity: inter-objects
-        synchronization</emphasis>. Systematic, implicit and transparent
-        futures. Ease the programming of synchronization and reuse of existing
-        methods</para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Polymorphism between standard and Active
-        Objects</emphasis></para>
-
-        <itemizedlist>
-          <listitem>
-            <para>Type compatibility for classes and not just for
-            interfaces</para>
-          </listitem>
-
-          <listitem>
-            <para>Needed and done for the future objects as well</para>
-          </listitem>
-
-          <listitem>
-            <para>Dynamic mechanism (dynamically achieved if
-            needed)<emphasis>[COMMENT]</emphasis></para>
-          </listitem>
-        </itemizedlist>
-      </listitem>
-    </itemizedlist>
-
-    <para><figure>
-        <title>Polymorphism</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="images/polymorphism.png" format="PNG" />
-          </imageobject>
-        </mediaobject>
-      </figure></para>
-  </sect1>
-
-  <sect1 id="TinyHelloWorld">
-    <title>Hello world ! (tiny example)</title>
-
-    <para>The example implements the smallest possible program in ProActive.
-    It is the easiest program you could write using the Active Object concept
-    and it shows quickly how code can be written with minimal knowledge of the
-    API.</para>
-
-    <para>In the example, a client object displays a String received from
-    elsewhere (the original VM) to illustrates the creation of an Active
-    Object. Only one class is needed, with the main method inside the class,
-    which when deployed will be an Active Object.</para>
-
-    <para>You can get a more complete "Hello World" example, with deployment
-    on a remote host, further on in the manual (<xref
-    linkend="HelloWorld" />). </para>
-
-    <sect2>
-      <title>The TinyHello Class</title>
-
-      <para>This class can be used as an Active Object, serving requests. Its
-      creation involves the following steps: <itemizedlist>
-          <listitem>
-            <para>Provide an implementation for the required server-side
-            functionalities</para>
-          </listitem>
-
-          <listitem>
-            <para>Provide an empty, no-argument constructor</para>
-          </listitem>
-
-          <listitem>
-            <para>Write a main method in order to instantiate one server
-            object.</para>
-          </listitem>
-        </itemizedlist></para>
-
-      <example>
-        <title>A possible implementation for the TinyHello class</title>
-
-        <programlisting lang="java"><textobject>
-            <textdata fileref="examples/hello/TinyHello.java" />
-          </textobject></programlisting>
-      </example>
-    </sect2>
-
-    <sect2>
-      <title>Implement the Required Functionality</title>
-
-      <para>Implementing any remotely-accessible functionality is simply done
-      through normal Java methods in a normal Java class, in exactly the same
-      manner it would have been done in a non-distributed version of the same
-      class. Here, the only method is sayHello.</para>
-    </sect2>
-
-    <sect2>
-      <title>Creating the Hello Active Object</title>
-
-      <para>Now that we know how to write the class that implements the
-      required server-side functionalities, let us see how to create the
-      server object. We want this Active Object to be created on the current
-      node, which is why we use newActive in the main methodwith only two
-      parameters.</para>
-
-      <para>The code snippet which instantiates the TinyHello in the same VM
-      is the following (in the main method):</para>
-
-      <programlisting lang="java">        TinyHello tiny = (TinyHello) ProActive.newActive(
-                TinyHello.class.getName(), // the class to deploy
-                null // the arguments to pass to the constructor, here none
-            ); // which jvm should be used to hold the Active Object</programlisting>
-    </sect2>
-
-    <sect2>
-      <title>Invoking a Method On a Remote Object And Printing Out the
-      Message</title>
-
-      <para>Invoking a method on a remote object is exactly like invoking a
-      method on a local object of the same type. The user does not have to
-      deal with catching exceptions related to the distant deployment.</para>
-
-      <para>As already stated, the only modification brought to the code by
-      ProActive is located at the place where Active Objects are created. All
-      the rest of the code remains the same, which fosters software reuse. So
-      the way to call the sayHello method in this example is the following (in
-      the main method):</para>
-
-      <programlisting lang="java">        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
-        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity</programlisting>
-    </sect2>
-
-    <sect2>
-      <title>Launching</title>
-
-      <para>To launch the example, you may type:<screen>linux&gt; java -cp $CLASSPATH -Djava.security.policy=scripts/proactive.java.policy 
-            -Dlog4j.configuration=file:scripts/proactive-log4j 
-            org.objectweb.proactive.examples.hello.TinyHello</screen> <screen>windows&gt; java -cp $CLASSPATH -Djava.security.policy=scripts\proactive.java.policy 
-              -Dlog4j.configuration=file:scripts\proactive-log4j 
-               org.objectweb.proactive.examples.hello.TinyHello</screen></para>
-
-      <para>There are also scripts in the scripts directory:<screen>linux&gt; cd scripts/unix/ 
-linux&gt; tinyHello.sh</screen> <screen>windows&gt; cd scripts/windows 
-windows&gt; tinyHello.bat</screen></para>
-
-      <sect3>
-        <title>The output</title>
-
-        <screen>[apple unix]tinyhello.sh
---- Hello World tiny example ---------------------------------
-&gt; This ClassFileServer is reading resources from classpath
-ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
-Created a new registry on port 1099
-//apple.inria.fr/Node628280013 successfully bound in registry at //apple.inria.fr/Node628280013
-Generating class: pa.stub.org.objectweb.proactive.examples.hello.Stub_TinyHello
-Generating class: pa.stub.org.objectweb.proactive.core.util.wrapper.Stub_StringMutableWrapper
-On apple/138.96.218.62, a message was received: Hello World!
-  from apple/138.96.218.62
-  at 03/11/2005 14:25:32
-</screen>
-      </sect3>
-    </sect2>
-  </sect1>
 </chapter>

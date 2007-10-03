@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="TroubleShooting">
-  <title>ProActive Trouble Shooting</title>
+  <title>ProActive Troubleshooting</title>
 
   <para>In this section we present common problems encountered while trying to
   use ProActive. For further assistance, or if you cannot solve a problem, feel free to post your question on the
@@ -14,7 +14,7 @@
 
     <para>If you encounter any problem with installing ProActive and running
     the examples, please make sure you correctly followed all the steps
-    described above. If it doesn't help, here is a list of the most common
+    described in the previous chapter. If it doesn't help, here is a list of the most common
     mistakes:</para>
 
     <itemizedlist>

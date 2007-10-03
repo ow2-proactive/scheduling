@@ -2,10 +2,10 @@
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?><chapter id="Installation">
   <title>ProActive Installation</title>
 
-  <para>ProActive is available for<ulink
+  <para>ProActive is available for <ulink
   url="http://proactive.inria.fr/download_proactive_latest.htm">download</ulink>
   under a <ulink url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>. ProActive requires <ulink
-  url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink>or later to be installed on your computer. Please note that ProActive will NOT run with any version prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
+  url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink> or later to be installed on your computer. Please note that ProActive will NOT run with any version prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
 
   <sect1>
     <title>Installation Overview</title>
@@ -15,15 +15,16 @@
 
       <itemizedlist>
         <listitem>
-          <para>Download and unzip the ProActive archive</para>
+          <para>Download and expand the ProActive archive</para>
         </listitem>
 
         <listitem>
-          <para>Set the JAVA_HOME variable to the Java distribution you want to use</para>
+          <para>Set the <literal>JAVA_HOME</literal> variable to the Java distribution you want to use</para>
         </listitem>
 
         <listitem>
-          <para>Launch the scripts located in ProActive/scripts/unix or ProActive/scripts/windows</para>
+          <para>Launch the scripts located in <literal>ProActive/scripts/unix
+          </literal> or <literal>ProActive/scripts/windows</literal></para>
         </listitem>
       </itemizedlist>
     </sect2>
@@ -43,21 +44,33 @@
             <secondary>configuration</secondary>
           </indexterm>
 
-          <para>Include in your CLASSPATH the ProActive jar file (ProActive/ProActive.jar) along with ProActive/lib/javassist.jar, ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar,  ProActive/lib/bouncycastle.jar</para>
+          <para>Include in your <literal>CLASSPATH</literal> the 
+          	ProActive jar file <literal>ProActive/dist/ProActive/ProActive.jar</literal>
+          		along with <literal>ProActive/lib/javassist.jar</literal>,
+          		<literal>ProActive/lib/log4j.jar</literal>, 
+          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
+          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		and <literal>ProActive/lib/bouncycastle.jar</literal></para>
         </listitem>
 
         <listitem>
-          <para>Depending on your project needs, you might need to include other libraries located in the ProActive/lib directory.</para>
+          <para>Depending on your project needs, you might need to include other libraries
+           located in the <literal>ProActive/lib </literal>directory.</para>
         </listitem>
 
         <listitem>
           <para>Launch the JVM with a <ulink
-          url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">security policy file</ulink> using the option -Djava.security.policy=pathToFile. A basic policy file can be found at ProActive/scripts/proactive.java.policy. You can also specify a<ulink url="http://logging.apache.org/log4j/docs/manual.html">log4j configuration file</ulink> with the property
-          <literal>-Dlog4j.configuration=file:pathToFile</literal>. If not specified a default logger that logs on the console will be created.</para>
+          url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html"> security policy
+          file</ulink> using the option
+          <literal> -Djava.security.policy=pathToFile</literal>. A basic policy file
+          can be found at <literal>ProActive/scripts/proactive.java.policy</literal>. You can also specify a 
+          <ulink url="http://logging.apache.org/log4j/docs/manual.html">log4j configuration
+          file</ulink> with the property <literal>-Dlog4j.configuration=file:pathToFile</literal>.
+          If a configuration file is not specified a default logger that logs on the console will be created.</para>
         </listitem>
       </itemizedlist>
 
-      <para>Below are described the different steps in more detail.</para>
+      <para>Below the different steps are described in more detail.</para>
     </sect2>
     
   </sect1>
@@ -66,13 +79,26 @@
     <title>Detailed Installation Steps</title>
 
     <sect2>
-    	<title>Download And Expand The Archive</title><para>You can download the archive file (a standard zip file) containing ProActive from the<ulink url="http://proactive.inria.fr/download_proactive_latest.htm">download section</ulink>of the ProActive home page. You will be asked to accept the licence agreement and provide a few personal details including your email address. You will then within a few minutes receive an email.</para><para>Unzip the archive using your favorite ZIP program, such as <ulink url="http://www.winzip.com/">Winzip</ulink> under Windows or the <ulink url="http://www.info-zip.org/pub/infozip/">unzip</ulink>command-line utility under most Linux/Unix systems. Unzipping the archive creates a ProActive directory and all the files contained in the archive go into this directory and its subdirectories.</para><para>Here is a quick overview of the directory structure of the archive:</para><table frame="all">
+    	<title>Download And Expand The Archive</title>
+    	<para>You can download the archive file (a standard zip file) containing 
+    	ProActive from the <ulink url="http://proactive.inria.fr/download_proactive_latest.htm">
+    	 download section </ulink> of the ProActive home page. You will be asked to accept 
+    	 the license agreement and provide a few details including your email address.
+    	 Within a few minutes you will  receive an email containing 
+    	 a password and an URL where you will be able to download the latest release of ProActive.</para>
+    	 <para>Unzip the archive using your favorite ZIP program, such as 
+    	 <ulink url="http://www.winzip.com/">Winzip</ulink> under Windows or 
+    	 the <ulink url="http://www.info-zip.org/pub/infozip/"> unzip </ulink>
+    	 command-line utility under most Linux/Unix systems. 
+    	 Unzipping the archive creates a ProActive directory and all the files contained in 
+    	 the archive go into this directory and its subdirectories.</para><para>Here is a quick 
+    	 overview of the directory structure of the archive:</para><table frame="all">
       <title>ProActive.zip contents</title>
 
       <tgroup cols="2">
-        <colspec colname="c1" colwidth="32*" />
+        <colspec colname="c1" colwidth="35*" />
 
-        <colspec colname="c2" colwidth="68*" />
+        <colspec colname="c2" colwidth="65*" />
 
         <tbody>
           <row>
@@ -85,19 +111,28 @@
             <entry><para><emphasis role="bold"><literal>ProActive.jar</literal></emphasis></para></entry>
 
             <entry><para>ProActive bytecode that you need to include in the
-            CLASSPATH in order to use ProActive</para></entry>
+            <literal>CLASSPATH</literal> in order to use ProActive</para></entry>
           </row>
 
           <row>
             <entry><para><emphasis role="bold"><literal>ProActive_examples.jar</literal></emphasis></para></entry>
 
-            <entry><para>The bytecode and resources of all examples included with ProActive. This jar file needs to be included in the CLASSPATH only when trying to run the examples. All examples rely on ProActive and therefore theProActive.jar file must be included in the CLASSPATH as well. This is done automatically by the scripts driving the examples. The source code is also included in the src directory (see below)</para></entry>
+            <entry><para>The bytecode and resources of all examples included with ProActive.
+             This jar file needs to be included in the <literal>CLASSPATH</literal> only when trying
+              to run the examples. All examples rely on ProActive and therefore the <literal>ProActive.jar</literal>
+               file must be included in the <literal>CLASSPATH</literal> as well. This is done automatically by
+                the scripts driving the examples. The source code is also included in the
+                 <literal>src</literal> directory (see below)</para></entry>
           </row>
 
           <row>
             <entry><para><emphasis role="bold"><literal>ic2d.jar</literal></emphasis></para></entry>
 
-            <entry><para>The bytecode and resources of IC2D. This jar file needs to be included in the CLASSPATH only when trying to run the application IC2D. IC2D relies on ProActive and therefore theProActive.jar file must be included in the CLASSPATH. This is done automatically by the scripts launching the application. The source code is also included in the src directory (see below)</para></entry>
+            <entry><para>The bytecode and resources of IC2D. This jar file needs to be included in
+             the <literal>CLASSPATH</literal> only when trying to run the application IC2D.
+              IC2D relies on ProActive and therefore <literal>theProActive.jar</literal> file must be
+               included in the <literal>CLASSPATH</literal>. This is done automatically by the scripts
+                launching the application. The source code is also included in the <literal>src</literal> directory (see below)</para></entry>
           </row>
 
           <row>
@@ -110,7 +145,7 @@
           <row>
             <entry><para><emphasis role="bold"><literal>docs</literal></emphasis></para></entry>
 
-            <entry><para>ProActive documentation including the full api
+            <entry><para>ProActive documentation including the full API
             doc</para></entry>
           </row>
 
@@ -123,7 +158,7 @@
           <row>
             <entry><para><emphasis role="bold"><literal>scripts/windows</literal></emphasis></para></entry>
 
-            <entry><para>Windows .bat batch files for running the examples</para></entry>
+            <entry><para>Windows bat batch files for running the examples</para></entry>
           </row>
 
           <row>
@@ -147,50 +182,15 @@
 
     
 
-    <sect2><title>Run A Few Examples For Testing</title><para>You can try to run the test applications provided with ProActive. Each example comes with a script to launch the application. Depending on your operating system, the script you need to launch is located either in<literal>ProActive/scripts/unix</literal> or
-    <literal>ProActive/scripts/windows</literal>. The source code of all the examples can be found in the directory<literal>ProActive/src/Examples/org/objectweb/proactive/examples/</literal>.</para>
-    	<sect3><title>Local Example 2: Reader/Writer</title><para>This example is the ProActive version of the Readers/Writers
-      canonical problem. To illustrate the ease-of-use of the ProActive model,
-      different synchronization policies can be applied without even stopping the application. This example is based on a easy to use Swing
-      GUI.</para><itemizedlist>
-        <listitem>
-          <para>script : <literal>readers.sh</literal> or
-          <literal>readers.bat</literal></para>
-        </listitem>
 
-        <listitem>
-          <para>source : <literal>examples/readers</literal></para>
-        </listitem>
-      </itemizedlist></sect3>
-    	<sect3><title>Local Example 3: The Dining Philosophers</title><para>This example is one possible implementation of the well-known Dining Philosophers synchronization problem. This
-      example is based on a easy to use Swing GUI.</para><itemizedlist>
-        <listitem>
-          <para>script : <literal>philosophers.sh</literal> or
-          <literal>philosophers.bat</literal></para>
-        </listitem>
-
-        <listitem>
-          <para>source : <literal>examples/philosophers</literal></para>
-        </listitem>
-      </itemizedlist></sect3>
-    	<sect3><title>Local Example 4: The N-Body Simulation</title><para>This example can be used later on as a deployment example for
-    	 several machines, and also for the fault-tolerance features. <itemizedlist>
-          <listitem>
-            <para>script : <literal>nbody.sh</literal> or
-            <literal>nbody.bat</literal></para>
-          </listitem>
-
-          <listitem>
-            <para>source : <literal>examples/nbody</literal></para>
-          </listitem>
-        </itemizedlist></para></sect3></sect2>
-    <sect2><title>Set the CLASSPATH for using ProActive to write applications</title><indexterm significance="preferred">
+    <sect2><title>Set the <literal>CLASSPATH</literal> for using ProActive to write applications</title><indexterm significance="preferred">
       <primary>CLASSPATH</primary>
 
       <secondary>to run ProActive</secondary>
-    </indexterm><para>In order to use <emphasis role="bold">ProActive</emphasis> to write your
+    </indexterm><para>In order to use ProActive to write your
     application you need to place in your <literal>CLASSPATH</literal> the
-    following jar files :</para><orderedlist>
+    following jar files :</para>
+    <itemizedlist>
       <listitem>
         <para><literal>lib/ProActive.jar</literal> - main library</para>
       </listitem>
@@ -226,55 +226,78 @@
       <listitem>
         <para><literal>lib/bouncycastle.jar</literal> - used by the ProActive security framework (see <xref linkend="Security" />).</para>
       </listitem>
-    </orderedlist><para>You do not need to modify your CLASSPATH permanently if you
-    include the entries above using a Java IDE or a shell script.</para><para>In addition to the jar files above you may want to add the following
+    </itemizedlist><para>You do not need to modify your <literal>CLASSPATH</literal> permanently if you
+    include the entries above using a Java IDE or a shell script.</para>
+     <para>Set the <literal>CLASSPATH</literal> as follow, putting on one line:</para>
+
+    <para>Under linux:</para>
+
+    <para><screen>export CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:\
+./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:\
+./lib/components/fractal.jar:./lib/bouncycastle.jar</screen></para>
+
+    <para>Under windows:</para>
+
+    <para><screen>set CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;\
+.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;\
+.\lib\components\fractal.jar;.\lib\bouncycastle.jar</screen></para>
+     
+    
+    <para>In addition to the jar files above you may want to add the following
     jar files. None of them are used directly by the core functionalities of
     ProActive but only in part of the library. They are needed to compile all
     the code but they are not needed at runtime if those specific
-    functionalities are not used.</para><orderedlist>
+    functionalities are not used.</para>
+    <itemizedlist>
       <listitem>
-        <para>ganymed-ssh2-build210.jar - used when tunneling with rmissh.</para>
+        <para><literal>ganymed-ssh2-build210.jar</literal> - used when tunneling with rmissh.</para>
       </listitem>
 
       <listitem>
-        <para>cryptix.jar, cog-jglobus-1.2.jar, puretls.jar, cryptix32.jar, cryptix-asn1.jar, cog-ogce.jar, cog-jglobus.jar - used to interface with Globus</para>
+        <para><literal>cryptix.jar, cog-jglobus-1.2.jar, puretls.jar, cryptix32.jar, cryptix-asn1.jar, cog-ogce.jar, cog-jglobus.jar
+        </literal> - used to interface with Globus</para>
       </listitem>
 
       <listitem>
-        <para>fractal.jar, fractal-gui.jar, fractal-swing.jar, fractal-adl.jar - used by the the Fractal components</para>
+        <para><literal>fractal.jar, fractal-gui.jar, fractal-swing.jar, fractal-adl.jar</literal> - used by the the Fractal components</para>
       </listitem>
 
       <listitem>
-        <para> commons-discovery.jar, saaj-api.jar, commons-logging.jar, jaxrpc.jar, activation.jar, wsdl4j.jar, mail.jar,servlet-api.jar,
-				xml-apis.jar, axis.jar, soap.jar - used by the Web Services features </para>
+        <para> <literal>commons-discovery.jar, saaj-api.jar, commons-logging.jar, jaxrpc.jar, activation.jar, wsdl4j.jar, mail.jar,servlet-api.jar,
+				xml-apis.jar, axis.jar, soap.jar</literal> - used by the Web Services features </para>
       </listitem>
 
       <listitem>
-        <para>bcel-5.1.jar, ibis-util-1.0.jar, colobus-0.1.jar, ibis-connect-1.0.jar, ibis-1.4.jar, bcel-5.1-fixes-1.0.jar - used by Ibis if
+        <para><literal>bcel-5.1.jar, ibis-util-1.0.jar, colobus-0.1.jar,
+         ibis-connect-1.0.jar, ibis-1.4.jar, bcel-5.1-fixes-1.0.jar</literal> - used by Ibis if
         configured as communication protocol</para>
       </listitem>
 
       <listitem>
-        <para>client.jar, ajo.jar, SystemDefaults.txt, njs_client.jar, scriptPlugin.jar, jh.jar - used when deploying to a UNICORE site.</para>
+        <para><literal>client.jar, ajo.jar, SystemDefaults.txt, njs_client.jar, scriptPlugin.jar, jh.jar</literal> 
+        - used when deploying to a UNICORE site.</para>
       </listitem>
 
       <listitem>
-        <para>classad.jar, glite-wms-jdlj.jar  - used when deploying on gLite sites.</para>
+        <para><literal>classad.jar, glite-wms-jdlj.jar</literal>  - used when deploying on gLite sites.</para>
       </listitem>
-    </orderedlist></sect2>
+    </itemizedlist>
+    </sect2>
     <sect2><title id="Create_Java_Policy">Create A <literal>java.policy</literal> File To Set
     Permissions</title><para>See <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions
     in the JavaTM 2 SDK</ulink> to learn more about Java permissions. The
     option <literal>-Djava.security.policy=pathToFile</literal> will specify which policy file to
     use within ProActive. As a first approximation, you can create a simple
-    policy file granting all permissions:</para><para><screen>grant {
-    permission java.security.AllPermission;
-};        </screen></para><note><para>
- If you use the scripts provided with the distribution to run the
- examples an existing policy file named
- <literal></literal>
- will be used by default.
-</para></note></sect2>
+    policy file granting all permissions:</para>
+    <para><screen>grant {
+    	permission java.security.AllPermission;
+	};        
+	</screen></para><note><para>
+ 	If you use the scripts provided with the distribution to run the
+ 	examples an existing policy file named
+ 	<literal>proactive.java.policy</literal>
+ 	will be used by default.
+	</para></note></sect2>
     <sect2><title>Create A log4j Configuration File</title><indexterm>
       <primary>Log4j</primary>
 
@@ -290,118 +313,49 @@
       examples an existing log4j file named <literal>proactive-log4j</literal>
       will be used by default.</para>
     </note></sect2>
+    <sect2><title>Run A Few Examples For Testing</title><para>You can try to run the test applications provided with ProActive.
+     Each example comes with a script to launch the application. Depending on your
+      operating system, the script you need to launch is located either in<literal> ProActive/scripts/unix </literal> or
+    <literal>ProActive/scripts/windows</literal>. The source code of all the examples can be found in the directory <literal>ProActive/src/Examples/org/objectweb/proactive/examples/</literal>.</para>
+    	<sect3><title>Local Example 2: Reader/Writer</title><para>This example is the ProActive version of the Readers/Writers
+      canonical problem. To illustrate the ease-of-use of the ProActive model,
+      different synchronization policies can be applied without even stopping the application. This example is based on a easy to use Swing
+      GUI.</para><itemizedlist>
+        <listitem>
+          <para>script : <literal>readers.sh</literal> or
+          <literal>readers.bat</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>source : <literal>examples/readers</literal></para>
+        </listitem>
+      </itemizedlist></sect3>
+    	<sect3><title>Local Example 3: The Dining Philosophers</title><para>This example is one possible implementation of the well-known Dining Philosophers synchronization problem. This
+      example is based on a easy to use Swing GUI.</para><itemizedlist>
+        <listitem>
+          <para>script : <literal>philosophers.sh</literal> or
+          <literal>philosophers.bat</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>source : <literal>examples/philosophers</literal></para>
+        </listitem>
+      </itemizedlist></sect3>
+    	<sect3><title>Local Example 4: The N-Body Simulation</title><para>This example can be used later on as a deployment example for
+    	 several machines, and also for the fault-tolerance features. <itemizedlist>
+          <listitem>
+            <para>script : <literal>nbody.sh</literal> or
+            <literal>nbody.bat</literal></para>
+          </listitem>
+
+          <listitem>
+            <para>source : <literal>examples/nbody</literal></para>
+          </listitem>
+        </itemizedlist></para></sect3></sect2>
+
+
+     
   </sect1>
 
-  <sect1>
-    <title>ProActive and IDEs (Eclipse, ...)</title>
 
-    <para>We recommend you use the Eclispe IDE to develop your ProActive
-    applications. You can get this tool on the <ulink
-    url="http://www.eclipse.org">Eclipse website</ulink> Just unzip and launch
-    the eclipse executable. In order to develop your own ProActive
-    application, you will need to create an eclipse project :</para>
-
-    <para><emphasis role="bold">File -&gt; New ... -&gt;
-    Project</emphasis></para>
-
-    <para>Then choose <emphasis role="bold">Java Project</emphasis> . A wizard
-    should appear and ask you to enter the project name :</para>
-
-    <informalfigure>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="./eclipse_files/wizard_new_project.jpg"
-                     format="JPG" />
-        </imageobject>
-      </mediaobject>
-    </informalfigure>
-
-    <para>In order to separate class files from source files (it can be useful
-    if you write scripts which refer to these classes), you can check the
-    <emphasis role="bold">Create separate source and ouput folders</emphasis>
-    in the <emphasis role="bold">Project Layout</emphasis> Frame, and click on
-    <emphasis role="bold">configure default ...</emphasis> to choose the
-    folders names. Once you have choosen all informations about <emphasis
-    role="bold">Project Name</emphasis> , <emphasis role="bold">Project
-    location</emphasis> , you can click on <emphasis
-    role="bold">Next</emphasis> .</para>
-
-    <para>You have to specify some java settings in order to set the
-    application classpath. Select the <emphasis
-    role="bold">Librairies</emphasis> tab and click on the <emphasis
-    role="bold">Add External Jar...</emphasis> button. Add the ProActive.jar
-    and the librairies contained in the lib/ directory of the ProActive
-    distribution.</para>
-
-    <para>The <emphasis role="bold">Librairies</emphasis> tab should look like
-    this :</para>
-
-    <informalfigure>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="./eclipse_files/wizard_java_settings.jpg"
-                     format="JPG" />
-        </imageobject>
-      </mediaobject>
-    </informalfigure>
-
-    <para>You can see now on the navigator tab on the left side, that there is
-    a new Project with the source and output folders you've just created
-    :</para>
-
-    <informalfigure>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="./eclipse_files/navigator.jpg" format="JPG" />
-        </imageobject>
-      </mediaobject>
-    </informalfigure>
-
-    <para>You are now able to create classes and packages that use the
-    ProActive library.</para>
-
-    <note>
-      <para>There is one file which is problematic with Eclipse:
-      <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal>.
-      If you have not installed java3d (<ulink
-      url="http://java3d.dev.java.net/"></ulink>), it will not compile
-      (missing dependencies). So you should remove it from your project build.
-      To do that, from the navigator view: <itemizedlist>
-          <listitem>
-            <para>right-click on your ProActive project</para>
-          </listitem>
-
-          <listitem>
-            <para>properties</para>
-          </listitem>
-
-          <listitem>
-            <para>java build path</para>
-          </listitem>
-
-          <listitem>
-            <para>in the source tab, choose excluded, then edit</para>
-          </listitem>
-
-          <listitem>
-            <para>add
-            <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal></para>
-          </listitem>
-
-          <listitem>
-            <para>click ok.</para>
-          </listitem>
-        </itemizedlist> With the ant file (when you run <literal>compile$
-      build compile</literal>), there are no problems. The script checks the
-      java3d installation before compiling the 3d class. When java3d is not
-      installed, the nbody example only works only in 2d.</para>
-    </note>
-
-    <para>All is now configured to create your ProActive application. Click on
-    the <emphasis role="bold">Finish</emphasis> button.</para>
-
-    <para>We are currently developing an Eclipse plugin that will help
-    developers to easily create ProActive applications. Have a look at the
-    plugin documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
-  </sect1>
 </chapter>
