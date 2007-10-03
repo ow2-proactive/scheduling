@@ -1,0 +1,564 @@
+  <sect1 id="TinyHelloWorld">
+    <title>Hello world ! (tiny example)</title>
+
+    <para>The example implements the smallest possible program in ProActive.
+    It is the easiest program you could write using the Active Object concept
+    and it shows quickly how code can be written with minimal knowledge of the
+    API.</para>
+
+    <para>In the example, a client object displays a String received from
+    elsewhere (the original VM) to illustrates the creation of an Active
+    Object. Only one class is needed, with the main method inside the class,
+    which when deployed will be an Active Object.</para>
+
+    <para>You can get a more complete "Hello World" example, with deployment
+    on a remote host, further on in the manual (<xref
+    linkend="HelloWorld" />). </para>
+
+    <sect2>
+      <title>The TinyHello Class</title>
+
+      <para>This class can be used as an Active Object, serving requests. Its
+      creation involves the following steps: <itemizedlist>
+          <listitem>
+            <para>Provide an implementation for the required server-side
+            functionalities</para>
+          </listitem>
+
+          <listitem>
+            <para>Provide an empty, no-argument constructor</para>
+          </listitem>
+
+          <listitem>
+            <para>Write a main method in order to instantiate one server
+            object.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <example>
+        <title>A possible implementation for the TinyHello class</title>
+
+        <programlisting lang="java"><textobject>
+            <textdata fileref="examples/hello/TinyHello.java" />
+          </textobject></programlisting>
+      </example>
+    </sect2>
+
+    <sect2>
+      <title>Implement the Required Functionality</title>
+
+      <para>Implementing any remotely-accessible functionality is simply done
+      through normal Java methods in a normal Java class, in exactly the same
+      manner it would have been done in a non-distributed version of the same
+      class. Here, the only method is sayHello.</para>
+    </sect2>
+
+    <sect2>
+      <title>Creating the Hello Active Object</title>
+
+      <para>Now that we know how to write the class that implements the
+      required server-side functionalities, let us see how to create the
+      server object. We want this Active Object to be created on the current
+      node, which is why we use newActive in the main methodwith only two
+      parameters.</para>
+
+      <para>The code snippet which instantiates the TinyHello in the same VM
+      is the following (in the main method):</para>
+
+      <programlisting lang="java">        TinyHello tiny = (TinyHello) ProActive.newActive(
+                TinyHello.class.getName(), // the class to deploy
+                null // the arguments to pass to the constructor, here none
+            ); // which jvm should be used to hold the Active Object</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>Invoking a Method On a Remote Object And Printing Out the
+      Message</title>
+
+      <para>Invoking a method on a remote object is exactly like invoking a
+      method on a local object of the same type. The user does not have to
+      deal with catching exceptions related to the distant deployment.</para>
+
+      <para>As already stated, the only modification brought to the code by
+      ProActive is located at the place where Active Objects are created. All
+      the rest of the code remains the same, which fosters software reuse. So
+      the way to call the sayHello method in this example is the following (in
+      the main method):</para>
+
+      <programlisting lang="java">        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
+        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity</programlisting>
+    </sect2>
+
+    <sect2>
+      <title>Launching</title>
+
+      <para>To launch the example, type:<screen>linux&gt; java -cp $CLASSPATH -Djava.security.policy=scripts/proactive.java.policy 
+            -Dlog4j.configuration=file:scripts/proactive-log4j 
+            org.objectweb.proactive.examples.hello.TinyHello</screen> <screen>windows&gt; java -cp $CLASSPATH -Djava.security.policy=scripts\proactive.java.policy 
+              -Dlog4j.configuration=file:scripts\proactive-log4j 
+               org.objectweb.proactive.examples.hello.TinyHello</screen></para>
+
+      <para>There are also scripts in the scripts directory:<screen>linux&gt; cd scripts/unix/ 
+linux&gt; tinyHello.sh</screen> <screen>windows&gt; cd scripts/windows 
+windows&gt; tinyHello.bat</screen></para>
+
+      <sect3>
+        <title>The output</title>
+
+        <screen>[apple unix]tinyhello.sh
+--- Hello World tiny example ---------------------------------
+&gt; This ClassFileServer is reading resources from classpath
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
+Created a new registry on port 1099
+//apple.inria.fr/Node628280013 successfully bound in registry at //apple.inria.fr/Node628280013
+Generating class: pa.stub.org.objectweb.proactive.examples.hello.Stub_TinyHello
+Generating class: pa.stub.org.objectweb.proactive.core.util.wrapper.Stub_StringMutableWrapper
+On apple/138.96.218.62, a message was received: Hello World!
+  from apple/138.96.218.62
+  at 03/11/2005 14:25:32
+</screen>
+      </sect3>
+    </sect2>
+  </sect1>
+  
+***************IN APPENDIX**************************
+  <sect1>
+    <title>ProActive and IDEs (Eclipse, ...)</title>
+
+    <para>We recommend you use the Eclipse IDE to develop your ProActive
+    applications. You can get this tool on the <ulink
+    url="http://www.eclipse.org">Eclipse website</ulink> Just unzip and launch
+    the eclipse executable. In order to develop your own ProActive
+    application, you will need to create an eclipse project :</para>
+
+    <para><emphasis role="bold">File -&gt; New ... -&gt;
+    Project</emphasis></para>
+
+    <para>Then choose <emphasis role="bold">Java Project</emphasis> . A wizard
+    should appear and ask you to enter the project name :</para>
+
+    <informalfigure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="./eclipse_files/wizard_new_project.jpg"
+                     format="JPG" />
+        </imageobject>
+      </mediaobject>
+    </informalfigure>
+
+    <para>In order to separate class files from source files (it can be useful
+    if you write scripts which refer to these classes), you can check the
+    <emphasis role="bold">Create separate source and ouput folders</emphasis>
+    in the <emphasis role="bold">Project Layout</emphasis> Frame, and click on
+    <emphasis role="bold">configure default ...</emphasis> to choose the
+    folders names. Once you have choosen all informations about <emphasis
+    role="bold">Project Name</emphasis> , <emphasis role="bold">Project
+    location</emphasis> , you can click on <emphasis
+    role="bold">Next</emphasis> .</para>
+
+    <para>You have to specify some java settings in order to set the
+    application classpath. Select the <emphasis
+    role="bold">Librairies</emphasis> tab and click on the <emphasis
+    role="bold">Add External Jar...</emphasis> button. Add the ProActive.jar
+    and the librairies contained in the lib/ directory of the ProActive
+    distribution.</para>
+
+    <para>The <emphasis role="bold">Librairies</emphasis> tab should look like
+    this :</para>
+
+    <informalfigure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="./eclipse_files/wizard_java_settings.jpg"
+                     format="JPG" />
+        </imageobject>
+      </mediaobject>
+    </informalfigure>
+
+    <para>You can see now on the navigator tab on the left side, that there is
+    a new Project with the source and output folders you've just created
+    :</para>
+
+    <informalfigure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="./eclipse_files/navigator.jpg" format="JPG" />
+        </imageobject>
+      </mediaobject>
+    </informalfigure>
+
+    <para>You are now able to create classes and packages that use the
+    ProActive library.</para>
+
+    <note>
+      <para>There is one file which is problematic with Eclipse:
+      <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal>.
+      If you have not installed java3d (<ulink
+      url="http://java3d.dev.java.net/"></ulink>), it will not compile
+      (missing dependencies). So you should remove it from your project build.
+      To do that, from the navigator view: <itemizedlist>
+          <listitem>
+            <para>right-click on your ProActive project</para>
+          </listitem>
+
+          <listitem>
+            <para>properties</para>
+          </listitem>
+
+          <listitem>
+            <para>java build path</para>
+          </listitem>
+
+          <listitem>
+            <para>in the source tab, choose excluded, then edit</para>
+          </listitem>
+
+          <listitem>
+            <para>add
+            <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal></para>
+          </listitem>
+
+          <listitem>
+            <para>click ok.</para>
+          </listitem>
+        </itemizedlist> With the ant file (when you run <literal>compile$
+      build compile</literal>), there are no problems. The script checks the
+      java3d installation before compiling the 3d class. When java3d is not
+      installed, the nbody example only works only in 2d.</para>
+    </note>
+
+    <para>All is now configured to create your ProActive application. Click on
+    the <emphasis role="bold">Finish</emphasis> button.</para>
+
+    <para>We are currently developing an Eclipse plugin that will help
+    developers to easily create ProActive applications. Have a look at the
+    plugin documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
+  </sect1>
+  
+  ============IC2D from C3D and Components part ======================= 
+  
+  <sect2>
+      <title>Start IC2D to visualize the topology</title>
+
+      <para>You will need at first to start IC2D using either
+      ProActive/scripts/unix/ic2d.sh or ProActive/scripts/windows/ic2d.bat
+      depending on your environment.</para>
+
+      <para></para>
+
+      <para>In order to visualize all Active objects, you need to acquire
+      ('Monitoring/Monitor a new RMI host' menu):</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The machine on which you started the 'Dispatcher'</para>
+        </listitem>
+
+        <listitem>
+          <para>The machine on which you started the second user</para>
+
+          <para>You'll need to type in the edit field asking it <emphasis>the
+          name of each machine</emphasis> and the <emphasis>RMI
+          port</emphasis> being used separated by a
+          <emphasis>colon</emphasis>.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para><figure>
+          <title>The C3D application when a new user joins in, seen with
+          IC2D</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure></para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Add random spheres for instance, and observe messages
+          (Requests) between Active Objects.</para>
+        </listitem>
+
+        <listitem>
+          <para>Add and remove renderers, and check graphically whether the
+          corresponding Active Objects are contacted or not, in order to
+          achieve the rendering.</para>
+        </listitem>
+
+        <listitem>
+          <para>You can textually visualize this information by activating
+          'add event timeline for this WorldObject' on the World panel with
+          the right mouse button, and then 'show the event list window' on the
+          top menu window</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2>
+      <title>Drag-and-drop migration</title>
+
+      <indexterm>
+        <primary>Migration</primary>
+
+        <secondary>drag-and-drop</secondary>
+      </indexterm>
+
+      <para>From IC2D, you can drag-and-drop active objects from one JVM to
+      another. Click the right button on a C3DRenderingEngine, and drag and
+      drop it in another JVM. Observe the migration taking place.</para>
+
+      <para>Add a new sphere, using all rendering engines, and check that the
+      messages are still sent to the active object that was asked to
+      migrate.</para>
+
+      <para>As migration and communications are implemented in a fully
+      compatible manner, you can even migrate with IC2D an active object while
+      it is communicating (for instance when a rendering action is in
+      progress). Give it a try!</para>
+
+      <note>
+        <para>You can also migrate Active Objects which create a GUI. If you
+        do that for the User, you will see the graphical window beiung
+        destroyed, and rebuilt once more.</para>
+      </note>
+    </sect2>
+
+    <sect2>
+      <title>Start a new JVM in a computation</title>
+
+      <para>Manually you can start a new JVM - a 'Node' in the ProActive
+      terminology - that will be used in a running system.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>On a different machine, or by remote login on another host,
+          start another Node, named for instance NodeZ</para>
+        </listitem>
+      </itemizedlist>
+
+      <screen>linux&gt; startNode.sh rmi://mymachine/NodeZ &amp;
+windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
+
+      <para>The node should appear in IC2D when you request the monitoring of
+      the new machine involved (Monitoring menu, then 'monitor new RMI
+      host'.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The node just started has no active object running in it. Drag
+          and drop one of the renderers, and check that the node is now taking
+          place in the computation</para>
+        </listitem>
+
+        <listitem>
+          <para>Spin the scene to trigger a new rendering</para>
+        </listitem>
+
+        <listitem>
+          <para>See the topology</para>
+        </listitem>
+      </itemizedlist>
+
+      <note>
+        <para>If you feel uncomfortable with the automatic layout, switch to
+        manual using the 'manual layout' option (right click on the World
+        panel). You can then reorganize the layout of the machines.</para>
+      </note>
+
+      <itemizedlist>
+        <listitem>
+          <para>To fully distribute the computation, start several nodes (you
+          need 2 more) and drag-and drop renderers in them.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Depending on the machines you have, the complexity of the image,
+      look for the most efficient configuration.</para>
+    </sect2>
+
+    <sect2>
+      <title>Wrapping Active Objects in Components</title>
+
+      <para>You can also write components with the Fractive API, which is an
+      implementation of Fractal in ProActive. You should check the section on
+      components for more information (<xref
+      linkend="ProActiveComponents" />). There is a long explanation of the
+      C3D component version (<xref linkend="C3D_component_example" />). The
+      visual aspect is very similar to the standard Active Object C3D version.
+      That's on purpose, to show how easy it is to transform code into
+      components. If you want to run a components version of c3d, try
+      this:</para>
+
+      <screen>scripts/unix/components$ ./c3d.sh  ../../../descriptors/components/C3D_all.xml
+scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml</screen>
+
+      <para>The component binding is done through the Fractal ADL, which is a
+      standard way of writing components through an xml file. You can have a
+      visual representation with IC2D (start IC2D,
+      menu-&gt;Components-&gt;Start the components GUI). You should specify
+      how to read the file. You have to enter:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>File-&gt;Storage: <literal>ProActive/src</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para>File-&gt;Open:<literal>ProActive/src/org/objectweb/proactive/examples/components/c3d/adl/userAndComposite.fractal</literal>.</para>
+        </listitem>
+      </itemizedlist>
+
+      <figure>
+        <title>IC2D component explorer with the C3D example</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="components/pics/c3d_components.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
+    </sect2>
+
+  
+  ============IC2D from C3D and Components part End =======================\
+  
+  ============Readers/Writers exercise ===============
+  
+  
+       <sect3>
+        <title>Introduce a bug in the Writer Priority policy</title>
+
+        <para>For instance, let several writers go through at the same
+        time.</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Observe the Writer Policy policy before recompiling</para>
+          </listitem>
+
+          <listitem>
+            <para>Recompile (using compile.sh readers or compile.bat
+            readers)</para>
+          </listitem>
+
+          <listitem>
+            <para>Observe that stub classes are regenerated and
+            recompiled</para>
+          </listitem>
+
+          <listitem>
+            <para>Observe the difference due to the new synchronization
+            policy: what happens now?</para>
+          </listitem>
+
+          <listitem>
+            <para>Correct the bug and recompile again ; check that everything
+            is back to normal</para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+  
+  ============== Readers writers exercise end =======================
+  
+  ============== Philosophers visualizations IC2D ======================
+      <sect3>
+        <title>Start the IC2D application</title>
+
+        <indexterm>
+          <primary>IC2D</primary>
+
+          <secondary>example usage</secondary>
+        </indexterm>
+
+        <para><ulink
+        url="http://www-sop.inria.fr/oasis/ProActive/IC2D/index.html">IC2D</ulink>
+        is a graphical environment for monitoring and steering of distributed
+        and Grid Computing applications.</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Being in the autopilot mode, start the IC2D visualization
+            application (using ic2d.sh or ic2d.bat)</para>
+          </listitem>
+        </itemizedlist>
+
+        <para><informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/ic2d_console.png"
+                           format="PNG" />
+              </imageobject>
+            </mediaobject>
+          </informalfigure></para>
+
+        <para><informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata contentwidth="100"
+                           fileref="guided_tour/pics/screenshots/jc2d_main_panel.png"
+                           format="PNG" width="6in" />
+              </imageobject>
+            </mediaobject>
+          </informalfigure></para>
+
+        <para><informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata contentwidth="100"
+                           fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png"
+                           format="PNG" width="6in" />
+              </imageobject>
+            </mediaobject>
+          </informalfigure></para>
+
+        <para>The ic2d GUI is started. It is composed of 2 panels: the main
+        panel and the request queue panel</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Acquire your current machine</para>
+          </listitem>
+        </itemizedlist>
+
+        <figure>
+          <title>Monitoring new RMI host with IC2D</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png"
+                         format="PNG" width="4in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+
+        <para>It is possible to visualize the status of each active object
+        (processing, waiting etc...), the communications between active
+        objects, and the topology of the system (here all active objects are
+        in the same node):</para>
+
+        <para><informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png"
+                           format="PNG" />
+              </imageobject>
+            </mediaobject>
+          </informalfigure></para>
+
+        <para><informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/ic2d_legend.png"
+                           format="PNG" />
+              </imageobject>
+            </mediaobject>
+          </informalfigure></para>
+      </sect3>
+  ================= Philosophers visualizations IC2D end ======================
