@@ -1,102 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="guidedIndex">
-  <title>Introduction to the Guided Tour and Tutorial</title>
+  <title>Introduction To The Guided Tour and Tutorial</title>
 
   <sect1 id="guidedOverview">
     <title>Overview</title>
 
     <para>This tour is a practical introduction to ProActive, giving an
     illustrated introduction to some of the functionality and facilities
-    offered by the library, by means of a <emphasis>step-by-step
-    tutorial</emphasis>.</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>First off, we give an explaination on how to install and
-        configure ProActive, in <xref linkend="guidedInstallation" />.</para>
-      </listitem>
-
-      <listitem>
-        <para>Next are introduced several features of the library through some
-        running examples, in <xref linkend="capabilities-intro" />.</para>
-      </listitem>
-
-      <listitem>
-        <para>Then are given some details on how this is put down in code, and
-        you will be challenged to write your bits of code, in <xref
-        linkend="hands_on_programming" />. This should give you practical
-        experience on how to program using ProActive.</para>
-      </listitem>
-
-      <listitem>
-        <para><xref linkend="OOSPMDJacobiexample" />, will show how to use the
+    offered by the library, by means of a step-by-step
+    tutorial.</para>
+   
+        <para>We will introduce several features of the library through 
+        examples, in <xref linkend="capabilities-intro" />.
+     
+        Chapter <xref linkend="hands_on_programming" /> will give you practical
+        experience on how to program using ProActive by show how to write your own client-server
+        application. <xref linkend="OOSPMDJacobiexample" />, will introduce the
         OO-SPMD (Object-Oriented Single Program Multiple Data) programming
-        paradigm.</para>
-      </listitem>
-
-      <listitem>
-        <para>The second-last part is the complete N-Body example, in <xref
-        linkend="nbody" />. This application is first written trivially, then
-        some speed-ups are inserted, to show how ProActive can help
-        you.</para>
-      </listitem>
-
-      <listitem>
-        <para>Finally, we close the tutorial off by showing some components.
-        In <xref linkend="C3D_component_example" />, the C3D example is
-        wrapped with components, and is this way exposed as components.</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>We hope this will help your understanding of the library and the
-    concepts driving it.</para>
+        paradigm. Next is the complete N-Body example, in <xref
+        linkend="nbody" />. This application is first written trivially then
+        some speed-ups are inserted to show how ProActive can help
+        you. Finally, we close the tutorial off by showing an example based
+        on components.  In <xref linkend="C3D_component_example" />, the C3D example is
+        wrapped with components, and is this way exposed as components.
+        </para>
 
     <para>If you need further details on how the examples work, check the
     ProActive <ulink
-    url="http://www-sop.inria.fr/oasis/ProActive/apps/index.html">applications</ulink>
+    url="http://proactive.inria.fr/applications.htm">  applications </ulink>
     page.</para>
   </sect1>
 
   <sect1 id="guidedInstallation">
     <title>Installation and setup</title>
 
-    <para>Follow the instructions for downloading and installing ProActive, in
+    <para>To get started follow the instructions for downloading and installing ProActive, in
     <xref linkend="Installation" />.</para>
 
     <para>The programming exercises in the first part imply that you:</para>
 
     <itemizedlist>
       <listitem>
-        <para>Don't forget to add the required libraries to your classpath
-        (i.e. the libraries contained in the ProActive/lib directory, as well
-        as either the proactive.jar archive, or the compiled classes of
-        proactive (better if you modify the source code)</para>
+        <para>Add the required libraries to your <literal>CLASSPATH</literal>
+        (i.e. the libraries contained in the <literal>ProActive/lib</literal> directory, as well
+        as either the <literal>ProActive.jar</literal> archive, or the compiled classes of
+        ProActive (better if you modify the source code)</para>
       </listitem>
 
       <listitem>
-        <para>use a policy file, such as
-        ProActive/scripts/proactive.security.policy, with the JVM option
-        -Djava.security.policy=/filelocation/proactive.java.policy</para>
+        <para>Use a policy file, such as <literal>
+        ProActive/scripts/proactive.security.policy</literal>, with the JVM option
+        <literal> -Djava.security.policy=/filelocation/proactive.java.policy </literal></para>
       </listitem>
     </itemizedlist>
 
-    <para>Set the CLASSPATH as follow, putting on one line:</para>
-
-    <para>Under linux:</para>
-
-    <para><screen>export CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:\
-./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:\
-./lib/components/fractal.jar:./lib/bouncycastle.jar</screen></para>
-
-    <para>Under windows:</para>
-
-    <para><screen>set CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;\
-.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;\
-.\lib\components\fractal.jar;.\lib\bouncycastle.jar</screen></para>
-
-    <para>Concerning <emphasis role="underline">the second part</emphasis> of
-    the tutorial (examples of some functionalities):</para>
+       <para>The second part of the tutorial (examples of some functionalities):</para>
 
     <itemizedlist>
       <listitem>
@@ -105,26 +64,130 @@
         this tool to make modifications to the source code, while doing this
         tutorial. Nevertheless, you can just change the code and recompile
         using <literal>compile.sh</literal> (or <literal>compile.bat</literal>
-        under windows)</para>
+        under Windows)</para>
       </listitem>
 
       <listitem>
         <para>The examples used in the second part of this tutorial are
-        provided in the /scripts directory of the distribution.</para>
+        provided in the <literal>ProActive/scripts</literal> directory of the distribution.</para>
 
-        <para>The scripts are platform dependant: <literal>.sh</literal> files
-        on linux are equivalent to the <literal>.bat</literal> files on
-        windows.</para>
+        <para>The scripts are platform dependant: use the <literal>.sh</literal> files
+        on Linux and the <literal>.bat</literal> files on
+        Windows.</para>
       </listitem>
     </itemizedlist>
 
-    <para><informalfigure>
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.png"
-                       format="PNG" />
-          </imageobject>
-        </mediaobject>
-      </informalfigure></para>
+  </sect1>
+  <sect1>
+    <title>ProActive and IDEs (Eclipse, ...)</title>
+
+    <para>We recommend you use the Eclipse IDE to develop your ProActive
+    applications. You can get this tool on the <ulink
+    url="http://www.eclipse.org">Eclipse website</ulink>. Just unzip and launch
+    the eclipse executable. In order to develop your own ProActive
+    application, you will need to create an Eclipse project :</para>
+
+    <para><emphasis role="bold">File -&gt; New ... -&gt;
+    Project</emphasis></para>
+
+    <para>Then choose <emphasis role="bold">Java Project</emphasis>. A wizard
+    will appear and ask you to enter the project name :</para>
+
+    <informalfigure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="./eclipse_files/wizard_new_project.jpg"
+                     format="JPG" />
+        </imageobject>
+      </mediaobject>
+    </informalfigure>
+
+    <para>In order to separate class files from source files (it can be useful
+    if you write scripts which refer to these classes), you can check the
+    <emphasis role="bold">Create separate source and ouput folders</emphasis>
+    in the <emphasis role="bold">Project Layout</emphasis> Frame, and click on
+    <emphasis role="bold">Configure Default ...</emphasis> to choose the
+    folders names. Once you have choosen all informations about <emphasis
+    role="bold">Project Name</emphasis> , <emphasis role="bold">Project
+    location</emphasis> , you can click on <emphasis
+    role="bold">Next</emphasis> .</para>
+
+    <para>You have to specify some Java settings in order to set the
+    application classpath. Select the <emphasis
+    role="bold">Librairies</emphasis> tab and click on the <emphasis
+    role="bold">Add External Jar...</emphasis> button. Add the ProActive.jar
+    and the librairies contained in the lib/ directory of the ProActive
+    distribution.</para>
+
+    <para>The <emphasis role="bold">Librairies</emphasis> tab should look like
+    this :</para>
+
+    <informalfigure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="./eclipse_files/wizard_java_settings.jpg"
+                     format="JPG" />
+        </imageobject>
+      </mediaobject>
+    </informalfigure>
+
+    <para>You can see now on the navigator tab on the left side, that there is
+    a new Project with the source and output folders you've just created
+    :</para>
+
+    <informalfigure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="./eclipse_files/navigator.jpg" format="JPG" />
+        </imageobject>
+      </mediaobject>
+    </informalfigure>
+
+    <para>You are now able to create classes and packages that use the
+    ProActive library.</para>
+
+    <note>
+      <para>There is one file which is problematic with Eclipse:
+      <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal>.
+      If you have not installed java3d (<ulink
+      url="http://java3d.dev.java.net/"></ulink>), it will not compile
+      (missing dependencies). So you should remove it from your project build.
+      To do that, from the navigator view: <itemizedlist>
+          <listitem>
+            <para>right-click on your ProActive project</para>
+          </listitem>
+
+          <listitem>
+            <para>properties</para>
+          </listitem>
+
+          <listitem>
+            <para>java build path</para>
+          </listitem>
+
+          <listitem>
+            <para>in the source tab, choose excluded, then edit</para>
+          </listitem>
+
+          <listitem>
+            <para>add
+            <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal></para>
+          </listitem>
+
+          <listitem>
+            <para>click ok.</para>
+          </listitem>
+        </itemizedlist> With the ant file (when you run <literal>compile$
+      build compile</literal>), there are no problems. The script checks the
+      java3d installation before compiling the 3d class. When java3d is not
+      installed, the nbody example only works only in 2d.</para>
+    </note>
+
+    <para>All is now configured to create your ProActive application. Click on
+    the <emphasis role="bold">Finish</emphasis> button.</para>
+
+    <para>We are currently developing an Eclipse plugin that will help
+    developers to easily create ProActive applications. Have a look at the
+    plugin documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
   </sect1>
 </chapter>
