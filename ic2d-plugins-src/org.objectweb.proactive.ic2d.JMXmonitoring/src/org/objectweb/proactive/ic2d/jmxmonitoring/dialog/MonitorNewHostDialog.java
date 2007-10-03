@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
@@ -108,7 +108,7 @@ public class MonitorNewHostDialog extends Dialog {
 
 		/* Get the machine's name */
 		try {
-			initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+			initialHostValue = URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -157,8 +157,8 @@ public class MonitorNewHostDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				String hostName = hostCombo.getText();
 				String url = urls.get(hostName);
-				Integer port = UrlBuilder.getPortFromUrl(url);
-				String protocol = UrlBuilder.getProtocol(url);
+				Integer port = URIBuilder.getPortNumber(url);
+				String protocol = URIBuilder.getProtocol(url);
 				portText.setText(port.toString());
 				protocolCombo.setText(protocol);
 			}
@@ -314,11 +314,11 @@ public class MonitorNewHostDialog extends Dialog {
 
 				while ((url = reader.readLine()) != null){
 					if(url==null || url.equals("")){
-						url = UrlBuilder.buildUrlFromProperties(initialHostValue, "");
+						url = URIBuilder.buildURIFromProperties(initialHostValue, "").toString();
 					}
-					lastNameUsed = UrlBuilder.getHostNameFromUrl(url);
-					lastPortUsed = UrlBuilder.getPortFromUrl(url);
-					lastProtocolUsed = UrlBuilder.getProtocol(url);
+					lastNameUsed = URIBuilder.getHostNameFromUrl(url);
+					lastPortUsed = URIBuilder.getPortNumber(url);
+					lastProtocolUsed = URIBuilder.getProtocol(url);
 					hostNames.add(lastNameUsed);
 					urls.put(lastNameUsed, url);
 				}
@@ -326,10 +326,10 @@ public class MonitorNewHostDialog extends Dialog {
 				String[] t = {""};
 				String[] hosts = null;
 				if(hostNames.isEmpty()){
-					url = UrlBuilder.buildUrlFromProperties(initialHostValue, "");
-					lastNameUsed = UrlBuilder.getHostNameFromUrl(url);
-					lastPortUsed = UrlBuilder.getPortFromUrl(url);
-					lastProtocolUsed = UrlBuilder.getProtocol(url);
+					url = URIBuilder.buildURIFromProperties(initialHostValue, "").toString();
+					lastNameUsed = URIBuilder.getHostNameFromUrl(url);
+					lastPortUsed = URIBuilder.getPortNumber(url);
+					lastProtocolUsed = URIBuilder.getProtocol(url);
 					hostNames.add(lastNameUsed);
 				}
 				hosts = (new ArrayList<String>(hostNames)).toArray(t);
@@ -352,7 +352,7 @@ public class MonitorNewHostDialog extends Dialog {
 		} catch (FileNotFoundException e) {
 			hostCombo.add(initialHostValue);
 			hostCombo.setText(initialHostValue);
-			String defaultURL = UrlBuilder.buildUrlFromProperties(initialHostValue, "");
+			String defaultURL = URIBuilder.buildURIFromProperties(initialHostValue, "").toString();
 			urls.put(initialHostValue, defaultURL);
 			recordUrl(defaultURL);
 		}
@@ -367,11 +367,11 @@ public class MonitorNewHostDialog extends Dialog {
 		try {
 			bw = new BufferedWriter(new FileWriter(file, false));
 			PrintWriter pw =new PrintWriter(bw,true);
-			String host = UrlBuilder.getHostNameFromUrl(url);
+			String host = URIBuilder.getHostNameFromUrl(url);
 			if(urls.size()>1)
 				urls.remove(host);
 			// Record urls
-			Iterator it = urls.values().iterator();
+			Iterator<String> it = urls.values().iterator();
 			while(it.hasNext()){
 				pw.println(it.next());
 			}
@@ -407,7 +407,7 @@ public class MonitorNewHostDialog extends Dialog {
 				hostname = hostCombo.getText();
 				port = Integer.parseInt(portText.getText());
 				protocol = protocolCombo.getText();
-				final String url = UrlBuilder.buildUrl(hostname, "", protocol, port);
+				final String url = URIBuilder.buildURI(hostname, "", protocol, port).toString();
 				recordUrl(url);
 				world.setDepth(Integer.parseInt(depthText.getText()));
 //				new Thread() {

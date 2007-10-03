@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.apache.log4j.WriterAppender;
@@ -45,8 +46,6 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Used to log informations in a console view.
@@ -82,7 +81,7 @@ public class Console extends MessageConsole {
 	}
 
 	public static boolean debug = false;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -93,14 +92,14 @@ public class Console extends MessageConsole {
 	 */
 	private Console(String title) {
 		super(title, null);
-		activate();	
-		
+		activate();
+
 		// Add the standard output and standard error output stream to the Console.
 //		MessageConsole console = new MessageConsole("System output", null);
-//		
+//
 //		ConsolePlugin.getDefault().getConsoleManager().showConsoleView(
 //		console);
-//		
+//
 //		MessageConsoleStream stream = console.newMessageStream();
 //		System.setOut(new PrintStream(stream));
 //		System.setErr(new PrintStream(stream));
@@ -108,17 +107,18 @@ public class Console extends MessageConsole {
 		//----- Log4j Console ------
 		// log4j output in the console
 		MessageConsole log4jConsole = new MessageConsole("log4j", null);
-		
+
 		MessageConsoleStream log4jStream = log4jConsole.newMessageStream();
-		
-		Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+
+//		Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+		Logger logger = LogManager.getRootLogger();
 		WriterAppender app = new WriterAppender(new SimpleLayout(), log4jStream);
-		logger.addAppender(app);
-	
+//		logger.addAppender(app);
+
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
 				new IConsole[] { /*console,*/ log4jConsole });
 		//-------------------------
-		
+
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(
 				new IConsole[]{ this });
 	}
@@ -132,7 +132,7 @@ public class Console extends MessageConsole {
 	 * @param title The console's title
 	 */
 	public static synchronized Console getInstance(String title){
-		Console console = (Console) consoles.get(title);
+		Console console = consoles.get(title);
 		if( console == null){
 			console = new Console(title);
 			consoles.put(title, console);
@@ -211,7 +211,7 @@ public class Console extends MessageConsole {
 		e.printStackTrace();
 	}
 
-	
+
 	/**
 	 * Logs an exception in the console
 	 * @param message the message to display.
@@ -229,12 +229,12 @@ public class Console extends MessageConsole {
 		if(debug)
 			log(message);
 	}
-	
+
 	public synchronized void debug(Throwable e) {
 		if(debug)
 			logException(e);
 	}
-	
+
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
 	//

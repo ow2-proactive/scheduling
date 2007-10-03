@@ -13,7 +13,7 @@ import javax.management.ObjectName;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RemoteObjectHostRTFinder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder;
@@ -31,32 +31,32 @@ public class HostObject extends AbstractData{
 	private String protocol;
 	private int rank;
 
-	private final static String DEFAULT_NAME = "undefined"; 
-	
+	private final static String DEFAULT_NAME = "undefined";
+
 	//Warning: Don't use this variavle directly, use getOSName().
 	private String osName;
 
-	//Warning: Don't use this vaiable directly, use getOSVersion(). 
+	//Warning: Don't use this vaiable directly, use getOSVersion().
 	private String osVersion;
 
 	/**
 	 * Creates a new HostObject. Use the method addHost(String url) of the WorldObject class instead.
 	 * @param url du host
-	 * @throws NullPointerException 
-	 * @throws MalformedObjectNameException 
+	 * @throws NullPointerException
+	 * @throws MalformedObjectNameException
 	 */
 	protected HostObject(WorldObject parent, String url, int rank) throws MalformedObjectNameException, NullPointerException{
 		super(new ObjectName(FactoryName.HOST));
-		
-		this.hostName = UrlBuilder.getHostNameFromUrl(url);
-		String name = UrlBuilder.getNameFromUrl(url);
-		this.protocol = UrlBuilder.getProtocol(url);
-		this.port = UrlBuilder.getPortFromUrl(url);
-		
-		this.url = UrlBuilder.buildUrl(hostName, name, protocol, port);
-		
+
+		this.hostName = URIBuilder.getHostNameFromUrl(url);
+		String name = URIBuilder.getNameFromURI(url);
+		this.protocol = URIBuilder.getProtocol(url);
+		this.port = URIBuilder.getPortNumber(url);
+
+		this.url = URIBuilder.buildURI(hostName, name, protocol, port).toString();
+
 		this.rank = rank;
-		
+
 		this.parent = parent;
 	}
 
@@ -75,12 +75,12 @@ public class HostObject extends AbstractData{
 	public String getType() {
 		return "host";
 	}
-	
+
 	@Override
 	public String getName() {
 		return getHostName();
 	}
-	
+
 	/**
 	 * Returns the url of this object.
 	 * @return An url.
@@ -128,12 +128,13 @@ public class HostObject extends AbstractData{
 		System.out.println(this);
 		findRuntimes();
 	}
-	
+
 	@Override
 	public int getHostRank(){
 		return this.rank;
 	}
 
+	@Override
 	public String toString(){
 		String result = this.hostName+":"+this.port;
 		if(!getOSName().equals(DEFAULT_NAME)){
@@ -149,9 +150,9 @@ public class HostObject extends AbstractData{
 	 * Propose à l'host de s'ajouter s'il y arrive le fils donné en paramètre.
 	 */
 	public void proposeChild(){
-		
+
 	}
-	
+
 	/**
 	 * Find all the ProActive Runtimes of this host.
 	 */
@@ -159,23 +160,23 @@ public class HostObject extends AbstractData{
 	private void findRuntimes(){
 		RuntimeFinder rfinder = new RemoteObjectHostRTFinder();
 		Collection<RuntimeObject> runtimeObjects = rfinder.getRuntimeObjects(this);
-		
+
 		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
-		
+
 		Iterator<RuntimeObject> it = runtimeObjects.iterator();
-		while(it.hasNext()){			
+		while(it.hasNext()){
 			RuntimeObject runtimeObject = it.next();
-			
+
 			// If this child is a NOT monitored child.
 			if(containsChildInNOTMonitoredChildren(runtimeObject.getKey())){
 				continue;
 			}
-			
+
 			RuntimeObject child = (RuntimeObject) this.getMonitoredChild(runtimeObject.getKey());
 			// If this child is not yet monitored.
 			if(child==null){
 				child = runtimeObject;
-				ObjectName oname = runtimeObject.getObjectName();		
+				ObjectName oname = runtimeObject.getObjectName();
 				JMXNotificationManager.getInstance().subscribe(oname, new RuntimeObjectListener(runtimeObject), runtimeObject.getUrl());
 				addChild(runtimeObject);
 				updateOSNameAndVersion(runtimeObject.getConnection());
@@ -187,14 +188,14 @@ public class HostObject extends AbstractData{
 			// Removes from the model the not monitored or termined runtimes.
 			childrenToRemoved.remove(child.getKey());
 		}
-		
+
 		// Some child have to be removed
 		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
 			RuntimeObject child = (RuntimeObject) iter.next();
 			child.destroy();
 		}
 	}
-	
+
 	private void updateOSNameAndVersion(ProActiveConnection connection){
 		if(this.osName==null || this.osVersion==null){
 			ObjectName OSoname = null;
@@ -207,16 +208,16 @@ public class HostObject extends AbstractData{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			OperatingSystemMXBean proxyMXBean = (OperatingSystemMXBean) MBeanServerInvocationHandler.newProxyInstance(connection, OSoname, OperatingSystemMXBean.class, false);			
-			this.osName = proxyMXBean.getName();			
+
+			OperatingSystemMXBean proxyMXBean = MBeanServerInvocationHandler.newProxyInstance(connection, OSoname, OperatingSystemMXBean.class, false);
+			this.osName = proxyMXBean.getName();
 			this.osVersion = proxyMXBean.getVersion();
-			
+
 			setChanged();
 			notifyObservers(this.toString());
 		}
 	}
-	
+
 	@Override
 	public ProActiveConnection getConnection(){
 		// A host object has no JMX ProActiveConnection

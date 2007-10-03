@@ -11,12 +11,10 @@ import java.util.Observable;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
-import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 
@@ -31,9 +29,9 @@ public abstract class AbstractData extends Observable {
 
 	/**
 	 * The monitored children
-	 */ 
+	 */
 	protected Map<String, AbstractData> monitoredChildren;
-	
+
 	/**
 	 * The NOT monitored children
 	 */
@@ -65,7 +63,7 @@ public abstract class AbstractData extends Observable {
 	public ObjectName getObjectName(){
 		return this.objectName;
 	}
-	
+
 	/**
 	 * Adds a child to this object, and explore this one.
 	 * @param <T>
@@ -105,7 +103,7 @@ public abstract class AbstractData extends Observable {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	/**
 	 * Returns the list of monitored children
 	 * @return The list of monitored children
@@ -113,7 +111,7 @@ public abstract class AbstractData extends Observable {
 	public List<AbstractData> getMonitoredChildrenAsList(){
 		return new ArrayList<AbstractData>(monitoredChildren.values());
 	}
-	
+
 	/**
 	 * Returns a copy of the map of the monitored children.
 	 * @return
@@ -121,7 +119,7 @@ public abstract class AbstractData extends Observable {
 	public Map<String, AbstractData> getMonitoredChildrenAsMap(){
 		return new HashMap<String, AbstractData>(this.monitoredChildren);
 	}
-	
+
 	/**
 	 * Returns the number of monitored children.
 	 * @return The number of monitored children.
@@ -129,7 +127,7 @@ public abstract class AbstractData extends Observable {
 	public int getMonitoredChildrenSize(){
 		return this.monitoredChildren.size();
 	}
-	
+
 	/**
 	 * Returns a child, searches in all recorded data
 	 * @param key
@@ -142,7 +140,7 @@ public abstract class AbstractData extends Observable {
 		}
 		return child;
 	}
-	
+
 	/**
 	 * Returns a monitored Child
 	 * @param key
@@ -151,7 +149,7 @@ public abstract class AbstractData extends Observable {
 	public AbstractData getMonitoredChild(String key){
 		return this.monitoredChildren.get(key);
 	}
-	
+
 	/**
 	 * Returns true if this object has associated a child with this key.
 	 * @param keyChild
@@ -160,7 +158,7 @@ public abstract class AbstractData extends Observable {
 	public boolean containsChild(String keyChild){
 		return containsChildInMonitoredChildren(keyChild) || containsChildInNOTMonitoredChildren(keyChild);
 	}
-	
+
 	/**
 	 * Returns true if this object has associated a monitored child with this key.
 	 * @param keyChild
@@ -169,7 +167,7 @@ public abstract class AbstractData extends Observable {
 	public boolean containsChildInMonitoredChildren(String keyChild){
 		return this.monitoredChildren.containsKey(keyChild);
 	}
-	
+
 	/**
 	 * Returns true if this object has associated a NOT monitored child with this key.
 	 * @param keyChild
@@ -178,7 +176,7 @@ public abstract class AbstractData extends Observable {
 	public boolean containsChildInNOTMonitoredChildren(String keyChild){
 		return this.notMonitoredChildren.containsKey(keyChild);
 	}
-	
+
 	/**
 	 * Remove all the communications of this object.
 	 */
@@ -188,7 +186,7 @@ public abstract class AbstractData extends Observable {
 			child.resetCommunications();
 		}
 	}
-	
+
 	/**
 	 * Returns the object's parent
 	 * @return the object's parent
@@ -208,7 +206,7 @@ public abstract class AbstractData extends Observable {
 			child.explore();
 		}
 	}
-	
+
 	/**
 	 * Stop monitoring this object
 	 * @param log Indicates if you want to log a message in the console.
@@ -218,15 +216,15 @@ public abstract class AbstractData extends Observable {
 			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getName());
 		}
 		List<AbstractData> children = getMonitoredChildrenAsList();
-		for (Iterator iter = children.iterator(); iter.hasNext();) {
-			AbstractData child = (AbstractData) iter.next();
+		for (Iterator<AbstractData> iter = children.iterator(); iter.hasNext();) {
+			AbstractData child = iter.next();
 			child.stopMonitoring(false);
 		}
 		getParent().removeChildFromMonitoredChildren(this);
 		setChanged();
 		notifyObservers(/*State.NOT_MONITORED*/);
 	}
-		
+
 	/**
 	 * Returns an unique identifer,
 	 * it is an unique key used to add this object to
@@ -240,13 +238,13 @@ public abstract class AbstractData extends Observable {
 	 * @return the type of the object.
 	 */
 	public abstract String getType();
-	
+
 	/**
 	 * Returns the name of the object.
 	 * @return the name of the object.
 	 */
 	public abstract String getName();
-	
+
 	/**
 	 * Returns the ProActive Connection
 	 * @return a ProActiveConnection
@@ -257,17 +255,17 @@ public abstract class AbstractData extends Observable {
 
 	/**
 	 * Invokes an operation on the MBean associated to the ProActive object.
-	 * 
+	 *
 	 * @param operationName The name of the operation to be invoked.
 	 * @param params An array containing the parameters to be set when
      * the operation is invoked
 	 * @param signature An array containing the signature of the
      * operation.
-     * 
+     *
 	 * @return The object returned by the operation, which represents
      * the result of invoking the operation on the ProActive object.
-     * 
-	 * @throws IOException 
+     *
+	 * @throws IOException
 	 * @throws ReflectionException Wraps a
      * <CODE>java.lang.Exception</CODE> thrown while trying to invoke
      * the method.
@@ -279,35 +277,35 @@ public abstract class AbstractData extends Observable {
 	public Object invoke(String operationName, Object[] params, String[] signature) throws InstanceNotFoundException, MBeanException, ReflectionException, IOException{
 		return getConnection().invoke(getObjectName(), operationName, params, signature);
 	}
-	
+
 	/**
 	 * Invokes an operation on the MBean associated to the ProActive object.
-	 * 
+	 *
 	 * @param operationName The name of the operation to be invoked.
 	 * @param params An array containing the parameters to be set when
      * the operation is invoked
 	 * @param signature An array containing the signature of the
      * operation.
-     * 
+     *
 	 * @return The object returned by the operation, which represents
      * the result of invoking the operation on the ProActive object.
 	 */
 	public Object invokeAsynchronous(String operationName, Object[] params, String[] signature){
 		return getConnection().invokeAsynchronous(getObjectName(), operationName, params, signature);
 	}
-	
+
 	public Object getAttribute(String attribute) throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, IOException{
 		return getConnection().getAttribute(getObjectName(), attribute);
 	}
-	
+
 	public Object getAttributeAsynchronous(String attribute){
 		return getConnection().getAttributeAsynchronous(getObjectName(), attribute);
 	}
-	
+
 	protected String getHostUrlServer(){
 		return getParent().getHostUrlServer();
 	}
-	
+
 	/**
 	 * Returns the JMX Server Name
 	 * @return the JMX Server Name
@@ -315,7 +313,7 @@ public abstract class AbstractData extends Observable {
 	protected String getServerName(){
 		return getParent().getServerName();
 	}
-	
+
 	/**
 	 * Returns the current World
 	 * @return The World, or null if the parent of this object is null.
@@ -323,14 +321,14 @@ public abstract class AbstractData extends Observable {
 	public WorldObject getWorldObject(){
 		return getParent().getWorldObject();
 	}
-	
+
 	/**
 	 * Destroy this object.
 	 */
 	public void destroy(){
 		getParent().removeChild(this);
 	}
-	
+
 	/**
 	 * Returns the host rank.
 	 * @return the host rank.
@@ -338,7 +336,7 @@ public abstract class AbstractData extends Observable {
 	public int getHostRank(){
 		return getParent().getHostRank();
 	}
-	
+
 	/**
 	 * Return the max depth.
 	 * @return the max depth.

@@ -85,7 +85,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 					 throw e;
 				 }
 			 }
-			 
+
 			if (uris != null ) {
 				/* Searchs all ProActive Runtimes */
 				for (int i = 0; i < uris.length; ++i) {
@@ -93,24 +93,24 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 					try {
 						/*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
 					    RemoteObject ro = RemoteObjectHelper.lookup(url);
-					    
+
 						/*Object stub = ro.getObjectProxy();*/
 					    Object stub = RemoteObjectHelper.generatedObjectStub(ro);
 
 	                    if (stub instanceof ProActiveRuntime) {
 	                    	ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
-							
+
 							String mbeanServerName = proActiveRuntime.getMBeanServerName();
 
 							String runtimeUrl = proActiveRuntime.getURL();
 							runtimeUrl = FactoryName.getCompleteUrl(runtimeUrl);
-							
+
 							ObjectName oname = FactoryName.createRuntimeObjectName(runtimeUrl);
 
 							if(runtimeObjects.containsKey(runtimeUrl)){
 								continue;
 							}
-							
+
 							RuntimeObject runtime = (RuntimeObject) host.getChild(runtimeUrl);
 							if(runtime==null){
 								// This runtime is not yet monitored
@@ -121,7 +121,6 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder{
 					} catch (ProActiveException pae) {
 					    // the lookup returned an active object, and an active object is
 					    // not a remote object (for now...)
-					    // TODO : Arnaud, Active objects should become Remote Objects...
 						pae.printStackTrace();
 					    console.warn("Found active object in registry at " + url);
 					}

@@ -10,7 +10,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
@@ -136,8 +136,8 @@ public class ActiveObjectListener implements NotificationListener{
 		UniqueID sourceID = request.getSource();
 		UniqueID destinationID = request.getDestination();
 		UniqueID aoID;
-		String sourceHost = UrlBuilder.getHostNameFromUrl(request.getSourceNode());
-		String destinationHost = UrlBuilder.getHostNameFromUrl(request.getDestinationNode());
+		String sourceHost = URIBuilder.getHostNameFromUrl(request.getSourceNode());
+		String destinationHost = URIBuilder.getHostNameFromUrl(request.getDestinationNode());
 		String hostToDiscovered;
 		String nodeUrlToDiscovered;
 
@@ -175,10 +175,10 @@ public class ActiveObjectListener implements NotificationListener{
 				ao.getParent().getParent().getParent().explore();
 			}
 			else{// We have to monitore a new host.
-				String protocol = UrlBuilder.getProtocol(nodeUrlToDiscovered);
-				int port = UrlBuilder.getPortFromUrl(nodeUrlToDiscovered);
+				String protocol = URIBuilder.getProtocol(nodeUrlToDiscovered);
+				int port = URIBuilder.getPortNumber(nodeUrlToDiscovered);
 				if((ao.getDepth() - ao.getHostRank())>0){
-					ao.getWorldObject().addHost(UrlBuilder.buildUrl(hostToDiscovered, "", protocol, port), ao.getHostRank()+1);
+					ao.getWorldObject().addHost(URIBuilder.buildURI(hostToDiscovered, "", protocol, port).toString(), ao.getHostRank()+1);
 					if(type == Type.SENDER){
 						ao.addCommunicationTo(destinationID);
 						return;

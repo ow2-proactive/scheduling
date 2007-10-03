@@ -42,23 +42,23 @@ public class MonitoringLayout extends ToolbarLayout{
 	//
 	// -- PUBLIC METHODS -------------------------------------------
 	//
-	
+
 	/** Constant for center alignment **/
 	public static final int ALIGN_CENTER_CENTER = 3;
 
 	/**
-	 * Constructs a vertically oriented MonitoringLayout with child spacing of 0 pixels, 
+	 * Constructs a vertically oriented MonitoringLayout with child spacing of 0 pixels,
 	 * matchWidth <code>true</code>, and {@link #ALIGN_TOPLEFT} alignment.
-	 */		
+	 */
 	public MonitoringLayout(){
 		super();
 	}
 
 	/**
-	 * Constructs a ToolbarLayout with a specified orientation. Default values are: child 
-	 * spacing 0 pixels, matchWidth <code>false</code>, and {@link #ALIGN_TOPLEFT} 
+	 * Constructs a ToolbarLayout with a specified orientation. Default values are: child
+	 * spacing 0 pixels, matchWidth <code>false</code>, and {@link #ALIGN_TOPLEFT}
 	 * alignment.
-	 * 
+	 *
 	 * @param isHorizontal whether the children are oriented horizontally
 	 * @since 2.0
 	 */
@@ -69,8 +69,9 @@ public class MonitoringLayout extends ToolbarLayout{
 	/**
 	 * @see org.eclipse.draw2d.LayoutManager#layout(IFigure)
 	 */
+	@Override
 	public void layout(IFigure parent) {
-		List children = parent.getChildren();
+		List<IFigure> children = parent.getChildren();
 		int numChildren = children.size();
 		Rectangle clientArea = transposer.t(parent.getClientArea());
 		int x = clientArea.x;
@@ -81,35 +82,35 @@ public class MonitoringLayout extends ToolbarLayout{
 		Dimension minSizes [] = new Dimension[numChildren];
 
 		// Calculate the width and height hints.  If it's a vertical ToolBarLayout,
-		// then ignore the height hint (set it to -1); otherwise, ignore the 
+		// then ignore the height hint (set it to -1); otherwise, ignore the
 		// width hint.  These hints will be passed to the children of the parent
-		// figure when getting their preferred size. 
+		// figure when getting their preferred size.
 		int wHint = -1;
-		int hHint = -1;    
+		int hHint = -1;
 		if (isHorizontal()) {
 			hHint = parent.getClientArea(Rectangle.SINGLETON).height;
 		} else {
 			wHint = parent.getClientArea(Rectangle.SINGLETON).width;
 		}
 
-		/*		
-		 * Calculate sum of preferred heights of all children(totalHeight). 
+		/*
+		 * Calculate sum of preferred heights of all children(totalHeight).
 		 * Calculate sum of minimum heights of all children(minHeight).
 		 * Cache Preferred Sizes and Minimum Sizes of all children.
 		 *
 		 * totalHeight is the sum of the preferred heights of all children
 		 * totalMinHeight is the sum of the minimum heights of all children
 		 * prefMinSumHeight is the sum of the difference between all children's
-		 * preferred heights and minimum heights. (This is used as a ratio to 
-		 * calculate how much each child will shrink). 
+		 * preferred heights and minimum heights. (This is used as a ratio to
+		 * calculate how much each child will shrink).
 		 */
-		IFigure child; 
+		IFigure child;
 		int totalHeight = 0;
 		int totalMinHeight = 0;
 		int prefMinSumHeight = 0;
 
 		for (int i = 0; i < numChildren; i++) {
-			child = (IFigure)children.get(i);
+			child = children.get(i);
 
 			prefSizes[i] = transposer.t(child.getPreferredSize(wHint, hHint));
 			minSizes[i] = transposer.t(child.getMinimumSize(wHint, hHint));
@@ -120,14 +121,14 @@ public class MonitoringLayout extends ToolbarLayout{
 		totalHeight += (numChildren - 1) * spacing;
 		totalMinHeight += (numChildren - 1) * spacing;
 		prefMinSumHeight = totalHeight - totalMinHeight;
-		/* 
-		 * The total amount that the children must be shrunk is the 
-		 * sum of the preferred Heights of the children minus  
+		/*
+		 * The total amount that the children must be shrunk is the
+		 * sum of the preferred Heights of the children minus
 		 * Max(the available area and the sum of the minimum heights of the children).
 		 *
 		 * amntShrinkHeight is the combined amount that the children must shrink
-		 * amntShrinkCurrentHeight is the amount each child will shrink respectively  
-		 */	
+		 * amntShrinkCurrentHeight is the amount each child will shrink respectively
+		 */
 		int amntShrinkHeight = totalHeight - Math.max(availableHeight, totalMinHeight);
 
 		if (amntShrinkHeight < 0) {
@@ -142,9 +143,9 @@ public class MonitoringLayout extends ToolbarLayout{
 			int minWidth = minSizes[i].width;
 			Rectangle newBounds = new Rectangle(x, y, prefWidth, prefHeight);
 
-			child = (IFigure)children.get(i);
+			child = children.get(i);
 			if (prefMinSumHeight != 0)
-				amntShrinkCurrentHeight = 
+				amntShrinkCurrentHeight =
 					(prefHeight - minHeight) * amntShrinkHeight / (prefMinSumHeight);
 
 			int width = Math.min(prefWidth, transposer.t(child.getMaximumSize()).width);
@@ -155,7 +156,7 @@ public class MonitoringLayout extends ToolbarLayout{
 
 			int adjust = clientArea.width - width;
 			switch (minorAlignment) {
-			case ALIGN_TOPLEFT: 
+			case ALIGN_TOPLEFT:
 				adjust = 0;
 				break;
 			case ALIGN_CENTER:
@@ -176,5 +177,5 @@ public class MonitoringLayout extends ToolbarLayout{
 			prefMinSumHeight -= (prefHeight - minHeight);
 			y += newBounds.height + spacing;
 		}
-	}				
+	}
 }

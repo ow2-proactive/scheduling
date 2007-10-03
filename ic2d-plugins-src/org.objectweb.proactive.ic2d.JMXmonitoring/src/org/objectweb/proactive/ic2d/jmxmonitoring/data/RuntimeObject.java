@@ -14,7 +14,7 @@ import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 /**
@@ -27,25 +27,25 @@ public class RuntimeObject extends AbstractData{
 	 * All the method names used to notify the observers
 	 */
 	public enum methodName { RUNTIME_KILLED, RUNTIME_NOT_RESPONDING, RUNTIME_NOT_MONITORED };
-	
+
 	private HostObject parent;
 	private String url;
 	//private ProActiveConnection connection;
 	private String hostUrlServer;
 	private String serverName;
-	
+
 	private ProActiveRuntimeWrapperMBean proxyMBean;
-	
+
 	public RuntimeObject(HostObject parent, String runtimeUrl, ObjectName objectName, String hostUrl, String serverName) {
 		super(objectName);
 		this.parent = parent;
-		
+
 		this.url = FactoryName.getCompleteUrl(runtimeUrl);
-		
+
 		this.hostUrlServer = hostUrl;
 		this.serverName = serverName;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public HostObject getParent() {
@@ -61,22 +61,22 @@ public class RuntimeObject extends AbstractData{
 	public String getKey() {
 		return this.url;
 	}
-	
+
 	@Override
 	public String getType() {
 		return "runtime object";
 	}
-	
+
 	@Override
 	protected String getHostUrlServer(){
 		return this.hostUrlServer;
 	}
-	
+
 	@Override
 	protected String getServerName(){
 		return this.serverName;
 	}
-	
+
 	/**
 	 * Returns the url of this object.
 	 * @return An url.
@@ -84,12 +84,13 @@ public class RuntimeObject extends AbstractData{
 	public String getUrl(){
 		return this.url;
 	}
-	
+
 	/**
 	 * Kill this runtime.
 	 */
 	public void killRuntime(){
 		new Thread(){
+			@Override
 			public void run(){
 				Object[] params = {};
 				String[] signature = {};
@@ -99,11 +100,12 @@ public class RuntimeObject extends AbstractData{
 		}.start();
 	}
 
-	
+
 	public void runtimeKilled(){
 		setChanged();
 		notifyObservers(methodName.RUNTIME_KILLED);
 		new Thread(){
+			@Override
 			public void run(){
 				try {
 					sleep(3000);
@@ -115,13 +117,13 @@ public class RuntimeObject extends AbstractData{
 			}
 		}.start();
 	}
-	
+
 	/**
 	 * Finds all nodes of this Runtime.
 	 */
 	@SuppressWarnings("unchecked")
 	private void findNodes(){
-		proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
+		proxyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
 		try {
 			if(!(getConnection().isRegistered(getObjectName()))){
 				return;
@@ -130,7 +132,7 @@ public class RuntimeObject extends AbstractData{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		List<ObjectName> nodeNames = null;
 		try {
 			nodeNames = nodeNames = proxyMBean.getNodes();
@@ -138,29 +140,29 @@ public class RuntimeObject extends AbstractData{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
-		
+
 		for (ObjectName name : nodeNames) {
-			
+
 			// Search if the node is a P2P node
 			String nodeName  = name.getKeyProperty(FactoryName.NODE_NAME_PROPERTY);
 			if(nodeName.startsWith(P2PConstants.P2P_NODE_NAME) && getWorldObject().isP2PHidden()){
 				// We have to skeep this node because it is a P2PNode
 				continue;
 			}
-			
-			NodeWrapperMBean proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), name, NodeWrapperMBean.class, false);
+
+			NodeWrapperMBean proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(), name, NodeWrapperMBean.class, false);
 			String url = proxyNodeMBean.getURL();
 
 			// We need to have a complete url protocol://host:port/name
 			url = FactoryName.getCompleteUrl(url);
-			
+
 			// If this child is a NOT monitored child.
 			if(containsChildInNOTMonitoredChildren(url)){
 				continue;
 			}
-			
+
 			NodeObject child = (NodeObject)this.getMonitoredChild(url);
 			// If this child is not monitored.
 			if(child==null){
@@ -184,24 +186,25 @@ public class RuntimeObject extends AbstractData{
 			// Removes from the model the not monitored or termined nodes.
 			childrenToRemoved.remove(child.getKey());
 		}
-		
+
 		// Some child have to be removed
 		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
 			NodeObject child = (NodeObject) iter.next();
 			child.destroy();
 		}
 	}
-	
+
 	@Override
 	public String getName(){
-		return UrlBuilder.getNameFromUrl(getUrl());
+		return URIBuilder.getNameFromURI(getUrl());
 	}
-	
+
 	@Override
 	public ProActiveConnection getConnection(){
 		return JMXNotificationManager.getInstance().getConnection(getUrl());
 	}
-	
+
+	@Override
 	public String toString(){
 		return "Runtime: "+getUrl();
 	}

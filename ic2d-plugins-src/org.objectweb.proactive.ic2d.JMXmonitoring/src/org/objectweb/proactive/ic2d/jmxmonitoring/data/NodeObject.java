@@ -16,7 +16,7 @@ import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 public class NodeObject extends AbstractData{
 
@@ -26,13 +26,13 @@ public class NodeObject extends AbstractData{
 
  	//Warning: Don't use this variavle directly, use getProxyNodeMBean().
 	private NodeWrapperMBean proxyNodeMBean;
-	
+
 	public NodeObject(RuntimeObject parent, String url, ObjectName objectName){
 		super(objectName);
 		this.parent = parent;
-		
+
 		this.url = FactoryName.getCompleteUrl(url);
-		
+
 		Comparator<String> comparator = new ActiveObject.ActiveObjectComparator();
 		this.monitoredChildren = new TreeMap<String, AbstractData>(comparator);
 	}
@@ -42,7 +42,7 @@ public class NodeObject extends AbstractData{
 	public RuntimeObject getParent() {
 		return this.parent;
 	}
-	
+
 	/**
 	 * Sets the virtual node.
 	 * @param vn the virtual node.
@@ -50,7 +50,7 @@ public class NodeObject extends AbstractData{
 	public void setVirtualNode(VNObject vn){
 		this.vnParent = vn;
 	}
-	
+
 	/**
 	 * Returns the virtual node.
 	 * @return the virtual node.
@@ -58,14 +58,14 @@ public class NodeObject extends AbstractData{
 	public VNObject getVirtualNode(){
 		return this.vnParent;
 	}
-	
+
 	private NodeWrapperMBean getProxyNodeMBean(){
 		if(proxyNodeMBean==null){
-			proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), NodeWrapperMBean.class, false);
+			proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), NodeWrapperMBean.class, false);
 		}
 		return proxyNodeMBean;
 	}
-	
+
 	@Override
 	public void destroy(){
 		this.vnParent.removeChild(this);
@@ -81,12 +81,12 @@ public class NodeObject extends AbstractData{
 	public String getKey() {
 		return this.url;
 	}
-	
+
 	@Override
 	public String getType() {
 		return "node object";
 	}
-	
+
 	/**
 	 * Returns the url of this object.
 	 * @return An url.
@@ -101,10 +101,10 @@ public class NodeObject extends AbstractData{
 	@SuppressWarnings("unchecked")
 	private void findActiveObjects(){
 		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
-		
-		List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();		
+
+		List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
 		for (ObjectName oname : activeObjectNames) {
-			BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), oname, BodyWrapperMBean.class, false);
+			BodyWrapperMBean proxyBodyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(), oname, BodyWrapperMBean.class, false);
 			UniqueID id = proxyBodyMBean.getID();
 			String activeObjectName = proxyBodyMBean.getName();
 			// If this child is a NOT monitored child.
@@ -115,7 +115,7 @@ public class NodeObject extends AbstractData{
 			// If this child is not yet monitored.
 			if(child==null){
 				child = new ActiveObject(this,id, activeObjectName, oname);
-				addChild(child);	
+				addChild(child);
 			}
 			else{
 				child.explore();
@@ -123,7 +123,7 @@ public class NodeObject extends AbstractData{
 			// Removes from the model the not monitored or termined aos.
 			childrenToRemoved.remove(child.getKey());
 		}
-		
+
 		// Some child have to be removed
 		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
 			ActiveObject child = (ActiveObject)iter.next();
@@ -133,22 +133,22 @@ public class NodeObject extends AbstractData{
 
 	@Override
 	public String getName(){
-		return UrlBuilder.getNameFromUrl(getUrl());
+		return URIBuilder.getNameFromURI(getUrl());
 	}
 
 	@Override
 	public String toString(){
 		return "Node: "+getUrl();
 	}
-	
-	public void addChild(ActiveObject child){		
+
+	public void addChild(ActiveObject child){
 		super.addChild(child);
 		String name = child.getClassName();
 		if((!name.equals(ProActiveConnection.class.getName())
 				&&
 				(!name.equals(ProActiveServerImpl.class.getName())))){
 			ObjectName oname = child.getObjectName();
-			
+
 			JMXNotificationManager.getInstance().subscribe(oname, child.getListener(), getParent().getUrl());
 		}
 	}
@@ -160,7 +160,7 @@ public class NodeObject extends AbstractData{
 	public String getVirtualNodeName() {
 		return getProxyNodeMBean().getVirtualNodeName();
 	}
-	
+
 	/**
 	 * Returns the Job Id.
 	 * @return the Job Id.
@@ -168,7 +168,7 @@ public class NodeObject extends AbstractData{
 	public String getJobId() {
 		return getProxyNodeMBean().getJobId();
 	}
-	
+
 	/**
 	 * Used to highlight this node, in a virtual node.
 	 * @param highlighted true, or false

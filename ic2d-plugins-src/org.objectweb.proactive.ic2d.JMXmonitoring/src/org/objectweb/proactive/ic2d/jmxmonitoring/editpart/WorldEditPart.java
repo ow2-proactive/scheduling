@@ -50,15 +50,15 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	private FreeformLayer layer;
 
 	private MonitoringView monitoringView;
-	
+
 	private WorldObject castedModel;
 	private IFigure castedFigure;
-	
+
 	private Set<IFigure> figuresToUpdate;
 	private Set<GraphicalCommunication> communicationsToDraw;
 
 	private boolean shouldRepaint = true;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -66,12 +66,13 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	public WorldEditPart(WorldObject model, MonitoringView monitoringView) {
 		super(model);
 		this.monitoringView = monitoringView;
-		
-		
-		this.figuresToUpdate = Collections.synchronizedSet(new HashSet());
-		this.communicationsToDraw = Collections.synchronizedSet(new HashSet());
+
+
+		this.figuresToUpdate = Collections.synchronizedSet(new HashSet<IFigure>());
+		this.communicationsToDraw = Collections.synchronizedSet(new HashSet<GraphicalCommunication>());
 
 		new Thread(){
+			@Override
 			public void run(){
 				while(shouldRepaint){
 					try {
@@ -79,19 +80,19 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}	
+					}
 						Control control = getViewer().getControl();
 						if(control==null){
 							return;
 						}
 						control.getDisplay().asyncExec(new Runnable() {
-						
+
 						public void run () {
 							for (GraphicalCommunication communication : communicationsToDraw) {
 								communication.draw();
 							}
 							communicationsToDraw.clear();
-							
+
 							/*for (IFigure figure : figuresToUpdate) {
 								figure.repaint();
 							}
@@ -112,18 +113,18 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	public void addGraphicalCommunication(GraphicalCommunication communication){
 		communicationsToDraw.add(communication);
 	}
-	
+
 	@Override
 	public void addFigureToUpdtate(IFigure figure){
 		figuresToUpdate.add(figure);
 	}
-	
+
 	/**
 	 * Convert the result of EditPart.getModel()
 	 * to WorldObject (the real type of the model).
 	 * @return the casted model
 	 */
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public WorldObject getCastedModel() {
@@ -139,17 +140,17 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 			castedFigure = getFigure();
 		return castedFigure;
 	}
-	
+
 	@Override
 	public IFigure getContentPane() {
 		return layer;
 	}
-	
+
 	@Override
 	public MonitoringView getMonitoringView(){
 		return this.monitoringView;
 	}
-	
+
 	@Override
 	public WorldEditPart getWorldEditPart(){
 		return this;
@@ -165,6 +166,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	 * EditPart is associated with. So here, it returns a new FreeFormLayer.
 	 * @return a new FreeFormLayer view associated with the WorldObject model.
 	 */
+	@Override
 	protected IFigure createFigure() {
 		layer = new FreeformLayer();
 		FlowLayout layout = /*new FlowLayout()*/new MonitoringLayout();
@@ -172,11 +174,11 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 		layout.setMajorSpacing(50);
 		layout.setMinorSpacing(50);
 		layer.setLayoutManager(layout);
-		
-		WorldListener listener = new WorldListener(monitoringView); 
+
+		WorldListener listener = new WorldListener(monitoringView);
 		layer.addMouseListener(listener);
 		layer.addMouseMotionListener(listener);
-		
+
 		return layer;
 	}
 
@@ -185,6 +187,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
 	 */
+	@Override
 	protected List<AbstractData> getModelChildren() {
 		return getCastedModel().getMonitoredChildrenAsList();
 	}
@@ -192,14 +195,16 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
+	@Override
 	protected void createEditPolicies() {/* Do nothing */}
-	
+
 	//
 	// -- INNER CLASS -----------------------------------------------
 	//
-	
+
 	private class MonitoringLayout extends FlowLayout {
-		
+
+		@Override
 		protected void setBoundsOfChild(IFigure parent, IFigure child, Rectangle bounds) {
 			parent.getClientArea(Rectangle.SINGLETON);
 			bounds.translate(Rectangle.SINGLETON.x, Rectangle.SINGLETON.y+100);

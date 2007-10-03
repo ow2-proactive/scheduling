@@ -10,9 +10,7 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
-import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
@@ -49,7 +47,7 @@ public class ActiveObject extends AbstractData{
 
 	/** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
 	private BodyWrapperMBean proxyMBean;
-	
+
 	// -------------------------------------------
 	// --- Constructor ---------------------------
 	// -------------------------------------------
@@ -72,8 +70,8 @@ public class ActiveObject extends AbstractData{
 		getWorldObject().addActiveObject(this);
 
 		this.listener = new ActiveObjectListener(this);
-		
-		proxyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), BodyWrapperMBean.class, false);
+
+		proxyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), BodyWrapperMBean.class, false);
 	}
 
 	/**

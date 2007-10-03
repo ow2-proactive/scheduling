@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
@@ -45,7 +45,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 
 	private NodeObject castedModel;
 	private NodeFigure castedFigure;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -71,7 +71,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 		}
 		return castedModel;
 	}
-	
+
 	/**
 	 * Convert the result of EditPart.getFigure()
 	 * to NodeFigure (the real type of the figure).
@@ -121,10 +121,11 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 * EditPart is associated with. So here, it returns a new NodeFigure.
 	 * @return a new NodeFigure view associated with the NodeObject model.
 	 */
+	@Override
 	protected IFigure createFigure() {
 		//TODO A faire
 		NodeObject model = getCastedModel();
-		NodeFigure figure = new NodeFigure("Node "+model.getName(), UrlBuilder.getProtocol(model.getUrl())/*getCastedModel().getFullName(),getCastedModel().getParentProtocol()*/);
+		NodeFigure figure = new NodeFigure("Node "+model.getName(), URIBuilder.getProtocol(model.getUrl())/*getCastedModel().getFullName(),getCastedModel().getParentProtocol()*/);
 
 		NodeListener listener = new NodeListener(getCastedModel(), figure, getMonitoringView());
 		figure.addMouseListener(listener);
@@ -136,6 +137,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
 	 */
+	@Override
 	protected List<AbstractData> getModelChildren() {
 		return getCastedModel().getMonitoredChildrenAsList();
 	}
@@ -143,6 +145,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
+	@Override
 	protected void createEditPolicies() {/* Do nothing */}
 
 }
