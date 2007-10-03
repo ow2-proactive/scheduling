@@ -13,7 +13,6 @@ public class MethodCallInfo {
         Synchronous;
     }
     public enum SynchronousReason {NotApplicable,
-        Forced,
         ThrowsCheckedException,
         NotReifiable;
     }

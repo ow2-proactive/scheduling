@@ -147,9 +147,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             }
 
             if (!isToString(methodCall) && !isHashCode(methodCall) &&
-                    (mci.getReason() != MethodCallInfo.SynchronousReason.Forced) &&
-                    syncCallLogger.isEnabledFor(Level.WARN)) {
-                String msg = "[WARNING: synchronous call] All calls to the method below are synchronous " +
+                    syncCallLogger.isEnabledFor(Level.DEBUG)) {
+                String msg = "[DEBUG: synchronous call] All calls to the method below are synchronous " +
                     "(not an error, but may lead to performance issues or deadlocks):" +
                     System.getProperty("line.separator") +
                     methodCall.getReifiedMethod() +
@@ -158,7 +157,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                     mci.getMessage();
 
                 if (loggedSyncCalls.add(msg)) {
-                    syncCallLogger.warn(msg);
+                    syncCallLogger.debug(msg);
                 }
             }
 

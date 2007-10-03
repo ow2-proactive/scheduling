@@ -39,7 +39,6 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.Synchronous;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.representative.ItfID;
@@ -582,7 +581,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     static class ReifiableAndExceptions {
         boolean reifiable; // Is the method return type reifiable ?
         boolean exceptions; // Does the method throws exceptions ?
-        boolean forced; // Is the method forced to be synchronous by the user
         boolean returnsvoid; // Is the method returning void
         String reason; // Why is the method synchronous ? null if it is asynchronous
     }
@@ -620,11 +618,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             }
         }
 
-        if (cached.forced) {
-            mci.setReason(MethodCallInfo.SynchronousReason.Forced);
-            //mci.setType(MethodCallInfo.CallType.Synchronous);
-        }
-
         return mci;
     }
 
@@ -632,10 +625,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         ReifiableAndExceptions cached = REIF_AND_EXCEP.get(this.key);
         if (cached == null) {
             cached = new ReifiableAndExceptions();
-
-            if (hasSynchronousAnnotation(m)) {
-                cached.forced = true;
-            }
 
             if (m.getReturnType().equals(java.lang.Void.TYPE)) {
                 cached.returnsvoid = true;
@@ -683,29 +672,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public boolean isAsynchronousWayCall() {
         return getMethodCallInfo().getType() == MethodCallInfo.CallType.Asynchronous;
-    }
-
-    /**
-     * Checks that the method has the Synchronous annotation in it which forces synchronous execution
-     * @param method the method to check
-     * @return true if the annotation is present
-     */
-    private static boolean hasSynchronousAnnotation(Method method) {
-        try {
-            Object[] o = method.getAnnotations();
-            if (o != null) {
-                for (Object object : o) {
-                    if (object instanceof Synchronous) {
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return false;
     }
 
     /**
