@@ -251,7 +251,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
         fp.setCreatorID(this.getBodyID());
         fp.setUpdater(this.getBody());
-        fp.setOriginatingProxy(this);
 
         try {
             sendRequest(methodCall, fp);
@@ -271,7 +270,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         FutureProxy fp = FutureProxy.getFutureProxy();
         fp.setCreatorID(this.getBodyID());
         fp.setUpdater(this.getBody());
-        fp.setOriginatingProxy(this);
 
         try {
             sendRequest(methodCall, fp);
