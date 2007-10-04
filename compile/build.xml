@@ -6,7 +6,7 @@
 			-Dversion="3.2.1"					Tag a build with this version
 	-->
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask" />
-
+	<property file="${user.home}/.proactive/build.properties"/>
 	<import file="common.xml" />
 	<import file="doc.xml" />
 
@@ -67,8 +67,8 @@
 			<fileset dir="${cl.test.dir}" id="testsuite">
 				<include name="unitTests/**/*.class" />
 				<exclude name="**/*$*.class" />
-				<include name="functionalTests/**/*Test*.class" />
-				<exclude name="functionalTests/security/*/*.class" />
+				<include name="functionalTests/*/**/*Test*.class" />
+                                <!-- <exclude name="functionalTests/security/*/*.class" /> -->
 				<exclude name="functionalTests/*.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class" />
@@ -389,7 +389,7 @@
 
 			<delete dir="${junit.dir}" />
 			<mkdir dir="${junit.dir}" />
-			<junit printsummary="yes" forkmode="perTest" showoutput="false">
+			<junit printsummary="yes" forkmode="perTest" showoutput="${junit.showoutput}">
 				<jvmarg value="-Dproactive.dir=${base.dir}" />
 
 				<classpath>
