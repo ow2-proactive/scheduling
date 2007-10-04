@@ -144,7 +144,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    @Override
     public int compareTo(InternalTask task) {
         switch (currentSort) {
         case SORT_BY_DESCRIPTION:

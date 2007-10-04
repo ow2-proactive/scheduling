@@ -182,7 +182,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    @Override
     public int compareTo(InternalJob job) {
         switch (currentSort) {
         case SORT_BY_DESCRIPTION:

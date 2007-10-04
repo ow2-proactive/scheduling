@@ -105,7 +105,6 @@ public class SimpleLoggerServer implements Runnable {
         this.terminate = true;
     }
 
-    @Override
     public void run() {
         while (!terminate) {
             try {
@@ -147,7 +146,6 @@ public class SimpleLoggerServer implements Runnable {
             }
         }
 
-        @Override
         public void run() {
             LoggingEvent currentEvent;
             Logger localLogger;

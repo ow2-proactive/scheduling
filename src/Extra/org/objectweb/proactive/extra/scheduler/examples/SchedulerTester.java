@@ -184,7 +184,6 @@ public class SchedulerTester {
         }
 
         @SuppressWarnings("unchecked")
-        @Override
         public void run() {
             Random generator = new Random();
 
