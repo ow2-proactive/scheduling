@@ -123,8 +123,10 @@
         found in <xref linkend="miscFileSrc.webservices.web.xml" />.</para>
       </listitem>
     </itemizedlist>
-  </sect1>
+  
 -->
+</sect1>
+
 	<para>The last part consists in generating the web archive file using the ant target called 'proActiveWar'
 	and copying it under the TOMCAT/webapps directory. Tomcat will automatically uncompress and install the web application. 
 	</para>
