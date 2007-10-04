@@ -7,7 +7,7 @@
   use ProActive. For further assistance, or if you cannot solve a problem, feel free to post your question on the
   ProActive mailing list <ulink
   url="http://forge.objectweb.org/mail/?group_id=7">proactive@objectweb.org
-  </ulink> Make sure that you include a
+  </ulink>. Make sure that you include a
     precise description of your problem along with a full copy of the error
     message.</para><sect1>
     <title>Common problems</title>
@@ -79,11 +79,11 @@ java.security.AccessControlException: access denied
       <listitem>
         <para><emphasis role="bold">Examples and compilation do not work at
         all under Windows system:</emphasis> Check if your java installation
-        is not in a path containing spaces like C:\Program Files\java or
-        C:\Documents and Settings\java. Batch scripts do not run
+        is not in a path containing spaces like <literal>C:\Program Files\java or
+        C:\Documents and Settings\java</literal>. Batch scripts do not run
         properly when JAVA_HOME is set to such a directory. The solution is to install the JDK under a
-        space-free path (e.g. C:\java\j2sdk.... or
-        D:\java\j2sdk... ) and then set the JAVA_HOME environment variable
+        space-free path (e.g. <literal>C:\java\j2sdk....</literal> or <literal>
+        D:\java\j2sdk... </literal> ) and then set the <literal>JAVA_HOME </literal> environment variable
         accordingly.</para>
       </listitem>
     </itemizedlist>
@@ -109,7 +109,7 @@ log4j.logger.proactive.deployment.process = DEBUG, CONSOLE</screen>
   </sect1>
 
   <sect1 id="dbdoclet.id.TroubleShooting_hostname_ip">
-    <title>Hostname and IP Address</title>
+    <title>Hostname And IP Address</title>
 
     <para>To function properly, ProActive requires machines to have a
     correctly configured hostname and domain name. If the name of a machines
