@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC 
+           "-//INRIA//DTD DocBook V4.2-Based Subset V0.2//EN"
+           "http://www-sop.inria.fr/oasis/proactive/doc/dtd/0.2/ProActiveManual.dtd" >
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?><chapter id="Installation">
   <title>ProActive Installation</title>
 
   <para>ProActive is available for <ulink
-  url="http://proactive.inria.fr/download_proactive_latest.htm">download</ulink>
-  under a <ulink url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>. ProActive requires <ulink
-  url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink> or later to be installed on your computer. Please note that ProActive will NOT run with any version prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
+  url="http://proactive.inria.fr/download_proactive_latest.htm">download </ulink>under <emphasis> [COMMENT].
+  What type of open source license? [/COMMENT].</emphasis> ProActive requires <ulink
+  url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink> or later to be installed 
+  on your computer. Please note that ProActive will NOT run with any 
+  version prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
 
   <sect1>
     <title>Installation Overview</title>
@@ -289,10 +294,12 @@
     option <literal>-Djava.security.policy=pathToFile</literal> will specify which policy file to
     use within ProActive. As a first approximation, you can create a simple
     policy file granting all permissions:</para>
-    <para><screen>grant {
+    <para>
+    <programlisting lang="java" >grant {
     	permission java.security.AllPermission;
 	};        
-	</screen></para><note><para>
+	</programlisting>
+	</para><note><para>
  	If you use the scripts provided with the distribution to run the
  	examples an existing policy file named
  	<literal>proactive.java.policy</literal>
@@ -305,9 +312,9 @@
     </indexterm><example>
       <title>A simple proactive-log4j file</title>
 
-      <programlisting><textobject>
+      <screen><textobject>
           <textdata fileref="../../scripts/proactive-log4j" />
-        </textobject></programlisting>
+        </textobject></screen>
     </example><note>
       <para>If you use the scripts provided with the distribution to run the
       examples an existing log4j file named <literal>proactive-log4j</literal>
