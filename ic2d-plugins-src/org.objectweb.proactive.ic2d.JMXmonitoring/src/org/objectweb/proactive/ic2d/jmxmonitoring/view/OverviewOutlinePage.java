@@ -17,86 +17,78 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+
 public class OverviewOutlinePage extends Page implements IContentOutlinePage {
 
-	
-	/** the control of the overview */
+    /** the control of the overview */
     private Canvas overview;
+
     /** the root edit part */
     private ScalableFreeformRootEditPart rootEditPart;
 
     /** the thumbnail */
     private Thumbnail thumbnail;
-	
-    
-    
+
     /**
      * Creates a new OverviewOutlinePage instance.
      * @param rootEditPart the root edit part to show the overview from
      */
-    public OverviewOutlinePage(ScalableFreeformRootEditPart rootEditPart)
-    {
+    public OverviewOutlinePage(ScalableFreeformRootEditPart rootEditPart) {
         super();
         this.rootEditPart = rootEditPart;
     }
-    
-    
-    
-	@Override
-	public void createControl(Composite parent) {
-		// create canvas and lws
+
+    @Override
+    public void createControl(Composite parent) {
+        // create canvas and lws
         overview = new Canvas(parent, SWT.NONE);
         LightweightSystem lws = new LightweightSystem(overview);
 
         // create thumbnail
-        thumbnail =
-            new ScrollableThumbnail((Viewport) rootEditPart.getFigure());
+        thumbnail = new ScrollableThumbnail((Viewport) rootEditPart.getFigure());
         thumbnail.setBorder(new MarginBorder(3));
-        thumbnail.setSource(
-            rootEditPart.getLayer(LayerConstants.PRINTABLE_LAYERS));
+        thumbnail.setSource(rootEditPart.getLayer(
+                LayerConstants.PRINTABLE_LAYERS));
         lws.setContents(thumbnail);
-	}
-	
+    }
+
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.IPage#dispose()
      */
-    public void dispose()
-    {
-        if (null != thumbnail)
+    public void dispose() {
+        if (null != thumbnail) {
             thumbnail.deactivate();
+        }
 
         super.dispose();
     }
 
-	@Override
-	public Control getControl() {
-		return overview;
-	}
+    @Override
+    public Control getControl() {
+        return overview;
+    }
 
-	@Override
-	public void setFocus() {
-		if (getControl() != null)
+    @Override
+    public void setFocus() {
+        if (getControl() != null) {
             getControl().setFocus();
-	}
+        }
+    }
 
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
-		// TODO Auto-generated method stub
+    public void addSelectionChangedListener(ISelectionChangedListener listener) {
+        // TODO Auto-generated method stub
+    }
 
-	}
+    public ISelection getSelection() {
+        return StructuredSelection.EMPTY;
+    }
 
-	public ISelection getSelection() {
-		return StructuredSelection.EMPTY;
-	}
+    public void removeSelectionChangedListener(
+        ISelectionChangedListener listener) {
+        // TODO Auto-generated method stub
+    }
 
-	public void removeSelectionChangedListener(
-			ISelectionChangedListener listener) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void setSelection(ISelection selection) {
-		// TODO Auto-generated method stub
-
-	}
-
+    public void setSelection(ISelection selection) {
+        // TODO Auto-generated method stub
+    }
 }

@@ -37,58 +37,61 @@ import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+
 /**
  * This class is used to drag a host.
  * @author ProActive Team
  */
 public class DragHost extends MouseMotionListener.Stub implements MouseListener {
-	
-	private IFigure figure;
-	private int deltaX;
-	private int deltaY;
-	
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
-	
-	/**
-	 * Set the figure to drag.
-	 */
-	public void setFigure(IFigure figure){
-		this.figure = figure;
-	}
-	
-	public void mouseReleased(MouseEvent e){
-		moveFigure(e);
-		this.figure = null;
-	}
-	
-	public void mouseClicked(MouseEvent e){/*Do nothing*/}
-	
-	public void mouseDoubleClicked(MouseEvent e){/*Do nothing*/}
-	
-	public void mousePressed(MouseEvent e){
-		this.figure = ((Figure)e.getSource());
-		Rectangle rectangle = figure.getBounds();
-		this.deltaX = e.x - rectangle.x;
-		this.deltaY = e.y - rectangle.y;
-	}
-	
-	public void mouseDragged(MouseEvent e){
-		moveFigure(e);
-	}
-	
-	//
-	// -- PRIVATE METHODS ---------------------------------------------
-	//
-	
-	/**
-	 * Drag a figure.
-	 */
-	private void moveFigure(MouseEvent e){
-		if(this.figure != null){
-			Rectangle rectangle = this.figure.getBounds();
-			this.figure.setBounds(new Rectangle(e.x - deltaX, e.y - deltaY, rectangle.width, rectangle.height));
-		}		
-	}
+    private IFigure figure;
+    private int deltaX;
+    private int deltaY;
+
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
+
+    /**
+     * Set the figure to drag.
+     */
+    public void setFigure(IFigure figure) {
+        this.figure = figure;
+    }
+
+    public void mouseReleased(MouseEvent e) {
+        moveFigure(e);
+        this.figure = null;
+    }
+
+    public void mouseClicked(MouseEvent e) { /*Do nothing*/
+    }
+
+    public void mouseDoubleClicked(MouseEvent e) { /*Do nothing*/
+    }
+
+    public void mousePressed(MouseEvent e) {
+        this.figure = ((Figure) e.getSource());
+        Rectangle rectangle = figure.getBounds();
+        this.deltaX = e.x - rectangle.x;
+        this.deltaY = e.y - rectangle.y;
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        moveFigure(e);
+    }
+
+    //
+    // -- PRIVATE METHODS ---------------------------------------------
+    //
+
+    /**
+     * Drag a figure.
+     */
+    private void moveFigure(MouseEvent e) {
+        if (this.figure != null) {
+            Rectangle rectangle = this.figure.getBounds();
+            this.figure.setBounds(new Rectangle(e.x - deltaX, e.y - deltaY,
+                    rectangle.width, rectangle.height));
+        }
+    }
 }

@@ -43,25 +43,28 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 public class JobMonitoringTreePartFactory implements EditPartFactory {
 
-	
-	/**
-	 * @see org.eclipse.gef.EditPartFactory#createEditPart(org.eclipse.gef.EditPart, java.lang.Object)
-	 */
-	public EditPart createEditPart(EditPart context, Object model) {
-		if(model instanceof WorldObject)
-			return new WorldTreeEditPart((AbstractData)model);
-		if(model instanceof VNObject)
-			return new VNTreeEditPart((AbstractData)model);
-		if(model instanceof HostObject)
-			return new HostTreeEditPart((AbstractData)model);
-		if(model instanceof RuntimeObject)
-			return new JVMTreeEditPart((AbstractData)model);
-		if(model instanceof NodeObject)
-			return new NodeTreeEditPart((AbstractData)model);
-		if(model instanceof ActiveObject)
-			return new AOTreeEditPart((AbstractData)model);
-		return null;
-	}
-
+    /**
+     * @see org.eclipse.gef.EditPartFactory#createEditPart(org.eclipse.gef.EditPart, java.lang.Object)
+     */
+    public EditPart createEditPart(EditPart context, Object model) {
+        if (model instanceof WorldObject) {
+            return new WorldTreeEditPart((AbstractData) model);
+        }
+        if (model instanceof VNObject) {
+            return new VNTreeEditPart((AbstractData) model);
+        }
+        if (model instanceof HostObject) {
+            return new HostTreeEditPart((AbstractData) model);
+        }
+        if (model instanceof RuntimeObject) {
+            return new JVMTreeEditPart((AbstractData) model);
+        }
+        if (model instanceof NodeObject) {
+            return new NodeTreeEditPart((AbstractData) model);
+        }
+        if (model instanceof ActiveObject) {
+            return new AOTreeEditPart((AbstractData) model);
+        }
+        return null;
+    }
 }
- 

@@ -22,17 +22,17 @@ class DgcLabel extends Label {
     }
 
     @Override
-	public String getText() {
+    public String getText() {
         return this.text;
     }
 
     @Override
-	public String getSubStringText() {
+    public String getSubStringText() {
         return getText();
     }
 
     @Override
-	public void setText(String text) {
+    public void setText(String text) {
         this.text = text;
     }
 }
@@ -48,25 +48,24 @@ public class DgcAOFigure extends AOFigure {
     public void updateDgcState(ActiveObject model) {
         NodeObject node = model.getParent();
         String state = "";
-		try {
-			state = (String) model.getAttribute("DgcState");
-			((DgcLabel) this.label).setText(model.getName() + "\n" + state);
-		} catch (AttributeNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstanceNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MBeanException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ReflectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+        try {
+            state = (String) model.getAttribute("DgcState");
+            ((DgcLabel) this.label).setText(model.getName() + "\n" + state);
+        } catch (AttributeNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstanceNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (MBeanException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ReflectionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

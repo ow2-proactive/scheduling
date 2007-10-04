@@ -34,25 +34,22 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.HostFigure;
 
+
 public class VerticalLayoutAction extends Action {
+    public static final String VERTICAL_LAYOUT = "vertical layout";
+    private HostFigure host;
 
-	
-	public static final String VERTICAL_LAYOUT = "vertical layout";
-	
-	private HostFigure host;
-	
-	public VerticalLayoutAction() {
-		super("Vertical", IAction.AS_RADIO_BUTTON);
-		this.setId(VERTICAL_LAYOUT);
-	}
-	
-	public void setHost(HostFigure host) {
-		this.host = host;
-	}
-	
-	@Override
-	public void run() {
-		host.setVerticalLayout();
-	}
+    public VerticalLayoutAction() {
+        super("Vertical", IAction.AS_RADIO_BUTTON);
+        this.setId(VERTICAL_LAYOUT);
+    }
 
+    public void setHost(HostFigure host) {
+        this.host = host;
+    }
+
+    @Override
+    public void run() {
+        host.setVerticalLayout();
+    }
 }

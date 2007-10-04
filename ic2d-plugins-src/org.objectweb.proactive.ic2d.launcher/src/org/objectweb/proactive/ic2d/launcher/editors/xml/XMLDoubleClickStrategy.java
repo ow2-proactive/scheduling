@@ -35,126 +35,129 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.ITextViewer;
 
+
 public class XMLDoubleClickStrategy implements ITextDoubleClickStrategy {
-	
-	protected ITextViewer fText;
+    protected ITextViewer fText;
 
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
-	
-	public void doubleClicked(ITextViewer part) {
-		int pos = part.getSelectedRange().x;
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
+    public void doubleClicked(ITextViewer part) {
+        int pos = part.getSelectedRange().x;
 
-		if (pos < 0)
-			return;
+        if (pos < 0) {
+            return;
+        }
 
-		fText = part;
+        fText = part;
 
-		if (!selectComment(pos)) {
-			selectWord(pos);
-		}
-	}
-	
-	//
-	// -- PROTECTED METHODS ---------------------------------------------
-	//
-	
-	protected boolean selectComment(int caretPos) {
-		IDocument doc = fText.getDocument();
-		int startPos, endPos;
+        if (!selectComment(pos)) {
+            selectWord(pos);
+        }
+    }
 
-		try {
-			int pos = caretPos;
-			char c = ' ';
+    //
+    // -- PROTECTED METHODS ---------------------------------------------
+    //
+    protected boolean selectComment(int caretPos) {
+        IDocument doc = fText.getDocument();
+        int startPos;
+        int endPos;
 
-			while (pos >= 0) {
-				c = doc.getChar(pos);
-				if (c == '\\') {
-					pos -= 2;
-					continue;
-				}
-				if (c == Character.LINE_SEPARATOR || c == '\"')
-					break;
-				--pos;
-			}
+        try {
+            int pos = caretPos;
+            char c = ' ';
 
-			if (c != '\"')
-				return false;
+            while (pos >= 0) {
+                c = doc.getChar(pos);
+                if (c == '\\') {
+                    pos -= 2;
+                    continue;
+                }
+                if ((c == Character.LINE_SEPARATOR) || (c == '\"')) {
+                    break;
+                }
+                --pos;
+            }
 
-			startPos = pos;
+            if (c != '\"') {
+                return false;
+            }
 
-			pos = caretPos;
-			int length = doc.getLength();
-			c = ' ';
+            startPos = pos;
 
-			while (pos < length) {
-				c = doc.getChar(pos);
-				if (c == Character.LINE_SEPARATOR || c == '\"')
-					break;
-				++pos;
-			}
-			if (c != '\"')
-				return false;
+            pos = caretPos;
+            int length = doc.getLength();
+            c = ' ';
 
-			endPos = pos;
+            while (pos < length) {
+                c = doc.getChar(pos);
+                if ((c == Character.LINE_SEPARATOR) || (c == '\"')) {
+                    break;
+                }
+                ++pos;
+            }
+            if (c != '\"') {
+                return false;
+            }
 
-			int offset = startPos + 1;
-			int len = endPos - offset;
-			fText.setSelectedRange(offset, len);
-			return true;
-		} catch (BadLocationException x) {
-		}
+            endPos = pos;
 
-		return false;
-	}
-	
-	protected boolean selectWord(int caretPos) {
+            int offset = startPos + 1;
+            int len = endPos - offset;
+            fText.setSelectedRange(offset, len);
+            return true;
+        } catch (BadLocationException x) {
+        }
 
-		IDocument doc = fText.getDocument();
-		int startPos, endPos;
+        return false;
+    }
 
-		try {
+    protected boolean selectWord(int caretPos) {
+        IDocument doc = fText.getDocument();
+        int startPos;
+        int endPos;
 
-			int pos = caretPos;
-			char c;
+        try {
+            int pos = caretPos;
+            char c;
 
-			while (pos >= 0) {
-				c = doc.getChar(pos);
-				if (!Character.isJavaIdentifierPart(c))
-					break;
-				--pos;
-			}
+            while (pos >= 0) {
+                c = doc.getChar(pos);
+                if (!Character.isJavaIdentifierPart(c)) {
+                    break;
+                }
+                --pos;
+            }
 
-			startPos = pos;
+            startPos = pos;
 
-			pos = caretPos;
-			int length = doc.getLength();
+            pos = caretPos;
+            int length = doc.getLength();
 
-			while (pos < length) {
-				c = doc.getChar(pos);
-				if (!Character.isJavaIdentifierPart(c))
-					break;
-				++pos;
-			}
+            while (pos < length) {
+                c = doc.getChar(pos);
+                if (!Character.isJavaIdentifierPart(c)) {
+                    break;
+                }
+                ++pos;
+            }
 
-			endPos = pos;
-			selectRange(startPos, endPos);
-			return true;
+            endPos = pos;
+            selectRange(startPos, endPos);
+            return true;
+        } catch (BadLocationException x) {
+        }
 
-		} catch (BadLocationException x) {
-		}
+        return false;
+    }
 
-		return false;
-	}
-
-	//
-	// -- PRIVATE METHODS ---------------------------------------------
-	//
-	
-	private void selectRange(int startPos, int stopPos) {
-		int offset = startPos + 1;
-		int length = stopPos - offset;
-		fText.setSelectedRange(offset, length);
-	}
+    //
+    // -- PRIVATE METHODS ---------------------------------------------
+    //
+    private void selectRange(int startPos, int stopPos) {
+        int offset = startPos + 1;
+        int length = stopPos - offset;
+        fText.setSelectedRange(offset, length);
+    }
 }

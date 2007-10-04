@@ -37,50 +37,48 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
 
+
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
  *
  */
 public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
+    //
+    // -- CONSTRUCTOR ------------------------------------------------
+    //
 
-	//
-	// -- CONSTRUCTOR ------------------------------------------------
-	//
+    /**
+     * @param model
+     */
+    public JVMTreeEditPart(AbstractData model) {
+        super(model);
+    }
 
-	/**
-	 * @param model
-	 */
-	public JVMTreeEditPart(AbstractData model) {
-		super(model);
-	}
+    //
+    // -- PROTECTED METHODS -------------------------------------------
+    //
 
-	//
-	// -- PROTECTED METHODS -------------------------------------------
-	//
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+     */
+    @Override
+    protected List getModelChildren() {
+        return JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
+            (VNObject) getParent().getParent().getModel());
+    }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
-	 */
-	@Override
-	protected List getModelChildren() {
-		return JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
-				(VNObject)getParent().getParent().getModel());
-	}
+    /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
+     */
+    @Override
+    protected String getText() {
+        return getCastedModel().getName();
+    }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
-	 */
-	@Override
-	protected String getText() {
-		return getCastedModel().getName();
-	}
-
-	//
-	// -- PRIVATE METHODS -------------------------------------------
-	//
-
-	private RuntimeObject  getCastedModel() {
-		return (RuntimeObject)getModel();
-	}
-
+    //
+    // -- PRIVATE METHODS -------------------------------------------
+    //
+    private RuntimeObject getCastedModel() {
+        return (RuntimeObject) getModel();
+    }
 }

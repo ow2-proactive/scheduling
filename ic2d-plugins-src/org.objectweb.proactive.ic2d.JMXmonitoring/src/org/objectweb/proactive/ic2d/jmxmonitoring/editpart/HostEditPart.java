@@ -40,94 +40,94 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.HostFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.HostListener;
 
+
 public class HostEditPart extends AbstractMonitoringEditPart {
+    private HostObject castedModel;
+    private HostFigure castedFigure;
 
-	private HostObject castedModel;
-	private HostFigure castedFigure;
-	
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    public HostEditPart(HostObject model) {
+        super(model);
+    }
 
-	public HostEditPart(HostObject model) {
-		super(model);
-	}
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+    /**
+     * Convert the result of EditPart.getModel()
+     * to HostObject (the real type of the model).
+     * @return the casted model
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public HostObject getCastedModel() {
+        if (castedModel == null) {
+            castedModel = (HostObject) getModel();
+        }
+        return castedModel;
+    }
 
-	/**
-	 * Convert the result of EditPart.getModel()
-	 * to HostObject (the real type of the model).
-	 * @return the casted model
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public HostObject getCastedModel(){
-		if(castedModel==null){
-			castedModel =  (HostObject)getModel();
-		}
-		return castedModel;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public HostFigure getCastedFigure() {
-		if(castedFigure==null){
-			castedFigure =  (HostFigure)getFigure();
-		}
-		return castedFigure;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public HostFigure getCastedFigure() {
+        if (castedFigure == null) {
+            castedFigure = (HostFigure) getFigure();
+        }
+        return castedFigure;
+    }
 
-	@Override
-	public void update(Observable o, Object arg) {
-		final Object param = arg;
+    @Override
+    public void update(Observable o, Object arg) {
+        final Object param = arg;
 
-		if(param instanceof State && (State)param == State.NOT_MONITORED) {
-			deactivate();
-		}
-		// OS have been updated
-		else if((param instanceof String) && (o instanceof HostObject)){
-			getCastedFigure().changeTitle((String)param);
-		}
-		getViewer().getControl().getDisplay().asyncExec(this);
-	}
+        if (param instanceof State && ((State) param == State.NOT_MONITORED)) {
+            deactivate();
+        }
+        // OS have been updated
+        else if ((param instanceof String) && (o instanceof HostObject)) {
+            getCastedFigure().changeTitle((String) param);
+        }
+        getViewer().getControl().getDisplay().asyncExec(this);
+    }
 
-	@Override
-	public void run(){
-		refresh();
-	}
+    @Override
+    public void run() {
+        refresh();
+    }
 
-	//
-	// -- PROTECTED METHODS -----------------------------------------------
-	//
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
 
-	/**
-	 * Returns a new view associated
-	 * with the type of model object the
-	 * EditPart is associated with. So here, it returns a new HostFigure.
-	 * @return a new HostFigure view associated with the HostObject model.
-	 */
-	protected IFigure createFigure() {
-		HostFigure figure = new HostFigure(getCastedModel().toString());
-		HostListener listener = new HostListener(getCastedModel(), figure, getMonitoringView());
-		figure.addMouseListener(listener);
-		figure.addMouseMotionListener(listener);
-		return figure;
-	}
+    /**
+     * Returns a new view associated
+     * with the type of model object the
+     * EditPart is associated with. So here, it returns a new HostFigure.
+     * @return a new HostFigure view associated with the HostObject model.
+     */
+    protected IFigure createFigure() {
+        HostFigure figure = new HostFigure(getCastedModel().toString());
+        HostListener listener = new HostListener(getCastedModel(), figure,
+                getMonitoringView());
+        figure.addMouseListener(listener);
+        figure.addMouseMotionListener(listener);
+        return figure;
+    }
 
-	/**
-	 * Returns a List containing the children model objects.
-	 * @return the List of children
-	 */
-	protected List<AbstractData> getModelChildren() {
-		return getCastedModel().getMonitoredChildrenAsList();
-	}
+    /**
+     * Returns a List containing the children model objects.
+     * @return the List of children
+     */
+    protected List<AbstractData> getModelChildren() {
+        return getCastedModel().getMonitoredChildrenAsList();
+    }
 
-	/**
-	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
-	 */
-	protected void createEditPolicies() {/* Do nothing */}
+    /**
+     * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
+     */
+    protected void createEditPolicies() { /* Do nothing */
+    }
 }

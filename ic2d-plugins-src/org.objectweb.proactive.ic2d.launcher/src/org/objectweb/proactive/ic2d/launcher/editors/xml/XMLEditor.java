@@ -45,73 +45,75 @@ import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptor;
 import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptorSet;
 import org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective;
 
+
 public class XMLEditor extends TextEditor {
+    public static final String ID = "org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor";
+    private ColorManager colorManager;
 
-	public static final String ID = "org.objectweb.proactive.ic2d.launcher.editors.xml.XMLEditor";
+    //
+    // -- CONSTRUCTORS ---------------------------------------------
+    //
+    public XMLEditor() {
+        super();
+        colorManager = new ColorManager();
+        setSourceViewerConfiguration(new XMLConfiguration(colorManager));
+        setDocumentProvider(new XMLDocumentProvider());
+    }
 
-	private ColorManager colorManager;
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
+    public void dispose() {
+        colorManager.dispose();
+        super.dispose();
+    }
 
-	//
-	// -- CONSTRUCTORS ---------------------------------------------
-	//
-	
-	public XMLEditor() {
-		super();
-		colorManager = new ColorManager();
-		setSourceViewerConfiguration(new XMLConfiguration(colorManager));
-		setDocumentProvider(new XMLDocumentProvider());
+    //
+    // -- PROTECTED METHODS ---------------------------------------------
+    //
+    @Override
+    protected void doSetInput(IEditorInput input) throws CoreException {
+        super.doSetInput(input);
+        String path = null;
+        if (input instanceof IPathEditorInput) {
+            path = ((IPathEditorInput) input).getPath().toOSString();
+            changePerspective();
+            XMLDescriptorSet.getInstance().addFile(new XMLDescriptor(path));
+            Console.getInstance(Activator.CONSOLE_NAME)
+                   .log("File selected : " + path);
+            System.out.println("XMLEditor.doSetInput() " +
+                this.getEditorSite().getPage());
+        }
+    }
 
-	}
+    //
+    // -- PRIVATE METHODS ---------------------------------------------
+    //
 
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
-	
-	public void dispose() {
-		colorManager.dispose();
-		super.dispose();
-	}
-	
-	//
-	// -- PROTECTED METHODS ---------------------------------------------
-	//
-	
-	@Override
-	protected void doSetInput(IEditorInput input) throws CoreException {
-		super.doSetInput(input);
-		String path = null;
-		if(input instanceof IPathEditorInput){
-			path = ((IPathEditorInput)input).getPath().toOSString();
-			changePerspective();
-			XMLDescriptorSet.getInstance().addFile(new XMLDescriptor(path));
-			Console.getInstance(Activator.CONSOLE_NAME).log("File selected : " + path);
-			System.out.println("XMLEditor.doSetInput() "+this.getEditorSite().getPage());
-		}
-	}
-
-	//
-	// -- PRIVATE METHODS ---------------------------------------------
-	//
-
-	/**
-	 * Change the current perspective, to the Launcher perspective.
-	 */
-	private void changePerspective(){
-		IEditorSite site = getEditorSite();
-		if(site==null)
-			return;
-		IWorkbenchPage page = site.getPage();
-		if(page==null)
-			return;
-		IWorkbenchWindow workbenchWindow = page.getWorkbenchWindow();
-		if(workbenchWindow==null)
-			return;
-		IWorkbench workbench = workbenchWindow.getWorkbench();
-		if(workbench==null)
-			return;
-		IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
-		if(reg==null)
-			return;
-		page.setPerspective(reg.findPerspectiveWithId(LauncherPerspective.ID));
-	}
+    /**
+     * Change the current perspective, to the Launcher perspective.
+     */
+    private void changePerspective() {
+        IEditorSite site = getEditorSite();
+        if (site == null) {
+            return;
+        }
+        IWorkbenchPage page = site.getPage();
+        if (page == null) {
+            return;
+        }
+        IWorkbenchWindow workbenchWindow = page.getWorkbenchWindow();
+        if (workbenchWindow == null) {
+            return;
+        }
+        IWorkbench workbench = workbenchWindow.getWorkbench();
+        if (workbench == null) {
+            return;
+        }
+        IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
+        if (reg == null) {
+            return;
+        }
+        page.setPerspective(reg.findPerspectiveWithId(LauncherPerspective.ID));
+    }
 }

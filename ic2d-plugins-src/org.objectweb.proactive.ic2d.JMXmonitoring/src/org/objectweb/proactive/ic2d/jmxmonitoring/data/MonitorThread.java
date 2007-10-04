@@ -35,127 +35,125 @@ import java.util.Observer;
 
 
 public class MonitorThread implements Observer {
+    private final static int DEFAULT_TTR = 30;
 
-	private final static int DEFAULT_TTR = 30;
+    //	/** Hosts will be recursively searched up to this depth */
+    //	private int depth;
 
+    /** Thread which refresh the objects */
+    private Thread refresher;
 
-//	/** Hosts will be recursively searched up to this depth */
-//	private int depth;
+    /** true if we want to refresh, false otherwise */
+    private boolean refresh;
 
-	/** Thread which refresh the objects */
-	private Thread refresher;
-	/** true if we want to refresh, false otherwise */
-	private boolean refresh;
-	/** Time To Refresh (in seconds) */
-	private int ttr;
+    /** Time To Refresh (in seconds) */
+    private int ttr;
 
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
 
-	/**
-	 * Creates a new MonitorThread
-	 * @param worl A world object
-	 */
-	public MonitorThread(WorldObject world){
-		this.ttr = DEFAULT_TTR;
+    /**
+     * Creates a new MonitorThread
+     * @param worl A world object
+     */
+    public MonitorThread(WorldObject world) {
+        this.ttr = DEFAULT_TTR;
 
-		this.refresh = false;
-		this.refresher = new Thread(new MonitorThreadRefresher(world));
-	}
+        this.refresh = false;
+        this.refresher = new Thread(new MonitorThreadRefresher(world));
+    }
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
 
-//	/**
-//	 * Hosts will be recursively searched up to 
-//	 * the depth returned by this method.
-//	 * @return depth depth used to searched up hosts
-//	 */
-//	public int getDepth(){
-//		return this.depth;
-//	}
-//
-//	/**
-//	 * Sets the depth used to searched up hosts.
-//	 * @param depth the news depth
-//	 */
-//	public void setDepth(int depth){
-//		this.depth = depth;
-//	}
+    //	/**
+    //	 * Hosts will be recursively searched up to 
+    //	 * the depth returned by this method.
+    //	 * @return depth depth used to searched up hosts
+    //	 */
+    //	public int getDepth(){
+    //		return this.depth;
+    //	}
+    //
+    //	/**
+    //	 * Sets the depth used to searched up hosts.
+    //	 * @param depth the news depth
+    //	 */
+    //	public void setDepth(int depth){
+    //		this.depth = depth;
+    //	}
 
-	/**
-	 * Returns the Time To Refresh (in seconds). 
-	 * @return time to refresh
-	 */
-	public int getTTR() {
-		return this.ttr;
-	}
+    /**
+     * Returns the Time To Refresh (in seconds).
+     * @return time to refresh
+     */
+    public int getTTR() {
+        return this.ttr;
+    }
 
-	/**
-	 * Sets the Time To Refresh (in seconds).
-	 * @param ttr the new time to refresh
-	 */
-	public void setTTR(int ttr) {
-		this.ttr = ttr;
-	}
+    /**
+     * Sets the Time To Refresh (in seconds).
+     * @param ttr the new time to refresh
+     */
+    public void setTTR(int ttr) {
+        this.ttr = ttr;
+    }
 
-	public void update(Observable o, Object arg) {
-		if (arg != null && o instanceof WorldObject && arg instanceof WorldObject.methodName) {
-			WorldObject.methodName method = (WorldObject.methodName)arg;
-			if(method == WorldObject.methodName.ADD_CHILD){
-				startRefreshing((WorldObject)o);
-			}
-			else if (method == WorldObject.methodName.REMOVE_CHILD){
-				stopRefreshing();
-			}
-		}
-	}
+    public void update(Observable o, Object arg) {
+        if ((arg != null) && o instanceof WorldObject &&
+                arg instanceof WorldObject.methodName) {
+            WorldObject.methodName method = (WorldObject.methodName) arg;
+            if (method == WorldObject.methodName.ADD_CHILD) {
+                startRefreshing((WorldObject) o);
+            } else if (method == WorldObject.methodName.REMOVE_CHILD) {
+                stopRefreshing();
+            }
+        }
+    }
 
-	public void forceRefresh() {
-		refresher.interrupt();
-	}
-	
-	//
-	// -- PROTECTED METHODS -----------------------------------------------
-	//
+    public void forceRefresh() {
+        refresher.interrupt();
+    }
 
-	protected void startRefreshing(WorldObject world) {
-		refresh = true;
-		if(refresher.getState()==Thread.State.TERMINATED){
-			refresher = new Thread(new MonitorThreadRefresher(world));
-		}
-		
-		refresher.start();
-	}
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
+    protected void startRefreshing(WorldObject world) {
+        refresh = true;
+        if (refresher.getState() == Thread.State.TERMINATED) {
+            refresher = new Thread(new MonitorThreadRefresher(world));
+        }
 
+        refresher.start();
+    }
 
-	protected void stopRefreshing() {
-		refresh = false;
-		refresher.interrupt();
-	}
-	
-	//
-	// -- INNER CLASS -----------------------------------------------
-	//
+    protected void stopRefreshing() {
+        refresh = false;
+        refresher.interrupt();
+    }
 
-	private class MonitorThreadRefresher implements Runnable {
+    //
+    // -- INNER CLASS -----------------------------------------------
+    //
+    private class MonitorThreadRefresher implements Runnable {
 
-		/** The World to refresh*/
-		private WorldObject world;
-		
-		public MonitorThreadRefresher(WorldObject world){
-			this.world = world;
-		}
-		
-		public void run() {
-			while(refresh) {
-				world.explore();
-				try {
-					Thread.sleep(ttr * 1000);
-				} catch (InterruptedException e) {/* Do nothing */}
-			}
-		}
-	}
+        /** The World to refresh*/
+        private WorldObject world;
+
+        public MonitorThreadRefresher(WorldObject world) {
+            this.world = world;
+        }
+
+        public void run() {
+            while (refresh) {
+                world.explore();
+                try {
+                    Thread.sleep(ttr * 1000);
+                } catch (InterruptedException e) { /* Do nothing */
+                }
+            }
+        }
+    }
 }

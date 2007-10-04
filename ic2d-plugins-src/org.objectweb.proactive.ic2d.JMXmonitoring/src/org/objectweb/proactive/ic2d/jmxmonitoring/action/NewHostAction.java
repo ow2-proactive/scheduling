@@ -36,34 +36,33 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dialog.MonitorNewHostDialog;
 
-public class NewHostAction extends Action {
 
-	private Display display;
-	
-	/** The World */
-	private WorldObject world;
-	
-	public static final String NEW_HOST = "New host";
-	
-	public NewHostAction(Display display, WorldObject world) {
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "host.gif"));
-		this.display = display;
-		this.world = world;
-		this.setId(NEW_HOST);
-		this.setText("Monitor a new host...");
-		setToolTipText("Monitor a new host");
-	}
-	
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
-	
-	protected void setWorldObject(WorldObject world){
-		this.world = world;
-	}
-	
-	@Override
-	public void run() {
-		new MonitorNewHostDialog(display.getActiveShell(), world);
-	}
+public class NewHostAction extends Action {
+    private Display display;
+
+    /** The World */
+    private WorldObject world;
+    public static final String NEW_HOST = "New host";
+
+    public NewHostAction(Display display, WorldObject world) {
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "host.gif"));
+        this.display = display;
+        this.world = world;
+        this.setId(NEW_HOST);
+        this.setText("Monitor a new host...");
+        setToolTipText("Monitor a new host");
+    }
+
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    protected void setWorldObject(WorldObject world) {
+        this.world = world;
+    }
+
+    @Override
+    public void run() {
+        new MonitorNewHostDialog(display.getActiveShell(), world);
+    }
 }

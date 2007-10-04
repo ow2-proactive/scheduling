@@ -34,32 +34,28 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 
 
-
 public class AOTreeEditPart extends JobMonitoringTreeEditPart {
 
-	/**
-	 * @param model
-	 */
-	public AOTreeEditPart(AbstractData model) {
-		super(model);
-	}
+    /**
+     * @param model
+     */
+    public AOTreeEditPart(AbstractData model) {
+        super(model);
+    }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
-	 */
-	@Override
-	protected String getText() {
-		return getCastedModel().getName() + "("+getCastedModel().getJobId()+")";
-	}
-	
-	
-	//
-	// -- PRIVATE METHODS -------------------------------------------
-	//
-	
-	
-	private ActiveObject getCastedModel() {
-		return (ActiveObject)getModel();
-	}
-	
+    /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
+     */
+    @Override
+    protected String getText() {
+        return getCastedModel().getName() + "(" + getCastedModel().getJobId() +
+        ")";
+    }
+
+    //
+    // -- PRIVATE METHODS -------------------------------------------
+    //
+    private ActiveObject getCastedModel() {
+        return (ActiveObject) getModel();
+    }
 }

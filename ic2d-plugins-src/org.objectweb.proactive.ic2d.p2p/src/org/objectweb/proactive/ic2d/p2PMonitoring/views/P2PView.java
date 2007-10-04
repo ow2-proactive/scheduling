@@ -18,16 +18,18 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ic2d.p2PMonitoring.jung.JungGUI;
 import org.objectweb.proactive.p2p.v2.monitoring.Dumper;
 
-public class P2PView extends ViewPart implements IPerspectiveListener4  {
+
+public class P2PView extends ViewPart implements IPerspectiveListener4 {
     javax.swing.JPanel panel = new javax.swing.JPanel();
- 
-    static Display test = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
-   static  protected  JungGUI gui = new JungGUI( PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay());
+    static Display test = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                    .getShell().getDisplay();
+    static protected JungGUI gui = new JungGUI(PlatformUI.getWorkbench()
+                                                         .getActiveWorkbenchWindow()
+                                                         .getShell().getDisplay());
 
-//    public static JungGUI getGUI() {
-//        return gui;
-//    }
-
+    //    public static JungGUI getGUI() {
+    //        return gui;
+    //    }
     @Override
     public void createPartControl(Composite parent) {
         Composite swtAwtComponent = new Composite(parent, SWT.EMBEDDED);
@@ -36,35 +38,38 @@ public class P2PView extends ViewPart implements IPerspectiveListener4  {
         panel.setLayout(new GridLayout(1, 1));
         panel.add(gui.getPanel());
         frame.add(panel);
-        System.out.println("----------------------------------------- P2PView.createPartControl() static display is "+ test );
-        System.out.println("P2PView.createPartControl() non static display is " + PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay());
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(this); 
+        System.out.println(
+            "----------------------------------------- P2PView.createPartControl() static display is " +
+            test);
+        System.out.println("P2PView.createPartControl() non static display is " +
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()
+                      .getDisplay());
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                  .addPerspectiveListener(this);
     }
 
     @Override
     public void setFocus() {
-        
     }
 
     public static void loadDumpFile(final String filename) {
         new Thread() {
                 public void run() {
-                	Dumper d = new Dumper();
-                	 d.getP2PNetwork().addListener(gui);
-                     d.createGraphFromFile(filename);
-                //   gui.createGraphFromFile2(filename);
+                    Dumper d = new Dumper();
+                    d.getP2PNetwork().addListener(gui);
+                    d.createGraphFromFile(filename);
+                    //   gui.createGraphFromFile2(filename);
                 }
             }.start();
     }
-    
+
     public static void dumpP2PNetwork(final String URL) {
         Dumper dump = new Dumper();
         dump.getP2PNetwork().addListener(gui);
         //dump.createGraphFromFile2(args[0]);
-
         try {
             Dumper aDump = (Dumper) ProActive.turnActive(dump);
-            Dumper.requestAcquaintances(URL+"/P2PNode", aDump);
+            Dumper.requestAcquaintances(URL + "/P2PNode", aDump);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -72,48 +77,49 @@ public class P2PView extends ViewPart implements IPerspectiveListener4  {
         }
     }
 
-	public void perspectivePreDeactivate(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void perspectivePreDeactivate(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective) {
+        // TODO Auto-generated method stub
+    }
 
-	public void perspectiveClosed(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		System.out.println("P2PView.perspectiveClosed()");
-	}
+    public void perspectiveClosed(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective) {
+        System.out.println("P2PView.perspectiveClosed()");
+    }
 
-	public void perspectiveDeactivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void perspectiveDeactivated(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective) {
+        // TODO Auto-generated method stub
+    }
 
-	public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void perspectiveOpened(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective) {
+        // TODO Auto-generated method stub
+    }
 
-	public void perspectiveSavedAs(IWorkbenchPage page, IPerspectiveDescriptor oldPerspective, IPerspectiveDescriptor newPerspective) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void perspectiveSavedAs(IWorkbenchPage page,
+        IPerspectiveDescriptor oldPerspective,
+        IPerspectiveDescriptor newPerspective) {
+        // TODO Auto-generated method stub
+    }
 
-	public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef, String changeId) {
-	System.out.println("P2PView.perspectiveChanged( ) " + changeId);
-	if (changeId.equals("viewHide")) {
-		System.out.println("FERMETURE");
-		this.gui.clear();
-	}
-			
-		
-	}
+    public void perspectiveChanged(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective, IWorkbenchPartReference partRef,
+        String changeId) {
+        System.out.println("P2PView.perspectiveChanged( ) " + changeId);
+        if (changeId.equals("viewHide")) {
+            System.out.println("FERMETURE");
+            this.gui.clear();
+        }
+    }
 
-	public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void perspectiveActivated(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective) {
+        // TODO Auto-generated method stub
+    }
 
-	public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId) {
-		// TODO Auto-generated method stub
-		
-	}
-    
+    public void perspectiveChanged(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective, String changeId) {
+        // TODO Auto-generated method stub
+    }
 }

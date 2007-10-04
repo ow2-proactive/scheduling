@@ -34,25 +34,25 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 
-public class RefreshNodeAction extends Action {
 
-	public static final String REFRESH_NODE = "Refresh Node";
-	
-	private NodeObject node;
-	
-	public RefreshNodeAction() {
-		this.setId(REFRESH_NODE);
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
-		this.setText("Look for new Active Objects");
-		this.setToolTipText("Look for new Active Objects");
-	}
-	
-	public void setNode(NodeObject node) {
-		this.node = node;
-	}
-	
-	@Override
-	public void run() {
-		node.explore();
-	}
+public class RefreshNodeAction extends Action {
+    public static final String REFRESH_NODE = "Refresh Node";
+    private NodeObject node;
+
+    public RefreshNodeAction() {
+        this.setId(REFRESH_NODE);
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "refresh.gif"));
+        this.setText("Look for new Active Objects");
+        this.setToolTipText("Look for new Active Objects");
+    }
+
+    public void setNode(NodeObject node) {
+        this.node = node;
+    }
+
+    @Override
+    public void run() {
+        node.explore();
+    }
 }

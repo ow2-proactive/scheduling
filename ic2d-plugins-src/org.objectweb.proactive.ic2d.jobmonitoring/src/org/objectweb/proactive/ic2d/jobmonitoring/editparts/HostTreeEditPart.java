@@ -37,43 +37,40 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
 
+
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
  *
  */
 public class HostTreeEditPart extends JobMonitoringTreeEditPart {
+    //
+    // -- CONSTRUCTOR ------------------------------------------------
+    //
 
-	//
-	// -- CONSTRUCTOR ------------------------------------------------
-	//
-	
-	/**
-	 * @param model
-	 */ 
-	public HostTreeEditPart(AbstractData model) {
-		super(model);
-	}
-	
-	//
-	// -- PROTECTED METHODS -------------------------------------------
-	//
-	
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
-	 */
-	@Override
-	protected List getModelChildren() {
-		return JobMonitoringTreeUtil.getHostChildren(getCastedModel(), 
-				(VNObject)getParent().getModel());
-	}
-	
-	//
-	// -- PRIVATE METHODS -------------------------------------------
-	//
-	
-	private HostObject getCastedModel() {
-		return (HostObject)getModel();
-	}
+    /**
+     * @param model
+     */
+    public HostTreeEditPart(AbstractData model) {
+        super(model);
+    }
 
+    //
+    // -- PROTECTED METHODS -------------------------------------------
+    //
 
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+     */
+    @Override
+    protected List getModelChildren() {
+        return JobMonitoringTreeUtil.getHostChildren(getCastedModel(),
+            (VNObject) getParent().getModel());
+    }
+
+    //
+    // -- PRIVATE METHODS -------------------------------------------
+    //
+    private HostObject getCastedModel() {
+        return (HostObject) getModel();
+    }
 }

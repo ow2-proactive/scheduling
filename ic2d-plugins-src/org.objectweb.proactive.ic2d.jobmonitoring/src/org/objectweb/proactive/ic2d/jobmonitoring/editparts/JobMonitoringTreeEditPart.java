@@ -40,116 +40,117 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
+
 /**
  * @author Jean-Michael Legait and Michèle Reynier
  *
  */
-public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart implements
-		Observer {
+public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart
+    implements Observer {
+    //
+    // -- CONSTRUCTOR ------------------------------------------------
+    //
+    public JobMonitoringTreeEditPart(AbstractData model) {
+        super(model);
+    }
 
-	//
-	// -- CONSTRUCTOR ------------------------------------------------
-	//
-	
-	public JobMonitoringTreeEditPart(AbstractData model) {
-		super(model);
-	}
-	
-	//
-	// -- PUBLIC METHODS ----------------------------------------------
-	//
-	
-	/**
-	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
-	 */
-	public void update(Observable o, Object arg) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-//				refreshChildren();
-//				refreshVisuals();
-				refresh();
-			}
-		});
-	}
-	
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#activate()
-	 */
-	@Override
-	public void activate() {
-		if (!isActive())
-			((AbstractData)getModel()).addObserver(this);
-		super.activate();
-	}
-	
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#deactivate()
-	 */
-	@Override
-	public void deactivate() {
-		if (isActive())
-			((AbstractData)getModel()).deleteObserver(this);
-		super.deactivate();
-	}
-	
-	//
-	// -- PROTECTED METHODS -------------------------------------------
-	//
-	
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
-	 */
-	@Override
-	protected String getText() {
-		return getCastedModel().getName();
-	}
+    //
+    // -- PUBLIC METHODS ----------------------------------------------
+    //
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getImage()
-	 */
-	@Override
-	protected Image getImage() {
-		return new Image(Display.getCurrent(), this.getClass().
-				getResourceAsStream(getCastedModel().getType().toLowerCase()+"_icon.png"));
-	}
-	
-	
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#refreshVisuals()
-	 */
-	@Override
-	protected void refreshVisuals() {
-//		System.out.println("JobMonitoringTreeEditPart.refreshVisuals() "+
-//				getCastedModel().getFullName()+" "+getWidget().getClass().getName());
-		if (getWidget() instanceof Tree)
-			return;
-//		TreeItem item = (TreeItem)getWidget();
-//		if (image != null)
-//			image.setBackground(item.getParent().getBackground());
-		setWidgetImage(getImage());
-		setWidgetText(getText());
-//		((TreeItem)getWidget()).getParent().redraw();
-	}
-	
-	protected void refreshChildren() {
-//		System.out.println("JobMonitoringTreeEditPart.refreshChildren() "+getCastedModel().getFullName());
-		super.refreshChildren();
-	}
-	
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
-	 */
-	@Override
-	protected List getModelChildren() {
-		return getCastedModel().getMonitoredChildrenAsList();
-	}
-	 
-	//
-	// -- PRIVATE METHODS -------------------------------------------
-	//
-	
-	
-	private AbstractData getCastedModel() {
-		return (AbstractData)getModel();
-	}
+    /**
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    public void update(Observable o, Object arg) {
+        Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    //				refreshChildren();
+                    //				refreshVisuals();
+                    refresh();
+                }
+            });
+    }
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#activate()
+     */
+    @Override
+    public void activate() {
+        if (!isActive()) {
+            ((AbstractData) getModel()).addObserver(this);
+        }
+        super.activate();
+    }
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#deactivate()
+     */
+    @Override
+    public void deactivate() {
+        if (isActive()) {
+            ((AbstractData) getModel()).deleteObserver(this);
+        }
+        super.deactivate();
+    }
+
+    //
+    // -- PROTECTED METHODS -------------------------------------------
+    //
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
+     */
+    @Override
+    protected String getText() {
+        return getCastedModel().getName();
+    }
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getImage()
+     */
+    @Override
+    protected Image getImage() {
+        return new Image(Display.getCurrent(),
+            this.getClass()
+                .getResourceAsStream(getCastedModel().getType().toLowerCase() +
+                "_icon.png"));
+    }
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#refreshVisuals()
+     */
+    @Override
+    protected void refreshVisuals() {
+        //		System.out.println("JobMonitoringTreeEditPart.refreshVisuals() "+
+        //				getCastedModel().getFullName()+" "+getWidget().getClass().getName());
+        if (getWidget() instanceof Tree) {
+            return;
+        }
+        //		TreeItem item = (TreeItem)getWidget();
+        //		if (image != null)
+        //			image.setBackground(item.getParent().getBackground());
+        setWidgetImage(getImage());
+        setWidgetText(getText());
+        //		((TreeItem)getWidget()).getParent().redraw();
+    }
+
+    protected void refreshChildren() {
+        //		System.out.println("JobMonitoringTreeEditPart.refreshChildren() "+getCastedModel().getFullName());
+        super.refreshChildren();
+    }
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+     */
+    @Override
+    protected List getModelChildren() {
+        return getCastedModel().getMonitoredChildrenAsList();
+    }
+
+    //
+    // -- PRIVATE METHODS -------------------------------------------
+    //
+    private AbstractData getCastedModel() {
+        return (AbstractData) getModel();
+    }
 }

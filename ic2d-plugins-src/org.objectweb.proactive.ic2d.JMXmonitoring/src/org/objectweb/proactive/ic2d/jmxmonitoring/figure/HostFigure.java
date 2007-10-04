@@ -39,147 +39,146 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 
-public class HostFigure extends AbstractRectangleFigure{
 
-	protected final static int DEFAULT_WIDTH = 25;
+public class HostFigure extends AbstractRectangleFigure {
+    protected final static int DEFAULT_WIDTH = 25;
+    private IFigure contentPane;
+    protected String title = "";
+    private final static Color DEFAULT_BORDER_COLOR;
 
-	private IFigure contentPane;
+    static {
+        Display device = Display.getCurrent();
+        DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
+    }
 
-	protected  String  title = "";
-	
-	private final static Color DEFAULT_BORDER_COLOR;
+    //
+    // -- CONSTRUCTOR -----------------------------------------------
+    //
+    public HostFigure(String text) {
+        super(text);
+    }
 
-	static {
-		Display device = Display.getCurrent();
-		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
-	}
+    /**
+     * Used to display the legend.
+     *
+     */
+    public HostFigure() {
+        super();
+    }
 
-	//
-	// -- CONSTRUCTOR -----------------------------------------------
-	//
-	public HostFigure(String text) {
-		super(text);
-	}
+    //
+    // -- PUBLIC METHOD --------------------------------------------
+    //
+    public IFigure getContentPane() {
+        return contentPane;
+    }
 
-	/**
-	 * Used to display the legend.
-	 *
-	 */
-	public HostFigure() {
-		super();
-	}
+    public boolean isVerticalLayout() {
+        return contentPane.getLayoutManager() instanceof HostVerticalLayout;
+    }
 
-	//
-	// -- PUBLIC METHOD --------------------------------------------
-	//
+    public void setVerticalLayout() {
+        contentPane.setLayoutManager(new HostVerticalLayout());
+    }
 
-	public IFigure getContentPane() {
-		return contentPane;
-	}
+    public void setHorizontalLayout() {
+        contentPane.setLayoutManager(new HostHorizontalLayout());
+    }
 
-	public boolean isVerticalLayout() {
-		return contentPane.getLayoutManager() instanceof HostVerticalLayout;
-	}
+    //
+    // -- PROTECTED METHODS --------------------------------------------
+    //
+    protected void initColor() {
+        Device device = Display.getCurrent();
+        borderColor = DEFAULT_BORDER_COLOR;
+        backgroundColor = new Color(device, 208, 208, 208);
+        shadowColor = new Color(device, 230, 230, 230);
+    }
 
-	public void setVerticalLayout() {
-		contentPane.setLayoutManager(new HostVerticalLayout());
-	}
+    protected void initFigure() {
+        BorderLayout layout = new HostBorderLayout();
+        setLayoutManager(layout);
+        add(label, BorderLayout.TOP);
 
-	public void setHorizontalLayout() {
-		contentPane.setLayoutManager(new HostHorizontalLayout());
-	}
+        contentPane = new Figure();
+        ToolbarLayout contentPaneLayout = new HostHorizontalLayout();
+        contentPaneLayout.setSpacing(5);
+        contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+        contentPane.setLayoutManager(contentPaneLayout);
 
-	//
-	// -- PROTECTED METHODS --------------------------------------------
-	//
-	protected void initColor() {
-		Device device = Display.getCurrent();
-		borderColor = DEFAULT_BORDER_COLOR;
-		backgroundColor = new Color(device, 208, 208, 208);
-		shadowColor = new Color(device, 230, 230, 230);
-	}
+        add(contentPane, BorderLayout.CENTER);
+    }
 
-	protected void initFigure() {
-		BorderLayout layout = new HostBorderLayout();
-		setLayoutManager(layout);
-		add(label, BorderLayout.TOP);
+    @Override
+    protected int getDefaultWidth() {
+        return DEFAULT_WIDTH;
+    }
 
-		contentPane = new Figure();
-		ToolbarLayout contentPaneLayout = new HostHorizontalLayout();
-		contentPaneLayout.setSpacing(5);
-		contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
-		contentPane.setLayoutManager(contentPaneLayout);
+    @Override
+    protected Color getDefaultBorderColor() {
+        return null;
+    }
 
-		add(contentPane, BorderLayout.CENTER);
-	}
+    public void changeTitle(String newTitle) {
+        String text = getTextResized(newTitle);
+        this.title = text;
+        setToolTip(new ToolTipFigure(newTitle));
+        Display.getDefault().asyncExec(this);
+    }
 
-	@Override
-	protected int getDefaultWidth() {
-		return DEFAULT_WIDTH;
-	}
+    @Override
+    public void run() {
+        setTitle(title);
+        repaint();
+    }
 
-	@Override
-	protected Color getDefaultBorderColor() {
-		return null;
-	}
+    //
+    // -- INNER CLASS --------------------------------------------
+    //
+    private class HostBorderLayout extends BorderLayout {
+        protected Dimension calculatePreferredSize(IFigure container,
+            int wHint, int hHint) {
+            if (legend) {
+                return super.calculatePreferredSize(container, wHint, hHint).expand( /*100*/
+                    50, /*10*/
+                    0);
+            }
+            return super.calculatePreferredSize(container, wHint, hHint)
+                        .expand(10, 0);
+        }
+    }
 
-	
-	
-	public void changeTitle(String newTitle){
-		String text = getTextResized(newTitle);
-		this.title = text;
-		setToolTip(new ToolTipFigure(newTitle));
-		Display.getDefault().asyncExec(this);
-	}
+    private class HostHorizontalLayout extends ToolbarLayout {
+        public HostHorizontalLayout() {
+            super(true);
+        }
 
-	@Override
-	public void run(){
-		setTitle(title);
-		repaint();
-	}
-	
-	//
-	// -- INNER CLASS --------------------------------------------
-	//
+        protected Dimension calculatePreferredSize(IFigure container,
+            int wHint, int hHint) {
+            return super.calculatePreferredSize(container, wHint, hHint)
+                        .expand(0, 13);
+        }
 
-	private class HostBorderLayout extends BorderLayout {
+        public void layout(IFigure figure) {
+            super.layout(figure);
+            figure.translate(5, 0);
+        }
+    }
 
-		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			if(legend)
-				return super.calculatePreferredSize(container, wHint, hHint).expand(/*100*/50, /*10*/0);
-			return super.calculatePreferredSize(container, wHint, hHint).expand(10,0);
-		}
-	}
+    private class HostVerticalLayout extends ToolbarLayout {
+        public HostVerticalLayout() {
+            super(false);
+        }
 
-	private class HostHorizontalLayout extends ToolbarLayout {
+        protected Dimension calculatePreferredSize(IFigure container,
+            int wHint, int hHint) {
+            return super.calculatePreferredSize(container, wHint, hHint)
+                        .expand(0, 13);
+        }
 
-		public HostHorizontalLayout(){
-			super(true);
-		}
-
-		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			return super.calculatePreferredSize(container, wHint, hHint).expand(0, 13);
-		}
-
-		public void layout(IFigure figure) {
-			super.layout(figure);
-			figure.translate(5, 0);
-		}
-	}
-
-	private class HostVerticalLayout extends ToolbarLayout {
-
-		public HostVerticalLayout(){
-			super(false);
-		}
-
-		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			return super.calculatePreferredSize(container, wHint, hHint).expand(0, 13);
-		}
-
-		public void layout(IFigure figure) {
-			super.layout(figure);
-			figure.translate(5, 5);
-		}
-	}
+        public void layout(IFigure figure) {
+            super.layout(figure);
+            figure.translate(5, 5);
+        }
+    }
 }

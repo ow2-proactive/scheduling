@@ -50,89 +50,93 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
-public class RemoteObjectHostRTFinder implements RuntimeFinder{
 
-	//
-	// -- PUBLIC METHODS -----------------------------------------------
-	//
+public class RemoteObjectHostRTFinder implements RuntimeFinder {
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
 
-	/**
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder#getRuntimeObjects(HostObject)
-	 */
-	public Collection<RuntimeObject> getRuntimeObjects(HostObject host){
+    /**
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder#getRuntimeObjects(HostObject)
+     */
+    public Collection<RuntimeObject> getRuntimeObjects(HostObject host) {
+        String hostUrl = host.getUrl();
 
-		String hostUrl = host.getUrl();
+        Map<String, RuntimeObject> runtimeObjects = new HashMap<String, RuntimeObject>();
 
-		Map<String,RuntimeObject> runtimeObjects = new HashMap<String, RuntimeObject>();
+        Console console = Console.getInstance(Activator.CONSOLE_NAME);
+        console.log("Exploring " + host + " with RMI on port " +
+            host.getPort());
 
-		Console console = Console.getInstance(Activator.CONSOLE_NAME);
-		console.log("Exploring "+host+" with RMI on port "+host.getPort());
+        URI[] uris = null;
+        try {
+            URI target = URIBuilder.buildURI(host.getHostName(), null,
+                    host.getProtocol(), host.getPort());
+            try {
+                uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol())
+                                         .list(target);
+            } catch (ProActiveException e) {
+                if (e.getCause() instanceof ConnectException) {
+                    Console.getInstance(Activator.CONSOLE_NAME)
+                           .err("Connection refused to " + host);
+                    return runtimeObjects.values();
+                } else {
+                    throw e;
+                }
+            }
 
+            if (uris != null) {
 
-		URI [] uris = null;
-		try {
+                /* Searchs all ProActive Runtimes */
+                for (int i = 0; i < uris.length; ++i) {
+                    URI url = uris[i];
+                    try {
 
-			 URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
-			 try{
-				 uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).list(target);
-			 }
-			 catch(ProActiveException e){
-				 if(e.getCause() instanceof ConnectException){
-					 Console.getInstance(Activator.CONSOLE_NAME).err("Connection refused to "+host);
-					 return runtimeObjects.values();
-				 }
-				 else{
-					 throw e;
-				 }
-			 }
+                        /*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
+                        RemoteObject ro = RemoteObjectHelper.lookup(url);
 
-			if (uris != null ) {
-				/* Searchs all ProActive Runtimes */
-				for (int i = 0; i < uris.length; ++i) {
-					URI url = uris[i];
-					try {
-						/*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
-					    RemoteObject ro = RemoteObjectHelper.lookup(url);
+                        /*Object stub = ro.getObjectProxy();*/
+                        Object stub = RemoteObjectHelper.generatedObjectStub(ro);
 
-						/*Object stub = ro.getObjectProxy();*/
-					    Object stub = RemoteObjectHelper.generatedObjectStub(ro);
+                        if (stub instanceof ProActiveRuntime) {
+                            ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
 
-	                    if (stub instanceof ProActiveRuntime) {
-	                    	ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
+                            String mbeanServerName = proActiveRuntime.getMBeanServerName();
 
-							String mbeanServerName = proActiveRuntime.getMBeanServerName();
+                            String runtimeUrl = proActiveRuntime.getURL();
+                            runtimeUrl = FactoryName.getCompleteUrl(runtimeUrl);
 
-							String runtimeUrl = proActiveRuntime.getURL();
-							runtimeUrl = FactoryName.getCompleteUrl(runtimeUrl);
+                            ObjectName oname = FactoryName.createRuntimeObjectName(runtimeUrl);
 
-							ObjectName oname = FactoryName.createRuntimeObjectName(runtimeUrl);
+                            if (runtimeObjects.containsKey(runtimeUrl)) {
+                                continue;
+                            }
 
-							if(runtimeObjects.containsKey(runtimeUrl)){
-								continue;
-							}
-
-							RuntimeObject runtime = (RuntimeObject) host.getChild(runtimeUrl);
-							if(runtime==null){
-								// This runtime is not yet monitored
-								runtime = new RuntimeObject(host, runtimeUrl, oname, hostUrl, mbeanServerName);
-							}
-							runtimeObjects.put(runtimeUrl,runtime);
-	                    }
-					} catch (ProActiveException pae) {
-					    // the lookup returned an active object, and an active object is
-					    // not a remote object (for now...)
-						pae.printStackTrace();
-					    console.warn("Found active object in registry at " + url);
-					}
-				}
-			}
-		} catch (Exception e) {
-			if(e instanceof ConnectException || e instanceof ConnectIOException) {
-				console.debug(e);
-			}
-			else
-				console.logException(e);
-		}
-		return runtimeObjects.values();
-	}
+                            RuntimeObject runtime = (RuntimeObject) host.getChild(runtimeUrl);
+                            if (runtime == null) {
+                                // This runtime is not yet monitored
+                                runtime = new RuntimeObject(host, runtimeUrl,
+                                        oname, hostUrl, mbeanServerName);
+                            }
+                            runtimeObjects.put(runtimeUrl, runtime);
+                        }
+                    } catch (ProActiveException pae) {
+                        // the lookup returned an active object, and an active object is
+                        // not a remote object (for now...)
+                        pae.printStackTrace();
+                        console.warn("Found active object in registry at " +
+                            url);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (e instanceof ConnectException ||
+                    e instanceof ConnectIOException) {
+                console.debug(e);
+            } else {
+                console.logException(e);
+            }
+        }
+        return runtimeObjects.values();
+    }
 }

@@ -47,25 +47,26 @@ import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.dynamicnoa.ChangeMaxNOAMessage;
+import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.service.messages.Message;
 
 
 public class ChangeNOADialog extends Dialog {
     private Shell shell = null;
-//    private Text hostText;
-//    private Text portText;
+
+    //    private Text hostText;
+    //    private Text portText;
     private Text noaText;
     private Button okButton;
     private Button cancelButton;
-   // private String URL;
 
+    // private String URL;
     protected String name;
     protected int noa;
-    
+
     //
-    
+
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public ChangeNOADialog(String title, String n, int noa, Shell parent) {
@@ -74,11 +75,11 @@ public class ChangeNOADialog extends Dialog {
 
         this.name = n;
         this.noa = noa;
-        
+
         /* Load the proactive default configuration */
         ProActiveConfiguration.load();
 
-         /* Init the display */
+        /* Init the display */
         Display display = getParent().getDisplay();
         shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
         shell.setText(title + " " + name);
@@ -89,58 +90,58 @@ public class ChangeNOADialog extends Dialog {
         layout.marginWidth = 5;
         shell.setLayout(layout);
 
-//        Group hostGroup = new Group(shell, SWT.NONE);
-//        hostGroup.setText("Peer to contact");
-//        FormLayout hostLayout = new FormLayout();
-//        hostLayout.marginHeight = 5;
-//        hostLayout.marginWidth = 5;
-//        hostGroup.setLayout(hostLayout);
-//        FormData hostFormData1 = new FormData();
-//        hostFormData1.left = new FormAttachment(0, 0);
-//        hostFormData1.right = new FormAttachment(100, 0);
-//        hostGroup.setLayoutData(hostFormData1);
+        //        Group hostGroup = new Group(shell, SWT.NONE);
+        //        hostGroup.setText("Peer to contact");
+        //        FormLayout hostLayout = new FormLayout();
+        //        hostLayout.marginHeight = 5;
+        //        hostLayout.marginWidth = 5;
+        //        hostGroup.setLayout(hostLayout);
+        //        FormData hostFormData1 = new FormData();
+        //        hostFormData1.left = new FormAttachment(0, 0);
+        //        hostFormData1.right = new FormAttachment(100, 0);
+        //        hostGroup.setLayoutData(hostFormData1);
 
-    //    Label hostLabel = new Label(hostGroup, SWT.NONE);
-   //     hostLabel.setText("Name or IP :");
+        //    Label hostLabel = new Label(hostGroup, SWT.NONE);
+        //     hostLabel.setText("Name or IP :");
 
-      //  this.hostText = new Text(hostGroup, SWT.BORDER);
-    //    hostText.setText(initialHostValue);
-//        FormData hostFormData = new FormData();
-//        hostFormData.top = new FormAttachment(0, -1);
-//        hostFormData.left = new FormAttachment(hostLabel, 5);
-//        hostFormData.right = new FormAttachment(70, -10);
-     //   hostText.setLayoutData(hostFormData);
+        //  this.hostText = new Text(hostGroup, SWT.BORDER);
+        //    hostText.setText(initialHostValue);
+        //        FormData hostFormData = new FormData();
+        //        hostFormData.top = new FormAttachment(0, -1);
+        //        hostFormData.left = new FormAttachment(hostLabel, 5);
+        //        hostFormData.right = new FormAttachment(70, -10);
+        //   hostText.setLayoutData(hostFormData);
 
-//        Label portLabel = new Label(hostGroup, SWT.NONE);
-//        portLabel.setText("Port :");
-//        FormData portFormData = new FormData();
-//        portFormData.left = new FormAttachment(70, 10);
-//        portLabel.setLayoutData(portFormData);
+        //        Label portLabel = new Label(hostGroup, SWT.NONE);
+        //        portLabel.setText("Port :");
+        //        FormData portFormData = new FormData();
+        //        portFormData.left = new FormAttachment(70, 10);
+        //        portLabel.setLayoutData(portFormData);
 
-      //  this.portText = new Text(hostGroup, SWT.BORDER);
-     //   if (port != null) {
-    //        portText.setText(port);
-   //     }
-//        FormData portFormData2 = new FormData();
-//        portFormData2.top = new FormAttachment(0, -1);
-//        portFormData2.left = new FormAttachment(portLabel, 5);
-//        portFormData2.right = new FormAttachment(100, 0);
-//    //   portText.setLayoutData(portFormData2);
-//
+        //  this.portText = new Text(hostGroup, SWT.BORDER);
+        //   if (port != null) {
+        //        portText.setText(port);
+        //     }
+        //        FormData portFormData2 = new FormData();
+        //        portFormData2.top = new FormAttachment(0, -1);
+        //        portFormData2.left = new FormAttachment(portLabel, 5);
+        //        portFormData2.right = new FormAttachment(100, 0);
+        //    //   portText.setLayoutData(portFormData2);
+        //
         Label ttlLabel = new Label(shell, SWT.NONE);
         ttlLabel.setText("NOA Value");
         FormData noaFormData = new FormData();
-      //  ttlFormData.top = new FormAttachment(hostGroup, 20);
+        //  ttlFormData.top = new FormAttachment(hostGroup, 20);
         noaFormData.left = new FormAttachment(0, 20);
         ttlLabel.setLayoutData(noaFormData);
 
         this.noaText = new Text(shell, SWT.BORDER);
         //	depthText.setText(MonitorThread.getInstance().getDepth()+"");
         FormData noaFormData2 = new FormData();
-     //   ttlFormData2.top = new FormAttachment(hostGroup, 17);
+        //   ttlFormData2.top = new FormAttachment(hostGroup, 17);
         noaFormData2.left = new FormAttachment(ttlLabel, 5);
         noaFormData2.right = new FormAttachment(100, -20);
-        noaText.setText(this.noa+"");
+        noaText.setText(this.noa + "");
         noaText.setLayoutData(noaFormData2);
 
         //		Label depthLabel2 = new Label(shell, SWT.CENTER);
@@ -159,7 +160,7 @@ public class ChangeNOADialog extends Dialog {
 
         this.cancelButton = new Button(shell, SWT.NONE);
         cancelButton.setText("Cancel");
-       cancelButton.addSelectionListener(new ChangeNOAListener(this));
+        cancelButton.addSelectionListener(new ChangeNOAListener(this));
         FormData cancelFormData = new FormData();
         cancelFormData.top = new FormAttachment(ttlLabel, 20);
         cancelFormData.left = new FormAttachment(50, 10);
@@ -203,11 +204,15 @@ public class ChangeNOADialog extends Dialog {
 
         public void widgetSelected(SelectionEvent e) {
             if (e.widget == okButton) {
-            	System.out.println("ChangeNOAListener.widgetSelected() it's ok baby");       
-     	System.out.println("ChangeNOAListener.widgetSelected() now trying to contact " + "//" +  name+ "/P2PNode");
-                this.changeNOA( "//" +  name+ "/P2PNode", Integer.parseInt(noaText.getText()));
-               // this.dialog.getUrl();
-           //     this.dialog.buildURL();
+                System.out.println(
+                    "ChangeNOAListener.widgetSelected() it's ok baby");
+                System.out.println(
+                    "ChangeNOAListener.widgetSelected() now trying to contact " +
+                    "//" + name + "/P2PNode");
+                this.changeNOA("//" + name + "/P2PNode",
+                    Integer.parseInt(noaText.getText()));
+                // this.dialog.getUrl();
+                //     this.dialog.buildURL();
                 shell.close();
             } else if (e.widget == cancelButton) {
                 shell.close();
@@ -215,35 +220,32 @@ public class ChangeNOADialog extends Dialog {
         }
 
         public void changeNOA(String ref, int noa) {
-    		  P2PService p2p = null;
-    	        Node distNode = null;
-    	        try {
-    	            distNode = NodeFactory.getNode(ref);
-    	            p2p = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
-    	            System.out.println("Dumper ready to change NOA");
-    	            Message m = new ChangeMaxNOAMessage(1,noa);
-    	            p2p.message(m);
-    	            System.out.println("Fini!");
-    	            //p2p.message(new ChangeNOAMessage(1,5));
-    	        } catch (Exception e) {
-    	        	e.printStackTrace();
-    	        }
-
-    	}
-    
+            P2PService p2p = null;
+            Node distNode = null;
+            try {
+                distNode = NodeFactory.getNode(ref);
+                p2p = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
+                System.out.println("Dumper ready to change NOA");
+                Message m = new ChangeMaxNOAMessage(1, noa);
+                p2p.message(m);
+                System.out.println("Fini!");
+                //p2p.message(new ChangeNOAMessage(1,5));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    
-//    protected void buildURL() {
-//        try {
-//            this.URL = "//" + hostText.getText() + ":" +
-//                Integer.parseInt(portText.getText());
-//        } catch (NumberFormatException e) {
-//            this.URL = "";
-//        }
-//    }
-//
-//    public String getUrl() {
-//        return this.URL;
-//    }
+    //    protected void buildURL() {
+    //        try {
+    //            this.URL = "//" + hostText.getText() + ":" +
+    //                Integer.parseInt(portText.getText());
+    //        } catch (NumberFormatException e) {
+    //            this.URL = "";
+    //        }
+    //    }
+    //
+    //    public String getUrl() {
+    //        return this.URL;
+    //    }
 }

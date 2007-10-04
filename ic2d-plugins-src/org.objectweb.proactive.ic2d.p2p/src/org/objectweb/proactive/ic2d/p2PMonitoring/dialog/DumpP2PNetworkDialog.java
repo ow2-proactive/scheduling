@@ -210,8 +210,7 @@ public class DumpP2PNetworkDialog extends Dialog {
 
         public void widgetSelected(SelectionEvent e) {
             if (e.widget == okButton) {
-            
-               // this.dialog.getUrl();
+                // this.dialog.getUrl();
                 this.dialog.buildURL();
                 shell.close();
             } else if (e.widget == cancelButton) {

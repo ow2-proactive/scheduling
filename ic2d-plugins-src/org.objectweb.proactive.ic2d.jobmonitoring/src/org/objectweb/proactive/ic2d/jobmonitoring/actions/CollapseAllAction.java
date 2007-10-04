@@ -37,36 +37,34 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+
 /**
  * @author Jean-Michael Legait and Michèle Reynier
  *
  */
 public class CollapseAllAction extends Action {
+    private TreeViewer treeViewer;
 
-	private TreeViewer treeViewer;
+    /**
+     *
+     */
+    public CollapseAllAction(TreeViewer treeViewer) {
+        super("Collapse All");
+        this.treeViewer = treeViewer;
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "collapse.gif"));
+        this.setToolTipText("Collapse All");
+    }
 
-	/**
-	 * 
-	 */
-	public CollapseAllAction(TreeViewer treeViewer) {
-		super("Collapse All");
-		this.treeViewer = treeViewer;
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "collapse.gif"));
-		this.setToolTipText("Collapse All");
-	}
+    @Override
+    public void run() {
+        collapse(((Tree) ((RootTreeEditPart) treeViewer.getRootEditPart()).getWidget()).getItems());
+    }
 
-	@Override
-	public void run() {
-		collapse(((Tree)((RootTreeEditPart)treeViewer.getRootEditPart()).getWidget()).getItems());
-	}
-
-	private void collapse(TreeItem[] items) {
-		for (int i = 0; i < items.length; i++) {
-			items[i].setExpanded(false);
-			collapse(items[i].getItems());
-			
-		}
-	}
-
-	
+    private void collapse(TreeItem[] items) {
+        for (int i = 0; i < items.length; i++) {
+            items[i].setExpanded(false);
+            collapse(items[i].getItems());
+        }
+    }
 }

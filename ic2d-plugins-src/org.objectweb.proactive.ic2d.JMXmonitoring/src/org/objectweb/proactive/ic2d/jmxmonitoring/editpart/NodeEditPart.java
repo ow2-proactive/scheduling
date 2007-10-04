@@ -41,111 +41,115 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.NodeListener;
 
-public class NodeEditPart extends AbstractMonitoringEditPart{
 
-	private NodeObject castedModel;
-	private NodeFigure castedFigure;
+public class NodeEditPart extends AbstractMonitoringEditPart {
+    private NodeObject castedModel;
+    private NodeFigure castedFigure;
 
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    public NodeEditPart(NodeObject model) {
+        super(model);
+    }
 
-	public NodeEditPart(NodeObject model) {
-		super(model);
-	}
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+    /**
+     * Convert the result of EditPart.getModel()
+     * to NodeObject (the real type of the model).
+     * @return the casted model
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public NodeObject getCastedModel() {
+        if (castedModel == null) {
+            castedModel = (NodeObject) getModel();
+        }
+        return castedModel;
+    }
 
-	/**
-	 * Convert the result of EditPart.getModel()
-	 * to NodeObject (the real type of the model).
-	 * @return the casted model
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public NodeObject getCastedModel(){
-		if(castedModel==null){
-			castedModel = (NodeObject)getModel();
-		}
-		return castedModel;
-	}
+    /**
+     * Convert the result of EditPart.getFigure()
+     * to NodeFigure (the real type of the figure).
+     * @return the casted figure
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public NodeFigure getCastedFigure() {
+        if (castedFigure == null) {
+            castedFigure = (NodeFigure) getFigure();
+        }
+        return castedFigure;
+    }
 
-	/**
-	 * Convert the result of EditPart.getFigure()
-	 * to NodeFigure (the real type of the figure).
-	 * @return the casted figure
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public NodeFigure getCastedFigure(){
-		if(castedFigure==null){
-			castedFigure = (NodeFigure)getFigure();
-		}
-		return castedFigure;
-	}
+    /**
+     * This method is called whenever the observed object is changed.
+     * It calls the method <code>refresh()</code>.
+     * @param o the observable object (instance of AbstractDataObject).
+     * @param arg an argument passed to the notifyObservers  method.
+     */
+    @Override
+    public void update(Observable o, Object arg) {
+        final Object param = arg;
+        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    if (param instanceof State &&
+                            ((State) param == State.NOT_MONITORED)) {
+                        deactivate();
+                    } else if (param instanceof State) {
+                        getCastedFigure()
+                            .setHighlight(getMonitoringView()
+                                              .getVirtualNodesGroup()
+                                              .getColor(getCastedModel()
+                                                            .getVirtualNode()));
+                        refresh();
+                    } else {
+                        refresh();
+                    }
+                }
+            });
+    }
 
-	/**
-	 * This method is called whenever the observed object is changed.
-	 * It calls the method <code>refresh()</code>.
-	 * @param o the observable object (instance of AbstractDataObject).
-	 * @param arg an argument passed to the notifyObservers  method.
-	 */
-	@Override
-	public void update(Observable o, Object arg) {
-		final Object param = arg;
-		getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-			public void run () {
-				if(param instanceof State && (State)param == State.NOT_MONITORED) {
-					deactivate();
-				}
-				else if(param instanceof State) {
-					getCastedFigure().setHighlight(getMonitoringView().getVirtualNodesGroup().getColor(getCastedModel().getVirtualNode()));
-					refresh();
-				}
-				else {
-					refresh();
-				}
-			}
-		});
-	}
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
 
-	//
-	// -- PROTECTED METHODS -----------------------------------------------
-	//
+    /**
+     * Returns a new view associated
+     * with the type of model object the
+     * EditPart is associated with. So here, it returns a new NodeFigure.
+     * @return a new NodeFigure view associated with the NodeObject model.
+     */
+    @Override
+    protected IFigure createFigure() {
+        //TODO A faire
+        NodeObject model = getCastedModel();
+        NodeFigure figure = new NodeFigure("Node " + model.getName(),
+                URIBuilder.getProtocol(model.getUrl()) /*getCastedModel().getFullName(),getCastedModel().getParentProtocol()*/);
 
-	/**
-	 * Returns a new view associated
-	 * with the type of model object the
-	 * EditPart is associated with. So here, it returns a new NodeFigure.
-	 * @return a new NodeFigure view associated with the NodeObject model.
-	 */
-	@Override
-	protected IFigure createFigure() {
-		//TODO A faire
-		NodeObject model = getCastedModel();
-		NodeFigure figure = new NodeFigure("Node "+model.getName(), URIBuilder.getProtocol(model.getUrl())/*getCastedModel().getFullName(),getCastedModel().getParentProtocol()*/);
+        NodeListener listener = new NodeListener(getCastedModel(), figure,
+                getMonitoringView());
+        figure.addMouseListener(listener);
+        figure.addMouseMotionListener(listener);
+        return figure;
+    }
 
-		NodeListener listener = new NodeListener(getCastedModel(), figure, getMonitoringView());
-		figure.addMouseListener(listener);
-		figure.addMouseMotionListener(listener);
-		return figure;
-	}
+    /**
+     * Returns a List containing the children model objects.
+     * @return the List of children
+     */
+    @Override
+    protected List<AbstractData> getModelChildren() {
+        return getCastedModel().getMonitoredChildrenAsList();
+    }
 
-	/**
-	 * Returns a List containing the children model objects.
-	 * @return the List of children
-	 */
-	@Override
-	protected List<AbstractData> getModelChildren() {
-		return getCastedModel().getMonitoredChildrenAsList();
-	}
-
-	/**
-	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
-	 */
-	@Override
-	protected void createEditPolicies() {/* Do nothing */}
-
+    /**
+     * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
+     */
+    @Override
+    protected void createEditPolicies() { /* Do nothing */
+    }
 }

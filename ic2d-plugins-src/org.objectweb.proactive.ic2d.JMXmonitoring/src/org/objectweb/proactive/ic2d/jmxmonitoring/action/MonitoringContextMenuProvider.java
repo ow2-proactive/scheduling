@@ -43,95 +43,95 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView.MonitoringViewer;
 
-public class MonitoringContextMenuProvider extends ContextMenuProvider {
-	
-	private List<IAction> actions;
-	
-	public MonitoringContextMenuProvider(EditPartViewer viewer) {
-		super(viewer);		
-	}
-	
-	@Override
-	public void buildContextMenu(IMenuManager manager) {
-		GEFActionConstants.addStandardActionGroups(manager); // ???				
-		
-		IAction action;
-		ActionRegistry registry = ((MonitoringViewer)this.getViewer()).getActionRegistry();
-				
-		MenuManager layoutMenu = new MenuManager("Layout");
-		
-		if (actions == null ){
-			actions = new ArrayList<IAction>();
-			// Monitor a new host			
-			actions.add( registry.getAction(NewHostAction.NEW_HOST) ); 
-			
-			// Set depth control
-			actions.add(registry.getAction(SetDepthAction.SET_DEPTH));
-			
-			// Refresh
-			actions.add(registry.getAction(RefreshAction.REFRESH));
-			
-			// Set time to refresh
-			actions.add(registry.getAction(SetTTRAction.SET_TTR));
-			
-			// Look for new JVM
-			actions.add(registry.getAction(RefreshHostAction.REFRESH_HOST));
-			
-			// Look for new Nodes
-			actions.add(registry.getAction(RefreshJVMAction.REFRESH_JVM));
-			
-			// Look for new Active Objects
-			actions.add(registry.getAction(RefreshNodeAction.REFRESH_NODE));	
-			
-			// Stop monitoring this ...
-			actions.add(registry.getAction(StopMonitoringAction.STOP_MONITORING));
-			
-			// Set update frequence...
-			actions.add(registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE));
-			
-			// Kill this VM
-			actions.add(registry.getAction(KillVMAction.KILLVM));
-			
-			// Zoom In
-			actions.add(registry.getAction(GEFActionConstants.ZOOM_IN));
-			
-			// Zoom Out
-			actions.add(registry.getAction(GEFActionConstants.ZOOM_OUT));			
-			
-			// Vertical Layout
-			actions.add(registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT));
-			
-			// Horizontal Layout
-			actions.add(registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT));
-			
-		}
-		
-		for(IAction a : this.actions){
-			if( a.isEnabled() ){
-				manager.appendToGroup(GEFActionConstants.GROUP_REST, a);
-			}
-		}
-		
-		
-		Iterator<IAction> it = registry.getActions();
-		
-		while(it.hasNext()){
-			action = it.next();
-			
-			if ( !action.isEnabled() || this.actions.contains(action) )
-				continue;
-			
-			///////////////////////////////////////////////////////////////////////
-			// HERE GOES ALL ACTIONS PROVIDED BY EXTENSIONS (from external plugins)
-			// THEY ARE APPENDED IN A STANDARD WAY
-			///////////////////////////////////////////////////////////////////////
-			 
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
-		}		
-		
-		// Once the layout menu is filled append it to the manager
-		if (!layoutMenu.isEmpty())
-			manager.appendToGroup(GEFActionConstants.GROUP_REST, layoutMenu);				
-	}
 
+public class MonitoringContextMenuProvider extends ContextMenuProvider {
+    private List<IAction> actions;
+
+    public MonitoringContextMenuProvider(EditPartViewer viewer) {
+        super(viewer);
+    }
+
+    @Override
+    public void buildContextMenu(IMenuManager manager) {
+        GEFActionConstants.addStandardActionGroups(manager); // ???				
+
+        IAction action;
+        ActionRegistry registry = ((MonitoringViewer) this.getViewer()).getActionRegistry();
+
+        MenuManager layoutMenu = new MenuManager("Layout");
+
+        if (actions == null) {
+            actions = new ArrayList<IAction>();
+            // Monitor a new host			
+            actions.add(registry.getAction(NewHostAction.NEW_HOST));
+
+            // Set depth control
+            actions.add(registry.getAction(SetDepthAction.SET_DEPTH));
+
+            // Refresh
+            actions.add(registry.getAction(RefreshAction.REFRESH));
+
+            // Set time to refresh
+            actions.add(registry.getAction(SetTTRAction.SET_TTR));
+
+            // Look for new JVM
+            actions.add(registry.getAction(RefreshHostAction.REFRESH_HOST));
+
+            // Look for new Nodes
+            actions.add(registry.getAction(RefreshJVMAction.REFRESH_JVM));
+
+            // Look for new Active Objects
+            actions.add(registry.getAction(RefreshNodeAction.REFRESH_NODE));
+
+            // Stop monitoring this ...
+            actions.add(registry.getAction(StopMonitoringAction.STOP_MONITORING));
+
+            // Set update frequence...
+            actions.add(registry.getAction(
+                    SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE));
+
+            // Kill this VM
+            actions.add(registry.getAction(KillVMAction.KILLVM));
+
+            // Zoom In
+            actions.add(registry.getAction(GEFActionConstants.ZOOM_IN));
+
+            // Zoom Out
+            actions.add(registry.getAction(GEFActionConstants.ZOOM_OUT));
+
+            // Vertical Layout
+            actions.add(registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT));
+
+            // Horizontal Layout
+            actions.add(registry.getAction(
+                    HorizontalLayoutAction.HORIZONTAL_LAYOUT));
+        }
+
+        for (IAction a : this.actions) {
+            if (a.isEnabled()) {
+                manager.appendToGroup(GEFActionConstants.GROUP_REST, a);
+            }
+        }
+
+        Iterator<IAction> it = registry.getActions();
+
+        while (it.hasNext()) {
+            action = it.next();
+
+            if (!action.isEnabled() || this.actions.contains(action)) {
+                continue;
+            }
+
+            ///////////////////////////////////////////////////////////////////////
+            // HERE GOES ALL ACTIONS PROVIDED BY EXTENSIONS (from external plugins)
+            // THEY ARE APPENDED IN A STANDARD WAY
+            ///////////////////////////////////////////////////////////////////////
+            manager.appendToGroup(GEFActionConstants.GROUP_REST, action);
+        }
+
+        // Once the layout menu is filled append it to the manager
+        if (!layoutMenu.isEmpty()) {
+            manager.appendToGroup(GEFActionConstants.GROUP_REST, layoutMenu);
+        }
+    }
 }

@@ -34,25 +34,25 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
-public class KillVMAction extends Action {
 
-	public static final String KILLVM = "Kill this Virtual Machine";
-	
-	private RuntimeObject jvm;
-	
-	public KillVMAction(){
-		this.setId(KILLVM);
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "stop_monitoring.gif"));
-		this.setText("Kill this VM");
-		this.setToolTipText("Kill this VM");
-	}
-	
-	public void setVM(RuntimeObject jvm) {
-		this.jvm = jvm;
-	}
-	
-	@Override
-	public void run() {
-		jvm.killRuntime();
-	}
+public class KillVMAction extends Action {
+    public static final String KILLVM = "Kill this Virtual Machine";
+    private RuntimeObject jvm;
+
+    public KillVMAction() {
+        this.setId(KILLVM);
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "stop_monitoring.gif"));
+        this.setText("Kill this VM");
+        this.setToolTipText("Kill this VM");
+    }
+
+    public void setVM(RuntimeObject jvm) {
+        this.jvm = jvm;
+    }
+
+    @Override
+    public void run() {
+        jvm.killRuntime();
+    }
 }

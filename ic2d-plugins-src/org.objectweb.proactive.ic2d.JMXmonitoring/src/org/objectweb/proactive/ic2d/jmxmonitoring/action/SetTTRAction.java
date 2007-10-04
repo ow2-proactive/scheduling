@@ -36,26 +36,24 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.MonitorThread;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dialog.SetTTRDialog;
 
+
 public class SetTTRAction extends Action {
+    public static final String SET_TTR = "Set ttr";
+    private Display display;
+    private MonitorThread monitorThread;
 
-	public static final String SET_TTR = "Set ttr";
-	
-	private Display display;
-	
-	private MonitorThread monitorThread;
-		
-	public SetTTRAction(Display display, MonitorThread monitorThread) {
-		this.display = display;
-		this.monitorThread = monitorThread;
-		this.setId(SET_TTR);
-		this.setText("Set Time To Refresh...");
-		setToolTipText("Set Time To Refresh");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "ttr.gif"));
-	}
-		
-	@Override
-	public void run() {
-		new SetTTRDialog(display.getActiveShell(), monitorThread);
-	}
+    public SetTTRAction(Display display, MonitorThread monitorThread) {
+        this.display = display;
+        this.monitorThread = monitorThread;
+        this.setId(SET_TTR);
+        this.setText("Set Time To Refresh...");
+        setToolTipText("Set Time To Refresh");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "ttr.gif"));
+    }
 
+    @Override
+    public void run() {
+        new SetTTRDialog(display.getActiveShell(), monitorThread);
+    }
 }

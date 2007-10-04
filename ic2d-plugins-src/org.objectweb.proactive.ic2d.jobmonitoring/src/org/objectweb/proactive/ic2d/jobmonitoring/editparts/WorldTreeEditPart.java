@@ -35,42 +35,40 @@ import java.util.List;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
+
 /**
  * @author Mich&egrave;le Reynier and Jean-Michael Legait
  *
  */
 public class WorldTreeEditPart extends JobMonitoringTreeEditPart {
+    //
+    // -- CONSTRUCTOR ------------------------------------------------
+    //
 
-	//
-	// -- CONSTRUCTOR ------------------------------------------------
-	//
-	
-	/**
-	 * @param model
-	 */
-	public WorldTreeEditPart(AbstractData model) {
-		super(model);
-	}
-	
-	//
-	// -- PROTECTED METHODS -------------------------------------------
-	//
-	
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
-	 */
-	@Override
-	protected List getModelChildren() {
-//		return getCastedModel().getVNChildren();
-		return getCastedModel().getVNChildren();
-	}
-	
-	//
-	// -- PRIVATE METHODS -------------------------------------------
-	//
+    /**
+     * @param model
+     */
+    public WorldTreeEditPart(AbstractData model) {
+        super(model);
+    }
 
-	private WorldObject getCastedModel() {
-		return (WorldObject)getModel();
-	}
-	
+    //
+    // -- PROTECTED METHODS -------------------------------------------
+    //
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+     */
+    @Override
+    protected List getModelChildren() {
+        //		return getCastedModel().getVNChildren();
+        return getCastedModel().getVNChildren();
+    }
+
+    //
+    // -- PRIVATE METHODS -------------------------------------------
+    //
+    private WorldObject getCastedModel() {
+        return (WorldObject) getModel();
+    }
 }

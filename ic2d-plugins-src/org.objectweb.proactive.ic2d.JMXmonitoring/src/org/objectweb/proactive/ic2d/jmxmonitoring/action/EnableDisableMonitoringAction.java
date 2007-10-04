@@ -40,61 +40,62 @@ import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
-public class EnableDisableMonitoringAction extends Action implements IWorkbenchWindowActionDelegate {
 
-	public static final String ENABLE_DISABLE_MONITORING = "EnableDisbaleMonitoring";
-	public static final boolean DEFAULT_IS_MONITORING = true;
-	
-	
-	private WorldObject world;
-	private boolean monitoring = DEFAULT_IS_MONITORING;
-	private String enableMessage = "The Monitoring is Enabled";
-	private String disableMessage = "The Monitoring is Disabled";
-	
-	public EnableDisableMonitoringAction(WorldObject world) {
-		super("Enable/Disable Monitoring", AS_PUSH_BUTTON);
-		this.world = world;		
-		this.setId(ENABLE_DISABLE_MONITORING);
-		updateMonitoringState();
-	}
+public class EnableDisableMonitoringAction extends Action
+    implements IWorkbenchWindowActionDelegate {
+    public static final String ENABLE_DISABLE_MONITORING = "EnableDisbaleMonitoring";
+    public static final boolean DEFAULT_IS_MONITORING = true;
+    private WorldObject world;
+    private boolean monitoring = DEFAULT_IS_MONITORING;
+    private String enableMessage = "The Monitoring is Enabled";
+    private String disableMessage = "The Monitoring is Disabled";
 
-	//
-	// -- PUBLIC METHODS -----------------------------------------------
-	//
+    public EnableDisableMonitoringAction(WorldObject world) {
+        super("Enable/Disable Monitoring", AS_PUSH_BUTTON);
+        this.world = world;
+        this.setId(ENABLE_DISABLE_MONITORING);
+        updateMonitoringState();
+    }
 
-	public void dispose() {/* Do nothing */}
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
+    public void dispose() { /* Do nothing */
+    }
 
-	public void init(IWorkbenchWindow window) {/* Do nothing */}
+    public void init(IWorkbenchWindow window) { /* Do nothing */
+    }
 
-	public void run(IAction action) {
-		this.run();
-	}
+    public void run(IAction action) {
+        this.run();
+    }
 
-	public void selectionChanged(IAction action, ISelection selection) {/* Do nothing */}
+    public void selectionChanged(IAction action, ISelection selection) { /* Do nothing */
+    }
 
-	@Override
-	public void run() {
-		monitoring = !monitoring;
-		updateMonitoringState();
-	}
-	
-	//
-	// -- PRIVATE METHODS -----------------------------------------------
-	//
-	
-	private void updateMonitoringState(){
-		if(monitoring){
-			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "openedEye.gif"));
-			this.setToolTipText(enableMessage);
-			Console.getInstance(Activator.CONSOLE_NAME).debug(enableMessage);
-		}
-		else{
-			this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "closedEye.gif"));
-			this.setToolTipText(disableMessage);
-			Console.getInstance(Activator.CONSOLE_NAME).debug(disableMessage);
-		}
-		// TODO A faire
-		/*world.enableMonitoring(monitoring);*/
-	}
+    @Override
+    public void run() {
+        monitoring = !monitoring;
+        updateMonitoringState();
+    }
+
+    //
+    // -- PRIVATE METHODS -----------------------------------------------
+    //
+    private void updateMonitoringState() {
+        if (monitoring) {
+            this.setImageDescriptor(ImageDescriptor.createFromFile(
+                    this.getClass(), "openedEye.gif"));
+            this.setToolTipText(enableMessage);
+            Console.getInstance(Activator.CONSOLE_NAME).debug(enableMessage);
+        } else {
+            this.setImageDescriptor(ImageDescriptor.createFromFile(
+                    this.getClass(), "closedEye.gif"));
+            this.setToolTipText(disableMessage);
+            Console.getInstance(Activator.CONSOLE_NAME).debug(disableMessage);
+        }
+
+        // TODO A faire
+        /*world.enableMonitoring(monitoring);*/
+    }
 }
-

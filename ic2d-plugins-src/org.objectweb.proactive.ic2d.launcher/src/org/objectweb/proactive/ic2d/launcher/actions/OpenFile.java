@@ -56,95 +56,94 @@ import org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective;
 
 
 public class OpenFile implements IWorkbenchWindowActionDelegate {
+    private IWorkbenchWindow fWindow;
 
-	private IWorkbenchWindow fWindow;
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
+    public void dispose() {
+        fWindow = null;
+    }
 
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
+    public void init(IWorkbenchWindow window) {
+        fWindow = window;
+    }
 
-	public void dispose() {
-		fWindow= null;
-	}
+    /*
+     * @see org.eclipse.jface.action.Action#run()
+     */
+    public void run() {
+        File file = queryFile();
+        if (file != null) {
+            IEditorInput input = createEditorInput(file);
+            String editorId = getEditorId(file);
+            IWorkbenchPage page = fWindow.getActivePage();
+            try {
+                page.openEditor(input, editorId);
+            } catch (PartInitException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	public void init(IWorkbenchWindow window) {
-		fWindow= window;
-	}
+    public void run(IAction action) {
+        run();
+    }
 
-	/*
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
-	public void run() {
-		File file= queryFile();
-		if (file != null) {
-			IEditorInput input= createEditorInput(file);
-			String editorId= getEditorId(file);
-			IWorkbenchPage page= fWindow.getActivePage();
-			try {
-				page.openEditor(input, editorId);
-			} catch (PartInitException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    public void selectionChanged(IAction action, ISelection selection) {
+        // TODO Auto-generated method stub
+    }
 
-	public void run(IAction action) {
-		run();
-	}
+    //
+    // -- PRIVATE METHODS ---------------------------------------------
+    //
 
-	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-	}
+    /**
+     * Change the current perspective, to the Launcher perspective.
+     */
+    private void changePerspective() {
+        IWorkbenchPage page = fWindow.getActivePage();
+        IWorkbench workbench = fWindow.getWorkbench();
+        IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
+        page.setPerspective(reg.findPerspectiveWithId(LauncherPerspective.ID));
+    }
 
-	//
-	// -- PRIVATE METHODS ---------------------------------------------
-	//
+    /**
+     * Allows to the user of selectionner a file.
+     * @return The selected file
+     */
+    private File queryFile() {
+        FileDialog dialog = new FileDialog(fWindow.getShell(), SWT.OPEN);
+        dialog.setText("Open File");
+        String[] filterExt = { "*.xml", "*.*" };
+        dialog.setFilterExtensions(filterExt);
+        String path = dialog.open();
+        if ((path != null) && (path.length() > 0)) {
+            changePerspective();
+            Console.getInstance(Activator.CONSOLE_NAME)
+                   .log("File selected : " + path);
+            XMLDescriptorSet.getInstance().addFile(new XMLDescriptor(path));
+            return new File(path);
+        } else {
+            Console.getInstance(Activator.CONSOLE_NAME)
+                   .warn("No file was selected");
+        }
+        return null;
+    }
 
-	/**
-	 * Change the current perspective, to the Launcher perspective.
-	 */
-	private void changePerspective(){
-		IWorkbenchPage page = fWindow.getActivePage();
-		IWorkbench workbench = fWindow.getWorkbench();
-		IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
-		page.setPerspective(reg.findPerspectiveWithId(LauncherPerspective.ID));
-	}
+    private String getEditorId(File file) {
+        IWorkbench workbench = fWindow.getWorkbench();
+        IEditorRegistry editorRegistry = workbench.getEditorRegistry();
+        IEditorDescriptor descriptor = editorRegistry.getDefaultEditor(file.getName());
+        if (descriptor != null) {
+            return descriptor.getId();
+        }
+        return "org.eclipse.ui.examples.rcp.texteditor.editors.SimpleEditor"; //$NON-NLS-1$
+    }
 
-	/**
-	 * Allows to the user of selectionner a file.
-	 * @return The selected file
-	 */
-	private File queryFile() {
-		FileDialog dialog= new FileDialog(fWindow.getShell(), SWT.OPEN);
-		dialog.setText("Open File");
-		String[] filterExt = {"*.xml", "*.*"};
-		dialog.setFilterExtensions(filterExt);
-		String path= dialog.open();
-		if (path != null && path.length() > 0){
-			changePerspective();
-			Console.getInstance(Activator.CONSOLE_NAME).log("File selected : " + path);
-			XMLDescriptorSet.getInstance().addFile(new XMLDescriptor(path));
-			return new File(path);
-		}
-		else{
-			Console.getInstance(Activator.CONSOLE_NAME).warn("No file was selected");
-		}
-		return null;
-	}
-
-	private String getEditorId(File file) {
-		IWorkbench workbench= fWindow.getWorkbench();
-		IEditorRegistry editorRegistry= workbench.getEditorRegistry();
-		IEditorDescriptor descriptor= editorRegistry.getDefaultEditor(file.getName());
-		if (descriptor != null)
-			return descriptor.getId();
-		return "org.eclipse.ui.examples.rcp.texteditor.editors.SimpleEditor"; //$NON-NLS-1$
-	}
-
-	private IEditorInput createEditorInput(File file) {
-		IPath location = new Path(file.getAbsolutePath());
-		PathEditorInput input = new PathEditorInput(location);
-		return input;
-	}
-
+    private IEditorInput createEditorInput(File file) {
+        IPath location = new Path(file.getAbsolutePath());
+        PathEditorInput input = new PathEditorInput(location);
+        return input;
+    }
 }

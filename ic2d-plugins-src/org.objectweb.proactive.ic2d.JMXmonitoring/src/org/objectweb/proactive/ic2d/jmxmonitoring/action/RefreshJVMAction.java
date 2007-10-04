@@ -34,26 +34,25 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
-public class RefreshJVMAction extends Action {
 
-	public static final String REFRESH_JVM = "Refresh JVM";
-	
-	private RuntimeObject jvm;
-	
-	public RefreshJVMAction() {
-		this.setId(REFRESH_JVM);
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
-		this.setText("Look for new Nodes");
-		this.setToolTipText("Look for new Nodes");
-	}
-	
-	public void setJVM(RuntimeObject jvm) {
-		this.jvm = jvm;
-	}
-	
-	@Override
-	public void run() {
-		jvm.explore();
-	}
-	
+public class RefreshJVMAction extends Action {
+    public static final String REFRESH_JVM = "Refresh JVM";
+    private RuntimeObject jvm;
+
+    public RefreshJVMAction() {
+        this.setId(REFRESH_JVM);
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "refresh.gif"));
+        this.setText("Look for new Nodes");
+        this.setToolTipText("Look for new Nodes");
+    }
+
+    public void setJVM(RuntimeObject jvm) {
+        this.jvm = jvm;
+    }
+
+    @Override
+    public void run() {
+        jvm.explore();
+    }
 }

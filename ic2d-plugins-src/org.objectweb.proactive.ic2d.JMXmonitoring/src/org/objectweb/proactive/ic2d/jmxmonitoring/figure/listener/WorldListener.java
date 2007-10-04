@@ -52,99 +52,106 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
+
 public class WorldListener implements MouseListener, MouseMotionListener {
+    private DragAndDrop dnd;
+    private DragHost dragHost;
+    private ActionRegistry registry;
+    private WorldObject world;
 
-	private DragAndDrop dnd;
-	private DragHost dragHost;
-	private ActionRegistry registry;
-	private WorldObject world;
-	
-	public WorldListener(MonitoringView monitoringView) {
-		this.world = monitoringView.getWorld();
-		this.dnd = monitoringView.getDragAndDrop();
-		this.dragHost = monitoringView.getDragHost();
-		this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
-	}
+    public WorldListener(MonitoringView monitoringView) {
+        this.world = monitoringView.getWorld();
+        this.dnd = monitoringView.getDragAndDrop();
+        this.dragHost = monitoringView.getDragHost();
+        this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
+    }
 
-	public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */ }
+    public void mouseDoubleClicked(MouseEvent me) { /* Do nothing */
+    }
 
-	public void mousePressed(MouseEvent me) {
-		if(me.button == 1){
-			dnd.reset();
-		}
-		else if(me.button == 3) {
-			// Monitor a new host
-			registry.getAction(NewHostAction.NEW_HOST).setEnabled(true);
-			
-			// Set depth control
-			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(true);
-				
-			// Refresh
-			registry.getAction(RefreshAction.REFRESH).setEnabled(true);
-			
-			// Set time to refresh
-			registry.getAction(SetTTRAction.SET_TTR).setEnabled(true);
+    public void mousePressed(MouseEvent me) {
+        if (me.button == 1) {
+            dnd.reset();
+        } else if (me.button == 3) {
+            // Monitor a new host
+            registry.getAction(NewHostAction.NEW_HOST).setEnabled(true);
 
-			// Look for new JVM
-			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
-			
-			// Look for new Nodes
-			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
-			
-			// Look for new Active Objects
-			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
-			
-			// Stop monitoring this ...
-			registry.getAction(StopMonitoringAction.STOP_MONITORING).setEnabled(false);
-			
-			// Set update frequence...
-			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
-			
-			// Kill VM
-			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
+            // Set depth control
+            registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(true);
 
-			// Vertical Layout
-			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
-			
-			// Horizontal Layout
-			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
-			
-			// Manual handling of an action for timer snapshot ... needs
-			// improvement
-			if (this.world.getMonitoredChildrenSize() != 0) {
-				IAction anAction = registry.getAction("Get timer snapshot");
-				if (anAction != null) {
-					((IActionExtPoint) anAction)
-							.setAbstractDataObject(this.world);
-					anAction.setText("Gather All Stats");
-					anAction.setEnabled(true);
-				}
-			}
-		}
-	}
+            // Refresh
+            registry.getAction(RefreshAction.REFRESH).setEnabled(true);
 
-	public void mouseReleased(MouseEvent me) {
-		dnd.reset();
-		dragHost.mouseReleased(me);;
-	}
+            // Set time to refresh
+            registry.getAction(SetTTRAction.SET_TTR).setEnabled(true);
 
-	//---- MouseMotionListener 
+            // Look for new JVM
+            registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
 
-	public void mouseEntered(MouseEvent me) {		
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+            // Look for new Nodes
+            registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
 
-	public void mouseExited(MouseEvent me) {
-		if(dnd.getSource()!=null)
-			dnd.refresh(null);
-	}
+            // Look for new Active Objects
+            registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
 
-	public void mouseDragged(MouseEvent me) {
-		dragHost.mouseDragged(me);
-	}
-	
-	public void mouseHover(MouseEvent me) { /* Do nothing */ }
+            // Stop monitoring this ...
+            registry.getAction(StopMonitoringAction.STOP_MONITORING)
+                    .setEnabled(false);
 
-	public void mouseMoved(MouseEvent me) {	/* Do nothing */ }
+            // Set update frequence...
+            registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE)
+                    .setEnabled(false);
+
+            // Kill VM
+            registry.getAction(KillVMAction.KILLVM).setEnabled(false);
+
+            // Vertical Layout
+            registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT)
+                    .setEnabled(false);
+
+            // Horizontal Layout
+            registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT)
+                    .setEnabled(false);
+
+            // Manual handling of an action for timer snapshot ... needs
+            // improvement
+            if (this.world.getMonitoredChildrenSize() != 0) {
+                IAction anAction = registry.getAction("Get timer snapshot");
+                if (anAction != null) {
+                    ((IActionExtPoint) anAction).setAbstractDataObject(this.world);
+                    anAction.setText("Gather All Stats");
+                    anAction.setEnabled(true);
+                }
+            }
+        }
+    }
+
+    public void mouseReleased(MouseEvent me) {
+        dnd.reset();
+        dragHost.mouseReleased(me);
+        ;
+    }
+
+    //---- MouseMotionListener 
+    public void mouseEntered(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
+
+    public void mouseExited(MouseEvent me) {
+        if (dnd.getSource() != null) {
+            dnd.refresh(null);
+        }
+    }
+
+    public void mouseDragged(MouseEvent me) {
+        dragHost.mouseDragged(me);
+    }
+
+    public void mouseHover(MouseEvent me) { /* Do nothing */
+    }
+
+    public void mouseMoved(MouseEvent me) { /* Do nothing */
+    }
 }

@@ -36,20 +36,20 @@ public class ChartObject {
     protected Map<String, TimerObject> timersMap;
     protected List<TimerObject> timersList;
     protected TimerObject rootTimer;
-    protected ActiveObject  aoObject;
+    protected ActiveObject aoObject;
     protected ChartEditPart ep;
     protected boolean hasChanged;
     protected String[] currentTimerLevel = BASIC_LEVEL;
 
     public TimerObject getRootTimer() {
-		return rootTimer;
-	}
+        return rootTimer;
+    }
 
-	public void setRootTimer(TimerObject rootTimer) {
-		this.rootTimer = rootTimer;
-	}
+    public void setRootTimer(TimerObject rootTimer) {
+        this.rootTimer = rootTimer;
+    }
 
-	public ChartObject(final ChartContainerObject parent,
+    public ChartObject(final ChartContainerObject parent,
         final List<BasicTimer> basicTimersList, final ActiveObject aoObject) {
         this.parent = parent;
         this.timersMap = new java.util.HashMap<String, TimerObject>();
@@ -132,9 +132,8 @@ public class ChartObject {
         }
     }
 
-    public final void updateCurrentTimersList(
-        final List<BasicTimer> list) {        
-        for (final BasicTimer basicTimer : list) {        	
+    public final void updateCurrentTimersList(final List<BasicTimer> list) {
+        for (final BasicTimer basicTimer : list) {
             TimerObject timerObject = this.timersMap.get(basicTimer.getName());
 
             if (timerObject != null) {
@@ -150,29 +149,29 @@ public class ChartObject {
                         // Create the timer object
                         timerObject = new TimerObject(basicTimer, parent);
                         // Set the total timer reference
-                        timerObject.setTotalTimerAndCompute(this.rootTimer);                        
+                        timerObject.setTotalTimerAndCompute(this.rootTimer);
                         // Add to map
                         this.timersMap.put(basicTimer.getName(), timerObject);
                         // Add to list
                         this.timersList.add(timerObject);
                     }
                 } else { // If root then add to map and to list
-                	if (this.rootTimer == null) {
-						this.rootTimer = new TimerObject(basicTimer, null);
-						this.rootTimer.setTotalTimerAndCompute(this.rootTimer);
-						this.timersMap.put(basicTimer.getName(), this.rootTimer);
-						this.timersList.add(this.rootTimer);						
-					}
+                    if (this.rootTimer == null) {
+                        this.rootTimer = new TimerObject(basicTimer, null);
+                        this.rootTimer.setTotalTimerAndCompute(this.rootTimer);
+                        this.timersMap.put(basicTimer.getName(), this.rootTimer);
+                        this.timersList.add(this.rootTimer);
+                    }
                 }
             }
-        }        
+        }
     }
 
     /**
-	 * Returns this uniqueId of the associated active object
-	 * 
-	 * @return The uniqueId of the active object
-	 */
+         * Returns this uniqueId of the associated active object
+         *
+         * @return The uniqueId of the active object
+         */
     public final UniqueID getAoObjectID() {
         return this.aoObject.getUniqueID();
     }
@@ -257,11 +256,14 @@ public class ChartObject {
      * @return A list of BasicTimer
      */
     protected static final List<BasicTimer> performSnapshotInternal(
-        final ActiveObject  aoObject, final String[] timerLevel) {
+        final ActiveObject aoObject, final String[] timerLevel) {
         try {
-//            Spy spy = ((NodeObject) aoObject.getParent()).getSpy();
-            Object[] result = (Object[]) aoObject.invoke("getTimersSnapshotFromBody",new Object [] { timerLevel}, new String[] {String[].class.getName()});
-//                    timerLevel);
+            //            Spy spy = ((NodeObject) aoObject.getParent()).getSpy();
+            Object[] result = (Object[]) aoObject.invoke("getTimersSnapshotFromBody",
+                    new Object[] { timerLevel },
+                    new String[] { String[].class.getName() });
+
+            //                    timerLevel);
             List<BasicTimer> availableTimersList = (List<BasicTimer>) result[0];
             long remoteTimeStamp = (Long) result[1];
 
@@ -270,7 +272,7 @@ public class ChartObject {
                 if (t.isStarted()) {
                     t.stop(remoteTimeStamp);
                 }
-            } 
+            }
             if ((availableTimersList == null) ||
                     (availableTimersList.size() == 0)) {
                 Console.getInstance(Activator.CONSOLE_NAME)

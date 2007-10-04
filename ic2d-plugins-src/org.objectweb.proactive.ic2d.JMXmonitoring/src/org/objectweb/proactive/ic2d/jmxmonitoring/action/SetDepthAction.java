@@ -36,26 +36,26 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dialog.DepthDialog;
 
-public class SetDepthAction extends Action {
 
-	public static final String SET_DEPTH = "Set depth";
-	
-	private Display display;
-	
-	/** The world */
-	private WorldObject world;
-		
-	public SetDepthAction(Display display, WorldObject world) {
-		this.display = display;
-		this.world = world;
-		this.setId(SET_DEPTH);
-		this.setText("Set Depth Control...");
-		setToolTipText("Set Depth Control");
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "depth.gif"));
-	}
-		
-	@Override
-	public void run() {
-		new DepthDialog(display.getActiveShell(), world);
-	}
+public class SetDepthAction extends Action {
+    public static final String SET_DEPTH = "Set depth";
+    private Display display;
+
+    /** The world */
+    private WorldObject world;
+
+    public SetDepthAction(Display display, WorldObject world) {
+        this.display = display;
+        this.world = world;
+        this.setId(SET_DEPTH);
+        this.setText("Set Depth Control...");
+        setToolTipText("Set Depth Control");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "depth.gif"));
+    }
+
+    @Override
+    public void run() {
+        new DepthDialog(display.getActiveShell(), world);
+    }
 }

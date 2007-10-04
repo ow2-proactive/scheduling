@@ -44,90 +44,85 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
-public class DepthDialog extends Dialog {
 
-	private Shell shell = null;
-	
-	private Text text;
-	private Button okButton;
-	private Button cancelButton;
-	
-	private WorldObject world;
-	
-	public DepthDialog(Shell parent, WorldObject world) {
-		// Pass the default styles here
-		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-		
-		this.world = world;
-		
-		/* Init the display */
-		Display display = getParent().getDisplay();
-		
-		/* Init the shell */
-		shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
-		shell.setText("Set Depth Control");
-		FormLayout layout = new FormLayout();
-		layout.marginHeight = 5;
-		layout.marginWidth = 5;
-		shell.setLayout(layout);
-		
-		Label titleLabel = new Label(shell, SWT.NONE);
-		titleLabel.setText("Please enter the max depth control");
-		FormData titleLabelFormData = new FormData();
-		titleLabelFormData.left = new FormAttachment(10, 0);
-		titleLabel.setLayoutData(titleLabelFormData);
-		
-		this.text = new Text(shell, SWT.BORDER);
-		text.setText(Integer.toString(world.getDepth()));
-		FormData textFormData = new FormData();
-		textFormData.top = new FormAttachment(0, -3);
-		textFormData.left = new FormAttachment(titleLabel, 10);
-		textFormData.right = new FormAttachment(90, 0);
-		text.setLayoutData(textFormData);
-		
-		// button "OK"
-		this.okButton = new Button(shell, SWT.NONE);
-		okButton.setText("OK");
-		okButton.addSelectionListener(new DepthListener());
-		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(titleLabel, 20);
-		okFormData.left = new FormAttachment(25, 20);
-		okFormData.right = new FormAttachment(50, -10);
-		okButton.setLayoutData(okFormData);
-		shell.setDefaultButton(okButton);
-		
-		// button "CANCEL"
-		this.cancelButton = new Button(shell, SWT.NONE);
-		cancelButton.setText("Cancel");
-		cancelButton.addSelectionListener(new DepthListener());
-		FormData cancelFormData = new FormData();
-		cancelFormData.top = new FormAttachment(titleLabel, 20);
-		cancelFormData.left = new FormAttachment(50, 10);
-		cancelFormData.right = new FormAttachment(75, -20);
-		cancelButton.setLayoutData(cancelFormData);
-		
-		shell.pack();
-		shell.open();
-		
-		while(!shell.isDisposed()) {
-			if(!display.readAndDispatch())
-				display.sleep();
-		}
-	}
-	
-	
-	//
-	// -- INNER CLASS -----------------------------------------------
-	//
-	
-	private class DepthListener extends SelectionAdapter {
-		
-		public void widgetSelected(SelectionEvent e) {
-			if(e.widget == okButton) {
-				world.setDepth(Integer.parseInt(text.getText()));
-			}
-			shell.close();
-		}
-	}
-	
+public class DepthDialog extends Dialog {
+    private Shell shell = null;
+    private Text text;
+    private Button okButton;
+    private Button cancelButton;
+    private WorldObject world;
+
+    public DepthDialog(Shell parent, WorldObject world) {
+        // Pass the default styles here
+        super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+
+        this.world = world;
+
+        /* Init the display */
+        Display display = getParent().getDisplay();
+
+        /* Init the shell */
+        shell = new Shell(getParent(), SWT.BORDER | SWT.CLOSE);
+        shell.setText("Set Depth Control");
+        FormLayout layout = new FormLayout();
+        layout.marginHeight = 5;
+        layout.marginWidth = 5;
+        shell.setLayout(layout);
+
+        Label titleLabel = new Label(shell, SWT.NONE);
+        titleLabel.setText("Please enter the max depth control");
+        FormData titleLabelFormData = new FormData();
+        titleLabelFormData.left = new FormAttachment(10, 0);
+        titleLabel.setLayoutData(titleLabelFormData);
+
+        this.text = new Text(shell, SWT.BORDER);
+        text.setText(Integer.toString(world.getDepth()));
+        FormData textFormData = new FormData();
+        textFormData.top = new FormAttachment(0, -3);
+        textFormData.left = new FormAttachment(titleLabel, 10);
+        textFormData.right = new FormAttachment(90, 0);
+        text.setLayoutData(textFormData);
+
+        // button "OK"
+        this.okButton = new Button(shell, SWT.NONE);
+        okButton.setText("OK");
+        okButton.addSelectionListener(new DepthListener());
+        FormData okFormData = new FormData();
+        okFormData.top = new FormAttachment(titleLabel, 20);
+        okFormData.left = new FormAttachment(25, 20);
+        okFormData.right = new FormAttachment(50, -10);
+        okButton.setLayoutData(okFormData);
+        shell.setDefaultButton(okButton);
+
+        // button "CANCEL"
+        this.cancelButton = new Button(shell, SWT.NONE);
+        cancelButton.setText("Cancel");
+        cancelButton.addSelectionListener(new DepthListener());
+        FormData cancelFormData = new FormData();
+        cancelFormData.top = new FormAttachment(titleLabel, 20);
+        cancelFormData.left = new FormAttachment(50, 10);
+        cancelFormData.right = new FormAttachment(75, -20);
+        cancelButton.setLayoutData(cancelFormData);
+
+        shell.pack();
+        shell.open();
+
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+    }
+
+    //
+    // -- INNER CLASS -----------------------------------------------
+    //
+    private class DepthListener extends SelectionAdapter {
+        public void widgetSelected(SelectionEvent e) {
+            if (e.widget == okButton) {
+                world.setDepth(Integer.parseInt(text.getText()));
+            }
+            shell.close();
+        }
+    }
 }

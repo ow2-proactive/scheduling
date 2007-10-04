@@ -35,87 +35,86 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 
 
 public class VNObject extends AbstractData {
-	
-	
-	private WorldObject parent;
-	/** The virtual node name */
-	private String name;
-	/** The virtual node job ID */
-	private String jobID;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+    private WorldObject parent;
 
-	/**
-	 * Creates a nes VNObject
-	 * @param name
-	 * @param jobID
-	 * @param world
-	 */
-	protected VNObject(String name, String jobID, WorldObject world) {
-		super(FactoryName.createVirtualNodeObjectName(name, jobID));
-		
-		this.parent = world;
-		this.name = name;
-		this.jobID = jobID;
-	}
+    /** The virtual node name */
+    private String name;
 
-	
-	//
-	// -- PUBLIC METHOD -----------------------------------------------
-	//
-		
-	@Override
-	public void explore() {/* Do nothing */}
+    /** The virtual node job ID */
+    private String jobID;
 
-	@Override
-	public String getName(){
-		return this.name;
-	}
-	
-	@Override
-	public String getKey() {
-		return name;
-	}
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
 
-	@Override
-	public String getType() {
-		return "virtual node";
-	}
-		
-	/**
-	 * Returns the job id
-	 * @return The job id
-	 */
-	public String getJobID() {
-		return jobID;
-	}
-	
-	@Override
-	public void addChild(AbstractData child){
-		if(!monitoredChildren.containsKey(child.getKey())){
-			monitoredChildren.put(child.getKey(), child);
-		}
-	}
-	
-	@Override
-	public void removeChild(AbstractData child) {
-		monitoredChildren.remove(child.getKey());
-		if(monitoredChildren.isEmpty()){
-			parent.removeVirtualNode(this);
-		}
-	}
+    /**
+     * Creates a nes VNObject
+     * @param name
+     * @param jobID
+     * @param world
+     */
+    protected VNObject(String name, String jobID, WorldObject world) {
+        super(FactoryName.createVirtualNodeObjectName(name, jobID));
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public WorldObject getParent() {
-		return parent;
-	}
-	
-	@Override
-	public ProActiveConnection getConnection(){
-		// A Virtual node has no JMX ProActiveConnection
-		return null;
-	}
+        this.parent = world;
+        this.name = name;
+        this.jobID = jobID;
+    }
+
+    //
+    // -- PUBLIC METHOD -----------------------------------------------
+    //
+    @Override
+    public void explore() { /* Do nothing */
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String getKey() {
+        return name;
+    }
+
+    @Override
+    public String getType() {
+        return "virtual node";
+    }
+
+    /**
+     * Returns the job id
+     * @return The job id
+     */
+    public String getJobID() {
+        return jobID;
+    }
+
+    @Override
+    public void addChild(AbstractData child) {
+        if (!monitoredChildren.containsKey(child.getKey())) {
+            monitoredChildren.put(child.getKey(), child);
+        }
+    }
+
+    @Override
+    public void removeChild(AbstractData child) {
+        monitoredChildren.remove(child.getKey());
+        if (monitoredChildren.isEmpty()) {
+            parent.removeVirtualNode(this);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public WorldObject getParent() {
+        return parent;
+    }
+
+    @Override
+    public ProActiveConnection getConnection() {
+        // A Virtual node has no JMX ProActiveConnection
+        return null;
+    }
 }

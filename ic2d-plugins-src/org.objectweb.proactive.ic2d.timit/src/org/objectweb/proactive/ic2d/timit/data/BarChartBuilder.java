@@ -234,12 +234,12 @@ public class BarChartBuilder {
                 if (t.currentTimer.getTotalTime() == 0) {
                     value = -1;
                 } else {
-                	value = t.currentTotalTimeInMsInDouble;
+                    value = t.currentTotalTimeInMsInDouble;
                     //value = Math.ceil((double) t.currentTimer.getTotalTime() / 1000000d); // total
-                                                                                          // time
-                                                                                          // is
-                                                                                          // in
-                                                                                          // nanoseconds
+                    // time
+                    // is
+                    // in
+                    // nanoseconds
                 }
 
                 // Choose destination index

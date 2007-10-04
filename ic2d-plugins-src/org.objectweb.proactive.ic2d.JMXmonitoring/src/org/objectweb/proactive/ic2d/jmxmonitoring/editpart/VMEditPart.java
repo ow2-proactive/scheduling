@@ -42,107 +42,107 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject.methodName;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.JVMListener;
 
+
 public class VMEditPart extends AbstractMonitoringEditPart {
+    private RuntimeObject castedModel;
+    private VMFigure castedFigure;
 
-	private RuntimeObject castedModel;
-	private VMFigure castedFigure;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    public VMEditPart(RuntimeObject model) {
+        super(model);
+    }
 
-	public VMEditPart(RuntimeObject model) {
-		super(model);
-	}
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    @Override
+    public void update(Observable o, Object arg) {
+        final Object param = arg;
+        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    if (param instanceof methodName) {
+                        methodName method = (methodName) param;
+                        switch (method) {
+                        case RUNTIME_KILLED:
+                            Console.getInstance(Activator.CONSOLE_NAME)
+                                   .log(getModel() + " killed!");
+                            getCastedFigure().notResponding();
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    /*
+                    if(param instanceof State && (State)param == State.NOT_RESPONDING)
+                            ((VMFigure)getFigure()).notResponding();
+                    else if(param instanceof State && (State)param == State.NOT_MONITORED) {
+                            deactivate();
+                    }*/
+                    refresh();
+                }
+            });
+    }
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
 
-	@Override
-	public void update(Observable o, Object arg) {
-		final Object param = arg;
-		getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-			public void run () {
-				if(param instanceof methodName){
-					methodName method = (methodName) param;
-					switch (method) {
-					case RUNTIME_KILLED:
-						Console.getInstance(Activator.CONSOLE_NAME).log(getModel()+" killed!");
-						getCastedFigure().notResponding();
-						break;
-					default:
-						break;
-					}
-				}
-				/*
-				if(param instanceof State && (State)param == State.NOT_RESPONDING)
-					((VMFigure)getFigure()).notResponding();
-				else if(param instanceof State && (State)param == State.NOT_MONITORED) {
-					deactivate();
-				}*/
-				refresh();
-			}
-		});
-	}
+    /**
+     * Returns a new view associated
+     * with the type of model object the
+     * EditPart is associated with. So here, it returns a new VMFigure.
+     * @return a new VMFigure view associated with the VMObject model.
+     */
+    protected IFigure createFigure() {
+        VMFigure figure = new VMFigure(getCastedModel().getName() /*FullName()*/);
+        JVMListener listener = new JVMListener(getCastedModel(),
+                getMonitoringView());
+        figure.addMouseListener(listener);
+        figure.addMouseMotionListener(listener);
+        return figure;
+    }
 
-	//
-	// -- PROTECTED METHODS -----------------------------------------------
-	//
+    /**
+     * Returns a List containing the children model objects.
+     * @return the List of children
+     */
+    protected List<AbstractData> getModelChildren() {
+        return getCastedModel().getMonitoredChildrenAsList();
+    }
 
-	/**
-	 * Returns a new view associated
-	 * with the type of model object the
-	 * EditPart is associated with. So here, it returns a new VMFigure.
-	 * @return a new VMFigure view associated with the VMObject model.
-	 */
-	protected IFigure createFigure() {
-		VMFigure figure = new VMFigure(getCastedModel().getName()/*FullName()*/);
-		JVMListener listener = new JVMListener(getCastedModel(), getMonitoringView());
-		figure.addMouseListener(listener);
-		figure.addMouseMotionListener(listener);
-		return figure;
-	}
+    /**
+     * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
+     */
+    protected void createEditPolicies() { /* Do nothing */
+    }
 
+    /**
+     * Convert the result of EditPart.getModel()
+     * to VMObject (the real type of the model).
+     * @return the casted model
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public RuntimeObject getCastedModel() {
+        if (castedModel == null) {
+            castedModel = (RuntimeObject) getModel();
+        }
+        return castedModel;
+    }
 
-	/**
-	 * Returns a List containing the children model objects.
-	 * @return the List of children
-	 */
-	protected List<AbstractData> getModelChildren() {
-		return getCastedModel().getMonitoredChildrenAsList();
-	}
-
-	/**
-	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
-	 */
-	protected void createEditPolicies() {/* Do nothing */}
-	
-	/**
-	 * Convert the result of EditPart.getModel()
-	 * to VMObject (the real type of the model).
-	 * @return the casted model
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public RuntimeObject getCastedModel(){
-		if(castedModel==null){
-			castedModel = (RuntimeObject)getModel();
-		}
-		return castedModel;
-	}
-	
-	 /**
-	  * Convert the result of EditPart.getFigure()
-	  * to VMFigure (the real type of the figure).
-	  * @return the casted figure
-	  */
-	@SuppressWarnings("unchecked")
-	@Override
-	public VMFigure getCastedFigure(){
-		if(castedFigure == null)
-			castedFigure = (VMFigure)getFigure();
-		return castedFigure;
-	}
+    /**
+     * Convert the result of EditPart.getFigure()
+     * to VMFigure (the real type of the figure).
+     * @return the casted figure
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public VMFigure getCastedFigure() {
+        if (castedFigure == null) {
+            castedFigure = (VMFigure) getFigure();
+        }
+        return castedFigure;
+    }
 }
-

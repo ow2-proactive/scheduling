@@ -32,29 +32,29 @@ package org.objectweb.proactive.ic2d.launcher.exceptions;
 
 import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptor;
 
-public class TagMissingException extends Exception{
 
-	// The associated xml descriptor.
-	private XMLDescriptor descriptor;
+public class TagMissingException extends Exception {
+    // The associated xml descriptor.
+    private XMLDescriptor descriptor;
 
-	//
-	// -- CONSTRUCTORS ---------------------------------------------
-	//
+    //
+    // -- CONSTRUCTORS ---------------------------------------------
+    //
+    public TagMissingException(XMLDescriptor desc) {
+        super("The file (" + desc.getPath() +
+            ") must contain a mainDefinition tag!");
+        this.descriptor = desc;
+    }
 
-	public TagMissingException(XMLDescriptor desc){
-		super("The file ("+ desc.getPath()+ ") must contain a mainDefinition tag!");
-		this.descriptor = desc;
-	}
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
 
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
-
-	/**
-	 * Returns the xml descriptor.
-	 * @return the xml descriptor.
-	 */
-	public XMLDescriptor getXMLDescriptor(){
-		return this.descriptor;
-	}
+    /**
+     * Returns the xml descriptor.
+     * @return the xml descriptor.
+     */
+    public XMLDescriptor getXMLDescriptor() {
+        return this.descriptor;
+    }
 }

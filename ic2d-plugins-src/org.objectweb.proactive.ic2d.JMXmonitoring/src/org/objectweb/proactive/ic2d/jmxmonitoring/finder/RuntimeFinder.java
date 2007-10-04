@@ -35,12 +35,13 @@ import java.util.Collection;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
+
 public interface RuntimeFinder {
-	
-	/**
-	 * Returns a collection of runtime objects representing the ProActiveRuntimes located on the given host.
-	 * @param host
-	 * @return a collection of runtime objects representing the ProActiveRuntimes located on the given host.
-	 */
-	public Collection<RuntimeObject> getRuntimeObjects(HostObject host);
+
+    /**
+     * Returns a collection of runtime objects representing the ProActiveRuntimes located on the given host.
+     * @param host
+     * @return a collection of runtime objects representing the ProActiveRuntimes located on the given host.
+     */
+    public Collection<RuntimeObject> getRuntimeObjects(HostObject host);
 }

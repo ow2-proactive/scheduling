@@ -40,124 +40,119 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
 
-public class VMFigure extends AbstractRectangleFigure{
 
-	protected final static int DEFAULT_WIDTH = 19;
+public class VMFigure extends AbstractRectangleFigure {
+    protected final static int DEFAULT_WIDTH = 19;
+    private IFigure contentPane;
+    public static final Color STANDARD_COLOR;
+    public static final Color GLOBUS_COLOR;
+    public static final Color NOT_RESPONDING = ColorConstants.red;
+    private static final Color DEFAULT_BORDER_COLOR;
 
-	private IFigure contentPane;
+    static {
+        Display device = Display.getCurrent();
+        STANDARD_COLOR = new Color(device, 240, 240, 240);
+        GLOBUS_COLOR = new Color(device, 255, 208, 208);
+        DEFAULT_BORDER_COLOR = new Color(device, 140, 200, 225);
+    }
 
-	public static final Color STANDARD_COLOR;
-	public static final Color GLOBUS_COLOR;
-	public static final Color NOT_RESPONDING = ColorConstants.red;
+    //
+    // -- CONSTRUCTOR -----------------------------------------------
+    //
+    public VMFigure(String text) {
+        super(text);
+    }
 
-	private static final Color DEFAULT_BORDER_COLOR;
-	
-	static {
-		Display device = Display.getCurrent();
-		STANDARD_COLOR = new Color(device, 240, 240, 240);
-		GLOBUS_COLOR = new Color(device, 255, 208, 208);
-		DEFAULT_BORDER_COLOR = new Color(device, 140, 200, 225);
-	}
-	//
-	// -- CONSTRUCTOR -----------------------------------------------
-	//
+    /**
+     * Used to display the legend
+     */
+    public VMFigure() {
+        super();
+    }
 
-	public VMFigure(String text) {
-		super(text);
-	}
+    //
+    // -- PUBLIC METHOD --------------------------------------------
+    //
+    public IFigure getContentPane() {
+        return contentPane;
+    }
 
-	/**
-	 * Used to display the legend
-	 */
-	public VMFigure(){
-		super();
-	}
+    /**
+     * To indicate that the JVM started with Globus.
+     */
+    public void withGlobus() {
+        backgroundColor = GLOBUS_COLOR;
+        this.repaint();
+    }
 
-	//
-	// -- PUBLIC METHOD --------------------------------------------
-	//
+    /**
+     * To indicate that the JVM does not answer any more.
+     */
+    public void notResponding() {
+        backgroundColor = NOT_RESPONDING;
+        this.repaint();
+    }
 
-	public IFigure getContentPane() {
-		return contentPane;
-	}
+    //
+    // -- PROTECTED METHOD --------------------------------------------
+    //
+    protected void initColor() {
+        Device device = Display.getCurrent();
+        borderColor = DEFAULT_BORDER_COLOR;
+        backgroundColor = STANDARD_COLOR;
+        shadowColor = new Color(device, 230, 230, 230);
+    }
 
-	
-	/**
-	 * To indicate that the JVM started with Globus.
-	 */
-	public void withGlobus(){
-		backgroundColor = GLOBUS_COLOR;
-		this.repaint();
-	}
-	
-	/**
-	 * To indicate that the JVM does not answer any more.
-	 */
-	public void notResponding(){
-		backgroundColor = NOT_RESPONDING;
-		this.repaint();
-	}
-	
-	//
-	// -- PROTECTED METHOD --------------------------------------------
-	//
+    protected void initFigure() {
+        BorderLayout layout = new VMBorderLayout();
+        layout.setVerticalSpacing(5);
+        setLayoutManager(layout);
+        add(label, BorderLayout.TOP);
 
-	protected void initColor() {
-		Device device = Display.getCurrent();
-		borderColor = DEFAULT_BORDER_COLOR;
-		backgroundColor = STANDARD_COLOR;
-		shadowColor = new Color(device, 230, 230, 230);
-	}
+        contentPane = new Figure();
+        ToolbarLayout contentPaneLayout = new VMToolbarLayout();
+        contentPaneLayout.setSpacing(10);
+        contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
+        contentPane.setLayoutManager(contentPaneLayout);
+        add(contentPane, BorderLayout.CENTER);
+    }
 
-	protected void initFigure() {
-		BorderLayout layout = new VMBorderLayout();
-		layout.setVerticalSpacing(5);
-		setLayoutManager(layout);
-		add(label, BorderLayout.TOP);
+    @Override
+    protected int getDefaultWidth() {
+        return DEFAULT_WIDTH;
+    }
 
-		contentPane = new Figure();
-		ToolbarLayout contentPaneLayout = new VMToolbarLayout();
-		contentPaneLayout.setSpacing(10);
-		contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
-		contentPane.setLayoutManager(contentPaneLayout);
-		add(contentPane, BorderLayout.CENTER);
-	}
+    @Override
+    protected Color getDefaultBorderColor() {
+        return DEFAULT_BORDER_COLOR;
+    }
 
-	@Override
-	protected int getDefaultWidth() {
-		return DEFAULT_WIDTH;
-	}
-	
-	
-	@Override
-	protected Color getDefaultBorderColor() {
-		return DEFAULT_BORDER_COLOR;
-	}
-	
-	//
-	// -- INNER CLASS --------------------------------------------
-	//
+    //
+    // -- INNER CLASS --------------------------------------------
+    //
+    private class VMBorderLayout extends BorderLayout {
+        protected Dimension calculatePreferredSize(IFigure container,
+            int wHint, int hHint) {
+            if (legend) {
+                return super.calculatePreferredSize(container, wHint, hHint).expand( /*90*/
+                    50, /*5*/
+                    0);
+            }
 
-	
-	private class VMBorderLayout extends BorderLayout {
-		
-		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			if(legend)
-				return super.calculatePreferredSize(container, wHint, hHint).expand(/*90*/50, /*5*/0);
-			
-			return super.calculatePreferredSize(container, wHint, hHint).expand(5,0);
-		}
-	}
-	
-	private class VMToolbarLayout extends ToolbarLayout {
+            return super.calculatePreferredSize(container, wHint, hHint)
+                        .expand(5, 0);
+        }
+    }
 
-		public VMToolbarLayout() {
-			super(false);
-		}
+    private class VMToolbarLayout extends ToolbarLayout {
+        public VMToolbarLayout() {
+            super(false);
+        }
 
-		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
-			return super.calculatePreferredSize(container, wHint, hHint).expand(0,8);
-		}
-
-	}
+        protected Dimension calculatePreferredSize(IFigure container,
+            int wHint, int hHint) {
+            return super.calculatePreferredSize(container, wHint, hHint)
+                        .expand(0, 8);
+        }
+    }
 }

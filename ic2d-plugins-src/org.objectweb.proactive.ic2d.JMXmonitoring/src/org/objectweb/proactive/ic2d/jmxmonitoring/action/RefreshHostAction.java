@@ -34,25 +34,25 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 
-public class RefreshHostAction extends Action {
 
-	public static final String REFRESH_HOST = "Refresh host";
-	
-	private HostObject host;
-	
-	public RefreshHostAction() {
-		super("Look for new JVM", ImageDescriptor.createFromFile(RefreshHostAction.class, "refresh.gif"));
-		this.setId(REFRESH_HOST);
-		this.setToolTipText("Look for new JVM");
-	}
-	
-	public void setHost(HostObject host) {
-		this.host = host;
-	}
-	
-	@Override
-	public void run() {
-		host.explore();
-	}
-	
+public class RefreshHostAction extends Action {
+    public static final String REFRESH_HOST = "Refresh host";
+    private HostObject host;
+
+    public RefreshHostAction() {
+        super("Look for new JVM",
+            ImageDescriptor.createFromFile(RefreshHostAction.class,
+                "refresh.gif"));
+        this.setId(REFRESH_HOST);
+        this.setToolTipText("Look for new JVM");
+    }
+
+    public void setHost(HostObject host) {
+        this.host = host;
+    }
+
+    @Override
+    public void run() {
+        host.explore();
+    }
 }

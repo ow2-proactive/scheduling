@@ -36,28 +36,26 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 
 public class NodeTreeEditPart extends JobMonitoringTreeEditPart {
 
-	/**
-	 * @param model
-	 */
-	public NodeTreeEditPart(AbstractData model) {
-		super(model);
-	}
+    /**
+     * @param model
+     */
+    public NodeTreeEditPart(AbstractData model) {
+        super(model);
+    }
 
-	/**
-	 * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
-	 */
-	@Override
-	protected String getText() {
-		return getCastedModel().getName() + "("+getCastedModel().getJobId()+")";
-	}
-	
-	
-	//
-	// -- PRIVATE METHODS -------------------------------------------
-	//
-	
-	
-	private NodeObject getCastedModel() {
-		return (NodeObject)getModel();
-	}
+    /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
+     */
+    @Override
+    protected String getText() {
+        return getCastedModel().getName() + "(" + getCastedModel().getJobId() +
+        ")";
+    }
+
+    //
+    // -- PRIVATE METHODS -------------------------------------------
+    //
+    private NodeObject getCastedModel() {
+        return (NodeObject) getModel();
+    }
 }

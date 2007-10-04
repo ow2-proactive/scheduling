@@ -39,31 +39,32 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
-public class MonitoringEditPartFactory implements EditPartFactory{
-	
-	/** The monitoring view, where the figures will be drawn */
-	private MonitoringView monitoringView;
-	
-	public MonitoringEditPartFactory(MonitoringView monitoringView){
-		this.monitoringView = monitoringView;
-	}
-	
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
-	
-	public EditPart createEditPart(EditPart context, Object model) {
-		if (model instanceof WorldObject)
-			return new WorldEditPart((WorldObject)model, monitoringView);
-		else if (model instanceof HostObject)
-			return new HostEditPart((HostObject)model);
-		else if(model instanceof RuntimeObject)
-			return new VMEditPart((RuntimeObject)model);
-		else if(model instanceof NodeObject)
-			return new NodeEditPart((NodeObject)model);
-		else if(model instanceof ActiveObject)
-			return new AOEditPart((ActiveObject)model);
-		else
-			return null;
-	}
+
+public class MonitoringEditPartFactory implements EditPartFactory {
+
+    /** The monitoring view, where the figures will be drawn */
+    private MonitoringView monitoringView;
+
+    public MonitoringEditPartFactory(MonitoringView monitoringView) {
+        this.monitoringView = monitoringView;
+    }
+
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    public EditPart createEditPart(EditPart context, Object model) {
+        if (model instanceof WorldObject) {
+            return new WorldEditPart((WorldObject) model, monitoringView);
+        } else if (model instanceof HostObject) {
+            return new HostEditPart((HostObject) model);
+        } else if (model instanceof RuntimeObject) {
+            return new VMEditPart((RuntimeObject) model);
+        } else if (model instanceof NodeObject) {
+            return new NodeEditPart((NodeObject) model);
+        } else if (model instanceof ActiveObject) {
+            return new AOEditPart((ActiveObject) model);
+        } else {
+            return null;
+        }
+    }
 }

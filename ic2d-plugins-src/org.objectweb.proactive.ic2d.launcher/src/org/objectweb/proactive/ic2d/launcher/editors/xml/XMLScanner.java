@@ -38,24 +38,21 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 
+
 public class XMLScanner extends RuleBasedScanner {
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    public XMLScanner(ColorManager manager) {
+        IToken procInstr = new Token(new TextAttribute(manager.getColor(
+                        IXMLColorConstants.PROC_INSTR)));
 
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
-	
-	public XMLScanner(ColorManager manager) {
-		IToken procInstr =
-			new Token(
-					new TextAttribute(
-							manager.getColor(IXMLColorConstants.PROC_INSTR)));
+        IRule[] rules = new IRule[2];
+        //Add rule for processing instructions
+        rules[0] = new SingleLineRule("<?", "?>", procInstr);
+        // Add generic whitespace rule.
+        rules[1] = new WhitespaceRule(new XMLWhitespaceDetector());
 
-		IRule[] rules = new IRule[2];
-		//Add rule for processing instructions
-		rules[0] = new SingleLineRule("<?", "?>", procInstr);
-		// Add generic whitespace rule.
-		rules[1] = new WhitespaceRule(new XMLWhitespaceDetector());
-
-		setRules(rules);
-	}
+        setRules(rules);
+    }
 }

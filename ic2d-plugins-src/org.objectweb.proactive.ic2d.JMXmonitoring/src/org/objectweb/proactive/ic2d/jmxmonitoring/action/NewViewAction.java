@@ -43,53 +43,50 @@ import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
-public class NewViewAction  extends Action implements IWorkbenchWindowActionDelegate {
-	
-	private static int index = 0;
-	
-	public static final String NEW_VIEW = "NewMonitoringView";
-	
-	public NewViewAction() {
-		this.setId(NEW_VIEW);
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "newview.gif"));
-		this.setText("New Monitoring View");
-		this.setToolTipText("New Monitoring View");
-	}
-	
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
-		
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	public void init(IWorkbenchWindow window) {
-		// TODO Auto-generated method stub
-		
-	}
+public class NewViewAction extends Action
+    implements IWorkbenchWindowActionDelegate {
+    private static int index = 0;
+    public static final String NEW_VIEW = "NewMonitoringView";
 
-	public void run(IAction action) {
-		this.run();
-	}
+    public NewViewAction() {
+        this.setId(NEW_VIEW);
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "newview.gif"));
+        this.setText("New Monitoring View");
+        this.setToolTipText("New Monitoring View");
+    }
 
-	public void selectionChanged(IAction action, ISelection selection) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void run() {
-		  try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().
-			    getActivePage().showView(MonitoringView.ID,
-			    		MonitoringView.ID+"#"+(++index),
-			    		IWorkbenchPage.VIEW_ACTIVATE);
-		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Console.getInstance(Activator.CONSOLE_NAME).debug("New Monitoring view");
-	}
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    public void dispose() {
+        // TODO Auto-generated method stub
+    }
+
+    public void init(IWorkbenchWindow window) {
+        // TODO Auto-generated method stub
+    }
+
+    public void run(IAction action) {
+        this.run();
+    }
+
+    public void selectionChanged(IAction action, ISelection selection) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void run() {
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                      .showView(MonitoringView.ID,
+                MonitoringView.ID + "#" + (++index),
+                IWorkbenchPage.VIEW_ACTIVATE);
+        } catch (PartInitException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        Console.getInstance(Activator.CONSOLE_NAME).debug("New Monitoring view");
+    }
 }

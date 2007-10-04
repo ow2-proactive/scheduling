@@ -32,13 +32,12 @@ package org.objectweb.proactive.ic2d.launcher.editors.xml;
 
 import org.eclipse.jface.text.rules.IWhitespaceDetector;
 
-public class XMLWhitespaceDetector implements IWhitespaceDetector {
 
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
-	
-	public boolean isWhitespace(char c) {
-		return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
-	}
+public class XMLWhitespaceDetector implements IWhitespaceDetector {
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
+    public boolean isWhitespace(char c) {
+        return ((c == ' ') || (c == '\t') || (c == '\n') || (c == '\r'));
+    }
 }

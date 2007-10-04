@@ -12,77 +12,76 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
-public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-	
-	// Actions - important to allocate these only in makeActions, and then use them
+public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
+    // Actions - important to allocate these only in makeActions, and then use them
     // in the fill methods.  This ensures that the actions aren't recreated
     // when fillActionBars is called with FILL_PROXY.
-	private IWorkbenchAction exitAction;
-	private IWorkbenchAction newWindowAction;
-	private IWorkbenchAction aboutAction;
-	private IWorkbenchAction saveAction;
-	
-	private IContributionItem perspectiveList;
-	private IContributionItem viewList;
-	
-	private IWorkbenchWindow window;
-	
+    private IWorkbenchAction exitAction;
+    private IWorkbenchAction newWindowAction;
+    private IWorkbenchAction aboutAction;
+    private IWorkbenchAction saveAction;
+    private IContributionItem perspectiveList;
+    private IContributionItem viewList;
+    private IWorkbenchWindow window;
+
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
     }
 
     protected void makeActions(IWorkbenchWindow window) {
-    	// Creates the actions and registers them.
+        // Creates the actions and registers them.
         // Registering is needed to ensure that key bindings work.
         // The corresponding commands keybindings are defined in the plugin.xml file.
         // Registering also provides automatic disposal of the actions when
         // the window is closed.
+        this.window = window;
 
-    	this.window = window;
-    	
         exitAction = ActionFactory.QUIT.create(window);
         register(exitAction);
-        
+
         newWindowAction = ActionFactory.OPEN_NEW_WINDOW.create(window);
         register(newWindowAction);
-        
+
         aboutAction = ActionFactory.ABOUT.create(window);
         register(aboutAction);
-        
+
         saveAction = ActionFactory.SAVE.create(window);
         register(saveAction);
-        
+
         perspectiveList = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(window);
-        viewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window); 
+        viewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
     }
 
     protected void fillMenuBar(IMenuManager menuBar) {
-    	MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
-    	MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
-    	MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
-    	
-    	MenuManager perspectiveMenu = new MenuManager("Open Perspective");
-    	MenuManager viewMenu = new MenuManager("Show View");
-    	
-    	menuBar.add(fileMenu);
-    	// Add a group marker indicating where action set menus will appear.
+        MenuManager fileMenu = new MenuManager("&File",
+                IWorkbenchActionConstants.M_FILE);
+        MenuManager windowMenu = new MenuManager("&Window",
+                IWorkbenchActionConstants.M_WINDOW);
+        MenuManager helpMenu = new MenuManager("&Help",
+                IWorkbenchActionConstants.M_HELP);
+
+        MenuManager perspectiveMenu = new MenuManager("Open Perspective");
+        MenuManager viewMenu = new MenuManager("Show View");
+
+        menuBar.add(fileMenu);
+        // Add a group marker indicating where action set menus will appear.
         menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         menuBar.add(windowMenu);
         menuBar.add(helpMenu);
-        
+
         // File
         fileMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         fileMenu.add(new Separator());
         fileMenu.add(ActionFactory.SAVE.create(window));
         fileMenu.add(new Separator());
         fileMenu.add(exitAction);
-        
+
         // Window
         windowMenu.add(newWindowAction);
         fileMenu.add(new Separator());
@@ -90,26 +89,24 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         windowMenu.add(perspectiveMenu);
         viewMenu.add(viewList);
         windowMenu.add(viewMenu);
-        
+
         // Help
         helpMenu.add(aboutAction);
     }
-    
+
     @Override
     protected void fillCoolBar(ICoolBarManager coolBar) {
-    	coolBar.add(new GroupMarker("group.file"));
-    	
-    	IToolBarManager fileToolBar = new
-    	ToolBarManager(coolBar.getStyle());
-    	fileToolBar.add(new Separator(IWorkbenchActionConstants.NEW_GROUP));
-    	fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
-    	fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.OPEN_EXT));
-    	fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.SAVE_GROUP));
-    	fileToolBar.add(saveAction);
+        coolBar.add(new GroupMarker("group.file"));
 
-    	// Add to the cool bar manager
-    	coolBar.add(new ToolBarContributionItem(fileToolBar,
-    	IWorkbenchActionConstants.TOOLBAR_FILE)); 
+        IToolBarManager fileToolBar = new ToolBarManager(coolBar.getStyle());
+        fileToolBar.add(new Separator(IWorkbenchActionConstants.NEW_GROUP));
+        fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
+        fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.OPEN_EXT));
+        fileToolBar.add(new GroupMarker(IWorkbenchActionConstants.SAVE_GROUP));
+        fileToolBar.add(saveAction);
+
+        // Add to the cool bar manager
+        coolBar.add(new ToolBarContributionItem(fileToolBar,
+                IWorkbenchActionConstants.TOOLBAR_FILE));
     }
-    
 }

@@ -38,101 +38,97 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
-public abstract class AbstractFigure extends Figure implements Runnable{
-	
-	// the space between top and the first child
-	protected final static int topShift = 25;
-	// The space between borders and children
-	protected final static int shift = 10;
-	
-	protected Label label = new Label();
-	
-	/* Colors to use */
-	protected Color borderColor;
-	protected Color backgroundColor;
-	protected Color shadowColor;
-	
-	protected Color highlight;
-	
-	protected static boolean showShadow = false; 
-	
-	protected boolean legend;
-	
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
-	protected AbstractFigure(String text){
-		super();
-		
-		this.legend = false;
-		
-		// Initialisation
-		this.label = new Label(text);
-		initFigure();
-		initColor();
-		setToolTip(new ToolTipFigure(text));
-	}
-	
-	protected AbstractFigure() {
-		this.legend = true;
-		initFigure();
-		initColor();
-	}
-	
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
-	
-	public abstract ConnectionAnchor getAnchor();
-	
-	public void paintFigure(Graphics graphics){
-		graphics.setAntialias(SWT.ON);
-		super.paintFigure(graphics);
-		paintIC2DFigure(graphics);
-	}
-	
-	public void setTitle(String title){
-		this.label.setText(title);
-	}
-	
-	public String getTitle(){
-		return this.label.getText();
-	}
-	
-	public abstract IFigure getContentPane();
-	
-	/**
-	 * @param color The color, or null to use the default color.
-	 */
-	public void setHighlight(Color color) {
-		this.highlight = color;
-		if(highlight != null)
-			this.borderColor = color;
-		else
-			this.borderColor = getDefaultBorderColor();
-		this.repaint();
-	}
-	
-	/**
-	 * Refreshes the graphical interface.
-	 * This method is used by GUIManager
-	 */
-	public void refresh(){ /* DO NOTHING */}
-	
-	//
-	// -- PROTECTED METHODS --------------------------------------------
-	//
-	
-	protected abstract void initFigure();
-	
-	protected abstract void initColor();
-	
-	protected abstract void paintIC2DFigure(Graphics graphics);
 
-	protected abstract Color getDefaultBorderColor();
-	
-	public void run(){
-		repaint();
-	}
-	
+public abstract class AbstractFigure extends Figure implements Runnable {
+    // the space between top and the first child
+    protected final static int topShift = 25;
+
+    // The space between borders and children
+    protected final static int shift = 10;
+    protected Label label = new Label();
+
+    /* Colors to use */
+    protected Color borderColor;
+    protected Color backgroundColor;
+    protected Color shadowColor;
+    protected Color highlight;
+    protected static boolean showShadow = false;
+    protected boolean legend;
+
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    protected AbstractFigure(String text) {
+        super();
+
+        this.legend = false;
+
+        // Initialisation
+        this.label = new Label(text);
+        initFigure();
+        initColor();
+        setToolTip(new ToolTipFigure(text));
+    }
+
+    protected AbstractFigure() {
+        this.legend = true;
+        initFigure();
+        initColor();
+    }
+
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
+    public abstract ConnectionAnchor getAnchor();
+
+    public void paintFigure(Graphics graphics) {
+        graphics.setAntialias(SWT.ON);
+        super.paintFigure(graphics);
+        paintIC2DFigure(graphics);
+    }
+
+    public void setTitle(String title) {
+        this.label.setText(title);
+    }
+
+    public String getTitle() {
+        return this.label.getText();
+    }
+
+    public abstract IFigure getContentPane();
+
+    /**
+     * @param color The color, or null to use the default color.
+     */
+    public void setHighlight(Color color) {
+        this.highlight = color;
+        if (highlight != null) {
+            this.borderColor = color;
+        } else {
+            this.borderColor = getDefaultBorderColor();
+        }
+        this.repaint();
+    }
+
+    /**
+     * Refreshes the graphical interface.
+     * This method is used by GUIManager
+     */
+    public void refresh() { /* DO NOTHING */
+    }
+
+    //
+    // -- PROTECTED METHODS --------------------------------------------
+    //
+    protected abstract void initFigure();
+
+    protected abstract void initColor();
+
+    protected abstract void paintIC2DFigure(Graphics graphics);
+
+    protected abstract Color getDefaultBorderColor();
+
+    public void run() {
+        repaint();
+    }
 }

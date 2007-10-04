@@ -37,35 +37,34 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+
 /**
  * @author Jean-Michael Legait and Michèle Reynier
  *
  */
 public class ExpandAllAction extends Action {
+    private TreeViewer treeViewer;
 
-	private TreeViewer treeViewer;
+    /**
+     *
+     */
+    public ExpandAllAction(TreeViewer treeViewer) {
+        super("Expand All");
+        this.treeViewer = treeViewer;
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "expand.gif"));
+        this.setToolTipText("Expand All");
+    }
 
-	/**
-	 * 
-	 */
-	public ExpandAllAction(TreeViewer treeViewer) {
-		super("Expand All");
-		this.treeViewer = treeViewer;
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "expand.gif"));
-		this.setToolTipText("Expand All");
-	}
+    @Override
+    public void run() {
+        expand(((Tree) ((RootTreeEditPart) treeViewer.getRootEditPart()).getWidget()).getItems());
+    }
 
-	@Override
-	public void run() {
-		expand(((Tree)((RootTreeEditPart)treeViewer.getRootEditPart()).getWidget()).getItems());
-	}
-
-	private void expand(TreeItem[] items) {
-		for (int i = 0; i < items.length; i++) {
-			items[i].setExpanded(true);
-			expand(items[i].getItems());
-			
-		}
-	}
-
+    private void expand(TreeItem[] items) {
+        for (int i = 0; i < items.length; i++) {
+            items[i].setExpanded(true);
+            expand(items[i].getItems());
+        }
+    }
 }

@@ -52,136 +52,132 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.actions.CollapseAllAction;
 import org.objectweb.proactive.ic2d.jobmonitoring.actions.ExpandAllAction;
 import org.objectweb.proactive.ic2d.jobmonitoring.editparts.JobMonitoringTreePartFactory;
- 
+
+
 /**
- * 
+ *
  * @author Jean-Michael Legait and Michèle Reynier
  *
  */
-public class JobMonitoringView extends ViewPart implements Observer{
+public class JobMonitoringView extends ViewPart implements Observer {
+    private TreeViewer treeViewer;
+    private IMenuManager dropDownMenu;
 
+    /**
+     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    @Override
+    public void createPartControl(Composite parent) {
+        FormLayout layout = new FormLayout();
+        parent.setLayout(layout);
 
-	private TreeViewer treeViewer;
+        // create graphical viewer
+        treeViewer = new TreeViewer();
+        treeViewer.createControl(parent);
 
-	private IMenuManager dropDownMenu;
+        // configure the viewer
+        Tree tree = new Tree(parent, SWT.SINGLE);
+        ((RootTreeEditPart) treeViewer.getRootEditPart()).setWidget(tree);
 
-	/**
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
+        // hide an empty part in the view
+        FormData formData1 = new FormData();
+        formData1.top = new FormAttachment(0, 0);
+        formData1.bottom = new FormAttachment(0, 0);
+        formData1.left = new FormAttachment(0, 0);
+        formData1.right = new FormAttachment(0, 0);
+        parent.getChildren()[0].setLayoutData(formData1);
 
-		FormLayout layout = new FormLayout();
-		parent.setLayout(layout);
+        FormData formData = new FormData();
+        formData.top = new FormAttachment(0, 0);
+        formData.bottom = new FormAttachment(100, 0);
+        formData.left = new FormAttachment(0, 0);
+        formData.right = new FormAttachment(100, 0);
+        parent.getChildren()[1].setLayoutData(formData);
 
-		// create graphical viewer
-		treeViewer = new TreeViewer();
-		treeViewer.createControl(parent);
+        IToolBarManager toolBarManager = getViewSite().getActionBars()
+                                             .getToolBarManager();
 
-		// configure the viewer
-		Tree tree = new Tree(parent, SWT.SINGLE);
-		((RootTreeEditPart)treeViewer.getRootEditPart()).setWidget(tree);
+        toolBarManager.add(new ExpandAllAction(treeViewer));
+        toolBarManager.add(new CollapseAllAction(treeViewer));
 
-		// hide an empty part in the view
-		FormData formData1 = new FormData();
-		formData1.top = new FormAttachment(0, 0);
-		formData1.bottom = new FormAttachment(0, 0);
-		formData1.left = new FormAttachment(0, 0);
-		formData1.right = new FormAttachment(0, 0);
-		parent.getChildren()[0].setLayoutData(formData1);
+        // configure the menu
+        IActionBars actionBars = getViewSite().getActionBars();
+        dropDownMenu = actionBars.getMenuManager();
+        ModelRecorder.getInstance().addObserver(this);
 
-		FormData formData = new FormData();
-		formData.top = new FormAttachment(0, 0);
-		formData.bottom = new FormAttachment(100, 0);
-		formData.left = new FormAttachment(0, 0);
-		formData.right = new FormAttachment(100, 0);
-		parent.getChildren()[1].setLayoutData(formData);
+        // Monitor a new model
+        Action newHost = new NewHostJobMonitoringAction(parent);
+        dropDownMenu.add(newHost);
+        Separator separator = new Separator();
+        dropDownMenu.add(separator);
 
-		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+        // The list of existing models
+        Object[] titles = ModelRecorder.getInstance().getNames().toArray();
+        for (int i = 0, size = titles.length; i < size; i++) {
+            dropDownMenu.add(new ViewAction((String) titles[i]));
+        }
 
-		toolBarManager.add(new ExpandAllAction(treeViewer));
-		toolBarManager.add(new CollapseAllAction(treeViewer));
+        /*****************************/
 
-		// configure the menu
-		IActionBars actionBars = getViewSite().getActionBars();
-		dropDownMenu = actionBars.getMenuManager();
-		ModelRecorder.getInstance().addObserver(this);
-		
-		// Monitor a new model
-		Action newHost = new NewHostJobMonitoringAction(parent);
-		dropDownMenu.add(newHost);
-		Separator separator = new Separator();
-		dropDownMenu.add(separator);
-		
-		// The list of existing models
-		Object[] titles = ModelRecorder.getInstance().getNames().toArray();
-		for(int i = 0, size=titles.length; i<size ; i++){
-			dropDownMenu.add(new ViewAction((String) titles[i]));
-		}
-		/*****************************/
+        //		ContextMenuProvider contextMenu = new JobMonitoringContextMenuProvider(treeViewer);
+        //		treeViewer.setContextMenu(contextMenu);
+        //		getSite().registerContextMenu(contextMenu, treeViewer);
+    }
 
-//		ContextMenuProvider contextMenu = new JobMonitoringContextMenuProvider(treeViewer);
-//		treeViewer.setContextMenu(contextMenu);
-//		getSite().registerContextMenu(contextMenu, treeViewer);
-	}
+    @Override
+    public void setFocus() {
+        // TODO Auto-generated method stub
+    }
 
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-	}
+    public void update(Observable o, Object arg) {
+        // A view has been added to the viewRecorder, this view contains a model (WorldObject)
+        if (o instanceof ModelRecorder) {
+            dropDownMenu.add(new ViewAction((String) arg));
+            dropDownMenu.updateAll(true);
+        }
+    }
 
+    //
+    //-----INNER CLASSES------------
+    //
 
-	public void update(Observable o, Object arg) {
-		// A view has been added to the viewRecorder, this view contains a model (WorldObject)
-		if(o instanceof ModelRecorder){
-			dropDownMenu.add(new ViewAction((String) arg));
-			dropDownMenu.updateAll(true);
-		}
-	}
+    /**
+     * To monitor a new host.
+     */
+    public class NewHostJobMonitoringAction extends org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction {
+        public NewHostJobMonitoringAction(Composite parent) {
+            super(parent.getDisplay(), null);
+            setImageDescriptor(null);
+        }
 
-	//
-	//-----INNER CLASSES------------
-	//
+        @Override
+        public void run() {
+            treeViewer.setEditPartFactory(new JobMonitoringTreePartFactory());
+            WorldObject world = new WorldObject();
+            treeViewer.setContents(world);
+            super.setWorldObject(world);
+            super.run();
+            dropDownMenu.updateAll(true);
+        }
+    }
 
-	/**
-	 * To monitor a new host.
-	 */
-	public class NewHostJobMonitoringAction extends org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction {
+    /**
+     * To select a existing model.
+     */
+    public class ViewAction extends Action {
+        public ViewAction(String title) {
+            super(title);
+            this.setToolTipText(title);
+        }
 
-		public NewHostJobMonitoringAction(Composite parent){
-			super(parent.getDisplay(), null);
-			setImageDescriptor(null);
-		}
-
-		@Override
-		public void run() {
-			treeViewer.setEditPartFactory(new JobMonitoringTreePartFactory());
-			WorldObject world = new WorldObject();
-			treeViewer.setContents(world);
-			super.setWorldObject(world);
-			super.run();
-			dropDownMenu.updateAll(true);
-		}
-	}
-
-	/**
-	 * To select a existing model.
-	 */
-	public class ViewAction extends Action {
-
-		public ViewAction(String title) {
-			super(title);
-			this.setToolTipText(title);
-		}
-
-		@Override
-		public void run() {
-			WorldObject world = ModelRecorder.getInstance().getModel(getText());
-			if(world!=null){
-				treeViewer.setEditPartFactory(new JobMonitoringTreePartFactory());
-				treeViewer.setContents(world);
-				dropDownMenu.updateAll(true);
-			}
-		}
-	}
+        @Override
+        public void run() {
+            WorldObject world = ModelRecorder.getInstance().getModel(getText());
+            if (world != null) {
+                treeViewer.setEditPartFactory(new JobMonitoringTreePartFactory());
+                treeViewer.setContents(world);
+                dropDownMenu.updateAll(true);
+            }
+        }
+    }
 }

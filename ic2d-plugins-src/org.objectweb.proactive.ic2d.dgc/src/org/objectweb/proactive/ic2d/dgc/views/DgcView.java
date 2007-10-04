@@ -38,8 +38,8 @@ public class DgcView extends MonitoringView implements Runnable {
     }
 
     public void createPartControl(Composite parent) {
-    	super.createPartControl(parent);
-		this.setPartName("DGC View");
+        super.createPartControl(parent);
+        this.setPartName("DGC View");
     }
 
     public void run() {

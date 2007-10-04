@@ -36,23 +36,23 @@ import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.MonitorThread;
 
+
 public class RefreshAction extends Action {
-	
-	public static final String REFRESH = "Refresh";
-	
-	private MonitorThread monitorThread;
-	
-	public RefreshAction(MonitorThread monitorThread) {
-		this.monitorThread = monitorThread;
-		this.setId(REFRESH);
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
-		this.setText("Refresh");
-		this.setToolTipText("Refresh");
-	}
-	
-	@Override
-	public void run() {
-		monitorThread.forceRefresh();
-		Console.getInstance(Activator.CONSOLE_NAME).debug("Manual refresh");
-	}
+    public static final String REFRESH = "Refresh";
+    private MonitorThread monitorThread;
+
+    public RefreshAction(MonitorThread monitorThread) {
+        this.monitorThread = monitorThread;
+        this.setId(REFRESH);
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "refresh.gif"));
+        this.setText("Refresh");
+        this.setToolTipText("Refresh");
+    }
+
+    @Override
+    public void run() {
+        monitorThread.forceRefresh();
+        Console.getInstance(Activator.CONSOLE_NAME).debug("Manual refresh");
+    }
 }

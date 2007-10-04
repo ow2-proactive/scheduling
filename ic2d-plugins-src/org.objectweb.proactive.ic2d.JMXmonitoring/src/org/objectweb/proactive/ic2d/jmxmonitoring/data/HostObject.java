@@ -22,205 +22,210 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder;
 /**
  * Holder class for the host data representation.
  */
-public class HostObject extends AbstractData{
+public class HostObject extends AbstractData {
+    private WorldObject parent;
+    private String url;
+    private String hostName;
+    private int port;
+    private String protocol;
+    private int rank;
+    private final static String DEFAULT_NAME = "undefined";
 
-	private WorldObject parent;
-	private String url;
-	private String hostName;
-	private int port;
-	private String protocol;
-	private int rank;
+    //Warning: Don't use this variavle directly, use getOSName().
+    private String osName;
 
-	private final static String DEFAULT_NAME = "undefined";
+    //Warning: Don't use this vaiable directly, use getOSVersion().
+    private String osVersion;
 
-	//Warning: Don't use this variavle directly, use getOSName().
-	private String osName;
+    /**
+     * Creates a new HostObject. Use the method addHost(String url) of the WorldObject class instead.
+     * @param url du host
+     * @throws NullPointerException
+     * @throws MalformedObjectNameException
+     */
+    protected HostObject(WorldObject parent, String url, int rank)
+        throws MalformedObjectNameException, NullPointerException {
+        super(new ObjectName(FactoryName.HOST));
 
-	//Warning: Don't use this vaiable directly, use getOSVersion().
-	private String osVersion;
+        this.hostName = URIBuilder.getHostNameFromUrl(url);
+        String name = URIBuilder.getNameFromURI(url);
+        this.protocol = URIBuilder.getProtocol(url);
+        this.port = URIBuilder.getPortNumber(url);
 
-	/**
-	 * Creates a new HostObject. Use the method addHost(String url) of the WorldObject class instead.
-	 * @param url du host
-	 * @throws NullPointerException
-	 * @throws MalformedObjectNameException
-	 */
-	protected HostObject(WorldObject parent, String url, int rank) throws MalformedObjectNameException, NullPointerException{
-		super(new ObjectName(FactoryName.HOST));
+        this.url = URIBuilder.buildURI(hostName, name, protocol, port).toString();
 
-		this.hostName = URIBuilder.getHostNameFromUrl(url);
-		String name = URIBuilder.getNameFromURI(url);
-		this.protocol = URIBuilder.getProtocol(url);
-		this.port = URIBuilder.getPortNumber(url);
+        this.rank = rank;
 
-		this.url = URIBuilder.buildURI(hostName, name, protocol, port).toString();
+        this.parent = parent;
+    }
 
-		this.rank = rank;
+    @SuppressWarnings("unchecked")
+    @Override
+    public WorldObject getParent() {
+        return this.parent;
+    }
 
-		this.parent = parent;
-	}
+    @Override
+    public String getKey() {
+        return this.url;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public WorldObject getParent() {
-		return this.parent;
-	}
+    @Override
+    public String getType() {
+        return "host";
+    }
 
-	@Override
-	public String getKey() {
-		return this.url;
-	}
+    @Override
+    public String getName() {
+        return getHostName();
+    }
 
-	@Override
-	public String getType() {
-		return "host";
-	}
+    /**
+     * Returns the url of this object.
+     * @return An url.
+     */
+    public String getUrl() {
+        return this.url;
+    }
 
-	@Override
-	public String getName() {
-		return getHostName();
-	}
+    public String getHostName() {
+        return this.hostName;
+    }
 
-	/**
-	 * Returns the url of this object.
-	 * @return An url.
-	 */
-	public String getUrl(){
-		return this.url;
-	}
+    public int getPort() {
+        return this.port;
+    }
 
-	public String getHostName(){
-		return this.hostName;
-	}
+    public String getProtocol() {
+        return this.protocol;
+    }
 
-	public int getPort(){
-		return this.port;
-	}
+    /**
+     * Returns the operating system name.
+     * @return The operating system name.
+     */
+    public String getOSName() {
+        if (this.osName == null) {
+            return DEFAULT_NAME;
+        } else {
+            return this.osName;
+        }
+    }
 
-	public String getProtocol(){
-		return this.protocol;
-	}
+    /**
+     * Returns the operating sytem version.
+     * @return The operating sytem version.
+     */
+    public String getOSVersion() {
+        if (osVersion == null) {
+            return DEFAULT_NAME;
+        } else {
+            return this.osVersion;
+        }
+    }
 
-	/**
-	 * Returns the operating system name.
-	 * @return The operating system name.
-	 */
-	public String getOSName(){
-		if(this.osName==null)
-			return DEFAULT_NAME;
-		else
-			return this.osName;
-	}
+    @Override
+    public void explore() {
+        System.out.println(this);
+        findRuntimes();
+    }
 
-	/**
-	 * Returns the operating sytem version.
-	 * @return The operating sytem version.
-	 */
-	public String getOSVersion(){
-		if(osVersion==null)
-			return DEFAULT_NAME;
-		else
-			return this.osVersion;
-	}
+    @Override
+    public int getHostRank() {
+        return this.rank;
+    }
 
-	@Override
-	public void explore() {
-		System.out.println(this);
-		findRuntimes();
-	}
+    @Override
+    public String toString() {
+        String result = this.hostName + ":" + this.port;
+        if (!getOSName().equals(DEFAULT_NAME)) {
+            result += (":" + getOSName());
+        }
+        if (!getOSVersion().equals(DEFAULT_NAME)) {
+            result += ("(OS version: " + getOSVersion() + ")");
+        }
+        return result;
+    }
 
-	@Override
-	public int getHostRank(){
-		return this.rank;
-	}
+    /**
+     * Propose à l'host de s'ajouter s'il y arrive le fils donné en paramètre.
+     */
+    public void proposeChild() {
+    }
 
-	@Override
-	public String toString(){
-		String result = this.hostName+":"+this.port;
-		if(!getOSName().equals(DEFAULT_NAME)){
-			result+=":"+getOSName();
-		}
-		if(!getOSVersion().equals(DEFAULT_NAME)){
-			result+="(OS version: "+getOSVersion()+")";
-		}
-		return result;
-	}
+    /**
+     * Find all the ProActive Runtimes of this host.
+     */
+    @SuppressWarnings("unchecked")
+    private void findRuntimes() {
+        RuntimeFinder rfinder = new RemoteObjectHostRTFinder();
+        Collection<RuntimeObject> runtimeObjects = rfinder.getRuntimeObjects(this);
 
-	/**
-	 * Propose à l'host de s'ajouter s'il y arrive le fils donné en paramètre.
-	 */
-	public void proposeChild(){
+        Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
-	}
+        Iterator<RuntimeObject> it = runtimeObjects.iterator();
+        while (it.hasNext()) {
+            RuntimeObject runtimeObject = it.next();
 
-	/**
-	 * Find all the ProActive Runtimes of this host.
-	 */
-	@SuppressWarnings("unchecked")
-	private void findRuntimes(){
-		RuntimeFinder rfinder = new RemoteObjectHostRTFinder();
-		Collection<RuntimeObject> runtimeObjects = rfinder.getRuntimeObjects(this);
+            // If this child is a NOT monitored child.
+            if (containsChildInNOTMonitoredChildren(runtimeObject.getKey())) {
+                continue;
+            }
 
-		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
+            RuntimeObject child = (RuntimeObject) this.getMonitoredChild(runtimeObject.getKey());
 
-		Iterator<RuntimeObject> it = runtimeObjects.iterator();
-		while(it.hasNext()){
-			RuntimeObject runtimeObject = it.next();
+            // If this child is not yet monitored.
+            if (child == null) {
+                child = runtimeObject;
+                ObjectName oname = runtimeObject.getObjectName();
+                JMXNotificationManager.getInstance()
+                                      .subscribe(oname,
+                    new RuntimeObjectListener(runtimeObject),
+                    runtimeObject.getUrl());
+                addChild(runtimeObject);
+                updateOSNameAndVersion(runtimeObject.getConnection());
+            } else {
+                // This child is already monitored, but this child maybe contains some not monitord objects.
+                child.explore();
+            }
+            // Removes from the model the not monitored or termined runtimes.
+            childrenToRemoved.remove(child.getKey());
+        }
 
-			// If this child is a NOT monitored child.
-			if(containsChildInNOTMonitoredChildren(runtimeObject.getKey())){
-				continue;
-			}
+        // Some child have to be removed
+        for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator();
+                iter.hasNext();) {
+            RuntimeObject child = (RuntimeObject) iter.next();
+            child.destroy();
+        }
+    }
 
-			RuntimeObject child = (RuntimeObject) this.getMonitoredChild(runtimeObject.getKey());
-			// If this child is not yet monitored.
-			if(child==null){
-				child = runtimeObject;
-				ObjectName oname = runtimeObject.getObjectName();
-				JMXNotificationManager.getInstance().subscribe(oname, new RuntimeObjectListener(runtimeObject), runtimeObject.getUrl());
-				addChild(runtimeObject);
-				updateOSNameAndVersion(runtimeObject.getConnection());
-			}
-			else{
-				// This child is already monitored, but this child maybe contains some not monitord objects.
-				child.explore();
-			}
-			// Removes from the model the not monitored or termined runtimes.
-			childrenToRemoved.remove(child.getKey());
-		}
+    private void updateOSNameAndVersion(ProActiveConnection connection) {
+        if ((this.osName == null) || (this.osVersion == null)) {
+            ObjectName OSoname = null;
+            try {
+                OSoname = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
+            } catch (MalformedObjectNameException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
-		// Some child have to be removed
-		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
-			RuntimeObject child = (RuntimeObject) iter.next();
-			child.destroy();
-		}
-	}
+            OperatingSystemMXBean proxyMXBean = MBeanServerInvocationHandler.newProxyInstance(connection,
+                    OSoname, OperatingSystemMXBean.class, false);
+            this.osName = proxyMXBean.getName();
+            this.osVersion = proxyMXBean.getVersion();
 
-	private void updateOSNameAndVersion(ProActiveConnection connection){
-		if(this.osName==null || this.osVersion==null){
-			ObjectName OSoname = null;
-			try {
-				OSoname = new ObjectName(ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME);
-			} catch (MalformedObjectNameException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NullPointerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            setChanged();
+            notifyObservers(this.toString());
+        }
+    }
 
-			OperatingSystemMXBean proxyMXBean = MBeanServerInvocationHandler.newProxyInstance(connection, OSoname, OperatingSystemMXBean.class, false);
-			this.osName = proxyMXBean.getName();
-			this.osVersion = proxyMXBean.getVersion();
-
-			setChanged();
-			notifyObservers(this.toString());
-		}
-	}
-
-	@Override
-	public ProActiveConnection getConnection(){
-		// A host object has no JMX ProActiveConnection
-		return null;
-	}
+    @Override
+    public ProActiveConnection getConnection() {
+        // A host object has no JMX ProActiveConnection
+        return null;
+    }
 }

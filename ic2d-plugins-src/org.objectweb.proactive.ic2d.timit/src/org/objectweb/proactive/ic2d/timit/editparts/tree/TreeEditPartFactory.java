@@ -14,7 +14,8 @@ public class TreeEditPartFactory implements EditPartFactory {
         this.timerTreeView = timerTreeView;
     }
 
-    public final EditPart createEditPart(final EditPart context, final Object model) {
+    public final EditPart createEditPart(final EditPart context,
+        final Object model) {
         EditPart part = null;
         if (model instanceof TimerTreeHolder) {
             part = new TimerTreeHolderEditPart();

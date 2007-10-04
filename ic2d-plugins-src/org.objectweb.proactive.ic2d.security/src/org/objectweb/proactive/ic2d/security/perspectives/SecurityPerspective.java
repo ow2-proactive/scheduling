@@ -37,27 +37,22 @@ import org.objectweb.proactive.ic2d.security.views.PolicyEditor;
 
 
 public class SecurityPerspective implements IPerspectiveFactory {
+    public static final String ID = "org.objectweb.proactive.ic2d.monitoring.perspectives.SecurityPerspective";
 
-	public static final String ID = "org.objectweb.proactive.ic2d.monitoring.perspectives.SecurityPerspective";
-
-	 /** Top folder's id. */
+    /** Top folder's id. */
     public static final String FI_TOP = ID + ".topFolder";
 
+    //
+    // -- PUBLIC METHODS ----------------------------------------------
+    //
+    public void createInitialLayout(IPageLayout layout) {
+        String editorAreaId = layout.getEditorArea();
+        layout.setEditorAreaVisible(false);
+        layout.setFixed(false);
 
-	//
-	// -- PUBLIC METHODS ----------------------------------------------
-	//
-
-	public void createInitialLayout(IPageLayout layout) {
-		String editorAreaId=layout.getEditorArea();
-		layout.setEditorAreaVisible(false);
-		layout.setFixed(false);
-
-
-		IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP, 0.75f, editorAreaId );
-		topFolder.addView(PolicyEditor.ID);
-		topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
-
-	}
-
+        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
+                0.75f, editorAreaId);
+        topFolder.addView(PolicyEditor.ID);
+        topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
+    }
 }

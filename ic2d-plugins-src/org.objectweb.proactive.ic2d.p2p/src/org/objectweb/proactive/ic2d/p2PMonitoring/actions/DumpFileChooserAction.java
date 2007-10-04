@@ -8,40 +8,34 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.objectweb.proactive.ic2d.p2PMonitoring.views.P2PView;
 
-public class DumpFileChooserAction  implements IWorkbenchWindowActionDelegate {
 
-		private Display display;
-		
-		
-		//
-		// -- PUBLICS METHODS -----------------------------------------------
-		//
-		
-		public void dispose() {
-			
-		}
+public class DumpFileChooserAction implements IWorkbenchWindowActionDelegate {
+    private Display display;
 
-		public void init(IWorkbenchWindow window) {
-			this.display = window.getShell().getDisplay();
-		}
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    public void dispose() {
+    }
 
-		public void run(IAction action) {
-		//	new MonitorNewHostDialog(display.getActiveShell(), Protocol.RMI);
-			//new LoadFileDialog(display.getActiveShell(), Protocol.RMI);
-			FileDialog fd = new FileDialog(display.getActiveShell());
-			fd.setText("Open P2P dump file");
-			 String filename = fd.open();
-		        if (filename != null){
-		        // loadImage(filename);
-		//         String currentDir = fd.getFilterPath();
-		         System.out.println("Opening " + filename);
-		         P2PView.loadDumpFile(filename);
-		        }
-		}
+    public void init(IWorkbenchWindow window) {
+        this.display = window.getShell().getDisplay();
+    }
 
-		public void selectionChanged(IAction action, ISelection selection) {
-			
-		}
-	}
+    public void run(IAction action) {
+        //	new MonitorNewHostDialog(display.getActiveShell(), Protocol.RMI);
+        //new LoadFileDialog(display.getActiveShell(), Protocol.RMI);
+        FileDialog fd = new FileDialog(display.getActiveShell());
+        fd.setText("Open P2P dump file");
+        String filename = fd.open();
+        if (filename != null) {
+            // loadImage(filename);
+            //         String currentDir = fd.getFilterPath();
+            System.out.println("Opening " + filename);
+            P2PView.loadDumpFile(filename);
+        }
+    }
 
-
+    public void selectionChanged(IAction action, ISelection selection) {
+    }
+}

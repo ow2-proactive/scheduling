@@ -34,26 +34,25 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
-public class StopMonitoringAction extends Action {
 
-	public static final String STOP_MONITORING = "Stop monitoring";
-	
-	private AbstractData object;
-	
-	public StopMonitoringAction() {
-		this.setId(STOP_MONITORING);
-		this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "stop_monitoring.gif"));
-	}
-	
-	public void setObject(AbstractData object) {
-		this.object = object;
-		this.setText("Stop monitoring this "+object.getType());
-		this.setToolTipText("Stop monitoring this "+object.getType());
-	}
-	
-	@Override
-	public void run() {
-		object.stopMonitoring(true);
-	}
-	
+public class StopMonitoringAction extends Action {
+    public static final String STOP_MONITORING = "Stop monitoring";
+    private AbstractData object;
+
+    public StopMonitoringAction() {
+        this.setId(STOP_MONITORING);
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "stop_monitoring.gif"));
+    }
+
+    public void setObject(AbstractData object) {
+        this.object = object;
+        this.setText("Stop monitoring this " + object.getType());
+        this.setToolTipText("Stop monitoring this " + object.getType());
+    }
+
+    @Override
+    public void run() {
+        object.stopMonitoring(true);
+    }
 }

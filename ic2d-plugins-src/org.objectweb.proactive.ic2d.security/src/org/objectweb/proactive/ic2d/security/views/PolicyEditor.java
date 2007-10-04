@@ -1,6 +1,5 @@
 package org.objectweb.proactive.ic2d.security.views;
 
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -31,144 +30,134 @@ import org.eclipse.ui.part.ViewPart;
  * presented in the same way everywhere.
  * <p>
  */
-
 public class PolicyEditor extends ViewPart {
+    public static final String ID = "org.objectweb.proactive.ic2d.security.views.PolicyEditor";
+    private Action action1;
+    private Action action2;
+    private Action doubleClickAction;
+    private FormToolkit toolkit;
+    private ScrolledForm form;
 
-	public static final String ID = "org.objectweb.proactive.ic2d.security.views.PolicyEditor";
+    /**
+     * The constructor.
+     */
+    public PolicyEditor() {
+    }
 
-	private Action action1;
-	private Action action2;
-	private Action doubleClickAction;
-	private FormToolkit toolkit;
-	private ScrolledForm form;
+    /**
+     * This is a callback that will allow us
+     * to create the viewer and initialize it.
+     */
+    @Override
+    public void createPartControl(Composite parent) {
+        this.toolkit = new FormToolkit(parent.getDisplay());
+        this.form = this.toolkit.createScrolledForm(parent);
+        this.form.setText("");
 
-	/**
-	 * The constructor.
-	 */
-	public PolicyEditor() {
-	}
+        GridLayout layout = new GridLayout();
+        this.form.getBody().setLayout(layout);
 
-	/**
-	 * This is a callback that will allow us
-	 * to create the viewer and initialize it.
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
+        Hyperlink link = this.toolkit.createHyperlink(this.form.getBody(),
+                "Click here.", SWT.WRAP);
+        link.addHyperlinkListener(new HyperlinkAdapter() {
+                @Override
+                public void linkActivated(HyperlinkEvent e) {
+                    System.out.println("Link activated!");
+                }
+            });
 
-		  this.toolkit = new FormToolkit(parent.getDisplay());
-	      this.form = this.toolkit.createScrolledForm(parent);
-	      this.form.setText("");
+        FormText ft = this.toolkit.createFormText(this.form.getBody(), false);
+        ft.setToolTipText("blaaaaaaaaaaaaaaaaaaaaaaa");
+    }
 
+    /*private void hookContextMenu() {
+            MenuManager menuMgr = new MenuManager("#PopupMenu");
+            menuMgr.setRemoveAllWhenShown(true);
+            menuMgr.addMenuListener(new IMenuListener() {
+                    public void menuAboutToShow(IMenuManager manager) {
+                            PolicyEditor.this.fillContextMenu(manager);
+                    }
+            });
+            Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
+            this.viewer.getControl().setMenu(menu);
+            getSite().registerContextMenu(menuMgr, this.viewer);
+    }
 
-	      GridLayout layout = new GridLayout();
-	      this.form.getBody().setLayout(layout);
+    private void contributeToActionBars() {
+            IActionBars bars = getViewSite().getActionBars();
+            fillLocalPullDown(bars.getMenuManager());
+            fillLocalToolBar(bars.getToolBarManager());
+    }
 
-	      Hyperlink link = this.toolkit.createHyperlink(this.form.getBody(),
-	        "Click here.", SWT.WRAP);
-	      link.addHyperlinkListener(new HyperlinkAdapter() {
-	       @Override
-		public void linkActivated(HyperlinkEvent e) {
-	        System.out.println("Link activated!");
-	       }
-	      });
+    private void fillLocalPullDown(IMenuManager manager) {
+            manager.add(this.action1);
+            manager.add(new Separator());
+            manager.add(this.action2);
+    }
 
+    private void fillContextMenu(IMenuManager manager) {
+            manager.add(this.action1);
+            manager.add(this.action2);
+            // Other plug-ins can contribute there actions here
+            manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    }
 
-	      FormText ft = this.toolkit.createFormText(this.form.getBody(), false);
-	      ft.setToolTipText("blaaaaaaaaaaaaaaaaaaaaaaa");
+    private void fillLocalToolBar(IToolBarManager manager) {
+            manager.add(this.action1);
+            manager.add(this.action2);
+    }
 
+    private void makeActions() {
+            this.action1 = new Action() {
+                    @Override
+                    public void run() {
+                            showMessage("Action 1 executed");
+                    }
+            };
+            this.action1.setText("Action 1");
+            this.action1.setToolTipText("Action 1 tooltip");
+            this.action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+                    getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
+            this.action2 = new Action() {
+                    @Override
+                    public void run() {
+                            showMessage("Action 2 executed");
+                    }
+            };
+            this.action2.setText("Action 2");
+            this.action2.setToolTipText("Action 2 tooltip");
+            this.action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+                            getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+            this.doubleClickAction = new Action() {
+                    @Override
+                    public void run() {
+                            ISelection selection = PolicyEditor.this.viewer.getSelection();
+                            Object obj = ((IStructuredSelection)selection).getFirstElement();
+                            showMessage("Double-click detected on "+obj.toString());
+                    }
+            };
+    }
 
+    private void hookDoubleClickAction() {
+            this.viewer.addDoubleClickListener(new IDoubleClickListener() {
+                    public void doubleClick(DoubleClickEvent event) {
+                            PolicyEditor.this.doubleClickAction.run();
+                    }
+            });
+    }
+    private void showMessage(String message) {
+            MessageDialog.openInformation(
+                    this.viewer.getControl().getShell(),
+                    "Policy Editor",
+                    message);
+    }
+    */
 
-	}
-
-	/*private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				PolicyEditor.this.fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
-		this.viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, this.viewer);
-	}
-
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
-
-	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(this.action1);
-		manager.add(new Separator());
-		manager.add(this.action2);
-	}
-
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(this.action1);
-		manager.add(this.action2);
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
-
-	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(this.action1);
-		manager.add(this.action2);
-	}
-
-	private void makeActions() {
-		this.action1 = new Action() {
-			@Override
-			public void run() {
-				showMessage("Action 1 executed");
-			}
-		};
-		this.action1.setText("Action 1");
-		this.action1.setToolTipText("Action 1 tooltip");
-		this.action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-
-		this.action2 = new Action() {
-			@Override
-			public void run() {
-				showMessage("Action 2 executed");
-			}
-		};
-		this.action2.setText("Action 2");
-		this.action2.setToolTipText("Action 2 tooltip");
-		this.action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		this.doubleClickAction = new Action() {
-			@Override
-			public void run() {
-				ISelection selection = PolicyEditor.this.viewer.getSelection();
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				showMessage("Double-click detected on "+obj.toString());
-			}
-		};
-	}
-
-	private void hookDoubleClickAction() {
-		this.viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				PolicyEditor.this.doubleClickAction.run();
-			}
-		});
-	}
-	private void showMessage(String message) {
-		MessageDialog.openInformation(
-			this.viewer.getControl().getShell(),
-			"Policy Editor",
-			message);
-	}
-*/
-	/**
-	 * Passing the focus request to the viewer's control.
-	 */
-	@Override
-	public void setFocus() {
-
-	}
+    /**
+     * Passing the focus request to the viewer's control.
+     */
+    @Override
+    public void setFocus() {
+    }
 }

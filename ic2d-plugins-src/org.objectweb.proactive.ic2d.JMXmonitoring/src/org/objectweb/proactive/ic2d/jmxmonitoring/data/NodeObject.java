@@ -18,166 +18,173 @@ import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
 
-public class NodeObject extends AbstractData{
 
-	private RuntimeObject parent;
-	private VNObject vnParent;
-	private String url;
+public class NodeObject extends AbstractData {
+    private RuntimeObject parent;
+    private VNObject vnParent;
+    private String url;
 
- 	//Warning: Don't use this variavle directly, use getProxyNodeMBean().
-	private NodeWrapperMBean proxyNodeMBean;
+    //Warning: Don't use this variavle directly, use getProxyNodeMBean().
+    private NodeWrapperMBean proxyNodeMBean;
 
-	public NodeObject(RuntimeObject parent, String url, ObjectName objectName){
-		super(objectName);
-		this.parent = parent;
+    public NodeObject(RuntimeObject parent, String url, ObjectName objectName) {
+        super(objectName);
+        this.parent = parent;
 
-		this.url = FactoryName.getCompleteUrl(url);
+        this.url = FactoryName.getCompleteUrl(url);
 
-		Comparator<String> comparator = new ActiveObject.ActiveObjectComparator();
-		this.monitoredChildren = new TreeMap<String, AbstractData>(comparator);
-	}
+        Comparator<String> comparator = new ActiveObject.ActiveObjectComparator();
+        this.monitoredChildren = new TreeMap<String, AbstractData>(comparator);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public RuntimeObject getParent() {
-		return this.parent;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public RuntimeObject getParent() {
+        return this.parent;
+    }
 
-	/**
-	 * Sets the virtual node.
-	 * @param vn the virtual node.
-	 */
-	public void setVirtualNode(VNObject vn){
-		this.vnParent = vn;
-	}
+    /**
+     * Sets the virtual node.
+     * @param vn the virtual node.
+     */
+    public void setVirtualNode(VNObject vn) {
+        this.vnParent = vn;
+    }
 
-	/**
-	 * Returns the virtual node.
-	 * @return the virtual node.
-	 */
-	public VNObject getVirtualNode(){
-		return this.vnParent;
-	}
+    /**
+     * Returns the virtual node.
+     * @return the virtual node.
+     */
+    public VNObject getVirtualNode() {
+        return this.vnParent;
+    }
 
-	private NodeWrapperMBean getProxyNodeMBean(){
-		if(proxyNodeMBean==null){
-			proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(), getObjectName(), NodeWrapperMBean.class, false);
-		}
-		return proxyNodeMBean;
-	}
+    private NodeWrapperMBean getProxyNodeMBean() {
+        if (proxyNodeMBean == null) {
+            proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+                    getObjectName(), NodeWrapperMBean.class, false);
+        }
+        return proxyNodeMBean;
+    }
 
-	@Override
-	public void destroy(){
-		this.vnParent.removeChild(this);
-		super.destroy();
-	}
+    @Override
+    public void destroy() {
+        this.vnParent.removeChild(this);
+        super.destroy();
+    }
 
-	@Override
-	public void explore() {
-		findActiveObjects();
-	}
+    @Override
+    public void explore() {
+        findActiveObjects();
+    }
 
-	@Override
-	public String getKey() {
-		return this.url;
-	}
+    @Override
+    public String getKey() {
+        return this.url;
+    }
 
-	@Override
-	public String getType() {
-		return "node object";
-	}
+    @Override
+    public String getType() {
+        return "node object";
+    }
 
-	/**
-	 * Returns the url of this object.
-	 * @return An url.
-	 */
-	public String getUrl(){
-		return this.url;
-	}
+    /**
+     * Returns the url of this object.
+     * @return An url.
+     */
+    public String getUrl() {
+        return this.url;
+    }
 
-	/**
-	 * Finds all active objects of this node.
-	 */
-	@SuppressWarnings("unchecked")
-	private void findActiveObjects(){
-		Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
+    /**
+     * Finds all active objects of this node.
+     */
+    @SuppressWarnings("unchecked")
+    private void findActiveObjects() {
+        Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
-		List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
-		for (ObjectName oname : activeObjectNames) {
-			BodyWrapperMBean proxyBodyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(), oname, BodyWrapperMBean.class, false);
-			UniqueID id = proxyBodyMBean.getID();
-			String activeObjectName = proxyBodyMBean.getName();
-			// If this child is a NOT monitored child.
-			if(containsChildInNOTMonitoredChildren(id.toString())){
-				continue;
-			}
-			ActiveObject child = (ActiveObject) this.getMonitoredChild(id.toString());
-			// If this child is not yet monitored.
-			if(child==null){
-				child = new ActiveObject(this,id, activeObjectName, oname);
-				addChild(child);
-			}
-			else{
-				child.explore();
-			}
-			// Removes from the model the not monitored or termined aos.
-			childrenToRemoved.remove(child.getKey());
-		}
+        List<ObjectName> activeObjectNames = getProxyNodeMBean()
+                                                 .getActiveObjects();
+        for (ObjectName oname : activeObjectNames) {
+            BodyWrapperMBean proxyBodyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+                    oname, BodyWrapperMBean.class, false);
+            UniqueID id = proxyBodyMBean.getID();
+            String activeObjectName = proxyBodyMBean.getName();
 
-		// Some child have to be removed
-		for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
-			ActiveObject child = (ActiveObject)iter.next();
-			child.destroy();
-		}
-	}
+            // If this child is a NOT monitored child.
+            if (containsChildInNOTMonitoredChildren(id.toString())) {
+                continue;
+            }
+            ActiveObject child = (ActiveObject) this.getMonitoredChild(id.toString());
 
-	@Override
-	public String getName(){
-		return URIBuilder.getNameFromURI(getUrl());
-	}
+            // If this child is not yet monitored.
+            if (child == null) {
+                child = new ActiveObject(this, id, activeObjectName, oname);
+                addChild(child);
+            } else {
+                child.explore();
+            }
+            // Removes from the model the not monitored or termined aos.
+            childrenToRemoved.remove(child.getKey());
+        }
 
-	@Override
-	public String toString(){
-		return "Node: "+getUrl();
-	}
+        // Some child have to be removed
+        for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator();
+                iter.hasNext();) {
+            ActiveObject child = (ActiveObject) iter.next();
+            child.destroy();
+        }
+    }
 
-	public void addChild(ActiveObject child){
-		super.addChild(child);
-		String name = child.getClassName();
-		if((!name.equals(ProActiveConnection.class.getName())
-				&&
-				(!name.equals(ProActiveServerImpl.class.getName())))){
-			ObjectName oname = child.getObjectName();
+    @Override
+    public String getName() {
+        return URIBuilder.getNameFromURI(getUrl());
+    }
 
-			JMXNotificationManager.getInstance().subscribe(oname, child.getListener(), getParent().getUrl());
-		}
-	}
+    @Override
+    public String toString() {
+        return "Node: " + getUrl();
+    }
 
-	/**
-	 * Returns the virtual node name.
-	 * @return the virtual node name.
-	 */
-	public String getVirtualNodeName() {
-		return getProxyNodeMBean().getVirtualNodeName();
-	}
+    public void addChild(ActiveObject child) {
+        super.addChild(child);
+        String name = child.getClassName();
+        if ((!name.equals(ProActiveConnection.class.getName()) &&
+                (!name.equals(ProActiveServerImpl.class.getName())))) {
+            ObjectName oname = child.getObjectName();
 
-	/**
-	 * Returns the Job Id.
-	 * @return the Job Id.
-	 */
-	public String getJobId() {
-		return getProxyNodeMBean().getJobId();
-	}
+            JMXNotificationManager.getInstance()
+                                  .subscribe(oname, child.getListener(),
+                getParent().getUrl());
+        }
+    }
 
-	/**
-	 * Used to highlight this node, in a virtual node.
-	 * @param highlighted true, or false
-	 */
-	public void setHighlight(boolean highlighted) {
-		this.setChanged();
-		if (highlighted)
-			this.notifyObservers(State.HIGHLIGHTED);
-		else
-			this.notifyObservers(State.NOT_HIGHLIGHTED);
-	}
+    /**
+     * Returns the virtual node name.
+     * @return the virtual node name.
+     */
+    public String getVirtualNodeName() {
+        return getProxyNodeMBean().getVirtualNodeName();
+    }
+
+    /**
+     * Returns the Job Id.
+     * @return the Job Id.
+     */
+    public String getJobId() {
+        return getProxyNodeMBean().getJobId();
+    }
+
+    /**
+     * Used to highlight this node, in a virtual node.
+     * @param highlighted true, or false
+     */
+    public void setHighlight(boolean highlighted) {
+        this.setChanged();
+        if (highlighted) {
+            this.notifyObservers(State.HIGHLIGHTED);
+        } else {
+            this.notifyObservers(State.NOT_HIGHLIGHTED);
+        }
+    }
 }

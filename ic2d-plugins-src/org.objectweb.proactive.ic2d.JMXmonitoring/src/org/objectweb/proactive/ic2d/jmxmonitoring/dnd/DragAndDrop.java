@@ -35,87 +35,90 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 
+
 /**
  * This class allows us to make drag and drop for a migration.
  */
 public class DragAndDrop {
 
-	/** The source object */
-	private ActiveObject source;
+    /** The source object */
+    private ActiveObject source;
 
-	/** The source node */
-	private NodeObject sourceNode;
+    /** The source node */
+    private NodeObject sourceNode;
 
-	/** The source figure */
-	private AOFigure sourceFigure;
+    /** The source figure */
+    private AOFigure sourceFigure;
 
-	/** The current nodeFigure */
-	private NodeFigure nodeFigure;
+    /** The current nodeFigure */
+    private NodeFigure nodeFigure;
 
-	//
-	// -- PUBLICS METHODS -----------------------------------------------
-	//
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
 
-	/**
-	 * Returns the source of the migration
-	 * @return the source of the migration
-	 */
-	public ActiveObject getSource(){
-		return this.source;
-	}
+    /**
+     * Returns the source of the migration
+     * @return the source of the migration
+     */
+    public ActiveObject getSource() {
+        return this.source;
+    }
 
-	public NodeObject getSourceNode(){
-		return this.sourceNode;
-	}
+    public NodeObject getSourceNode() {
+        return this.sourceNode;
+    }
 
-	/**
-	 * Sets the source of the migration
-	 * @param source The new source
-	 */
-	public void setSource(ActiveObject source){
-		this.source = source;
-		if(source==null)
-			this.sourceNode=null;
-		else
-			this.sourceNode = (NodeObject)source.getParent();
-	}
+    /**
+     * Sets the source of the migration
+     * @param source The new source
+     */
+    public void setSource(ActiveObject source) {
+        this.source = source;
+        if (source == null) {
+            this.sourceNode = null;
+        } else {
+            this.sourceNode = (NodeObject) source.getParent();
+        }
+    }
 
-	/**
-	 * Returns the figure of the source of the migration
-	 * @return the figure of the source of the migration
-	 */
-	public AOFigure getSourceFigure(){
-		return this.sourceFigure;
-	}
+    /**
+     * Returns the figure of the source of the migration
+     * @return the figure of the source of the migration
+     */
+    public AOFigure getSourceFigure() {
+        return this.sourceFigure;
+    }
 
-	/**
-	 * Sets the figure of the source of the mirgation
-	 * @param figure The new figure
-	 */
-	public void setSourceFigure(AOFigure figure){
-		this.sourceFigure = figure;
-	}
+    /**
+     * Sets the figure of the source of the mirgation
+     * @param figure The new figure
+     */
+    public void setSourceFigure(AOFigure figure) {
+        this.sourceFigure = figure;
+    }
 
-	/**
-	 * Highlights the new nodeFigure, and cleans the previous nodeFigure.
-	 * @param nodeFigure
-	 */
-	public void refresh(NodeFigure nodeFigure){
-		if(this.nodeFigure!=null)
-			this.nodeFigure.setHighlight(null);
-		this.nodeFigure = nodeFigure;
-	}
+    /**
+     * Highlights the new nodeFigure, and cleans the previous nodeFigure.
+     * @param nodeFigure
+     */
+    public void refresh(NodeFigure nodeFigure) {
+        if (this.nodeFigure != null) {
+            this.nodeFigure.setHighlight(null);
+        }
+        this.nodeFigure = nodeFigure;
+    }
 
-	/**
-	 * Resets all recorded data in order to allow a new migration.
-	 */
-	public void reset(){
-		setSource(null);
-		nodeFigure=null;
-		AOFigure figure = getSourceFigure();
-		if(figure != null){
-			figure.setHighlight(null);
-			setSourceFigure(null);
-		}
-	}
+    /**
+     * Resets all recorded data in order to allow a new migration.
+     */
+    public void reset() {
+        setSource(null);
+        nodeFigure = null;
+        AOFigure figure = getSourceFigure();
+        if (figure != null) {
+            figure.setHighlight(null);
+            setSourceFigure(null);
+        }
+    }
 }

@@ -39,39 +39,41 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
 public class MonitoringPerspective implements IPerspectiveFactory {
-	
-	public static final String ID = "org.objectweb.proactive.ic2d.jmxmonitoring.perspective.MonitoringPerspective";
-	
-	 /** Top folder's id. */
+    public static final String ID = "org.objectweb.proactive.ic2d.jmxmonitoring.perspective.MonitoringPerspective";
+
+    /** Top folder's id. */
     public static final String FI_TOP = ID + ".topFolder";
+
     /** Bottom folder's id. */
     public static final String FI_BOTTOM = ID + ".bottomFolder";
+
     /** Right folder's id. */
     public static final String FI_RIGHT = ID + ".rightFolder";
-    
-	
-	//
-	// -- PUBLIC METHODS ----------------------------------------------
-	//
-	
-	public void createInitialLayout(IPageLayout layout) {
-		String editorAreaId=layout.getEditorArea();
-		layout.setEditorAreaVisible(false);
-		layout.setFixed(false);
 
-		IFolderLayout rightFolder = layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.80f, editorAreaId);
+    //
+    // -- PUBLIC METHODS ----------------------------------------------
+    //
+    public void createInitialLayout(IPageLayout layout) {
+        String editorAreaId = layout.getEditorArea();
+        layout.setEditorAreaVisible(false);
+        layout.setFixed(false);
+
+        IFolderLayout rightFolder = layout.createFolder(FI_RIGHT,
+                IPageLayout.RIGHT, 0.80f, editorAreaId);
         //rightFolder.addPlaceholder(Legend.ID);
-		rightFolder.addView(Legend.ID);
-		
-		IFolderLayout topFolder = layout.createFolder(FI_TOP,IPageLayout.TOP, 0.75f, editorAreaId );
-		//topFolder.addPlaceholder(MonitoringView.ID);
-		topFolder.addView(MonitoringView.ID);
-		topFolder.addPlaceholder("org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView:org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView*");
-		topFolder.addPlaceholder("org.objectweb.proactive.ic2d.dgc.*");
-		
-        IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.20f, editorAreaId);
+        rightFolder.addView(Legend.ID);
+
+        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
+                0.75f, editorAreaId);
+        //topFolder.addPlaceholder(MonitoringView.ID);
+        topFolder.addView(MonitoringView.ID);
+        topFolder.addPlaceholder(
+            "org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView:org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView*");
+        topFolder.addPlaceholder("org.objectweb.proactive.ic2d.dgc.*");
+
+        IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM,
+                IPageLayout.BOTTOM, 0.20f, editorAreaId);
         //bottomFolder.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
         bottomFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-	}
-	
+    }
 }

@@ -17,20 +17,20 @@ public class DgcAOEditPart extends AOEditPart {
     }
 
     @Override
-	protected IFigure createFigure() {
+    protected IFigure createFigure() {
         return new DgcAOFigure(getCastedModel().getName());
     }
 
-	@Override
-	protected Color getArrowColor() {
-		return new Color(Display.getCurrent(), 0, 0, 255);
-	}
+    @Override
+    protected Color getArrowColor() {
+        return new Color(Display.getCurrent(), 0, 0, 255);
+    }
 
     @Override
-	public void update(Observable o, Object arg) {
-    	ObjectGraph.addObject((ActiveObject) o);
-    	ActiveObject model = this.getCastedModel();
-    	((DgcAOFigure) super.getCastedFigure()).updateDgcState(model);
-    	super.update(o, arg);
+    public void update(Observable o, Object arg) {
+        ObjectGraph.addObject((ActiveObject) o);
+        ActiveObject model = this.getCastedModel();
+        ((DgcAOFigure) super.getCastedFigure()).updateDgcState(model);
+        super.update(o, arg);
     }
 }

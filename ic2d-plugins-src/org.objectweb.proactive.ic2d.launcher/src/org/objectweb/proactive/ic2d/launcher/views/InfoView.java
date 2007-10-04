@@ -78,354 +78,365 @@ import org.objectweb.proactive.ic2d.launcher.Activator;
 import org.objectweb.proactive.ic2d.launcher.actions.Launch;
 import org.objectweb.proactive.ic2d.launcher.editors.PathEditorInput;
 import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptor;
-import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptorSet;
 import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptor.FileState;
+import org.objectweb.proactive.ic2d.launcher.files.XMLDescriptorSet;
 import org.objectweb.proactive.ic2d.launcher.perspectives.LauncherPerspective;
 
-public class InfoView extends ViewPart  implements Observer{
 
-	public static final String ID = "org.objectweb.proactive.ic2d.launcher.views.InfoView";
+public class InfoView extends ViewPart implements Observer {
+    public static final String ID = "org.objectweb.proactive.ic2d.launcher.views.InfoView";
+    private TableViewer viewer;
 
-	private TableViewer viewer;
+    // Launches an application
+    private Action action1;
 
-	// Launches an application
-	private Action action1;
+    // Display some informations about the application
+    private Action action2;
 
-	// Display some informations about the application
-	private Action action2;
+    // Kills the application
+    private Action action3;
 
-	// Kills the application
-	private Action action3;
+    // Open the descriptor into an XML editor.
+    private Action doubleClickAction;
 
-	// Open the descriptor into an XML editor.
-	private Action doubleClickAction;
+    //
+    // -- CONSTRUCTORS ---------------------------------------------
+    //
 
+    /**
+     * The constructor.
+     */
+    public InfoView() {
+        XMLDescriptorSet.getInstance().addObserver(this);
+    }
 
-	//
-	// -- CONSTRUCTORS ---------------------------------------------
-	//
+    //
+    // -- PUBLIC METHODS ---------------------------------------------
+    //
 
-	/**
-	 * The constructor.
-	 */
-	public InfoView() {
-		XMLDescriptorSet.getInstance().addObserver(this);
-	}
+    /**
+     * This is a callback that will allow us
+     * to create the viewer and initialize it.
+     */
+    public void createPartControl(Composite parent) {
+        viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL |
+                SWT.V_SCROLL);
+        ViewContentProvider vcp = new ViewContentProvider();
+        viewer.setContentProvider(vcp);
+        viewer.setLabelProvider(new ViewLabelProvider());
+        viewer.setSorter(new NameSorter());
+        viewer.setInput(getViewSite());
+        makeActions();
+        hookContextMenu();
+        // TODO Fix the bug of the double click action
+        //hookDoubleClickAction();
+        contributeToActionBars();
+    }
 
-	//
-	// -- PUBLIC METHODS ---------------------------------------------
-	//
+    /**
+     * Passing the focus request to the viewer's control.
+     */
+    public void setFocus() {
+        viewer.getControl().setFocus();
+    }
 
-	/**
-	 * This is a callback that will allow us
-	 * to create the viewer and initialize it.
-	 */
-	public void createPartControl(Composite parent) {
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		ViewContentProvider vcp = new ViewContentProvider();
-		viewer.setContentProvider(vcp);
-		viewer.setLabelProvider(new ViewLabelProvider());
-		viewer.setSorter(new NameSorter());
-		viewer.setInput(getViewSite());
-		makeActions();
-		hookContextMenu();
-		// TODO Fix the bug of the double click action
-		//hookDoubleClickAction();
-		contributeToActionBars();
-	}
+    /**
+     *  @see Observer#update(Observable o, Object arg)
+     */
+    public void update(Observable o, Object arg) {
+        if (o instanceof XMLDescriptorSet) {
+            if (arg instanceof XMLDescriptor) { // A new file has been added to the XMLDescriptorSet
+                XMLDescriptor file = (XMLDescriptor) arg;
+                file.addObserver(this);
+            }
+            if (this.viewer != null) {
+                IWorkbench workbench = PlatformUI.getWorkbench();
+                IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
+                IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
+                if ((perspective != null) &&
+                        !this.viewer.getControl().isDisposed()) {
+                    this.viewer.refresh();
+                }
+            }
+        } else if (o instanceof XMLDescriptor) {
+            if (arg instanceof String) {
+                String message = (String) arg;
+                showError((XMLDescriptor) o, message);
+            } else {
+                if (this.viewer != null) {
+                    IWorkbench workbench = PlatformUI.getWorkbench();
+                    IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
+                    IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
+                    if ((perspective != null) &
+                            !this.viewer.getControl().isDisposed()) {
+                        this.viewer.refresh();
+                    }
+                }
+            }
+        }
+    }
 
+    //
+    // -- PRIVATE METHODS ---------------------------------------------
+    //
+    private void hookContextMenu() {
+        MenuManager menuMgr = new MenuManager("#PopupMenu");
+        menuMgr.setRemoveAllWhenShown(true);
+        menuMgr.addMenuListener(new IMenuListener() {
+                public void menuAboutToShow(IMenuManager manager) {
+                    InfoView.this.fillContextMenu(manager);
+                }
+            });
 
-	/**
-	 * Passing the focus request to the viewer's control.
-	 */
-	public void setFocus() {
-		viewer.getControl().setFocus();
-	}
+        Menu menu = menuMgr.createContextMenu(viewer.getControl());
+        viewer.getControl().setMenu(menu);
+        getSite().registerContextMenu(menuMgr, viewer);
+    }
 
-	/**
-	 *  @see Observer#update(Observable o, Object arg)
-	 */
-	public void update(Observable o, Object arg) {
-		if (o instanceof XMLDescriptorSet) {
-			if (arg instanceof XMLDescriptor) {// A new file has been added to the XMLDescriptorSet
-				XMLDescriptor file = (XMLDescriptor)arg;
-				file.addObserver(this);
-			}
-			if(this.viewer!=null){
-				IWorkbench workbench = PlatformUI.getWorkbench();
-				IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
-				IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
-				if(perspective!=null && !this.viewer.getControl().isDisposed())
-					this.viewer.refresh();
-			}
-		}
-		else if(o instanceof XMLDescriptor){
-			if(arg instanceof String){
-				String message = (String)arg;
-				showError((XMLDescriptor) o, message);
-			}
-			else{
-				if(this.viewer!=null){
-					IWorkbench workbench = PlatformUI.getWorkbench();
-					IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
-					IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
-					if(perspective!=null & !this.viewer.getControl().isDisposed())
-						this.viewer.refresh();
-				}
-			}
-		}
-	}
+    private void contributeToActionBars() {
+        IActionBars bars = getViewSite().getActionBars();
+        fillLocalPullDown(bars.getMenuManager());
+        fillLocalToolBar(bars.getToolBarManager());
+    }
 
+    private void fillLocalPullDown(IMenuManager manager) {
+        manager.add(action1);
+        manager.add(new Separator());
+        manager.add(action2);
+        manager.add(new Separator());
+        manager.add(action3);
+    }
 
-	//
-	// -- PRIVATE METHODS ---------------------------------------------
-	//
+    private void fillContextMenu(IMenuManager manager) {
+        manager.add(action1);
+        manager.add(action2);
+        manager.add(action3);
+        // Other plug-ins can contribute there actions here
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    }
 
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				InfoView.this.fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
-	}
+    private void fillLocalToolBar(IToolBarManager manager) {
+        manager.add(action1);
+        manager.add(action2);
+        manager.add(action3);
+    }
 
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
+    private void makeActions() {
+        // Action 1 : Launches an application
+        action1 = new Action() {
+                    public void run() {
+                        ISelection selection = viewer.getSelection();
+                        if ((((IStructuredSelection) selection).size() == 0) ||
+                                (((IStructuredSelection) selection).getFirstElement() == null)) {
+                            return;
+                        }
+                        Object obj = ((IStructuredSelection) selection).getFirstElement();
+                        IWorkbenchWindow workbenchWindow = getSite()
+                                                               .getWorkbenchWindow();
+                        IWorkbenchPage page = workbenchWindow.getActivePage();
+                        Launch.launch(page, obj.toString());
+                    }
+                };
+        action1.setText("Launch the application");
+        action1.setToolTipText("Launch the application");
+        action1.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "launch.gif"));
 
-	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(new Separator());
-		manager.add(action2);
-		manager.add(new Separator());
-		manager.add(action3);
-	}
+        // Action 2 : Display some informations about the application
+        action2 = new Action() {
+                    public void run() {
+                        ISelection selection = viewer.getSelection();
+                        if ((((IStructuredSelection) selection).size() == 0) ||
+                                (((IStructuredSelection) selection).getFirstElement() == null)) {
+                            return;
+                        }
+                        Object obj = ((IStructuredSelection) selection).getFirstElement();
+                        showInfo(obj.toString());
+                    }
+                };
+        action2.setText("Informations");
+        action2.setToolTipText("Informations");
+        action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+                                             .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(action2);
-		manager.add(action3);
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
+        // Action 3 : Kills the application
+        action3 = new Action() {
+                    public void run() {
+                        ISelection selection = viewer.getSelection();
+                        if ((((IStructuredSelection) selection).size() == 0) ||
+                                (((IStructuredSelection) selection).getFirstElement() == null)) {
+                            return;
+                        }
+                        Object obj = ((IStructuredSelection) selection).getFirstElement();
+                        XMLDescriptor file = XMLDescriptorSet.getInstance()
+                                                             .getFile(obj.toString());
+                        FileState state = file.getState();
+                        if (state != FileState.LAUNCHED) {
+                            showWarning("The " + file.getShortName() +
+                                " application  was not launched!");
+                            return;
+                        }
 
-	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(action1);
-		manager.add(action2);
-		manager.add(action3);
-	}
+                        Launcher launcher = file.getLauncher();
+                        if (launcher.isActivated()) {
+                            try {
+                                launcher.getProActiveDescriptor().killall(true);
+                                file.setState(FileState.KILLED);
+                            } catch (ProActiveException e) {
+                                Console.getInstance(Activator.CONSOLE_NAME)
+                                       .logException(e);
+                            }
+                        }
+                    }
+                };
+        action3.setText("Kill the application");
+        action3.setToolTipText("Kill the application");
+        action3.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "kill.gif"));
 
-	private void makeActions() {
-		// Action 1 : Launches an application
-		action1 = new Action() {
-			public void run() {
-				ISelection selection = viewer.getSelection();
-				if(((IStructuredSelection)selection).size()==0 || ((IStructuredSelection)selection).getFirstElement()==null)
-					return;
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
-				IWorkbenchPage page = workbenchWindow.getActivePage();
-				Launch.launch(page, obj.toString());
-			}
-		};
-		action1.setText("Launch the application");
-		action1.setToolTipText("Launch the application");
-		action1.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "launch.gif"));
+        // doubleClickAction : Open the descriptor into an XML editor.
+        doubleClickAction = new Action() {
+                    public void run() {
+                        ISelection selection = viewer.getSelection();
+                        Object obj = ((IStructuredSelection) selection).getFirstElement();
 
+                        IWorkbenchWindow workbenchWindow = getSite()
+                                                               .getWorkbenchWindow();
+                        IWorkbenchPage page =  /*workbenchWindow.getActivePage();*/getSite()
+                                                                                       .getPage();
+                        IWorkbench workbench = workbenchWindow.getWorkbench();
 
-		// Action 2 : Display some informations about the application
-		action2 = new Action() {
-			public void run() {
-				ISelection selection = viewer.getSelection();
-				if(((IStructuredSelection)selection).size()==0 || ((IStructuredSelection)selection).getFirstElement()==null)
-					return;
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				showInfo(obj.toString());
-			}
-		};
-		action2.setText("Informations");
-		action2.setToolTipText("Informations");
-		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+                        // Opens the corresponding page.
+                        openPerspective(workbench, page);
 
-		// Action 3 : Kills the application
-		action3 = new Action() {
-			public void run() {
-				ISelection selection = viewer.getSelection();
-				if(((IStructuredSelection)selection).size()==0 || ((IStructuredSelection)selection).getFirstElement()==null)
-					return;
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				XMLDescriptor file = XMLDescriptorSet.getInstance().getFile(obj.toString());
-				FileState state = file.getState();
-				if(state!=FileState.LAUNCHED){
-					showWarning("The "+file.getShortName()+" application  was not launched!");
-					return;
-				}
+                        // Opens the corresponding editor.
+                        openEditor(workbench, page, obj.toString());
+                    }
+                };
+    }
 
-				Launcher launcher = file.getLauncher();
-				if (launcher.isActivated()) {
-					try {
-						launcher.getProActiveDescriptor().killall(true);
-						file.setState(FileState.KILLED);
-					} catch (ProActiveException e) {
-						Console.getInstance(Activator.CONSOLE_NAME).logException(e);
-					}
-				}
-			}
-		};
-		action3.setText("Kill the application");
-		action3.setToolTipText("Kill the application");
-		action3.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "kill.gif"));
+    private void hookDoubleClickAction() {
+        viewer.addDoubleClickListener(new IDoubleClickListener() {
+                public void doubleClick(DoubleClickEvent event) {
+                    doubleClickAction.run();
+                }
+            });
+    }
 
+    /**
+     * Shows the informations about the file to the screen.
+     * @param path The file's path
+     */
+    private void showInfo(String path) {
+        String msg = null;
+        XMLDescriptor file = XMLDescriptorSet.getInstance().getFile(path);
+        String ID = XMLDescriptorSet.getInstance().getFile(path).getJobID();
+        if (ID != null) {
+            ID = "ID = " + ID + "\n";
+        }
+        String name = "Name = " + file.getShortName() + "\n";
+        String status = "Status =" + file.getState().toString();
+        if (ID != null) {
+            msg = ID + name + status;
+        } else {
+            msg = name + status;
+        }
+        msg = msg + "\nPath = " + path;
+        MessageDialog.openInformation(viewer.getControl().getShell(), "Info",
+            msg);
+    }
 
-		// doubleClickAction : Open the descriptor into an XML editor.
-		doubleClickAction = new Action() {
-			public void run() {
+    /**
+     * Shows an error message.
+     * @param file The source xml descriptor.
+     * @param message
+     */
+    private void showError(XMLDescriptor file, String message) {
+        MessageDialog.openError(viewer.getControl().getShell(), "Error", message);
+    }
 
-				ISelection selection = viewer.getSelection();
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
+    /**
+     * Shows a warning message.
+     * @param message The massage to display.
+     */
+    private void showWarning(String message) {
+        MessageDialog.openWarning(viewer.getControl().getShell(), "Warning",
+            message);
+    }
 
-				IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
-				IWorkbenchPage page = /*workbenchWindow.getActivePage();*/getSite().getPage();
-				IWorkbench workbench = workbenchWindow.getWorkbench();
+    /**
+     * Opens the perspective corresponding to the Launcher.
+     * @param workbench
+     * @param page
+     */
+    private void openPerspective(IWorkbench workbench, IWorkbenchPage page) {
+        IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
+        page.setPerspective(reg.findPerspectiveWithId(LauncherPerspective.ID));
+    }
 
-				// Opens the corresponding page.
-				openPerspective(workbench, page);
+    /**
+     * Opens the editor corresponding to the file having this file path.
+     * @param workbench
+     * @param page
+     * @param path The file path.
+     */
+    private void openEditor(IWorkbench workbench, IWorkbenchPage page,
+        String path) {
+        IEditorInput input = new PathEditorInput(new Path(path));
+        IEditorRegistry editorRegistry = workbench.getEditorRegistry();
+        IEditorDescriptor descriptor = editorRegistry.getDefaultEditor(path);
+        String editorId = descriptor.getId();
+        try {
+            if (page != null) {
+                page.openEditor(input, editorId);
+            }
+        } catch (PartInitException e) {
+            e.printStackTrace();
+        }
+    }
 
-				// Opens the corresponding editor.
-				openEditor(workbench, page, obj.toString());
+    //
+    // -- INNER CLASSES ---------------------------------------------
+    //
 
-			}
-		};
-	}
+    /*
+     * The content provider class is responsible for
+     * providing objects to the view. It can wrap
+     * existing objects in adapters or simply return
+     * objects as-is. These objects may be sensitive
+     * to the current input of the view, or ignore
+     * it and always show the same content.
+     */
+    class ViewContentProvider implements IStructuredContentProvider {
+        public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+        }
 
-	private void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				doubleClickAction.run();
-			}
-		});
-	}
+        public void dispose() {
+        }
 
-	/**
-	 * Shows the informations about the file to the screen.
-	 * @param path The file's path
-	 */
-	private void showInfo(String path) {
-		String msg = null;
-		XMLDescriptor file = XMLDescriptorSet.getInstance().getFile(path);
-		String ID = XMLDescriptorSet.getInstance().getFile(path).getJobID();
-		if(ID!=null)
-			ID = "ID = "+ID +"\n";
-		String name = "Name = "+file.getShortName()+"\n";
-		String status = "Status ="+file.getState().toString();
-		if(ID!=null)
-			msg = ID+name+status;
-		else
-			msg = name+status;
-		msg = msg+"\nPath = "+path;
-		MessageDialog.openInformation(
-				viewer.getControl().getShell(),
-				"Info",
-				msg);
-	}
+        public Object[] getElements(Object parent) {
+            return XMLDescriptorSet.getInstance().getFilePaths();
+        }
+    }
 
-	/**
-	 * Shows an error message.
-	 * @param file The source xml descriptor.
-	 * @param message
-	 */
-	private void showError(XMLDescriptor file, String message) {
-		MessageDialog.openError(
-				viewer.getControl().getShell(),
-				"Error",
-				message);
-	}
+    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+        public String getColumnText(Object obj, int index) {
+            return XMLDescriptorSet.getInstance()
+                                   .getFileNameToDisplay((String) obj);
+        }
 
-	/**
-	 * Shows a warning message.
-	 * @param message The massage to display.
-	 */
-	private void showWarning(String message){
-		MessageDialog.openWarning(
-				viewer.getControl().getShell(),
-				"Warning",
-				message);
-	}
+        public Image getColumnImage(Object obj, int index) {
+            return getImage(obj);
+        }
 
-	/**
-	 * Opens the perspective corresponding to the Launcher.
-	 * @param workbench
-	 * @param page
-	 */
-	private void openPerspective(IWorkbench workbench, IWorkbenchPage page){
-		IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
-		page.setPerspective(reg.findPerspectiveWithId(LauncherPerspective.ID));
-	}
+        public Image getImage(Object obj) {
+            String image = XMLDescriptorSet.getInstance().getFile((String) obj)
+                                           .getImage();
+            return new Image(Display.getCurrent(),
+                this.getClass().getResourceAsStream(image));
+        }
+    }
 
-	/**
-	 * Opens the editor corresponding to the file having this file path.
-	 * @param workbench
-	 * @param page
-	 * @param path The file path.
-	 */
-	private void openEditor(IWorkbench workbench, IWorkbenchPage page, String path){
-		IEditorInput input = new PathEditorInput(new Path(path));
-		IEditorRegistry editorRegistry= workbench.getEditorRegistry();
-		IEditorDescriptor descriptor= editorRegistry.getDefaultEditor(path);
-		String editorId= descriptor.getId();
-		try {
-			if(page!=null)
-				page.openEditor(input, editorId);
-		} catch (PartInitException e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	//
-	// -- INNER CLASSES ---------------------------------------------
-	//
-
-	/*
-	 * The content provider class is responsible for
-	 * providing objects to the view. It can wrap
-	 * existing objects in adapters or simply return
-	 * objects as-is. These objects may be sensitive
-	 * to the current input of the view, or ignore
-	 * it and always show the same content.
-	 */
-	class ViewContentProvider implements IStructuredContentProvider {
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {	}
-		public void dispose() {
-		}
-		public Object[] getElements(Object parent) {
-			return XMLDescriptorSet.getInstance().getFilePaths();
-		}
-	}
-
-	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-		public String getColumnText(Object obj, int index) {
-			return XMLDescriptorSet.getInstance().getFileNameToDisplay((String)obj);
-		}		
-
-		public Image getColumnImage(Object obj, int index) {
-			return getImage(obj);
-		}
-		public Image getImage(Object obj) {
-			String image = XMLDescriptorSet.getInstance().getFile((String)obj).getImage();
-			return new Image(Display.getCurrent(),this.getClass().getResourceAsStream(image));
-		}
-	}
-
-	class NameSorter extends ViewerSorter {
-	}
-
+    class NameSorter extends ViewerSorter {
+    }
 }
