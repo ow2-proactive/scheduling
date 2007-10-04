@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -109,7 +110,7 @@ public class NodeImpl implements Node, Serializable {
      */
     public Object[] getActiveObjects()
         throws NodeException, ActiveObjectCreationException {
-        ArrayList bodyArray;
+        List<UniversalBody> bodyArray;
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
         } catch (ProActiveException e) {
@@ -122,8 +123,8 @@ public class NodeImpl implements Node, Serializable {
         } else {
             Object[] stubOnAO = new Object[bodyArray.size()];
             for (int i = 0; i < bodyArray.size(); i++) {
-                UniversalBody body = (UniversalBody) ((ArrayList) bodyArray.get(i)).get(0);
-                String className = (String) ((ArrayList) bodyArray.get(i)).get(1);
+                UniversalBody body = bodyArray.get(i);
+                String className = body.getReifiedClassName();
                 try {
                     stubOnAO[i] = createStubObject(className, body);
                 } catch (MOPException e) {
@@ -139,7 +140,7 @@ public class NodeImpl implements Node, Serializable {
      * @see org.objectweb.proactive.core.node.Node#getNumberOfActiveObjects()
      */
     public int getNumberOfActiveObjects() throws NodeException {
-        ArrayList bodyArray;
+        List<UniversalBody> bodyArray;
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
         } catch (ProActiveException e) {
@@ -155,7 +156,7 @@ public class NodeImpl implements Node, Serializable {
      */
     public Object[] getActiveObjects(String className)
         throws NodeException, ActiveObjectCreationException {
-        ArrayList bodyArray;
+        List<UniversalBody> bodyArray;
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName(),
                     className);
@@ -171,7 +172,7 @@ public class NodeImpl implements Node, Serializable {
         } else {
             Object[] stubOnAO = new Object[bodyArray.size()];
             for (int i = 0; i < bodyArray.size(); i++) {
-                UniversalBody body = (UniversalBody) bodyArray.get(i);
+                UniversalBody body = bodyArray.get(i);
                 try {
                     stubOnAO[i] = createStubObject(className, body);
                 } catch (MOPException e) {
@@ -192,9 +193,9 @@ public class NodeImpl implements Node, Serializable {
     }
 
     // -------------------------------------------------------------------------------------------
-    // 
+    //
     // STUB CREATION
-    // 
+    //
     // -------------------------------------------------------------------------------------------
     private static Object createStubObject(String className, UniversalBody body)
         throws MOPException {
@@ -294,7 +295,7 @@ public class NodeImpl implements Node, Serializable {
      * @see org.objectweb.proactive.core.node.Node#killAllActiveObjects()
      */
     public void killAllActiveObjects() throws NodeException, IOException {
-        ArrayList bodyArray;
+        List<UniversalBody> bodyArray;
         boolean local = NodeFactory.isNodeLocal(this);
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
@@ -304,7 +305,7 @@ public class NodeImpl implements Node, Serializable {
                 this.nodeInformation.getURL(), e);
         }
         for (int i = 0; i < bodyArray.size(); i++) {
-            UniversalBody body = (UniversalBody) ((ArrayList) bodyArray.get(i)).get(0);
+            UniversalBody body = bodyArray.get(i);
             if (local) {
                 ((Body) body).terminate();
             } else {

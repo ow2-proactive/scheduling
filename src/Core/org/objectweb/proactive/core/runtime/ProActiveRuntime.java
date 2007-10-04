@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -223,10 +223,10 @@ public interface ProActiveRuntime extends SecurityEntity {
      * Returns all Active Objects deployed on the node with the given name on
      * this ProActiveRuntime
      * @param nodeName the name of the node
-     * @return ArrayList of ArrayList. The latter contains [body, classname].
+     * @return List of UniversalBody. The latter contains [body, classname].
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public ArrayList getActiveObjects(String nodeName)
+    public List<UniversalBody> getActiveObjects(String nodeName)
         throws ProActiveException;
 
     /**
@@ -237,8 +237,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return Active Objects of the specified class name deployed on this ProactiveRuntime
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public ArrayList getActiveObjects(String nodeName, String className)
-        throws ProActiveException;
+    public List<UniversalBody> getActiveObjects(String nodeName,
+        String className) throws ProActiveException;
 
     /**
      * Returns the VirtualNode with the given name

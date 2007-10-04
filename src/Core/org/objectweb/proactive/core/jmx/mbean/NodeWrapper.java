@@ -76,12 +76,13 @@ public class NodeWrapper extends NotificationBroadcasterSupport
     }
 
     public List<ObjectName> getActiveObjects() {
-        List<List<Object>> activeObjects = this.localNode.getActiveObjects(new ProActiveInternalObjectFilter());
+        List<UniversalBody> activeObjects = this.localNode.getActiveObjects(new ProActiveInternalObjectFilter());
 
         List<ObjectName> onames = new ArrayList<ObjectName>();
-        for (List<Object> ao : activeObjects) {
-            UniversalBody ub = (UniversalBody) ao.get(0);
+        for (UniversalBody ub : activeObjects) {
             UniqueID id = ub.getID();
+
+            System.out.println("NodeWrapper.getActiveObjects() " + id);
 
             ObjectName name = FactoryName.createActiveObjectName(id);
             onames.add(name);

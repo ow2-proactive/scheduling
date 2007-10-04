@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -44,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -706,12 +706,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return this.roe.getURL();
     }
 
-    public ArrayList<ArrayList<Serializable>> getActiveObjects(String nodeName) {
+    public List<UniversalBody> getActiveObjects(String nodeName) {
         // the array to return
-        ArrayList<ArrayList<Serializable>> localBodies = new ArrayList<ArrayList<Serializable>>();
+        List<UniversalBody> localBodies = new ArrayList<UniversalBody>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -735,15 +734,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     // the body is on this runtime then return adapter and class
                     // name of the reified
                     // object to enable the construction of stub-proxy couple.
-                    ArrayList<Serializable> bodyAndObjectClass = new ArrayList<Serializable>(2);
-
-                    // adapter
-                    bodyAndObjectClass.add(0, body.getRemoteAdapter());
-
-                    // className
-                    bodyAndObjectClass.add(1,
-                        body.getReifiedObject().getClass().getName());
-                    localBodies.add(bodyAndObjectClass);
+                    localBodies.add(0, body.getRemoteAdapter());
                 }
             }
 
@@ -791,8 +782,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // the array to return
         ArrayList<UniversalBody> localBodies = new ArrayList<UniversalBody>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -950,8 +940,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             if (!bodyList.contains(bodyID)) {
@@ -975,8 +964,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // System.out.println("in remove id= "+ bodyID.toString());
         // System.out.println("array size
         // "+((ArrayList)nodeMap.get(nodeName)).size());
-        ArrayList<UniqueID> bodyList = this.nodeMap.get(nodeName)
-                                                   .getActiveObjectsId();
+        List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             bodyList.remove(bodyID);
