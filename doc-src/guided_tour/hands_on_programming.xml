@@ -82,7 +82,7 @@
       the interfaces InitActive and EndActive.It acts a a server for the
       InitializedHelloClient class.</para>
 
-      <para>The main method is overriden so that it can instantiate the
+      <para>The main method is overridden so that it can instantiate the
       InitializedHello class</para>
 
       <para><informalfigure>
