@@ -32,7 +32,7 @@ package functionalTests.stub.stubgeneration;
 
 import java.util.Arrays;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.Utils;
 
@@ -109,7 +109,7 @@ public class Test extends FunctionalTest {
                 }));
 
         // test Serializable return type
-        A a = (A) ProActive.newActive(A.class.getName(), new Object[] {  });
+        A a = (A) ProActiveObject.newActive(A.class.getName(), new Object[] {  });
         assertEquals(A.RESULT, a.foo().toString());
 
         //BENCH
