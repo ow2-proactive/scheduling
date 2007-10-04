@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="job_pre_post" priority="normal" >
+	<description>Set a java Property in PreTask and unset it in PostTask</description>
+	<tasks>
+		<task name="main_task" finalTask="true">
+			<!-- Task human description -->
+			<description>Testing the pre and post scripts.</description>
+			<preTask>
+				<script file="/user/jmartin/home/scripts/set.js" />
+			</preTask>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.PropertyTask">
+				</javaProcess>
+			</process>
+			<postTask>
+				<script file="/user/jmartin/home/scripts/unset.js" />
+			</postTask>
+		</task>
+	</tasks>
+</job>

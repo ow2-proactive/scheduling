@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+	xmlns:jd="urn:proactive:jobdescriptor:3.3"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	
+	
+	<xs:complexType name="scriptType">
+		<xs:simpleContent>
+			<xs:restriction base="xs:string"></xs:restriction>
+		</xs:simpleContent>
+		<xs:attribute name="engine" type="xs:string" use="optional" />
+		<xs:attribute name="url" type="xs:string" use="optional" />
+		<xs:attribute name="file" type="xs:string" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="parameterSet">
+		<xs:sequence>
+			<xs:element name="parameter" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:string"
+						use="required" />
+					<xs:attribute name="value" type="xs:string"
+						use="optional" />
+					<xs:attribute name="serializedFile" type="xs:string"
+						use="optional" />
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="job">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="description" type="xs:string"
+					minOccurs="0" />
+				<xs:element name="owner" type="xs:string" minOccurs="0"/>
+				<xs:element name="priority" default="normal"
+					minOccurs="0">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="highest" />
+							<xs:enumeration value="high" />
+							<xs:enumeration value="normal" />
+							<xs:enumeration value="low" />
+							<xs:enumeration value="lowest" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="envParameters" type="parameterSet" minOccurs="0"/>
+				<xs:element name="tasks">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="task"
+								maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="description"
+											type="xs:string" minOccurs="0" />
+										<xs:element
+											name="verifyingTask">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element
+														name="script" type="scriptType" />
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="preTask">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element
+														name="script" type="scriptType"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="runTask">
+											<xs:complexType>
+												<xs:choice>
+													<xs:element
+														name="javaTask">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="initParameters" type="parameterSet" minOccurs="0"/>
+															</xs:sequence>
+															<xs:attribute name="class" type="xs:string"/>
+														</xs:complexType>
+													</xs:element>
+													<xs:element
+														name="nativeTask" />
+												</xs:choice>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="postTask">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element
+														name="script" type="scriptType"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="name"
+										type="xs:string" use="required" />
+									<xs:attribute name="reRunnable"
+										type="xs:integer" use="optional" />
+									<xs:attribute name="finalTask"
+										type="xs:boolean" use="optional" />
+									<xs:attribute name="depends"
+										type="xs:string" use="optional" />
+									<xs:attribute name="runtimeLimit"
+										type="xs:string" use="optional" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" />
+			<xs:attribute name="priority" default="normal"
+				use="optional">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="highest" />
+						<xs:enumeration value="high" />
+						<xs:enumeration value="normal" />
+						<xs:enumeration value="low" />
+						<xs:enumeration value="lowest" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="runTimeLimit" type="xs:string" />
+			<xs:attribute name="type" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="APPLI" />
+						<xs:enumeration value="TASK_FLOW" />
+						<xs:enumeration value="PARAMETER_SWEEPING" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:complexType name="script"></xs:complexType>
+</xs:schema>

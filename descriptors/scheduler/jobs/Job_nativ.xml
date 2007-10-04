@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="job_nativ" priority="normal" >
+	<description>Will execute 3 nativ C tasks and a java task with diamond dependences</description>
+	<tasks>
+		<task name="task1">
+			<!-- Task human description -->
+			<description>Will display 10 dots every 1s</description>
+			<process>
+				<nativeProcess command="/user/jlscheef/home/ProActiveScheduler/classes/Examples/org/objectweb/proactive/examples/scheduler/nativTask">
+					<initParameters>
+						<parameter value="1" />
+					</initParameters>
+				</nativeProcess>
+			</process>
+		</task>
+		<task name="task2" depends="task1">
+			<!-- Task human description -->
+			<description>Will display 10 dots every 2s</description>
+			<process>
+				<nativeProcess command="/user/jlscheef/home/ProActiveScheduler/classes/Examples/org/objectweb/proactive/examples/scheduler/nativTask">
+					<initParameters>
+						<parameter value="2" />
+					</initParameters>
+				</nativeProcess>
+			</process>
+		</task>
+		<task name="task3" depends="task1">
+			<!-- Task human description -->
+			<description>This task will sleep 10s</description>
+			<process>
+				<javaProcess class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="15" />
+						<parameter name="number" value="3" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+		<task name="task4" depends="task2 task3" finalTask="true">
+			<!-- Task human description -->
+			<description>Will display 10 dots every 1s</description>
+			<process>
+				<nativeProcess command="/user/jlscheef/home/ProActiveScheduler/classes/Examples/org/objectweb/proactive/examples/scheduler/nativTask">
+					<initParameters>
+						<parameter value="1" />
+					</initParameters>
+				</nativeProcess>
+			</process>
+		</task>
+	</tasks>
+</job>

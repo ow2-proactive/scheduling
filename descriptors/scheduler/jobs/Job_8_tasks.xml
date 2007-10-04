@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job name="job_8_tasks" priority="normal">
+	<description>Simple test of 8 tasks with variable durations</description>
+	<tasks>
+		<task name="task1">
+			<!-- Task human description -->
+			<description>This task will sleep 8s</description><!--
+			<preTask>
+				<script url="http://fiacre.inria.fr:10080/test.js" />
+			</preTask> -->
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="8" />
+						<parameter name="number" value="1" />
+					</initParameters>
+				</javaProcess>
+			</process><!-- 
+			<postTask>
+				<script file="/user/jmartin/home/scripts/test.js" />
+			</postTask> -->
+		</task>
+		<task name="task2">
+			<!-- Task human description -->
+			<description>This task will sleep 6s</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="6" />
+						<parameter name="number" value="2" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+		<task name="task3">
+			<!-- Task human description -->
+			<description>This task will sleep 8s</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="8" />
+						<parameter name="number" value="3" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+		<task name="task8" finalTask="true" reRunnable="4">
+			<!-- Task human description -->
+			<description>This task will sleep 20s</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="20" />
+						<parameter name="number" value="8" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+		<task name="task4">
+			<!-- Task human description -->
+			<description>This task will sleep 6s</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="6" />
+						<parameter name="number" value="4" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+		<task name="task5">
+			<!-- Task human description -->
+			<description>This task will sleep 6s</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="6" />
+						<parameter name="number" value="5" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+		<task name="task6">
+			<!-- Task human description -->
+			<description>This task will sleep 4s</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="4" />
+						<parameter name="number" value="6" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+		<task name="task7">
+			<!-- Task human description -->
+			<description>This task will sleep 4s</description>
+			<process>
+				<javaProcess
+					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+					<initParameters>
+						<parameter name="sleepTime" value="4" />
+						<parameter name="number" value="7" />
+					</initParameters>
+				</javaProcess>
+			</process>
+		</task>
+	</tasks>
+</job>
