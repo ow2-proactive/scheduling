@@ -34,6 +34,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
@@ -43,7 +45,14 @@ import org.apache.log4j.Logger;
  *  to create and to retrieve a logger.
  */
 public class ProActiveLogger extends Logger {
-    // It's enough to instantiate a factory once and for all.
+
+    static {
+        if (System.getProperty("log4j.configuration") == null) {
+            PropertyConfigurator.configure(PAProperties.class.getResource(
+                    "proactive-log4j"));
+        }
+    }
+
     private static ProActiveLoggerFactory myFactory = new ProActiveLoggerFactory();
 
     /**
