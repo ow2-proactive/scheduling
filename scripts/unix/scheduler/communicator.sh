@@ -3,18 +3,14 @@
 echo
 echo --- Communicator ----------------------------------------------
 
-if [ $# -lt 1 ]; then
-    SCHEDULER_URL=//localhost/SchedulerNode
-else
-  SCHEDULER_URL=$1
-fi
+SCHEDULER_URL=$1
 
 workingDir=..
 PROACTIVE=$workingDir/../..
 CLASSPATH=.
 . $workingDir/env.sh
 
-$JAVACMD org.objectweb.proactive.extra.scheduler.AdminCommunicator $SCHEDULER_URL
+$JAVACMD org.objectweb.proactive.examples.scheduler.AdminCommunicator $SCHEDULER_URL
 
 
 echo

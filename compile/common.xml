@@ -3,7 +3,7 @@
 	<taskdef name="if" classname="ise.antelope.tasks.IfTask"/>
 
 	<property environment="env" />
-	
+
 	<property name="base.dir"           value="${basedir}/.." />
 	<property name="lib.dir"            value="${base.dir}/lib" />
 	<property name="src.dir"            value="${base.dir}/src" />
@@ -17,7 +17,7 @@
 	<property name="PAdist.dir"         value="${dist.dir}/ProActive" />
 	<property name="junit.dir"          value="${base.dir}/junitReports" />
 	<property name="emma.dir"           value="${base.dir}/emmaReports" />
-	
+
 	<property name="src.proactive.dir"  value="${src.dir}/Core" />
 	<property name="src.extensions.dir" value="${src.dir}/Extensions" />
 	<property name="src.extra.dir"      value="${src.dir}/Extra" />
@@ -41,7 +41,7 @@
 	<property name="docs.dir"      		value="${base.dir}/docs" />
 	<property name="docs.tmp.dir"  		value="${docs.dir}/tmp" />
 	<property name="docs.mainFile" 		value="PA_index.xml" />
-	
+
 	<!-- Javac properties -->
 	<property name="debug" value="on" />
 	<property name="source" value="1.5" />
@@ -59,26 +59,31 @@
 	<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
 	<property name="manifest.connector.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/connector/Manifest/"/>
 	<property name="manifest.example.management.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/jmx/remote/management/osgi/Manifest/"/>
-	<property name="example.management.classes.dir" value="${classes.dir}/Examples/org/objectweb/proactive/examples/jmx/remote/management/"/>	
-	
+	<property name="example.management.classes.dir" value="${classes.dir}/Examples/org/objectweb/proactive/examples/jmx/remote/management/"/>
+
 	<!-- IC2d properties -->
 	<property name="ic2d-plugin.dir" value="${base.dir}/ic2d-plugins-src" />
 	<property name="plugin.lib" value="org.objectweb.proactive.ic2d.lib" />
+
+	
+	<!-- Scheduler/Infrastructure Manager properties -->
+	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />
+	<property name="im-plugin.dir" value="${base.dir}/infrastructure-manager-src" />
 	
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
-	
+
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
-	
+
 	<path id="project.libs">
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
 		</fileset>
 		<!-- XXX ${dev.dir} is not included in the source release ! -->
-		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/> 
+		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 	</path>
-		
+
 	<path id="project.classpath">
 		<pathelement location="${cl.proactive.dir}" />
 		<pathelement location="${cl.extensions.dir}" />
@@ -88,7 +93,7 @@
 		<pathelement location="${cl.ic2d.dir}"/>
 		<path refid="project.libs"/>
 	</path>
-	
+
 	<macrodef name="compile_extra">
 		<attribute name="module" />
 		<sequential>
@@ -99,7 +104,7 @@
 				dest="${cl.extra.dir}"/>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="compile_extension">
 		<attribute name="module" />
 		<sequential>
@@ -110,29 +115,29 @@
 				dest="${cl.extensions.dir}"/>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="compile_module">
 		<attribute name="module" />
 		<attribute name="sourcepath"/>
 		<attribute name="package"/>
 		<attribute name="dest"/>
-		<sequential>			
+		<sequential>
 			<mkdir dir="${cl.extensions.dir}"/>
-			
+
 			<if name="proactive.jar">
 				<else>
 					<!-- Try to automagically find the classes/ -->
 					<property name="proactive.jar" location="${cl.proactive.dir}"/>
 				</else>
 			</if>
-			
+
 			<echo>Compiling  ___@{module}___</echo>
 			<!-- <echo>  [i] ProActive:  ${proactive.jar}</echo> -->
 
 			<echo>  [i] src:  @{sourcepath}/@{package}/@{module}</echo>
 			<echo>  [i] dest: @{dest}</echo>
 			<echo>  [i] cp:   ${proactive.jar}</echo>
-			
+
 			<javac 
 			 srcdir="@{sourcepath}" 
 			 destdir="@{dest}" 
@@ -147,7 +152,14 @@
 				</classpath>
 				<include name="@{package}/@{module}/**/*.java" />
 			</javac>
+
+			<copy todir="@{dest}" includeEmptyDirs="no">
+				<fileset dir="@{sourcepath}">
+					<exclude name="**/*.java" />
+				</fileset>
+			</copy>
+
 		</sequential>
 	</macrodef>
-			
+
 </project>

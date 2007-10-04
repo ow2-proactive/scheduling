@@ -13,7 +13,7 @@ PROACTIVE=$workingDir/../..
 CLASSPATH=.
 . $workingDir/env.sh
 
-$JAVACMD org.objectweb.proactive.examples.scheduler.HelloWorld $TASK $SLEEP $SCHEDULER_URL
+$JAVACMD org.objectweb.proactive.extra.scheduler.examples.HelloWorld $TASK $SLEEP $SCHEDULER_URL
 
 echo
 

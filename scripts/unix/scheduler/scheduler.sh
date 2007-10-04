@@ -4,15 +4,19 @@ echo
 echo --- Scheduler----------------------------------------------
 
 
-  SCHEDULER_URL=$1
-	RM=$2
+  SCHEDULER_URL=$2
+	RM=$1
 
 workingDir=..
 PROACTIVE=$workingDir/../..
 CLASSPATH=.
 . $workingDir/env.sh
 
-$JAVACMD org.objectweb.proactive.examples.scheduler.LocalSchedulerExample $SCHEDULER_URL $RM
+CLASSPATH=$workingDir/../../scheduler-plugins-src/org.objectweb.proactive.scheduler.plugin/bin/:$CLASSPATH
+
+echo $JAVACMD
+
+$JAVACMD -Xmx512m -Xms512m org.objectweb.proactive.extra.scheduler.examples.LocalSchedulerExample $RM $SCHEDULER_URL
 
 echo
 

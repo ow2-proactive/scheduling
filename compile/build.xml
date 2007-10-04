@@ -352,7 +352,7 @@
 		<move file="${daemon.dir}/src/common/p2pctl" todir="${daemon.dir}/build" />
 	</target>
 
-
+	
 	<!-- ================================================================ -->
 	<!--                      Compile Examples                            -->
 	<!--  =============================================================== -->
@@ -772,6 +772,9 @@
 			<format_m srcdir="${src.extra.dir}" />
 			<format_m srcdir="${src.examples.dir}" />
 			<format_m srcdir="${src.test.dir}" />
+			<format_m srcdir="${ic2d-plugin.dir}" />
+			<format_m srcdir="${scheduler-plugin.dir}" />
+			<format_m srcdir="${im-plugin.dir}" />
 		</parallel>
 	</target>
 
