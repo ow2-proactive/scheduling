@@ -36,7 +36,7 @@ import java.net.URI;
 
 
 public class UpdateCopyrightAndVersion {
-    private static String copyright = "/*\n" +
+    private static String LGPLcopyright = "/*\n" +
         " * ################################################################\n" +
         " *\n" +
         " * ProActive: The Java(TM) library for Parallel, Distributed,\n" +
@@ -66,6 +66,39 @@ public class UpdateCopyrightAndVersion {
         " *\n" +
         " * ################################################################\n" +
         " */\n";
+    
+    
+    private static String GPLcopyright = "/*\n" +
+    " * ################################################################\n" +
+    " *\n" +
+    " * ProActive: The Java(TM) library for Parallel, Distributed,\n" +
+    " *            Concurrent computing with Security and Mobility\n" +
+    " *\n" +
+    " * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis\n" +
+    " * Contact: proactive@objectweb.org" + "\n" + 
+    " *\n" +
+    " * This library is free software; you can redistribute it and/or\n" +
+    " * modify it under the terms of the GNU General Public License\n" +
+    " * as published by the Free Software Foundation; either version\n" +
+    " * 2 of the License, or any later version.\n" +
+    " *\n" +
+    " * This library is distributed in the hope that it will be useful,\n" +
+    " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+    " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n" +
+    " * General Public License for more details.\n" +
+    " *\n" +
+    " * You should have received a copy of the GNU General Public License\n" +
+    " * along with this library; if not, write to the Free Software\n" +
+    " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" +
+    " * USA\n" + 
+" *\n" +
+    " *  Initial developer(s):               The ProActive Team\n" +
+    " *                        http://proactive.inria.fr/team_members.htm\n" +
+    " *  Contributor(s):\n" + 
+    " *\n" +
+    " * ################################################################\n" +
+    " */\n";
+    
     private static String PatternBegin = "$$%%";
     private static String PatternEnd = "%%$$";
     private static String VersionPattern = "ProActiveVersion";
@@ -76,8 +109,8 @@ public class UpdateCopyrightAndVersion {
     private static String LastYearShortCopyrightPattern = "CopyrightLastYearShort";
     private static String FirstYearCopyrightPattern = "CopyrightFirstYear";
     private static String FirstYearShortCopyrightPattern = "CopyrightFirstYearShort";
-    private static String CurrentVersion = "3.2";
-    private static String CurrentVersionUnderscore = "3_2";
+    private static String CurrentVersion = "3.2.1";
+    private static String CurrentVersionUnderscore = "3_2_1";
     private static String CopyrightYears = "1997-2007";
     private static String CopyrightYearsShort = "97-07";
     private static String LastYearCopyright = "2007";
@@ -151,7 +184,7 @@ public class UpdateCopyrightAndVersion {
         System.out.println("Processing " + file);
 
         String uncopyrightedProgram = program.substring(packageStart);
-        String copyrightedProgram = copyright + uncopyrightedProgram;
+        String copyrightedProgram = LGPLcopyright + uncopyrightedProgram;
         b = copyrightedProgram.getBytes();
         file.delete();
 
