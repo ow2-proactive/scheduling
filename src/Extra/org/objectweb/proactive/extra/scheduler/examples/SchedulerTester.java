@@ -64,11 +64,11 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
  */
 public class SchedulerTester {
     public final static String DATA_HOME = "/proj/proactivep2p/home/scheduler/";
-    public final static String PROACTIVE_HOME = "/user/cdelbe/home/ProActiveStd/ProActiveScheduler/";
+    //public final static String PROACTIVE_HOME = "/user/jlscheef/home/worspace/ProActiveScheduler/";
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     // scheduler connection
-    private static final String DEFAULT_URL = "rmi://localhost/SCHEDULER";
+    private static final String DEFAULT_URL = null;
     private SchedulerAuthenticationInterface authentication;
 
     // users
@@ -113,8 +113,7 @@ public class SchedulerTester {
         Vector<String> jobs = null;
         try {
             // read logins
-            FileReader l = new FileReader(PROACTIVE_HOME +
-                    "src/Examples/org/objectweb/proactive/examples/scheduler/login.cfg");
+            FileReader l = new FileReader(SchedulerTester.class.getResource("login.cfg").getFile());
             BufferedReader br = new BufferedReader(l);
             String current = br.readLine();
             while (current != null) {

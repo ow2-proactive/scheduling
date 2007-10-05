@@ -42,7 +42,6 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
-import org.objectweb.proactive.extra.scheduler.resourcemanager.SimpleResourceManager;
 
 
 public class LocalSchedulerExample {
@@ -66,11 +65,8 @@ public class LocalSchedulerExample {
             } else {
                 IMFactory.startLocal();
                 IMAdmin admin = IMFactory.getAdmin();
-
-                String xmlURL = SimpleResourceManager.class.getResource(
-                        "/org/objectweb/proactive/extra/scheduler/examples/test.xml")
-                                                           .getPath();
-                admin.deployAllVirtualNodes(new File(xmlURL), null);
+                
+                admin.deployAllVirtualNodes(new File("../../../descriptors/scheduler/deployment/test.xml"), null);
 
                 imp = InfrastructureManagerProxy.getProxy(new URI(
                             "rmi://localhost:" +

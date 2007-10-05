@@ -106,9 +106,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = 2000;
 
-    /** Scheduler node ping frequency. It is based on the main loop time out.
-     *  For example, if the frequency is X and the main loop time out is Y,
-     *  so the maximum umount of time between each ping will be X*Y. */
+    /** Scheduler node ping frequency in ms. */
     private static final int SCHEDULER_NODE_PING_FREQUENCY = 45000;
 
     /** Selected port for connection logger system */
@@ -326,7 +324,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             InternalTask internalTask = currentJob.getHMTasks()
                                                   .get(taskDescriptor.getId());
 
-            //TODO improve the way to get the node from the resources manager.
+            //TODO improve the way to get the nodes from the resources manager.
             //it can be better to associate scripts and node to ask for more than one node each time,
             //and to be sure that we give the right node with its right script
             NodeSet nodeSet = resourceManager.getAtMostNodes(internalTask.getNumberOfNodesNeeded(),
@@ -463,7 +461,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @param job the job to failed.
      * @param td the task who has been the caused of failing.
      * @param errorMsg the error message to send in the task result.
-     * @param jobState the type of the failure for this job. (failed/cancelled)
+     * @param jobState the type of the failure for this job. (failed/canceled)
      */
     private void failedJob(InternalJob job, InternalTask task, String errorMsg,
         JobState jobState) {
@@ -544,7 +542,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 if (ProException.isException(res)) {
                     //in this case, it is a node error.
                     //this is not user exception or usage,
-                    //so we restart independantly of rerunnable properties
+                    //so we restart independently of rerunnable properties
                     logger.info("<<<<<<<< Node failed on job " + jobId +
                         ", task [ " + taskId + " ]");
                     job.reStartTask(descriptor);
@@ -556,7 +554,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             }
             logger.info("<<<<<<<< Terminated task on job " + jobId + " [ " +
                 taskId + " ]");
-            //if an exception occured and the user wanted to cancel on exception, cancel the job.
+            //if an exception occurred and the user wanted to cancel on exception, cancel the job.
             if (job.isCancelOnException() && res.hadException()) {
                 failedJob(job, descriptor,
                     "An error has occured due to a user exception caught in the task and user wanted to cancel on exception.",
@@ -646,7 +644,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * Listen for the tasks user log.
      *
      * @param jobId the id of the job to listen to.
-     * @param hostname the hostname where to send the log.
+     * @param hostname the host name where to send the log.
      * @param port the port number on which the log will be sent.
      */
     public void listenLog(JobId jobId, String hostname, int port) {
@@ -913,7 +911,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     /**
      * Change the priority of the job represented by jobId.
      *
-     * @param jobId the job on whitch to change the priority.
+     * @param jobId the job on which to change the priority.
      * @throws SchedulerException (can be due to insufficient permission)
      */
     public void changePriority(JobId jobId, JobPriority priority) {
