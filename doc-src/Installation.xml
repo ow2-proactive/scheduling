@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC 
-           "-//INRIA//DTD DocBook V4.2-Based Subset V0.2//EN"
-           "http://www-sop.inria.fr/oasis/proactive/doc/dtd/0.2/ProActiveManual.dtd" >
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?><chapter id="Installation">
   <title>ProActive Installation</title>
 
