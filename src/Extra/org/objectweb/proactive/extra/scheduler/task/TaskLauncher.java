@@ -83,7 +83,7 @@ public class TaskLauncher implements InitActive, Serializable {
     // handle streams
     protected final PrintStream stdout = System.out;
     protected final PrintStream stderr = System.err;
-    
+
     /**
      * ProActive empty constructor.
      */
@@ -144,9 +144,11 @@ public class TaskLauncher implements InitActive, Serializable {
             if (pre != null) {
                 this.executePreScript(null);
             }
+
             //launch task
             TaskResult result = new TaskResultImpl(taskId,
                     executableTask.execute(results));
+
             //return result
             return result;
         } catch (Exception ex) {
@@ -159,11 +161,10 @@ public class TaskLauncher implements InitActive, Serializable {
         }
     }
 
-    
     /**
      * Redirect stdout/err in the scheduler task logger.
      */
-    protected void initLoggers (){
+    protected void initLoggers() {
         //handle loggers
         Appender out = new SocketAppender(this.host, this.port);
 
@@ -178,26 +179,25 @@ public class TaskLauncher implements InitActive, Serializable {
         System.setErr(new PrintStream(new LoggingOutputStream(l, Level.ERROR),
                 true));
     }
-    
-    
+
     /**
      * Close scheduler task logger and reset stdout/err
      */
-    protected void finalizeLoggers () {
-      //Unhandle loggers
+    protected void finalizeLoggers() {
+        //Unhandle loggers
         LogManager.shutdown();
         System.setOut(stdout);
         System.setErr(stderr);
     }
-    
-    
+
     /**
      * Execute the preScript pre on the node n, or on the default node if n is null
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occured during the execution of the script
      */
-    protected void executePreScript(Node n) throws ActiveObjectCreationException, NodeException, UserException{
+    protected void executePreScript(Node n)
+        throws ActiveObjectCreationException, NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(n);
         ScriptResult<Object> res = handler.handle(pre);
         if (res.errorOccured()) {
@@ -207,7 +207,7 @@ public class TaskLauncher implements InitActive, Serializable {
                 "PreTask script has failed on the current node");
         }
     }
-    
+
     /**
      * To get the node(s) on which this active object has been launched.
      *

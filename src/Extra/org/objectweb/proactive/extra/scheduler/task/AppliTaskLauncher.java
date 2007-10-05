@@ -107,7 +107,7 @@ public class AppliTaskLauncher extends TaskLauncher {
         }
 
         this.initLoggers();
-        
+
         try {
             //launch pre script
             if (pre != null) {
