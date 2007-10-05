@@ -269,9 +269,9 @@
         	public void evenPolicy(org.objectweb.proactive.Service service)
     	    public void readerPolicy(org.objectweb.proactive.Service service)
     	    public void writerPolicy(org.objectweb.proactive.Service service)
-		</programlisting > 
+		</programlisting> 
 		<para>
-		and can be found in i
+		and can be found in
         <literal>org.objectweb.proactive.examples.readers.ReaderWriter.java</literal>. 
         </para>
         
