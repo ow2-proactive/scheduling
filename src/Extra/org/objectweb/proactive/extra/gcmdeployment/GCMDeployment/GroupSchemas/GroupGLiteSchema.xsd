@@ -25,6 +25,9 @@
 					<element name="rank" type="paext:gLiteRankType" />
 					<element name="gLiteOptions" type="paext:gLiteOptionsType" minOccurs="0" />
 					<element name="JdlTransferDeploy" type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
+					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
+					<element name="stdin" type="pa:pathElementType" minOccurs="0" />
 				</sequence>
 				<attribute name="hostname" type="string" />
 				<attribute name="virtualOrganisation" type="string" use="required" />
@@ -32,9 +35,6 @@
 				<attribute name="Type" type="string" default="job" />
 				<attribute name="executable" type="string" default="/bin/sh" />
 				<attribute name="jobType" type="string" default="normal" />
-				<attribute name="stdOutput" type="string" default="output.log" />
-				<attribute name="stdError" type="string" default="error.log" />
-				<attribute name="stdInput" type="string" />
 				<attribute name="outputse" type="string" />
 				<attribute name="retryCount" type="string" />
 				<attribute name="myProxyServer" type="string" />

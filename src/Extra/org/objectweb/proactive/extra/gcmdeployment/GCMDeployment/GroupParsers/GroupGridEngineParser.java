@@ -18,7 +18,6 @@ public class GroupGridEngineParser extends AbstractGroupParser {
     private static final String NODE_NAME_BOOKING_DURATION = "bookingDuration";
     private static final String NODE_NAME_PARALLEL_ENVIRONMENT = "parallelEnvironment";
     private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
-    private static final String NODE_NAME_HOSTLIST = "hostlist";
     private static final String XPATH_GRID_ENGINE_OPTION = "gridEngineOption";
     private static final String ATTR_QUEUE = "queue";
     private static final String NODE_NAME = "gridEngineGroup";
@@ -55,9 +54,7 @@ public class GroupGridEngineParser extends AbstractGroupParser {
 
                 String nodeName = childNode.getNodeName();
                 String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals(NODE_NAME_HOSTLIST)) {
-                    gridGroup.setHostList(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
+                if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
                     gridGroup.setHostsNumber(nodeExpandedValue);
                 } else if (nodeName.equals(NODE_NAME_PARALLEL_ENVIRONMENT)) {
                     gridGroup.setParallelEnvironment(nodeExpandedValue);

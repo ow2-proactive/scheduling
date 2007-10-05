@@ -2,8 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
@@ -17,34 +16,15 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="commandPath"
-						type="pa:pathElementType" minOccurs="0" />
-					<element name="pbsOption" type="paext:PbsOptionType"
-						minOccurs="0" />
+					<element name="hostsNumber" type="positiveInteger" minOccurs="0" />
 				</sequence>
-				<attribute name="closeStream" type="pa:CloseStreamType"
-					use="optional" />
-				<attribute name="interactive"
-					type="pa:BooleanOrVariableType" use="optional" />
+				<attribute name="interactive" type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 				<attribute name="jobName" type="string" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
 
-	<!--PbsOption-->
-	<complexType name="PbsOptionType">
-		<complexContent>
-			<extension base="paext:prunOptionType">
-				<sequence>
-					<element name="scriptPath" type="pa:pathElementType"
-						minOccurs="0" />
-					<element name="node" type="positiveInteger" minOccurs="0" />
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<element name="pbsGroup" type="paext:PbsProcessType" substitutionGroup="pa:abstractShElement"/>
+	<element name="pbsGroup" type="paext:PbsProcessType" substitutionGroup="pa:abstractShElement" />
 
 </schema>

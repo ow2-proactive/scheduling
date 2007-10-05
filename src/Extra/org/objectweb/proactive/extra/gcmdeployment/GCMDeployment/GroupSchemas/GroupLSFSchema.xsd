@@ -2,8 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
@@ -13,35 +12,19 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="commandPath" type="pa:pathElementType" minOccurs="0" />
-					<element name="lsfOption" type="paext:lsfOptionType"
-						minOccurs="0" />
+					<element name="hostlist" type="string" minOccurs="0" />
+					<element name="processor" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="resourceRequirement" minOccurs="0">
+						<complexType>
+							<attribute name="value" type="string" />
+						</complexType>
+					</element>
 				</sequence>
-				<attribute name="closeStream" type="pa:CloseStreamType"
-					use="optional" />
-				<attribute name="interactive"
-					type="pa:BooleanOrVariableType" use="optional" />
+				<attribute name="interactive" type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="jobname" type="string" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>
-	</complexType>
-
-
-	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
-	<complexType name="lsfOptionType" mixed="true">
-		<all>
-			<element name="hostlist" type="string" minOccurs="0" />
-			<element name="processor" type="pa:PosintOrVariableType"
-				minOccurs="0" />
-			<element name="resourceRequirement" minOccurs="0">
-				<complexType>
-					<attribute name="value" type="string" />
-				</complexType>
-			</element>
-			<element name="scriptPath" type="pa:pathElementType"
-				minOccurs="0" />
-		</all>
 	</complexType>
 
 	<element name="lsfGroup" substitutionGroup="pa:abstractShElement" type="paext:lsfGroupType"></element>

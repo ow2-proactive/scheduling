@@ -2,8 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
@@ -14,32 +13,15 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="environment"
-						type="pa:environmentType" minOccurs="0" />
-					<!--	<element ref="commandPath" minOccurs="0"/>-->
-					<element name="globusOption"
-						type="paext:GlobusOptionType" minOccurs="0" />
-				</sequence>				
-				<attribute name="closeStream" type="pa:CloseStreamType"
-					use="optional" />
+					<element name="count" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
+				</sequence>
 				<attribute name="hostname" type="string" use="required" />
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>
-	</complexType>
-
-	<!--globusOption element has one child count element-->
-	<complexType name="GlobusOptionType">
-		<all>
-			<element name="count" type="pa:PosintOrVariableType"
-				minOccurs="0" />
-			<element name="maxTime" type="pa:PosintOrVariableType"
-				minOccurs="0" />
-			<element name="outputFile" type="pa:pathElementType"
-				minOccurs="0" />
-			<element name="errorFile" type="pa:pathElementType"
-				minOccurs="0" />
-		</all>
 	</complexType>
 
 	<element name="globusGroup" type="paext:GlobusProcessType" substitutionGroup="pa:abstractShElement"></element>

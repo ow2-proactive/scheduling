@@ -13,20 +13,10 @@
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
 					<element name="resource" type="paext:oarResourceType" minOccurs="0" />
-					<element name="scriptPath" type="pa:pathElementType" minOccurs="0" />
 					<element name="directory" type="pa:pathElementType" minOccurs="0" />
 					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
 				</sequence>
-				<attribute name="bookedNodesAccess" use="optional">
-					<simpleType>
-						<restriction base="string">
-							<enumeration value="rsh" />
-							<enumeration value="ssh" />
-							<enumeration value="oarsh" />
-						</restriction>
-					</simpleType>
-				</attribute>
 				<attribute name="interactive" type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 				<attribute name="type" use="optional">

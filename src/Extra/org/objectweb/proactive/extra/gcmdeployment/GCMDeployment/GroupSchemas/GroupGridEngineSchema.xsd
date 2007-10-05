@@ -12,22 +12,17 @@
 	<complexType name="GridEngineProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="commandPath" type="pa:pathElementType" minOccurs="0" />
-					<element name="gridEngineOption" type="paext:GridEngineOptionType" />
+                <sequence>
+					<element name="hostsNumber" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="bookingDuration" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="parallelEnvironment" type="pa:TextOrVariableType" minOccurs="0" />
+					<element name="directory" type="pa:pathElementType" minOccurs="0" />
+					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
 				</sequence>
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>
-	</complexType>
-	<complexType name="GridEngineOptionType">
-		<sequence>
-			<element name="hostsNumber" type="pa:PosintOrVariableType" minOccurs="0" />
-			<element name="bookingDuration" type="pa:PosintOrVariableType" minOccurs="0" />
-			<element name="scriptPath" type="pa:pathElementGeneralType" minOccurs="0" />
-			<element name="hostlist" type="pa:TextOrVariableType" minOccurs="0" />
-			<element name="parallelEnvironment" type="pa:TextOrVariableType" minOccurs="0" />
-		</sequence>
 	</complexType>
 
 	<element name="gridEngineGroup" type="paext:GridEngineProcessType" substitutionGroup="pa:abstractShElement"></element>

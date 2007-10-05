@@ -11,7 +11,6 @@ public class GroupGridEngine extends AbstractGroup {
     private String bookingDuration;
     private PathElement scriptLocation;
     private String parallelEnvironment;
-    private String hostList;
 
     @Override
     public List<String> internalBuildCommands() {
@@ -71,21 +70,4 @@ public class GroupGridEngine extends AbstractGroup {
         return this.parallelEnvironment;
     }
 
-    /**
-     * Sets the value of the hostList parameter with the given value
-     * Not yet included in the sge command
-     * @param hostList
-     */
-    public void setHostList(String hostList) {
-        this.hostList = hostList;
-    }
-
-    /**
-     * Returns the hostList value of this process.
-     * Not yet included in the sge command
-     * @return String
-     */
-    public String getHostList() {
-        return hostList;
-    }
 }
