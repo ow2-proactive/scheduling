@@ -40,6 +40,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
@@ -79,6 +80,10 @@ public class TaskLauncher implements InitActive, Serializable {
     protected String host;
     protected Integer port;
 
+    // handle streams
+    protected final PrintStream stdout = System.out;
+    protected final PrintStream stderr = System.err;
+    
     /**
      * ProActive empty constructor.
      */
@@ -132,12 +137,35 @@ public class TaskLauncher implements InitActive, Serializable {
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask,
         TaskResult... results) {
-        //handle loggers
-        Appender out = new SocketAppender(host, port);
+        // plug stdout/err into a socketAppender
+        this.initLoggers();
+        try {
+            //launch pre script
+            if (pre != null) {
+                this.executePreScript(null);
+            }
+            //launch task
+            TaskResult result = new TaskResultImpl(taskId,
+                    executableTask.execute(results));
+            //return result
+            return result;
+        } catch (Exception ex) {
+            return new TaskResultImpl(taskId, ex);
+        } finally {
+            // reset stdout/err
+            this.finalizeLoggers();
+            //terminate the task
+            core.terminate(taskId, jobId);
+        }
+    }
 
-        // store stdout and err
-        PrintStream stdout = System.out;
-        PrintStream stderr = System.err;
+    
+    /**
+     * Redirect stdout/err in the scheduler task logger.
+     */
+    protected void initLoggers (){
+        //handle loggers
+        Appender out = new SocketAppender(this.host, this.port);
 
         // create logger
         Logger l = Logger.getLogger(SchedulerCore.LOGGER_PREFIX + jobId);
@@ -149,37 +177,37 @@ public class TaskLauncher implements InitActive, Serializable {
                 true));
         System.setErr(new PrintStream(new LoggingOutputStream(l, Level.ERROR),
                 true));
-        try {
-            //launch pre script
-            if (pre != null) {
-                ScriptHandler handler = ScriptLoader.createHandler(null);
-                ScriptResult<Object> res = handler.handle(pre);
-                if (res.errorOccured()) {
-                    System.err.println("Error on pre-script occured : ");
-                    res.getException().printStackTrace();
-                    throw new UserException(
-                        "PreTask script has failed on the current node");
-                }
-            }
-
-            //launch task
-            TaskResult result = new TaskResultImpl(taskId,
-                    executableTask.execute(results));
-
-            //return result
-            return result;
-        } catch (Exception ex) {
-            return new TaskResultImpl(taskId, ex);
-        } finally {
-            //Unhandle loggers
-            LogManager.shutdown();
-            System.setOut(stdout);
-            System.setErr(stderr);
-            //terminate the task
-            core.terminate(taskId, jobId);
+    }
+    
+    
+    /**
+     * Close scheduler task logger and reset stdout/err
+     */
+    protected void finalizeLoggers () {
+      //Unhandle loggers
+        LogManager.shutdown();
+        System.setOut(stdout);
+        System.setErr(stderr);
+    }
+    
+    
+    /**
+     * Execute the preScript pre on the node n, or on the default node if n is null
+     * @throws ActiveObjectCreationException if the script handler cannot be created
+     * @throws NodeException if the script handler cannot be created
+     * @throws UserException if an error occured during the execution of the script
+     */
+    protected void executePreScript(Node n) throws ActiveObjectCreationException, NodeException, UserException{
+        ScriptHandler handler = ScriptLoader.createHandler(n);
+        ScriptResult<Object> res = handler.handle(pre);
+        if (res.errorOccured()) {
+            System.err.println("Error on pre-script occured : ");
+            res.getException().printStackTrace();
+            throw new UserException(
+                "PreTask script has failed on the current node");
         }
     }
-
+    
     /**
      * To get the node(s) on which this active object has been launched.
      *
