@@ -69,5 +69,4 @@ public class GroupGridEngine extends AbstractGroup {
     public String getParallelEnvironment() {
         return this.parallelEnvironment;
     }
-
 }
