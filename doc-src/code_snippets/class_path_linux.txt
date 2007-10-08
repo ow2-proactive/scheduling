@@ -1,0 +1,6 @@
+cd [Your ProActive install directory]
+PA_PATH=$(pwd)
+CLASSPATH=.:${PA_PATH}/ProActive_examples.jar:${PA_PATH}/ProActive.jar:${PA_PATH}/lib/ibis:\
+	${PA_PATH}/lib/components/asm-2.2.1.jar:${PA_PATH}/lib/log4j.jar:${PA_PATH}/lib/xercesImpl.jar:\
+	${PA_PATH}/lib/components/fractal.jar:${PA_PATH}/lib/bouncycastle.jar
+	

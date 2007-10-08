@@ -1,0 +1,4 @@
+cd [Your ProActive install directory]
+set CLASSPATH=.;%CD%\ProActive_examples.jar;%CD%\ProActive.jar;%CD%\lib\ibis;\
+	%CD%\lib\components\asm-2.2.1.jar;%CD%\lib\log4j.jar;%CD%\lib\xercesImpl.jar;\
+	%CD%\lib\components\fractal.jar;%CD%\lib\bouncycastle.jar
