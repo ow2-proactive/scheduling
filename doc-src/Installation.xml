@@ -47,11 +47,11 @@
           </indexterm>
 
           <para>Include in your <literal>CLASSPATH</literal> the 
-          	ProActive jar file <literal>ProActive/dist/ProActive/ProActive.jar</literal>
+          	ProActive jar file <literal>ProActive/ProActive.jar</literal>
           		along with <literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
-          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		<literal>ProActive/lib/components/fractal.jar</literal>,  
           		and <literal>ProActive/lib/bouncycastle.jar</literal></para>
         </listitem>
 
@@ -220,7 +220,7 @@
       </listitem>
 
       <listitem>
-        <para><literal>lib/fractal.jar</literal>
+        <para><literal>lib/components/fractal.jar</literal>
         - component model used for ProActive Components (see
         <xref linkend="intro" />).</para>
       </listitem>
@@ -230,19 +230,27 @@
       </listitem>
     </itemizedlist><para>You do not need to modify your <literal>CLASSPATH</literal> permanently if you
     include the entries above using a Java IDE or a shell script.</para>
-     <para>Set the <literal>CLASSPATH</literal> as follow, putting on one line:</para>
+   
+    <para>Under Linux/Unix:</para>
 
-    <para>Under linux:</para>
-
-    <para><screen>export CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:\
-./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:\
-./lib/components/fractal.jar:./lib/bouncycastle.jar</screen></para>
-
-    <para>Under windows:</para>
-
-    <para><screen>set CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;\
-.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;\
-.\lib\components\fractal.jar;.\lib\bouncycastle.jar</screen></para>
+    <para>
+    Open a  Linux/Unix terminal, change to the install directory using <literal>cd </literal> 
+    and set the the <literal>CLASSPATH</literal>.
+    </para>
+   <para>
+     <programlisting java="lang"><textobject><textdata fileref="code_snippets/class_path_linux.txt"></textdata></textobject></programlisting>
+   	</para>
+    <para>Under Windows:</para>
+	<para> Open a Windows command terminal by executing either <literal>cmd</literal> or
+	<literal>command</literal> in <emphasis>Start-> Run</emphasis> </para>
+	<para>
+	Change to the ProActive installation folder by using  <literal>cd </literal> 
+	then set the <literal>CLASSPATH</literal> by executing the following commands.
+    </para>
+	
+   <para>
+     <programlisting java="lang"><textobject><textdata fileref="code_snippets/class_path_windows.txt"></textdata></textobject></programlisting>
+   	</para>
      
     
     <para>In addition to the jar files above you may want to add the following
@@ -285,33 +293,39 @@
       </listitem>
     </itemizedlist>
     </sect2>
-    <sect2><title id="Create_Java_Policy">Create A <literal>java.policy</literal> File To Set
-    Permissions</title><para>See <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions
+    <sect2><title id="Create_Java_Policy">Create a <literal>java.policy</literal> File To Set
+    Permissions</title><para>See <ulink url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">Permissions
     in the JavaTM 2 SDK</ulink> to learn more about Java permissions. The
-    option <literal>-Djava.security.policy=pathToFile</literal> will specify which policy file to
-    use within ProActive. As a first approximation, you can create a simple
+    option <literal>-Djava.security.policy=pathToFile</literal> will specify which security policy file to
+    use within ProActive. As a first approximation, you can create a simple security
     policy file granting all permissions:</para>
+    
     <para>
-    <programlisting lang="java" >grant {
-    	permission java.security.AllPermission;
-	};        
-	</programlisting>
+    
+    <programlisting lang="java" ><textobject><textdata fileref="../scripts/proactive.java.policy" /></textobject></programlisting>
 	</para><note><para>
  	If you use the scripts provided with the distribution to run the
  	examples an existing policy file named
  	<literal>proactive.java.policy</literal>
  	will be used by default.
 	</para></note></sect2>
-    <sect2><title>Create A log4j Configuration File</title><indexterm>
+    <sect2><title>Create A <literal>log4j</literal> Configuration File</title><indexterm>
       <primary>Log4j</primary>
 
       <secondary>configuration</secondary>
     </indexterm><example>
-      <title>A simple proactive-log4j file</title>
+     <title>A simple proactive-log4j file</title>
 
-      <screen><textobject>
-          <textdata fileref="../../scripts/proactive-log4j" />
-        </textobject></screen>
+		
+	<para>See  for logging using
+    the <ulink url="http://logging.apache.org/log4j/1.2/index.html">Apache log4j</ulink>. The
+    option <literal>-Dlog4j.configuration=file:pathToFile</literal> will specify which logging policy file to
+    use within ProActive. As a first approximation, you can create a simple logging
+    policy file:
+		
+			
+		</para>
+      <programlisting java="lang"><textobject><textdata fileref="../scripts/proactive-log4j" /></textobject></programlisting>
     </example><note>
       <para>If you use the scripts provided with the distribution to run the
       examples an existing log4j file named <literal>proactive-log4j</literal>
@@ -356,10 +370,5 @@
             <para>source : <literal>examples/nbody</literal></para>
           </listitem>
         </itemizedlist></para></sect3></sect2>
-
-
-     
-  </sect1>
-
-
+	 </sect1>
 </chapter>
