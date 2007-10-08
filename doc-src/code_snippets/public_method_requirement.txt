@@ -1,0 +1,10 @@
+class A{
+	public void foo(A a){ 
+   		...
+   		a.bar();           //This call will not be handled by the remote Active Object!!!
+   		...
+ 	}
+	private void bar(){  //To fix this, change this method to public.
+		...
+ 	}
+}
