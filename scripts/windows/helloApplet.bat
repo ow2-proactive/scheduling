@@ -10,7 +10,7 @@ goto end
 
 
 :doit
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat
 
 rem For creating the hello object on a remote node simply pass the url of 

@@ -3,7 +3,7 @@ echo.
 echo --- Hello World tiny example ---------------------------------------------
 
 :doit
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat
 
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..

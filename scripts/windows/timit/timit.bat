@@ -2,7 +2,7 @@
 echo. 
 echo --- TimIt --------------------------------------------------
 
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..
 
 call "%PROACTIVE%\scripts\windows\init.bat"

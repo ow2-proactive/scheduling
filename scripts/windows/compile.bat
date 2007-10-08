@@ -33,7 +33,7 @@ goto end
 
 
 :doit
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 set PATH=%JAVA_HOME%\bin;%PATH%
 
 FOR /F %%f IN ('dir /B ..\..\src\org\objectweb\proactive\examples\%1\*.jav?') DO call setFile.bat %1 %%f

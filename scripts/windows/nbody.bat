@@ -4,7 +4,7 @@ echo --- N-body with ProActive ---------------------------------
 
 :doit
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 
 call init.bat
 if "%1" equ "displayft" goto ft

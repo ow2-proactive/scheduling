@@ -29,7 +29,7 @@ goto end
   SET RM=%2
 
 
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 

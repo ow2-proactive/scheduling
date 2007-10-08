@@ -11,7 +11,7 @@ goto end
 
 
 :doit
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 
 call "%PROACTIVE%\scripts\windows\init.bat"

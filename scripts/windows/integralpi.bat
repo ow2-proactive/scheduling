@@ -2,7 +2,7 @@
 echo. 
 echo --- IntegralPi --------------------------------------------------
 
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 set np=%1
 
 IF "%1"=="" set np=4

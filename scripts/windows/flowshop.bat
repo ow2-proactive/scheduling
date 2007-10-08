@@ -11,7 +11,7 @@ goto end
 
 
 :doit
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 call init.bat
 
 %JAVA_CMD% org.objectweb.proactive.examples.flowshop.Main -bench ..\..\src\Example\org\objectweb\proactive\examples\flowshop\taillard\test_10_10.txt -desc ..\..\descriptors\Workers.xml

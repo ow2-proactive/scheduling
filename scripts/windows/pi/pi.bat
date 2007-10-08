@@ -1,7 +1,7 @@
 @echo off
 echo. 
 
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 
 set CLASSPATHEXT=%JAVA_HOME%\lib\tools.jar;%PROACTIVE%\compile\lib\ant.jar;%PROACTIVE%\compile\lib\ant-launcher.jar;%PROACTIVE%\lib\ws\xml-apis.jar;%PROACTIVE%\lib\xercesImpl.jar

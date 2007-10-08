@@ -2,7 +2,7 @@
 
 echo Starting Fault-Tolerant version of ProActive NBody...
 
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 
 PUSHD ..

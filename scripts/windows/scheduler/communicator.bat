@@ -31,7 +31,7 @@ IF  "%1" == "" (
   SET SCHEDULER_URL=%1
 )
 
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
