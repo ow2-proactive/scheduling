@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -81,8 +82,8 @@ public class TaskLauncher implements InitActive, Serializable {
     protected Integer port;
 
     // handle streams
-    protected final PrintStream stdout = System.out;
-    protected final PrintStream stderr = System.err;
+    protected transient PrintStream stdout;
+    protected transient PrintStream stderr;
 
     /**
      * ProActive empty constructor.
@@ -103,6 +104,8 @@ public class TaskLauncher implements InitActive, Serializable {
         this.jobId = jobId;
         this.host = host;
         this.port = port;
+        this.stdout = System.out;
+        this.stderr = System.err;
     }
 
     /**
@@ -186,8 +189,8 @@ public class TaskLauncher implements InitActive, Serializable {
     protected void finalizeLoggers() {
         //Unhandle loggers
         LogManager.shutdown();
-        System.setOut(stdout);
-        System.setErr(stderr);
+        System.setOut(this.stdout);
+        System.setErr(this.stderr);
     }
 
     /**
