@@ -65,8 +65,10 @@ public class LocalSchedulerExample {
             } else {
                 IMFactory.startLocal();
                 IMAdmin admin = IMFactory.getAdmin();
-                
-                admin.deployAllVirtualNodes(new File("../../../descriptors/scheduler/deployment/test.xml"), null);
+
+                admin.deployAllVirtualNodes(new File(
+                        "../../../descriptors/scheduler/deployment/test.xml"),
+                    null);
 
                 imp = InfrastructureManagerProxy.getProxy(new URI(
                             "rmi://localhost:" +

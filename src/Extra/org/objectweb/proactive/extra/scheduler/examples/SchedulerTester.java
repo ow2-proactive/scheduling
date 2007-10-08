@@ -64,6 +64,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
  */
 public class SchedulerTester {
     public final static String DATA_HOME = "/proj/proactivep2p/home/scheduler/";
+
     //public final static String PROACTIVE_HOME = "/user/jlscheef/home/worspace/ProActiveScheduler/";
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
@@ -113,7 +114,8 @@ public class SchedulerTester {
         Vector<String> jobs = null;
         try {
             // read logins
-            FileReader l = new FileReader(SchedulerTester.class.getResource("login.cfg").getFile());
+            FileReader l = new FileReader(SchedulerTester.class.getResource(
+                        "login.cfg").getFile());
             BufferedReader br = new BufferedReader(l);
             String current = br.readLine();
             while (current != null) {
