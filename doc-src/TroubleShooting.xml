@@ -41,27 +41,10 @@
         access.</emphasis> If you get the following exceptions, you probably
         didn't change the file java.policy as described in <xref lang=""
         linkend="Create_Java_Policy" />.</para>
-
-        <screen>org.objectweb.proactive.NodeException:
-java.security.AccessControlException: access denied
-(java.net.SocketPermission 127.0.0.1:1099 connect,resolve)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeImpl.&lt;init&gt;(RmiNode.java:17)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory._createDefaultNode
-                        (RmiNodeFactory.java, Compiled Code)
-                at org.objectweb.proactive.core.node.NodeFactory.createDefaultNode(NodeFactory.java:127)
-                at org.objectweb.proactive.core.node.NodeFactory.getDefaultNode(NodeFactory.java:57)
-                at org.objectweb.proactive.ProActive.newActive(ProActive.java:315)
-                ...
-Exception in thread "main" java.lang.ExceptionInInitializerError:
-java.security.AccessControlException: access denied
-(java.util.PropertyPermission user.home re ad)
-                at java.security.AccessControlContext.checkPermission (AccessControlContext.java, Compiled Code)
-                at java.security.AccessController.checkPermission(AccessController.java:403)
-                at java.lang.SecurityManager.checkPermission(SecurityManager.java:549)
-                at java.lang.SecurityManager.checkPropertyAccess(SecurityManager.java:1243)
-                at java.lang.System.getProperty(System.java:539)
-                at org.objectweb.proactive.mop.MOPProperties.createDefaultProperties (MOPProperties.java:190)
-                ...         </screen>
+       
+      <programlisting lang="java"><textobject><textdata fileref="code_snippets/java_policy_error.txt"/></textobject></programlisting>
+      
+      
       </listitem>
 
       <listitem>
@@ -71,9 +54,7 @@ java.security.AccessControlException: access denied
         <literal>-Dlog4j.configuration</literal> property to the java command.
         Be sure that the given path is right, try also to add <literal>file:</literal> before the
         path.</para>
-
-        <screen>    log4j:WARN No appender could be found for logger .....
-    log4j:WARN Please initialize the log4j system properly            </screen>
+<programlisting lang="java"><textobject><textdata fileref="code_snippets/log4j_notfound_error.txt"/></textobject></programlisting>
       </listitem>
 
       <listitem>
@@ -86,6 +67,17 @@ java.security.AccessControlException: access denied
         D:\java\j2sdk... </literal> ) and then set the <literal>JAVA_HOME </literal> environment variable
         accordingly.</para>
       </listitem>
+      
+      <listitem>
+      	<para>
+      		<emphasis role="bold">Java complains about unsupported classes:</emphasis> Check
+      		that you are using a JRE that is at least version 1.5. since ProActive needs 
+      		certain features that are only available starting from Java 1.5.
+      		<programlisting lang="java"><textobject><textdata fileref="code_snippets/jdk_version_error.txt"/></textobject></programlisting>
+      		
+      		
+      	</para>
+      </listitem>
     </itemizedlist>
 
     
@@ -94,18 +86,17 @@ java.security.AccessControlException: access denied
   <sect1 id="TroubleShooting_html_loggers">
     <title>Enabling the loggers</title>
 
-    <para>To enable the debuging logger the following log file can be
+    <para>To enable the debugging logger the following log file can be
     used:</para>
 
-    <screen>-Dlog4j.configuration=file:ProActive/compile/proactive-log4j</screen>
+	<programlisting lang="java"><textobject><textdata fileref="code_snippets/enable_debugging_loggers.txt"/></textobject></programlisting>
 
     <para>In this file, the relevant loggers can be uncommented (by removing
     the leading #). For example, the deployment loggers
     are activated with the following lines:</para>
 
-    <screen>log4j.logger.proactive.deployment = DEBUG, CONSOLE
-log4j.logger.proactive.deployment.log = DEBUG, CONSOLE
-log4j.logger.proactive.deployment.process = DEBUG, CONSOLE</screen>
+	<programlisting lang="java"><textobject><textdata fileref="code_snippets/enable_deployment_loggers.txt"/></textobject></programlisting>
+
   </sect1>
 
   <sect1 id="dbdoclet.id.TroubleShooting_hostname_ip">
@@ -116,18 +107,14 @@ log4j.logger.proactive.deployment.process = DEBUG, CONSOLE</screen>
     is not properly configured, then remote nodes will be unable to locate the
     machine.</para>
 
-    <para>To test if the involved machines are properly configured, in L(U)nix
+    <para>To test if the involved machines are properly configured, in Linux/Unix
     you can run the following commands:</para>
 
-    <screen>$&gt;hostname
-localhost     //This is an error!
-
-$&gt;hostname -i
-127.0.0.1     //This is an error!</screen>
+	<programlisting lang="java"><textobject><textdata fileref="code_snippets/hostname_errors.txt"/></textobject></programlisting>
 
     <para><literal>hostname</literal> should print the hostname
     of the machine as known by the other hosts, and <literal
-    role="bold">hostname -i</literal> should return the network interface
+    role="bold">hostname -i</literal> should return the network interface (IP number)
     accessible by other machines.</para>
   </sect1>
 
@@ -137,7 +124,7 @@ $&gt;hostname -i
     <para>To work around misconfigured domain names ProActive can be activated
     to use IP adresses through the following java property:</para>
 
-    <screen>-Dproactive.useIPaddress=true</screen>
+	<programlisting lang="java"><textobject><textdata fileref="code_snippets/misconfigured_domains.txt"/></textobject></programlisting>
 
     <para>This property should be given as parameter to Java virtual machines
     deployed on computers that have names that do not resolve properly.</para>
@@ -178,16 +165,7 @@ $&gt;hostname -i
     different types, this problem usually takes place when invoking a remote
     method on an object of the same type.</para>
 
-    <programlisting lang="java">
-    	class A{
-	  		public void foo(A a){ 
-   				...
-   				a.bar();           //This call will not be handled by the remote Active Object!!!
-   				...
- 			}
-			private void bar(){  //To fix this, change this method to public.
-   				...
-  			}
-		}</programlisting>
+	<programlisting lang="java"><textobject><textdata fileref="code_snippets/public_method_requirement.txt"/></textobject></programlisting>
+
   </sect1>
 </chapter>
