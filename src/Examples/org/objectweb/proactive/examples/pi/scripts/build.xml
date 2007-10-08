@@ -4,7 +4,7 @@
 	<property environment="env" />
 	<property name="base" value=".." />
 	<property name="src.dir" value="${base}" />
-	<property name="proactive.dir" value="${base}/../../../../../.." />
+	<property name="proactive.dir" value="${base}/../../../../../../.." />
 	<property name="classes.dir" value="${proactive.dir}/classes" />
 	<property name="configfiles.dir" value="${proactive.dir}/classes/Examples/org/objectweb/proactive/examples/pi" />
 	<property name="name" value="ProActiveTutorial" />
@@ -12,7 +12,8 @@
 	<property name="source" value="1.5" />
 	<!-- define the classpath -->
 	<path id="tutorial.classpath">
-		<pathelement location="${proactive.dir}/classes"/>
+		<pathelement location="${proactive.dir}/classes/Core"/>
+		<pathelement location="${proactive.dir}/classes/Examples"/>
 		<fileset dir="${proactive.dir}/lib">
 			<include name="*.jar" />
 			<include name="components/*.jar" />
@@ -72,14 +73,14 @@
 		</copy>
 	</target>
 	<target name="compile" depends="init, configurationCopy">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}/Examples" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="tutorial.classpath" />
 			<include name="**/*.java" />
 		</javac>
 	</target>
 
 	<target name="compileP2P" depends="init, configurationCopy">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}/Exmaples" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="p2p.classpath" />
 			<include name="**/*.java" />
 		</javac>

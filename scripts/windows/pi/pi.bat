@@ -1,5 +1,6 @@
 @echo off
-echo. 
+echo  ---------------------------------  PI Example --------------------------------
+echo  (This example works only in Bundle or Source version).
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
@@ -8,6 +9,6 @@ set CLASSPATHEXT=%JAVA_HOME%\lib\tools.jar;%PROACTIVE%\compile\lib\ant.jar;%PROA
 
 call "%PROACTIVE%\scripts\windows\init.bat"
 
-%JAVA_CMD%  -Xmx256000000 org.apache.tools.ant.Main -buildfile "%PROACTIVE%\src\org\objectweb\proactive\examples\pi\scripts\build.xml" %*
+%JAVA_CMD%  -Xmx256000000 org.apache.tools.ant.Main -buildfile "%PROACTIVE%\src\Examples\org\objectweb\proactive\examples\pi\scripts\build.xml" %*
 pause
 ENDLOCAL
