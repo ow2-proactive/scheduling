@@ -43,13 +43,13 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     implements Runnable {
     private ProxyForGroup proxyGroup;
     private String className;
-    private Class[] genericParameters;
+    private Class<?>[] genericParameters;
     private Object[] param;
     private Node node;
     private int index;
 
     public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className,
-        Class[] genericParameters, Object[] param, Node node, int index) {
+        Class<?>[] genericParameters, Object[] param, Node node, int index) {
         this.proxyGroup = proxyGroup;
         this.className = className;
         this.genericParameters = genericParameters;

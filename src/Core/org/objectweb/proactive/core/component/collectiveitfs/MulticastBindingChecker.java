@@ -76,7 +76,7 @@ public class MulticastBindingChecker implements Serializable {
         Method result = null;
         Type clientSideReturnType = clientSideMethod.getGenericReturnType();
         Type[] clientSideParametersTypes = clientSideMethod.getGenericParameterTypes();
-        Class[] clientSideExceptionTypes = clientSideMethod.getExceptionTypes();
+        Class<?>[] clientSideExceptionTypes = clientSideMethod.getExceptionTypes();
         ParamDispatch[] paramDispatchModes = getDispatchModes(clientSideMethod);
 
 serverSideMethodsLoop: 
@@ -84,10 +84,10 @@ serverSideMethodsLoop:
             if (serverItfIsGathercast) {
                 // look for corresponding method in the gather proxy itf
                 Type[] genericParamTypes = serverSideMethod.getGenericParameterTypes();
-                Class[] correspondingParamTypes = new Class[genericParamTypes.length];
+                Class<?>[] correspondingParamTypes = new Class<?>[genericParamTypes.length];
                 for (int i = 0; i < genericParamTypes.length; i++) {
                     ParameterizedType t = (ParameterizedType) genericParamTypes[i];
-                    correspondingParamTypes[i] = (Class) t.getActualTypeArguments()[0];
+                    correspondingParamTypes[i] = (Class<?>) t.getActualTypeArguments()[0];
                 }
                 serverSideMethod = serverSideItf.getClass()
                                                 .getMethod(serverSideMethod.getName(),
@@ -102,11 +102,11 @@ serverSideMethodsLoop:
             // 2. check return types
             if (!(clientSideReturnType == Void.TYPE)) {
                 Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType()).getActualTypeArguments()[0];
-                Class clientSideReturnTypeArgument = null;
+                Class<?> clientSideReturnTypeArgument = null;
                 if (cType instanceof ParameterizedType) {
-                    clientSideReturnTypeArgument = (Class) ((ParameterizedType) cType).getRawType();
+                    clientSideReturnTypeArgument = (Class<?>) ((ParameterizedType) cType).getRawType();
                 } else {
-                    clientSideReturnTypeArgument = (Class) cType;
+                    clientSideReturnTypeArgument = (Class<?>) cType;
                 }
                 if (!(clientSideReturnTypeArgument.isAssignableFrom(
                             serverSideMethod.getReturnType()))) {
@@ -132,10 +132,10 @@ serverSideMethodsLoop:
             }
 
             // 4. check exception types
-            Class[] serverSideExceptionTypes = serverSideMethod.getExceptionTypes();
-            for (Class clientExceptionType : clientSideExceptionTypes) {
+            Class<?>[] serverSideExceptionTypes = serverSideMethod.getExceptionTypes();
+            for (Class<?> clientExceptionType : clientSideExceptionTypes) {
                 boolean match = false;
-                for (Class serverExceptionType : serverSideExceptionTypes) {
+                for (Class<?> serverExceptionType : serverSideExceptionTypes) {
                     if (clientExceptionType.isAssignableFrom(
                                 serverExceptionType)) {
                         match = true;

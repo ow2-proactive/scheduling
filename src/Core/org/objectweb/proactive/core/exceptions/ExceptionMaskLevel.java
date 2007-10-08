@@ -57,7 +57,7 @@ public class ExceptionMaskLevel {
     private boolean catchRuntimeException;
 
     /* Do we catch a Non Functional Exception */
-    ExceptionMaskLevel(ExceptionMaskStack parent, Class[] exceptions) {
+    ExceptionMaskLevel(ExceptionMaskStack parent, Class<?>[] exceptions) {
         for (int i = 0; i < exceptions.length; i++) {
             if (!Throwable.class.isAssignableFrom(exceptions[i])) {
                 throw new IllegalArgumentException(
@@ -85,10 +85,10 @@ public class ExceptionMaskLevel {
         caughtExceptionTypes = new LinkedList();
     }
 
-    boolean isExceptionTypeCaught(Class c) {
+    boolean isExceptionTypeCaught(Class<?> c) {
         Iterator iter = caughtExceptionTypes.iterator();
         while (iter.hasNext()) {
-            Class cc = (Class) iter.next();
+            Class<?> cc = (Class<?>) iter.next();
             if (cc.isAssignableFrom(c) || c.isAssignableFrom(cc)) {
                 return true;
             }
@@ -98,7 +98,7 @@ public class ExceptionMaskLevel {
     }
 
     /* We do an OR */
-    boolean areExceptionTypesCaught(Class[] exceptions) {
+    boolean areExceptionTypesCaught(Class<?>[] exceptions) {
         if (caughtExceptionTypes.isEmpty()) {
             return false;
         }
@@ -115,7 +115,7 @@ public class ExceptionMaskLevel {
     void addExceptionTypes(ExceptionMaskLevel level) {
         Iterator iter = level.caughtExceptionTypes.iterator();
         while (iter.hasNext()) {
-            Class c = (Class) iter.next();
+            Class<?> c = (Class<?>) iter.next();
             if (!isExceptionTypeCaught(c)) {
                 caughtExceptionTypes.add(c);
             }

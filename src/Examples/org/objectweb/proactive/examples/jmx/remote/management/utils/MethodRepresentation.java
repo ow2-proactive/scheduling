@@ -91,8 +91,8 @@ public class MethodRepresentation implements Serializable {
         this.description = description;
     }
 
-    public Class[] getParamsTypes() {
-        Class[] classes = new Class[sig.length];
+    public Class<?>[] getParamsTypes() {
+        Class<?>[] classes = new Class[sig.length];
         for (int i = 0; i < sig.length; i++) {
             try {
                 classes[i] = Class.forName(sig[i]);

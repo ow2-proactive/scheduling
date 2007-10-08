@@ -35,13 +35,13 @@ import java.util.Map;
 
 public class TechnicalServiceXmlType {
     private String id;
-    private Class type;
+    private Class<?> type;
     private Map args;
 
     public TechnicalServiceXmlType() {
     }
 
-    public TechnicalServiceXmlType(String id, Class type, Map args) {
+    public TechnicalServiceXmlType(String id, Class<?> type, Map args) {
         this.id = id;
         this.type = type;
         this.args = args;
@@ -78,14 +78,14 @@ public class TechnicalServiceXmlType {
     /**
      * @return Returns the type.
      */
-    public Class getType() {
+    public Class<?> getType() {
         return type;
     }
 
     /**
      * @param type The type to set.
      */
-    public void setType(Class type) {
+    public void setType(Class<?> type) {
         this.type = type;
     }
 }

@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.mop.MethodCallExceptionContext;
 public class ExceptionHandler {
 
     /* Called by the user */
-    public static void tryWithCatch(Class[] exceptions) {
+    public static void tryWithCatch(Class<?>[] exceptions) {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             stack.waitForIntersection(exceptions);

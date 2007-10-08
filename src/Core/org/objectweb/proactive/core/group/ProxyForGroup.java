@@ -745,13 +745,13 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return the Class that all Group's members are (or extend).
      * @throws java.lang.ClassNotFoundException if the class name of the Group is not known.
      */
-    public Class getType() throws java.lang.ClassNotFoundException {
+    public Class<?> getType() throws java.lang.ClassNotFoundException {
         return MOP.forName(this.className);
     }
 
     /**
-     * Returns the full name of ("higher") Class of group's member
-     * @return the name of the Class that all Group's members are (or extend).
+     * Returns the full name of ("higher") Class<?> of group's member
+     * @return the name of the Class<?> that all Group's members are (or extend).
      */
     public String getTypeName() {
         return this.className;
@@ -1124,12 +1124,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
     /**
      * Builds the members using the threads (of the threadpool).
-     * @param className - the name of the Class of the members.
+     * @param className - the name of the Class<?> of the members.
      * @param params - an array that contains the parameters for the constructor of member.
      * @param nodeList - the nodes where the member will be created.
      */
     public void createMemberWithMultithread(String className,
-        Class[] genericParameters, Object[][] params, Node[] nodeList) {
+        Class<?>[] genericParameters, Object[][] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < params.length; i++) {
             this.memberList.add(null);
@@ -1144,12 +1144,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
     /**
      * Builds the members using the threads (of the threadpool).
-     * @param className - the name of the Class of the members.
+     * @param className - the name of the Class<?> of the members.
      * @param params - the parameters for the constructor of members.
      * @param nodeList - the nodes where the member will be created.
      */
     public void createMemberWithMultithread(String className,
-        Class[] genericParameters, Object[] params, Node[] nodeList) {
+        Class<?>[] genericParameters, Object[] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < nodeList.length; i++) {
             this.memberList.add(null);

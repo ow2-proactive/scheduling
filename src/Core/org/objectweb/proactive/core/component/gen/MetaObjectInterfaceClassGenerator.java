@@ -109,7 +109,7 @@ public class MetaObjectInterfaceClassGenerator
             String generatedClassFullName = org.objectweb.proactive.core.component.gen.Utils.getMetaObjectClassName(interfaceName,
                     interfaceType.getFcItfSignature());
 
-            Class generated_class;
+            Class<?> generated_class;
 
             // check whether class has already been generated
             try {
@@ -200,7 +200,7 @@ public class MetaObjectInterfaceClassGenerator
                             key = key + params[k].getName();
                         }
 
-                        // this gives the actual declaring Class of this method
+                        // this gives the actual declaring Class<?> of this method
                         methodsToImplement.put(key, currentMethod);
                     }
                 }
@@ -246,7 +246,7 @@ public class MetaObjectInterfaceClassGenerator
                         ClassDataCache.instance().toString());
                 }
 
-                // convert the bytes into a Class
+                // convert the bytes into a Class<?>
                 generated_class = Utils.defineClass(generatedClassFullName,
                         bytecode);
             }

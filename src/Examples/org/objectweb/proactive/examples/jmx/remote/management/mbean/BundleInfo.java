@@ -324,7 +324,7 @@ public class BundleInfo extends NotificationBroadcasterSupport
     public Object invoke(String actionName, Object[] params, String[] signature)
         throws MBeanException, ReflectionException {
         try {
-            Class[] paramTypes = new Class[signature.length];
+            Class<?>[] paramTypes = new Class[signature.length];
             for (int i = 0; i < signature.length; i++) {
                 paramTypes[i] = Class.forName(signature[i]);
             }

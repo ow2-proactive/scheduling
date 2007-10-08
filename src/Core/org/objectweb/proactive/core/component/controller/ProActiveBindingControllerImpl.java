@@ -168,8 +168,8 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
             InterfaceType cType = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName);
 
             try {
-                Class s = Class.forName(sType.getFcItfSignature());
-                Class c = Class.forName(cType.getFcItfSignature());
+                Class<?> s = Class.forName(sType.getFcItfSignature());
+                Class<?> c = Class.forName(cType.getFcItfSignature());
                 if (!c.isAssignableFrom(s)) {
                     throw new IllegalBindingException(
                         "The server interface type " + s.getName() +
@@ -393,7 +393,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         Object serverItf, ProActiveInterface sItf)
         throws NoSuchInterfaceException {
         // add an adaptor proxy for matching interface types
-        Class clientItfClass = null;
+        Class<?> clientItfClass = null;
         try {
             InterfaceType[] cItfTypes = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
             for (int i = 0; i < cItfTypes.length; i++) {
@@ -414,7 +414,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         }
         ProActiveInterface itfProxy = (ProActiveInterface) Proxy.newProxyInstance(Thread.currentThread()
                                                                                         .getContextClassLoader(),
-                new Class[] { ProActiveInterface.class, clientItfClass },
+                new Class<?>[] { ProActiveInterface.class, clientItfClass },
                 new GatherItfAdapterProxy(serverItf));
         return itfProxy;
     }

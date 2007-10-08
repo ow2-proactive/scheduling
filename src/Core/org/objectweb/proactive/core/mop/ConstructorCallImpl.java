@@ -156,7 +156,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
      *        Returns a <code>Class</code> object representing the type of
      * the object this reified constructor will build when reflected
      */
-    protected Class getReifiedClass() {
+    protected Class<?> getReifiedClass() {
         return reifiedConstructor.getDeclaringClass();
     }
 
@@ -168,9 +168,10 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
         // We want to implement a workaround the Constructor
         // not being Serializable
         out.writeObject(this.effectiveArguments);
+
         // Constructor needs to be converted because it is not serializable
-        Class declaringClass;
-        Class[] parameters;
+        Class<?> declaringClass;
+        Class<?>[] parameters;
 
         declaringClass = this.reifiedConstructor.getDeclaringClass();
         out.writeObject(declaringClass);
@@ -181,8 +182,8 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
-        Class declaringClass = null;
-        Class[] parameters;
+        Class<?> declaringClass = null;
+        Class<?>[] parameters;
         try {
             this.effectiveArguments = (Object[]) in.readObject();
         } catch (IOException e) {
@@ -191,8 +192,8 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
             throw e;
         }
 
-        declaringClass = (Class) in.readObject();
-        parameters = (Class[]) in.readObject();
+        declaringClass = (Class<?>) in.readObject();
+        parameters = (Class<?>[]) in.readObject();
 
         try {
             this.reifiedConstructor = declaringClass.getConstructor(parameters);

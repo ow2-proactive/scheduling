@@ -179,12 +179,13 @@ public class HalfBody extends AbstractBody {
         throw new HalfBodyException();
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 
@@ -297,7 +298,7 @@ public class HalfBody extends AbstractBody {
         return this.localBodyStrategy.getNextSequenceID();
     }
 
-    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+    public boolean checkMethod(String methodName, Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 

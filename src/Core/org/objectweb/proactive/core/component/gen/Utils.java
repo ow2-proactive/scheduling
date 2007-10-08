@@ -182,13 +182,14 @@ public class Utils {
             javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
     }
 
-    public static Class defineClass(final String className, final byte[] bytes)
+    public static Class<?> defineClass(final String className,
+        final byte[] bytes)
         throws ClassNotFoundException, SecurityException, NoSuchMethodException,
             IllegalArgumentException, IllegalAccessException,
             InvocationTargetException {
         // The following code invokes defineClass on the current thread classloader by reflection
-        Class clc = Class.forName("java.lang.ClassLoader");
-        Class[] argumentTypes = new Class[4];
+        Class<?> clc = Class.forName("java.lang.ClassLoader");
+        Class<?>[] argumentTypes = new Class<?>[4];
         argumentTypes[0] = className.getClass();
         argumentTypes[1] = bytes.getClass();
         argumentTypes[2] = Integer.TYPE;
@@ -203,8 +204,8 @@ public class Utils {
         effectiveArguments[2] = new Integer(0);
         effectiveArguments[3] = new Integer(bytes.length);
 
-        return (Class) method.invoke(Thread.currentThread()
-                                           .getContextClassLoader(),
+        return (Class<?>) method.invoke(Thread.currentThread()
+                                              .getContextClassLoader(),
             effectiveArguments);
     }
 

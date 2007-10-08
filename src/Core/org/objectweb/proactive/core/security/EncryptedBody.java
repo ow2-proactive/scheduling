@@ -411,11 +411,12 @@ public class EncryptedBody implements Body, Serializable {
     public void createShortcut(Shortcut shortcut) throws IOException {
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
     }
 
     public UniversalBody getRemoteAdapter() {
@@ -437,7 +438,7 @@ public class EncryptedBody implements Body, Serializable {
         return null;
     }
 
-    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+    public boolean checkMethod(String methodName, Class<?>[] parametersTypes) {
         return false;
     }
 

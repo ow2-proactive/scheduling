@@ -73,9 +73,9 @@ public class SerializableMethod implements Serializable {
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         System.out.println("reading WrappedMethod");
-        Class declaringClass = (Class) in.readObject();
+        Class<?> declaringClass = (Class<?>) in.readObject();
         String name = (String) in.readObject();
-        Class[] paramTypes = (Class[]) in.readObject();
+        Class<?>[] paramTypes = (Class<?>[]) in.readObject();
 
         try {
             m = declaringClass.getMethod(name, paramTypes);

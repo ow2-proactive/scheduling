@@ -46,8 +46,8 @@ public class ProException {
      *
      * @param c the caught exception type in the catch block
      */
-    public static void tryWithCatch(Class c) {
-        tryWithCatch(new Class[] { c });
+    public static void tryWithCatch(Class<?> c) {
+        tryWithCatch(new Class<?>[] { c });
     }
 
     /**
@@ -55,7 +55,7 @@ public class ProException {
      *
      * @param c the caught exception types in the catch block
      */
-    public static void tryWithCatch(Class[] c) {
+    public static void tryWithCatch(Class<?>[] c) {
         ExceptionHandler.tryWithCatch(c);
     }
 

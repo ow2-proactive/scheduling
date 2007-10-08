@@ -115,7 +115,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected MessageEventProducerImpl messageEventProducer;
 
     // already checked methods
-    private HashMap<String, HashSet<List<Class>>> checkedMethodNames;
+    private HashMap<String, HashSet<List<Class<?>>>> checkedMethodNames;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -152,7 +152,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
         }
 
-        this.checkedMethodNames = new HashMap<String, HashSet<List<Class>>>();
+        this.checkedMethodNames = new HashMap<String, HashSet<List<Class<?>>>>();
 
         this.requestReceiver = factory.newRequestReceiverFactory()
                                       .newRequestReceiver();
@@ -324,7 +324,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
         // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved
         //    	if (!checkMethod(methodName, parametersTypes)) {
         //    		String signature = methodName+"(";
@@ -344,7 +345,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         ((RequestReceiverImpl) this.requestReceiver).removeImmediateService(methodName,
             parametersTypes);
     }
@@ -358,12 +359,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         return this.requestReceiver.isInImmediateService();
     }
 
-    public boolean checkMethod(String methodName, Class[] parametersTypes) {
+    public boolean checkMethod(String methodName, Class<?>[] parametersTypes) {
         if (this.checkedMethodNames.containsKey(methodName)) {
             if (parametersTypes != null) {
                 // the method name with the right signature has already been checked
-                List<Class> parameterTlist = Arrays.asList(parametersTypes);
-                HashSet<List<Class>> signatures = this.checkedMethodNames.get(methodName);
+                List<Class<?>> parameterTlist = Arrays.asList(parametersTypes);
+                HashSet<List<Class<?>>> signatures = this.checkedMethodNames.get(methodName);
                 if (signatures.contains(parameterTlist)) {
                     return true;
                 }
@@ -374,7 +375,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         // check if the method is defined as public
-        Class reifiedClass = getReifiedObject().getClass();
+        Class<?> reifiedClass = getReifiedObject().getClass();
         boolean exists = org.objectweb.proactive.core.mop.Utils.checkMethodExistence(reifiedClass,
                 methodName, parametersTypes);
         if (exists) {
@@ -389,8 +390,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @param methodName name of the method
      * @param parametersTypes parameter type list
      */
-    private void storeInMethodCache(String methodName, Class[] parametersTypes) {
-        List<Class> parameterTlist = null;
+    private void storeInMethodCache(String methodName,
+        Class<?>[] parametersTypes) {
+        List<Class<?>> parameterTlist = null;
         if (parametersTypes != null) {
             parameterTlist = Arrays.asList(parametersTypes);
         }
@@ -398,12 +400,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // if we already know a version of this method, we store the new version in the existing set
         if (this.checkedMethodNames.containsKey(methodName) &&
                 (parameterTlist != null)) {
-            HashSet<List<Class>> signatures = this.checkedMethodNames.get(methodName);
+            HashSet<List<Class<?>>> signatures = this.checkedMethodNames.get(methodName);
             signatures.add(parameterTlist);
         }
         // otherwise, we create a set containing a single element
         else {
-            HashSet<List<Class>> signatures = new HashSet<List<Class>>();
+            HashSet<List<Class<?>>> signatures = new HashSet<List<Class<?>>>();
             if (parameterTlist != null) {
                 signatures.add(parameterTlist);
             }

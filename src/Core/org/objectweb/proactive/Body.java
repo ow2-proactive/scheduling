@@ -161,7 +161,8 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
      */
-    public void setImmediateService(String methodName, Class[] parametersTypes);
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes);
 
     /**
      * Removes an immediate service for this body
@@ -170,7 +171,7 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @param parametersTypes the types of the parameters of the method
      */
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes);
+        Class<?>[] parametersTypes);
 
     /**
      * Terminate the body. After this call the body is no more alive and no more active.
@@ -198,7 +199,7 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @param parametersTypes an array of parameter types
      * @return true if the method exists, false otherwise
      */
-    public boolean checkMethod(String methodName, Class[] parametersTypes);
+    public boolean checkMethod(String methodName, Class<?>[] parametersTypes);
 
     /**
      * Checks if a method methodName is declared by the reified object

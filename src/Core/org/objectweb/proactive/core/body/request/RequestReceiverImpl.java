@@ -116,7 +116,7 @@ public class RequestReceiverImpl implements RequestReceiver,
                 } else {
                     Iterator it = ((List) immediateServices.get(methodName)).iterator();
                     while (it.hasNext()) {
-                        Class[] next = (Class[]) it.next();
+                        Class<?>[] next = (Class<?>[]) it.next();
                         if (Arrays.equals(next,
                                     request.getMethodCall().getReifiedMethod()
                                                .getParameterTypes())) {
@@ -142,14 +142,14 @@ public class RequestReceiverImpl implements RequestReceiver,
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) {
+        Class<?>[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (!ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
-                List<Class[]> list = (List<Class[]>) immediateServices.get(methodName);
-                List<Class[]> elementsToRemove = new ArrayList<Class[]>(list.size());
-                Iterator<Class[]> it = list.iterator();
+                List<Class<?>[]> list = (List<Class<?>[]>) immediateServices.get(methodName);
+                List<Class<?>[]> elementsToRemove = new ArrayList<Class<?>[]>(list.size());
+                Iterator<Class<?>[]> it = list.iterator();
                 while (it.hasNext()) {
-                    Class[] element = it.next();
+                    Class<?>[] element = it.next();
                     if (Arrays.equals(element, parametersTypes)) {
                         // cannot modify a list while iterating over it => keep reference of 
                         // the elements to remove
@@ -168,16 +168,17 @@ public class RequestReceiverImpl implements RequestReceiver,
         }
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
                 // there is already a filter on all methods with that name, whatever the parameters
                 return;
             } else {
-                ((List<Class[]>) immediateServices.get(methodName)).add(parametersTypes);
+                ((List<Class<?>[]>) immediateServices.get(methodName)).add(parametersTypes);
             }
         } else {
-            List<Class[]> list = new ArrayList<Class[]>();
+            List<Class<?>[]> list = new ArrayList<Class<?>[]>();
             list.add(parametersTypes);
             immediateServices.put(methodName, list);
         }

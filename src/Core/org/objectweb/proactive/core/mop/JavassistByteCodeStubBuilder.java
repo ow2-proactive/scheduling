@@ -74,12 +74,13 @@ public class JavassistByteCodeStubBuilder {
      * @return the bytecode for the corresponding stub class
      * @throws NoClassDefFoundError if the specified classname does not correspond to a class in the classpath
      */
-    public static byte[] create(String className, Class[] genericParameters)
+    @SuppressWarnings("unchecked")
+    public static byte[] create(String className, Class<?>[] genericParameters)
         throws NoClassDefFoundError {
         CtClass generatedCtClass = null;
 
         if (genericParameters == null) {
-            genericParameters = new Class[0];
+            genericParameters = new Class<?>[0];
         }
         CtMethod[] reifiedMethodsWithoutGenerics;
         try {
@@ -242,7 +243,7 @@ public class JavassistByteCodeStubBuilder {
                         key.append(params[k].getName());
                     }
 
-                    // replace with current one, because this gives the actual declaring Class of this method
+                    // replace with current one, because this gives the actual declaring Class<?> of this method
                     temp.put(key.toString(), currentMethod);
                 }
             }
@@ -269,7 +270,7 @@ public class JavassistByteCodeStubBuilder {
 
             Class realSuperClass = Class.forName(className);
             TypeVariable<GenericDeclaration>[] tv = realSuperClass.getTypeParameters();
-            Map<TypeVariable, Class> genericTypesMapping = new HashMap<TypeVariable, Class>();
+            Map<TypeVariable, Class<?>> genericTypesMapping = new HashMap<TypeVariable, Class<?>>();
             if (genericParameters.length != 0) {
                 // only deal with cases where parameters have been specified
                 for (int i = 0; i < tv.length; i++) {
@@ -485,10 +486,10 @@ public class JavassistByteCodeStubBuilder {
      */
     public static void createStaticInitializer(CtClass generatedClass,
         CtMethod[] reifiedMethods, List<String> classesIndexer,
-        String superClassName, Class[] genericParameters)
+        String superClassName, Class<?>[] genericParameters)
         throws CannotCompileException, NotFoundException {
         if (genericParameters == null) {
-            genericParameters = new Class[0];
+            genericParameters = new Class<?>[0];
         }
         CtConstructor classInitializer = generatedClass.makeClassInitializer();
 

@@ -496,8 +496,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         // where the proxy object implements the interface FUTURE_PROXY_INTERFACE
         // if the proxy does not inherit from FUTURE_PROXY_ROOT_CLASS
         // it is not a future
-        Class proxyclass = ((StubObject) obj).getProxy().getClass();
-        Class[] ints = proxyclass.getInterfaces();
+        Class<?> proxyclass = ((StubObject) obj).getProxy().getClass();
+        Class<?>[] ints = proxyclass.getInterfaces();
         for (int i = 0; i < ints.length; i++) {
             if (Constants.FUTURE_PROXY_INTERFACE.isAssignableFrom(ints[i])) {
                 return true;

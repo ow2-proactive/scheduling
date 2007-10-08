@@ -68,7 +68,7 @@ public class Test extends FunctionalTest {
         String baseclassName = "functionalTests.stub.stubgeneration.A";
         data = JavassistByteCodeStubBuilder.create(baseclassName, null);
         assertNotNull(data);
-        Class stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.functionalTests.stub.stubgeneration._StubA",
+        Class<?> stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.functionalTests.stub.stubgeneration._StubA",
                 data);
         assertTrue("A isn't parent of its Stub!",
             A.class.isAssignableFrom(stubClass));

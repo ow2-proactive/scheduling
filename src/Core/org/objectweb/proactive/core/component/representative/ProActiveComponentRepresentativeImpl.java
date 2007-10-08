@@ -169,17 +169,17 @@ public class ProActiveComponentRepresentativeImpl
         //Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
         Iterator iteratorOnControllers = controllersConfiguration.keySet()
                                                                  .iterator();
-        Class controllerClass = null;
+        Class<?> controllerClass = null;
         AbstractProActiveController currentController;
         ProActiveInterface currentInterface = null;
-        Class controllerItf;
+        Class<?> controllerItf;
         while (iteratorOnControllers.hasNext()) {
             String controllerItfName = (String) iteratorOnControllers.next();
             try {
                 controllerItf = Class.forName(controllerItfName);
                 controllerClass = Class.forName((String) controllersConfiguration.get(
                             controllerItf.getName()));
-                Constructor controllerClassConstructor = controllerClass.getConstructor(new Class[] {
+                Constructor controllerClassConstructor = controllerClass.getConstructor(new Class<?>[] {
                             Component.class
                         });
                 currentController = (AbstractProActiveController) controllerClassConstructor.newInstance(new Object[] {
@@ -224,7 +224,7 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     protected Object reifyCall(String className, String methodName,
-        Class[] parameterTypes, Object[] effectiveParameters, short priority) {
+        Class<?>[] parameterTypes, Object[] effectiveParameters, short priority) {
         try {
             return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
                     Class.forName(className)
@@ -251,7 +251,7 @@ public class ProActiveComponentRepresentativeImpl
             if (nfInterfaceReferences == null) {
                 // retrieve the configuration by calling directly the mandatory component parameters controller itf
                 ComponentParameters params = (ComponentParameters) reifyCall(ComponentParametersController.class.getName(),
-                        "getComponentParameters", new Class[] {  },
+                        "getComponentParameters", new Class<?>[] {  },
                         new Object[] {  }, ComponentRequest.STRICT_FIFO_PRIORITY);
                 hierarchicalType = params.getHierarchicalType();
                 addControllers(componentType,
@@ -367,7 +367,7 @@ public class ProActiveComponentRepresentativeImpl
     @Override
     public boolean equals(Object component) {
         Object result = reifyCall(Object.class.getName(), "equals",
-                new Class[] { Object.class }, new Object[] { component },
+                new Class<?>[] { Object.class }, new Object[] { component },
                 ComponentRequest.STRICT_FIFO_PRIORITY);
         return ((Boolean) result).booleanValue();
     }
@@ -379,8 +379,8 @@ public class ProActiveComponentRepresentativeImpl
         try {
             result = proxy.reify((MethodCall) MethodCall.getMethodCall(
                         Class.forName(Object.class.getName())
-                             .getDeclaredMethod("hashCode", new Class[] {  }),
-                        new Object[] {  }, (Map<TypeVariable, Class>) null));
+                             .getDeclaredMethod("hashCode", new Class<?>[] {  }),
+                        new Object[] {  }, (Map<TypeVariable, Class<?>>) null));
             return ((Integer) result).intValue();
         } catch (SecurityException e) {
             throw new ProActiveRuntimeException(e.toString());

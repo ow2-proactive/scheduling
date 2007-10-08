@@ -47,12 +47,12 @@ import org.objectweb.proactive.core.node.Node;
 public class ProcessForAoCreation implements Runnable {
     private Vector result;
     private String className;
-    private Class[] genericParameters;
+    private Class<?>[] genericParameters;
     private Object[] param;
     private Node node;
 
     public ProcessForAoCreation(Vector result, String className,
-        Class[] genericParameters, Object[] param, Node node) {
+        Class<?>[] genericParameters, Object[] param, Node node) {
         this.result = result;
         this.className = className;
         this.genericParameters = genericParameters;

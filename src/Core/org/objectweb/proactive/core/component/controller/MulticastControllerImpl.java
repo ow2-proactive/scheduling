@@ -121,9 +121,9 @@ public class MulticastControllerImpl extends AbstractProActiveController
         ProActiveInterface serverSideItf) throws IllegalBindingException {
         try {
             ProActiveInterfaceType serverSideItfType = (ProActiveInterfaceType) serverSideItf.getFcItfType();
-            Class clientSideItfClass;
+            Class<?> clientSideItfClass;
             clientSideItfClass = Class.forName(clientSideItfType.getFcItfSignature());
-            Class serverSideItfClass = Class.forName(serverSideItfType.getFcItfSignature());
+            Class<?> serverSideItfClass = Class.forName(serverSideItfType.getFcItfSignature());
 
             Method[] clientSideItfMethods = clientSideItfClass.getMethods();
             Method[] serverSideItfMethods = serverSideItfClass.getMethods();
@@ -295,7 +295,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
             throw new ParameterDispatchException(e.fillInStackTrace());
         }
 
-        Class[] clientSideParamTypes = matchingMethodInClientInterface.getParameterTypes();
+        Class<?>[] clientSideParamTypes = matchingMethodInClientInterface.getParameterTypes();
         ParamDispatch[] clientSideParamDispatchModes = MulticastBindingChecker.getDispatchModes(matchingMethodInClientInterface);
 
         List<List<Object>> dispatchedParameters = new ArrayList<List<Object>>();

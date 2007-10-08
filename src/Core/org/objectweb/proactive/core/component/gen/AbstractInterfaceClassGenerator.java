@@ -57,7 +57,7 @@ public abstract class AbstractInterfaceClassGenerator {
     protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS);
     protected static ClassPool pool = ClassPool.getDefault();
 
-    protected Class loadClass(final String className)
+    protected Class<?> loadClass(final String className)
         throws ClassNotFoundException {
         // try to fetch the class from the default class loader
         return Thread.currentThread().getContextClassLoader()

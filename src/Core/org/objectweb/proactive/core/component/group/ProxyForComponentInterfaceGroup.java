@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.mop.StubObject;
  */
 public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
     protected ProActiveInterfaceType interfaceType;
-    protected Class itfSignatureClass = null;
+    protected Class<?> itfSignatureClass = null;
     protected ProActiveComponent owner;
     protected ProxyForComponentInterfaceGroup delegatee = null;
 
@@ -191,8 +191,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                             mc.getReifiedMethod().toString());
                     }
 
-                    Class returnTypeForGroup = (Class) ((ParameterizedType) mc.getReifiedMethod()
-                                                                              .getGenericReturnType()).getActualTypeArguments()[0];
+                    Class<?> returnTypeForGroup = (Class<?>) ((ParameterizedType) mc.getReifiedMethod()
+                                                                                    .getGenericReturnType()).getActualTypeArguments()[0];
                     result = MOP.newInstance(returnTypeForGroup.getName(),
                             null, null, ProxyForGroup.class.getName(),
                             paramProxy);

@@ -42,25 +42,25 @@ package org.objectweb.proactive.core;
 public interface Constants {
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_BODY_CLASS = org.objectweb.proactive.core.body.ActiveBody.class;
+    public static final Class<?> DEFAULT_BODY_CLASS = org.objectweb.proactive.core.body.ActiveBody.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_BODY_CLASS_NAME = DEFAULT_BODY_CLASS.getName();
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_BODY_INTERFACE = org.objectweb.proactive.Body.class;
+    public static final Class<?> DEFAULT_BODY_INTERFACE = org.objectweb.proactive.Body.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_BODY_INTERFACE_NAME = DEFAULT_BODY_INTERFACE.getName();
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_BODY_PROXY_CLASS = org.objectweb.proactive.core.body.proxy.UniversalBodyProxy.class;
+    public static final Class<?> DEFAULT_BODY_PROXY_CLASS = org.objectweb.proactive.core.body.proxy.UniversalBodyProxy.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_BODY_PROXY_CLASS_NAME = DEFAULT_BODY_PROXY_CLASS.getName();
 
     /** The explicit local body default class */
-    public static final Class DEFAULT_FUTURE_PROXY_CLASS = org.objectweb.proactive.core.body.future.FutureProxy.class;
+    public static final Class<?> DEFAULT_FUTURE_PROXY_CLASS = org.objectweb.proactive.core.body.future.FutureProxy.class;
 
     /** The name of the explicit local body default class */
     public static final String DEFAULT_FUTURE_PROXY_CLASS_NAME = DEFAULT_FUTURE_PROXY_CLASS.getName();
@@ -69,7 +69,7 @@ public interface Constants {
      * The interface implemented by all proxies featuring 'future' semantics,
      * depending on whether they are remoteBodyly-accessible or not
      */
-    public static final Class FUTURE_PROXY_INTERFACE = org.objectweb.proactive.core.body.future.Future.class;
+    public static final Class<?> FUTURE_PROXY_INTERFACE = org.objectweb.proactive.core.body.future.Future.class;
 
     /** rmi protocol identifier */
     public static final String RMI_PROTOCOL_IDENTIFIER = "rmi";

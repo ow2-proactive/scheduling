@@ -66,7 +66,7 @@ public class ExceptionMaskStack {
         return (ExceptionMaskStack) threadLocalMask.get();
     }
 
-    void push(Class[] exceptions) {
+    void push(Class<?>[] exceptions) {
         ExceptionMaskLevel level = new ExceptionMaskLevel(this, exceptions);
         stack.add(0, level);
         currentExceptionMask.addExceptionTypes(level);
@@ -122,7 +122,7 @@ public class ExceptionMaskStack {
     }
 
     /* Optimization: we don't always insert at the top level */
-    ExceptionMaskLevel findBestLevel(Class[] c) {
+    ExceptionMaskLevel findBestLevel(Class<?>[] c) {
         Iterator<ExceptionMaskLevel> iter = stack.iterator();
         while (iter.hasNext()) {
             ExceptionMaskLevel level = iter.next();
@@ -135,7 +135,7 @@ public class ExceptionMaskStack {
         throw new IllegalStateException("No exception level found");
     }
 
-    void waitForIntersection(Class[] exceptions) {
+    void waitForIntersection(Class<?>[] exceptions) {
         if (currentExceptionMask.areExceptionTypesCaught(exceptions)) {
             Iterator<ExceptionMaskLevel> iter = stack.iterator();
             while (iter.hasNext()) {
@@ -147,11 +147,11 @@ public class ExceptionMaskStack {
         }
     }
 
-    boolean areExceptionTypesCaught(Class[] c) {
+    boolean areExceptionTypesCaught(Class<?>[] c) {
         return currentExceptionMask.areExceptionTypesCaught(c);
     }
 
-    boolean isExceptionTypeCaught(Class c) {
+    boolean isExceptionTypeCaught(Class<?> c) {
         return currentExceptionMask.isExceptionTypeCaught(c);
     }
 

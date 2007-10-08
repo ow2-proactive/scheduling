@@ -128,7 +128,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 }
             } else {
                 // instantiate the body locally or remotely
-                Class bodyClass = Constants.DEFAULT_BODY_CLASS;
+                Class<?> bodyClass = Constants.DEFAULT_BODY_CLASS;
                 Node node = (Node) p0;
 
                 //added lines--------------------------
@@ -137,7 +137,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 Active activity = (Active) parameters[1];
                 MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
                 String jobID = (String) parameters[3];
-                Class[] argsClass = new Class[] {
+                Class<?>[] argsClass = new Class<?>[] {
                         ConstructorCall.class, String.class, Active.class,
                         MetaObjectFactory.class, String.class
                     };
@@ -357,8 +357,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private ConstructorCall buildBodyConstructorCall(Class bodyClass,
-        Class[] argsClass, Object[] args) throws ProActiveException {
+    private ConstructorCall buildBodyConstructorCall(Class<?> bodyClass,
+        Class<?>[] argsClass, Object[] args) throws ProActiveException {
         // Determines the constructor of the body object: it is the constructor that
         // has only one argument, this argument being of type ConstructorCall
         try {

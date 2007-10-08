@@ -67,7 +67,7 @@ public class GatherBindingChecker implements Serializable {
         Method result = null;
         Type clientSideReturnType = clientSideMethod.getGenericReturnType();
         Type[] clientSideParametersTypes = clientSideMethod.getGenericParameterTypes();
-        Class[] clientSideExceptionTypes = clientSideMethod.getExceptionTypes();
+        Class<?>[] clientSideExceptionTypes = clientSideMethod.getExceptionTypes();
 
         if (!Utils.checkMethod(clientSideMethod)) {
             throw new NoSuchMethodException(
@@ -90,9 +90,9 @@ serverSideMethodsLoop:
                         "gather interfaces only accept client interfaces with parameterized return types, which is not the case for " +
                         clientSideMethod.toGenericString());
                 }
-                Class serverSideReturnTypeArgument = (Class) ((ParameterizedType) returnType).getActualTypeArguments()[0];
+                Class<?> serverSideReturnTypeArgument = (Class<?>) ((ParameterizedType) returnType).getActualTypeArguments()[0];
                 try {
-                    MOP.checkClassIsReifiable(((Class) clientSideReturnType));
+                    MOP.checkClassIsReifiable(((Class<?>) clientSideReturnType));
                 } catch (ClassNotReifiableException e) {
                     throw new NoSuchMethodException(
                         "gather interfaces only accept client interfaces with reifiable return types, which is not the case for " +
@@ -100,7 +100,7 @@ serverSideMethodsLoop:
                 }
 
                 if (!(serverSideReturnTypeArgument.isAssignableFrom(
-                            (Class) clientSideReturnType))) {
+                            (Class<?>) clientSideReturnType))) {
                     continue serverSideMethodsLoop;
                 }
             } else {
@@ -121,8 +121,8 @@ serverSideParametersTypesLoop:
                     if (StubObject.class.isAssignableFrom(
                                 serverSideMethod.getDeclaringClass())) {
                         // => check in implemented interfaces
-                        Class[] implementedInterfaces = serverSideMethod.getDeclaringClass()
-                                                                        .getInterfaces();
+                        Class<?>[] implementedInterfaces = serverSideMethod.getDeclaringClass()
+                                                                           .getInterfaces();
                         for (int j = 0; j < implementedInterfaces.length;
                                 j++) {
                             try {
@@ -149,7 +149,7 @@ serverSideParametersTypesLoop:
                     pServerParameterType = (ParameterizedType) serverSideParametersTypes[i];
                 }
                 if (!List.class.isAssignableFrom(
-                            (Class) pServerParameterType.getRawType())) {
+                            (Class<?>) pServerParameterType.getRawType())) {
                     continue serverSideMethodsLoop;
                 }
                 if (pServerParameterType.getActualTypeArguments().length != 1) {
@@ -157,13 +157,13 @@ serverSideParametersTypesLoop:
                 }
 
                 if (clientItfIsMulticast) {
-                    //                	if (! (((Class)clientSideParametersTypes[i]).isAssignableFrom((Class)pServerParameterType.getRawType()))) {
+                    //                	if (! (((Class<?>)clientSideParametersTypes[i]).isAssignableFrom((Class<?>)pServerParameterType.getRawType()))) {
                     if (clientSideParametersTypes[i] instanceof ParameterizedType &&
-                            ((Class) ((ParameterizedType) clientSideParametersTypes[i]).getRawType()).isAssignableFrom(
+                            ((Class<?>) ((ParameterizedType) clientSideParametersTypes[i]).getRawType()).isAssignableFrom(
                                 List.class)) {
                         // we have a list<T> in the client multicast itf, that's fine
-                        if (!((Class) (((ParameterizedType) clientSideParametersTypes[i]).getActualTypeArguments()[0])).isAssignableFrom(
-                                    (Class) pServerParameterType.getActualTypeArguments()[0])) {
+                        if (!((Class<?>) (((ParameterizedType) clientSideParametersTypes[i]).getActualTypeArguments()[0])).isAssignableFrom(
+                                    (Class<?>) pServerParameterType.getActualTypeArguments()[0])) {
                             continue serverSideMethodsLoop;
                         }
                     } else {
@@ -172,18 +172,18 @@ serverSideParametersTypesLoop:
 
                     //                	}
                 } else {
-                    if (!(((Class) clientSideParametersTypes[i]).isAssignableFrom(
-                                (Class) pServerParameterType.getActualTypeArguments()[0]))) {
+                    if (!(((Class<?>) clientSideParametersTypes[i]).isAssignableFrom(
+                                (Class<?>) pServerParameterType.getActualTypeArguments()[0]))) {
                         continue serverSideMethodsLoop;
                     }
                 }
             }
 
             // 4. check exception types
-            Class[] serverSideExceptionTypes = serverSideMethod.getExceptionTypes();
-            for (Class clientExceptionType : clientSideExceptionTypes) {
+            Class<?>[] serverSideExceptionTypes = serverSideMethod.getExceptionTypes();
+            for (Class<?> clientExceptionType : clientSideExceptionTypes) {
                 boolean match = false;
-                for (Class serverExceptionType : serverSideExceptionTypes) {
+                for (Class<?> serverExceptionType : serverSideExceptionTypes) {
                     if (clientExceptionType.isAssignableFrom(
                                 serverExceptionType)) {
                         match = true;

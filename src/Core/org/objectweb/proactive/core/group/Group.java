@@ -49,7 +49,7 @@ public interface Group<E> extends List<E> {
     /**
      * Returns the (upper) class of member.
      */
-    public Class getType() throws java.lang.ClassNotFoundException;
+    public Class<?> getType() throws java.lang.ClassNotFoundException;
 
     /**
      * Returns the name of the (upper) class of member.

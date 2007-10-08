@@ -151,7 +151,7 @@ public class ArrayOfInt implements java.io.Serializable {
      * Get Custom Serializer
      */
     public static org.apache.axis.encoding.Serializer getSerializer(
-        java.lang.String mechType, java.lang.Class _javaType,
+        java.lang.String mechType, java.lang.Class<?> _javaType,
         javax.xml.namespace.QName _xmlType) {
         return new org.apache.axis.encoding.ser.BeanSerializer(_javaType,
             _xmlType, typeDesc);
@@ -161,7 +161,7 @@ public class ArrayOfInt implements java.io.Serializable {
      * Get Custom Deserializer
      */
     public static org.apache.axis.encoding.Deserializer getDeserializer(
-        java.lang.String mechType, java.lang.Class _javaType,
+        java.lang.String mechType, java.lang.Class<?> _javaType,
         javax.xml.namespace.QName _xmlType) {
         return new org.apache.axis.encoding.ser.BeanDeserializer(_javaType,
             _xmlType, typeDesc);

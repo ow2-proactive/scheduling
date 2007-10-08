@@ -99,7 +99,7 @@ public class OutputInterceptorClassGenerator
         try {
             String representativeClassName = org.objectweb.proactive.core.component.gen.Utils.getOutputInterceptorClassName(interfaceName,
                     interfaceType.getFcItfSignature());
-            Class generated_class;
+            Class<?> generated_class;
 
             // check whether class has already been generated
             try {
@@ -201,7 +201,7 @@ public class OutputInterceptorClassGenerator
                             key = key + params[k].getName();
                         }
 
-                        // this gives the actual declaring Class of this method
+                        // this gives the actual declaring Class<?> of this method
                         methodsToImplement.put(key, currentMethod);
                     }
                 }
@@ -248,7 +248,7 @@ public class OutputInterceptorClassGenerator
                         ClassDataCache.instance().toString());
                 }
 
-                // convert the bytes into a Class
+                // convert the bytes into a Class<?>
                 generated_class = Utils.defineClass(representativeClassName,
                         bytecode);
             }

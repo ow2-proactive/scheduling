@@ -114,7 +114,7 @@ public class UnicoreProActiveClient {
     private void initStaticClientFields(Boolean noGui, String unicoreDir,
         Boolean testGrid) {
         try {
-            Class clientClass = Client.class;
+            Class<?> clientClass = Client.class;
 
             Field fNoGui = clientClass.getDeclaredField("noGui");
             Field fUnicoreDir = clientClass.getDeclaredField("unicoreDir");

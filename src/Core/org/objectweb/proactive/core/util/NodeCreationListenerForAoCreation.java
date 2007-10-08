@@ -48,12 +48,12 @@ public class NodeCreationListenerForAoCreation
     implements NodeCreationEventListener {
     private Vector result;
     private String className;
-    private Class[] genericParameters;
+    private Class<?>[] genericParameters;
     private Object[] constructorParameters;
     private ExecutorService threadpool;
 
     public NodeCreationListenerForAoCreation(Vector result, String className,
-        Class[] genericParameters, Object[] constructorParameters,
+        Class<?>[] genericParameters, Object[] constructorParameters,
         ExecutorService threadpool) {
         this.result = result;
         this.className = className;

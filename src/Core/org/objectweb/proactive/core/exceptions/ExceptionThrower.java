@@ -59,7 +59,7 @@ public class ExceptionThrower {
         "." + THROWER_CLASS_NAME;
     private static Thrower thrower = null;
 
-    private static Class loadClassJavassist() {
+    private static Class<?> loadClassJavassist() {
         try {
             CtClass throwerClass = ClassPool.getDefault()
                                             .makeClass(THROWER_CLASS_FULLNAME);
@@ -79,13 +79,13 @@ public class ExceptionThrower {
     }
 
     /* We load a class given its name and its binary representation */
-    private static Class loadClass(String className, byte[] b)
+    private static Class<?> loadClass(String className, byte[] b)
         throws Exception {
-        Class clazz = null;
+        Class<?> clazz = null;
         ClassLoader loader = ClassLoader.getSystemClassLoader();
-        Class cls = Class.forName("java.lang.ClassLoader");
+        Class<?> cls = Class.forName("java.lang.ClassLoader");
         java.lang.reflect.Method method = cls.getDeclaredMethod("defineClass",
-                new Class[] { String.class, byte[].class, int.class, int.class });
+                new Class<?>[] { String.class, byte[].class, int.class, int.class });
 
         /* protected method invocaton */
         method.setAccessible(true);
@@ -93,7 +93,7 @@ public class ExceptionThrower {
             Object[] args = new Object[] {
                     className, b, new Integer(0), new Integer(b.length)
                 };
-            clazz = (Class) method.invoke(loader, args);
+            clazz = (Class<?>) method.invoke(loader, args);
         } finally {
             method.setAccessible(false);
         }
@@ -103,7 +103,7 @@ public class ExceptionThrower {
     /* The first time the mechanism is used, it has to initialize the thrower */
     private static void activate() {
         try {
-            Class clazz = loadClassJavassist();
+            Class<?> clazz = loadClassJavassist();
             thrower = (Thrower) clazz.newInstance();
         } catch (Exception e) {
             e.printStackTrace();

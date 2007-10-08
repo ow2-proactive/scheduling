@@ -200,7 +200,7 @@ public abstract class Utils extends Object {
      * @param cl A class object representing an array type.
      * @return A String with the'source code representation' of that array type
      */
-    static public String sourceLikeForm(Class cl) {
+    static public String sourceLikeForm(Class<?> cl) {
         if (!(cl.isArray())) {
             //to fix an issue with jdk1.3 and inner class
             // A$B should be A.B in source code
@@ -208,7 +208,7 @@ public abstract class Utils extends Object {
             return cl.getName().replace('$', '.');
         } else {
             int nb = 0;
-            Class current = cl;
+            Class<?> current = cl;
             String result = "";
 
             do {
@@ -226,7 +226,7 @@ public abstract class Utils extends Object {
      * Returns the name of the wrapper class for class <code>cl</code>.
      * If <code>cl</code> is not a primitive type, returns <code>null</code>
      */
-    static public String nameOfWrapper(Class cl) {
+    static public String nameOfWrapper(Class<?> cl) {
         String str = cl.getName();
 
         if (cl.isPrimitive()) {
@@ -292,10 +292,10 @@ public abstract class Utils extends Object {
     }
 
     /**
-     * Returns the Class object that is a wrapper for the given <code>cl</code>
+     * Returns the Class<?> object that is a wrapper for the given <code>cl</code>
      * class.
      */
-    public static Class getWrapperClass(Class cl) {
+    public static Class<?> getWrapperClass(Class<?> cl) {
         if (!(cl.isPrimitive())) {
             return null;
         }
@@ -310,14 +310,14 @@ public abstract class Utils extends Object {
     /**
      * Performs the opposite operation as getWrapperClass
      */
-    public static Class getPrimitiveType(Class cl) {
+    public static Class<?> getPrimitiveType(Class<?> cl) {
         Field cst;
         if (Utils.isWrapperClass(cl)) {
             // These types are not classes , yet class static variables
             // We want to locale the TYPE field in the class
             try {
                 cst = cl.getField("TYPE");
-                return (Class) cst.get(null);
+                return (Class<?>) cst.get(null);
             } catch (NoSuchFieldException e) {
                 throw new InternalException(
                     "Cannot locate constant TYPE in class " + cl.getName());
@@ -386,7 +386,7 @@ public abstract class Utils extends Object {
          return Utils.getPackageName(nameOfClass) + "." + STUB_DEFAULT_PREFIX + Utils.getSimpleName(nameOfClass);
        }
      */
-    public static boolean isNormalException(Class exc) {
+    public static boolean isNormalException(Class<?> exc) {
         boolean result;
 
         if (Utils.JAVA_LANG_THROWABLE.isAssignableFrom(exc)) {
@@ -407,7 +407,7 @@ public abstract class Utils extends Object {
         return result;
     }
 
-    public static Class decipherPrimitiveType(String str) {
+    public static Class<?> decipherPrimitiveType(String str) {
         if (str.equals("int")) {
             return java.lang.Integer.TYPE;
         } else if (str.equals("boolean")) {
@@ -431,16 +431,16 @@ public abstract class Utils extends Object {
         return null;
     }
 
-    public static boolean isSuperTypeInArray(String className, Class[] types) {
+    public static boolean isSuperTypeInArray(String className, Class<?>[] types) {
         try {
-            Class c = MOP.forName(className);
+            Class<?> c = MOP.forName(className);
             return isSuperTypeInArray(c, types);
         } catch (ClassNotFoundException e) {
             throw new InternalException(e);
         }
     }
 
-    public static boolean isSuperTypeInArray(Class c, Class<?>[] types) {
+    public static boolean isSuperTypeInArray(Class<?> c, Class<?>[] types) {
         for (int i = 0; i < types.length; i++) {
             if (types[i].isAssignableFrom(c)) {
                 return true;
@@ -462,7 +462,7 @@ public abstract class Utils extends Object {
         if (source == null) {
             return null;
         }
-        Class cl;
+        Class<?> cl;
         Object obj;
         final Object[] ret = new Object[source.length];
         int len = 0;
@@ -497,7 +497,7 @@ public abstract class Utils extends Object {
     }
 
     public static String convertClassNameToStubClassName(String classname,
-        Class[] genericParameters) {
+        Class<?>[] genericParameters) {
         if (classname.length() == 0) {
             return classname;
         }
@@ -511,7 +511,7 @@ public abstract class Utils extends Object {
 
         String genericsDifferentiator = "";
         if (genericParameters != null) {
-            for (Class gClassName : genericParameters) {
+            for (Class<?> gClassName : genericParameters) {
                 if (!genericsDifferentiator.equals("")) {
                     genericsDifferentiator += STUB_GENERICS_SEPARATOR;
                 }
@@ -705,13 +705,13 @@ public abstract class Utils extends Object {
     /**
      * Looks for all super interfaces of the given interface, and adds them in the given List
      * @param cl the base interface
-     * @param superItfs a vector that will list all Class instances corresponding to the super interfaces of cl
+     * @param superItfs a vector that will list all Class<?> instances corresponding to the super interfaces of cl
      */
-    public static void addSuperInterfaces(Class cl, List<Class> superItfs) {
+    public static void addSuperInterfaces(Class<?> cl, List<Class<?>> superItfs) {
         if (!cl.isInterface()) {
             return;
         }
-        Class[] super_interfaces = cl.getInterfaces();
+        Class<?>[] super_interfaces = cl.getInterfaces();
         for (int i = 0; i < super_interfaces.length; i++) {
             superItfs.add(super_interfaces[i]);
             addSuperInterfaces(super_interfaces[i], superItfs);
@@ -723,10 +723,10 @@ public abstract class Utils extends Object {
      * adds them to this list.
      * @param interfaces a list of interfaces
      */
-    public static void addSuperInterfaces(List<Class> interfaces) {
+    public static void addSuperInterfaces(List<Class<?>> interfaces) {
         for (int i = 0; i < interfaces.size(); i++) {
-            Class[] super_itfs_table = interfaces.get(i).getInterfaces();
-            List<Class> super_itfs = new ArrayList<Class>(super_itfs_table.length); // resizable list
+            Class<?>[] super_itfs_table = interfaces.get(i).getInterfaces();
+            List<Class<?>> super_itfs = new ArrayList<Class<?>>(super_itfs_table.length); // resizable list
             for (int j = 0; j < super_itfs_table.length; j++) {
                 super_itfs.add(super_itfs_table[j]);
             }
@@ -739,7 +739,7 @@ public abstract class Utils extends Object {
         }
     }
 
-    private static final Class silentForName(String classname) {
+    private static final Class<?> silentForName(String classname) {
         try {
             return MOP.forName(classname);
         } catch (ClassNotFoundException e) {
@@ -752,15 +752,15 @@ public abstract class Utils extends Object {
 
     /**
      * Searches a method with the given parameters in the given reifiedClass
-     * Note that a call to checkMethodExistence(reifiedClass, methodName, null) is different to a call to checkMethodExistence(reifiedClass, methodName, new Class[0])
+     * Note that a call to checkMethodExistence(reifiedClass, methodName, null) is different to a call to checkMethodExistence(reifiedClass, methodName, new Class<?>[0])
      * The former means that no checking is done on the parameters, whereas the latter means that we look for a method with no parameters.
      * @param reifiedClass the class where to search the method
      * @param methodName the name of the method
      * @param parametersTypes the parametersTypes list
      * @return true if the method was found, false otherwise
      */
-    public static boolean checkMethodExistence(Class reifiedClass,
-        String methodName, Class[] parametersTypes) {
+    public static boolean checkMethodExistence(Class<?> reifiedClass,
+        String methodName, Class<?>[] parametersTypes) {
         Method[] methods = reifiedClass.getMethods();
         for (Method m : methods) {
             // is it the right method name

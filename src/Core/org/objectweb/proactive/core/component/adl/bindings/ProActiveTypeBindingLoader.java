@@ -77,11 +77,11 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
 
             try {
                 ClassLoader cl = getClassLoader(context);
-                Class clientSideItfClass = cl.loadClass(cItf.getSignature());
-                Class serverSideItfClass = cl.loadClass(sItf.getSignature());
+                Class<?> clientSideItfClass = cl.loadClass(cItf.getSignature());
+                Class<?> serverSideItfClass = cl.loadClass(sItf.getSignature());
 
-                //            	Class clientSideItfClass = Class.forName(cItf.getSignature());
-                //            	Class serverSideItfClass = Class.forName(sItf.getSignature());
+                //            	Class<?> clientSideItfClass = Class<?>.forName(cItf.getSignature());
+                //            	Class<?> serverSideItfClass = Class<?>.forName(sItf.getSignature());
                 if (!clientSideItfClass.isAssignableFrom(serverSideItfClass)) {
                     // check if multicast interface
                     if (ProActiveTypeInterface.MULTICAST_CARDINALITY.equals(

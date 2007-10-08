@@ -73,8 +73,8 @@ public class ProComponent {
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Component newActiveComponent(String classname,
-        Class[] genericParameters, Object[] constructorParameters, Node node,
-        Active activity, MetaObjectFactory factory,
+        Class<?>[] genericParameters, Object[] constructorParameters,
+        Node node, Active activity, MetaObjectFactory factory,
         ComponentParameters componentParameters)
         throws ActiveObjectCreationException, NodeException {
         try {
@@ -123,7 +123,7 @@ public class ProComponent {
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Component newActiveComponent(String className,
-        Class[] genericParameters, Object[] constructorParameters,
+        Class<?>[] genericParameters, Object[] constructorParameters,
         VirtualNode vn, ComponentParameters componentParameters)
         throws ActiveObjectCreationException, NodeException {
         try {

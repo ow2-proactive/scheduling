@@ -41,10 +41,10 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _initOperationDesc1();
     }
 
-    private java.util.Vector<Class> cachedSerClasses = new java.util.Vector<Class>();
+    private java.util.Vector<Class<?>> cachedSerClasses = new java.util.Vector<Class<?>>();
     private java.util.Vector<QName> cachedSerQNames = new java.util.Vector<QName>();
-    private java.util.Vector<Class> cachedSerFactories = new java.util.Vector<Class>();
-    private java.util.Vector<Class> cachedDeserFactories = new java.util.Vector<Class>();
+    private java.util.Vector<Class<?>> cachedSerFactories = new java.util.Vector<Class<?>>();
+    private java.util.Vector<Class<?>> cachedDeserFactories = new java.util.Vector<Class<?>>();
 
     public Service1SoapStub() throws org.apache.axis.AxisFault {
         this(null);
@@ -64,16 +64,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
             super.service = service;
         }
 
-        java.lang.Class cls;
+        java.lang.Class<?> cls;
         javax.xml.namespace.QName qName;
-        java.lang.Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
-        java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
-        java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
-        java.lang.Class enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
-        java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
-        java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
-        java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
-        java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
+        java.lang.Class<?> beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
+        java.lang.Class<?> beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
+        java.lang.Class<?> enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
+        java.lang.Class<?> enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
+        java.lang.Class<?> arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
+        java.lang.Class<?> arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
+        java.lang.Class<?> simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
+        java.lang.Class<?> simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
         qName = new javax.xml.namespace.QName("http://tempuri.org/",
                 "ArrayOfInt");
         cachedSerQNames.add(qName);
@@ -267,10 +267,10 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
                     _call.setEncodingStyle(null);
 
                     for (int i = 0; i < cachedSerFactories.size(); ++i) {
-                        java.lang.Class cls = (java.lang.Class) cachedSerClasses.get(i);
+                        java.lang.Class<?> cls = (java.lang.Class<?>) cachedSerClasses.get(i);
                         javax.xml.namespace.QName qName = (javax.xml.namespace.QName) cachedSerQNames.get(i);
-                        java.lang.Class sf = (java.lang.Class) cachedSerFactories.get(i);
-                        java.lang.Class df = (java.lang.Class) cachedDeserFactories.get(i);
+                        java.lang.Class<?> sf = (java.lang.Class<?>) cachedSerFactories.get(i);
+                        java.lang.Class<?> df = (java.lang.Class<?>) cachedDeserFactories.get(i);
                         _call.registerTypeMapping(cls, qName, sf, df, false);
                     }
                 }

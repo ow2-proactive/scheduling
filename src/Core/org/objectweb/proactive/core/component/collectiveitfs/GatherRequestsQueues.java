@@ -246,14 +246,14 @@ public class GatherRequestsQueues implements Serializable {
                         methodName + "]");
                 }
 
-                Class[] clientMethodParamTypes = clientMethod.getParameterTypes();
-                Class[] gatherMethodParamTypes = new Class[clientMethodParamTypes.length];
+                Class<?>[] clientMethodParamTypes = clientMethod.getParameterTypes();
+                Class<?>[] gatherMethodParamTypes = new Class<?>[clientMethodParamTypes.length];
 
                 for (int i = 0; i < clientMethodParamTypes.length; i++) {
                     gatherMethodParamTypes[i] = List.class;
                 }
 
-                Class gatherItfClass = Class.forName(((ProActiveInterfaceType) ((ProActiveInterface) owner.getFcInterface(
+                Class<?> gatherItfClass = Class.forName(((ProActiveInterfaceType) ((ProActiveInterface) owner.getFcInterface(
                             serverItfName)).getFcItfType()).getFcItfSignature());
 
                 Method gatherMethod = gatherItfClass.getMethod(clientMethod.getName(),

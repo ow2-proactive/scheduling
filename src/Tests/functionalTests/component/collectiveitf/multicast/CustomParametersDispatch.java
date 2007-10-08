@@ -72,9 +72,9 @@ public class CustomParametersDispatch implements ParamDispatch {
     public boolean match(Type clientSideInputParameterType,
         Type serverSideInputParameterType) throws ParameterDispatchException {
         try {
-            boolean one = ((Class) ((ParameterizedType) clientSideInputParameterType).getRawType()).equals(List.class);
-            boolean two = ((Class) ((ParameterizedType) clientSideInputParameterType).getActualTypeArguments()[0]).equals(WrappedInteger.class);
-            boolean three = ((Class) serverSideInputParameterType).equals(WrappedInteger.class);
+            boolean one = ((Class<?>) ((ParameterizedType) clientSideInputParameterType).getRawType()).equals(List.class);
+            boolean two = ((Class<?>) ((ParameterizedType) clientSideInputParameterType).getActualTypeArguments()[0]).equals(WrappedInteger.class);
+            boolean three = ((Class<?>) serverSideInputParameterType).equals(WrappedInteger.class);
             return one && two && three;
         } catch (ClassCastException e) {
             return false;

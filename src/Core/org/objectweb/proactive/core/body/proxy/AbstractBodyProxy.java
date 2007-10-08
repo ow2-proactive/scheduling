@@ -221,7 +221,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
         // Creates a stub + FutureProxy for representing the result
         try {
-            Class returnType = null;
+            Class<?> returnType = null;
             Type t = methodCall.getReifiedMethod().getGenericReturnType();
             if (t instanceof TypeVariable) {
                 returnType = methodCall.getGenericTypesMapping().get(t);

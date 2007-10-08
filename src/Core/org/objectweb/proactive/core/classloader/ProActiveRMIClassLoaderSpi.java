@@ -109,7 +109,7 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
      * @see RMIClassLoaderSpi#getClassAnnotation(java.lang.Class)
      */
     @Override
-    public String getClassAnnotation(Class arg0) {
+    public String getClassAnnotation(Class<?> arg0) {
         return rmiClassLoaderSpi.getClassAnnotation(arg0);
     }
 }

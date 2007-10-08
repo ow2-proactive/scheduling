@@ -777,7 +777,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return localNode.getJobId();
     }
 
-    public ArrayList<UniversalBody> getActiveObjects(String nodeName,
+    public List<UniversalBody> getActiveObjects(String nodeName,
         String className) {
         // the array to return
         ArrayList<UniversalBody> localBodies = new ArrayList<UniversalBody>();
@@ -1182,7 +1182,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         System.out.println("ProActiveRuntimeImpl.launchMain() -" + className +
             "-");
 
-        Class mainClass = Class.forName(className);
+        Class<?> mainClass = Class.forName(className);
         Method mainMethod = mainClass.getMethod("main",
                 new Class[] { String[].class });
         new LauncherThread(mainMethod, parameters).start();
@@ -1190,7 +1190,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public void newRemote(String className)
         throws ClassNotFoundException, ProActiveException {
-        Class remoteClass = Class.forName(className);
+        Class<?> remoteClass = Class.forName(className);
         new LauncherThread(remoteClass).start();
     }
 
@@ -1449,10 +1449,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private class LauncherThread extends Thread {
         private final boolean launchMain;
         private Method mainMethod;
-        private Class remoteClass;
+        private Class<?> remoteClass;
         private String[] parameters;
 
-        public LauncherThread(Class remoteClass) {
+        public LauncherThread(Class<?> remoteClass) {
             this.remoteClass = remoteClass;
             this.launchMain = false;
         }

@@ -42,7 +42,7 @@ public class PAObjectOutputStream extends MarshalOutputStream {
     }
 
     @Override
-    protected void annotateClass(Class cl) throws IOException {
+    protected void annotateClass(Class<?> cl) throws IOException {
         MOP.addClassToCache(cl.getName(), cl);
         super.annotateClass(cl);
     }

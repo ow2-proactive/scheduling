@@ -403,7 +403,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     public ExternalProcess createProcess(String processClassName)
         throws ProActiveException {
         try {
-            Class processClass = Class.forName(processClassName);
+            Class<?> processClass = Class.forName(processClassName);
             ExternalProcess process = (ExternalProcess) processClass.newInstance();
 
             return process;

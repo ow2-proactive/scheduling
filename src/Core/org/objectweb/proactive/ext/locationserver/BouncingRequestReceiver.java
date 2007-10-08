@@ -59,11 +59,11 @@ public class BouncingRequestReceiver implements RequestReceiver {
     }
 
     public void removeImmediateService(String methodName,
-        Class[] parametersTypes) throws IOException {
+        Class<?>[] parametersTypes) throws IOException {
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes)
-        throws IOException {
+    public void setImmediateService(String methodName,
+        Class<?>[] parametersTypes) throws IOException {
     }
 
     public boolean isInImmediateService() throws IOException {

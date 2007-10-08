@@ -47,16 +47,16 @@ import org.objectweb.proactive.core.mop.Proxy;
  *
  */
 public class NonFunctionalServices {
-    static Class nonFunctionalServicesClass = null;
+    static Class<?> nonFunctionalServicesClass = null;
     static Method terminateAOMethod = null;
     static Method terminateAOImmediatelyMethod = null;
-    static Class[] paramTypes;
+    static Class<?>[] paramTypes;
 
     static {
         try {
             nonFunctionalServicesClass = java.lang.Class.forName(
                     "org.objectweb.proactive.core.util.NonFunctionalServices");
-            paramTypes = new Class[1];
+            paramTypes = new Class<?>[1];
             paramTypes[0] = java.lang.Class.forName(
                     "org.objectweb.proactive.core.mop.Proxy");
             terminateAOMethod = nonFunctionalServicesClass.getMethod("_terminateAO",
@@ -79,7 +79,7 @@ public class NonFunctionalServices {
      */
     public static void terminateAO(Proxy proxy) throws Throwable {
         proxy.reify(MethodCall.getMethodCall(terminateAOMethod, paramTypes,
-                (Map<TypeVariable, Class>) null));
+                (Map<TypeVariable, Class<?>>) null));
     }
 
     /**
@@ -91,7 +91,7 @@ public class NonFunctionalServices {
     public static void terminateAOImmediately(Proxy proxy)
         throws Throwable {
         proxy.reify(MethodCall.getMethodCall(terminateAOImmediatelyMethod,
-                paramTypes, (Map<TypeVariable, Class>) null));
+                paramTypes, (Map<TypeVariable, Class<?>>) null));
     }
 
     /**

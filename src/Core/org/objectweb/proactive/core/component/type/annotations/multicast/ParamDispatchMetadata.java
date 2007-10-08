@@ -57,5 +57,5 @@ public @interface ParamDispatchMetadata {
      * the {@link ParamDispatchMetadata#mode()} method.
      * @return a class defining the dispatch strategy
      */
-    Class customMode() default ParamDispatchMode.class;
+    Class<?> customMode() default ParamDispatchMode.class;
 }

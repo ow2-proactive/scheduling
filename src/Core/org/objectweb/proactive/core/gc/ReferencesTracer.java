@@ -48,9 +48,9 @@ public class ReferencesTracer {
         System.out.println(str);
     }
 
-    private static Field[] getFields(Class c) {
+    private static Field[] getFields(Class<?> c) {
         Vector<Field> returnedFields = new Vector<Field>();
-        for (Class current = c; current != null;
+        for (Class<?> current = c; current != null;
                 current = current.getSuperclass()) {
             try {
                 Field[] fields = current.getDeclaredFields();
@@ -77,7 +77,7 @@ public class ReferencesTracer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Class c = o.getClass();
+        Class<?> c = o.getClass();
         if (c.isArray()) {
             if (!(o instanceof Object[])) {
 
@@ -118,7 +118,7 @@ public class ReferencesTracer {
         printAllReferences(0, new HashSet<Object>(), o);
     }
 
-    private static Class[] getAllClasses() {
+    private static Class<?>[] getAllClasses() {
         Field f;
         try {
             f = ClassLoader.class.getDeclaredField("classes");
@@ -134,10 +134,10 @@ public class ReferencesTracer {
             e.printStackTrace();
             return null;
         }
-        return (Class[]) classes.toArray(new Class[0]);
+        return (Class<?>[]) classes.toArray(new Class<?>[0]);
     }
 
-    private static Collection<Object> getStaticObjects(Class c) {
+    private static Collection<Object> getStaticObjects(Class<?> c) {
         Field[] fields = getFields(c);
         Vector<Object> staticObjects = new Vector<Object>();
         for (int i = 0; i < fields.length; i++) {
@@ -155,7 +155,7 @@ public class ReferencesTracer {
     }
 
     private static Object[] getAllStaticObjects() {
-        Class[] classes = getAllClasses();
+        Class<?>[] classes = getAllClasses();
         Vector<Object> staticObjects = new Vector<Object>();
         for (int i = 0; i < classes.length; i++) {
             System.out.println(i + " classes");
@@ -172,14 +172,14 @@ public class ReferencesTracer {
     }
 
     public static Collection<Object> getAllTypedReferences(Object root,
-        Class type) {
+        Class<?> type) {
         return getAllTypedReferences(root, type, new HashSet<Object>());
     }
 
     private static Collection<Object> EMPTY_COLLECTION = new Vector<Object>();
 
     private static Collection<Object> getAllTypedReferences(Object o,
-        Class type, Collection<Object> items) {
+        Class<?> type, Collection<Object> items) {
         try {
             if ((o == null) || !items.add(o)) {
                 return EMPTY_COLLECTION;
@@ -187,7 +187,7 @@ public class ReferencesTracer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Class c = o.getClass();
+        Class<?> c = o.getClass();
         Collection<Object> list = new LinkedList<Object>();
         if (c.isAssignableFrom(type)) {
             list.add(o);

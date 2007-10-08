@@ -121,6 +121,7 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public java.rmi.Remote getPort(javax.xml.namespace.QName portName,
         Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {

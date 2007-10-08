@@ -220,7 +220,7 @@ public class TimIt {
                 //
                 ConfigChart[] chart = element.getCharts();
                 Benchmark[] bench = element.getBenchmarks();
-                Class runClass = Class.forName(element.get("class"));
+                Class<?> runClass = Class.forName(element.get("class"));
                 Startable startable = (Startable) runClass.newInstance();
                 message(1,
                     "RUN SERIES " + runClass.getSimpleName() + " [" +

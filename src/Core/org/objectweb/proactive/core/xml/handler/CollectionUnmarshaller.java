@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  */
 public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
     protected java.util.ArrayList resultList;
-    protected Class targetClass;
+    protected Class<?> targetClass;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -56,12 +56,12 @@ public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
         this(null);
     }
 
-    public CollectionUnmarshaller(Class targetClass, boolean lenient) {
+    public CollectionUnmarshaller(Class<?> targetClass, boolean lenient) {
         super(lenient);
         this.targetClass = targetClass;
     }
 
-    public CollectionUnmarshaller(Class targetClass) {
+    public CollectionUnmarshaller(Class<?> targetClass) {
         super();
         this.targetClass = targetClass;
     }

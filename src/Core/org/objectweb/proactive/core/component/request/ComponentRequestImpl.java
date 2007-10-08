@@ -79,8 +79,8 @@ public class ComponentRequestImpl extends RequestImpl
 
     //private int shortcutCounter = 0;
     //private Shortcut shortcut;
-    private final Class declaringClass;
-    private final Class targetClass;
+    private final Class<?> declaringClass;
+    private final Class<?> targetClass;
 
     // priorities for NF requests (notably when using filters on functional requests) : 
     //private short priority=ComponentRequest.STRICT_FIFO_PRIORITY;
@@ -322,7 +322,7 @@ public class ComponentRequestImpl extends RequestImpl
     /*
      * @see org.objectweb.proactive.core.component.request.ComponentRequest#getTargetClass()
      */
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 }
