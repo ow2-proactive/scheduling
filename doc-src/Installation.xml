@@ -238,7 +238,7 @@
     and set the the <literal>CLASSPATH</literal>.
     </para>
    <para>
-     <programlisting java="lang"><textobject><textdata fileref="code_snippets/class_path_linux.txt"></textdata></textobject></programlisting>
+     <programlisting lang="java"><textobject><textdata fileref="code_snippets/class_path_linux.txt"></textdata></textobject></programlisting>
    	</para>
     <para>Under Windows:</para>
 	<para> Open a Windows command terminal by executing either <literal>cmd</literal> or
@@ -249,7 +249,7 @@
     </para>
 	
    <para>
-     <programlisting java="lang"><textobject><textdata fileref="code_snippets/class_path_windows.txt"></textdata></textobject></programlisting>
+     <programlisting lang="java"><textobject><textdata fileref="code_snippets/class_path_windows.txt"></textdata></textobject></programlisting>
    	</para>
      
     
@@ -325,7 +325,7 @@
 		
 			
 		</para>
-      <programlisting java="lang"><textobject><textdata fileref="../scripts/proactive-log4j" /></textobject></programlisting>
+      <programlisting lang="java"><textobject><textdata fileref="../scripts/proactive-log4j" /></textobject></programlisting>
     </example><note>
       <para>If you use the scripts provided with the distribution to run the
       examples an existing log4j file named <literal>proactive-log4j</literal>
