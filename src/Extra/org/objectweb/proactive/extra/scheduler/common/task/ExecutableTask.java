@@ -50,7 +50,8 @@ public interface ExecutableTask extends Serializable {
      * This may generate an Object result. It can be whatever you want.
      *
      * @param results the results (as a taskResult) from parent tasks.
+     * @throws any exception thrown by the user's code
      * @return any object from the user.
      */
-    public Object execute(TaskResult... results);
+    public Object execute(TaskResult... results) throws Throwable;
 }

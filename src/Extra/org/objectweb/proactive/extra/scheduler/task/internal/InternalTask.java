@@ -36,6 +36,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
@@ -90,10 +91,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /**
      * Return the user task represented by this task descriptor.
-     *
+     * @throws ShcedulerException if the task cannot be created or initialized
      * @return the user task represented by this task descriptor.
      */
-    public abstract ExecutableTask getTask();
+    public abstract ExecutableTask getTask() throws SchedulerException;
 
     /**
      * Create the launcher for this taskDescriptor.

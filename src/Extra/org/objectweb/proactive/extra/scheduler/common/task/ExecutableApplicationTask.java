@@ -66,7 +66,9 @@ public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
      * and the other will be sent to you as parameters.
      *
      * @param nodes the nodes you asked for.
+     * @throws any exception thrown by the user's code
      * @return any object from the user.
      */
-    public abstract Object execute(ArrayList<Node> nodes);
+    public abstract Object execute(ArrayList<Node> nodes)
+        throws Throwable;
 }

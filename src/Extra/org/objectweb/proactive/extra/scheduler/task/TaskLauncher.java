@@ -44,6 +44,7 @@ import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -81,9 +82,12 @@ public class TaskLauncher implements InitActive, Serializable {
     protected String host;
     protected Integer port;
 
+    // if true, this VM should be killed
+    protected boolean shutdown;
+
     // handle streams
-    protected transient PrintStream stdout;
-    protected transient PrintStream stderr;
+    protected final transient PrintStream stdout = System.out;
+    protected final transient PrintStream stderr = System.err;
 
     /**
      * ProActive empty constructor.
@@ -104,8 +108,7 @@ public class TaskLauncher implements InitActive, Serializable {
         this.jobId = jobId;
         this.host = host;
         this.port = port;
-        this.stdout = System.out;
-        this.stderr = System.err;
+        this.shutdown = false;
     }
 
     /**
@@ -154,13 +157,22 @@ public class TaskLauncher implements InitActive, Serializable {
 
             //return result
             return result;
-        } catch (Exception ex) {
+        } catch (OutOfMemoryError e) {
+            // this node is no more available: this VM is killed
+            this.shutdown = true;
+            // notify the scheduler
+            throw new RuntimeException(e);
+        } catch (Throwable ex) {
+            // user handled exception
             return new TaskResultImpl(taskId, ex);
         } finally {
             // reset stdout/err
             this.finalizeLoggers();
             //terminate the task
             core.terminate(taskId, jobId);
+            if (shutdown) {
+                this.terminateVM();
+            }
         }
     }
 
@@ -229,5 +241,13 @@ public class TaskLauncher implements InitActive, Serializable {
      */
     public void terminate() {
         ProActiveObject.terminateActiveObject(true);
+    }
+
+    /**
+     * This method should be called when an unhandlable exception
+     * is thrown by the execution.
+     */
+    protected void terminateVM() {
+        ProActive.exitFailure();
     }
 }

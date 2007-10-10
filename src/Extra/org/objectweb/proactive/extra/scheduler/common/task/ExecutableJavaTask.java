@@ -51,16 +51,7 @@ public abstract class ExecutableJavaTask implements ExecutableTask {
      *
      * @param args a map containing the differents variables names and values.
      */
-    public void init(Map<String, Object> args) {
-        try {
-            //for (String key : args.keySet()){
-            //TODO make the mapping automatically (seems not to be possible)
-            //Field f = this.getClass().getDeclaredField(key);
-            //f.set(this, f.getClass().cast(args.get(key)));
-            //f.set(this, args.get(key));
-            //}
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void init(Map<String, Object> args) throws Exception {
+        // TODO : automatic assignation ?
     }
 }

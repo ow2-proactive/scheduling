@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 
@@ -78,24 +80,27 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() {
-        if (task != null) {
-            return task;
-        }
-        try {
-            task = (ExecutableJavaTask) taskClass.newInstance();
+    public ExecutableTask getTask() throws SchedulerException {
+        // create task from taskClass
+        if (task == null) {
             try {
-                task.init(args);
-            } catch (Exception e) {
-                System.err.println("WARING : INIT has failed for task " +
-                    task.getClass().getSimpleName());
-                e.printStackTrace();
+                task = (ExecutableApplicationTask) taskClass.newInstance();
+            } catch (InstantiationException e) {
+                throw new SchedulerException("Cannot create task from task class ",
+                    e);
+            } catch (IllegalAccessException e) {
+                throw new SchedulerException("Cannot create task from task class ",
+                    e);
             }
-            return task;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
+
+        // init task
+        try {
+            task.init(args);
+        } catch (Exception e) {
+            throw new SchedulerException("Cannot initialize task ", e);
+        }
+        return task;
     }
 
     /**

@@ -96,12 +96,22 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //return result
             return result;
-        } catch (Exception ex) {
+        } catch (OutOfMemoryError e) {
+            // this node is no more available: this VM is killed
+            this.shutdown = true;
+            // notify the scheduler
+            throw new RuntimeException(e);
+        } catch (Throwable ex) {
+            // user handled exception
             return new TaskResultImpl(taskId, ex);
         } finally {
+            // reset stdout/err
             this.finalizeLoggers();
             //terminate the task
             core.terminate(taskId, jobId);
+            if (shutdown) {
+                this.terminateVM();
+            }
         }
     }
 
