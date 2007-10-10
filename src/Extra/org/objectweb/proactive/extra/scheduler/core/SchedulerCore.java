@@ -118,7 +118,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     /** Implementation of Infrastructure Manager */
     private InfrastructureManagerProxy resourceManager;
 
-    /** Scheduler frontend. */
+    /** Scheduler front-end. */
     private SchedulerFrontend frontend;
 
     /** Scheduler current policy */
@@ -236,7 +236,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     //block the loop until a method is invoked and serve it
                     service.blockingServeOldest(SCHEDULER_TIME_OUT);
                 } catch (Exception e) {
-                    System.out.println("SchedulerCore.runActivity(MAIN_LOOP)");
+                    System.out.println(
+                        "SchedulerCore.runActivity(MAIN_LOOP) caught an EXCEPTION - it will not terminate the body !");
                     e.printStackTrace();
                 }
             }
@@ -388,7 +389,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                             currentJob.start();
                             pendingJobs.remove(currentJob);
                             runningJobs.add(currentJob);
-                            // send job event to frontend
+                            // send job event to front-end
                             frontend.pendingToRunningJobEvent(currentJob.getJobInfo());
                             // don't forget to set the task status modify to null after a Job.start() method;
                             currentJob.setTaskStatusModify(null);
@@ -397,7 +398,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                         currentJob.startTask(internalTask,
                             node.getNodeInformation().getVMInformation()
                                 .getHostName());
-                        // send task event to frontend
+                        // send task event to front-end
                         frontend.pendingToRunningTaskEvent(internalTask.getTaskInfo());
                     } else {
                         //if no task can be launched on this job, go to the next job.
@@ -406,16 +407,21 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                         break;
                     }
                 }
-                //if everything were ok, removed this task from the processed task.
+                //if everything were OK, removed this task from the processed task.
                 taskRetrivedFromPolicy.remove(0);
-            } catch (Exception e) {
-                //if we are here, it is that something happend while launching the current task.
+            } catch (SchedulerException e) {
                 logger.warn(
-                    "Current node has failed during its initialisation or launching the task : " +
+                    "Current node has failed while launching or initializing the task : " +
+                    node);
+                resourceManager.freeNode(node);
+            } catch (Exception e1) {
+                //if we are here, it is that something append while launching the current task.
+                logger.warn("Current node has failed due to node failure : " +
                     node);
                 //so get back the node to the resource manager
                 resourceManager.freeDownNode(internalTask.getExecuterInformations()
                                                          .getNodeName());
+                e1.printStackTrace();
             }
         }
     }

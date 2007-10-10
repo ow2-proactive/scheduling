@@ -37,6 +37,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask;
@@ -80,40 +81,45 @@ public class InternalNativeTask extends InternalTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() {
+    public ExecutableTask getTask() throws SchedulerException {
         //create the new task that will launch the command on execute.
-        ExecutableNativeTask executableNativeTask = new ExecutableNativeTask() {
-                private static final long serialVersionUID = 0L;
-                private Process process;
+        ExecutableNativeTask executableNativeTask = null;
+        try {
+            executableNativeTask = new ExecutableNativeTask() {
+                        private static final long serialVersionUID = 0L;
+                        private Process process;
 
-                /**
-                 * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
-                 */
-                public Object execute(TaskResult... results) {
-                    try {
-                        process = Runtime.getRuntime().exec(cmd);
-                        //TODO ask cdelbe for better solution.
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                                    process.getInputStream()));
-                        String str = null;
-                        while ((str = reader.readLine()) != null) {
-                            System.out.println(str);
+                        /**
+                         * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+                         */
+                        public Object execute(TaskResult... results) {
+                            try {
+                                process = Runtime.getRuntime().exec(cmd);
+                                //TODO ask cdelbe for better solution.
+                                BufferedReader reader = new BufferedReader(new InputStreamReader(
+                                            process.getInputStream()));
+                                String str = null;
+                                while ((str = reader.readLine()) != null) {
+                                    System.out.println(str);
+                                }
+                                process.waitFor();
+                                return process.exitValue();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                return 255;
+                            }
                         }
-                        process.waitFor();
-                        return process.exitValue();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return 255;
-                    }
-                }
 
-                /**
-                 * @see org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask#getProcess()
-                 */
-                public Process getProcess() {
-                    return process;
-                }
-            };
+                        /**
+                         * @see org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask#getProcess()
+                         */
+                        public Process getProcess() {
+                            return process;
+                        }
+                    };
+        } catch (Exception e) {
+            throw new SchedulerException("Cannot create native task !!", e);
+        }
         return executableNativeTask;
     }
 

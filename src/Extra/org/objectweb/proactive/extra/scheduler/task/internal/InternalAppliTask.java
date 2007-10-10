@@ -66,7 +66,7 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     /**
      * Create a new Java application task descriptor using instantiated java task.
      *
-     * @param task the already instanciated java task.
+     * @param task the already instantiated java task.
      */
     public InternalAppliTask(ExecutableApplicationTask task) {
         this.task = task;
@@ -75,7 +75,7 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     /**
      * Create a new Java application task descriptor using a specific Class.
      *
-     * @param taskClass the class instance of the class to instanciate.
+     * @param taskClass the class instance of the class to instantiate.
      */
     public InternalAppliTask(Class<ExecutableApplicationTask> taskClass) {
         super(taskClass);
@@ -91,10 +91,10 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
             try {
                 task = (ExecutableApplicationTask) taskClass.newInstance();
             } catch (InstantiationException e) {
-                throw new SchedulerException("Cannot create task from task class ",
+                throw new SchedulerException("Cannot create applitask from task class ",
                     e);
             } catch (IllegalAccessException e) {
-                throw new SchedulerException("Cannot create task from task class ",
+                throw new SchedulerException("Cannot create applitask from task class ",
                     e);
             }
         }
@@ -128,9 +128,9 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     }
 
     /**
-     * Set the instanciated java application task.
+     * Set the instantiated java application task.
      *
-     * @param task the instanciated java application task.
+     * @param task the instantiated java application task.
      */
     public void setTask(ExecutableApplicationTask task) {
         this.task = task;

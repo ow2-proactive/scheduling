@@ -100,7 +100,7 @@
 			<processDefinition id="remoteJVM1">
 				<sshProcess 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
-					hostname="nahuel">
+					hostname="apple">
 					<processReference refid="JVM"/>
 				</sshProcess>
 			</processDefinition>

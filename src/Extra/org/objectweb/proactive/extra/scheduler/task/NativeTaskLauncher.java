@@ -52,7 +52,7 @@ public class NativeTaskLauncher extends TaskLauncher {
     private Process process;
 
     /**
-     * ProActive Empy Constructor
+     * ProActive Empty Constructor
      */
     public NativeTaskLauncher() {
     }
