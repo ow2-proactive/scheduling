@@ -409,11 +409,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 }
                 //if everything were OK, removed this task from the processed task.
                 taskRetrivedFromPolicy.remove(0);
-            } catch (SchedulerException e) {
-                logger.warn(
-                    "Current node has failed while launching or initializing the task : " +
-                    node);
-                resourceManager.freeNode(node);
             } catch (Exception e1) {
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node has failed due to node failure : " +

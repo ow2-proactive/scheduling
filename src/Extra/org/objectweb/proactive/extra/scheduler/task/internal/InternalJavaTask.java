@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
-import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 
@@ -79,16 +79,16 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() throws SchedulerException {
+    public ExecutableTask getTask() throws TaskCreationException {
         // create task from taskClass
         if (task == null) {
             try {
                 task = (ExecutableJavaTask) taskClass.newInstance();
             } catch (InstantiationException e) {
-                throw new SchedulerException("Cannot create javatask from task class ",
+                throw new TaskCreationException("Cannot create javatask from task class ",
                     e);
             } catch (IllegalAccessException e) {
-                throw new SchedulerException("Cannot create javatask from task class ",
+                throw new TaskCreationException("Cannot create javatask from task class ",
                     e);
             }
         }
@@ -97,7 +97,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
         try {
             task.init(args);
         } catch (Exception e) {
-            throw new SchedulerException("Cannot initialize task ", e);
+            throw new TaskCreationException("Cannot initialize task ", e);
         }
         return task;
     }

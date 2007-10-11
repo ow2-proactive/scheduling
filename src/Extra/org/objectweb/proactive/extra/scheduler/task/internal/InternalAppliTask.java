@@ -34,7 +34,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
@@ -85,16 +85,16 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() throws SchedulerException {
+    public ExecutableTask getTask() throws TaskCreationException {
         // create task from taskClass
         if (task == null) {
             try {
                 task = (ExecutableApplicationTask) taskClass.newInstance();
             } catch (InstantiationException e) {
-                throw new SchedulerException("Cannot create applitask from task class ",
+                throw new TaskCreationException("Cannot create applitask from task class ",
                     e);
             } catch (IllegalAccessException e) {
-                throw new SchedulerException("Cannot create applitask from task class ",
+                throw new TaskCreationException("Cannot create applitask from task class ",
                     e);
             }
         }
@@ -103,7 +103,7 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
         try {
             task.init(args);
         } catch (Exception e) {
-            throw new SchedulerException("Cannot initialize task ", e);
+            throw new TaskCreationException("Cannot initialize task ", e);
         }
         return task;
     }

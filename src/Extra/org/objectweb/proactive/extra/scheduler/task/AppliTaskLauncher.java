@@ -121,22 +121,21 @@ public class AppliTaskLauncher extends TaskLauncher {
 
             //return result
             return result;
-        } catch (OutOfMemoryError e) {
-            // this node is no more available: this VM is killed
-            this.shutdown = true;
-            // notify the scheduler
-            throw new RuntimeException(e);
         } catch (Throwable ex) {
-            // user handled exception
+            // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex);
         } finally {
             // reset stdout/err
-            this.finalizeLoggers();
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to te scheduler core
+                // the result has been computed and must be returned !
+                // TODO : logger.warn
+                System.err.println("WARNING : Loggers are not shut down !");
+            }
             //terminate the task
             core.terminate(taskId, jobId);
-            if (shutdown) {
-                this.terminateVM();
-            }
         }
     }
 

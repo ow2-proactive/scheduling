@@ -83,9 +83,6 @@ public class TaskLauncher implements InitActive, Serializable {
     protected String host;
     protected Integer port;
 
-    // if true, this VM should be killed
-    protected boolean shutdown;
-
     // handle streams
     protected final transient PrintStream stdout = System.out;
     protected final transient PrintStream stderr = System.err;
@@ -109,7 +106,6 @@ public class TaskLauncher implements InitActive, Serializable {
         this.jobId = jobId;
         this.host = host;
         this.port = port;
-        this.shutdown = false;
     }
 
     /**
@@ -147,7 +143,7 @@ public class TaskLauncher implements InitActive, Serializable {
      */
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask,
-        TaskResult... results) throws SchedulerException {
+        TaskResult... results) {
         // plug stdout/err into a socketAppender
         this.initLoggers();
         try {
@@ -163,35 +159,20 @@ public class TaskLauncher implements InitActive, Serializable {
             //return result
             return result;
         } catch (Throwable ex) {
-            // exception handling
-            return this.handleExceptions(ex);
+            // exceptions are always handled at scheduler core level
+            return new TaskResultImpl(taskId, ex);
         } finally {
             // reset stdout/err
-            this.finalizeLoggers();
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to te scheduler core
+                // the result has been computed and must be returned !
+                // TODO : logger.warn
+                System.err.println("WARNING : Loggers are not shut down !");
+            }
             //terminate the task
             core.terminate(taskId, jobId);
-            if (shutdown) {
-                this.terminateVM();
-            }
-        }
-    }
-
-    /**
-     * Handle exceptions thrown by doTask.
-     * @param t the exception thrown
-     * @return the task result containing
-     * @throws SchedulerException if this exception should be handled specifically by the scheduler
-     */
-    protected TaskResult handleExceptions(Throwable t)
-        throws SchedulerException {
-        if (t instanceof OutOfMemoryError) {
-            // this node is no more available: this VM is killed
-            this.shutdown = true;
-            // notify the scheduler
-            throw new SchedulerException("Task cannot be executed ", t);
-        } else {
-            // user handled exception
-            return new TaskResultImpl(taskId, t);
         }
     }
 
@@ -260,13 +241,5 @@ public class TaskLauncher implements InitActive, Serializable {
      */
     public void terminate() {
         ProActiveObject.terminateActiveObject(true);
-    }
-
-    /**
-     * This method should be called when an unhandlable exception
-     * is thrown by the execution.
-     */
-    protected void terminateVM() {
-        ProActive.exitFailure();
     }
 }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
@@ -71,6 +72,17 @@ public class NativeTaskLauncher extends TaskLauncher {
     }
 
     /**
+     * Constructor with native task identification
+     *
+     * @param taskId represents the task the launcher will execute.
+     * @param jobId represents the job where the task is located.
+     */
+    public NativeTaskLauncher(TaskId taskId, JobId jobId, Script<?> pre,
+        String host, Integer port) {
+        super(taskId, jobId, pre, host, port);
+    }
+
+    /**
      * Execute the user task as an active object.
      *
      * @param core The scheduler core to be notify
@@ -96,22 +108,21 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //return result
             return result;
-        } catch (OutOfMemoryError e) {
-            // this node is no more available: this VM is killed
-            this.shutdown = true;
-            // notify the scheduler
-            throw new RuntimeException(e);
         } catch (Throwable ex) {
-            // user handled exception
+            // exceptions are always handled at scheduler core level
             return new TaskResultImpl(taskId, ex);
         } finally {
             // reset stdout/err
-            this.finalizeLoggers();
+            try {
+                this.finalizeLoggers();
+            } catch (RuntimeException e) {
+                // exception should not be thrown to te scheduler core
+                // the result has been computed and must be returned !
+                // TODO : logger.warn
+                System.err.println("WARNING : Loggers are not shut down !");
+            }
             //terminate the task
             core.terminate(taskId, jobId);
-            if (shutdown) {
-                this.terminateVM();
-            }
         }
     }
 
