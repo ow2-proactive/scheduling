@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
+import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
@@ -116,10 +117,14 @@ public class TaskLauncher implements InitActive, Serializable {
      *
      * @param taskId represents the task the launcher will execute.
      * @param jobId represents the job where the task is located.
+     * @param pre the script executed before the task.
+     * @param host the host on which to append the standard output/input.
+     * @param port the port number on which to send the standard output/input.
      */
     public TaskLauncher(TaskId taskId, JobId jobId, Script<?> pre, String host,
         Integer port) {
         this(taskId, jobId, host, port);
+        System.out.println("TaskLauncher.TaskLauncher() : " + pre);
         this.pre = pre;
     }
 
@@ -142,7 +147,7 @@ public class TaskLauncher implements InitActive, Serializable {
      */
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask,
-        TaskResult... results) {
+        TaskResult... results) throws SchedulerException {
         // plug stdout/err into a socketAppender
         this.initLoggers();
         try {
@@ -157,14 +162,9 @@ public class TaskLauncher implements InitActive, Serializable {
 
             //return result
             return result;
-        } catch (OutOfMemoryError e) {
-            // this node is no more available: this VM is killed
-            this.shutdown = true;
-            // notify the scheduler
-            throw new RuntimeException(e);
         } catch (Throwable ex) {
-            // user handled exception
-            return new TaskResultImpl(taskId, ex);
+            // exception handling
+            return this.handleExceptions(ex);
         } finally {
             // reset stdout/err
             this.finalizeLoggers();
@@ -173,6 +173,25 @@ public class TaskLauncher implements InitActive, Serializable {
             if (shutdown) {
                 this.terminateVM();
             }
+        }
+    }
+
+    /**
+     * Handle exceptions thrown by doTask.
+     * @param t the exception thrown
+     * @return the task result containing
+     * @throws SchedulerException if this exception should be handled specifically by the scheduler
+     */
+    protected TaskResult handleExceptions(Throwable t)
+        throws SchedulerException {
+        if (t instanceof OutOfMemoryError) {
+            // this node is no more available: this VM is killed
+            this.shutdown = true;
+            // notify the scheduler
+            throw new SchedulerException("Task cannot be executed ", t);
+        } else {
+            // user handled exception
+            return new TaskResultImpl(taskId, t);
         }
     }
 
