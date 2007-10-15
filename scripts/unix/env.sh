@@ -7,11 +7,11 @@
 if [ -z "$PROACTIVE" ]
 then
 workingDir=`dirname $0`
-PROACTIVE=$workingDir/../../.
+PROACTIVE=$(cd $workingDir/../.././ || (echo "Broken ProActive installation" ; exit 1) && echo $PWD)
 CLASSPATH=.
 fi
 
- 
+
 # ----------------------------------------------------------------------------
 
 JAVA_HOME=${JAVA_HOME-NULL};
