@@ -469,9 +469,10 @@ public class JobFactory {
                 e.printStackTrace();
             }
         }
+
         String engine = (String) xpath.evaluate("@engine", node,
                 XPathConstants.STRING);
-        if (((path != null) && (path != "")) &&
+        if (((engine != null) && (engine != "")) &&
                 (node.getTextContent() != null)) {
             String script = node.getTextContent();
             try {
@@ -480,7 +481,9 @@ public class JobFactory {
                 e.printStackTrace();
             }
         }
-        throw new InvalidScriptException("The script is not valid");
+
+        // schema should check this...?
+        throw new InvalidScriptException("The script is not recognized");
     }
 
     private VerifyingScript createVerifyingScript(Node node, XPath xpath)
