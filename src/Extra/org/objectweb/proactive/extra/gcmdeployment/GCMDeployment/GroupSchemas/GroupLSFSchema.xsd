@@ -12,16 +12,19 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="hostlist" type="string" minOccurs="0" />
-					<element name="processor" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="resourceRequirement" minOccurs="0">
-						<complexType>
-							<attribute name="value" type="string" />
-						</complexType>
+					<element name="hostList" type="string" minOccurs="0" />
+					<element name="processorsNumber" minOccurs="0">
+						<simpleType>
+							<restriction base="integer">
+								<minInclusive value="1" />
+								<maxInclusive value="2" />
+							</restriction>
+						</simpleType>
 					</element>
+					<element name="resourceRequirement" type="string" minOccurs="0" />
 				</sequence>
 				<attribute name="interactive" type="pa:BooleanOrVariableType" use="optional" />
-				<attribute name="jobname" type="string" use="optional" />
+				<attribute name="jobName" type="string" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 			</extension>
 		</complexContent>

@@ -8,7 +8,6 @@
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
-	<!--globusProcess element has three childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) , environment, and globusOption element  which represents different options of globus command.They may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.globus.GlobusProcess, and hostname which is required and represents the globus host where the RSL request is destinated -->
 	<complexType name="GlobusProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
@@ -17,6 +16,7 @@
 					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
 					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
+					<element name="directory" type="pa:pathElementType" minOccurs="0" />
 				</sequence>
 				<attribute name="hostname" type="string" use="required" />
 				<attribute name="queue" type="string" use="optional" />

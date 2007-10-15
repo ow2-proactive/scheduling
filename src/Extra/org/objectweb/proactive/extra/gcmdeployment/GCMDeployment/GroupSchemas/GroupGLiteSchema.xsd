@@ -19,15 +19,19 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="environment" type="pa:environmentType" minOccurs="0" />
 					<element name="requirements" type="pa:TextOrVariableType" minOccurs="0" />
 					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
 					<element name="rank" type="paext:gLiteRankType" />
-					<element name="gLiteOptions" type="paext:gLiteOptionsType" minOccurs="0" />
 					<element name="JdlTransferDeploy" type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
 					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
 					<element name="stdin" type="pa:pathElementType" minOccurs="0" />
+					<element name="configFile" type="pa:pathElementType" minOccurs="0" />
+					<element name="JDLFilePath" type="pa:pathElementType" minOccurs="0" />
+					<element name="JDLRemoteFilePath" type="pa:pathElementType" minOccurs="0" />
+					<element name="arguments" type="pa:TextOrVariableType" minOccurs="0" />
+					<element name="inputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
+					<element name="outputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
 				</sequence>
 				<attribute name="hostname" type="string" />
 				<attribute name="virtualOrganisation" type="string" use="required" />
@@ -57,17 +61,6 @@
 		<attribute name="dataAccessProtocol" type="string" />
 		<attribute name="storageIndex" type="string" />
 		<attribute name="dataCatalog" type="string" />
-	</complexType>
-	<!--gLiteOptions-->
-	<complexType name="gLiteOptionsType">
-		<all>
-			<element name="configFile" type="pa:pathElementType" minOccurs="0" />
-			<element name="JDLFilePath" type="pa:pathElementType" minOccurs="0" />
-			<element name="JDLRemoteFilePath" type="pa:pathElementType" minOccurs="0" />
-			<element name="arguments" type="pa:TextOrVariableType" minOccurs="0" />
-			<element name="inputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
-			<element name="outputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
-		</all>
 	</complexType>
 	<!-- end of gLiteProcessType -->
 
