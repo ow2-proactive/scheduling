@@ -2,14 +2,19 @@
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="hands_on_programming">
   <title>Hands-on programming</title>
-
-  <para>You've already seen quite sophisticated examples in the section <xref
+<para>You've already seen quite sophisticated examples in the section <xref
   linkend="Introduction_Proactive_Features" />. Here is an introduction to
   programming with ProActive.</para>
 
-  <para>The program that we will develop is a classic 'helloworld' example. We
+  <para>The program that we will develop is a classic 'HelloWorld' example. We
   will increase the complexity of the example, so you get more familiar with
   different features of ProActive.</para>
+
+    <para>This example implements a very simple client-server application. It
+    has an in-depth explanation in <xref linkend="HelloWorld" />; you might
+    wish to skim through it. Summarized, it is a client object displaying a
+    <literal>StringWrapper</literal> received from a remote server.</para>
+
 
   <itemizedlist>
     <listitem>
@@ -33,59 +38,155 @@
     </listitem>
   </itemizedlist>
 
-  <sect1>
-    <title>The client - server example</title>
 
-    <para>This example implements a very simple client-server application. It
-    has an in-depth explanation in <xref linkend="HelloWorld" />; you might
-    wish to skim through it. Summarized, it is a client object displaying a
-    <literal>StringWrapper</literal> received from a remote server.</para>
-
-    <para>The corresponding class diagram is the following:</para>
-
-    <para><informalfigure>
-        <mediaobject>
+	<sect1>
+		<title> First Active Object class</title>
+	<para>
+		Welcome to your first ProActive program! This is the simplest application that can be
+		written. It is composed of two classes with a master-worker structure. 
+	</para>
+	<figure> <title>Diagram of simple master-worker structure</title>
+		  <mediaobject>
           <imageobject>
             <imagedata contentwidth="100"
                        fileref="guided_tour/pics/hello/clientserver.png"
                        format="PNG" width="6in" />
           </imageobject>
         </mediaobject>
-      </informalfigure></para>
-  </sect1>
+      </figure>
+	<para>	
+		The example illustrates the creation of a active object from the HelloWorld class that will be
+		used by the Main class to retrieve a string and print it to the standard output.		
+		The Main class corresponds to the client, and is only a container for the main() method, while 
+		the HelloWorld class corresponds to the server and its instance is an active object which provides a sayHello
+		method as a remote service.
+	</para>		
+	<para>
+		To safely use the HelloWorld class as an active object we have to meet three requirements.
+	</para>
+		<itemizedlist>
+			<listitem><para><emphasis role="bold">no direct access to field variables</emphasis> - If
+							<literal>public</literal> variables are used then the stub class generated from
+							the original class may become decoupled from the original class. If a change is
+							affected on the public field variable in the stub instance, the change will not be 
+							 propagated to the the class instance from which the stub was generated. The safe
+							 way to change variables is to set them as <literal>private</literal> and access
+							 them through <literal>public get/set</literal> methods.   </para></listitem>
+			
+			<listitem><para><emphasis role="bold">provide a no-argument and preferably an empty constructor</emphasis> - A 
+							no-argument constructor is necessary to create the stub class needed for communication.
+							A stub cannot be created if there are only constructors with arguments since the 
+							stub is only meant to abstract the communication from the active objects. 
+							
+							If there is no constructor defined, the Java compiler
+							will automatically create a no-argument constructor that initializes all instance variables
+							to the default value. However, if there is an already defined constructor with arguments 
+							then no default no-argument constructor will be created by the compiler. In this case (overloaded constructor)
+							the definition of a no-argument constructor is mandatory for stub creation. The safest way is
+							to always define a no-argument constructor.
+							Also, the constructor should be empty so that on stub creation no 
+							initialization is done on the stub.    
+							 
+						
+						</para>	</listitem>
+			<listitem><para><emphasis role="bold">provide remote functionalities as public methods with reifiable type</emphasis> - Since
+			the stub is created through inheritance, the only methods it can use for communication are
+			the inherited public methods from the superclass. The return types of the methods have to be 
+			 reifiable (?) and therefore not final. ProActive provides several wrappers for Java types
+			 that are final.The example uses the <literal>StringWrapper</literal> class in order to provide a wrapper for the 
+			final String class.  Since ProActive uses a proxy mechanism and the String class is final, it’s not
+			possible to subclass a String and to perform asynchronous calls.	
+			ProActive provides several wrappers for final classes: StringWrapper, BooleanWrapper, 
+		IntegerWrapper, DoubleWrapper and FloatWrapper. These have to be used in
+		replacement of String, Boolean, Integer, Double and Float
+		in classes which will be active objects. Since ProActive uses a proxy
+		mechanism and theses classes are final, it’s not
+		possible to subclass them and to perform asynchronous calls. The
+		subclasses is necessary in order to create the stub class uses in 
+		communication. 
+		If you don’t use wrappers, method calls will be synchronous.
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/public_method.txt"></textdata></textobject></programlisting>
+			</para>	
+			</listitem>
+		</itemizedlist>	
+		
+	<para>
+		The following class meets all of the requirements above.
+	</para>	
+	 <programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/HelloWorld.java" /></textobject></programlisting>
+	
+<para>We will now show how to create the server object. For now, we want the HelloWorld active object 
+ to be created on the current Node (we will see later how to distribute the program). To create an instance of
+  a remotely accessible object we must use the <literal>ProActive.newActive</literal> primitive.
+  <programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_creation.txt"></textdata></textobject></programlisting>
+</para>
+	<para>
+		<emphasis role="bold"> [[EXPLAIN WAIT BY NECESSITY BETTER]]</emphasis>
+		Invoking a method on a remote active object is transparent and is similar to  invoking a method on
+		a local object of the same type. The user does not have to deal with catching exceptions
+		related to the remote communication. The only modification brought to the code by ProActive
+		is during the active objects creation. All the rest of the code can remain unmodified, 
+		fostering software reuse.
+		To invoke the sayHello method we execute:	
+	<programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_invocation.txt" /></textobject></programlisting>
+
+	</para>
+	<para> The full code of the <literal>Main</literal> class is the following. </para>
+	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/Main.java" /></textobject></programlisting>
+	<sect2>
+		<title>Running the HelloWorld application</title>
+		<para>
+		For now the application will be deployed on the local Node. To compile and run the application you need the 
+		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
+		include the following jar files: 
+		  	<literal>ProActive/ProActive.jar</literal>,
+          	<literal>ProActive/lib/javassist.jar</literal>,
+          		<literal>ProActive/lib/log4j.jar</literal>, 
+          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
+          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		and <literal>ProActive/lib/bouncycastle.jar</literal>
+           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
+           JVM option. The steps necessary are explained in <xref linkend="Installation"/>.
+           Also, the full code for the example is available in [[[FOLDER NAME]]] as a ready to run Eclipse project.
+		</para>	
+	</sect2>
+	</sect1>
 
   <sect1>
-    <title>Initialization of the activity</title>
+    <title>Initialization of the active object activity</title>
 
     <para>Active objects, as their name indicates, have an activity of their
-    own (an internal thread).</para>
+    own (an internal thread).By default the active object steps through
+    the constructor, the <literal>initActivity</literal>, the <literal>runActivity</literal>,
+     and when the <literal>terminate</literal> method is called on
+    the <literal>Body</literal> of the active object through the <literal>endActivity</literal> method.
+    It is possible to control the initialization, running, and ending phase of this
+    thread by implementing three interfaces:<literal>InitActive</literal>,<literal>
+    RunActive</literal>, and <literal>EndActive</literal>.These interfaces define the
+    <literal>initActivity</literal>, <literal>runActivity</literal> and <literal>endActivity</literal>
+    methods. One of the reasons for using <literal>initActivity</literal>
+    method is the presence of the empty constructor in an active object. The <literal>initActivity</literal>
+    method is automatically called on the creation of an active object allowing for setting up the 
+    object without using the constructor. The <literal>runActivity</literal> method allows the user
+    to control By implementing the <literal>EndActive</literal> interface is also possible to 
+    do clean up before the active object thread is stopped. </para>
 
-    <para>It is possible to add pre and post processing to this activity, just
-    by implementing the interfaces InitActive and EndActive, that define the
-    methods initActivity and endActivity.</para>
 
     <para>The following example will help you to understand how and when you
-    can initialize and clean the activity.</para>
+    can initialize and clean the activity. The example will implement the <literal>InitActive</literal> and
+    <literal>EndActive</literal> interfaces. To understand how to use the more complex
+    <literal>RunActive</literal> interface read <xref linkend="AOCreation"/> </para>
 
-    <para>When instantiated, the activity of an object is automatically
-    started, but it will first do what is written in the initActivity
-    method.</para>
-
-    <para>Ending the activity can only be done from inside the active object
-    (i.e. from a call to its own body). This is the reason why we have written
-    a terminate method in the following example.</para>
 
     <sect2>
       <title>Design of the application with Init activity</title>
 
-      <para>The InitializedHello class extends the Hello class, and implements
-      the interfaces InitActive and EndActive.It acts a a server for the
-      InitializedHelloClient class.</para>
+      <para>The InitializedHelloWorld class extends the Hello class in the previous example, and implements
+      the interfaces InitActive and EndActive.It acts as a server for the
+      Main class.</para>
 
-      <para>The main method is overridden so that it can instantiate the
-      InitializedHello class</para>
-
-      <para><informalfigure>
+      <para><figure>
+      		<title> Diagram of the master-worker structure with a worker that does initialization</title> 
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
@@ -93,110 +194,134 @@
                          format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
-        </informalfigure></para>
+        </figure></para>
+    
+    
+    <para>
+    	To implement the application we will create a class that inherits from the 
+    	<literal>HelloWorld</literal> class and implements the EndActive and InitActive
+    	interfaces. 
+    	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/InitializedSimpleHello/src/active/InitializedHelloWorld.java"></textdata></textobject></programlisting>
+    </para>
+    <para>
+    	By default an active object has a never ending thread that should be stopped when the object is 
+    	not needed anymore. The method <literal>terminate</literal> serves the purpose of destroying the 
+    	object. However, if an explicit call to terminate the object is not made, ProActive has its own
+    	distributed garbage collection system that is able to decide when an active object can be destroyed. 
+    </para>
+    <para>
+    	In the <literal>Main</literal> class we will change the object created from <literal>HelloWorld</literal> to 
+    	<literal>InitializedHelloWorld</literal> and also we will call the <literal>terminate </literal> method to 
+    	destroy the object.
+    	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/InitializedSimpleHello/src/active/Main.java"></textdata></textobject></programlisting>
+    	 
+    </para>
     </sect2>
 
+        
+    
     <sect2>
-      <title>Programming</title>
+      <title>Running the InitializedHelloWorld application</title>
 
-      <sect3>
-        <title>InitializedHello</title>
-
-        <para>The source code of the InitializedHello class is in <xref
-        linkend="tutorialCodeSrc.InitializedHello.java" />.</para>
-
-        <para>initActivity and endActivity here just log messages onto the
-        console, so you can see when they are called.</para>
-
-        <para>initActivity is called at the creation of the active object,
-        while endActive is called after the activity has terminated (thanks to
-        the method terminate).</para>
-
-        <para>Here is the initActivity method:</para>
-
-        <programlisting lang="java">public void initActivity(Body body) {
-        System.out.println("I am about to start my activity");
-}         </programlisting>
-
-        <para>Here is the endActivity method:</para>
-
-        <programlisting lang="java">public void endActivity(Body body) {
-        System.out.println("I have finished my activity");
-}          </programlisting>
-
-        <para>The following code shows how to terminate the activity of the
-        active object:</para>
-
-        <programlisting lang="java">public void terminate() throws IOException {
-        // the termination of the activity is done through a call on the
-        // terminate method of the body associated to the current active object
-        ProActive.getBodyOnThis().terminate();
-}          </programlisting>
-
-        <para>The only differences from the the previous example is the
-        classes instantiated, which are now InitializedHello (and not Hello)
-        and InitializedHelloClient, and you will add a call to
-        hello.terminate().</para>
-
-        <para>The source code of <emphasis
-        role="bold">InitializedHello</emphasis> is in <xref
-        linkend="tutorialCodeSrc.InitializedHello.java" />, and the code for
-        <emphasis role="bold">InitializedHelloClient</emphasis> is in <xref
-        linkend="tutorialCodeSrc.InitializedHelloClient.java" />.</para>
-
-        <para>So, create InitializedHelloClient.java and InitializedHello.java
-        in src/org/objectweb/proactive/examples/hello</para>
-
-        <para>Now compile all proactive sources</para>
-
-        <screen>cd compile
-windows&gt;build.bat examples
-linux&gt;build examples
-cd ..          </screen>
-
-        <para>Add './classes' directory to CLASSPATH to use these two new
-        source files</para>
-
-        <screen>windows&gt;set  CLASSPATH=.;.\classes;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;.\lib\asm.jar;.\lib\log4j.jar;\
-        .\lib\xercesImpl.jar;.\lib\fractal.jar;.\lib\bouncycastle.jar
-
-linux&gt;export  CLASSPATH=.:./classes:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:./lib/asm.jar:./lib/log4j.jar:\
-        ./lib/xercesImpl.jar:./lib/fractal.jar:./lib/bouncycastle.jar</screen>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Execution</title>
-
-      <para>Execution is similar to the previous example; just use the
-      InitializedHelloClient client class and InitializedHello server
-      class.</para>
-
-      <sect3>
-        <title>Starting the server</title>
-
-        <para><screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy \
-            -Dlog4j.configuration=file:scripts/proactive-log4j 
-            org.objectweb.proactive.examples.hello.InitializedHello 
-
-windows&gt; java -Djava.security.policy=scripts\proactive.java.policy  \
-              -Dlog4j.configuration=file:scripts\proactive-log4j \
-              org.objectweb.proactive.examples.hello.InitializedHello &amp;</screen></para>
-      </sect3>
-
-      <sect3>
-        <title>Launching the client</title>
-
-        <para><screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy 
-            -Dlog4j.configuration=file:scripts/proactive-log4j  \
-            org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello 
-
-windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
-              -Dlog4j.configuration=file:scripts\proactive-log4j 
-              org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello </screen></para>
-      </sect3>
+      <para>To compile and run the application you need the
+      	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
+      	You also have to include the following jar files: ProActive/ProActive.jar, ProActive/lib/javassist.jar,
+       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
+       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
+       	 <literal>-Djava.security.policy=pathToFile </literal> JVM option. The steps necessary are explained in 
+       	<xref linkend="Installation"/>. Also, the full code for the example is available in
+       	  [[[FOLDER NAME]]] as a ready to run Eclipse project.</para>
+ 
     </sect2>
   </sect1>
+	<sect1>
+		<title>Application Deployment</title>
+		<para>
+			In the previous example the applications were deployed inside the same JVM.
+			This section will focus on showing how to deploy the application on different nodes
+			using deployment descriptors. 
+		</para>
+		<sect2>
+			<title>Deployment Related Concepts</title>
+			<para>
+				A first principle is to fully eliminate from the source code the following elements:
+				<itemizedlist>
+					<listitem>machine names</listitem>
+					<listitem>creation protocols</listitem>
+					<listitem>registry lookup protocols</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				The goal is to deploy any application anywhere without changing the source code. 
+				For instance, we must be able to use various protocols, rsh, ssh, Globus, LSF,
+				etc., for the creation of the JVMs needed by the application. In the same 
+				manner, the discovery of existing resources or the registration of the
+				ones created by the application can be done with various protocols such as 
+				RMIregistry, Globus etc. Therefore, we see that the creation, registration and 
+				discovery of resources have to be done externally to the application.
+			</para>
+			<para>
+				A second key principle is the capability to abstractly describe an
+			 	application, or part of it, in terms of its conceptual activities. The description
+			 	should indicate the various parallel or distributed entities in the program. For
+			 	instance, an application that is designed to use three interactive 
+			 	visualization nodes, a node to capture input from a physic experiment, and a
+			 	simulation engine designed to run on a cluster of machines should somewhere clearly
+			 	advertise this information.
+			</para>
+			<para>
+				Now, one should note that the abstract description of an application and the way to 
+				deploy it are not independent piece of information. In the example just above, if 
+				there is a simulation engine, it might register in a specific registry protocol, and if 
+				so, the other entities of the computation might have to use that lookup protocol to bind to 
+				the engine. Moreover, one part of the program can just lookup for the engine (assuming it is 
+				started independently), or explicitly create the engine itself.	To summarize, in order to abstract away 
+				the underlying execution platform, and to allow a source-independent deployment, a framework has 
+				to provide the following elements:
+				<itemizedlist>
+					<listitem>an abstract description of the distributed entities of a parallel program or component,
+					</listitem>
+					<listitem>an external mapping of those entities to real machines, using actual creation, registry, and lookup protocols.
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				To reach that goal, the programming model relies on the specific notion of Virtual Nodes (VNs):
+				<itemizedlist>
+					<listitem>a VN is identified as a name (a simple string)
+					</listitem>
+					<listitem>a VN is used in a program source
+					</listitem>
+					<listitem>a VN is defined and configured in a deployment descriptor (XML)
+					</listitem>
+					<listitem>a VN, after activation, is mapped to one or to a set of actual ProActive Nodes
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				Of course, distributed entities (Active Objects), are created on Nodes, not on Virtual Nodes.
+ 			 	There is a strong need for both Nodes and Virtual Nodes. Virtual Nodes are a much richer abstraction,
+ 			 	as they provide mechanisms such as set or cyclic mapping. Another key aspect is the capability to
+ 			 	describe and trigger the mapping of a single VN that generates the allocation of several JVMs.
+ 			 	This is critical if we want to get at once machines from a cluster of PCs managed through Globus or
+ 			 	LSF. It is even more critical in a Grid application, when trying to achieve the co-allocation of
+ 			 	machines from several clusters across several continents.
+			</para>
+			<para>
+				Moreover, a Virtual Node is a concept of a distributed program or component, while a Node is actually
+				a deployment concept: it is an object that lives in a JVM, hosting Active Objects. There is of 
+				course a correspondence between Virtual Nodes and Nodes: the function created by the deployment, 
+				the mapping. This mapping can be specified in an XML descriptor. By definition, the following 
+				operations can be configured in such a deployment descriptor:
+				<itemizedlist>
+					<listitem>the mapping of VNs to Nodes and to JVMs</listitem>
+					<listitem>the way to create or to acquire JVMs</listitem>
+					<listitem>the way to register or to lookup VNs</listitem>
+				</itemizedlist>
+				
+			</para>
+		</sect2>
+	</sect1>
 
   <sect1>
     <title>A simple migration example</title>
