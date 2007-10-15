@@ -2,13 +2,14 @@ package active;
 import java.io.IOException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
 public class Main{
 	public static void main(String args[])
 	{
 		try{
-			InitializedHelloWorld ao=(InitializedHelloWorld) ProActive.newActive( 
+			InitializedHelloWorld ao=(InitializedHelloWorld) ProActiveObject.newActive( 
 				InitializedHelloWorld.class.getName(), //instantiation class 
 				null); // constructor arguments
 			System.out.println(ao.sayHello()); //possible wait-by-necessity

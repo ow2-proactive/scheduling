@@ -1,7 +1,7 @@
 package active;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper; 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 public class HelloWorld {
 	public HelloWorld(){//empty constructor is required by ProActive
