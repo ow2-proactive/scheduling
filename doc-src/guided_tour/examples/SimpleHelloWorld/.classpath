@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/user/vjuresch/home/Desktop/ProActive/ProActive.jar" sourcepath="/user/vjuresch/home/Desktop/ProActive"/>
+	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/Desktop/ProActive/lib/components/fractal.jar"/>
+	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/Desktop/ProActive/lib/bouncycastle.jar"/>
+	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/Desktop/ProActive/lib/javassist.jar"/>
+	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/Desktop/ProActive/lib/log4j.jar"/>
+	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/Desktop/ProActive/lib/xercesImpl.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
