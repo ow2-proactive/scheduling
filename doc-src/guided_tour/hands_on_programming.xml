@@ -345,22 +345,32 @@
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/variable_definition.txt"></textdata></textobject></programlisting>
 			</para>
 			<para>
-				Next, we define the virtual nodes that will be used:
+				Next, we define the virtual nodes that will be used. In our case we define a node that
+				can contain several JVMs by setting the multiple property.
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
-				In our case we define a node that can contain several JVMs by setting the multiple property.
 			</para>
 			<para>
-				The deployment part of the XML file contains information about the JVMs deployed.
+				The deployment part of the XML file specifies how the JVMs are started and 
+				mapped on the Virtual Nodes
 				It has two parts one dealing with the mapping of the JVMs to the Virtual Nodes and another
 				related to how the JVMs are created. In our case we map one JVM to the remote node and
 				define a process reference that will be used later in the file. 
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/jvms.txt"></textdata></textobject></programlisting>
 			</para>
 			<para>
+				Next is the infrastructure part that uses the previous defined variables to load the
+				jar files needed to create the JVMs. It also defines the hosts on which the 
+				JVMs are deployed.  
+				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
+			</para>
+			<para>
 				The full deployment descriptor file:
 				<programlisting lang="xml"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
 			</para>	
 			<para>
+				We also need to change the <literal>Main</literal> class to declare the deployment descriptors 
+				to be used.
+				
 				Changes to the <literal>Main</literal>class:
 				<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
 			</para>
