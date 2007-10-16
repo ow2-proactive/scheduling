@@ -187,14 +187,13 @@ public class Stateness {
         GetAllClassHandler<Object> handler02 = new GetAllClassHandler<Object>(Object.class);
 
         ObjectGraph.searchForClass(o1, handler01);
-        ObjectGraph.searchForClass(o1, handler02);
+        ObjectGraph.searchForClass(o2, handler02);
 
         Collection list = handler01.getMusclesList();
 
         for (Object f : list) {
             if (handler02.getMusclesHash().containsKey(f)) {
-                // System.out.println("State shared variable:"+
-                // System.identityHashCode(f) + ":" + f.getClass());
+                //System.out.println("State shared variable:"+ System.identityHashCode(f) + ":" + f);
                 return true;
             }
         }
@@ -299,7 +298,8 @@ public class Stateness {
         Class<T> c;
 
         public GetAllClassHandler(Class<T> c) {
-            list = new IdentityHashMap<T, T>();
+            this.c = c;
+            this.list = new IdentityHashMap<T, T>();
         }
 
         public T transform(T o) throws Exception {

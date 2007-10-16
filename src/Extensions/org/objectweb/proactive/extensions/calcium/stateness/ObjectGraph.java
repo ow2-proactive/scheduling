@@ -40,11 +40,12 @@ public class ObjectGraph {
         IdentityHashMap<Object, Object> visited = new IdentityHashMap<Object, Object>();
         IdentityHashMap<Object, ArrayList<Reference>> found = new IdentityHashMap<Object, ArrayList<Reference>>();
 
+        /*
         if (handler.matches(root)) {
             root = handler.transform((T) root);
             return root;
         }
-
+        */
         searchForClass(root, handler, visited, found);
 
         Iterator<Object> it = found.keySet().iterator();
@@ -57,6 +58,10 @@ public class ObjectGraph {
             for (Reference ref : list) {
                 ref.updateReferenceWith(transformed);
             }
+        }
+
+        if (handler.matches(root)) {
+            root = handler.transform((T) root);
         }
 
         return root;
@@ -100,7 +105,7 @@ public class ObjectGraph {
 
                     if (handler.matches(array[i])) {
                         array[i] = handler.transform((T) array[i]);
-                        visited.put(array[i], array[i]);
+                        //visited.put(array[i], array[i]);
                     }
 
                     searchForClass(array[i], handler, visited, found);
@@ -115,7 +120,7 @@ public class ObjectGraph {
 
                     ArrayList<Reference> list = found.get(fieldObject);
                     list.add(new Reference(parent, f));
-                    visited.put(fieldObject, fieldObject);
+                    //visited.put(fieldObject, fieldObject);
                 }
 
                 searchForClass(fieldObject, handler, visited, found);

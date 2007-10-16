@@ -41,8 +41,8 @@ public class TestGrouping {
     /**
      * muscles: a, b, c, d ,e
      *
-     * Group 1: a->x, b->x, b->y c->y
-     * Group 2: d->o, e->p, p->q
+     * Group 1: a->x, b->{x,y}, c->y
+     * Group 2: d->p, p->o, e->q, q->o
      *
      */
     public void groupTest() throws Exception {
@@ -67,12 +67,14 @@ public class TestGrouping {
         assertTrue(Stateness.shareState(a, b));
         assertFalse(Stateness.shareState(a, c));
 
+        assertTrue(Stateness.shareState(d, e));
+
         //put all the graphs entrypoints inside a list
         ArrayList list = new ArrayList();
         list.add(a);
         list.add(b);
-        list.add(d);
         list.add(c);
+        list.add(d);
         list.add(e);
         list.add(a); //duplicates should be handled independantely
 
