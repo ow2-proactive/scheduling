@@ -37,11 +37,13 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
 @StateFul(value = false)
+@PrefetchFilesMatching(name = "query.*|formatdb")
 public class ExecuteFormatQuery implements Execute<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
@@ -53,11 +55,15 @@ public class ExecuteFormatQuery implements Execute<BlastParams, BlastParams> {
 
         //Put the native program in the wspace
         WSpace wspace = system.getWorkingSpace();
-        File formatDB = wspace.copyInto(param.formatProg);
+
+        //File formatDB = wspace.copyInto(param.formatProg);
 
         //Execute the native command
         String args = param.getFormatQueryString();
-        system.execCommand(formatDB, args);
+        system.execCommand(param.formatProg, args);
+
+        //File[] index = wspace.listFiles(new FormatDBOutputFilter());
+        //param.queryIndexFiles = index;
 
         //TODO keep a reference on the index files??????????
         return param;

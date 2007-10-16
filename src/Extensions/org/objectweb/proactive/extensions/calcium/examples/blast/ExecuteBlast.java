@@ -39,11 +39,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
 @StateFul(value = false)
+@PrefetchFilesMatching(name = "db.*|query.*|blastall")
 public class ExecuteBlast implements Execute<BlastParams, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
@@ -55,14 +57,15 @@ public class ExecuteBlast implements Execute<BlastParams, File> {
 
         //Put the native program in the wspace
         WSpace wspace = system.getWorkingSpace();
-        File blastProg = wspace.copyInto(param.blastProg);
+
+        //File blastProg = wspace.copyInto(param.blastProg);
 
         //Create a reference to a file in the wspace
         File result = wspace.newFile("result.blast");
         String args = param.getBlastParemeterString(result);
 
         //Execute the native blast
-        system.execCommand(blastProg, args);
+        system.execCommand(param.blastProg, args);
 
         return result;
     }

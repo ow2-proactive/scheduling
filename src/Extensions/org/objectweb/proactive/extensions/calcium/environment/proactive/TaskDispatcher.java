@@ -30,41 +30,36 @@ package org.objectweb.proactive.extensions.calcium.environment.proactive;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
 
 public class TaskDispatcher extends Thread {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
-    private ActiveInterpreterPool intpool;
-    private ActiveTaskPool taskpool;
+    private AOInterpreterPool intpool;
+    private AOTaskPool taskpool;
     private boolean shutdown;
 
-    public TaskDispatcher(ActiveTaskPool taskpool, FileServer fserver,
-        Node[] nodes)
+    public TaskDispatcher(int maxCInterp, AOTaskPool taskpool,
+        FileServerClient fserver, AOInterpreterPool intpool, AOInterpreter[] aoi)
         throws NodeException, ActiveObjectCreationException,
             ClassNotFoundException {
         super();
         shutdown = false;
 
-        Node localnode = NodeFactory.getDefaultNode();
-
         // Create Active Objects
         this.taskpool = taskpool;
-        intpool = Util.createActiveInterpreterPool(localnode);
-        AOInterpreter[] aoi = Util.createAOinterpreter(nodes);
+        this.intpool = intpool;
+
+        this.intpool.init(aoi);
 
         //Instantiate Active Objects
         for (AOInterpreter i : aoi) {
-            i.init(i, taskpool, fserver, intpool);
+            i.init(maxCInterp, i, taskpool, fserver, intpool);
         }
-
-        intpool.init(aoi);
     }
 
     public void run() {

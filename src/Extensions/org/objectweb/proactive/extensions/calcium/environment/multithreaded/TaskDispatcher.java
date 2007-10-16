@@ -39,7 +39,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.environment.Interpreter;
+import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
@@ -50,11 +52,11 @@ class TaskDispatcher extends Thread {
     boolean shutdown;
     int maxSimulatenusTasks;
     TaskPool taskpool;
-    LocalFileServer fserver;
+    FileServerClient fserver;
     ExecutorService threadPool;
     BlockingQueue<CallableInterpreter> intPool;
 
-    public TaskDispatcher(TaskPool taskpool, LocalFileServer fserver,
+    public TaskDispatcher(TaskPool taskpool, FileServerClient fserver,
         int numThreads) {
         this.taskpool = taskpool;
         this.fserver = fserver;
@@ -145,7 +147,9 @@ class TaskDispatcher extends Thread {
         }
 
         public Task call() throws Exception {
-            task = interpreter.interpret(fserver, task);
+            Timer timer = new Timer();
+            timer.start();
+            task = interpreter.interpret(fserver, task, null, null, null, timer);
             return task;
         }
 

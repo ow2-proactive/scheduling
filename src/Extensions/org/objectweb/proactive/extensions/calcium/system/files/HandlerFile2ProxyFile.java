@@ -25,47 +25,47 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.environment;
+package org.objectweb.proactive.extensions.calcium.system.files;
 
 import java.io.File;
+import java.util.IdentityHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
+import org.objectweb.proactive.extensions.calcium.stateness.Handler;
+import org.objectweb.proactive.extensions.calcium.system.ProxyFile;
 
 
-public class RemoteFile implements java.io.Serializable {
+/**
+ * This class is used to transfor File objects into ProxyFile objects.
+ *
+ * @author The ProActive Team (mleyton)
+ */
+class HandlerFile2ProxyFile implements Handler<File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
-    public long fileId;
-    public File location;
-    public long length;
-    public String md5sum;
+    FileServerClient fserver;
+    IdentityHashMap<ProxyFile, ProxyFile> files;
 
-    public RemoteFile(File location, long fileId, long length) {
-        this.location = location;
-        this.fileId = fileId;
-        this.length = length;
-        this.md5sum = null;
+    HandlerFile2ProxyFile(FileServerClient fserver,
+        IdentityHashMap<ProxyFile, ProxyFile> files) {
+        this.fserver = fserver;
+        this.files = files;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof RemoteFile)) {
-            return false;
-        }
+    public ProxyFile transform(File f) throws Exception {
+        ProxyFile pfile = new ProxyFile(f.getParentFile(), f.getName());
 
-        return equals((RemoteFile) o);
+        pfile.store(fserver, 1);
+
+        files.put(pfile, pfile);
+
+        return pfile;
     }
 
-    public boolean equals(RemoteFile rf) {
-        return (this.fileId == rf.fileId) &&
-        this.location.getPath().equals(rf.location.getPath()) &&
-        (this.length == rf.length);
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + fileId + " path=" + location + " length=" + length +
-        " md5sum=" + md5sum;
+    public boolean matches(Object o) {
+        return File.class.isAssignableFrom(o.getClass()) &&
+        !ProxyFile.class.isAssignableFrom(o.getClass());
     }
 }

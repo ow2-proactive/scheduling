@@ -38,13 +38,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
+@PrefetchFilesMatching(name = "merged.*")
 public class ConquerResults implements Conquer<File, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
@@ -57,7 +60,8 @@ public class ConquerResults implements Conquer<File, File> {
         WSpace wspace = system.getWorkingSpace();
 
         //Create a reference on the result merged file
-        File merged = wspace.newFile("merged.result");
+        File merged = wspace.newFile("merged.result" +
+                ProActiveRandom.nextPosInt());
 
         //Merge the files
         mergeFiles(merged, param);

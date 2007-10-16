@@ -27,10 +27,13 @@
  */
 package org.objectweb.proactive.extensions.calcium.instructions;
 
+import java.lang.annotation.Annotation;
+
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -56,5 +59,13 @@ public class SeqInst<P, R> implements Instruction<P, R> {
 
     public boolean isStateFul() {
         return Stateness.isStateFul(secCode);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        Class cls = secCode.getClass();
+        Annotation[] an = cls.getAnnotations();
+
+        return (PrefetchFilesMatching) cls.getAnnotation(PrefetchFilesMatching.class);
     }
 }

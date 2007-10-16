@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -60,5 +61,12 @@ public class ForkInst<P, R> implements Instruction<P, P> {
 
     public boolean isStateFul() {
         return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        Class cls = div.getClass();
+
+        return (PrefetchFilesMatching) cls.getAnnotation(PrefetchFilesMatching.class);
     }
 }

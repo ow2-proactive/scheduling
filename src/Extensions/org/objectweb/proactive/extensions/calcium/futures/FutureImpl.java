@@ -33,13 +33,13 @@ package org.objectweb.proactive.extensions.calcium.futures;
 import java.io.File;
 import java.util.concurrent.BlockingQueue;
 
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.statistics.Stats;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
-import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
 
 
 /**
@@ -54,15 +54,16 @@ public class FutureImpl<R> implements Future<R> {
     Task<R> task;
     int taskId;
     BlockingQueue<Future<R>> callback;
-    FileServer fserver;
+    FileServerClient fserver;
     File outDir;
 
-    public FutureImpl(int taskId, FileServer fserver, File outRootDir) {
+    public FutureImpl(int taskId, FileServerClient fserver, File outRootDir) {
         this.task = null;
         this.taskId = taskId;
         this.fserver = fserver;
         this.outDir = SkeletonSystemImpl.newRandomNamedDirIn(outRootDir);
-        this.outDir.mkdir();
+        this.outDir.mkdirs();
+        SkeletonSystemImpl.checkWritableDirectory(outDir);
     }
 
     @Override
@@ -116,7 +117,7 @@ public class FutureImpl<R> implements Future<R> {
 
         if (!task.hasException()) {
             try {
-                TaskFiles.stageOutput(fserver, task.getObject(), outDir);
+                task = FileStaging.stageOutput(fserver, task, outDir);
             } catch (Exception e) {
                 task.setException(e);
             }
@@ -131,5 +132,12 @@ public class FutureImpl<R> implements Future<R> {
 
     public synchronized void setCallBackQueue(BlockingQueue<Future<R>> callback) {
         this.callback = callback;
+    }
+
+    @Override
+    public void finalize() {
+        if (outDir.list().length <= 0) {
+            outDir.delete();
+        }
     }
 }

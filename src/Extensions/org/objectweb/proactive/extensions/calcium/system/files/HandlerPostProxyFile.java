@@ -25,36 +25,38 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.environment.proactive;
+package org.objectweb.proactive.extensions.calcium.system.files;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.IdentityHashMap;
 
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
-import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
+import org.objectweb.proactive.extensions.calcium.stateness.Handler;
+import org.objectweb.proactive.extensions.calcium.system.ProxyFile;
 
 
-public class ProActiveRemoteFile implements RemoteFile {
-    public void countReference(FileServer fserver) {
-        // TODO Auto-generated method stub
+class HandlerPostProxyFile implements Handler<ProxyFile> {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
+    IdentityHashMap<ProxyFile, ProxyFile> files;
+    FileServerClient fserver;
+
+    public HandlerPostProxyFile(FileServerClient fserver,
+        IdentityHashMap<ProxyFile, ProxyFile> files) { //IdentityHashMap<ProxyFile,ProxyFile> files){
+        this.files = files;
+        this.fserver = fserver;
     }
 
-    public void discountReference(FileServer fserver) {
-        // TODO Auto-generated method stub
+    public ProxyFile transform(ProxyFile pfile) throws IOException {
+        pfile.refCAfter++;
+        files.put(pfile, pfile);
+
+        return pfile;
     }
 
-    public String getMD5Hash() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public long length() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public boolean saveAs(File f) throws IOException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean matches(Object o) {
+        return ProxyFile.class.isAssignableFrom(o.getClass());
     }
 }

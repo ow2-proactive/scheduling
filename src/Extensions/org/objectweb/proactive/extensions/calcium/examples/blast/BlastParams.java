@@ -32,12 +32,11 @@ package org.objectweb.proactive.extensions.calcium.examples.blast;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 
 public class BlastParams implements java.io.Serializable {
-    public URL formatProg;
-    public URL blastProg;
+    public File formatProg;
+    public File blastProg;
     public File queryFile; //query file
     public File dbFile; //database file
 
@@ -46,12 +45,11 @@ public class BlastParams implements java.io.Serializable {
     int divideDBInto; //Number of parts the database should be divided into
     long maxDBSize; //maximum database size to accept
 
-    public BlastParams(File queryFile, File dbFile, boolean isNucleotide,
-        long maxDBSize) throws MalformedURLException {
-        this.formatProg = new URL(
-                "http://www-sop.inria.fr/oasis/personnel/Mario.Leyton/blast/bin-linux/formatdb");
-        this.blastProg = new URL(
-                "http://www-sop.inria.fr/oasis/personnel/Mario.Leyton/blast/bin-linux/blastall");
+    public BlastParams(File queryFile, File dbFile, File formatProg,
+        File blastProg, boolean isNucleotide, long maxDBSize)
+        throws MalformedURLException {
+        this.formatProg = formatProg;
+        this.blastProg = blastProg;
 
         this.queryFile = queryFile;
         this.dbFile = dbFile;
@@ -59,10 +57,13 @@ public class BlastParams implements java.io.Serializable {
 
         this.divideDBInto = 2;
         this.maxDBSize = maxDBSize;
+
+        //this.queryIndexFiles = null;
     }
 
     public BlastParams(BlastParams param) throws MalformedURLException {
-        this(param.queryFile, param.dbFile, param.isNucleotide, param.maxDBSize);
+        this(param.queryFile, param.dbFile, param.formatProg, param.blastProg,
+            param.isNucleotide, param.maxDBSize);
     }
 
     public String getBlastParemeterString(File outFile) {

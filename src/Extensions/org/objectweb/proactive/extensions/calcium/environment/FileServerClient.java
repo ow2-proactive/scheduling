@@ -25,46 +25,29 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.environment.multithreaded;
+package org.objectweb.proactive.extensions.calcium.environment;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
-import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class LocalFile implements RemoteFile {
-    File location;
-    long fileId;
-    long length;
-    String md5sum;
+public interface FileServerClient {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
 
-    public LocalFile(File location, long fileId, long length, String md5sum) {
-        this.location = location;
-        this.fileId = fileId;
-        this.length = length;
-        this.md5sum = md5sum;
-    }
+    public RemoteFile store(File current, int refCount)
+        throws IOException;
 
-    public void countReference(FileServer fserver) {
-        fserver.increaseReference(fileId);
-    }
+    public void fetch(RemoteFile rfile, File localDst)
+        throws IOException;
 
-    public void discountReference(FileServer fserver) {
-        fserver.discountReference(fileId);
-    }
+    public RemoteFile store(URL current) throws IOException;
 
-    public String getMD5Hash() {
-        return md5sum;
-    }
+    public void commit(long fileId, int refCountDelta);
 
-    public long length() {
-        return length;
-    }
-
-    public boolean saveAs(File f) throws IOException {
-        return SkeletonSystemImpl.copyFile(location, f);
-    }
+    public void shutdown();
 }

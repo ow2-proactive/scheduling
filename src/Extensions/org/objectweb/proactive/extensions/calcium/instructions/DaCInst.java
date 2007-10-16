@@ -36,6 +36,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -65,7 +66,9 @@ public class DaCInst<P extends Serializable, R extends Serializable>
 
         if (evalCondition) { //Split the task if required
             t.pushInstruction(new ConquerInst<R, R>(conq));
-            t.pushInstruction(new DivideSIMD<P, P>(div, childStack));
+            Stack clone = new Stack();
+            clone.push(this);
+            t.pushInstruction(new DivideSIMD<P, P>(div, clone));
             return t;
         } else { //else execute the child skeleton by
                  // appending the child skeleton code to the stack
@@ -78,5 +81,12 @@ public class DaCInst<P extends Serializable, R extends Serializable>
 
     public boolean isStateFul() {
         return Stateness.isStateFul(cond);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        Class cls = cond.getClass();
+
+        return (PrefetchFilesMatching) cls.getAnnotation(PrefetchFilesMatching.class);
     }
 }

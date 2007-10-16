@@ -42,6 +42,10 @@ public class StatsImpl implements Stats {
     private long initTime;
     private long finitTime;
     private long currentStateStart;
+    private long computationBlockedFetchingData;
+    private long unusedCPUTime;
+    private long uploadedBytes;
+    private long downloadedBytes;
     private Workout workout;
     private int maxResources;
 
@@ -56,6 +60,8 @@ public class StatsImpl implements Stats {
         finitTime = 0;
         currentStateStart = initTime;
         maxResources = 1;
+        computationBlockedFetchingData = unusedCPUTime = 0;
+        uploadedBytes = downloadedBytes = 0;
 
         subTreeSize = numberLeafs = 0;
         workout = new Workout(8);
@@ -67,6 +73,22 @@ public class StatsImpl implements Stats {
 
     public void addComputationTime(long time) {
         computationTime += time;
+    }
+
+    public void addComputationBlockedFetchingData(long time) {
+        computationBlockedFetchingData += time;
+    }
+
+    public void addUnusedCPUTime(long time) {
+        unusedCPUTime += time;
+    }
+
+    public void addUploadedBytes(long time) {
+        uploadedBytes += time;
+    }
+
+    public void addDownloadedBytes(long time) {
+        downloadedBytes += time;
     }
 
     public void exitReadyState() {
@@ -97,9 +119,11 @@ public class StatsImpl implements Stats {
 
         return "Time: " + processingTime + "P " + readyTime + "R " +
         waitingTime + "W " + resultsTime + "F " + getWallClockTime() + "L " +
-        getComputationTime() + "C [ms] " + "TreeSize:" + getTreeSize() + " " +
-        "TreeSpan:" + getTreeSpan() + " " + "TreeDepth:" + getTreeDepth() + ls +
-        workout;
+        getComputationTime() + "C[ms] " + unusedCPUTime + "UC[ms] " +
+        computationBlockedFetchingData + "B[ms] " + uploadedBytes +
+        "Up [bytes] " + downloadedBytes + "Down [bytes] " + "TreeSize:" +
+        getTreeSize() + " " + "TreeSpan:" + getTreeSpan() + " " + "TreeDepth:" +
+        getTreeDepth() + ls + workout;
     }
 
     public void markFinishTime() {
@@ -121,6 +145,11 @@ public class StatsImpl implements Stats {
         this.maxResources = Math.max(maxResources,
                 stats.getMaxAvailableResources());
         this.workout.track(stats.workout);
+
+        this.computationBlockedFetchingData += stats.computationBlockedFetchingData;
+        this.unusedCPUTime += stats.unusedCPUTime;
+        this.uploadedBytes += stats.uploadedBytes;
+        this.downloadedBytes += stats.downloadedBytes;
     }
 
     private int getNumberLeafs() {

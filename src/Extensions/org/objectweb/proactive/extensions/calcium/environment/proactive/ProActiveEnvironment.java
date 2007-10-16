@@ -30,29 +30,56 @@ package org.objectweb.proactive.extensions.calcium.environment.proactive;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
 public class ProActiveEnvironment implements EnvironmentFactory {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
-    ActiveTaskPool taskpool;
+    ProActiveDescriptor pad;
+    AOTaskPool taskpool;
     TaskDispatcher dispatcher;
-    FileServer fserver;
+    FileServerClientImpl fserver;
+    AOInterpreterPool interPool;
 
-    public ProActiveEnvironment(String descriptor, String virtualNode)
-        throws ProActiveException, ClassNotFoundException {
-        Node localnode = NodeFactory.getDefaultNode();
-        taskpool = Util.createActiveTaskPool(localnode);
-        fserver = null; //TODO fix this
-        Node[] nodes = Util.getNodes(descriptor, virtualNode);
-        dispatcher = new TaskDispatcher(taskpool, fserver, nodes);
+    public ProActiveEnvironment(String descriptor) throws ProActiveException {
+        //get the local node: NodeFactory.getDefaultNode();
+        VariableContract vc = new VariableContract();
+        vc.setVariableFromProgram("SKELETON_FRAMEWORK_VN", "",
+            VariableContractType.DescriptorVariable);
+        vc.setVariableFromProgram("INTERPRETERS_VN", "",
+            VariableContractType.DescriptorVariable);
+        vc.setVariableFromProgram("MAX_CINTERPRETERS", "3",
+            VariableContractType.ProgramDefaultVariable);
+
+        pad = ProDeployment.getProactiveDescriptor(descriptor, vc);
+        vc = pad.getVariableContract();
+
+        int maxCInterp = Integer.parseInt(vc.getValue("MAX_CINTERPRETERS"));
+
+        Node frameworkNode = Util.getFrameWorkNode(pad, vc);
+        Node[] nodes = Util.getInterpreterNodes(pad, vc);
+
+        taskpool = Util.createActiveTaskPool(frameworkNode);
+        interPool = Util.createActiveInterpreterPool(frameworkNode);
+        fserver = Util.createFileServer(frameworkNode);
+        AOInterpreter[] aoi = Util.createAOinterpreter(nodes);
+
+        try {
+            dispatcher = new TaskDispatcher(maxCInterp, taskpool, fserver,
+                    interPool, aoi);
+        } catch (ClassNotFoundException e) {
+            throw new ProActiveException(e);
+        }
     }
 
     public TaskPool getTaskPool() {
@@ -65,15 +92,16 @@ public class ProActiveEnvironment implements EnvironmentFactory {
 
     public void shutdown() {
         dispatcher.shutdown();
-        //TODO shutdown
+        fserver.shutdown();
+        try {
+            pad.killall(true);
+        } catch (ProActiveException e) {
+            //We don't care about ProActive's death exceptions
+            //e.printStackTrace();
+        }
     }
 
-    public FileServer getFileServer() {
+    public FileServerClient getFileServer() {
         return fserver;
-    }
-
-    public File getOutPutDir() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

@@ -36,6 +36,7 @@ import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
+import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.DivideBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.SolveBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.DivideBT2;
@@ -57,8 +58,8 @@ public class NQueens implements Serializable {
         NQueens nq = new NQueens();
 
         if (args.length != 5) {
-            nq.solve(16, 14, 10,
-                NQueens.class.getResource("LocalDescriptor.xml").getPath(),
+            nq.solve(16, 14, 5,
+                NQueens.class.getResource("../LocalDescriptor.xml").getPath(),
                 "local");
         } else {
             nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
@@ -81,9 +82,9 @@ public class NQueens implements Serializable {
 
     public void solve(int boardSize, int solvableSize, int times,
         String descriptor, String virtualNode) throws Exception {
-        EnvironmentFactory manager = new MultiThreadedEnvironment(2);
+        //EnvironmentFactory manager = new MultiThreadedEnvironment(2);
+        EnvironmentFactory manager = new ProActiveEnvironment(descriptor);
 
-        //EnvironmentFactory manager = new ProActiveEnvironment(descriptor, virtualNode);
         Calcium calcium = new Calcium(manager);
         Monitor monitor = new SimpleLogMonitor(calcium, 1);
         monitor.start();

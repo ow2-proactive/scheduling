@@ -29,6 +29,7 @@ package org.objectweb.proactive.extensions.calcium.instructions;
 
 import java.util.Vector;
 
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -57,5 +58,9 @@ public class ForInst<P> implements Instruction<P, P> {
 
     public boolean isStateFul() {
         return false;
+    }
+
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        return childStack.get(childStack.size() - 1).getPrefetchFilesAnnotation();
     }
 }

@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.calcium.instructions;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -48,4 +49,6 @@ public interface Instruction<P, R> extends Serializable {
         throws Exception;
 
     public boolean isStateFul();
+
+    public PrefetchFilesMatching getPrefetchFilesAnnotation();
 }

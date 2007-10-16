@@ -85,12 +85,10 @@ public class Stateness {
      *            The list of objects that are going to be grouped (graph entry
      *            points).
      * @return A list of groups, holding the entry points objects.
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
+     * @throws Exception
      */
     static public <T> Collection<Collection<T>> getReferenceGroups(
-        Collection<T> list)
-        throws IllegalArgumentException, IllegalAccessException {
+        Collection<T> list) throws Exception {
         Collection<Collection<T>> groups = new ArrayList<Collection<T>>();
 
         for (T muscle : list) {
@@ -176,23 +174,25 @@ public class Stateness {
      * @return True if the objects have a reference on a same object inside
      *         their graphs. False if the two object do not have any other
      *         object in common inside their reference graphs.
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
+     * @throws Exception
      */
     static public boolean shareState(Object o1, Object o2)
-        throws IllegalArgumentException, IllegalAccessException {
+        throws Exception {
         // If either class is stateless then there is no shared state
         if (!isStateFul(o1.getClass()) || !isStateFul(o2.getClass())) {
             return false;
         }
 
-        IdentityHashMap fieldsO1 = getAllFieldObjects(o1);
-        IdentityHashMap fieldsO2 = getAllFieldObjects(o2);
+        GetAllClassHandler<Object> handler01 = new GetAllClassHandler<Object>(Object.class);
+        GetAllClassHandler<Object> handler02 = new GetAllClassHandler<Object>(Object.class);
 
-        Collection list = fieldsO1.values();
+        ObjectGraph.searchForClass(o1, handler01);
+        ObjectGraph.searchForClass(o1, handler02);
+
+        Collection list = handler01.getMusclesList();
 
         for (Object f : list) {
-            if (fieldsO2.containsKey(f)) {
+            if (handler02.getMusclesHash().containsKey(f)) {
                 // System.out.println("State shared variable:"+
                 // System.identityHashCode(f) + ":" + f.getClass());
                 return true;
@@ -202,111 +202,6 @@ public class Stateness {
         return false;
     }
 
-    static public <T> IdentityHashMap<T, T> getAllFieldObjects(Object o)
-        throws IllegalArgumentException, IllegalAccessException {
-        return getAllFieldObjects(o, new IdentityHashMap<T, T>(), null);
-    }
-
-    static public <T> IdentityHashMap<T, T> getAllFieldObjects(Object o,
-        Class<T> filter)
-        throws IllegalArgumentException, IllegalAccessException {
-        return getAllFieldObjects(o, new IdentityHashMap<T, T>(), filter);
-    }
-
-    /**
-     * This method returns all the sub object instances for an object that match
-     * a given pattern. It does not consider static variables though.
-     *
-     * @param o
-     *            The root object to search from
-     * @param list
-     *            A list of already found objects, or null in which case a new
-     *            IdentityHashMap will be instantiated.
-     * @param filter
-     *            Only considers objects asignable to this class. If this
-     *            parameter is null then all fields are consdiered.
-     * @return The list with all the objects found, including those passed as
-     *         parameteres.
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     */
-    static public <T> IdentityHashMap<T, T> getAllFieldObjects(Object o,
-        IdentityHashMap list, Class<?> filter)
-        throws IllegalArgumentException, IllegalAccessException {
-        if (list == null) {
-            list = new IdentityHashMap();
-        }
-
-        if (!list.containsKey(o)) {
-            if (filter == null) {
-                list.put(o, o);
-                // System.out.println("added:" + o.getClass().getSimpleName());
-            } else if (filter.isAssignableFrom(o.getClass())) {
-                list.put(o, o);
-                // System.out.println("added:" + o.getClass().getSimpleName() +
-                // " asignable from:" + filter.getSimpleName());
-            }
-        }
-
-        Class<?> cls = o.getClass();
-        ArrayList<Field> field = getAllInheritedFields(cls);
-
-        for (Field f : field) {
-            Class<?> c = f.getType();
-
-            // primitives can not be shared & static vars are not considered
-            if (c.isPrimitive() || Modifier.isStatic(f.getModifiers())) {
-                continue;
-            }
-
-            f.setAccessible(true);
-            Object fieldObject = f.get(o);
-
-            if ((fieldObject == null) || list.containsKey(fieldObject)) {
-                continue; // already visited (this a loop)
-            }
-
-            // If its an array of T[], where T is not primitive
-            // (ex: int[] is not assignable to Object[])
-            if (new Object[0].getClass().isAssignableFrom(fieldObject.getClass())) {
-                Object[] array = (Object[]) fieldObject;
-                for (Object a : array) {
-                    if (a != null) {
-                        getAllFieldObjects(a, list, filter);
-                    }
-                }
-            } else { // regular object (not an array
-                getAllFieldObjects(fieldObject, list, filter);
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * @param cls
-     *            A Class.
-     * @return All the Fields of this class, including the inherited ones.
-     */
-    static public ArrayList<Field> getAllInheritedFields(Class<?> cls) {
-        ArrayList<Field> array = new ArrayList<Field>();
-
-        // Reached the top of the recurtion. This class is stateless.
-        if ((cls == null) || (cls == Object.class)) {
-            return array;
-        }
-
-        Field[] declared = cls.getDeclaredFields();
-
-        for (Field d : declared) {
-            array.add(d);
-        }
-
-        array.addAll(getAllInheritedFields(cls.getSuperclass()));
-
-        return array;
-    }
-
     /**
      * Determines if an object has a shared state with any of the objects inside
      * the set.
@@ -314,11 +209,10 @@ public class Stateness {
      * @param set
      * @param muscle
      * @return true if the object shares the state. False otherwise.
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
+     * @throws Exception
      */
     static private <T> boolean shareStateWithGroup(Collection<T> set, T muscle)
-        throws IllegalArgumentException, IllegalAccessException {
+        throws Exception {
         for (T m : set) {
             if (shareState(m, muscle)) {
                 return true;
@@ -329,16 +223,15 @@ public class Stateness {
     }
 
     public static Collection<Muscle> getStatefulMuscles(Skeleton root)
-        throws IllegalArgumentException, IllegalAccessException {
-        IdentityHashMap fields = getAllFieldObjects(root, null, Muscle.class);
+        throws Exception {
+        GetAllClassHandler<Muscle> handler = new GetAllClassHandler<Muscle>(Muscle.class);
 
-        Collection<Muscle> list = fields.values();
+        ObjectGraph.searchForClass(root, handler);
 
-        return list;
+        return handler.getMusclesList();
     }
 
-    public static void main(String[] args)
-        throws IllegalArgumentException, IllegalAccessException {
+    public static void main(String[] args) throws Exception {
         Condition<Board> div = new DivideCondition();
 
         Skeleton<Board, Result> BT1 = new DaC<Board, Result>(new DivideBT1(),
@@ -399,5 +292,34 @@ public class Stateness {
         ois.close();
 
         return copy;
+    }
+
+    static class GetAllClassHandler<T> implements Handler<T> {
+        IdentityHashMap<T, T> list;
+        Class<T> c;
+
+        public GetAllClassHandler(Class<T> c) {
+            list = new IdentityHashMap<T, T>();
+        }
+
+        public T transform(T o) throws Exception {
+            if (!list.containsKey(o)) {
+                list.put(o, o);
+            }
+
+            return o;
+        }
+
+        public boolean matches(Object o) {
+            return c.isAssignableFrom(o.getClass());
+        }
+
+        public Collection<T> getMusclesList() {
+            return list.values();
+        }
+
+        public IdentityHashMap<T, T> getMusclesHash() {
+            return list;
+        }
     }
 }

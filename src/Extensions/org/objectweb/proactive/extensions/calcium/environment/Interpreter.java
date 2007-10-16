@@ -31,14 +31,15 @@
 package org.objectweb.proactive.extensions.calcium.environment;
 
 import java.io.Serializable;
+import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
-import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
 
 
 /**
@@ -62,53 +63,107 @@ import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
  */
 public class Interpreter implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
-    FileServer fserver = null;
 
-    public Interpreter() {
-    }
+    public Task interpret(FileServerClient fserver, Task task, Semaphore semIn,
+        Semaphore semCom, Semaphore semOut, Timer tUnusedCPU) {
+        Timer timer = new Timer();
 
-    public Task interpret(FileServer fserver, Task task) {
-        Timer timer = new Timer(true);
-
-        this.fserver = fserver;
+        timer.start();
 
         try {
-            task = interpretLoop(task, new SkeletonSystemImpl());
+            SkeletonSystemImpl system = new SkeletonSystemImpl();
+
+            FileStaging files = stageIn(semIn, task, system, fserver);
+            task = theLoop(semCom, task, system, tUnusedCPU);
+            task = stageOut(semOut, task, files, system, fserver);
         } catch (Exception e) {
+            e.printStackTrace();
             task.setException(e);
         }
 
         //The task is finished
         task.getStats().addComputationTime(timer.getTime());
+
         timer.stop();
 
         return task;
     }
 
-    private Task<?> interpretLoop(Task<?> task, SkeletonSystemImpl system)
+    private FileStaging stageIn(Semaphore semIn, Task<?> task,
+        SkeletonSystemImpl system, FileServerClient fserver)
         throws Exception {
         //Keep track of current stored files
-        TaskFiles files = new TaskFiles(task);
+        if (semIn != null) {
+            semIn.acquire();
+        }
 
-        files.stageIn(system.getWorkingSpace());
+        FileStaging tfiles;
 
-        //Stop loop if task is finished or has ready children
-        while (task.hasInstruction() && !task.family.hasReadyChildTask()) {
-            if (logger.isDebugEnabled()) {
-                System.out.println(task.stackToString());
+        try {
+            tfiles = new FileStaging(task, fserver, system.getWorkingSpace());
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (semIn != null) {
+                semIn.release();
             }
+        }
 
-            task = task.compute(system);
-        } //while
+        return tfiles;
+    }
 
-        //Update new/modified/unreferenced files
-        files.stageOut(fserver, task);
+    private Task<?> theLoop(Semaphore semCom, Task<?> task,
+        SkeletonSystemImpl system, Timer timer) throws Exception {
+        timer.stop();
+        if (semCom != null) {
+            semCom.acquire();
+        }
 
-        //From now on, the parameters inside each task have different spaces
-        task.family.splitfReadyTasksSpace();
+        try {
+            //Stop loop if task is finished or has ready children 
+            while (task.hasInstruction() && !task.family.hasReadyChildTask()) {
+                if (logger.isDebugEnabled()) {
+                    System.out.println(task.stackToString());
+                }
 
-        //Clean the working space
-        system.getWorkingSpace().delete();
+                task = task.compute(system);
+            } //while
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            task.getStats().addUnusedCPUTime(timer.getTime());
+            timer.start();
+            if (semCom != null) {
+                semCom.release();
+            }
+        }
+
+        return task;
+    }
+
+    private Task<?> stageOut(Semaphore semOut, Task<?> task, FileStaging files,
+        SkeletonSystemImpl system, FileServerClient fserver)
+        throws Exception {
+        if (semOut != null) {
+            semOut.acquire();
+        }
+
+        try {
+            //Update new/modified/unreferenced files
+            files.stageOut(fserver, task);
+
+            //From now on, the parameters inside each task have different spaces
+            task.family.splitfReadyTasksSpace();
+
+            //Clean the working space
+            system.getWorkingSpace().delete();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (semOut != null) {
+                semOut.release();
+            }
+        }
 
         return task;
     }

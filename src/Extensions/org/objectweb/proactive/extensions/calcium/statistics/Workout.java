@@ -31,6 +31,9 @@
 package org.objectweb.proactive.extensions.calcium.statistics;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -44,17 +47,20 @@ import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
 
 public class Workout implements Serializable {
     public HashMap<Class<?>, Exercise> muscleWorkout;
+    public static ClassSorterByName classSorterByName = new ClassSorterByName();
 
     public Workout(int initHashSize) {
-        muscleWorkout = new HashMap<Class<?>, Exercise>(initHashSize);
+        muscleWorkout = new HashMap<Class<?>, Exercise>();
     }
 
     @Override
     public String toString() {
         String workout = "Workout: ";
-        java.util.Iterator<Class<?>> it = muscleWorkout.keySet().iterator();
-        while (it.hasNext()) {
-            Class<?> muscle = it.next();
+
+        List<Class<?>> keys = new ArrayList<Class<?>>(muscleWorkout.keySet());
+        Collections.sort(keys, classSorterByName);
+
+        for (Class<?> muscle : keys) {
             workout += (muscle.getSimpleName() + "(" +
             muscleWorkout.get(muscle) + ") ");
         }
@@ -125,5 +131,11 @@ public class Workout implements Serializable {
 
     public List<Exercise> getExecuteExercise() {
         return getExercises(Execute.class);
+    }
+
+    static class ClassSorterByName implements Comparator<Class<?>> {
+        public int compare(Class<?> o1, Class<?> o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
     }
 }

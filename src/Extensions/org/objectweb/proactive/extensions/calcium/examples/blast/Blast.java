@@ -32,11 +32,12 @@ package org.objectweb.proactive.extensions.calcium.examples.blast;
 
 import java.io.File;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
-import org.objectweb.proactive.extensions.calcium.examples.nqueens.NQueens;
+import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
@@ -69,22 +70,24 @@ public class Blast {
     }
 
     public static void main(String[] args) throws Exception {
-        BlastParams param = new BlastParams(new File("/home/mleyton/query.nt"),
-                new File("/home/mleyton/db.nt"), true, 100 * 1024);
+        String descriptor = Blast.class.getResource("../SSHDescriptor.xml")
+                                       .getPath();
+        BlastParams param = new BlastParams(new File(
+                    "/home/mleyton/NOSAVE/blast/query.nt"),
+                new File("/home/mleyton/NOSAVE/blast/db.nt"),
+                new File("/home/mleyton/NOSAVE/blast/bin-linux/formatdb"),
+                new File("/home/mleyton/NOSAVE/blast/bin-linux/blastall"),
+                true, 2000 * 1024);
 
         Blast blast = new Blast();
-        blast.solve(param);
+        blast.solve(param, descriptor);
     }
 
-    private void solve(BlastParams parameters)
-        throws InterruptedException, PanicException {
-        String descriptor = NQueens.class.getResource("LocalDescriptor.xml")
-                                         .getPath();
+    private void solve(BlastParams parameters, String descriptor)
+        throws InterruptedException, PanicException, ProActiveException {
+        EnvironmentFactory envfactory = new ProActiveEnvironment(descriptor);
 
-        //descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
-        //new ProActiveEnvironment(descriptor, "local");
-        EnvironmentFactory envfactory = new MultiThreadedEnvironment(1);
-
+        //EnvironmentFactory envfactory = new MultiThreadedEnvironment(10);
         Calcium calcium = new Calcium(envfactory);
         Stream<BlastParams, File> stream = calcium.newStream(root);
         Future<File> future = stream.input(parameters);

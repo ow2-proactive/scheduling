@@ -38,8 +38,9 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 
 
 /**
@@ -48,51 +49,75 @@ import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
  * @author The ProActive Team (mleyton)
  */
 public class ProxyFile extends File {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
     File wspace;
     File relative;
     File current; //current = wspace+"/"+relative
     RemoteFile remote;
+    FileServerClient fserver;
     long lastmodified;
-    public boolean marked;
+    long cachedSize;
+    public long blockedFetchingTime;
+    public long downloadedBytes;
+    public long uploadedBytes;
+    public int refCBefore;
+    public int refCAfter;
 
     public ProxyFile(File wspace, File relative) {
         super(relative.getName());
+
+        this.current = new File(wspace, relative.getPath());
         this.relative = relative;
         this.remote = null;
-        setWSpace(wspace);
-        this.lastmodified = 0;
+        setWSpace(null, wspace);
+        this.lastmodified = this.cachedSize = 0;
+        this.blockedFetchingTime = this.uploadedBytes = this.downloadedBytes = 0;
+
+        this.refCBefore = this.refCAfter = 0;
     }
 
     public ProxyFile(File wspace, String name) {
         this(wspace, new File(name));
     }
 
-    public void setWSpace(File wspace) {
+    public void setWSpace(FileServerClient fserver, File wspace) {
+        this.fserver = fserver;
         this.wspace = wspace;
-        this.current = new File(wspace, relative.getPath());
     }
 
-    public void store(FileServer fserver) throws IOException {
-        this.remote = fserver.store(current);
+    public void store(FileServerClient fserver, int refCount)
+        throws IOException {
+        this.cachedSize = current.length();
+        this.uploadedBytes += current.length();
+        this.remote = fserver.store(current, refCount);
         this.lastmodified = current.lastModified();
     }
 
-    public void saveRemoteFileInWSpace() throws IOException {
+    public void saveRemoteDataInWSpace() throws IOException {
         int i = 1;
-        while (current.exists()) {
-            current = new File(wspace, relative.getPath() + "-" + i);
-        }
-        remote.saveAs(current);
-        lastmodified = current.lastModified();
-    }
 
-    public File getCurrent() {
-        return current;
+        if (isLocallyStored()) {
+            return; //Nothing to do, data already donwloaded
+        }
+
+        current = new File(wspace, relative.getPath());
+        while (current.exists()) {
+            current = new File(wspace, relative.getPath() + "-" + i++);
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Fetching data into:" + this.current);
+        }
+        fserver.fetch(remote, this.current);
+        this.lastmodified = this.current.lastModified();
+        this.downloadedBytes += current.length();
     }
 
     public boolean isRemotelyStored() {
         return remote != null;
+    }
+
+    public boolean isLocallyStored() {
+        return current != null;
     }
 
     public boolean hasBeenModified() {
@@ -102,144 +127,235 @@ public class ProxyFile extends File {
              *  1. Also considering the hashcode.
              *  2. Keeping track of lastModified access.
              */
+        if (current == null) {
+            return false;
+        }
+
         return lastmodified != current.lastModified();
     }
 
-    public void dereference(FileServer fserver) {
-        //if(!isRemotelyStored()) return; //nothing to do
-        remote.discountReference(fserver);
+    public void handleStageOut(FileServerClient fserver)
+        throws IOException {
+        if (isNew()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Storing new file: [" + refCBefore + "," +
+                    refCAfter + "] " + relative + " (" + current + ")");
+            }
 
-        //make this file as new
-        remote = null;
-        lastmodified = 0;
+            store(fserver, refCAfter);
+
+            return;
+        }
+
+        if (isModified()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Storing modified file: [" + refCBefore + "," +
+                    refCAfter + "] " + relative + " (" + current + ")");
+            }
+
+            fserver.commit(remote.fileId, -refCBefore);
+
+            store(fserver, refCAfter);
+
+            return;
+        }
+
+        if (isNormal()) { //&& (refCAfter - refCBefore !=0)){
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updating normal file: [" + refCBefore + "," +
+                    refCAfter + "] " + relative + " (" + current + ")");
+            }
+
+            fserver.commit(remote.fileId, refCAfter - refCBefore);
+            return;
+        }
+
+        logger.error("Illegal ProxyFile state: " + refCAfter + "a " +
+            refCBefore + "b" + " data modified=" + hasBeenModified());
+
+        //Reached here, not good!
+        throw new IOException("ProxyFile reached illegal state:" + this);
     }
 
-    public void countReference(FileServer fserver) {
-        remote.countReference(fserver);
+    public void setStageOutState() {
+        this.current = null;
+        this.wspace = null;
+        this.fserver = null;
+        this.blockedFetchingTime = this.uploadedBytes = this.downloadedBytes = 0;
+        this.refCBefore = this.refCAfter = 0;
     }
 
-    /*
-     *  BEGIN EXTENDED FILE METHODS
+    private boolean isNew() {
+        return (this.refCBefore == 0) && (this.refCAfter != 0);
+    }
+
+    private boolean isNormal() {
+        return (this.refCBefore != 0) && !hasBeenModified();
+    }
+
+    private boolean isModified() {
+        return (this.refCBefore != 0) && (this.refCAfter != 0) &&
+        hasBeenModified();
+    }
+
+    public File getWSpaceFile() {
+        return wspace;
+    }
+
+    public File getCurrent() {
+        if (current == null) {
+            Timer t = new Timer();
+            t.start();
+
+            logger.debug("Blocking waiting for file's data:" + wspace + "/" +
+                relative);
+
+            /*
+                try{
+                        throw new Exception();
+                }catch(Exception e){
+                        e.printStackTrace();
+                }
+                */
+            try {
+                saveRemoteDataInWSpace();
+            } catch (IOException e) {
+                throw new IllegalArgumentException(e); //TODO change this exception type
+            }
+            t.stop();
+            this.blockedFetchingTime = 1 + t.getTime();
+        }
+        return current;
+    }
+
+    /* ***********************************************************
      *
-     */
+     *         BEGIN EXTENDED FILE METHODS
+     *
+     * ***********************************************************/
     public String getName() {
-        return current.getName();
+        return relative.getName();
     }
 
     public String getParent() {
-        return current.getParent();
+        return getCurrent().getParent();
     }
 
     public File getParentFile() {
-        return current.getParentFile();
+        return getCurrent().getParentFile();
     }
 
     public String getPath() {
-        return current.getPath();
+        return getCurrent().getPath();
     }
 
     public boolean isAbsolute() {
-        return current.isAbsolute();
+        return getCurrent().isAbsolute();
     }
 
     public String getAbsolutePath() {
-        return current.getAbsolutePath();
+        return getCurrent().getAbsolutePath();
     }
 
     public File getAbsoluteFile() {
-        return current.getAbsoluteFile();
+        return getCurrent().getAbsoluteFile();
     }
 
     public String getCanonicalPath() throws IOException {
-        return current.getCanonicalPath();
+        return getCurrent().getCanonicalPath();
     }
 
     public File getCanonicalFile() throws IOException {
-        return current.getCanonicalFile();
+        return getCurrent().getCanonicalFile();
     }
 
     public URL toURL() throws MalformedURLException {
-        return current.toURL();
+        return getCurrent().toURL();
     }
 
     public URI toURI() {
-        return current.toURI();
+        return getCurrent().toURI();
     }
 
     public boolean canRead() {
-        return current.canRead();
+        return getCurrent().canRead();
     }
 
     public boolean canWrite() {
-        return current.canWrite();
+        return getCurrent().canWrite();
     }
 
     public boolean exists() {
-        return current.exists();
+        return getCurrent().exists();
     }
 
     public boolean isDirectory() {
-        return current.isDirectory();
+        return getCurrent().isDirectory();
     }
 
     public boolean isFile() {
-        return current.isFile();
+        return getCurrent().isFile();
     }
 
     public boolean isHidden() {
-        return current.isHidden();
+        return getCurrent().isHidden();
     }
 
     public long lastModified() {
-        return current.lastModified();
+        return getCurrent().lastModified();
     }
 
     public long length() {
-        return current.length();
+        if (!isLocallyStored()) {
+            return cachedSize;
+        }
+
+        return getCurrent().length();
     }
 
     public boolean createNewFile() throws IOException {
-        return current.createNewFile();
+        return getCurrent().createNewFile();
     }
 
     public boolean delete() {
-        return current.delete();
+        return getCurrent().delete();
     }
 
     public void deleteOnExit() {
-        current.deleteOnExit();
+        getCurrent().deleteOnExit();
     }
 
     public String[] list() {
-        return current.list();
+        return getCurrent().list();
     }
 
     public String[] list(FilenameFilter filter) {
-        return current.list();
+        return getCurrent().list();
     }
 
     public File[] listFiles() {
-        return current.listFiles();
+        return getCurrent().listFiles();
     }
 
     public File[] listFiles(FilenameFilter filter) {
-        return current.listFiles(filter);
+        return getCurrent().listFiles(filter);
     }
 
     public File[] listFiles(FileFilter filter) {
-        return current.listFiles(filter);
+        return getCurrent().listFiles(filter);
     }
 
     public boolean mkdir() {
-        return current.mkdir();
+        return getCurrent().mkdir();
     }
 
     public boolean mkdirs() {
-        return current.mkdirs();
+        return getCurrent().mkdirs();
     }
 
     public boolean renameTo(File dest) {
-        boolean res = current.renameTo(new File(wspace, dest.getPath()));
+        //TODO check this method
+        boolean res = getCurrent().renameTo(new File(wspace, dest.getPath()));
 
         if (res) {
             relative = dest;
@@ -249,27 +365,27 @@ public class ProxyFile extends File {
     }
 
     public boolean setLastModified(long time) {
-        return current.setLastModified(time);
+        return getCurrent().setLastModified(time);
     }
 
     public boolean setReadOnly() {
-        return current.setReadOnly();
+        return getCurrent().setReadOnly();
     }
 
     public int compareTo(File pathname) {
-        return current.compareTo(pathname);
+        return getCurrent().compareTo(pathname);
     }
 
     public boolean equals(Object obj) {
-        return current.equals(obj);
+        return getCurrent().equals(obj);
     }
 
     public int hashCode() {
-        return current.hashCode();
+        return getCurrent().hashCode();
     }
 
     public String toString() {
-        return current.toString();
+        return getCurrent().toString();
     }
 
     public static void main(String[] args) throws Exception {

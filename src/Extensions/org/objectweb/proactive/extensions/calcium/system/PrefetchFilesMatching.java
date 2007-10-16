@@ -25,47 +25,17 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.environment;
+package org.objectweb.proactive.extensions.calcium.system;
 
-import java.io.File;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-
-public class RemoteFile implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
-    public long fileId;
-    public File location;
-    public long length;
-    public String md5sum;
-
-    public RemoteFile(File location, long fileId, long length) {
-        this.location = location;
-        this.fileId = fileId;
-        this.length = length;
-        this.md5sum = null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof RemoteFile)) {
-            return false;
-        }
-
-        return equals((RemoteFile) o);
-    }
-
-    public boolean equals(RemoteFile rf) {
-        return (this.fileId == rf.fileId) &&
-        this.location.getPath().equals(rf.location.getPath()) &&
-        (this.length == rf.length);
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + fileId + " path=" + location + " length=" + length +
-        " md5sum=" + md5sum;
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+@Target({ElementType.TYPE
+})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PrefetchFilesMatching {
+    String name() default "[unassigned]";
+    long sizeSmallerThan() default Long.MIN_VALUE;
+    long sizeBiggerThan() default Long.MAX_VALUE;
 }

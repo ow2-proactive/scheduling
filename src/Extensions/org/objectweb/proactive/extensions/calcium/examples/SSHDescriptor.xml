@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	<variables>
+ 	    <descriptorVariable name="SKELETON_FRAMEWORK_VN" value="framework" />     	
+		<descriptorVariable name="INTERPRETERS_VN" value="interpreters" />
+ 	    <programDefaultVariable name="MAX_CINTERPRETERS" value="3"/>
+ 	    
+ 	    <descriptorVariable name="PROACTIVE_HOME" value="/auto/pollux/u/pollux/home/mleyton/ProActive"/>
+  	    <descriptorVariable name="JAVA_HOME" value="/usr/lib/jvm/jre-1.5.0-sun"/>
+    </variables>
+	
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="${SKELETON_FRAMEWORK_VN}"/>
+			<virtualNode name="${INTERPRETERS_VN}"/>	
+		</virtualNodesDefinition>
+	</componentDefinition>
+	
+	<deployment>
+		<mapping>
+			<map virtualNode="${SKELETON_FRAMEWORK_VN}">
+				<jvmSet>
+					<vmName value="JvmNode"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="${INTERPRETERS_VN}">
+				<jvmSet>
+					<vmName value="sshJVMNode"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		
+		<jvms>
+			<jvm name="JvmNode">
+				<creation>
+					<processReference refid="localJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="sshJVMNode">
+				<creation>
+					<processReference refid="sshProcess"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	
+	<infrastructure>
+		<processes>
+			<processDefinition id="sshProcess">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="anaconda">
+					<processReference refid="remoteJVM"/> <!--  change to remoteJVM when testing from eclipse to avoid "Word to long" error -->
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="remoteJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					
+				<classpath>
+						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
+                        <!--absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/-->
+                        <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+
+                        <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+				</classpath>
+					
+					<javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath>
+					<log4jpropertiesFile><absolutePath value="${PROACTIVE_HOME}/compile/proactive-log4j"/></log4jpropertiesFile>
+					<jvmParameters>
+						<parameter value="-Dproactive.rmi.port=7199" />
+						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Dproactive.skeletons.filetransfer.policy=hybrid"/>
+					</jvmParameters>
+					<policyFile><absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/></policyFile>
+				</jvmProcess>	
+			</processDefinition>
+			
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+			
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

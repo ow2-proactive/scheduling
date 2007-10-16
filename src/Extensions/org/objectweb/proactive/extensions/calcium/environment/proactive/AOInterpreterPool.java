@@ -39,13 +39,18 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class ActiveInterpreterPool implements RunActive {
+public class AOInterpreterPool implements RunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
     Vector<AOInterpreter> pool;
 
-    public ActiveInterpreterPool() {
+    public AOInterpreterPool() {
     }
 
+    /**
+     * Add each AOInterpreter once to the AOInterpreterPool
+     *
+     * @param aoi The AOInterpreter array
+     */
     public void init(AOInterpreter[] aoi) {
         pool = new Vector<AOInterpreter>();
 

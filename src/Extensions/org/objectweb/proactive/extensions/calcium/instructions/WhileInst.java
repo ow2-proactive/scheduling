@@ -33,6 +33,7 @@ import java.util.Vector;
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
 import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -69,5 +70,12 @@ public class WhileInst<P> implements Instruction<P, P> {
 
     public boolean isStateFul() {
         return Stateness.isStateFul(cond);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        Class cls = cond.getClass();
+
+        return (PrefetchFilesMatching) cls.getAnnotation(PrefetchFilesMatching.class);
     }
 }

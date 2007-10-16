@@ -87,16 +87,16 @@ public class FileTransfer {
      * the calling thread until all files have been pulled.
      */
     public static FileVector pullFiles(Node node, File[] srcFile, File[] dstFile)
-        throws IOException, ProActiveException {
+        throws IOException {
         return pullFiles(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
             FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
     }
 
     public static FileVector pullFiles(Node node, File[] srcFile,
         File[] dstFile, int bsize, int numFlyingBlocks)
-        throws IOException, ProActiveException {
+        throws IOException {
         if (srcFile.length != dstFile.length) {
-            throw new ProActiveException(
+            throw new IOException(
                 "Error, number destination and source file lists do not match in length");
         }
 
@@ -135,8 +135,8 @@ public class FileTransfer {
             return fileWrapper;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ProActiveException(
-                "Unable to connect or use ProActive Node: " + node, e);
+            throw new IOException("Unable to connect or use ProActive Node: " +
+                node);
         }
     }
 
@@ -151,13 +151,13 @@ public class FileTransfer {
      * @throws ProActiveException Problems with communication like node unreachable, etc.
      */
     public static FileVector pushFile(Node node, File srcFile, File dstFile)
-        throws IOException, ProActiveException {
+        throws IOException {
         return pushFile(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
             FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
     }
 
     public static FileVector pushFile(Node node, File srcFile, File dstFile,
-        int bsize, int numFlyingBlocks) throws IOException, ProActiveException {
+        int bsize, int numFlyingBlocks) throws IOException {
         File[] src = new File[1];
         File[] dst = new File[1];
         src[0] = srcFile;
@@ -171,16 +171,16 @@ public class FileTransfer {
      * Accessing the future BooleanWrapper will block the thread, until all files have been pushed to the remote node.
      */
     public static FileVector pushFiles(Node node, File[] srcFile, File[] dstFile)
-        throws IOException, ProActiveException {
+        throws IOException {
         return pushFiles(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
             FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
     }
 
     public static FileVector pushFiles(Node node, File[] srcFile,
         File[] dstFile, int bsize, int numFlyingBlocks)
-        throws IOException, ProActiveException {
+        throws IOException {
         if (srcFile.length != dstFile.length) {
-            throw new ProActiveException(
+            throw new IOException(
                 "Error, destination and source file lists do not match in length");
         }
 
@@ -218,8 +218,8 @@ public class FileTransfer {
             return fileVector;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ProActiveException(
-                "Unable to connect or use ProActive Node: " + node, e);
+            throw new IOException("Unable to connect or use ProActive Node: " +
+                node);
         }
     }
 

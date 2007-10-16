@@ -40,14 +40,15 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
 import org.objectweb.proactive.extensions.calcium.skeletons.InstructionBuilderVisitor;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
-import org.objectweb.proactive.extensions.calcium.task.TaskFiles;
 import org.objectweb.proactive.extensions.calcium.task.TaskPriority;
 
 
@@ -58,37 +59,41 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
     private Facade facade;
     private Skeleton<T, R> skeleton;
     private int streamPriority;
-    private FileServer fserver;
-    private File outDir;
+    private FileServerClient fserver;
+    private static File DEFAULT_OUTPUT_ROOT_DIR = SkeletonSystemImpl.newDirInTmp(
+            "calcium-output");
     BlockingQueue<Future<R>> list;
 
-    Stream(Facade facade, FileServer fserver, Skeleton<T, R> skeleton,
-        File outDir) {
+    Stream(Facade facade, FileServerClient fserver, Skeleton<T, R> skeleton) {
         this.streamId = (int) (Math.random() * Integer.MAX_VALUE);
         this.skeleton = skeleton;
         this.facade = facade;
         this.fserver = fserver;
-        this.outDir = outDir;
+
         this.streamPriority = TaskPriority.DEFAULT_PRIORITY;
         this.list = new LinkedBlockingQueue<Future<R>>();
+    }
+
+    public Future<R> input(T param) throws PanicException {
+        return input(param, DEFAULT_OUTPUT_ROOT_DIR);
     }
 
     /**
      * Inputs a new T to be computed.
      * @param param The T to be computed.
+     * @param outputRootDir The root directory where files resulting from the computation are to be stored.
      * @throws PanicException
      */
     @SuppressWarnings("unchecked")
-    public Future<R> input(T param) throws PanicException, PanicException {
-        //Replace references to File with ProxyFile
-        try {
-            param = (T) TaskFiles.stageInput(fserver, param);
-        } catch (Exception e) {
-            throw new PanicException(e);
-        }
-
+    public Future<R> input(T param, File outputRootDir)
+        throws PanicException {
         //Put the parameters in a Task container
         Task<T> task = new Task<T>(param);
+
+        //Stage-in files (ie upload files)
+        //Replace references to File with ProxyFile
+        task = FileStaging.stageInput(fserver, task);
+
         InstructionBuilderVisitor builder = new InstructionBuilderVisitor();
 
         skeleton.accept(builder);
@@ -97,23 +102,29 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
         task.setPriority(new TaskPriority(streamPriority));
 
         FutureImpl<R> future = new FutureImpl<R>(task.taskId.getId(), fserver,
-                outDir);
+                outputRootDir);
         facade.putTask(task, future);
 
         return future;
     }
 
+    public Vector<Future<R>> input(Vector<T> paramV)
+        throws InterruptedException, PanicException {
+        return input(paramV, DEFAULT_OUTPUT_ROOT_DIR);
+    }
+
     /**
      * Inputs a vector of T to be computed.
      * @param paramV A vector containing the T.
+     * @param outputRootDir The root directory where files resulting from the computation are to be stored.
      * @throws PanicException
      * @throws InterruptedException
      */
-    public Vector<Future<R>> input(Vector<T> paramV)
+    public Vector<Future<R>> input(Vector<T> paramV, File outputRootDir)
         throws InterruptedException, PanicException {
         Vector<Future<R>> vector = new Vector<Future<R>>(paramV.size());
         for (T param : paramV)
-            vector.add(input(param));
+            vector.add(input(param, outputRootDir));
 
         return vector;
     }
@@ -124,14 +135,21 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      *
      * @param param The parameter to compute
      * @param queue  The queue to put the future once the result is available.
-     * @return The future without the result.
+     * @param outputRootDir The root directory where files resulting from the computation are to be stored.
+     * @return The future that will hold the result.
+     *
      * @throws PanicException
      */
     @SuppressWarnings("unchecked")
+    public void input(T param, BlockingQueue<Future<R>> queue,
+        File outputRootDir) throws PanicException {
+        FutureImpl<R> future = (FutureImpl) this.input(param, outputRootDir);
+        future.setCallBackQueue(queue);
+    }
+
     public void input(T param, BlockingQueue<Future<R>> queue)
         throws PanicException {
-        FutureImpl<R> future = (FutureImpl) this.input(param);
-        future.setCallBackQueue(queue);
+        input(param, queue, DEFAULT_OUTPUT_ROOT_DIR);
     }
 
     /**
@@ -139,11 +157,16 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * the future holding the result will be available by invoking the
      * {@link #retrieve(long, TimeUnit) waitForAny} method.
      * @param param  The parameter to compute
+     * @param outputRootDir The root directory where files resulting from the computation are to be stored.
      * @throws PanicException
      */
-    public void submit(T param) throws PanicException {
-        FutureImpl<R> future = (FutureImpl) this.input(param);
+    public void submit(T param, File outputRootDir) throws PanicException {
+        FutureImpl<R> future = (FutureImpl) this.input(param, outputRootDir);
         future.setCallBackQueue(list);
+    }
+
+    public void submit(T param) throws PanicException {
+        submit(param, DEFAULT_OUTPUT_ROOT_DIR);
     }
 
     /**

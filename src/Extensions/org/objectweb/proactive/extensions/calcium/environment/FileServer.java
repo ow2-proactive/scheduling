@@ -30,22 +30,191 @@ package org.objectweb.proactive.extensions.calcium.environment;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.objectweb.proactive.extensions.calcium.system.HashSum;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 
 
-public interface FileServer {
+public class FileServer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
+    private File rootDir;
+    long nextId;
+    HashMap<Long, RemoteFile> unstored;
+    HashMap<Long, Long> stored;
 
-    public void clean();
+    /**
+     * Empty constructor for ProActive  MOP.
+     *
+     * This constructor does not instantiate the fields of this class!
+     * Please invoke initFileServer(...) before using this object!
+     */
+    public FileServer() {
+    }
 
-    public RemoteFile store(File current) throws IOException;
+    public void initFileServer() {
+        if (this.rootDir != null) {
+            return; //already instantiated this object
+        }
 
-    public RemoteFile store(URL current) throws IOException;
+        File fsRoot = SkeletonSystemImpl.newDirInTmp("calcium-fileserver");
+        File rootDir = SkeletonSystemImpl.newRandomNamedDirIn(fsRoot);
 
-    public void increaseReference(long fileId);
+        initFileServer(rootDir);
+    }
 
-    public void discountReference(long fileId);
+    public void initFileServer(File rootDir) {
+        if (this.rootDir != null) {
+            return; //already instantiated this object
+        }
+
+        SkeletonSystemImpl.checkWritableDirectory(rootDir);
+        this.rootDir = rootDir;
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("FileServer running in :" + rootDir);
+        }
+
+        this.nextId = 0;
+
+        this.unstored = new HashMap<Long, RemoteFile>();
+        this.stored = new HashMap<Long, Long>();
+    }
+
+    public synchronized RemoteFile register() throws IOException {
+        long fileId = getNewId();
+
+        File dst = new File(rootDir, fileId + ".dat");
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("FileServer registering " + dst);
+        }
+
+        RemoteFile rfile = new RemoteFile(dst, fileId, dst.length());
+        unstored.put(fileId, rfile);
+
+        return rfile;
+    }
+
+    public synchronized RemoteFile dataHasBeenStored(RemoteFile rfile, int count)
+        throws IOException {
+        if (count <= 0) {
+            throw new IllegalArgumentException(
+                "Illegal initial reference count:" + count);
+        }
+
+        if (!unstored.containsKey(rfile.fileId)) {
+            throw new IllegalArgumentException(
+                "RemoteFile is not marked as unstored" + rfile.fileId);
+        }
+
+        if (stored.containsKey(rfile.fileId)) {
+            throw new IllegalArgumentException(
+                "RemoteFile is already marked as stored" + rfile.fileId);
+        }
+
+        RemoteFile rf = unstored.remove(rfile.fileId);
+
+        if (!rfile.equals(rf)) {
+            throw new IllegalArgumentException("RemoteFile was modified " +
+                rfile);
+        }
+
+        stored.put(rfile.fileId, new Long(count));
+
+        try {
+            rf.md5sum = HashSum.md5sum(rf.location);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new IOException("Can't perform md5sum");
+        }
+
+        return rf;
+    }
+
+    public synchronized void canFetch(RemoteFile rfile)
+        throws IOException {
+        if (!stored.containsKey(rfile.fileId)) {
+            throw new IllegalArgumentException("RemoteFile in stored list: " +
+                rfile.fileId);
+        }
+
+        if (!rfile.location.exists()) {
+            throw new IOException("File doest not exist: " + rfile.location);
+        }
+
+        if (!rfile.location.isFile()) {
+            throw new IOException("File is not a file: " + rfile.location);
+        }
+
+        if (!rfile.location.canRead()) {
+            throw new IOException("Can't read file: " + rfile.location);
+        }
+    }
+
+    public synchronized RemoteFile registerAndStore(URL remoteURL)
+        throws IOException {
+        long fileId = getNewId();
+        File dst = new File(rootDir, fileId + ".dat");
+
+        SkeletonSystemImpl.download(remoteURL, dst);
+
+        RemoteFile rfile = new RemoteFile(dst, fileId, dst.length());
+        try {
+            rfile.md5sum = HashSum.md5sum(rfile.location);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new IOException("Can't perform md5sum");
+        }
+
+        return rfile;
+    }
+
+    public void shutdown() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Shutting down File Server. Cleaning root directory:" +
+                this.rootDir);
+        }
+        SkeletonSystemImpl.deleteDirectory(this.rootDir);
+    }
+
+    public synchronized void commit(long fileId, int delta) {
+        if (!stored.containsKey(fileId)) {
+            throw new IllegalArgumentException(
+                "Cannot change reference count on if file is not stored:" +
+                fileId);
+        }
+
+        logger.debug("FileServer commiting id=" + fileId + " delta=" + delta);
+
+        Long c = stored.get(fileId) + delta;
+
+        if (c > 0) {
+            stored.put(fileId, c);
+        } else { //remove the file from storage
+            if (logger.isDebugEnabled()) {
+                logger.debug("FileServer file " + fileId +
+                    " is deleted (refererence decreased to:" + c + ")");
+            }
+
+            stored.remove(fileId);
+            File f = new File(rootDir, fileId + ".dat");
+            f.delete();
+        }
+    }
+
+    public synchronized void unregister(long fileId) {
+        if (unstored.containsKey(fileId)) {
+            unstored.remove(fileId);
+        }
+    }
+
+    private synchronized long getNewId() {
+        return nextId++;
+    }
 }

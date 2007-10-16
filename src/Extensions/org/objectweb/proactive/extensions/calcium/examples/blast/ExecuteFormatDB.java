@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.blast;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -39,11 +38,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
-import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
 @StateFul(value = false)
+@PrefetchFilesMatching(name = "db.*|formatdb")
 public class ExecuteFormatDB implements Execute<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
@@ -53,13 +53,10 @@ public class ExecuteFormatDB implements Execute<BlastParams, BlastParams> {
             logger.debug("Executing FormatDB");
         }
 
-        //Put the native program in the wspace
-        WSpace wspace = system.getWorkingSpace();
         String args = param.getFormatDBString();
-        File formatDB = wspace.copyInto(param.formatProg);
 
         //Execute the native command
-        system.execCommand(formatDB, args);
+        system.execCommand(param.formatProg, args);
 
         //TODO keep a reference on the index files??????????
         return param;

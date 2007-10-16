@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns="urn:proactive:deployment:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
-
+	<variables>
+ 	    <descriptorVariable name="SKELETON_FRAMEWORK_VN" value="framework" />     	
+		<descriptorVariable name="INTERPRETERS_VN" value="interpreters" />
+     	<descriptorVariable name="FILE_RESULT_OUTDIR_PATH" value="/tmp/calcium-output" />
+ 	    <programDefaultVariable name="MAX_CINTERPRETERS" value="3"/>
+    </variables>
+	
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="local"/>
+			<virtualNode name="${SKELETON_FRAMEWORK_VN}"/>
+			<virtualNode name="${INTERPRETERS_VN}"/>	
 		</virtualNodesDefinition>
 	</componentDefinition>
+	
 	<deployment>
 		<mapping>
-			<map virtualNode="local">
+		  <map virtualNode='${SKELETON_FRAMEWORK_VN}'>
 				<jvmSet>
-					<vmName value="JvmNode"/>
+					<vmName value='JvmNode'/>
+				</jvmSet>
+          </map>
+		  <map virtualNode="${INTERPRETERS_VN}">
+		     <jvmSet>
 					<vmName value="JvmNode2"/>
-					<vmName value="JvmNode3"/>
+					<!--vmName value="JvmNode3"/>
 					<vmName value="JvmNode4"/>
+					<vmName value="JvmNode5"/-->
 				</jvmSet>
 			</map>
 		</mapping>
@@ -38,7 +51,11 @@
 					<processReference refid="localJVM4"/>
 				</creation>
 			</jvm>
-			
+			<jvm name="JvmNode5">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>	
 		</jvms>
 	</deployment>
 	<infrastructure>
@@ -54,8 +71,10 @@
 			</processDefinition>	
 			<processDefinition id="localJVM4">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-			</processDefinition>	
-			
+			</processDefinition>
+			<processDefinition id="localJVM5">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

@@ -41,10 +41,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class is the interface for creating files on the computation node.
  * This class is not serializable on purpose, since it is environment dependant.
+ *
+ * @author The ProActive Team (mleyton)
  */
 @PublicAPI
 public interface WSpace {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
 
     /**
      * Copies a File into the workspace, and returns

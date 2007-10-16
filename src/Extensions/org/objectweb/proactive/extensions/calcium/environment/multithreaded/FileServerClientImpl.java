@@ -28,43 +28,48 @@
 package org.objectweb.proactive.extensions.calcium.environment.multithreaded;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
-import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
-import org.objectweb.proactive.extensions.calcium.task.TaskPool;
+import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 
 
-public class MultiThreadedEnvironment implements EnvironmentFactory {
-    TaskDispatcher dispatcher;
-    TaskPool taskpool;
-    FileServerClient fserver;
+public class FileServerClientImpl implements FileServerClient {
+    FileServer fserver;
 
-    public MultiThreadedEnvironment(int numThreads) {
-        this(numThreads, new FileServer());
+    public FileServerClientImpl(FileServer fserver) {
+        this.fserver = fserver;
     }
 
-    public MultiThreadedEnvironment(int numThreads, FileServer fserver) {
-        fserver.initFileServer();
-        this.taskpool = new TaskPool();
-        this.fserver = new FileServerClientImpl(fserver);
-        this.dispatcher = new TaskDispatcher(taskpool, this.fserver, numThreads);
+    public void commit(long fileId, int refCountDelta) {
+        fserver.commit(fileId, refCountDelta);
     }
 
-    public TaskPool getTaskPool() {
-        return taskpool;
-    }
+    public void fetch(RemoteFile rfile, File localDst)
+        throws IOException {
+        fserver.canFetch(rfile);
 
-    public void start() {
-        dispatcher.start();
+        SkeletonSystemImpl.copyFile(rfile.location, localDst);
     }
 
     public void shutdown() {
-        dispatcher.shutdown();
         fserver.shutdown();
     }
 
-    public FileServerClient getFileServer() {
-        return fserver;
+    public RemoteFile store(File current, int refCount)
+        throws IOException {
+        RemoteFile rfile = fserver.register();
+
+        SkeletonSystemImpl.copyFile(current, rfile.location);
+
+        //now mark as stored
+        return fserver.dataHasBeenStored(rfile, refCount);
+    }
+
+    public RemoteFile store(URL current) throws IOException {
+        return fserver.registerAndStore(current);
     }
 }

@@ -25,47 +25,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.environment;
+package org.objectweb.proactive.extensions.calcium.stateness;
 
-import java.io.File;
+public interface Handler<T> {
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+    /**
+     * This method is called when an object matching the specified type is found.
+     *
+     * References to the parameter object will be replaced by a reference to the returned object.
+     *
+     * @param o The original object found matching the pattern.
+     * @return The object that will replace the original one.
+     *
+     * @throws Exception
+     */
+    public T transform(T o) throws Exception;
 
-
-public class RemoteFile implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
-    public long fileId;
-    public File location;
-    public long length;
-    public String md5sum;
-
-    public RemoteFile(File location, long fileId, long length) {
-        this.location = location;
-        this.fileId = fileId;
-        this.length = length;
-        this.md5sum = null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof RemoteFile)) {
-            return false;
-        }
-
-        return equals((RemoteFile) o);
-    }
-
-    public boolean equals(RemoteFile rf) {
-        return (this.fileId == rf.fileId) &&
-        this.location.getPath().equals(rf.location.getPath()) &&
-        (this.length == rf.length);
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + fileId + " path=" + location + " length=" + length +
-        " md5sum=" + md5sum;
-    }
+    /**
+     * This method is used to determine if the handle(...) method will be called.
+     *
+     * @param o The candidate object to test
+     * @return true if the handle method should be called on the specified object.
+     */
+    public boolean matches(Object o);
 }

@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -79,5 +80,12 @@ public class DivideSIMD<P, X> implements Instruction<P, X> {
 
     public boolean isStateFul() {
         return Stateness.isStateFul(div);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        Class cls = div.getClass();
+
+        return (PrefetchFilesMatching) cls.getAnnotation(PrefetchFilesMatching.class);
     }
 }

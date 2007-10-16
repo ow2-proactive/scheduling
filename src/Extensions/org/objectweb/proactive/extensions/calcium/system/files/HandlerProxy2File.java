@@ -25,47 +25,51 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.environment;
+package org.objectweb.proactive.extensions.calcium.system.files;
 
 import java.io.File;
+import java.util.IdentityHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
+import org.objectweb.proactive.extensions.calcium.stateness.Handler;
+import org.objectweb.proactive.extensions.calcium.system.ProxyFile;
 
 
-public class RemoteFile implements java.io.Serializable {
+class HandlerProxy2File implements Handler<File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
-    public long fileId;
-    public File location;
-    public long length;
-    public String md5sum;
+    FileServerClient fserver;
+    File outDir;
+    IdentityHashMap<ProxyFile, ProxyFile> files;
 
-    public RemoteFile(File location, long fileId, long length) {
-        this.location = location;
-        this.fileId = fileId;
-        this.length = length;
-        this.md5sum = null;
+    HandlerProxy2File(FileServerClient fserver,
+        IdentityHashMap<ProxyFile, ProxyFile> files, File outDir) {
+        this.fserver = fserver;
+        this.outDir = outDir;
+        this.files = files;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof RemoteFile)) {
-            return false;
+    public File transform(File file) throws Exception {
+        if (!ProxyFile.class.isAssignableFrom(file.getClass())) {
+            throw new Exception("Transforming wrong type class:" +
+                file.getClass());
         }
 
-        return equals((RemoteFile) o);
+        ProxyFile pfile = (ProxyFile) file;
+
+        pfile.setWSpace(fserver, outDir);
+        pfile.saveRemoteDataInWSpace();
+
+        files.put(pfile, pfile);
+
+        File f = pfile.getCurrent();
+
+        return f;
     }
 
-    public boolean equals(RemoteFile rf) {
-        return (this.fileId == rf.fileId) &&
-        this.location.getPath().equals(rf.location.getPath()) &&
-        (this.length == rf.length);
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + fileId + " path=" + location + " length=" + length +
-        " md5sum=" + md5sum;
+    public boolean matches(Object o) {
+        return ProxyFile.class.isAssignableFrom(o.getClass());
     }
 }

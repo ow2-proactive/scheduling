@@ -27,17 +27,13 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment;
 
-import java.io.File;
-
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
 public interface EnvironmentFactory {
     public TaskPool getTaskPool();
 
-    public FileServer getFileServer();
-
-    public File getOutPutDir();
+    public FileServerClient getFileServer();
 
     public void start();
 

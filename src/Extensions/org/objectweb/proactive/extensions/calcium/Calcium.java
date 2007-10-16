@@ -33,7 +33,7 @@ package org.objectweb.proactive.extensions.calcium;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
-import org.objectweb.proactive.extensions.calcium.environment.FileServer;
+import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 public class Calcium {
     private Facade facade;
     private TaskPool taskpool;
-    private FileServer fserver;
+    private FileServerClient fserver;
     EnvironmentFactory environment;
 
     public Calcium(EnvironmentFactory environment) {
@@ -79,8 +79,7 @@ public class Calcium {
      */
     public <T extends java.io.Serializable, R extends java.io.Serializable> Stream<T, R> newStream(
         Skeleton<T, R> root) {
-        return new Stream<T, R>(facade, fserver, root,
-            environment.getOutPutDir());
+        return new Stream<T, R>(facade, fserver, root);
     }
 
     public void boot() {

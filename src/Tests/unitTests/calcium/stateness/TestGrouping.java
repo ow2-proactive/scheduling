@@ -45,8 +45,7 @@ public class TestGrouping {
      * Group 2: d->o, e->p, p->q
      *
      */
-    public void groupTest()
-        throws IllegalArgumentException, IllegalAccessException {
+    public void groupTest() throws Exception {
         //building the graph
         Leaf x = new Leaf();
         Leaf y = new Leaf();

@@ -31,6 +31,7 @@ import java.util.Stack;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -54,5 +55,10 @@ public class MapInst<P, R> implements Instruction<P, P> {
 
     public boolean isStateFul() {
         return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        return divideInst.getPrefetchFilesAnnotation();
     }
 }

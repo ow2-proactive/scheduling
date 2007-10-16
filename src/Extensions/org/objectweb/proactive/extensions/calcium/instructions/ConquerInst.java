@@ -27,12 +27,15 @@
  */
 package org.objectweb.proactive.extensions.calcium.instructions;
 
+import java.lang.reflect.Method;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
+import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
@@ -65,5 +68,12 @@ class ConquerInst<Y, R> implements Instruction<Y, R> {
 
     public boolean isStateFul() {
         return Stateness.isStateFul(conq);
+    }
+
+    @SuppressWarnings("unchecked")
+    public PrefetchFilesMatching getPrefetchFilesAnnotation() {
+        Class cls = conq.getClass();
+
+        return (PrefetchFilesMatching) cls.getAnnotation(PrefetchFilesMatching.class);
     }
 }

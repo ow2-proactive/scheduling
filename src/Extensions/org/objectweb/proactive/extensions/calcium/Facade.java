@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
+import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 

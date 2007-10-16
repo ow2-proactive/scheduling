@@ -33,6 +33,13 @@ import java.io.IOException;
 import java.net.URL;
 
 
+/**
+ * This class is an implementation of the Wspace interface.
+ *
+ * This class is not serializable on purpose, since it is environment dependant.
+ *
+ * @author The ProActive Team (mleyton)
+ */
 public class WSpaceImpl implements WSpace {
     File wspace;
 
