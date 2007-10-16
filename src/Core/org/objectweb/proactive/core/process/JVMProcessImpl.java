@@ -428,12 +428,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
             //remove file part to build absolute path
             path = path.substring(5);
         }
-        try {
-            return new File(path).getCanonicalPath();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            return path;
-        }
+        return new File(path).getAbsolutePath();
     }
 
     private String checkWhiteSpaces(String path) {
