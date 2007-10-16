@@ -50,7 +50,7 @@ public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
     /**
      * <font color="red">Not used anymore in this context</font>
      * This method should never be called.
-     * It is the last point for this method implemention.
+     * It is the last point for this method implementation.
      * That's why it is final. User cannot override/implement this one anymore.
      * Instead, implement the execute(ArrayList<Node>) method.
      */

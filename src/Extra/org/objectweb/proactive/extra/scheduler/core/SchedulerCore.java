@@ -76,6 +76,7 @@ import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.Status;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResultImpl;
+import org.objectweb.proactive.extra.scheduler.task.internal.InternalNativeTask;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -328,6 +329,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             //TODO improve the way to get the nodes from the resources manager.
             //it can be better to associate scripts and node to ask for more than one node each time,
             //and to be sure that we give the right node with its right script
+            //for the moment, we take the nodes one by one.
             NodeSet nodeSet = resourceManager.getAtMostNodes(internalTask.getNumberOfNodesNeeded(),
                     internalTask.getVerifyingScript());
             Node node = null;
@@ -437,7 +439,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     if (td.getRerunnableLeft() > 0) {
                         td.setRerunnableLeft(td.getRerunnableLeft() - 1);
                         job.reStartTask(td);
-                        //TODO if the job is paused, send an event to the schedulerto notify that this task is now paused.
+                        //TODO if the job is paused, send an event to the scheduler to notify that this task is now paused.
                         //free execution node even if it is dead
                         resourceManager.freeDownNode(td.getExecuterInformations()
                                                        .getNodeName());
@@ -556,9 +558,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             logger.info("<<<<<<<< Terminated task on job " + jobId + " [ " +
                 taskId + " ]");
             //if an exception occurred and the user wanted to cancel on exception, cancel the job.
-            if (job.isCancelOnException() && res.hadException()) {
+            if (job.isCancelOnException() &&
+                    (res.hadException() ||
+                    ((descriptor instanceof InternalNativeTask) &&
+                    ((Integer) (res.value()) != 0)))) {
                 failedJob(job, descriptor,
-                    "An error has occured due to a user exception caught in the task and user wanted to cancel on exception.",
+                    "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
                     JobState.CANCELLED);
                 return;
             }

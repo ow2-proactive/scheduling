@@ -129,7 +129,7 @@ public class AppliTaskLauncher extends TaskLauncher {
             try {
                 this.finalizeLoggers();
             } catch (RuntimeException e) {
-                // exception should not be thrown to te scheduler core
+                // exception should not be thrown to the scheduler core
                 // the result has been computed and must be returned !
                 // TODO : logger.warn
                 System.err.println("WARNING : Loggers are not shut down !");

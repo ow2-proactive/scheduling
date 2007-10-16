@@ -135,9 +135,6 @@
 			<processDefinition id="JVM">
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>
-						<parameter value="-agentlib:yjpagent" />
-					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 		</processes>

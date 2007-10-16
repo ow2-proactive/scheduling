@@ -37,7 +37,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
@@ -106,6 +105,7 @@ public class InternalNativeTask extends InternalTask {
                                 process.waitFor();
                                 return process.exitValue();
                             } catch (Exception e) {
+                                //TODO send the exception or error to the user ?
                                 e.printStackTrace();
                                 return 255;
                             }
