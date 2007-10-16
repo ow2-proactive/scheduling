@@ -166,9 +166,9 @@
     <literal>initActivity</literal>, <literal>runActivity</literal> and <literal>endActivity</literal>
     methods. One of the reasons for using <literal>initActivity</literal>
     method is the presence of the empty constructor in an active object. The <literal>initActivity</literal>
-    method is automatically called on the creation of an active object allowing for setting up the 
+    method is automatically called on the creation of an active object in order to set up the 
     object without using the constructor. The <literal>runActivity</literal> method allows the user
-    to control By implementing the <literal>EndActive</literal> interface is also possible to 
+    to control the active object request queue. By implementing the <literal>EndActive</literal> interface is also possible to 
     do clean up before the active object thread is stopped. </para>
 
 
@@ -265,7 +265,7 @@
 			 	application, or part of it, in terms of its conceptual activities. The description
 			 	should indicate the various parallel or distributed entities in the program. For
 			 	instance, an application that is designed to use three interactive 
-			 	visualization nodes, a node to capture input from a physic experiment, and a
+			 	visualization nodes, a node to capture input from a physics experiment, and a
 			 	simulation engine designed to run on a cluster of machines should somewhere clearly
 			 	advertise this information.
 			</para>
@@ -320,6 +320,51 @@
 				</itemizedlist>
 				
 			</para>
+		</sect2>
+		<sect2>
+			<title>Deployment descriptor file</title>
+			<para>	
+				The deployment descriptor is an XML file containing information on the properties listed above.
+				We will use a simple XML file to deploy the Hello World application on a remote 
+				The deployment XML file is composed of several parts, each with different options. For our
+				example we will use a simple version. To find out more about deployment and deployment 
+				descriptors reader <xref linkend="Descriptor"/>.
+			</para>
+			<para>
+				The document uses the XML Schema present at 
+				<xref href="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd"/>
+				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
+				To avoid mistake when building XML descriptors, ProActive provides an XML Schema called
+				DescriptorSchema.xsd. Then to validate your file against this schema,
+				the following line must be put at the top of the XML document as it is
+				done for all ProActive examples.
+			</para>
+			<para>
+				The XML file has a section for defining variables needed later in the document.
+				For our case, we define the location of the ProActive and Java installations.
+				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/variable_definition.txt"></textdata></textobject></programlisting>
+			</para>
+			<para>
+				Next, we define the virtual nodes that will be used:
+				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
+				In our case we define a node that can contain several JVMs by setting the multiple property.
+			</para>
+			<para>
+				The deployment part of the XML file contains information about the JVMs deployed.
+				It has two parts one dealing with the mapping of the JVMs to the Virtual Nodes and another
+				related to how the JVMs are created. In our case we map one JVM to the remote node and
+				define a process reference that will be used later in the file. 
+				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/jvms.txt"></textdata></textobject></programlisting>
+			</para>
+			<para>
+				The full deployment descriptor file:
+				<programlisting lang="xml"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
+			</para>	
+			<para>
+				Changes to the <literal>Main</literal>class:
+				<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
+			</para>
+			
 		</sect2>
 	</sect1>
 
