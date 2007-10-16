@@ -1,18 +1,32 @@
 /*
- * $Log: DiffPrint.java,v $
- * Revision 1.5  2004/01/29 02:35:35  stuart
- * Test for out of bounds exception in UnifiedPrint.print_hunk.
- * Add setOutput() to DiffPrint.Base.
+ * ################################################################
  *
- * Revision 1.4  2003/04/22  01:50:47  stuart
- * add Unified format diff
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
  *
- * Revision 1.3  2003/04/22  01:00:32  stuart
- * added context diff format
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
- * Revision 1.2  2000/03/02  16:59:54  stuart
- * add GPL
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
  */
 package diff;
 

@@ -50,7 +50,7 @@
 				<classpath refid="project.classpath" />
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
-				<bottom><![CDATA[<i>Copyright $$%%CopyrightYears%%$$ INRIA All Rights Reserved.</i>]]></bottom>
+				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
 				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
 				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
 				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
