@@ -1,0 +1,6 @@
+<variables>
+	<descriptorVariable name="PROACTIVE_HOME"
+		value="/user/vjuresch/home/workspace/ProActive" />
+	<descriptorVariable name="JAVA_HOME"
+		value="/user/vjuresch/home/work/jdk1.6.0_02" />
+</variables>
