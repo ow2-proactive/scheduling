@@ -1,7 +1,7 @@
 package active;
 import java.io.IOException;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -13,23 +13,23 @@ import org.objectweb.proactive.api.ProActiveObject;
 public class Main{
 	public static void main(String args[])
 	{
-		String path = new String("deployment.xml");
+		String path = new String(System.getProperty("user.dir") + 
+								"/src/active/deployment.xml");
 		ProActiveDescriptor pad;
-		VirtualNode workers; 
+		VirtualNode remoteNode; 
 		Node node;
 		try {
 			pad = ProDeployment.getProactiveDescriptor(path);
-			workers = pad.getVirtualNode("Agent");
+			remoteNode = pad.getVirtualNode("remoteNode");
 			// Returns the VirtualNode Workers described
 			// in the xml file as a java object
-			workers.activate();
+			remoteNode.activate();
 			// Activates the VirtualNode
-			node = workers.getNode();
+			node = remoteNode.getNode();
 			// Returns the first node available among nodes
 			// mapped to the VirtualNode
-//			InitializedHelloWorld ao=(InitializedHelloWorld) ProActiveObject.newActive( 
-//				InitializedHelloWorld.class.getName(), //instantiation class 
-//				null); // constructor arguments
+			//shutdown hook
+			
 			InitializedHelloWorld ao = (InitializedHelloWorld)ProActiveObject.newActive(
 					InitializedHelloWorld.class.getName(),
 		            new Object [] {},
@@ -50,5 +50,6 @@ public class Main{
 			System.err.println(proExcep.getMessage());
 		}
 		//quitting
+		ProActive.exitSuccess();
 	}
 }
