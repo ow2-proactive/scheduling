@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.extra.scheduler.gui;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.osgi.framework.BundleContext;
 
@@ -75,8 +75,7 @@ public class Activator extends AbstractUIPlugin {
         simpleLoggerServerThread.start();
 
         try {
-            hostname = InetAddress.getLocalHost().getHostName();
-            ;
+            hostname = URIBuilder.getLocalAddress().getHostName();
         } catch (UnknownHostException e) {
             hostname = "UnknownHost";
         }
