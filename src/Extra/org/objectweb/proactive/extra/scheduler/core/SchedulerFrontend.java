@@ -195,7 +195,7 @@ public class SchedulerFrontend implements InitActive,
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     public JobResult getResult(JobId jobId) throws SchedulerException {
         //checking permissions
@@ -279,7 +279,7 @@ public class SchedulerFrontend implements InitActive,
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port)
         throws SchedulerException {
@@ -401,7 +401,7 @@ public class SchedulerFrontend implements InitActive,
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#resume()
      */
     public BooleanWrapper coreResume() {
         if (!ssprsc("You do not have permission to resume the scheduler !")) {

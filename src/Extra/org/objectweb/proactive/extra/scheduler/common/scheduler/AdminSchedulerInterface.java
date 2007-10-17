@@ -28,11 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.core;
+package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 
 
 /**

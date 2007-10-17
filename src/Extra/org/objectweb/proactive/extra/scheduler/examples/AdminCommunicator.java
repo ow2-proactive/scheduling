@@ -37,9 +37,9 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
-import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
 
 
 public class AdminCommunicator {

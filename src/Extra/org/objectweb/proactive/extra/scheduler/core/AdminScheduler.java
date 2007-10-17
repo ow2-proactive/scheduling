@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
@@ -189,42 +190,42 @@ public class AdminScheduler extends UserScheduler
     //	}
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#start()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#start()
      */
     public BooleanWrapper start() throws SchedulerException {
         return schedulerFrontend.coreStart();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#stop()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#stop()
      */
     public BooleanWrapper stop() throws SchedulerException {
         return schedulerFrontend.coreStop();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pause()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#pause()
      */
     public BooleanWrapper pause() throws SchedulerException {
         return schedulerFrontend.corePause();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#pauseImmediate()
      */
     public BooleanWrapper pauseImmediate() throws SchedulerException {
         return schedulerFrontend.coreImmediatePause();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#resume()
      */
     public BooleanWrapper resume() throws SchedulerException {
         return schedulerFrontend.coreResume();
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#shutdown()
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#shutdown()
      */
     public BooleanWrapper shutdown() throws SchedulerException {
         return schedulerFrontend.coreShutdown();
