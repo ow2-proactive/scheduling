@@ -55,7 +55,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * Here is a class that explains how to simply use the scheduler.
  * You'll create a one task job that will print "HelloWorld !".
  * You'll be able to get the output of the task and/or get the result.
- * According that the API is not yet full implmented,
+ * According that the API is not yet full implemented,
  * adding task and job creation are not on their final implementation.
  * TaskDescriptor may also be removed from user view.
  *

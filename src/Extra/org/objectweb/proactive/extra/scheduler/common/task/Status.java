@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.common.task;
 
 
 /**

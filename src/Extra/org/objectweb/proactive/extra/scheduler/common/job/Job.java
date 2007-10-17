@@ -69,6 +69,13 @@ public abstract class Job implements Serializable {
     public abstract JobType getType();
 
     /**
+     * To get the id
+     *
+     * @return the id
+     */
+    public abstract JobId getId();
+
+    /**
      * To get the cancelOnError
      *
      * @return the cancelOnError

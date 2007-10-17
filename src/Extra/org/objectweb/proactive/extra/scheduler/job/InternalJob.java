@@ -35,13 +35,14 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
+import org.objectweb.proactive.extra.scheduler.common.task.Status;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.task.Status;
-import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -226,6 +227,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         if (task.isFinalTask()) {
             finalTasks.add(task);
         }
+        task.setId(TaskId.nextId(getId()));
         boolean result = (tasks.put(task.getId(), task) == null);
         if (result) {
             jobInfo.setTotalNumberOfTasks(jobInfo.getTotalNumberOfTasks() + 1);
@@ -429,10 +431,9 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * To get the id
-     *
-     * @return the id
+     * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getId()
      */
+    @Override
     public JobId getId() {
         return jobInfo.getJobId();
     }

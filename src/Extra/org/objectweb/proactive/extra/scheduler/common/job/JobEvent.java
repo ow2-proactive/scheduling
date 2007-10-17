@@ -28,16 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.job;
+package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.common.job.JobState;
+import org.objectweb.proactive.extra.scheduler.common.task.Status;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.task.Status;
 
 
 /**
@@ -56,8 +53,8 @@ public class JobEvent implements Serializable {
     /** Serial version UID */
     private static final long serialVersionUID = -7426315610231893158L;
 
-    /** job id */
-    private JobId jobId = null;
+    /** job id  : must be initialize to a value in order to create temp taskId */
+    private JobId jobId = JobId.makeJobId("0");
 
     /** job submitted time */
     private long submittedTime = -1;
@@ -94,6 +91,9 @@ public class JobEvent implements Serializable {
 
     /** If this finished time is not null, it means the tasks have to change their finished time */
     private HashMap<TaskId, Long> taskFinishedTimeModify = null;
+
+    /** Job result : if null, the job result is not available, if not null it is. */
+    private JobResult result = null;
 
     /**
      * To get the jobId
@@ -295,13 +295,17 @@ public class JobEvent implements Serializable {
     }
 
     /**
-     * @return the priority
+     * To get the priority.
+     *
+     * @return the priority.
      */
     public JobPriority getPriority() {
         return priority;
     }
 
     /**
+     * To set The priority.
+     *
      * @param priority the priority to set
      */
     public void setPriority(JobPriority priority) {
@@ -309,16 +313,38 @@ public class JobEvent implements Serializable {
     }
 
     /**
-     * @return the state
+     * Return the state of the job.
+     *
+     * @return the state of the job.
      */
     public JobState getState() {
         return state;
     }
 
     /**
-     * @param state the state to set
+     * To set the state of the job.
+     *
+     * @param state the state to set.
      */
     public void setState(JobState state) {
         this.state = state;
+    }
+
+    /**
+     * Returns the result.
+     *
+     * @return the result.
+     */
+    public JobResult getResult() {
+        return result;
+    }
+
+    /**
+     * Sets the result to the given result value.
+     *
+     * @param result the result to set.
+     */
+    public void setResult(JobResult result) {
+        this.result = result;
     }
 }

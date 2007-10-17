@@ -104,4 +104,13 @@ public class TaskFlowJob extends Job {
     public ArrayList<Task> getTasks() {
         return new ArrayList<Task>(tasks.values());
     }
+
+    /**
+         * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getId()
+         */
+    @Override
+    public JobId getId() {
+        // Not yet assigned
+        return null;
+    }
 }

@@ -89,14 +89,14 @@ public interface UserSchedulerInterface extends Serializable {
 
     /**
      * Add a scheduler event Listener. this listener provides method to notice of
-     * new comming job, started task, finished task, running job, finished job.
+     * new coming job, started task, finished task, running job, finished job.
      *
      * @param sel a SchedulerEventListener on which the scheduler will talk.
      * @return the scheduler current state containing the different lists of jobs.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
     public SchedulerInitialState<?extends Job> addSchedulerEventListener(
-        SchedulerEventListener sel) throws SchedulerException;
+        SchedulerEventListener<?extends Job> sel) throws SchedulerException;
 
     /**
      * Return the scheduler statistics.

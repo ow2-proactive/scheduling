@@ -28,13 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.task;
+package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 
 
 /**
@@ -74,6 +73,10 @@ public class TaskEvent implements Serializable {
 
     /** name of the host where the task is executed */
     private String executionHostName;
+
+    /** Task result : if null, the task result is not available or the task has no result.
+     * If not null the result of this task is available. */
+    private TaskResult result = null;
 
     /**
      * To get the jobEvent
@@ -234,11 +237,29 @@ public class TaskEvent implements Serializable {
     }
 
     /**
-     * Set the number of rerunn left.
+     * Set the number of rerun left.
      *
      * @param rerunnableLeft the rerunnableLeft to set
      */
     public void setRerunnableLeft(int rerunnableLeft) {
         this.rerunnableLeft = rerunnableLeft;
+    }
+
+    /**
+     * Returns the result.
+     *
+     * @return the result.
+     */
+    public TaskResult getResult() {
+        return result;
+    }
+
+    /**
+     * Sets the result to the given result value.
+     *
+     * @param result the result to set.
+     */
+    public void setResult(TaskResult result) {
+        this.result = result;
     }
 }

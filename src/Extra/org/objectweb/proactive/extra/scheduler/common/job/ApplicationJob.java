@@ -81,4 +81,13 @@ public class ApplicationJob extends Job {
     public void setTask(ApplicationTask task) {
         this.task = task;
     }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.job.Job#getId()
+     */
+    @Override
+    public JobId getId() {
+        // Not yet assigned
+        return null;
+    }
 }

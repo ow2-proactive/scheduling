@@ -32,10 +32,10 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extra.scheduler.common.job.Job;
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 
 
 /**
@@ -45,7 +45,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */
-public interface SchedulerEventListener extends Serializable {
+public interface SchedulerEventListener<E extends Job> extends Serializable {
 
     /**
      * Invoked when the scheduler has just been started.
@@ -76,7 +76,7 @@ public interface SchedulerEventListener extends Serializable {
     public void schedulerResumedEvent();
 
     /**
-     * Invoked when the scheduler shutdown sequence is initialised.
+     * Invoked when the scheduler shutdown sequence is initialized.
      */
     public void schedulerShuttingDownEvent();
 
@@ -119,7 +119,7 @@ public interface SchedulerEventListener extends Serializable {
      *
      * @param job the new scheduled job.
      */
-    public void newPendingJobEvent(InternalJob job);
+    public void newPendingJobEvent(E job);
 
     /**
      * Invoked when the scheduling of a job has just started.
