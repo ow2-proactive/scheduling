@@ -49,7 +49,7 @@ public abstract class Job implements Serializable {
     protected long runtimeLimit = -1;
 
     /** Is this job has to cancel when an exception occurs in a task */
-    protected boolean cancelOnException = false;
+    protected boolean cancelOnError = false;
 
     /** Short description of this job */
     protected String description = "Default description";
@@ -69,21 +69,21 @@ public abstract class Job implements Serializable {
     public abstract JobType getType();
 
     /**
-     * To get the cancelOnException
+     * To get the cancelOnError
      *
-     * @return the cancelOnException
+     * @return the cancelOnError
      */
-    public boolean isCancelOnException() {
-        return cancelOnException;
+    public boolean isCancelOnError() {
+        return cancelOnError;
     }
 
     /**
      * Set to true if you want to cancel the job when an exception occurs in a task.
      *
-     * @param cancelOnException the cancelOnException to set
+     * @param cancelOnError the cancelOnError to set
      */
-    public void setCancelOnException(boolean cancelOnException) {
-        this.cancelOnException = cancelOnException;
+    public void setCancelOnError(boolean cancelOnError) {
+        this.cancelOnError = cancelOnError;
     }
 
     /**

@@ -149,6 +149,9 @@ public class TaskLauncher implements InitActive, Serializable {
                 this.executePreScript(null);
             }
 
+            //init task
+            executableTask.init();
+
             //launch task
             TaskResult result = new TaskResultImpl(taskId,
                     executableTask.execute(results));

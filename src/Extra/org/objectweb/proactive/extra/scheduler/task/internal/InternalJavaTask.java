@@ -93,12 +93,8 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
             }
         }
 
-        // init task
-        try {
-            task.init(args);
-        } catch (Exception e) {
-            throw new TaskCreationException("Cannot initialize task ", e);
-        }
+        task.setArgs(args);
+
         return task;
     }
 

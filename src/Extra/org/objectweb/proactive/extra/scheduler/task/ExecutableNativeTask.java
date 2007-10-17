@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import java.util.Map;
+
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 
 
@@ -42,13 +44,19 @@ import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
  * @version 1.0, Aug 21, 2007
  * @since ProActive 3.2
  */
-public abstract class ExecutableNativeTask implements ExecutableTask {
+public abstract class ExecutableNativeTask extends ExecutableTask {
 
     /**
-     * Return the current nativ running process.
+     * Return the current native running process.
      * It is used by the scheduler to allow it to kill the process.
      *
-     * @return the current nativ running process.
+     * @return the current native running process.
      */
     public abstract Process getProcess();
+
+    @Override
+    public final void init(Map<String, Object> args) throws Exception {
+        throw new RuntimeException(
+            "This method should have NEVER been called in this context !!");
+    }
 }

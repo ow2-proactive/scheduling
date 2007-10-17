@@ -49,7 +49,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
     /** Serial Version UID  */
     private static final long serialVersionUID = 1340022492862249182L;
 
-    /** Class instance of the class to instanciate. */
+    /** Class instance of the class to instantiate. */
     protected Class<?extends ExecutableTask> taskClass;
 
     /** Arguments of the task as a map */
@@ -62,9 +62,9 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
     }
 
     /**
-     * Create a new java task descriptor using the Class instance of the class to instanciate.
+     * Create a new java task descriptor using the Class instance of the class to instantiate.
      *
-     * @param taskClass the Class instance of the class to instanciate.
+     * @param taskClass the Class instance of the class to instantiate.
      */
     public InternalAbstractJavaTask(Class<?extends ExecutableTask> taskClass) {
         this.taskClass = taskClass;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_PI" priority="normal" cancelOnException="true" type="TASKSFLOW">
+<job name="job_PI" priority="normal" cancelOnError="true" type="TASKSFLOW">
 	<description>
 		Computing PI according to MonteCarlo method.
 		This job will launch 6 MonteCarlo task, then 2 tasks will average 3 results each.

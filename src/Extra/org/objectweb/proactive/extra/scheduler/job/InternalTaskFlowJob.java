@@ -63,12 +63,12 @@ public class InternalTaskFlowJob extends InternalJob {
      * @param name the current job name.
      * @param priority the priority of this job between 1 and 5.
      * @param runtimeLimit the maximum execution time for this job given in millisecond.
-     * @param CancelOnException true if the job has to run until its end or an user intervention.
+     * @param cancelOnError true if the job has to run until its end or an user intervention.
      * @param description a short description of the job and what it will do.
      */
     public InternalTaskFlowJob(String name, JobPriority priority,
-        long runtimeLimit, boolean CancelOnException, String description) {
-        super(name, priority, runtimeLimit, CancelOnException, description);
+        long runtimeLimit, boolean cancelOnError, String description) {
+        super(name, priority, runtimeLimit, cancelOnError, description);
     }
 
     /**

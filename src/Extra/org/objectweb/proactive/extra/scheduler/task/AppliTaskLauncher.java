@@ -99,7 +99,7 @@ public class AppliTaskLauncher extends TaskLauncher {
      */
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core,
-        ExecutableApplicationTask task, NodeSet nodes) {
+        ExecutableApplicationTask executableTask, NodeSet nodes) {
         nodesList = nodes;
         try {
             nodesList.add(super.getNodes().get(0));
@@ -116,8 +116,12 @@ public class AppliTaskLauncher extends TaskLauncher {
                 }
             }
 
+            //init task
+            executableTask.init();
+
             //launch task
-            TaskResult result = new TaskResultImpl(taskId, task.execute(nodes));
+            TaskResult result = new TaskResultImpl(taskId,
+                    executableTask.execute(nodes));
 
             //return result
             return result;

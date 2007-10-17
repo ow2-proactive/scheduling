@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_nativ" priority="normal" cancelOnException="false">
+<job name="job_nativ" priority="normal" cancelOnError="false">
 	<description>Will execute 3 nativ C tasks and a java task with diamond dependences</description>
 	<tasks>
 		<task name="task1">

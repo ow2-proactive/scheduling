@@ -74,9 +74,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Owner of the job */
     private String owner = "";
 
-    // TODO envParameters
-    // TODO un moyen pour le user de mettre n'importe quelles données dans le job et la retrouver dans la police.
-    // cela lui permettrai de moduler sa police en fonction de ces données
+    // TODO a way for the user to put whatever he wants in the job and refind it in policy for example.
+    // Then user can interact in the policy using this new field.
     protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
     /** Instances of the final task, important to know which results will be sent to user */
@@ -105,11 +104,11 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param description a short description of the job and what it will do.
      */
     public InternalJob(String name, JobPriority priority, long runtimeLimit,
-        boolean cancelOnException, String description) {
+        boolean cancelOnError, String description) {
         this.name = name;
         this.jobInfo.setPriority(priority);
         this.runtimeLimit = runtimeLimit;
-        this.cancelOnException = cancelOnException;
+        this.cancelOnError = cancelOnError;
         this.description = description;
     }
 

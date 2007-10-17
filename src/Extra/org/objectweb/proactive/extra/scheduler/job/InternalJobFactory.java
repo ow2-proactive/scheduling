@@ -100,12 +100,12 @@ public class InternalJobFactory implements Serializable {
         if (userTask.getTaskClass() != null) {
             job = new InternalApplicationJob(userJob.getName(),
                     userJob.getPriority(), userJob.getRuntimeLimit(),
-                    userJob.isCancelOnException(), userJob.getDescription(),
+                    userJob.isCancelOnError(), userJob.getDescription(),
                     userTask.getNumberOfNodesNeeded(), userTask.getTaskClass());
         } else if (userTask.getTaskInstance() != null) {
             job = new InternalApplicationJob(userJob.getName(),
                     userJob.getPriority(), userJob.getRuntimeLimit(),
-                    userJob.isCancelOnException(), userJob.getDescription(),
+                    userJob.isCancelOnError(), userJob.getDescription(),
                     userTask.getNumberOfNodesNeeded(),
                     userTask.getTaskInstance());
         } else {
@@ -133,7 +133,7 @@ public class InternalJobFactory implements Serializable {
         }
         InternalJob job = new InternalTaskFlowJob(userJob.getName(),
                 userJob.getPriority(), userJob.getRuntimeLimit(),
-                userJob.isCancelOnException(), userJob.getDescription());
+                userJob.isCancelOnError(), userJob.getDescription());
         HashMap<Task, InternalTask> tasksList = new HashMap<Task, InternalTask>();
         boolean hasFinalTask = false;
         for (Task t : userJob.getTasks()) {
@@ -158,7 +158,7 @@ public class InternalJobFactory implements Serializable {
     }
 
     private static InternalTask createTask(Task task) throws SchedulerException {
-        //TODO jlscheef : change this instanceof by better solutions, no time left for the moment
+        //TODO jlscheef : change this instance of by better solutions, no time left for the moment
         if (task instanceof NativeTask) {
             return createTask((NativeTask) task);
         } else if (task instanceof JavaTask) {

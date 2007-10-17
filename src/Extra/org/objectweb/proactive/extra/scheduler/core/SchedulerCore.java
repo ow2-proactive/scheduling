@@ -559,7 +559,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             logger.info("<<<<<<<< Terminated task on job " + jobId + " [ " +
                 taskId + " ]");
             //if an exception occurred and the user wanted to cancel on exception, cancel the job.
-            if (job.isCancelOnException() &&
+            if (job.isCancelOnError() &&
                     (res.hadException() ||
                     ((descriptor instanceof InternalNativeTask) &&
                     ((Integer) (res.value()) != 0)))) {

@@ -41,15 +41,14 @@ import java.util.Map;
  * @version 1.0, Jun 4, 2007
  * @since ProActive 3.2
  */
-public abstract class ExecutableJavaTask implements ExecutableTask {
+public abstract class ExecutableJavaTask extends ExecutableTask {
 
     /**
      * Initialization default method for a task.
-     * By default it puts the parameters set in the task descriptor
-     * in the class variables if their names are correctly mapped.
-     * You can override this method to make your own initialisation.
+     * By default it puts the parameters in class fields if their names are correctly mapped.
+     * You can override this method to make your own initialization.
      *
-     * @param args a map containing the differents variables names and values.
+     * @param args a map containing the different variables names and values.
      */
     public void init(Map<String, Object> args) throws Exception {
         // TODO : automatic assignation ?

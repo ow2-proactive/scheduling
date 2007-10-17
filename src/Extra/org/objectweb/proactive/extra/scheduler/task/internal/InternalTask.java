@@ -99,7 +99,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     /**
      * Create the launcher for this taskDescriptor.
      *
-     * @param host the hostname on which to send the log.
+     * @param host the host name on which to send the log.
      * @param port the port on which to send the log.
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
