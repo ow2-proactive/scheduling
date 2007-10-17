@@ -37,7 +37,6 @@ import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
 
-
 /**
  * Test newActive method on the local default node
  */

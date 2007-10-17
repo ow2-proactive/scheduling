@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
@@ -501,8 +502,13 @@ public class FileTransferService implements ProActiveInternalObject {
      *  It is used for debugging.
      * @return a String with the hostname and the time*/
     public String sayHello() {
-        return "Hello World from " + URIBuilder.getLocalAddress().toString() +
-        " at " +
+        String address = "Unknow";
+        try {
+            address = URIBuilder.getLocalAddress().getHostName();
+        } catch (UnknownHostException e) { /* address will be Unknown */
+        }
+
+        return "Hello World from " + address + " at " +
         new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
     }
 }

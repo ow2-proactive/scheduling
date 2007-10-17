@@ -147,6 +147,9 @@ public class StartFTServer {
         } catch (MalformedURLException e) {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
+        } catch (UnknownHostException e) {
+            System.err.println("** ERROR ** Unable to launch FT server : ");
+            e.printStackTrace();
         }
     }
 }
