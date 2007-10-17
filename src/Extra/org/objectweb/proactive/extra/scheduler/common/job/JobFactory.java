@@ -138,8 +138,7 @@ public class JobFactory {
                 // JOB CANCEL ON EXCEPTION
                 node = jobAttr.getNamedItem("cancelOnError");
                 if (node != null) {
-                    cancelOnError = node.getNodeValue()
-                                            .equalsIgnoreCase("true");
+                    cancelOnError = node.getNodeValue().equalsIgnoreCase("true");
                 }
                 // JOB TYPE
                 node = jobAttr.getNamedItem("type");
