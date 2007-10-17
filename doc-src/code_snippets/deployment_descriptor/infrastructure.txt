@@ -1,0 +1,16 @@
+<infrastructure>
+  <processes>
+    <processDefinition id="genericJVM">
+      <jvmProcess
+        class="org.objectweb.proactive.core.process.JVMNodeProcess">
+      </jvmProcess>
+    </processDefinition>
+    <processDefinition id="rsh_cheypa">
+      <rshProcess
+        class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+        hostname="cheypa.inria.fr">
+        <processReference refid="genericJVM" />
+      </rshProcess>
+    </processDefinition>
+  </processes>
+</infrastructure>

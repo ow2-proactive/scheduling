@@ -2,17 +2,12 @@
 	<mapping>
 		<map virtualNode="remoteNode">
 			<jvmSet>
-				<vmName value="Jvm2" />
+				<vmName value="JVM" />
 			</jvmSet>
 		</map>
 	</mapping>
 	<jvms>
-		<jvm name="Jvm1">
-			<creation>
-				<processReference refid="genericJVM" />
-			</creation>
-		</jvm>
-		<jvm name="Jvm2">
+		<jvm name="JVM">
 			<creation>
 				<processReference refid="rsh_cheypa" />
 			</creation>
