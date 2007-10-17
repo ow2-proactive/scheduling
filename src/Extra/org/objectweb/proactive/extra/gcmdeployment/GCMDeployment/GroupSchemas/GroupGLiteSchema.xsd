@@ -23,12 +23,12 @@
 					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
 					<element name="rank" type="paext:gLiteRankType" />
 					<element name="JdlTransferDeploy" type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
-					<element name="stdout" type="pa:pathElementType" minOccurs="0" />
-					<element name="stderr" type="pa:pathElementType" minOccurs="0" />
-					<element name="stdin" type="pa:pathElementType" minOccurs="0" />
-					<element name="configFile" type="pa:pathElementType" minOccurs="0" />
-					<element name="JDLFilePath" type="pa:pathElementType" minOccurs="0" />
-					<element name="JDLRemoteFilePath" type="pa:pathElementType" minOccurs="0" />
+					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="configFile" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="JDLFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="JDLRemoteFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="arguments" type="pa:TextOrVariableType" minOccurs="0" />
 					<element name="inputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
 					<element name="outputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
