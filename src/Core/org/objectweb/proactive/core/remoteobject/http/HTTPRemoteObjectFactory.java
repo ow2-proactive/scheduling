@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
@@ -84,7 +85,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
      */
-    public RemoteRemoteObject newRemoteObject(RemoteObject target)
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
         throws ProActiveException {
         try {
             return new HttpRemoteObjectImpl(target, null);
@@ -102,7 +103,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
      */
-    public RemoteRemoteObject register(RemoteObject ro, URI url,
+    public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI url,
         boolean replacePrevious) throws ProActiveException {
         URL u = null;
 
@@ -168,21 +169,22 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     }
 
     /**
-     * Gets a body from an urn in the table that mps urns and bodies
-     * @param urn The urn of the body
-     * @return the body mapping the urn
+     * Gets a remote object from an urn in the table that maps urns and remote objects
+     * @param urn The urn of the remote Object
+     * @return the remote Object that maps the urn
      */
-    public static synchronized RemoteRemoteObject getRemoteObjectFromUrn(
-        String urn) {
-        try {
-            return new HTTPRemoteObjectFactory().newRemoteObject(HTTPRegistry.getInstance()
-                                                                             .lookup(urn));
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
+
+    //    public static synchronized InternalRemoteRemoteObject getRemoteObjectFromUrn(
+    //        String urn) {
+    //        try {
+    //            return new HTTPRemoteObjectFactory().newRemoteObject(HTTPRegistry.getInstance()
+    //                                                                             .lookup(urn));
+    //        } catch (ProActiveException e) {
+    //            // TODO Auto-generated catch block
+    //            e.printStackTrace();
+    //        }
+    //        return null;
+    //    }
 
     /**
      * List all active object previously registered in the registry

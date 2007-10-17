@@ -39,6 +39,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
@@ -118,9 +119,7 @@ public abstract class AbstractUniversalBody implements UniversalBody,
 
         try {
             RemoteRemoteObject rro = register(uri);
-
-            this.remoteBody = (UniversalBody) RemoteObjectHelper.generatedObjectStub(new RemoteObjectAdapter(
-                        rro));
+            this.remoteBody = (UniversalBody) new RemoteObjectAdapter(rro).getObjectProxy();
         } catch (Exception e) {
             e.printStackTrace();
             throw new ActiveObjectCreationException(e);
@@ -185,15 +184,12 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());
 
         try {
-            RemoteRemoteObject rro = this.roe.activateProtocol(uri);
+            InternalRemoteRemoteObject rro = this.roe.activateProtocol(uri);
             this.remoteBody = (UniversalBody) rro.getObjectProxy();
-            /// Initialiaze cache -- Gchazara won't touch it, ok ?
+            //  TODO remove me cache is now initialized via adapters          /// Initializing cache
             this.remoteBody.getID();
             //			this.remoteBody =(UniversalBody) rro.getObjectProxy();
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

@@ -915,7 +915,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                             part.getVMInformation().getVMID() + " on host " +
                             URIBuilder.getHostNameorIP(
                                 part.getVMInformation().getInetAddress()) +
-                            " terminated!!!");
+                            " terminated.");
                     }
                 } else {
                     try {

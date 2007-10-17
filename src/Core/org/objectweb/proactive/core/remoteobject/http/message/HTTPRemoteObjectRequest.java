@@ -33,15 +33,15 @@ package org.objectweb.proactive.core.remoteobject.http.message;
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 
 
-public class RemoteObjectRequest extends HttpMessage implements Serializable {
+public class HTTPRemoteObjectRequest extends HttpMessage implements Serializable {
     private Request request;
 
-    public RemoteObjectRequest(Request request, String url) {
+    public HTTPRemoteObjectRequest(Request request, String url) {
         super(url);
         this.request = request;
     }
@@ -64,7 +64,8 @@ public class RemoteObjectRequest extends HttpMessage implements Serializable {
     @Override
     public Object processMessage() {
         try {
-            RemoteObject ro = HTTPRegistry.getInstance().lookup(url);
+            InternalRemoteRemoteObject ro = HTTPRegistry.getInstance()
+                                                        .lookup(url);
             int max_retry = 10;
             while ((ro == null) && (max_retry > 0)) {
                 try {

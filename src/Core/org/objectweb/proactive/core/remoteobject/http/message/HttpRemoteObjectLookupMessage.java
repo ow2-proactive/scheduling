@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.net.URI;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.http.HTTPRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.http.HttpRemoteObjectImpl;
@@ -82,13 +82,14 @@ public class HttpRemoteObjectLookupMessage extends HttpMessage
     @Override
     public Object processMessage() {
         if (this.urn != null) {
-            RemoteObject ro = HTTPRegistry.getInstance().lookup(url);
+            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance()
+                                                          .lookup(url);
 
             //            System.out.println("HttpRemoteObjectLookupMessage.processMessage() ++ ro at " + url +" : " +ro) ;
-            if (ro != null) {
+            if (irro != null) {
                 RemoteRemoteObject rro = null;
                 try {
-                    rro = new HTTPRemoteObjectFactory().newRemoteObject(ro);
+                    rro = new HTTPRemoteObjectFactory().newRemoteObject(irro);
                     ((HttpRemoteObjectImpl) rro).setURI(URI.create(url));
                 } catch (ProActiveException e) {
                     // TODO Auto-generated catch block

@@ -28,22 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.p2pTest.utils;
+package org.objectweb.proactive.core.remoteobject;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.request.RequestImpl;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 
-public class ShutdownHook extends Thread {
-    ProActiveDescriptor pad = null;
-
-    public ShutdownHook(ProActiveDescriptor pad) {
-        this.pad = pad;
-    }
-
-    public void run() {
-        try {
-            pad.killall(false);
-        } catch (Exception e) {
-        }
+public class RemoteObjectRequest extends RequestImpl {
+    public RemoteObjectRequest(MethodCall methodCall) {
+        super(methodCall, false);
     }
 }

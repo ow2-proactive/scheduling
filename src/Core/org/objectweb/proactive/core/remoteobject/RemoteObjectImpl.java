@@ -91,7 +91,13 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
                 message.decrypt(this.psm);
             }
             Object o;
-            o = (message).getMethodCall().execute(this.target);
+
+            if (message instanceof RemoteObjectRequest) {
+                o = message.getMethodCall().execute(this);
+            } else {
+                o = (message).getMethodCall().execute(this.target);
+            }
+
             return new SynchronousReplyImpl(o);
         } catch (MethodCallExecutionFailedException e) {
             e.printStackTrace();
@@ -193,7 +199,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     }
 
     public Object getObjectProxy() throws ProActiveException {
-        Thread.dumpStack();
+        //        Thread.dumpStack();
         try {
             Object reifiedObjectStub = MOP.createStubObject(this.className,
                     target.getClass(), new Class[] {  });

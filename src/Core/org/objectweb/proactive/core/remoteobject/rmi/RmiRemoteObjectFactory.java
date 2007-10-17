@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
@@ -87,7 +88,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
      */
-    public RemoteRemoteObject newRemoteObject(RemoteObject target)
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
         throws ProActiveException {
         try {
             return new RmiRemoteObjectImpl(target);
@@ -121,8 +122,8 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
      */
-    public RemoteRemoteObject register(RemoteObject target, URI url,
-        boolean replacePreviousBinding) throws ProActiveException {
+    public RemoteRemoteObject register(InternalRemoteRemoteObject target,
+        URI url, boolean replacePreviousBinding) throws ProActiveException {
         RmiRemoteObject rro = null;
         try {
             rro = new RmiRemoteObjectImpl(target);
@@ -146,7 +147,6 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
             }
         }
 
-        LOGGER_RO.warn(URIBuilder.removeProtocol(url).toString());
         try {
             if (replacePreviousBinding) {
                 java.rmi.Naming.rebind(URIBuilder.removeProtocol(url).toString(),
@@ -155,7 +155,6 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
                 java.rmi.Naming.bind(URIBuilder.removeProtocol(url).toString(),
                     rro);
             }
-            rro.setURI(url);
             LOGGER_RO.debug(" successfully bound in registry at " + url);
         } catch (java.rmi.AlreadyBoundException e) {
             LOGGER_RO.warn(url + " already bound in registry", e);
@@ -179,7 +178,6 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     public void unregister(URI url) throws ProActiveException {
         try {
             java.rmi.Naming.unbind(URIBuilder.removeProtocol(url).toString());
-
             LOGGER_RO.debug(url + " unbound in registry");
         } catch (IOException e) {
             //No need to throw an exception if an object is already unregistered

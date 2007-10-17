@@ -28,14 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.remoteobject.rmi;
+package org.objectweb.proactive.core.remoteobject;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.rmi.RemoteException;
-import java.rmi.server.RMIClientSocketFactory;
-import java.rmi.server.RMIServerSocketFactory;
-import java.rmi.server.UnicastRemoteObject;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -43,8 +40,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -53,84 +49,105 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-/**
- * RMI implementation of the remote remote object interface
- *
- *
- */
-public class RmiRemoteObjectImpl extends UnicastRemoteObject
-    implements RmiRemoteObject {
+public class InternalRemoteRemoteObjectImpl
+    implements InternalRemoteRemoteObject {
+    private URI uri;
+    private transient RemoteObject remoteObject;
+    private RemoteRemoteObject remoteRemoteObject;
 
-    /**
-    *
-    */
-    protected InternalRemoteRemoteObject internalrrObject;
-
-    //    protected Object stub;
-    //    protected URI uri;
-    public RmiRemoteObjectImpl() throws java.rmi.RemoteException {
+    public InternalRemoteRemoteObjectImpl() {
     }
 
-    public RmiRemoteObjectImpl(InternalRemoteRemoteObject target)
-        throws java.rmi.RemoteException {
-        this.internalrrObject = target;
+    public InternalRemoteRemoteObjectImpl(RemoteObject ro) {
+        this.remoteObject = ro;
     }
 
-    public RmiRemoteObjectImpl(InternalRemoteRemoteObject target,
-        RMIServerSocketFactory sf, RMIClientSocketFactory cf)
-        throws java.rmi.RemoteException {
-        super(0, cf, sf);
-        this.internalrrObject = target;
+    public InternalRemoteRemoteObjectImpl(RemoteObject ro, URI uri) {
+        this.remoteObject = ro;
+        this.uri = uri;
     }
 
+    public InternalRemoteRemoteObjectImpl(RemoteObject ro, URI uri,
+        RemoteRemoteObject rro) {
+        this.remoteObject = ro;
+        this.uri = uri;
+        this.remoteRemoteObject = rro;
+    }
+
+    @Override
+    public URI getURI() throws ProActiveException, IOException {
+        return this.uri;
+    }
+
+    @Override
+    public void setURI(URI uri) throws ProActiveException, IOException {
+        this.uri = uri;
+    }
+
+    @Override
     public Reply receiveMessage(Request message)
-        throws RemoteException, RenegotiateSessionException, ProActiveException,
-            IOException {
-        if (message.isOneWay()) {
-            this.internalrrObject.receiveMessage(message);
-            return null;
+        throws ProActiveException, IOException, RenegotiateSessionException {
+        if (message instanceof InternalRemoteRemoteObjectRequest) {
+            Object o;
+            try {
+                o = message.getMethodCall().execute(this);
+                return new SynchronousReplyImpl(o);
+            } catch (MethodCallExecutionFailedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
-        return this.internalrrObject.receiveMessage(message);
+        return this.remoteObject.receiveMessage(message);
     }
 
+    @Override
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getCertificate();
+        return this.remoteObject.getCertificate();
     }
 
+    @Override
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getCertificateEncoded();
+        return this.remoteObject.getCertificateEncoded();
     }
 
+    @Override
     public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getEntities();
+        return this.remoteObject.getEntities();
     }
 
+    @Override
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getPolicy(securityContext);
+        return this.remoteObject.getPolicy(securityContext);
     }
 
+    @Override
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getPublicKey();
+        return this.remoteObject.getPublicKey();
     }
 
+    @Override
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return this.internalrrObject.publicKeyExchange(sessionID, myPublicKey,
+        return this.remoteObject.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
     }
 
+    @Override
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return this.internalrrObject.randomValue(sessionID, clientRandomValue);
+        return this.remoteObject.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
@@ -138,32 +155,52 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
         byte[] encodedLockData, byte[] parametersSignature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return this.internalrrObject.secretKeyExchange(sessionID,
-            encodedAESKey, encodedIVParameters, encodedClientMacKey,
-            encodedLockData, parametersSignature);
+        return this.remoteObject.secretKeyExchange(sessionID, encodedAESKey,
+            encodedIVParameters, encodedClientMacKey, encodedLockData,
+            parametersSignature);
     }
 
+    @Override
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
-        return this.internalrrObject.startNewSession(policy);
+        return this.remoteObject.startNewSession(policy);
     }
 
+    @Override
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
-        this.internalrrObject.terminateSession(sessionID);
+        this.remoteObject.terminateSession(sessionID);
     }
 
-    //    public Object getObjectProxy() throws ProActiveException, IOException {
-    //        if (this.stub == null) {
-    //            this.stub = this.internalrrObject.getObjectProxy(this);
-    //
-    //            //            if (stub instanceof Adapter) {
-    //            //            	 ((StubObject) ((Adapter)this.stub).getAdapter()).setProxy(new SynchronousProxy(null, new Object[] { this } ));
-    //            //            } else {
-    //            //            ((StubObject) this.stub).setProxy(new SynchronousProxy(null, new Object[] { this } ));
-    //            //            }
-    //        }
-    //        return this.stub;
-    //    }
+    @Override
+    public RemoteObject getRemoteObject() {
+        return this.remoteObject;
+    }
+
+    @Override
+    public RemoteRemoteObject getRemoteRemoteObject() {
+        return this.remoteRemoteObject;
+    }
+
+    @Override
+    public void setRemoteRemoteObject(RemoteRemoteObject remoteRemoteObject) {
+        this.remoteRemoteObject = remoteRemoteObject;
+    }
+
+    @Override
+    public void setRemoteObject(RemoteObject remoteObject) {
+        this.remoteObject = remoteObject;
+    }
+
+    @Override
+    public Object getObjectProxy() {
+        try {
+            return this.remoteObject.getObjectProxy(this.remoteRemoteObject);
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

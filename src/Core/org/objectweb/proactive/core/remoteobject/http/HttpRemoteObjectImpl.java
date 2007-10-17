@@ -40,12 +40,13 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
-import org.objectweb.proactive.core.remoteobject.http.message.RemoteObjectRequest;
+import org.objectweb.proactive.core.remoteobject.http.message.HTTPRemoteObjectRequest;
 import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.remoteobject.http.util.messages.HttpRemoteObjectRequest;
 import org.objectweb.proactive.core.security.Communication;
@@ -62,9 +63,10 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
     //    private String servletURL;
     private URI remoteObjectURL;
     protected Object stub;
-    protected transient RemoteObject remoteObject;
+    protected transient InternalRemoteRemoteObject remoteObject;
 
-    public HttpRemoteObjectImpl(RemoteObject remoteObject, URI remoteObjectURL) {
+    public HttpRemoteObjectImpl(InternalRemoteRemoteObject remoteObject,
+        URI remoteObjectURL) {
         //    	Thread.dumpStack();
 
         //        if (ProActiveConfiguration.getInstance().osgiServletEnabled()) {
@@ -75,6 +77,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         //
         //        System.out.println("HttpRemoteObjectImpl.HttpRemoteObjectImpl() -------------- servlet "  + this.servletURL);
         //
+        this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
 
         //        try {
@@ -89,7 +92,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
         ArrayList<Object> paramsList = new ArrayList<Object>();
         paramsList.add(message);
 
-        RemoteObjectRequest req = new RemoteObjectRequest(message,
+        HTTPRemoteObjectRequest req = new HTTPRemoteObjectRequest(message,
                 this.remoteObjectURL.toString());
 
         req.send();
@@ -206,7 +209,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public String getClassName() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getClassName();
+            return this.remoteObject.getRemoteObject().getClassName();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getClassName",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
@@ -221,7 +224,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public String getProxyName() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getProxyName();
+            return this.remoteObject.getRemoteObject().getProxyName();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getProxyName",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
@@ -236,7 +239,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public Class<?> getTargetClass() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getTargetClass();
+            return this.remoteObject.getRemoteObject().getTargetClass();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getTargetClass",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());
@@ -251,7 +254,7 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject {
 
     public Class<?> getAdapterClass() throws ProActiveException, IOException {
         if (isLocal) {
-            return this.remoteObject.getAdapterClass();
+            return this.remoteObject.getRemoteObject().getAdapterClass();
         } else {
             HttpRemoteObjectRequest br = new HttpRemoteObjectRequest("getAdapterClass",
                     new ArrayList<Object>(), this.remoteObjectURL.toString());

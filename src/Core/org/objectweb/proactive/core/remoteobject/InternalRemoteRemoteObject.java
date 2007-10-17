@@ -28,22 +28,26 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.p2pTest.utils;
+package org.objectweb.proactive.core.remoteobject;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import java.io.IOException;
+import java.net.URI;
+
+import org.objectweb.proactive.core.ProActiveException;
 
 
-public class ShutdownHook extends Thread {
-    ProActiveDescriptor pad = null;
+public interface InternalRemoteRemoteObject extends RemoteRemoteObject {
+    public URI getURI() throws ProActiveException, IOException;
 
-    public ShutdownHook(ProActiveDescriptor pad) {
-        this.pad = pad;
-    }
+    public void setURI(URI uri) throws ProActiveException, IOException;
 
-    public void run() {
-        try {
-            pad.killall(false);
-        } catch (Exception e) {
-        }
-    }
+    public RemoteRemoteObject getRemoteRemoteObject();
+
+    public void setRemoteRemoteObject(RemoteRemoteObject remoteRemoteObject);
+
+    public RemoteObject getRemoteObject();
+
+    public void setRemoteObject(RemoteObject remoteObject);
+
+    public Object getObjectProxy();
 }

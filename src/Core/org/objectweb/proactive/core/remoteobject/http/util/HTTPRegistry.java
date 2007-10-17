@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.remoteobject.http.util;
 
 import java.util.HashMap;
 
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -45,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HTTPRegistry {
     private static final String REGISTRY_NAME = "HTTP_REGISTRY";
     private static HTTPRegistry instance;
-    private static HashMap<String, RemoteObject> rRemteObjectMap = new HashMap<String, RemoteObject>();
+    private static HashMap<String, InternalRemoteRemoteObject> rRemteObjectMap = new HashMap<String, InternalRemoteRemoteObject>();
 
     private HTTPRegistry() {
     }
@@ -66,7 +67,7 @@ public class HTTPRegistry {
      * @param name  the name of the body
      * @param body the body to be binded
      */
-    public void bind(String name, RemoteObject body) {
+    public void bind(String name, InternalRemoteRemoteObject body) {
         ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                        .debug("registering remote object at " + name);
         rRemteObjectMap.put(name, body);
@@ -81,7 +82,7 @@ public class HTTPRegistry {
     }
 
     /**
-     * Gives all the names registered in this  registry
+     * Gives all the names registered in this registry
      * @return the names list
      */
     public String[] list() {
@@ -95,7 +96,7 @@ public class HTTPRegistry {
      * @param name The name of the body to be retrieved
      * @return the binded body
      */
-    public RemoteObject lookup(String name) {
+    public InternalRemoteRemoteObject lookup(String name) {
         return rRemteObjectMap.get(name);
     }
 }

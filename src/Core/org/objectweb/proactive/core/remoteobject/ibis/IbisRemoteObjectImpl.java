@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityContext;
@@ -56,14 +57,14 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
          *
          */
     private static final long serialVersionUID = -1989838338769716953L;
-    private transient RemoteObject remoteObject;
+    private transient InternalRemoteRemoteObject remoteObject;
     protected URI uri;
     protected transient Object stub;
 
     public IbisRemoteObjectImpl() throws ibis.rmi.RemoteException {
     }
 
-    public IbisRemoteObjectImpl(RemoteObject target)
+    public IbisRemoteObjectImpl(InternalRemoteRemoteObject target)
         throws ibis.rmi.RemoteException {
         this.remoteObject = target;
     }
@@ -134,21 +135,9 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
         this.remoteObject.terminateSession(sessionID);
     }
 
-    public Object getObjectProxy() throws ProActiveException, IOException {
-        if (this.stub == null) {
-            this.stub = this.remoteObject.getObjectProxy(this);
-        }
-        return this.stub;
-    }
-
     public void setObjectProxy(Object stub)
         throws ProActiveException, IOException {
         this.stub = stub;
-    }
-
-    public RemoteObject getRemoteObject()
-        throws ProActiveException, IOException {
-        return this.remoteObject;
     }
 
     public URI getURI() throws ProActiveException, IOException {
@@ -157,21 +146,5 @@ public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
 
     public void setURI(URI uri) throws ProActiveException, IOException {
         this.uri = uri;
-    }
-
-    public String getClassName() throws ProActiveException, IOException {
-        return this.remoteObject.getClassName();
-    }
-
-    public String getProxyName() throws ProActiveException, IOException {
-        return this.remoteObject.getProxyName();
-    }
-
-    public Class<?> getTargetClass() throws ProActiveException, IOException {
-        return this.remoteObject.getTargetClass();
-    }
-
-    public Class<?> getAdapterClass() throws ProActiveException, IOException {
-        return this.remoteObject.getAdapterClass();
     }
 }

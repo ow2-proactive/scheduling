@@ -83,7 +83,7 @@ public class RemoteObjectExposer implements Serializable {
      * @return a remote reference to the remote object ie a RemoteRemoteObject
      * @throws UnknownProtocolException thrown if the protocol specified within the url is unknow
      */
-    public synchronized RemoteRemoteObject activateProtocol(URI url)
+    public synchronized InternalRemoteRemoteObject activateProtocol(URI url)
         throws UnknownProtocolException {
         String protocol = null;
 
@@ -113,12 +113,15 @@ public class RemoteObjectExposer implements Serializable {
             }
 
             // register the object on the register
-            RemoteRemoteObject rmo = rof.register(this.remoteObject, url, true);
+            InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(this.remoteObject,
+                    url);
+            RemoteRemoteObject rmo = rof.register(irro, url, true);
+            irro.setRemoteRemoteObject(rmo);
 
             // put the url within the list of the activated protocols
             this.activatedProtocols.put(url, rmo);
 
-            return rmo;
+            return irro;
         } catch (ProActiveException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to activate a remote object at endpoint " +

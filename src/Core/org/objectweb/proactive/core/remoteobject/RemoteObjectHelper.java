@@ -164,7 +164,8 @@ public class RemoteObjectHelper {
     public static RemoteRemoteObject register(RemoteObject target, URI url,
         boolean replacePreviousBinding) throws ProActiveException {
         return getFactoryFromURL(url)
-                   .register(target, expandURI(url), replacePreviousBinding);
+                   .register(new InternalRemoteRemoteObjectImpl(target),
+            expandURI(url), replacePreviousBinding);
     }
 
     /**

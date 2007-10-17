@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
@@ -83,7 +84,7 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
      */
-    public RemoteRemoteObject newRemoteObject(RemoteObject target)
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
         throws ProActiveException {
         try {
             return new IbisRemoteObjectImpl(target);
@@ -117,8 +118,8 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
      */
-    public RemoteRemoteObject register(RemoteObject target, URI url,
-        boolean replacePreviousBinding) throws ProActiveException {
+    public RemoteRemoteObject register(InternalRemoteRemoteObject target,
+        URI url, boolean replacePreviousBinding) throws ProActiveException {
         IbisRemoteObject rro = null;
         try {
             rro = new IbisRemoteObjectImpl(target);
@@ -135,7 +136,7 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
                 ibis.rmi.Naming.bind(URIBuilder.removeProtocol(url).toString(),
                     rro);
             }
-            rro.setURI(url);
+            //            rro.setURI(url);
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .debug(" successfully bound in registry at " + url);
         } catch (ibis.rmi.AlreadyBoundException e) {

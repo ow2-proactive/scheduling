@@ -46,7 +46,7 @@ public interface RemoteObjectFactory {
      * @return the remote part of the remote object
      * @throws ProActiveException
      */
-    public RemoteRemoteObject newRemoteObject(RemoteObject target)
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
         throws ProActiveException;
 
     /**
@@ -64,8 +64,8 @@ public interface RemoteObjectFactory {
      *             throws a ProActiveException if something went wrong during
      *             the registration
      */
-    public RemoteRemoteObject register(RemoteObject target, URI url,
-        boolean replacePreviousBinding) throws ProActiveException;
+    public RemoteRemoteObject register(InternalRemoteRemoteObject target,
+        URI url, boolean replacePreviousBinding) throws ProActiveException;
 
     /**
      * unregister the remote remote object located at a given

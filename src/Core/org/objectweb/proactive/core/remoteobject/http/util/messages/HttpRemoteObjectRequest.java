@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
@@ -59,7 +60,7 @@ public class HttpRemoteObjectRequest extends ReflectRequest
     private String methodName;
     private List<Object> parameters = new ArrayList<Object>();
     private UniqueID oaid;
-    private RemoteObject remoteObject = null;
+    private InternalRemoteRemoteObject remoteObject = null;
 
     /**
      * Construct a request to send to the remote object identified by the url

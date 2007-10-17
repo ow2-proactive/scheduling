@@ -37,6 +37,7 @@ import java.rmi.registry.Registry;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
@@ -76,7 +77,7 @@ public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
     }
 
     @Override
-    public RemoteRemoteObject newRemoteObject(RemoteObject target)
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
         throws ProActiveException {
         try {
             return new RmiSshRemoteObjectImpl(target);
