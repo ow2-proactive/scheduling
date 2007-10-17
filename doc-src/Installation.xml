@@ -3,8 +3,9 @@
   <title>ProActive Installation</title>
 
   <para>ProActive is available for <ulink
-  url="http://proactive.inria.fr/download_proactive_latest.htm">download </ulink>under <emphasis> [COMMENT].
-  What type of open source license? [/COMMENT].</emphasis> ProActive requires <ulink
+  url="http://proactive.inria.fr/download_proactive_latest.htm">download </ulink>under 
+  the <ulink url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"> GPL 2</ulink>
+   license. ProActive requires <ulink
   url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink> or later to be installed 
   on your computer. Please note that ProActive will NOT run with any 
   version prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
