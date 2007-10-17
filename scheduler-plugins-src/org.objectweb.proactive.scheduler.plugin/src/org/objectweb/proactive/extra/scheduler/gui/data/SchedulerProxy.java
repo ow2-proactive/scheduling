@@ -62,6 +62,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public static final int CONNECTED = 0;
     public static final int LOGIN_OR_PASSWORD_WRONG = 1;
     public static final int COULD_NOT_CONNECT_SCHEDULER = 2;
+    public static final int CONNECTION_REFUSED = 3;
     private static final long serialVersionUID = 3783194235036041589L;
     private static SchedulerProxy instance = null;
     private UserSchedulerInterface scheduler = null;
@@ -318,13 +319,14 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             }
             return CONNECTED;
         } catch (SchedulerException e) {
-            userName = null;
-            logAsAdmin = false;
             return COULD_NOT_CONNECT_SCHEDULER;
         } catch (LoginException e) {
+            return LOGIN_OR_PASSWORD_WRONG;
+        } catch (Exception e) {
+            return CONNECTION_REFUSED;
+        } finally {
             userName = null;
             logAsAdmin = false;
-            return LOGIN_OR_PASSWORD_WRONG;
         }
     }
 

@@ -186,8 +186,8 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
             : (task.getExecutionHostName().compareTo(getExecutionHostName()));
         default:
             return (currentOrder == ASC_ORDER)
-            ? (getId().value() - task.getId().value())
-            : (task.getId().value() - getId().value());
+            ? (getId().compareTo(task.getId())) : (task.getId()
+                                                       .compareTo(getId()));
         }
     }
 

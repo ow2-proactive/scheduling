@@ -57,7 +57,7 @@ public class JobEvent implements Serializable {
     private static final long serialVersionUID = -7426315610231893158L;
 
     /** job id */
-    private JobId jobId = new JobIdImpl(0);
+    private JobId jobId = null;
 
     /** job submitted time */
     private long submittedTime = -1;

@@ -1,30 +1,27 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ * Initial developer(s): The ProActive Team
+ * http://proactive.inria.fr/team_members.htm Contributor(s):
  *
  * ################################################################
  */
@@ -36,10 +33,10 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.job.JobIdImpl;
 
 
 public class AdminCommunicator {
@@ -186,9 +183,8 @@ public class AdminCommunicator {
             }
         } else if (command.startsWith(PAUSEJOB_CMD)) {
             try {
-                boolean success = scheduler.pause(new JobIdImpl(
-                            Integer.parseInt(command.split(" ")[1])))
-                                           .booleanValue();
+                boolean success = scheduler.pause(JobId.makeJobId(
+                            command.split(" ")[1])).booleanValue();
                 if (success) {
                     output("Job paused.\n");
                 } else {
@@ -200,9 +196,8 @@ public class AdminCommunicator {
             }
         } else if (command.startsWith(RESUMEJOB_CMD)) {
             try {
-                boolean success = scheduler.resume(new JobIdImpl(
-                            Integer.parseInt(command.split(" ")[1])))
-                                           .booleanValue();
+                boolean success = scheduler.resume(JobId.makeJobId(
+                            command.split(" ")[1])).booleanValue();
                 if (success) {
                     output("Job resumed.\n");
                 } else {
@@ -214,8 +209,8 @@ public class AdminCommunicator {
             }
         } else if (command.startsWith(KILLJOB_CMD)) {
             try {
-                boolean success = scheduler.kill(new JobIdImpl(Integer.parseInt(
-                                command.split(" ")[1]))).booleanValue();
+                boolean success = scheduler.kill(JobId.makeJobId(
+                            command.split(" ")[1])).booleanValue();
                 if (success) {
                     output("Job killed.\n");
                 } else {

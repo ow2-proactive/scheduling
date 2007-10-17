@@ -342,7 +342,6 @@ public class SeparatedJobView extends ViewPart {
                 "Finished", JobsController.getLocalView());
 
         GridData gridData = new GridData();
-        gridData = new GridData();
         gridData.verticalAlignment = GridData.FILL;
         gridData.grabExcessVerticalSpace = true;
         gridData.horizontalAlignment = GridData.FILL;

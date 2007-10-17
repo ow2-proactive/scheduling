@@ -55,16 +55,15 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventLi
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.job.IdentifyJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalJobFactory;
 import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.job.JobIdImpl;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.task.TaskIdImpl;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -89,12 +88,6 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
-
-    /** Multiplicatif factor for job id (taskId will be : this_factor*jobID+taskID) */
-    public static final int JOB_FACTOR = 1000;
-
-    /** Global count for jobs IDs generation */
-    private static int jobGlobalCount = 1;
 
     /** Mapping on the UniqueId of the sender and the user/admin identifications */
     private HashMap<UniqueID, UserIdentification> identifications = new HashMap<UniqueID, UserIdentification>();
@@ -266,13 +259,11 @@ public class SchedulerFrontend implements InitActive, SchedulerEventListener,
             }
         }
         //setting the job properties
-        job.setId(new JobIdImpl(jobGlobalCount++));
+        job.setId(JobId.nextId());
         job.setOwner(identifications.get(id).getUsername());
-        //setting the unique task IDs and jobId for each task
-        int taskId = 1;
+        TaskId.initialize();
         for (InternalTask td : job.getTasks()) {
-            job.setTaskId(td,
-                new TaskIdImpl((job.getId().value() * JOB_FACTOR) + (taskId++)));
+            job.setTaskId(td, TaskId.nextId(job.getId()));
             td.setJobInfo(job.getJobInfo());
         }
         jobs.put(job.getId(),

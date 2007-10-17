@@ -562,6 +562,8 @@ public abstract class AbstractJobComposite extends Composite {
                             KillJobAction.getInstance().setEnabled(false);
                         }
                         table.remove(i);
+                        table.redraw();
+                        table.update();
                         decreaseCount();
                     }
                 });

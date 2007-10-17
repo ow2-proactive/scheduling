@@ -51,11 +51,8 @@ public class TaskEvent implements Serializable {
     /** Serial version UID */
     private static final long serialVersionUID = -7625483185225564284L;
 
-    /** global task id count */
-    private static int globalCount = 0;
-
     /** id of the task */
-    private TaskId taskID = new TaskIdImpl(globalCount++);
+    private TaskId taskID = null;
 
     /** informations about the job */
     private JobEvent jobEvent = null;

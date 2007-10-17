@@ -35,12 +35,12 @@ import java.io.InputStreamReader;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.job.JobIdImpl;
 
 
 public class ResultRecup {
@@ -78,7 +78,8 @@ public class ResultRecup {
                 }
                 for (int i = begin; i <= end; i++) {
                     try {
-                        JobResult result = scheduler.getResult(new JobIdImpl(i));
+                        JobResult result = scheduler.getResult(JobId.makeJobId(i +
+                                    ""));
                         if (result != null) {
                             System.out.println("Job " + i + " Result => ");
                             for (Entry<String, TaskResult> e : result.getTaskResults()

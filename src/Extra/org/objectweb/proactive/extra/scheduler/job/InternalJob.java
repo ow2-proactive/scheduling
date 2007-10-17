@@ -208,9 +208,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             ? (jobInfo.getState().compareTo(job.jobInfo.getState()))
             : (job.jobInfo.getState().compareTo(jobInfo.getState()));
         default:
-            return (currentOrder == ASC_ORDER)
-            ? (getId().value() - job.getId().value())
-            : (job.getId().value() - getId().value());
+            return (currentOrder == ASC_ORDER) ? (getId().compareTo(job.getId()))
+                                               : (job.getId().compareTo(getId()));
         }
     }
 

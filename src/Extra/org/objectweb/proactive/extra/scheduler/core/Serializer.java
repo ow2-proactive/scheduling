@@ -72,7 +72,7 @@ public class Serializer {
             calendar.setTimeInMillis(System.currentTimeMillis());
             String f = path + SERIALIZATION_PREFIX +
                 String.format("%1$tm-%1$te-%1$tY", calendar) + "_" +
-                e.getKey().value() + SERIALIZATION_POSTFIX;
+                e.getKey().toString() + SERIALIZATION_POSTFIX;
             serialize(f, e.getValue());
         }
     }
