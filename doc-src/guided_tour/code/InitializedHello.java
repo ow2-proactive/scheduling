@@ -2,6 +2,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class InitializedHello extends Hello implements InitActive, EndActive {
@@ -42,8 +43,8 @@ public class InitializedHello extends Hello implements InitActive, EndActive {
             // Creates an active instance of class HelloServer on the local node
             InitializedHello hello = (InitializedHello) org.objectweb.proactive.ProActive.newActive(InitializedHello.class.getName(),
                     new Object[] { "remote" });
-            java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
-            org.objectweb.proactive.ProActive.register(hello,
+            java.net.InetAddress localhost = URIBuilder.getLocalAddress();
+            org.objectweb.proactive.api.ProActiveObject.register(hello,
                 "//" + localhost.getHostName() + "/Hello");
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());

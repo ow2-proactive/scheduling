@@ -1378,7 +1378,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
-            this.hostInetAddress = java.net.InetAddress.getLocalHost();
+            this.hostInetAddress = URIBuilder.getLocalAddress();
             this.hostName = URIBuilder.getHostNameorIP(this.hostInetAddress);
             String random = Integer.toString(ProActiveRandom.nextPosInt());
 

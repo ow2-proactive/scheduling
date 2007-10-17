@@ -31,6 +31,8 @@
 package active;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 public class HelloWorld {
@@ -41,7 +43,7 @@ public class HelloWorld {
 	{
 		String hostname="Unkown";
 		try {
-			hostname=InetAddress.getLocalHost().toString();
+			hostname=URIBuilder.getLocalAddress().toString();
 		}
 		catch (UnknownHostException excep){
 			//hostname will be "Unknown"

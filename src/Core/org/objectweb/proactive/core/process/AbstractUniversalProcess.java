@@ -291,7 +291,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     //
     private static String getLocalHost() {
         try {
-            return URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            return URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
         } catch (java.net.UnknownHostException e) {
             return "localhost";
         }

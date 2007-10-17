@@ -35,6 +35,8 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.objectweb.proactive.core.util.URIBuilder;
+
 
 /**
  * This class handles a partial computation of PI. It is also used for workers in the component version of the application.
@@ -69,7 +71,7 @@ public class PiComputer implements PiComp {
     public PiComputer(Integer scaleObject) {
         try {
             System.out.println("created PiComputer on host " +
-                InetAddress.getLocalHost().getHostName());
+                URIBuilder.getLocalAddress().getHostName());
         } catch (UnknownHostException ignored) {
         }
         setScale(scaleObject);
@@ -92,7 +94,7 @@ public class PiComputer implements PiComp {
         try {
             System.out.println("Starting computation for interval [" +
                 interval.getBeginning() + " , " + interval.getEnd() +
-                "] on host : " + InetAddress.getLocalHost().getHostName());
+                "] on host : " + URIBuilder.getLocalAddress().getHostName());
         } catch (UnknownHostException ignored) {
             ignored.printStackTrace();
         }

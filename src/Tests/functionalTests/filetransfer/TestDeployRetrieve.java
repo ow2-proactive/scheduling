@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
@@ -84,7 +85,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         TestAPI.createRandomContentFile(fileTest.getAbsolutePath(), filesize);
 
         try {
-            hostName = java.net.InetAddress.getLocalHost().getHostName();
+            hostName = URIBuilder.getLocalAddress().getHostName();
         } catch (Exception e) {
             hostName = "localhost";
         }

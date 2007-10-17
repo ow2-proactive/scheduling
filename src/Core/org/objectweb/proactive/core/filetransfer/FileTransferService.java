@@ -46,6 +46,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -500,19 +501,8 @@ public class FileTransferService implements ProActiveInternalObject {
      *  It is used for debugging.
      * @return a String with the hostname and the time*/
     public String sayHello() {
-        return "Hello World from " + getHostName() + " at " +
+        return "Hello World from " + URIBuilder.getLocalAddress().toString() +
+        " at " +
         new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
-    }
-
-    /**
-     * Used for debugin. Returns the hostname.
-     * @return The host name.
-     */
-    public String getHostName() {
-        try {
-            return java.net.InetAddress.getLocalHost().toString();
-        } catch (Exception e) {
-            return "unknown";
-        }
     }
 }

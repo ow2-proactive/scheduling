@@ -104,7 +104,7 @@ public class HostsInfos {
         if (host_infos.get("username") == null) {
             host_infos.put("username", username);
             //        	try {
-            //        		System.out.println(hostname+" --> "+username+ " on host "+InetAddress.getLocalHost().getHostName());
+            //        		System.out.println(hostname+" --> "+username+ " on host "+URIBuilder.getLocalAddress().getHostName());
             //        	} catch (UnknownHostException e) {
             //        		// TODO Auto-generated catch block
             //        		e.printStackTrace();

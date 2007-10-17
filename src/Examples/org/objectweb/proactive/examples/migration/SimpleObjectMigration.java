@@ -41,6 +41,7 @@ import org.objectweb.proactive.api.ProMobileAgent;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -89,7 +90,7 @@ public class SimpleObjectMigration implements Serializable {
         logger.info("SimpleObjectMigration> sayHello()");
         String localhost = null;
         try {
-            localhost = InetAddress.getLocalHost().toString();
+            localhost = URIBuilder.getLocalAddress().toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -200,7 +201,7 @@ public class SimpleObjectMigration implements Serializable {
         try {
             String className = SimpleObjectMigration.class.getName();
             Object[] params = new Object[] {
-                    "Created by " + InetAddress.getLocalHost().toString()
+                    "Created by " + URIBuilder.getLocalAddress().toString()
                 };
 
             activeHello = (SimpleObjectMigration) ProActiveObject.newActive(className,

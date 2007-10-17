@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
@@ -333,7 +334,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         String hostName = "unknown";
 
         try {
-            hostName = InetAddress.getLocalHost().getHostName();
+            hostName = URIBuilder.getLocalAddress().getHostName();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

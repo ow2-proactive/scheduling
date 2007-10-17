@@ -62,6 +62,10 @@ public class ProActiveLoggerFactory implements LoggerFactory {
 
     private static String getHostName() {
         try {
+            // URIBuilder.getLocalAddress() cannot be used here since loggers are used in
+            // ProActiveConfiguration constructor.
+            // It should not be that important. AFAIK this method is only used to 
+            // print a hostname in the logs
             return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             return "unknown host";

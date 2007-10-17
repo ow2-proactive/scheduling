@@ -57,6 +57,6 @@ public class Test extends FunctionalTest {
 
         assertTrue(name.equals("toto"));
         assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    InetAddress.getLocalHost())) != -1);
+                    URIBuilder.getLocalAddress())) != -1);
     }
 }

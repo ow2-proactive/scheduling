@@ -30,14 +30,13 @@
  */
 package functionalTests.activeobject.creation.local.newactive;
 
-import java.net.InetAddress;
-
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
+
 
 /**
  * Test newActive method on the local default node
@@ -57,6 +56,6 @@ public class Test extends FunctionalTest {
 
         assertTrue(name.equals("toto"));
         assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    InetAddress.getLocalHost())) != -1);
+                    URIBuilder.getLocalAddress())) != -1);
     }
 }

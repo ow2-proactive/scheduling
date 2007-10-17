@@ -31,12 +31,12 @@
 package org.objectweb.proactive.core.ssh.rmissh;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.rmi.server.RMIClientSocketFactory;
 import static org.objectweb.proactive.core.ssh.SSH.logger;
 import org.objectweb.proactive.core.util.HostsInfos;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -50,7 +50,7 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory,
     public SshRMIClientSocketFactory() {
         this.username = System.getProperty("user.name");
         try {
-            this.hostname = InetAddress.getLocalHost().getCanonicalHostName();
+            this.hostname = URIBuilder.getLocalAddress().getCanonicalHostName();
         } catch (UnknownHostException e) {
             this.hostname = "locahost";
         }

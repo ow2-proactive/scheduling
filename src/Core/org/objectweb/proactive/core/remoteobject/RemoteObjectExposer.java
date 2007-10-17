@@ -122,7 +122,7 @@ public class RemoteObjectExposer implements Serializable {
         } catch (ProActiveException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to activate a remote object at endpoint " +
-                url.toString());
+                url.toString(), e);
 
             e.printStackTrace();
             return null;

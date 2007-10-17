@@ -100,7 +100,7 @@ public class StartRuntime {
 
         try {
             logger.info("**** Starting jvm on " +
-                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+                URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress()));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("**** Starting jvm with classpath " +

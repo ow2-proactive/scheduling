@@ -39,6 +39,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
@@ -115,7 +116,7 @@ public class AOInterpreter {
     public String sayHello() {
         String localhost = "unkown";
         try {
-            localhost = InetAddress.getLocalHost().toString();
+            localhost = URIBuilder.getLocalAddress().toString();
         } catch (Exception e) {
             e.printStackTrace();
         }

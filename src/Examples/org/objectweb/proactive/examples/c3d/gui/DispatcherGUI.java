@@ -159,7 +159,7 @@ public class DispatcherGUI implements ActionListener {
         Box box = Box.createVerticalBox();
         String localhostName = "";
         try {
-            localhostName = URIBuilder.getHostNameorIP(InetAddress.getLocalHost());
+            localhostName = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
         } catch (UnknownHostException e) {
             localhostName = "unknown host name!";
         }

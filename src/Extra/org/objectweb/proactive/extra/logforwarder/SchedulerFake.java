@@ -40,6 +40,7 @@ import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
@@ -61,7 +62,7 @@ public class SchedulerFake {
     // test method...
     public void scheduleTasks() {
         try {
-            this.hostname = java.net.InetAddress.getLocalHost().getHostName();
+            this.hostname = URIBuilder.getLocalAddress().getHostName();
         } catch (UnknownHostException e2) {
             e2.printStackTrace();
         }

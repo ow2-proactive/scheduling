@@ -30,12 +30,15 @@
  */
 package org.objectweb.proactive.examples.minidescriptor;
 
+import org.objectweb.proactive.core.util.URIBuilder;
+
+
 public class MiniDescrActive {
     public Message getComputerInfo() {
         try {
-            return new Message(java.net.InetAddress.getLocalHost() + "");
+            return new Message(URIBuilder.getLocalAddress() + "");
         } catch (Exception e) {
-            return new Message("java.net.InetAddress.getLocalHost() IMPOSSIBLE");
+            return new Message("URIBuilder.getLocalAddress() IMPOSSIBLE");
         }
     }
 }

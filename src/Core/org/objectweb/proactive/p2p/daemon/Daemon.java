@@ -63,6 +63,7 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.nt.NTEventLogAppender;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
@@ -510,8 +511,8 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     public static String getLocalHostName() {
         if (hostname == null) {
             try {
-                hostname = InetAddress.getLocalHost().getCanonicalHostName()
-                                      .toLowerCase();
+                hostname = URIBuilder.getLocalAddress().getCanonicalHostName()
+                                     .toLowerCase();
             } catch (UnknownHostException e) {
                 e.printStackTrace();
                 hostname = "localhost";

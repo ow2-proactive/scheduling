@@ -60,10 +60,10 @@ public class SimpleAgent implements java.io.Serializable {
         }
     }
 
-    /** Returns the machine name on which the Active Objzect is currently */
+    /** Returns the machine name on which the Active Object is currently */
     public String whereAreYou() {
         try {
-            return URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            return URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
         } catch (Exception e) {
             return "Localhost lookup failed";
         }

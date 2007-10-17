@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -166,7 +167,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             this.resourceManager = imp;
             this.frontend = frontend;
             //logger
-            host = java.net.InetAddress.getLocalHost().getHostName();
+            host = URIBuilder.getLocalAddress().getHostName();
             try {
                 SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
                 this.port = slf.getPort();

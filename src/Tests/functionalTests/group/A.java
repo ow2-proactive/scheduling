@@ -82,7 +82,7 @@ public class A implements InitActive, RunActive, EndActive,
 
     public String getHostName() {
         try { //return the name of the Host
-            return URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())
+            return URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress())
                              .toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();

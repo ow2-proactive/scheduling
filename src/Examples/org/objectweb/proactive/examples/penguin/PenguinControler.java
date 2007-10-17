@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.util.CircularArrayList;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class PenguinControler implements org.objectweb.proactive.RunActive,
@@ -132,7 +133,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
     //  public static void main(String args[]) {
     //      //args modification to replace relative name of nodes to them absolute name
     //      try {
-    //	  java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
+    //	  java.net.InetAddress localhost = URIBuilder.getLocalAddress();
     //	  for (int i=0; i<args.length; i++) {
     //	      if (args[i].startsWith("//localhost")) {
     //		  String nodeName;

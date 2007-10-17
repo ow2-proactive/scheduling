@@ -367,7 +367,7 @@ public class StartP2PService implements P2PConstants {
         // For Debbugging
         try {
             logger.info("**** Starting jvm on " +
-                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+                URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress()));
         } catch (UnknownHostException e) {
             logger.warn("Couldn't get local host name", e);
         }

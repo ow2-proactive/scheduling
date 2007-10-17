@@ -35,6 +35,7 @@ import java.net.UnknownHostException;
 
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
@@ -96,7 +97,7 @@ public class SimpleHelloWorld {
                         System.out.println("Hello World !");
                         try {
                             return "HelloWorld Sample host : " +
-                            java.net.InetAddress.getLocalHost().toString();
+                            URIBuilder.getLocalAddress().toString();
                         } catch (UnknownHostException e) {
                             return "HelloWorld Sample host : unknow host";
                         }
@@ -128,7 +129,7 @@ public class SimpleHelloWorld {
                 simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
                 // next, this method will forward task output on the previous loggerServer
                 scheduler.listenLog(jobId,
-                    java.net.InetAddress.getLocalHost().getHostName(),
+                    URIBuilder.getLocalAddress().getHostName(),
                     simpleLoggerServer.getPort());
             } catch (UnknownHostException e1) {
                 e1.printStackTrace();

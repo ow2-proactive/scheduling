@@ -37,6 +37,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
@@ -92,7 +93,7 @@ public class Domain implements Serializable {
         this.identification = i.intValue();
         this.info = planet;
         try {
-            this.hostName = InetAddress.getLocalHost().getHostName();
+            this.hostName = URIBuilder.getLocalAddress().getHostName();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -169,7 +170,7 @@ public class Domain implements Serializable {
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         try {
-            this.hostName = InetAddress.getLocalHost().getHostName();
+            this.hostName = URIBuilder.getLocalAddress().getHostName();
         } catch (UnknownHostException e) {
             hostName = "unknown";
             e.printStackTrace();

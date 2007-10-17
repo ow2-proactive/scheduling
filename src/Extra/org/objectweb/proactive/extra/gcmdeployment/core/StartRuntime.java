@@ -185,7 +185,7 @@ public class StartRuntime {
         // Print some information message
         try {
             logger.info("Starting a ProActiveRuntime on " +
-                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+                URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress()));
         } catch (UnknownHostException e1) {
             logger.error("Hostname cannot be determined", new Exception());
             abort();

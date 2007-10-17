@@ -370,7 +370,7 @@ public class UrlBuilder {
             localName = "localhost";
         }
 
-        java.net.InetAddress hostInetAddress = java.net.InetAddress.getLocalHost();
+        java.net.InetAddress hostInetAddress = URIBuilder.getLocalAddress();
 
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {

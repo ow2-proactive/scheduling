@@ -39,6 +39,7 @@ import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
@@ -67,7 +68,7 @@ public class Hello implements java.io.Serializable {
     /** finds the name of the local machine */
     static String getHostName() {
         try {
-            return java.net.InetAddress.getLocalHost().toString();
+            return URIBuilder.getLocalAddress().getHostName();
         } catch (UnknownHostException e) {
             return "unknown";
         }

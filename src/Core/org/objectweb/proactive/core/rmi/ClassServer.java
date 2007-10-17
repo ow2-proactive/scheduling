@@ -86,7 +86,7 @@ public class ClassServer implements Runnable {
 
         PAProperties.PA_HTTP_PORT.setValue(port + "");
 
-        hostname = java.net.InetAddress.getLocalHost().getHostAddress();
+        hostname = URIBuilder.getLocalAddress().getHostAddress();
         //        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
 
         //        System.out.println("URL du classServer : " + hostname + ":" + port);
@@ -124,8 +124,7 @@ public class ClassServer implements Runnable {
         java.net.Socket socket = null;
 
         try {
-            socket = new java.net.Socket(java.net.InetAddress.getLocalHost(),
-                    port);
+            socket = new java.net.Socket(URIBuilder.getLocalAddress(), port);
 
             // if we can connect to the port it means the server already exists
             return true;
@@ -179,7 +178,7 @@ public class ClassServer implements Runnable {
                 return ClassServerServlet.getUrl();
             } else {
                 return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
-                        java.net.InetAddress.getLocalHost()), "",
+                        URIBuilder.getLocalAddress()), "",
                     Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
             }
         } catch (UnknownHostException e) {

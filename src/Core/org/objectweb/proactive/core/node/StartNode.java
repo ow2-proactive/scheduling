@@ -240,7 +240,7 @@ public class StartNode {
         String localhost = "localhost";
 
         try {
-            localhost = URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            localhost = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
         } catch (java.net.UnknownHostException e) {
             logger.error("InetAddress failed: " + e.getMessage());
             e.printStackTrace();

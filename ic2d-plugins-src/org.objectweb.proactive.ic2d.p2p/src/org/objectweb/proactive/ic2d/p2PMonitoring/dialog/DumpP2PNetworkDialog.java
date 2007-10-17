@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveProvider;
 
@@ -73,7 +74,7 @@ public class DumpP2PNetworkDialog extends Dialog {
 
         /* Get the machine's name */
         try {
-            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            initialHostValue = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
         } catch (UnknownHostException e) {
             // TODO catch this exception, and do something
             e.printStackTrace();

@@ -109,8 +109,8 @@ public class ClassServerServlet extends HttpServlet {
             //            int port = Integer.parseInt(System.getProperty(
             //                        "proactive.http.port"));
             String url = Constants.XMLHTTP_PROTOCOL_IDENTIFIER + "://" +
-                URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
-                ':' + port + '/' + SERVLET_NAME;
+                URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress()) + ':' +
+                port + '/' + SERVLET_NAME;
 
             //                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+
             //            "/" + SERVLET_NAME ;*/

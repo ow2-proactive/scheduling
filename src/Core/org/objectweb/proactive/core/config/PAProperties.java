@@ -67,6 +67,8 @@ public enum PAProperties {
 
     /** this property indicates to use the IP address instead of DNS entry for a runtime url */
     PA_USE_IP_ADDRESS("proactive.useIPaddress", true),
+    PA_NOLOOPBACK("proactive.nolocal", true),
+    PA_NOPRIVATE("proactive.noprivate", true),
 
     /** TODO cdelbe Describe this property */
     PA_FUTURE_AC("proactive.future.ac", true),

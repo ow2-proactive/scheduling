@@ -57,6 +57,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 
@@ -232,7 +233,7 @@ public class SelectSchedulerDialog extends Dialog {
         String port = "";
         try {
             /* Get the machine's name */
-            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            initialHostValue = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
             /* Get the machine's port */
             port = System.getProperty("proactive.rmi.port");
         } catch (UnknownHostException e) {

@@ -63,7 +63,7 @@ public class Agent implements InitActive, RunActive, EndActive,
         try {
             //System.out.println("getName called");
             //return the name of the Host
-            return URIBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())
+            return URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress())
                              .toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();

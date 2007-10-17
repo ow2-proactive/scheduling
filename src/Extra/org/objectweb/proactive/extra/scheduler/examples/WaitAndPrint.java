@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.examples;
 
 import java.util.Map;
 
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
@@ -57,7 +58,7 @@ public class WaitAndPrint extends ExecutableJavaTask {
                         tRes.value());
                 }
             }
-            message = java.net.InetAddress.getLocalHost().toString();
+            message = URIBuilder.getLocalAddress().toString();
             //	            if (sleepTime == 5){
             //	            	Thread.sleep(sleepTime * 100);
             //	            	System.exit(1);

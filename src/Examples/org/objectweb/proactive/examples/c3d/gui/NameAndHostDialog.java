@@ -254,7 +254,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             }
 
             localhost = URIBuilder.buildURI(URIBuilder.getHostNameorIP(
-                        InetAddress.getLocalHost()), null, null, port).toString();
+                        URIBuilder.getLocalAddress()), null, null, port)
+                                  .toString();
         } catch (UnknownHostException e) {
             localhost = "";
         }

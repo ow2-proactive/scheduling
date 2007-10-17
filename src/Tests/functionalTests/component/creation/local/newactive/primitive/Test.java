@@ -96,6 +96,6 @@ public class Test extends ComponentTest {
 
         Assert.assertEquals(name, "toto");
         Assert.assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    InetAddress.getLocalHost())) != -1);
+                    URIBuilder.getLocalAddress())) != -1);
     }
 }

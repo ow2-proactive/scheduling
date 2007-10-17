@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.extra.logforwarder;
 
+import org.objectweb.proactive.core.util.URIBuilder;
+
+
 public class RemoteLogListener {
     public static final int LISTEN_PORT = 1988;
 
@@ -61,7 +64,7 @@ public class RemoteLogListener {
 
 
 
-                   String hostname = java.net.InetAddress.getLocalHost().getHostName();
+                   String hostname = URIBuilder.getLocalAddress().getHostName();
 
                    sf.listenLog(Integer.parseInt(args[1]),hostname, LISTEN_PORT);
 

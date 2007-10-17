@@ -30,10 +30,15 @@
  */
 package org.objectweb.proactive.core.util;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
@@ -317,6 +322,7 @@ public class URIBuilder {
         if (PAProperties.PA_HOSTNAME.getValue() != null) {
             return PAProperties.PA_HOSTNAME.getValue();
         }
+
         String temp = "";
 
         if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
@@ -341,7 +347,7 @@ public class URIBuilder {
             localName = "localhost";
         }
 
-        java.net.InetAddress hostInetAddress = java.net.InetAddress.getLocalHost();
+        java.net.InetAddress hostInetAddress = getLocalAddress();
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {
                 return URIBuilder.getHostNameorIP(hostInetAddress);
@@ -421,5 +427,79 @@ public class URIBuilder {
         }
 
         return url;
+    }
+
+    /**
+     * Return a suitable network address for localhost
+     *
+     * This function has to be used to determine the IP address of the localhost.
+     * Two ProActive properties can be used to customize the returned address
+     * <ul>
+     *         <li>PA_NOLOOPBACK will discards any loopback address (127.*)</li>
+     *         <li>PA_NOPRIVATE will discards any private IP address (10.*, 192.168.*, etc.)</li>
+     * </ul>
+     *
+     * If no suitable address can be found then the result of InetAddress.getLocalhost is returned.
+     * If no address at all can be found then null is returned.
+     *
+     * This function is IPv6 compliant since it relies on {@link Inet4Address} and {@link Inet6Address}
+     * to determine if an address is loopback/private or not.
+     *
+     * @return A suitable IP Address for this host
+     * @see -Djava.net.preferIPv4Stack=true
+     * @see -Djava.net.preferIPv6Stack=true
+     *
+     * TODO cmathieu Write documentation !
+     */
+    public static InetAddress getLocalAddress() throws UnknownHostException {
+        try {
+            Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
+            while (nis.hasMoreElements()) {
+                NetworkInterface ni = nis.nextElement();
+
+                Enumeration<InetAddress> ias = ni.getInetAddresses();
+                while (ias.hasMoreElements()) {
+                    InetAddress ia = ias.nextElement();
+
+                    if (PAProperties.PA_NOLOOPBACK.isTrue()) {
+                        if (ia.isLoopbackAddress()) {
+                            continue;
+                        }
+                    }
+
+                    if (PAProperties.PA_NOPRIVATE.isTrue()) {
+                        if (ia.isSiteLocalAddress()) {
+                            continue;
+                        }
+                    }
+
+                    // Bug PROACTIVE-19 remove me when closed !
+                    // Since IPv6 is broken skip all IPv6 addresses
+                    System.setProperty("java.net.preferIPv4Stack ", "true");
+                    if (ia instanceof Inet6Address) {
+                        continue;
+                    }
+
+                    /* To automatically use the right protocol when using plain sockets
+                    if (ia instanceof Inet4Address) {
+                            System.setProperty("java.net.preferIPv6Stack ", "false");
+                            System.setProperty("java.net.preferIPv6Stack ", "true");
+                    } else if (ia instanceof Inet6Address) {
+                            System.setProperty("java.net.preferIPv4Stack ", "false");
+                            System.setProperty("java.net.preferIPv6Stack ", "true");
+                    } else {
+                            logger.warn("Unhandled type of InetAddress " + ia.getClass().getName());
+                    }
+                    */
+                    return ia;
+                }
+            }
+        } catch (SocketException e1) {
+            logger.warn("Unable to list all the network interface of this machine",
+                e1);
+        }
+
+        logger.error("No suitable local address can be found");
+        return InetAddress.getLocalHost();
     }
 }

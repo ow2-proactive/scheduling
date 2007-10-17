@@ -61,7 +61,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.MemoryImageSource;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
@@ -74,6 +73,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
@@ -638,7 +638,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             s_localhost = "";
 
             try {
-                s_localhost = InetAddress.getLocalHost().getCanonicalHostName();
+                s_localhost = URIBuilder.getLocalAddress().getCanonicalHostName();
             } catch (UnknownHostException e) {
                 s_localhost = "unknown!";
             }
@@ -654,7 +654,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             s_localhost = "";
 
             try {
-                s_localhost = InetAddress.getLocalHost().getCanonicalHostName();
+                s_localhost = URIBuilder.getLocalAddress().getCanonicalHostName();
             } catch (UnknownHostException e) {
                 s_localhost = "unknown!";
             }

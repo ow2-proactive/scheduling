@@ -47,6 +47,7 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.rmi.ClassServer;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.jmx.remote.management.command.osgi.InstallCommand;
 import org.objectweb.proactive.examples.jmx.remote.management.command.osgi.OSGiCommand;
 import org.objectweb.proactive.examples.jmx.remote.management.exceptions.InvalidTransactionException;
@@ -100,7 +101,7 @@ public class OSGiFramework extends NotificationBroadcasterSupport
         try {
             this.context = context;
             OSGiStore.getInstance().setContext(this.context);
-            this.url = InetAddress.getLocalHost().getCanonicalHostName();
+            this.url = URIBuilder.getLocalAddress().getCanonicalHostName();
             this.port = ClassServer.getServerSocketPort();
             OSGiStore.getInstance().setUrl(url);
             UrlMBean urlMbean = new Url(this.url + '(' + this.port + ')');

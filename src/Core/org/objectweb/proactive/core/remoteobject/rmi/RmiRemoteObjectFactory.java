@@ -132,7 +132,8 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
 
         try {
-            Registry reg = LocateRegistry.getRegistry(url.getPort());
+            Registry reg = LocateRegistry.getRegistry(url.getHost(),
+                    url.getPort());
         } catch (Exception e) {
             LOGGER_RO.debug("creating new rmiregistry on port : " +
                 url.getPort());
@@ -145,6 +146,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
             }
         }
 
+        LOGGER_RO.warn(URIBuilder.removeProtocol(url).toString());
         try {
             if (replacePreviousBinding) {
                 java.rmi.Naming.rebind(URIBuilder.removeProtocol(url).toString(),

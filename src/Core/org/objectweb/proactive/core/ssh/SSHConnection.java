@@ -36,6 +36,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import static org.objectweb.proactive.core.ssh.SSH.logger;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.LocalPortForwarder;
@@ -78,7 +79,7 @@ public class SSHConnection {
         throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("Create SSH Connection from" +
-                InetAddress.getLocalHost() + " to " + hostname + ":" + port);
+                URIBuilder.getLocalAddress() + " to " + hostname + ":" + port);
         }
         connection = new Connection(hostname, port);
         connection.connect();

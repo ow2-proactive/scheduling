@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
@@ -71,7 +72,7 @@ public class IMDialogConnection extends Dialog {
 
         /* Get the machine's name */
         try {
-            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            initialHostValue = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
