@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -95,13 +96,15 @@ public class InternalNativeTask extends InternalTask {
                         public Object execute(TaskResult... results) {
                             try {
                                 process = Runtime.getRuntime().exec(cmd);
-                                //TODO ask cdelbe for better solution.
-                                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                                            process.getInputStream()));
-                                String str = null;
-                                while ((str = reader.readLine()) != null) {
-                                    System.out.println(str);
-                                }
+                                new Thread(new ThreadReader(
+                                        new BufferedReader(
+                                            new InputStreamReader(
+                                                process.getInputStream())))).start();
+
+                                new Thread(new ThreadReader(
+                                        new BufferedReader(
+                                            new InputStreamReader(
+                                                process.getErrorStream())))).start();
                                 process.waitFor();
                                 return process.exitValue();
                             } catch (Exception e) {
@@ -141,5 +144,26 @@ public class InternalNativeTask extends InternalTask {
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;
+    }
+
+    protected class ThreadReader implements Runnable {
+        private BufferedReader r;
+
+        public ThreadReader(BufferedReader r) {
+            this.r = r;
+        }
+
+        @Override
+        public void run() {
+            String str = null;
+            try {
+                while ((str = r.readLine()) != null) {
+                    System.out.println(str);
+                }
+            } catch (IOException e) {
+                //FIXME cdelbe gros vilain tu dois throw exception
+                e.printStackTrace();
+            }
+        }
     }
 }
