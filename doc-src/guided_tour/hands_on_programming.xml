@@ -146,9 +146,16 @@
           		<literal>ProActive/lib/fractal.jar</literal>,  
           		and <literal>ProActive/lib/bouncycastle.jar</literal>
            and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
-           JVM option. The steps necessary are explained in <xref linkend="Installation"/>.
+           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in <xref linkend="Installation"/>.
            Also, the full code for the example is available in [[[FOLDER NAME]]] as a ready to run Eclipse project.
 		</para>	
+		<para>
+			The command line for running the application is: 
+			<screen>
+java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main 
+			</screen>
+		</para>
 	</sect2>
 	</sect1>
 
@@ -228,10 +235,17 @@
       	You also have to include the following jar files: ProActive/ProActive.jar, ProActive/lib/javassist.jar,
        	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
        	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
-       	 <literal>-Djava.security.policy=pathToFile </literal> JVM option. The steps necessary are explained in 
+       	 <literal>-Djava.security.policy=pathToFile </literal> 
+       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in 
        	<xref linkend="Installation"/>. Also, the full code for the example is available in
        	  [[[FOLDER NAME]]] as a ready to run Eclipse project.</para>
- 
+ 		<para>	The command line for running the application is: </para> 
+	<para>
+			<screen>
+java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main 
+			</screen>
+ 	</para>
     </sect2>
   </sect1>
 	<sect1>
@@ -322,7 +336,7 @@
 			</para>
 		</sect2>
 		<sect2>
-			<title>Deployment descriptor file</title>
+			<title>Deployment Descriptor File</title>
 			<para>	
 				The deployment descriptor is an XML file containing information on the properties listed above.
 				We will use a simple XML file to deploy the Hello World application on a remote 
@@ -331,22 +345,28 @@
 				descriptors reader <xref linkend="Descriptor"/>.
 			</para>
 			<para>
-				The document uses the XML Schema present at 
-				<xref href="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd"/>
-				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
-				To avoid mistake when building XML descriptors, ProActive provides an XML Schema called
-				DescriptorSchema.xsd. Then to validate your file against this schema,
-				the following line must be put at the top of the XML document as it is
-				done for all ProActive examples.
+				The document uses the XML Schema present at the
+				<xref ulink="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">INRIA</xref> site.
 			</para>
+			<para>	
+				To avoid mistake when building XML descriptors, ProActive provides an XML Schema called
+				DescriptorSchema.xsd. To validate your file against this schema,
+				the following line must be put at the top of the XML document.
+			</para>
+
+				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/schema_location.txt"></textdata></textobject></programlisting>
 			<para>
 				The XML file has a section for defining variables needed later in the document.
-				For our case, we define the location of the ProActive and Java installations.
+				For our case, we define the location of the ProActive and Java installations on the local
+				and remote machine. To start the JVM and use ProActive on the remote machine, we need to define the  
+				location of the Java and ProActive files. This can be done by specifying the paths in the 
+				infrastructure section of the deployment descriptor or by setting the CLASSPATH and JAVA_HOME 
+				variables as described in	<xref linkend="Installation"/>.
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/variable_definition.txt"></textdata></textobject></programlisting>
 			</para>
 			<para>
 				Next, we define the virtual nodes that will be used. In our case we define a node that
-				can contain several JVMs by setting the multiple property.
+				can contain several JVMs by setting the multiple property. 
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/component_definition.txt"></textdata></textobject></programlisting>
 			</para>
 			<para>
@@ -354,28 +374,86 @@
 				mapped on the Virtual Nodes
 				It has two parts one dealing with the mapping of the JVMs to the Virtual Nodes and another
 				related to how the JVMs are created. In our case we map one JVM to the remote node and
-				define a process reference that will be used later in the file. 
+				define a process reference that will be used later in the file (infrastructure section)
+				to describe how the JVM is started. 
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/jvms.txt"></textdata></textobject></programlisting>
 			</para>
 			<para>
-				Next is the infrastructure part that uses the previous defined variables to load the
-				jar files needed to create the JVMs. It also defines the hosts on which the 
-				JVMs are deployed.  
+				Next is the infrastructure part that defines the paths to the files needed, the hosts on which the 
+				JVMs are deployed and which protocols are used for communication. 
+				
+				The process definition with the id <literal> genericRemoteJVM </literal> is 
+				necessary to tell the JVM machine how to start a node on the machine
+				that has a reference to it (<literal>processReference</literal>). It will use
+				the paths provided to locate the Java and ProActive files on the remote machine. 
+				Here we are using rsh to start the JVM but several other protocols can be used
+				as described in <xref linkend="Descriptor"/>. 
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
 			</para>
 			<para>
+				To deploy on a remote machine you will need to change the <literal>
+				hostname </literal> tag to fit your machine name. In our case the remote machine
+				needs to have the <literal> rsh </literal> service running.
+				 
 				The full deployment descriptor file:
 				<programlisting lang="xml"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
-			</para>	
-			<para>
-				We also need to change the <literal>Main</literal> class to declare the deployment descriptors 
-				to be used.
-				
-				Changes to the <literal>Main</literal>class:
-				<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
 			</para>
+			</sect2>	
+			<sect2>
+				<title> Application changes </title>
+				
+			<para>
+				To be able to deploy on remote machines we just have to use the deployment file
+				and add a method that tells ProActive to active the nodes used. 
+				<figure>
+					<title>Deployed HelloWorld architecture</title>
+					<mediaobject>
+						<imageobject> <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/hello/DeployedHelloWorld.png"
+                         format="PNG" width="6in" /></imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+				<para>
+				We will change the <literal>Main</literal> class to declare 
+				and load the deployment descriptors	to be used. For this we will use 
+				a <literal>static deploy</literal> method that returns the Node on 
+				which we deploy the active object. First, the method creates an
+				object representation of the deployment file, then activates all the nodes,
+				and then returns the first available node.  
+				</para>
+				<programlisting lang="java"><textobject><textdata fileref="code_snippets/deployed_hello_example/deploy_method.txt"></textdata></textobject></programlisting>
+				
+				
+				<para>The <literal>Main</literal> class:</para>
+				<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DeployedHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
+
 			
 		</sect2>
+
+
+
+    <sect2>
+      <title>Running the DeployedHelloWorld application</title>
+
+      <para>To compile and run the application you need the
+      	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
+      	You also have to include the following jar files: ProActive/ProActive.jar, ProActive/lib/javassist.jar,
+       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
+       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
+       	 <literal>-Djava.security.policy=pathToFile </literal> 
+       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in 
+       	<xref linkend="Installation"/>. Also, the full code for the example is available in
+       	  [[[FOLDER NAME]]] as a ready to run Eclipse project.</para>
+ 			<para>
+ 			The command line for running the application is:
+ 			</para> 
+	<para>
+		<screen>java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml</screen>
+ 	</para>
+    </sect2>
+
 	</sect1>
 
   <sect1>
@@ -385,167 +463,102 @@
       <primary>Migration</primary>
     </indexterm>
 
-    <para>This program is a very simple one: it creates an active object that
-    migrates between virtual machines. It is a extension of the previous
-    client-server example, the server now being mobile.</para>
+    <para>Our next example deals with migrating the active objects between 
+    remote nodes. We will start the active object on one machine and then move it 
+    to another one. We will need to change the descriptor file to specify the
+    second virtual node and machine and add a method that enables us to 
+    tell the active object to migrate. </para>
 
     <sect2>
       <title>Required conditions</title>
 
-      <para>The conditions for MigratableHello to be a migratable active
-      object are:</para>
+      <para>An active object must implement the Serializable interface (as it will be transferred
+      through the network) in order to be able to migrate.</para>
 
-      <para>- it must have a constructor without parameters: this is a result
-      of a ProActive restriction : the active object having to implement a
-      no-arg constructor. &lt;/ p&gt;</para>
-
-      <para>- implement the Serializable interface (as it will be transferred
-      through the network).&lt;/&gt;</para>
-
-      <para>Hello, the superclass, must be able to be serialized, in order to
-      be transferred remotely. It does not have to implement directly
-      java.io.Serializable, but its attributes should be serializable - or
-      transient. For more information on this topic, check <xref
+      <para> For more information on the topic of object migration, check <xref
       linkend="Migration" /> .</para>
     </sect2>
 
     <sect2>
       <title>Design</title>
 
-      <para>We want to further enhance InitializedHello it by making
-      migratable: we'd like to be able to move it across virtual
-      machines.</para>
-
-      <para>Thus, we create a MigratableHello class, that derives from
+      
+      <para>We create a MigrateableHello class, that derives from
       InitializedHello. This class will implement all the non-functionnal
       behavior concerning the migration, for which this example is created.
-      The Hello class (and InitializedHello) is left unmodified.</para>
+      The Hello and InitializedHello classes are left unmodified.</para>
 
-      <para><emphasis>Note that the migration has to be initiated <emphasis
-      role="underline">by the active object itself</emphasis>. This explains
-      why we have to write the moveTo method in the code of MigratableHello -
+      <para>The migration has to be initiated
+      by the active object itself. We will have to write the migrate method in the code of MigrateableHello -
       i.e. a method that contains an explicit call to the migration primitive.
-      (cf <xref linkend="Migration" /> for migration documentation
-      )</emphasis></para>
-
-      <para>MigratableHello also implements a factory method for instanciating
-      itself as an active object : <literal>static MigratableHello
-      createMigratableHello(String: name)</literal></para>
-
+      </para>
+    
       <para>The class diagram for the application is the following:</para>
 
-      <para><informalfigure>
+      <para><figure>
+      	<title>The Migrateable HelloWorld architecture</title>
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/migratablehello.png"
+                         fileref="guided_tour/pics/hello/MigrateableHelloWorld.png"
                          format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
-        </informalfigure></para>
+        </figure></para>
     </sect2>
 
     <sect2>
-      <title>Programming</title>
-
-      <sect3>
-        <title>a) the MigratableHello class</title>
-
-        <para>The code of the MigratableHello class is in <xref
-        linkend="tutorialCodeSrc.MigratableHello.java" />.</para>
-
-        <para>MigratableHello derives from the Hello class from the previous
-        example</para>
-
-        <para>MigratableHello being the active object itself, it has
-        to:</para>
-
-        <para>- implement the Serializable interface</para>
-
-        <para>- provide a no-arg constructor</para>
-
-        <para>- provide an implementation for using ProActive's migration
-        mechanism.</para>
-
-        <para>A new method getCurrentNodeLocation is added for the object to
-        tell the node where it resides..</para>
-
-        <para>A factory static method is added for ease of creation.</para>
-
-        <para>The migration is initiated by the moveTo method:</para>
-
-        <programlisting lang="java">/** method for migrating
-* @param destination_node destination node
-*/
-public void moveTo(String destination_node) {
-        System.out.println("\n-----------------------------");
-        System.out.println("starting migration to node: " + destination_node);
-        System.out.println("...");
-        try {
-                // THIS MUST BE THE LAST CALL OF THE METHOD
-                ProActive.migrateTo(destination_node);
-        } catch (MigrationException me) {
-                System.out.println("migration failed: " + me.toString());
-        }
-}          </programlisting>
+      <title>Deployment descriptor change</title>
+      <para>
+      	In the deployment descriptor file we will define a new virtual node,
+      </para>
+      <para>	
+      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migrateable_hello/component_definition.txt"></textdata></textobject></programlisting>
+      </para>
+      <para>	
+      	another JVM to be started in the virtual node,
+      </para>
+      <para>
+      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migrateable_hello/jvms.txt"></textdata></textobject></programlisting>
+      </para>	
+      <para>
+      	 and a host on which the new virtual node will be located. 
+	 
+      </para>	 
+      		<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migrateable_hello/infrastructure.txt"></textdata></textobject></programlisting>
+      <para>
+    	The full deployment descriptor file is:
+		</para>
+	<programlisting lang="xml"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/deployment.xml"></textdata></textobject></programlisting>
+	</sect2>
+	
+<sect2>
+	<title> Architecture change </title>
+	<para> We will extend the <literal>InitializedHelloWorld</literal> class and add a method that
+	makes the active object instantiated from the new class able to migrate. The new class also
+	has to implement the <literal>Serializable</literal> interface in order to be sent over
+	the network.</para>
+	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/MigrateableHello.java"></textdata></textobject></programlisting>
+	
+	<para>
+		We also have to change the <literal>Main</literal>class to retrieve the node
+		to which the active object will migrate. For this we will add a method that
+		returns the node contained in the virtual node on the second remote machine. 
+	</para>
+      	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migrateable_hello/node_retrieving_method.txt"></textdata></textobject></programlisting>
+	<para>
+		The full new <literal> Main </literal> class is: 
+	</para>	
+		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/Main.java"></textdata></textobject></programlisting>
+	
 
         <para>Note that the call to the ProActive primitive
         <literal>migrateTo</literal> is the last one of the method moveTo. See
         <xref linkend="Migration" /> for more information.</para>
-      </sect3>
-
-      <sect3>
-        <title>c) the client class</title>
-
-        <para>The entry point of the program is written in a separate class:
-        MigratableHelloClient (see <xref
-        linkend="tutorialCodeSrc.MigratableHelloClient.java" />).</para>
-
-        <para>It takes as arguments the locations of the nodes the object will
-        be migrated to.</para>
-
-        <para>The program calls the factory method of MigratableHello to
-        create an instance of an active object. It then moves it from node to
-        node, pausing for a while between the transfers.</para>
-      </sect3>
     </sect2>
 
-    <sect2>
-      <title>Execution</title>
-
-      <para>- start several nodes using the <literal>startnode</literal>
-      script.</para>
-
-      <screen>windows&gt;cd scripts/windows
-                                startNode.bat //localhost/n1
-                                startNode.bat //localhost/n2
-linux&gt;cd scripts/linux
-                ./startNode.sh //localhost/n1
-                ./startNode.sh //localhost/n2       </screen>
-
-      <para>- compile and run the program (run MigratableHelloClient), passing
-      in parameter the urls of the nodes you'd like the agent to migrate
-      to.</para>
-
-      <screen>cd compile
-windows&gt;build.bat examples
-linux&gt;build examples
-cd ..       </screen>
-
-      <para><literal>linux&gt;java
-      -Djava.security.policy=scripts/proactive.java.policy
-      -Dlog4j.configuration=file:scripts/proactive-log4j
-      org.objectweb.proactive.examples.hello.MigratableHelloClient
-      //localhost/n1 //localhost/n2</literal></para>
-
-      <para><literal>windows&gt;java
-      -Djava.security.policy=scripts\proactive.java.policy
-      -Dlog4j.configuration=file:scripts\proactive-log4j
-      org.objectweb.proactive.examples.hello.MigratableHelloClient
-      //localhost/n1 //localhost/n2</literal></para>
-
-      <para>- observe the instance of MigratableHello migrating:</para>
-
+   
+   <sect2>
       <para><informalfigure>
           <mediaobject>
             <imageobject>
@@ -560,6 +573,30 @@ cd ..       </screen>
       node to node, each time returning 'hello' and telling the client program
       where it is located.</para>
     </sect2>
+    
+    
+       <sect2>
+      <title>Running the InitializedHelloWorld application</title>
+
+      <para>To compile and run the application you need the
+      	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
+      	 MigrateableHello class,and the new Main class,.
+      	You also have to include the following jar files: ProActive/ProActive.jar, ProActive/lib/javassist.jar,
+       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
+       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
+       	 <literal>-Djava.security.policy=pathToFile </literal> 
+       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in 
+       	<xref linkend="Installation"/>. Also, the full code for the example is available in
+       	  [[[FOLDER NAME]]] as a ready to run Eclipse project.</para>
+ 		<para>	The command line for running the application is: </para> 
+	<para>
+			<screen>
+java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml
+			</screen>
+ 	</para>
+    </sect2>
+    
   </sect1>
 
   <sect1>
@@ -576,10 +613,10 @@ cd ..       </screen>
     more sophisticated frames.</para>
 
     <sect2>
-      <title>Design of the migratable application</title>
+      <title>Design of the migrateable application</title>
 
       <para>We will write a new active object class, that extends
-      MigratableHello. The sayHello method will create a window containing the
+      MigrateableHello. The sayHello method will create a window containing the
       hello message. This window is defined in the class HelloFrame</para>
 
       <para><informalfigure>
@@ -602,7 +639,7 @@ cd ..       </screen>
         <para>The code of the HelloFrameController is in <xref
         linkend="tutorialCodeSrc.HelloFrameController.java" />.</para>
 
-        <para>This class extends MigratableHello, and adds an activity and a
+        <para>This class extends MigrateableHello, and adds an activity and a
         migration strategy manager to the object .</para>
 
         <para>It creates a graphical frame upon call of the sayHello
@@ -624,7 +661,7 @@ cd ..       </screen>
  */
 public void initActivity(Body body) {
         // add a migration strategy manager on the current active object
-        migrationStrategyManager = new MigrationStrategyManagerImpl((Migratable) ProActive.getBodyOnThis());
+        migrationStrategyManager = new MigrationStrategyManagerImpl((Migrateable) ProActive.getBodyOnThis());
         // specify what to do when the active object is about to migrate
         // the specified method is then invoked by reflection
         migrationStrategyManager.onDeparture('clean');
@@ -658,18 +695,18 @@ public void initActivity(Body body) {
       <itemizedlist>
         <listitem>
           <para>Create a new class HelloFrameControllerClient: take the code
-          of MigratableHelloClient used in the previous part, change the class
+          of MigrateableHelloClient used in the previous part, change the class
           declaration to HelloFrameControllerClient and replace the
           line</para>
         </listitem>
       </itemizedlist>
 
-      <para><literal>MigratableHello migratable_hello =
-      MigratableHello.createMigratableHello("agent1");</literal></para>
+      <para><literal>MigrateableHello migrateable_hello =
+      MigrateableHello.createMigrateableHello("agent1");</literal></para>
 
       <para>with</para>
 
-      <para><literal>MigratableHello migratable_hello =
+      <para><literal>MigrateableHello migrateable_hello =
       HelloFrameController.createHelloFrameController("agent1");</literal></para>
 
       <itemizedlist>
