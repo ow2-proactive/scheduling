@@ -2,11 +2,13 @@ REM Local deployment of Grid Scilab ToolBox
 REM To define enviroment Variables
 @echo off
 
-#SET SCIDIR=<your current scilab path>
-#SET SCI=<your current scilab path>
-#SET PATH=%LD_LIBRARY_PATH%:%SCIDIR%/bin:.
+rem SET SCIDIR=<your current scilab path>
+rem SET SCI=<your current scilab path>
+rem SET MATLAB_DIR=<your current Matlab path>
+rem SET PATH=%SCIDIR%\bin;%MATLAB_DIR%\bin\win32;%PROACTIVE%\lib;%PATH%
 
-
-SET SCIDIR="c:\scilab\build4\scilab"
+SET SCIDIR=c:\scilab\build4\scilab
 SET SCI=%SCIDIR% 
-SET PATH=%SCIDIR%\bin;%PATH%
+SET MATLAB_DIR=C:\Program Files\MATLAB\R2007b
+SET MATLAB=matlab.exe
+SET PATH=%SCIDIR%\bin;%MATLAB_DIR%\bin\win32;%PROACTIVE%\lib;%PATH%
