@@ -78,7 +78,6 @@ public class InternalRemoteRemoteObjectImpl
         return this.uri;
     }
 
-
     public void setURI(URI uri) throws ProActiveException, IOException {
         this.uri = uri;
     }
@@ -102,36 +101,30 @@ public class InternalRemoteRemoteObjectImpl
         return this.remoteObject.receiveMessage(message);
     }
 
-
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getCertificate();
     }
-
 
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getCertificateEncoded();
     }
 
-
     public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
-
 
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getPolicy(securityContext);
     }
 
-
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getPublicKey();
     }
-
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
@@ -140,7 +133,6 @@ public class InternalRemoteRemoteObjectImpl
         return this.remoteObject.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
     }
-
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
@@ -157,7 +149,6 @@ public class InternalRemoteRemoteObjectImpl
             encodedIVParameters, encodedClientMacKey, encodedLockData,
             parametersSignature);
     }
-
 
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
