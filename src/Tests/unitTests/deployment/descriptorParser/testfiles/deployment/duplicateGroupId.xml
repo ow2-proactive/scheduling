@@ -2,11 +2,11 @@
 <pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd ">
-	<pa:resources />
 	<pa:infrastructure>
 		<pa:groups>
 			<pa:sshGroup hostList="host" id="not_unique"></pa:sshGroup>
 			<pa:sshGroup hostList="host" id="not_unique"></pa:sshGroup>
 		</pa:groups>
 	</pa:infrastructure>
+	<pa:resources />
 </pa:GCMDeployment>

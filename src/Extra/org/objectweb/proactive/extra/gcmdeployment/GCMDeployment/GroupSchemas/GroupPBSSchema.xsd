@@ -8,11 +8,8 @@
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
-	<!-- the Prun group schema is needed because the pbsoption element derives from prunoption -->
-	<include schemaLocation="GroupPrunSchema.xsd" />
-
 	<!--PBSProcess-->
-	<complexType name="PbsProcessType">
+	<complexType name="pbsProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
@@ -25,6 +22,6 @@
 		</complexContent>
 	</complexType>
 
-	<element name="pbsGroup" type="paext:PbsProcessType" substitutionGroup="pa:abstractShElement" />
+	<element name="pbsGroup" type="paext:pbsProcessType" substitutionGroup="pa:abstractShElement" />
 
 </schema>

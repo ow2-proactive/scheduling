@@ -8,7 +8,7 @@
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
-	<complexType name="GlobusProcessType">
+	<complexType name="globusProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
@@ -24,6 +24,6 @@
 		</complexContent>
 	</complexType>
 
-	<element name="globusGroup" type="paext:GlobusProcessType" substitutionGroup="pa:abstractShElement"></element>
+	<element name="globusGroup" type="paext:globusProcessType" substitutionGroup="pa:abstractShElement"></element>
 
 </schema>

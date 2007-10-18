@@ -3,12 +3,7 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
-
 	
-	<resources>
-		<host refid="schubby"/>
-	</resources>
-
 	<infrastructure>
 		<hosts>
 			<host id="schubby" os="unix" hostCapacity="1" vmCapacity="1">
@@ -16,4 +11,9 @@
 			</host>
 		</hosts>
 	</infrastructure>
+
+	<resources>
+		<host refid="schubby"/>
+	</resources>
+
 </GCMDeployment>

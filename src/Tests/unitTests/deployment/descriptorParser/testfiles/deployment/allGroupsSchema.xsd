@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	elementFormDefault="qualified">
+
+<!-- 
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd" />
+    <import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupBSubSchema.xsd" />
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGLiteSchema.xsd" />
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGlobusSchema.xsd" />
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGridEngineSchema.xsd" />
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupMPISchema.xsd" />
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARGridSchema.xsd" />
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARSchema.xsd" />	
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPBSSchema.xsd" />
+	<import namespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension" schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPrunSchema.xsd" />
+ -->	
+
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupARCSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupFuraSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGLiteSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGlobusSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGridEngineSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupLSFSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupLoadLevelerSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARGridSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARSchema.xsd" />	
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPBSSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPrunSchema.xsd" />
+
+</schema>

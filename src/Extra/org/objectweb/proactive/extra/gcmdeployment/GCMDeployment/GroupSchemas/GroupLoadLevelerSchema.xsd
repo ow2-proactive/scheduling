@@ -8,31 +8,24 @@
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
-	<complexType name="arcProcessType">
+	<complexType name="loadLevelerProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="count" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="arguments" type="string" minOccurs="0" />
-					<element name="inputFiles" type="paext:arcFileTransferType" minOccurs="0" />
-					<element name="outputFiles" type="paext:arcFileTransferType" minOccurs="0" />
 					<element name="directory" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="notify" type="string" minOccurs="0" />
+					<element name="arguments" type="string" minOccurs="0" />
+					<element name="nbTasks" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="cpusPerTask" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="tasksPerHost" type="pa:PosintOrVariableType" minOccurs="0" />
 				</sequence>
 				<attribute name="jobName" type="string" />
 			</extension>
 		</complexContent>
 	</complexType>
 
-	<complexType name="arcFileTransferType">
-		<attribute name="filename" type="string" />
-		<attribute name="location" type="string" />
-	</complexType>
-
-	<element name="arcGroup" type="paext:arcProcessType" substitutionGroup="pa:abstractShElement"></element>
+	<element name="loadLevelerGroup" type="paext:loadLevelerProcessType" substitutionGroup="pa:abstractShElement"></element>
 
 </schema>

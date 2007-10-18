@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GCMDeployment
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
-	
-	<resources>
-		<group refid="gINRIA">
-			<host refid="hSchubby"/>	
-		</group>
-	</resources>
 
 	<infrastructure>
 		<hosts>
@@ -17,11 +10,18 @@
 				<homeDirectory base="root" relpath="/user/cmathieu/home" />
 			</host>
 		</hosts>
-		
+
 		<groups>
-			<sshGroup id="gINRIA" 
-				hostList="schubby cheypa duff" 
-				username="cmathieu"/>
-		</groups>		
+			<sshGroup id="gINRIA" hostList="schubby cheypa duff" username="cmathieu" />
+
+			<rshGroup id="grINRIA" hostList="schubby cheypa duff" username="cmathieu" />
+		</groups>
 	</infrastructure>
+
+	<resources>
+		<group refid="gINRIA">
+			<host refid="hSchubby" />
+		</group>
+	</resources>
+
 </GCMDeployment>

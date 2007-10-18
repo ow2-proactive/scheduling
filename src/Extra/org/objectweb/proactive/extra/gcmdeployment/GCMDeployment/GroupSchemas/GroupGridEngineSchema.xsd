@@ -9,7 +9,7 @@
 	</import>
 
 	<!--gridEngine process -->
-	<complexType name="GridEngineProcessType">
+	<complexType name="gridEngineProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
                 <sequence>
@@ -25,5 +25,5 @@
 		</complexContent>
 	</complexType>
 
-	<element name="gridEngineGroup" type="paext:GridEngineProcessType" substitutionGroup="pa:abstractShElement"></element>
+	<element name="gridEngineGroup" type="paext:gridEngineProcessType" substitutionGroup="pa:abstractShElement"></element>
 </schema>

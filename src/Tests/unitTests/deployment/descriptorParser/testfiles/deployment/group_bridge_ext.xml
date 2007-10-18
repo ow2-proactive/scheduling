@@ -3,18 +3,12 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension            ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/SampleDeploymentExtension.xsd">
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension SampleDeploymentExtension.xsd">
 
 	<environment>
 		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
-
-	<resources>
-		<group refid="gINRIAEXT">
-			<host refid="hSchubby" />
-		</group>
-	</resources>
 
 	<infrastructure>
 		<hosts>
@@ -32,4 +26,12 @@
 			<paext:myBridge id="bINRIAEXT" someattr="somevalue" />
 		</bridges>
 	</infrastructure>
+
+	<resources>
+		<group refid="gINRIAEXT">
+			<host refid="hSchubby" />
+		</group>
+	</resources>
+
+
 </GCMDeployment>

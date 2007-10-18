@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GCMDeployment
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
-	
+
+	<acquisition>
+		<lookup hostlist="schubby" type="RMI" />
+		<p2p nodesAsked="3">
+		</p2p>
+	</acquisition>
+
 	<infrastructure>
 		<hosts>
-			<host id="hSchubby" os="unix" hostCapacity="1" vmCapacity="1">
+			<host id="schubby" os="unix" hostCapacity="1" vmCapacity="1">
 				<homeDirectory base="root" relpath="/user/cmathieu/home" />
 			</host>
 		</hosts>
-		
-		<bridges>
-			<sshBridge
-				commandPath="/usr/bin/ssh"
-				hostname="schubby.inria.fr"
-				id="bSchubby"
-				username="cmathieu"/>
-		</bridges>
 	</infrastructure>
 
 	<resources>
-		<bridge refid="bSchubby">	
-			<bridge refid="bSchubby">	
-				<host refid="hSchubby"/>	
-			</bridge>
-		</bridge>
+		<host refid="schubby" />
 	</resources>
+
 
 </GCMDeployment>

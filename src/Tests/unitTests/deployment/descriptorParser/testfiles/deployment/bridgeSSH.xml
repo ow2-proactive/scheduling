@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
-
-
-	<resources>
-		<bridge refid="bSchubby">
-			<host refid="hSchubby" />
-		</bridge>
-	</resources>
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
 	<infrastructure>
 		<hosts>
@@ -20,6 +13,15 @@
 		<bridges>
 			<sshBridge commandPath="/usr/bin/ssh" hostname="schubby.inria.fr" id="bSchubby" username="cmathieu" />
 
+			<rshBridge hostname="schubby.inria.fr" id="brSchubby" username="cmathieu" />
+
 		</bridges>
 	</infrastructure>
+
+	<resources>
+		<bridge refid="bSchubby">
+			<host refid="hSchubby" />
+		</bridge>
+	</resources>
+
 </GCMDeployment>
