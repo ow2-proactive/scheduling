@@ -39,8 +39,10 @@ import java.net.ProtocolException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -104,10 +106,10 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         if (key == null) {
             return null;
         }
-        ArrayList list = (ArrayList) _properties.get(key);
+        List<String> list = _properties.get(key);
         String retval = null;
         if (list != null) {
-            retval = (String) list.get(0);
+            retval = list.get(0);
         }
         return retval;
     }
@@ -257,13 +259,14 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
             e.printStackTrace();
         }
 
-        java.util.Set set = _properties.entrySet();
-        for (java.util.Iterator i = set.iterator(); i.hasNext();) {
-            Map.Entry entry = (Map.Entry) i.next();
-            String key = (String) entry.getKey();
-            ArrayList values = (ArrayList) entry.getValue();
-            for (java.util.Iterator j = values.iterator(); j.hasNext();) {
-                String val = (String) j.next();
+        Set<Map.Entry<String, List<String>>> set = _properties.entrySet();
+        for (java.util.Iterator<Map.Entry<String, List<String>>> i = set.iterator();
+                i.hasNext();) {
+            Map.Entry<String, List<String>> entry = i.next();
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+            for (Iterator<String> j = values.iterator(); j.hasNext();) {
+                String val = j.next();
                 try {
                     connection.addRequestProperty(key, val);
                 } catch (Exception e) {
@@ -304,7 +307,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
                             port // uncomment the following line and comment the one above to make sure
                                  // you test that connections fallback to tunneling if the main
                                  // connection fails.
-                                 //+ 1 
+                                 //+ 1
                              +path);
                     logger.debug("try http not tunneled");
                     _httpConnection = (HttpURLConnection) httpURL.openConnection();
