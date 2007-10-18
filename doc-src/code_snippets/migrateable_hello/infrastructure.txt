@@ -1,0 +1,54 @@
+	<infrastructure>
+		<processes>
+			<!-- SPECIFICATION FOR THE REMOTE INFRASTRUCTURE -->
+			<processDefinition id="genericRemoteJVM">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/dist/ProActive/ProActive.jar" />
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/lib/fractal.jar" />
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/lib/xercesImpl.jar" />
+					</classpath>
+					<javaPath>
+						<absolutePath
+							value="${REMOTE_JAVA_HOME}/bin/java" />
+					</javaPath>
+					<policyFile>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/scripts/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath
+							value="${REMOTE_PROACTIVE_HOME}/scripts/proactive-log4j" />
+					</log4jpropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<!-- HOST AND PROTOCOL DEFINITION -->
+			<processDefinition id="rsh_cheypa">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="cheypa.inria.fr">
+					<processReference refid="genericRemoteJVM" />
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_orchidee">
+				<rshProcess
+					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+					hostname="orchidee.inria.fr">
+					<processReference refid="genericRemoteJVM" />
+				</rshProcess>
+			</processDefinition>
+			
+		</processes>
+	</infrastructure>
