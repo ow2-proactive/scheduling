@@ -34,11 +34,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 

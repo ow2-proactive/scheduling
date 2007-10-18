@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.gui.composite;
 import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
@@ -49,7 +50,6 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.PendingJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 
 
 /**

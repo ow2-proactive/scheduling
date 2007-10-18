@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.gui.data;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
 
 
 public interface EventJobsListener {

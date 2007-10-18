@@ -36,8 +36,10 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
@@ -55,8 +57,6 @@ import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
 
 
 /**

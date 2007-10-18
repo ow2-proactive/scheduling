@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.gui.data;
 
-import org.objectweb.proactive.extra.scheduler.task.TaskEvent;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 
 
 /**

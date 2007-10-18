@@ -41,13 +41,13 @@ import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
 
 
