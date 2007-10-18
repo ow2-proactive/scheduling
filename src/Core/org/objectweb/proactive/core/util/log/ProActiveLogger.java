@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.core.util.log;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -48,8 +50,15 @@ public class ProActiveLogger extends Logger {
 
     static {
         if (System.getProperty("log4j.configuration") == null) {
-            PropertyConfigurator.configure(PAProperties.class.getResource(
-                    "proactive-log4j"));
+            URL u = PAProperties.class.getResource("proactive-log4j");
+            try {
+                // testing the avaibility of the file
+                u.openStream().close();
+                PropertyConfigurator.configure(u);
+            } catch (IOException e) {
+                System.err.println("the default log4j configuration file (" +
+                    u.toString() + ") is not accessible, looging is disabled");
+            }
         }
     }
 
