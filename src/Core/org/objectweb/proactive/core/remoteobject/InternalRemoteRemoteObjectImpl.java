@@ -74,17 +74,15 @@ public class InternalRemoteRemoteObjectImpl
         this.remoteRemoteObject = rro;
     }
 
-    @Override
     public URI getURI() throws ProActiveException, IOException {
         return this.uri;
     }
 
-    @Override
+
     public void setURI(URI uri) throws ProActiveException, IOException {
         this.uri = uri;
     }
 
-    @Override
     public Reply receiveMessage(Request message)
         throws ProActiveException, IOException, RenegotiateSessionException {
         if (message instanceof InternalRemoteRemoteObjectRequest) {
@@ -104,37 +102,37 @@ public class InternalRemoteRemoteObjectImpl
         return this.remoteObject.receiveMessage(message);
     }
 
-    @Override
+
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getCertificate();
     }
 
-    @Override
+
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getCertificateEncoded();
     }
 
-    @Override
+
     public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
 
-    @Override
+
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getPolicy(securityContext);
     }
 
-    @Override
+
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getPublicKey();
     }
 
-    @Override
+
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
@@ -143,7 +141,7 @@ public class InternalRemoteRemoteObjectImpl
             myCertificate, signature);
     }
 
-    @Override
+
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
@@ -160,40 +158,34 @@ public class InternalRemoteRemoteObjectImpl
             parametersSignature);
     }
 
-    @Override
+
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return this.remoteObject.startNewSession(policy);
     }
 
-    @Override
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
         this.remoteObject.terminateSession(sessionID);
     }
 
-    @Override
     public RemoteObject getRemoteObject() {
         return this.remoteObject;
     }
 
-    @Override
     public RemoteRemoteObject getRemoteRemoteObject() {
         return this.remoteRemoteObject;
     }
 
-    @Override
     public void setRemoteRemoteObject(RemoteRemoteObject remoteRemoteObject) {
         this.remoteRemoteObject = remoteRemoteObject;
     }
 
-    @Override
     public void setRemoteObject(RemoteObject remoteObject) {
         this.remoteObject = remoteObject;
     }
 
-    @Override
     public Object getObjectProxy() {
         try {
             return this.remoteObject.getObjectProxy(this.remoteRemoteObject);
