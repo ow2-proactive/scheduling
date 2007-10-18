@@ -57,7 +57,7 @@ public class ProActiveLogger extends Logger {
                 PropertyConfigurator.configure(u);
             } catch (IOException e) {
                 System.err.println("the default log4j configuration file (" +
-                    u.toString() + ") is not accessible, looging is disabled");
+                    u.toString() + ") is not accessible, logging is disabled");
             }
         }
     }
