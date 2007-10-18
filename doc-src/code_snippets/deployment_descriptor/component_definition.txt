@@ -1,5 +1,5 @@
 <componentDefinition>
 	<virtualNodesDefinition>
-		<virtualNode name="remoteNode" property="unique" />
+		<virtualNode name="remoteNode" property="multiple" />
 	</virtualNodesDefinition>
 </componentDefinition>
