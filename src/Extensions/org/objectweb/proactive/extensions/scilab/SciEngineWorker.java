@@ -94,7 +94,7 @@ public class SciEngineWorker implements Serializable {
                 }
             }
         } catch (TaskException e) {
-        	logger.error(e.getMessage());
+            logger.error(e.getMessage());
             this.genResult.setState(GeneralResult.ABORT);
             this.genResult.setException(e);
         }

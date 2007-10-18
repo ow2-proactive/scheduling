@@ -73,7 +73,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * You can join this front-end by using the <code>join()</code> method
  * in {@link SchedulerConnection} .
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 28, 2007
  * @since ProActive 3.2
  */
@@ -173,6 +173,15 @@ public class SchedulerFrontend implements InitActive,
     /* ########################################################################################### */
 
     /**
+     * Connect the scheduler front-end to the scheduler authentication.
+     */
+    public void connect() {
+        authenticationInterface = (SchedulerAuthentication) ProActiveObject.getContext()
+                                                                           .getStubOnCaller();
+        authenticationInterface.activate();
+    }
+
+    /**
      * Connect a new user on the scheduler.
      * This user can interact with the scheduler according to his right.
      *
@@ -181,10 +190,6 @@ public class SchedulerFrontend implements InitActive,
      */
     public void connect(UniqueID sourceBodyID, UserIdentification identification)
         throws SchedulerException {
-        if (authenticationInterface == null) {
-            authenticationInterface = (SchedulerAuthentication) ProActiveObject.getContext()
-                                                                               .getStubOnCaller();
-        }
         if (identifications.containsKey(sourceBodyID)) {
             logger.warn("Active object already connected !");
             throw new SchedulerException(
@@ -333,7 +338,7 @@ public class SchedulerFrontend implements InitActive,
     /* ########################################################################################### */
 
     /**
-     * Factorisation for the next 7 scheduler orders.
+     * Factoring for the next 7 scheduler orders.
      *
      * @param permissionMsg the message to log if an error occurs.
      * @return true if order can continue, false if not.
@@ -446,7 +451,7 @@ public class SchedulerFrontend implements InitActive,
     }
 
     /**
-     * Factorisation of exception management for the 4 next jobs order.
+     * Factoring of exception management for the 4 next jobs order.
      *
      * @param jobId the jobId concerned by the order.
      * @param permissionMsg the message to send the user if he has no right.
@@ -539,8 +544,8 @@ public class SchedulerFrontend implements InitActive,
     /**
      * Events dispatcher.
      * This method will invoke the given method on every listener.
-     * The method is selected with the class type params and an optional parameter.
-     * WARNING : in case of refactoring, make sure that the textual occurances of method names are modify as well.
+     * The method is selected with the class type arguments and an optional parameter.
+     * WARNING : in case of re-factoring, make sure that the textual occurrences of method names are modify as well.
      *
      * @param methodName a string representing the name of the method to invoke.
      * @param types the class type to select the right method.

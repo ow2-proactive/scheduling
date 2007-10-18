@@ -37,6 +37,8 @@ import java.util.Map;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -55,12 +57,13 @@ import org.objectweb.proactive.extra.security.Login;
  * Once authenticate, the <code>login</code> method returns a user/admin interface
  * in order to managed the scheduler.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 23, 2007
  * @since ProActive 3.2
  *
  */
-public class SchedulerAuthentication implements SchedulerAuthenticationInterface {
+public class SchedulerAuthentication implements InitActive,
+    SchedulerAuthenticationInterface {
 
     /** Serial version UID */
     private static final long serialVersionUID = -3143047028779653795L;
@@ -74,8 +77,13 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
     /** The file where to store group management */
     private String groupFile;
 
-    /** The scheduler frontend connected to this authentication interface */
+    /** The scheduler front-end connected to this authentication interface */
     private SchedulerFrontend scheduler;
+
+    /** Active state of the authentication interface :
+      * If false, user can not access the scheduler,
+      * If true user can connect to the scheduler.*/
+    private boolean activated = false;
 
     /**
      * ProActive empty constructor.
@@ -107,10 +115,19 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
     }
 
     /**
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+     */
+    @Override
+    public void initActivity(Body body) {
+        scheduler.connect();
+    }
+
+    /**
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
      */
     public UserSchedulerInterface logAsUser(String user, String password)
         throws LoginException, SchedulerException {
+        isStarted();
         // Verify that this user//password can connect to this existing scheduler
         logger.info(user + " is trying to connect...");
         logger.info("Verifying user name and password...");
@@ -140,6 +157,7 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
      */
     public AdminSchedulerInterface logAsAdmin(String user, String password)
         throws LoginException, SchedulerException {
+        isStarted();
         // Verify that this user//password can connect (as admin) to this existing scheduler.
         logger.info("Verifying admin name and password...");
         Map<String, Object> params = new HashMap<String, Object>(6);
@@ -161,6 +179,21 @@ public class SchedulerAuthentication implements SchedulerAuthenticationInterface
             new UserIdentification(user, true));
         // return the created interface
         return as;
+    }
+
+    private void isStarted() throws SchedulerException {
+        if (!activated) {
+            throw new SchedulerException(
+                "Scheduler is starting, please try to connect it later !");
+        }
+    }
+
+    /**
+     * Active the scheduler authentication interface.
+     * This method allow user to access the scheduler.
+     */
+    public void activate() {
+        activated = true;
     }
 
     /**

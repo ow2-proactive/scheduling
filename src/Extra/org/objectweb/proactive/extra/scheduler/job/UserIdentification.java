@@ -37,7 +37,7 @@ import java.io.Serializable;
  * This class will be able to authenticate a user/admin.
  * Two userIdentification are equals if there username are the same.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 4, 2007
  * @since ProActive 3.2
  */

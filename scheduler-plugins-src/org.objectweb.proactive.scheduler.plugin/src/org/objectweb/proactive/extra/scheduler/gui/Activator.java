@@ -74,7 +74,7 @@ public class Activator extends AbstractUIPlugin {
         simpleLoggerServerThread.start();
 
         try {
-        	//FIXME cmathieu
+            //FIXME cmathieu
             hostname = java.net.InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             hostname = "UnknownHost";

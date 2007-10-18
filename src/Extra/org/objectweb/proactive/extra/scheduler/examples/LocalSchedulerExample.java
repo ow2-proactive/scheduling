@@ -44,6 +44,14 @@ import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 
 
+/**
+ * LocalSchedulerExample start a new scheduler.
+ *
+ * @author jlscheef - ProActiveTeam
+ * @date 18 oct. 07
+ * @version 3.2
+ *
+ */
 public class LocalSchedulerExample {
     //shows how to run the scheduler
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
@@ -88,8 +96,6 @@ public class LocalSchedulerExample {
             adminAPI.start();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Error creating Scheduler " + e.toString());
-            System.exit(1);
         }
     }
 }

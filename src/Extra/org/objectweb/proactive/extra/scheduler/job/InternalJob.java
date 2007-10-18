@@ -38,6 +38,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.common.task.Status;
@@ -129,7 +130,11 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param jobInfo the jobInfo to set
      */
     public synchronized void update(JobEvent jobInfo) {
+        JobResult res = this.jobInfo.getResult();
         this.jobInfo = jobInfo;
+        if (res != null) {
+            this.jobInfo.setResult(res);
+        }
         if (jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 tasks.get(id).setStatus(jobInfo.getTaskStatusModify().get(id));

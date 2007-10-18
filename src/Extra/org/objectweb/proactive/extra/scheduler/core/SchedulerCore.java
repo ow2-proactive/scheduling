@@ -87,7 +87,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * it communicates with the entity manager to acquire nodes and with a policy
  * to insert and get jobs from the queue.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 27, 2007
  * @since ProActive 3.2
  */
@@ -511,8 +511,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //move the job
         runningJobs.remove(job);
         finishedJobs.add(job);
+        //put the job result in the job Info.
+        job.getJobInfo().setResult(results.get(job.getId()));
         //send event to listeners.
         frontend.runningToFinishedJobEvent(job.getJobInfo());
+        //no need to keep the result in the event
+        job.getJobInfo().setResult(null);
         //don't forget to set the task status modify to null after a job.failed(...) method.
         job.setTaskStatusModify(null);
         job.setTaskFinishedTimeModify(null);
@@ -534,11 +538,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         InternalTask descriptor = job.getHMTasks().get(taskId);
         try {
             //The task is terminated but it's possible to have to
-            //wait for the futur of the task result (TaskResult).
+            //wait for the future of the task result (TaskResult).
             //accessing to the taskResult could block current execution but for a little time.
-            //it is the time between the end of the task and the arrival of the futur from the task.
+            //it is the time between the end of the task and the arrival of the future from the task.
             //
-            //check if the task result futur has an error due to node death.
+            //check if the task result future has an error due to node death.
             //if the node has died, a runtimeException is sent instead of the result
             TaskResult res = null;
             res = taskResults.get(taskId);
@@ -546,7 +550,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 if (ProException.isException(res)) {
                     //in this case, it is a node error.
                     //this is not user exception or usage,
-                    //so we restart independently of rerunnable properties
+                    //so we restart independently of re-runnable properties
                     logger.info("<<<<<<<< Node failed on job " + jobId +
                         ", task [ " + taskId + " ]");
                     job.reStartTask(descriptor);
@@ -587,7 +591,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 runningJobs.remove(job);
                 finishedJobs.add(job);
                 logger.info("<<<<<<<<<<<<<<<<<<< Terminated job " + jobId);
+                //put the job result in the job Info.
+                job.getJobInfo().setResult(results.get(job.getId()));
+                //send event to listeners.
                 frontend.runningToFinishedJobEvent(job.getJobInfo());
+                //no need to keep the result in the event
+                job.getJobInfo().setResult(null);
             }
             //free every execution nodes
             resourceManager.freeNodes(descriptor.getExecuterInformations()

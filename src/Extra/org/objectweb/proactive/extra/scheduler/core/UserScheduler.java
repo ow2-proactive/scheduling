@@ -90,7 +90,7 @@ public class UserScheduler implements UserSchedulerInterface {
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener)
      */
     public SchedulerInitialState<?extends Job> addSchedulerEventListener(
-        SchedulerEventListener sel) throws SchedulerException {
+        SchedulerEventListener<?extends Job> sel) throws SchedulerException {
         return schedulerFrontend.addSchedulerEventListener(sel);
     }
 
