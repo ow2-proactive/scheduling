@@ -96,7 +96,8 @@ public interface UserSchedulerInterface extends Serializable {
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
     public SchedulerInitialState<?extends Job> addSchedulerEventListener(
-        SchedulerEventListener<?extends Job> sel) throws SchedulerException;
+        SchedulerEventListener<?extends Job> sel, SchedulerEvent... events)
+        throws SchedulerException;
 
     /**
      * Return the scheduler statistics.

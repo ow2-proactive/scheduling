@@ -31,6 +31,9 @@
 package org.objectweb.proactive.extra.scheduler.job;
 
 import java.io.Serializable;
+import java.util.HashSet;
+
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEvent;
 
 
 /**
@@ -51,6 +54,9 @@ public class UserIdentification implements Serializable {
 
     /** is this user an admin */
     private boolean admin = false;
+
+    /** List of events that the user want to receive. */
+    private HashSet<SchedulerEvent> userEvents = null;
 
     /**
      * Constructor of user identification using user name.
@@ -91,14 +97,35 @@ public class UserIdentification implements Serializable {
     }
 
     /**
-     * @see java.lang.Object#equals(java.lang.Object)
+     * Returns the userEvents.
      *
-     * @return true if the username of this and obj are equals.
+     * @return the userEvents.
      */
+    public HashSet<SchedulerEvent> getUserEvents() {
+        return userEvents;
+    }
+
+    /**
+     * Sets the userEvents to the given userEvents value.
+     *
+     * @param userEvents the userEvents to set.
+     */
+    public void setUserEvents(SchedulerEvent[] events) {
+        userEvents = new HashSet<SchedulerEvent>();
+        for (SchedulerEvent e : events) {
+            userEvents.add(e);
+        }
+    }
+
+    /**
+    * @see java.lang.Object#equals(java.lang.Object)
+    *
+    * @return true if the user name of this and object are equals.
+    */
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof UserIdentification) {
-            return username.equals(((UserIdentification) obj).username);
+    public boolean equals(Object object) {
+        if (object instanceof UserIdentification) {
+            return username.equals(((UserIdentification) object).username);
         }
         return false;
     }
