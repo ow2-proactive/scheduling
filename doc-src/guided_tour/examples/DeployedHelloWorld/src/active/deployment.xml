@@ -2,78 +2,87 @@
 <ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	<!-- VARIABLES DEFINITION -->
 	<variables>
+		<!-- LOCAL PATHS -->
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/user/vjuresch/home/workspace/ProActive" />
 		<descriptorVariable name="JAVA_HOME"
 			value="/user/vjuresch/home/work/jdk1.6.0_02" />
+		<!-- REMOTE PATHS -->
+		<descriptorVariable name="REMOTE_PROACTIVE_HOME"
+			value="/user/vjuresch/home/workspace/ProActive" />
+		<descriptorVariable name="REMOTE_JAVA_HOME"
+			value="/user/vjuresch/home/work/jdk1.6.0_02" />
 	</variables>
+	<!-- VIRTUAL NODES DEFINITION -->
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="remoteNode" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
+	<!-- JVMS MAPPING AND CREATION -->
 	<deployment>
+		<!-- MAPPING -->
 		<mapping>
 			<map virtualNode="remoteNode">
 				<jvmSet>
-					<vmName value="Jvm2" />
+					<vmName value="JVM" />
 				</jvmSet>
 			</map>
 		</mapping>
+		<!-- CREATION -->
 		<jvms>
-			<jvm name="Jvm1">
-				<creation>
-					<processReference refid="genericJVM" />
-				</creation>
-			</jvm>
-			<jvm name="Jvm2">
+			<jvm name="JVM">
 				<creation>
 					<processReference refid="rsh_cheypa" />
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
+	<!-- INFRASTRUCTURE SPECIFICATION -->
 	<infrastructure>
 		<processes>
-			<processDefinition id="genericJVM">
+			<!-- SPECIFICATION FOR THE REMOTE INFRASTRUCTURE -->
+			<processDefinition id="genericRemoteJVM">
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath
-							value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/ProActive/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/fractal.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/lib/fractal.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/lib/javassist.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/lib/log4j.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-
+							value="${REMOTE_PROACTIVE_HOME}/lib/xercesImpl.jar" />
 					</classpath>
 					<javaPath>
-						<absolutePath value="${JAVA_HOME}/bin/java" />
+						<absolutePath
+							value="${REMOTE_JAVA_HOME}/bin/java" />
 					</javaPath>
 					<policyFile>
 						<absolutePath
-							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
+							value="${REMOTE_PROACTIVE_HOME}/scripts/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
 						<absolutePath
-							value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
+							value="${REMOTE_PROACTIVE_HOME}/scripts/proactive-log4j" />
 					</log4jpropertiesFile>
 				</jvmProcess>
 			</processDefinition>
+			<!-- HOST AND PROTOCOL DEFINITION -->
 			<processDefinition id="rsh_cheypa">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
 					hostname="cheypa.inria.fr">
-					<processReference refid="genericJVM" />
+					<processReference refid="genericRemoteJVM" />
 				</rshProcess>
 			</processDefinition>
 		</processes>
