@@ -52,7 +52,8 @@ public class MatlabTask extends AbstractGeneralTask {
     private HashMap<String, Token> listDataIn;
     private static Engine matlabEngine = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
-    private OperatingSystem os = OperatingSystem.getOperatingSystem();;
+    private OperatingSystem os = OperatingSystem.getOperatingSystem();
+    ;
     private static long[] engineHandle;
 
     public MatlabTask(String id) {
@@ -122,10 +123,11 @@ public class MatlabTask extends AbstractGeneralTask {
             try {
                 matlabEngine = new Engine();
                 if (os.equals(OperatingSystem.unix)) {
-                	engineHandle = matlabEngine.open(matlab_command+" -nosplash -nodesktop -nojvm", true);
-                }
-                else {
-                	engineHandle = matlabEngine.open(matlab_command+" -nosplash -minimize", true);
+                    engineHandle = matlabEngine.open(matlab_command +
+                            " -nosplash -nodesktop -nojvm", true);
+                } else {
+                    engineHandle = matlabEngine.open(matlab_command +
+                            " -nosplash -minimize", true);
                 }
             } catch (Throwable e) {
                 throw new MatlabException(e);
