@@ -3,10 +3,6 @@
 echo
 echo --- LAUNCHER ----------------------------------------------
 
-  SCHEDULER_URL=$3
-  NB_JOB=$2
-  JOB_URL=$1
-
 
 workingDir=..
 PROACTIVE=$workingDir/../..
@@ -15,7 +11,7 @@ CLASSPATH=.
 
 echo $JAVACMD
 
-$JAVACMD org.objectweb.proactive.extra.scheduler.examples.JobLauncher $JOB_URL $NB_JOB $SCHEDULER_URL
+$JAVACMD org.objectweb.proactive.extra.scheduler.examples.JobLauncher $1 $2 $3 $4
 
 echo
 

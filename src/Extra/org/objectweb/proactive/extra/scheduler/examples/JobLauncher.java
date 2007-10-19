@@ -30,14 +30,26 @@
  */
 package org.objectweb.proactive.extra.scheduler.examples;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobFactory;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
 
 public class JobLauncher {
@@ -49,16 +61,23 @@ public class JobLauncher {
             String jobUrl = null;
             int nbJob = 1;
             SchedulerAuthenticationInterface auth = null;
+            boolean logIt = false;
+            int pos = 0;
+            if ("-log".equals(args[0])) {
+                logIt = true;
+                pos++;
+            }
+
             if (args.length > 2) {
-                jobUrl = args[0];
-                nbJob = Integer.parseInt(args[1]);
-                auth = SchedulerConnection.join(args[2]);
+                jobUrl = args[pos];
+                nbJob = Integer.parseInt(args[pos + 1]);
+                auth = SchedulerConnection.join(args[pos + 2]);
             } else if (args.length > 1) {
-                jobUrl = args[0];
-                nbJob = Integer.parseInt(args[1]);
+                jobUrl = args[pos];
+                nbJob = Integer.parseInt(args[pos + 1]);
                 auth = SchedulerConnection.join(null);
             } else if (args.length > 0) {
-                jobUrl = args[0];
+                jobUrl = args[pos];
                 auth = SchedulerConnection.join(null);
             } else {
                 System.err.println("You must enter a job descriptor");
@@ -68,9 +87,40 @@ public class JobLauncher {
 
             //CREATE JOB
             Job j = JobFactory.getFactory().createJob(jobUrl);
+
+            //******************** GET JOB OUTPUT ***********************
+            SimpleLoggerServer simpleLoggerServer = null;
+            if (logIt) {
+                try {
+                    // it will launch a listener that will listen connection on any free port
+                    simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             for (int i = 0; i < nbJob; i++) {
                 // SUBMIT JOB
-                scheduler.submit(j);
+                JobId id = scheduler.submit(j);
+                if (logIt) {
+                    // next, this method will forward task output on the previous loggerServer
+                    scheduler.listenLog(id,
+                        URIBuilder.getLocalAddress().getHostName(),
+                        simpleLoggerServer.getPort());
+                    Logger l = Logger.getLogger(SchedulerCore.LOGGER_PREFIX +
+                            id);
+
+                    // coucou Guillaume !
+                    DateFormat dateFormat = new SimpleDateFormat(
+                            "hh'h'mm'm'_dd-MM-yy");
+                    FileAppender fa = new FileAppender(new PatternLayout(
+                                "%m %n"),
+                            "./logs/job[" + j.getName() + "," + id + "]_" +
+                            dateFormat.format(new Date()) + ".log", true);
+                    l.addAppender(fa);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
