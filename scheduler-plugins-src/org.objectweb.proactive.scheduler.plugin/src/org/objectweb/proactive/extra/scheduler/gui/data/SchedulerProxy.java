@@ -84,7 +84,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public SchedulerInitialState<InternalJob> addSchedulerEventListener(
         SchedulerEventListener<?extends Job> listener, SchedulerEvent... events) {
         try {
-            return (SchedulerInitialState<InternalJob>) scheduler.addSchedulerEventListener(listener);
+            return (SchedulerInitialState<InternalJob>) scheduler.addSchedulerEventListener(listener,
+                events);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
