@@ -103,7 +103,7 @@ public class TaskResultImpl implements TaskResult {
      */
     public Object value() throws Throwable {
         if (this.exception != null) {
-            throw new RuntimeException(this.exception);
+            throw this.exception;
         } else {
             return value;
         }
