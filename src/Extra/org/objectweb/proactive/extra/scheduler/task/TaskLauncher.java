@@ -191,7 +191,7 @@ public class TaskLauncher implements InitActive, Serializable {
         // redirect stdout and err
         System.setOut(new PrintStream(new LoggingOutputStream(l, Level.INFO),
                 true));
-        System.setErr(new PrintStream(new LoggingOutputStream(l, Level.ERROR),
+        System.setErr(new PrintStream(new LoggingOutputStream(l, Level.INFO),
                 true));
     }
 

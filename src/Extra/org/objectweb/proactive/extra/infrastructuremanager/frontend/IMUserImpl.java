@@ -70,10 +70,10 @@ public class IMUserImpl implements IMUser {
     //----------------------------------------------------------------------//
     // METHODS
     public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
-        if (logger.isInfoEnabled()) {
-            logger.info("getAtMostNodes, nb nodes : " + nb + " (dispo : " +
-                imcore.getSizeListFreeIMNode() + ")");
-        }
+        //        if (logger.isInfoEnabled()) {
+        //            logger.info("getAtMostNodes, nb nodes : " + nb + " (dispo : " +
+        //                imcore.getSizeListFreeIMNode() + ")");
+        //        }
         return imcore.getAtMostNodes(nb, verifyingScript);
     }
 

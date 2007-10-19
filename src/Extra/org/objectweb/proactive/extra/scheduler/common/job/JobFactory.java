@@ -448,7 +448,7 @@ public class JobFactory {
     private Script<?> createScript(Node node, XPath xpath)
         throws XPathExpressionException, InvalidScriptException {
         String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
-        if ((url != null) && (url != "")) {
+        if ((url != null) && (!url.equals(""))) {
             try {
                 System.out.println(url);
                 return new SimpleScript(new URL(url));
@@ -460,7 +460,7 @@ public class JobFactory {
         }
         String path = (String) xpath.evaluate("@file", node,
                 XPathConstants.STRING);
-        if ((path != null) && (path != "")) {
+        if ((path != null) && (!path.equals(""))) {
             try {
                 System.out.println(path);
                 return new SimpleScript(new File(path));
@@ -471,7 +471,7 @@ public class JobFactory {
 
         String engine = (String) xpath.evaluate("@engine", node,
                 XPathConstants.STRING);
-        if (((engine != null) && (engine != "")) &&
+        if (((engine != null) && (!engine.equals(""))) &&
                 (node.getTextContent() != null)) {
             String script = node.getTextContent();
             try {
@@ -489,7 +489,7 @@ public class JobFactory {
         throws XPathExpressionException, InvalidScriptException {
         // TODO Verify if script is dynamic or static (default : dynamic)
         String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
-        if ((url != null) && (url != "")) {
+        if ((url != null) && (!url.equals(""))) {
             try {
                 System.out.println(url);
                 return new VerifyingScript(new URL(url));
@@ -501,7 +501,7 @@ public class JobFactory {
         }
         String path = (String) xpath.evaluate("@file", node,
                 XPathConstants.STRING);
-        if ((path != null) && (path != "")) {
+        if ((path != null) && (!path.equals(""))) {
             try {
                 System.out.println(path);
                 return new VerifyingScript(new File(path));
@@ -519,6 +519,6 @@ public class JobFactory {
                 e.printStackTrace();
             }
         }
-        throw new InvalidScriptException("The script is not valid");
+        throw new InvalidScriptException("The script is not recognized");
     }
 }

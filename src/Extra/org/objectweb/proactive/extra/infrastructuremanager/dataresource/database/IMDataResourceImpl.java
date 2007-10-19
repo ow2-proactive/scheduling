@@ -137,27 +137,36 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
      * has already been verified.
      */
     public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
+        logger.info("[RESOURCE] Searching for " + nb + " nodes on " +
+            this.nodeManager.getNbFreeNodes() + " free nodes.");
+
         ArrayList<IMNode> nodes = nodeManager.getNodesByScript(verifyingScript,
                 true);
+
+        // log
         StringBuffer order = new StringBuffer();
         for (IMNode n : nodes)
             order.append(n.getHostName() + " ");
-        logger.info("Nodes = " + order);
+        logger.info("[RESOURCE] Available nodes are : " + order);
+
         NodeSet result = new NodeSet();
         int found = 0;
+
+        // no verifying script
         if (verifyingScript == null) {
-            logger.info("No verif script");
             while (!nodes.isEmpty() && (found < nb.intValue())) {
-                IMNode imnode = nodes.remove(0);
-                imnode.clean();
+                IMNode node = nodes.remove(0);
+                node.clean();
                 try {
-                    result.add(imnode.getNode());
-                    nodeManager.setBusy(imnode);
+                    result.add(node.getNode());
+                    nodeManager.setBusy(node);
                     found++;
                 } catch (NodeException e) {
-                    nodeManager.setDown(imnode);
+                    nodeManager.setDown(node);
                 }
             }
+
+            // static verif script
         } else if (!verifyingScript.isDynamic()) {
             logger.info("Static verif script");
             while (!nodes.isEmpty() && (found < nb.intValue())) {
@@ -185,22 +194,21 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                 nodeResults.add(nodes.get(0));
                 ScriptResult<Boolean> sr = nodes.get(0)
                                                 .executeScript(verifyingScript);
-                if (MOP.isReifiedObject(sr)) { // should check isAFuture...
+
+                // if r is not a future, the script has not been executed
+                if (MOP.isReifiedObject(sr)) {
                     scriptResults.add(sr);
                 } else {
-                    // scriptResult is an exception ?
-                    if (sr.errorOccured()) {
-                        logger.warn("======> A script result is ignored ...");
-                    } else {
-                        throw new RuntimeException("COMPRENDS PAS LA ...");
-                    }
+                    // script has not been executed on remote host
+                    // nothing to do, just let the node in the free list
+                    logger.info("Error occured executing verifying script",
+                        sr.getException());
                 }
                 nodes.remove(0);
             }
 
             // Recupere les resultats
-            while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
-                    (found < nb.intValue())) {
+            do {
                 try {
                     int idx = ProFuture.waitForAny(scriptResults,
                             MAX_VERIF_TIMEOUT);
@@ -220,19 +228,23 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                             found++;
                         } catch (NodeException e) {
                             nodeManager.setDown(imnode);
-                            // try on a new node
-                            nodeResults.add(nodes.get(0));
-                            scriptResults.add(nodes.remove(0)
-                                                   .executeScript(verifyingScript));
+                            // try on a new node if any
+                            if (!nodes.isEmpty()) {
+                                nodeResults.add(nodes.get(0));
+                                scriptResults.add(nodes.remove(0)
+                                                       .executeScript(verifyingScript));
+                            }
                         }
                     } else {
                         // result is false
                         nodeManager.setNotVerifyingScript(imnode,
                             verifyingScript);
-                        // try on a new node
-                        nodeResults.add(nodes.get(0));
-                        scriptResults.add(nodes.remove(0)
-                                               .executeScript(verifyingScript));
+                        // try on a new node if any
+                        if (!nodes.isEmpty()) {
+                            nodeResults.add(nodes.get(0));
+                            scriptResults.add(nodes.remove(0)
+                                                   .executeScript(verifyingScript));
+                        }
                     }
                 } catch (ProActiveException e) {
                     // TODO Auto-generated catch block
@@ -240,9 +252,10 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     // traitement special
                     e.printStackTrace();
                 }
-            }
+            } while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
+                    (found < nb.intValue()));
         } else {
-            logger.info("Dynamic verif script");
+            logger.info("[RESOURCE] Nodes with dynamic verif script");
             Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
             Vector<IMNode> nodeResults = new Vector<IMNode>();
 
@@ -252,16 +265,26 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                 nodeResults.add(nodes.get(0));
                 ScriptResult<Boolean> r = nodes.get(0)
                                                .executeScript(verifyingScript);
-                scriptResults.add(r);
+
+                // if r is not a future, the script has not been executed
+                if (MOP.isReifiedObject(r)) {
+                    scriptResults.add(r);
+                } else {
+                    // script has not been executed on remote host
+                    // nothing to do, just let the node in the free list
+                    logger.info("Error occured executing verifying script",
+                        r.getException());
+                }
                 nodes.remove(0);
             }
 
-            // Recupere les resultats
-            while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
-                    (found < nb.intValue())) {
+            // testing script results
+            do {
                 try {
-                    //					int idx = ProActive.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
+                    //int idx = ProActive.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
                     int idx = ProFuture.waitForAny(scriptResults);
+
+                    // idx could be -1 if an error occured in wfa (or timeout expires)
                     IMNode imnode = nodeResults.remove(idx);
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
                     if (res.errorOccured()) {
@@ -278,19 +301,23 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                             found++;
                         } catch (NodeException e) {
                             nodeManager.setDown(imnode);
-                            // try on a new node
-                            nodeResults.add(nodes.get(0));
-                            scriptResults.add(nodes.remove(0)
-                                                   .executeScript(verifyingScript));
+                            // try on a new node if any
+                            if (!nodes.isEmpty()) {
+                                nodeResults.add(nodes.get(0));
+                                scriptResults.add(nodes.remove(0)
+                                                       .executeScript(verifyingScript));
+                            }
                         }
                     } else {
                         // result is false
                         nodeManager.setNotVerifyingScript(imnode,
                             verifyingScript);
-                        // try on a new node
-                        nodeResults.add(nodes.get(0));
-                        scriptResults.add(nodes.remove(0)
-                                               .executeScript(verifyingScript));
+                        // try on a new node if any 
+                        if (!nodes.isEmpty()) {
+                            nodeResults.add(nodes.get(0));
+                            scriptResults.add(nodes.remove(0)
+                                                   .executeScript(verifyingScript));
+                        }
                     }
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
@@ -298,7 +325,8 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     // traitement special
                     e.printStackTrace();
                 }
-            }
+            } while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
+                    (found < nb.intValue()));
         }
 
         return result;

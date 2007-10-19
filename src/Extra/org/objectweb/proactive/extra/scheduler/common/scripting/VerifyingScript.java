@@ -46,6 +46,12 @@ import javax.script.*;
  */
 public class VerifyingScript extends Script<Boolean> {
 
+    /**
+     * The variable name which must be set after the evaluation
+     * of a verifiying script.
+     */
+    public static final String RESULT_VARIABLE = "script_result";
+
     /**  */
     private static final long serialVersionUID = 120693403230482727L;
     private boolean dynamic;
@@ -171,8 +177,8 @@ public class VerifyingScript extends Script<Boolean> {
      */
     @Override
     protected ScriptResult<Boolean> getResult(Bindings bindings) {
-        if (bindings.containsKey("script_result")) {
-            Object result = bindings.get("script_result");
+        if (bindings.containsKey(RESULT_VARIABLE)) {
+            Object result = bindings.get(RESULT_VARIABLE);
             if (result instanceof Boolean) {
                 return new ScriptResult<Boolean>((Boolean) result);
             } else if (result instanceof Integer) {
@@ -187,7 +193,7 @@ public class VerifyingScript extends Script<Boolean> {
             }
         } else {
             return new ScriptResult<Boolean>(new Exception(
-                    "No binding for key 'script_result'"));
+                    "No binding for key " + RESULT_VARIABLE));
         }
     }
 
