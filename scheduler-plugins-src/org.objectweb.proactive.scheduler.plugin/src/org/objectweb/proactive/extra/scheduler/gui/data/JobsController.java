@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
+import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEvent;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
@@ -936,16 +937,15 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @return true only if no error caught, for synchronous call.
      */
     public boolean init() {
-        System.out.println("JobsController.init() 1");
         SchedulerInitialState<InternalJob> state = null;
         try {
             state = SchedulerProxy.getInstance()
-                                  .addSchedulerEventListener(((SchedulerEventListener) ProActiveObject.getStubOnThis()));
+                                  .addSchedulerEventListener(((SchedulerEventListener) ProActiveObject.getStubOnThis()),
+                    SchedulerEvent.NEW_PENDING_JOB);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println("JobsController.init() 2");
 
         if (state == null) { // addSchedulerEventListener failed
             return false;
