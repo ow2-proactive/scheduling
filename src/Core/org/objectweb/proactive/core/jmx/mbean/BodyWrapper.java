@@ -68,6 +68,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 /**
  * Implementation of a BodyWrapperMBean
+ *
  * @author ProActive Team
  */
 public class BodyWrapper extends NotificationBroadcasterSupport
@@ -100,8 +101,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     /** Used by the JMX notifications */
     private long counter = 1;
 
-    /** A list of jmx notifications.
-     * The current MBean sends a list of notifications in order to not overload the network
+    /**
+     * A list of jmx notifications. The current MBean sends a list of
+     * notifications in order to not overload the network
      */
     private transient ConcurrentLinkedQueue<Notification> notifications;
 
@@ -112,6 +114,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     /**
      * Creates a new BodyWrapper MBean, representing an active object.
+     *
      * @param oname
      * @param body
      */
@@ -120,7 +123,6 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         this.id = id;
         this.nodeUrl = body.getNodeURL();
         this.body = body;
-
         this.notifications = new ConcurrentLinkedQueue<Notification>();
         launchNotificationsThread();
     }
@@ -162,7 +164,8 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);
 
-        // If the migration is finished, we need to inform the JMXNotificationManager
+        // If the migration is finished, we need to inform the
+        // JMXNotificationManager
         if (type.equals(NotificationType.migrationFinished)) {
             sendNotifications();
             notifications.add(notification);
@@ -200,25 +203,39 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     //
 
     /**
-     * Creates a new thread which sends JMX notifications.
-     * A BodyWrapperMBean keeps all the notifications,
-     * and the NotificationsThread sends every 'updateFrequence' a list of notifications.
+     * Creates a new thread which sends JMX notifications. A BodyWrapperMBean
+     * keeps all the notifications, and the NotificationsThread sends every
+     * 'updateFrequence' a list of notifications.
      */
     private void launchNotificationsThread() {
-        new Thread() {
+        Thread t = new Thread("JMXNotificationThread for " +
+                BodyWrapper.this.objectName) {
                 @Override
                 public void run() {
-                    while (BodyWrapper.this.body.isActive()) {
+                    // first we wait for the creation of the body
+                    while (!BodyWrapper.this.body.isActive()) {
                         try {
                             Thread.sleep(updateFrequence);
                         } catch (InterruptedException e) {
                             logger.error("The JMX notifications sender thread was interrupted",
                                 e);
                         }
-                        sendNotifications();
+                    }
+
+                    // and once the body is activated, we can forward the notifications
+                    while (BodyWrapper.this.body.isActive()) {
+                        try {
+                            Thread.sleep(updateFrequence);
+                            sendNotifications();
+                        } catch (InterruptedException e) {
+                            logger.error("The JMX notifications sender thread was interrupted",
+                                e);
+                        }
                     }
                 }
-            }.start();
+            };
+        t.setDaemon(true);
+        t.start();
     }
 
     /**
@@ -230,21 +247,25 @@ public class BodyWrapper extends NotificationBroadcasterSupport
 
     /**
      * Sends a notification containing all stored notifications.
-     * @param userMessage The message to send with the set of notifications.
+     *
+     * @param userMessage
+     *            The message to send with the set of notifications.
      */
     private void sendNotifications(String userMessage) {
         if (notifications == null) {
             this.notifications = new ConcurrentLinkedQueue<Notification>();
         }
-        synchronized (notifications) {
-            if (!notifications.isEmpty()) {
-                ObjectName source = getObjectName();
-                Notification n = new Notification(NotificationType.setOfNotifications,
-                        source, counter++, userMessage);
-                n.setUserData(notifications);
-                super.sendNotification(n);
-                notifications.clear();
-            }
+
+        // not sure if the synchronize is needed here, let's see ...
+        //		synchronized (notifications) {
+        if (!notifications.isEmpty()) {
+            ObjectName source = getObjectName();
+            Notification n = new Notification(NotificationType.setOfNotifications,
+                    source, counter++, userMessage);
+            n.setUserData(notifications);
+            super.sendNotification(n);
+            notifications.clear();
+            //		}
         }
     }
 
@@ -329,7 +350,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     }
 
     /**
-     *  returns a list of outgoing active object references.
+     * returns a list of outgoing active object references.
      */
     public Collection<UniqueID> getReferenceList() {
         return ObjectGraph.getReferenceList(this.getID());
@@ -347,8 +368,10 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                 "The timers container is null, the body is not timed.");
         }
         return new Object[] {
-            container.getSnapshot(timerNames), // The list of timers
-            System.nanoTime() // The nano timestamp on this machine used to stop all timers at the caller side
+            container.getSnapshot(timerNames), // The list
+                                               // of timers
+            System.nanoTime() // The nano timestamp on this machine used
+                              // to stop all timers at the caller side
         };
     }
 }

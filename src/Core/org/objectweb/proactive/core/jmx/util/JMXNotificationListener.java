@@ -40,9 +40,12 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -52,7 +55,8 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
  */
 public class JMXNotificationListener implements NotificationListener,
     ProActiveInternalObject, Serializable {
-    //private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
+    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
+
     public JMXNotificationListener() {
         // Empty Constructor
     }
@@ -77,13 +81,11 @@ public class JMXNotificationListener implements NotificationListener,
                 (NotificationListener) ProActiveObject.getStubOnThis(), filter,
                 handback);
         } catch (InstanceNotFoundException e) {
-
-            /*logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);*/
+            logger.error("Doesn't find the object name " + oname +
+                " during the registration", e);
         } catch (IOException e) {
-
-            /*logger.error("Doesn't subscribe the JMX Notification listener to the Notifications",
-                e);*/
+            logger.error("Doesn't subscribe the JMX Notification listener to the Notifications",
+                e);
         }
     }
 
@@ -103,16 +105,13 @@ public class JMXNotificationListener implements NotificationListener,
                     filter, handback);
             }
         } catch (InstanceNotFoundException e) {
-
-            /*logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);*/
+            logger.error("Doesn't find the object name " + oname +
+                " during the registration", e);
         } catch (ListenerNotFoundException e) {
-
-            /*logger.error("Doesn't find the Notification Listener", e);*/
+            logger.error("Doesn't find the Notification Listener", e);
         } catch (IOException e) {
-
-            /*logger.error("Can't unsubscribe the JMX Notification listener to the Notifications",
-                e);*/
+            logger.error("Can't unsubscribe the JMX Notification listener to the Notifications",
+                e);
         }
     }
 
@@ -126,6 +125,6 @@ public class JMXNotificationListener implements NotificationListener,
         in.defaultReadObject();
 
         // Warning loggers is transient
-        //logger = ProActiveLogger.getLogger(Loggers.JMX);
+        logger = ProActiveLogger.getLogger(Loggers.JMX);
     }
 }

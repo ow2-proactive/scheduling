@@ -98,7 +98,7 @@ public class JMXNotificationManager implements NotificationListener {
     /**
      * The active object listener of all notifications.
      */
-    private JMXNotificationListener notificationlitener;
+    private JMXNotificationListener notificationlistener;
 
     private JMXNotificationManager() {
         allListeners = new ConcurrentHashMap<ObjectName, ConcurrentLinkedQueue<NotificationListener>>();
@@ -107,7 +107,7 @@ public class JMXNotificationManager implements NotificationListener {
 
         try {
             // Initalise the JMXNotificationListener which is an active object listening all needed MBeans
-            this.notificationlitener = (JMXNotificationListener) ProActiveObject.newActive(JMXNotificationListener.class.getName(),
+            this.notificationlistener = (JMXNotificationListener) ProActiveObject.newActive(JMXNotificationListener.class.getName(),
                     new Object[] {  });
         } catch (ActiveObjectCreationException e) {
             logger.error("Can't create the JMX notifications listener active object",
@@ -122,7 +122,7 @@ public class JMXNotificationManager implements NotificationListener {
      * Returns the unique instance of the JMXNotificationManager
      * @return Returns the unique instance of the JMXNotificationManager
      */
-    public static JMXNotificationManager getInstance() {
+    public synchronized static JMXNotificationManager getInstance() {
         if (instance == null) {
             instance = new JMXNotificationManager();
         }
@@ -192,7 +192,7 @@ public class JMXNotificationManager implements NotificationListener {
             connection.addObjectName(objectName);
 
             // Subscribes the JMXNotificationManager to the notifications of this MBean.
-            notificationlitener.subscribe(connection.getConnection(),
+            notificationlistener.subscribe(connection.getConnection(),
                 objectName, null, null);
 
             // Updates our map
@@ -249,7 +249,7 @@ public class JMXNotificationManager implements NotificationListener {
                     // The connection is not used, so we close this connection
                     if (!connection.isUsed()) {
                         // Unsubscribes to the JMX notifications of the remote MBean.
-                        notificationlitener.unsubscribe(connection.getConnection(),
+                        notificationlistener.unsubscribe(connection.getConnection(),
                             objectName, null, null);
 
                         // Updates our map
@@ -274,6 +274,7 @@ public class JMXNotificationManager implements NotificationListener {
         }
 
         if (type.equals(NotificationType.setOfNotifications)) {
+            @SuppressWarnings("unchecked")
             ConcurrentLinkedQueue<Notification> notifications = (ConcurrentLinkedQueue<Notification>) notification.getUserData();
             String msg = notification.getMessage();
 
@@ -298,7 +299,7 @@ public class JMXNotificationManager implements NotificationListener {
                 establishedConnection.addObjectName(ob);
 
                 // Subscribes to the JMX notifications
-                notificationlitener.subscribe(establishedConnection.getConnection(),
+                notificationlistener.subscribe(establishedConnection.getConnection(),
                     ob, null, null);
 
                 // Updates our map
