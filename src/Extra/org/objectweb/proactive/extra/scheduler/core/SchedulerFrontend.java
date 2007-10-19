@@ -179,7 +179,7 @@ public class SchedulerFrontend implements InitActive,
     public void connect() {
         authenticationInterface = (SchedulerAuthentication) ProActiveObject.getContext()
                                                                            .getStubOnCaller();
-        authenticationInterface.activate();
+        //authenticationInterface.activate();
     }
 
     /**
@@ -318,6 +318,7 @@ public class SchedulerFrontend implements InitActive,
             throw new SchedulerException(ACCESS_DENIED);
         }
         if (events.length > 0) {
+            System.out.println(events);
             identifications.get(id).setUserEvents(events);
         }
         schedulerListeners.put(id, sel);
@@ -566,9 +567,9 @@ public class SchedulerFrontend implements InitActive,
                 UniqueID id = iter.next();
                 try {
                     UserIdentification userId = identifications.get(id);
+
                     if ((userId.getUserEvents() == null) ||
-                            identifications.get(id).getUserEvents()
-                                               .contains(methodName)) {
+                            userId.getUserEvents().contains(methodName)) {
                         method.invoke(schedulerListeners.get(id), params);
                     }
                 } catch (Exception e) {

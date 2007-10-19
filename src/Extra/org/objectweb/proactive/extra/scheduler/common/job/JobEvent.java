@@ -92,8 +92,10 @@ public class JobEvent implements Serializable {
     /** If this finished time is not null, it means the tasks have to change their finished time */
     private HashMap<TaskId, Long> taskFinishedTimeModify = null;
 
-    /** Job result : if null, the job result is not available, if not null it is. */
-    private JobResult result = null;
+    /** Job result : if null, the job result is not available, if not null it is.
+     * WARNING : This field is transient in order to be send only to the scheduler persistence listener.
+     * This field will not be sent to an external user.*/
+    private transient JobResult result = null;
 
     /**
      * To get the jobId

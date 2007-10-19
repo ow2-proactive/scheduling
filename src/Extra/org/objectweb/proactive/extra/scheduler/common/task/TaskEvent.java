@@ -75,8 +75,10 @@ public class TaskEvent implements Serializable {
     private String executionHostName;
 
     /** Task result : if null, the task result is not available or the task has no result.
-     * If not null the result of this task is available. */
-    private TaskResult result = null;
+     * If not null the result of this task is available.
+     * WARNING : This field is transient in order to be send only to the scheduler persistence listener.
+     * This field will not be sent to an external user.*/
+    private transient TaskResult result = null;
 
     /**
      * To get the jobEvent

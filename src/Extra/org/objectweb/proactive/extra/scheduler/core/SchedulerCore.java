@@ -568,7 +568,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     ((descriptor instanceof InternalNativeTask) &&
                     ((Integer) (res.value()) != 0)))) {
                 failedJob(job, descriptor,
-                    "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
+                    "An error has occured due to a user error in the task and user wanted to cancel on error.",
                     JobState.CANCELLED);
                 return;
             }

@@ -46,9 +46,9 @@ import java.io.Serializable;
 public interface TaskResult extends Serializable {
 
     /**
-     * To know if an exception has occured on this task.
+     * To know if an exception has occurred on this task.
      *
-     * @return true if an exception occured, false if not.
+     * @return true if an exception occurred, false if not.
      */
     public boolean hadException();
 
