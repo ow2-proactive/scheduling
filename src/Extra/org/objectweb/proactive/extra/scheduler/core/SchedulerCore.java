@@ -571,15 +571,25 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             logger.info("[SCHEDULER] Terminated task on job " + jobId + " [ " +
                 taskId + " ]");
             //if an exception occurred and the user wanted to cancel on exception, cancel the job.
-            if (job.isCancelOnError() &&
-                    (res.hadException() ||
-                    ((descriptor instanceof InternalNativeTask) &&
-                    ((Integer) (res.value()) != 0)))) {
+            boolean errorOccured = false;
+            try {
+                Object resValue = res.value();
+                if (descriptor instanceof InternalNativeTask) {
+                    // an error occured if res is not 0
+                    errorOccured = ((Integer) resValue) != 0;
+                }
+            } catch (Throwable e) {
+                // An exception occured during task execution
+                errorOccured = true;
+            }
+            if (errorOccured && job.isCancelOnError()) {
+                // TODO jscheef : exception e should be the jobResult... 
                 failedJob(job, descriptor,
                     "An error has occured due to a user error caught in the task and user wanted to cancel on error.",
                     JobState.CANCELLED);
                 return;
             }
+
             descriptor = job.terminateTask(taskId);
             frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
             //store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.

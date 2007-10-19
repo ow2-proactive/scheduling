@@ -85,13 +85,13 @@ public class ResultRecup {
                             for (Entry<String, TaskResult> e : result.getTaskResults()
                                                                      .entrySet()) {
                                 TaskResult tRes = e.getValue();
-                                if (tRes.hadException()) {
+                                try {
+                                    System.out.println("\t " + e.getKey() +
+                                        " : " + tRes.value());
+                                } catch (Throwable e1) {
                                     System.out.println("\t ERROR : " +
                                         e.getKey() + " : " +
                                         tRes.getException().getMessage());
-                                } else {
-                                    System.out.println("\t " + e.getKey() +
-                                        " : " + tRes.value());
                                 }
                             }
                         } else {

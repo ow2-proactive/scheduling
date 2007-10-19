@@ -39,7 +39,7 @@ public class MonteCarloAverage extends ExecutableJavaTask {
     /** Serial version UID */
     private static final long serialVersionUID = -2762210298670871929L;
 
-    public Object execute(TaskResult... results) {
+    public Object execute(TaskResult... results) throws Throwable {
         double avrg = 0;
         int count = 0;
         System.out.print("Parameters are : ");

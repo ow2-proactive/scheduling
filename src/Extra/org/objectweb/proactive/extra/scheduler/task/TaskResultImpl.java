@@ -101,8 +101,12 @@ public class TaskResultImpl implements TaskResult {
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#value()
      */
-    public Object value() {
-        return value;
+    public Object value() throws Throwable {
+        if (this.exception != null) {
+            throw new RuntimeException(this.exception);
+        } else {
+            return value;
+        }
     }
 
     /**

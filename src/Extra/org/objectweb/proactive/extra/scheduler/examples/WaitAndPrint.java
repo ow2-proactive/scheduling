@@ -44,7 +44,7 @@ public class WaitAndPrint extends ExecutableJavaTask {
     public int sleepTime;
     public int number;
 
-    public Object execute(TaskResult... results) {
+    public Object execute(TaskResult... results) throws Throwable {
         String message;
         try {
             System.err.println("Démarrage de la tache numero " + number);
