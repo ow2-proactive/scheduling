@@ -181,7 +181,7 @@ public class LoggingOutputStream extends OutputStream {
             return;
         }
 
-        final byte[] theBytes = new byte[buf.length];
+        final byte[] theBytes = new byte[count];
 
         System.arraycopy(buf, 0, theBytes, 0, count);
 
