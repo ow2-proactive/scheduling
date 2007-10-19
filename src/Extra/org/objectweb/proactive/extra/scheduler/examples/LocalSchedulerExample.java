@@ -35,6 +35,7 @@ import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
@@ -55,6 +56,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 public class LocalSchedulerExample {
     //shows how to run the scheduler
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    protected static IMAdmin admin;
 
     public static void main(String[] args) {
         //get the path of the file
@@ -72,11 +74,22 @@ public class LocalSchedulerExample {
                 }
             } else {
                 IMFactory.startLocal();
-                IMAdmin admin = IMFactory.getAdmin();
+                admin = IMFactory.getAdmin();
 
                 admin.deployAllVirtualNodes(new File(
                         "../../../descriptors/scheduler/deployment/test.xml"),
                     null);
+
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                        public void run() {
+                            try {
+                                admin.killAll();
+                            } catch (ProActiveException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    });
 
                 imp = InfrastructureManagerProxy.getProxy(new URI(
                             "rmi://localhost:" +

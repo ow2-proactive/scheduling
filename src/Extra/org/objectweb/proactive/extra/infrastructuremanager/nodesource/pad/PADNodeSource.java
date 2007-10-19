@@ -369,6 +369,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
         pads.addAll(listPad.keySet());
         for (String padName : pads) {
             killPAD(padName);
+            // FIXME ProActiveException should be handled here 
         }
     }
 
