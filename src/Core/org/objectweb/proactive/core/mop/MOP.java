@@ -30,11 +30,16 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
@@ -744,7 +749,12 @@ public abstract class MOP {
         Class<?>[] targetConstructorArgs = new Class<?>[constructorParameters.length];
         for (int i = 0; i < constructorParameters.length; i++) {
             //	System.out.println("MOP: constructorParameters[i] = " + constructorParameters[i]);
-            targetConstructorArgs[i] = constructorParameters[i].getClass();
+            if (constructorParameters[i] != null) {
+                targetConstructorArgs[i] = constructorParameters[i].getClass();
+            } else {
+                targetConstructorArgs[i] = null;
+            }
+
             //	System.out.println("MOP: targetConstructorArgs[i] = " + targetConstructorArgs[i]);
         }
 
@@ -758,23 +768,17 @@ public abstract class MOP {
                 //	System.out.println("MOP: WARNING Interface detected");
                 targetConstructor = null;
             } else {
-                targetConstructor = targetClass.getDeclaredConstructor(targetConstructorArgs);
+                targetConstructor = targetClass.getConstructor(targetConstructorArgs);
             }
         } catch (NoSuchMethodException e) {
             // This may have failed because getConstructor does not allow subtypes
             targetConstructor = findReifiedConstructor(targetClass,
                     targetConstructorArgs);
 
-            if (targetConstructor == null) // This may have failed because some wrappers should be interpreted
-                                           // as primitive types. Let's investigate it
-             {
-                targetConstructor = investigateAmbiguity(targetClass,
-                        targetConstructorArgs);
-                if (targetConstructor == null) {
-                    throw new ConstructionOfReifiedObjectFailedException(
-                        "Cannot locate this constructor in class " +
-                        targetClass + " : " + targetConstructorArgs);
-                }
+            if (targetConstructor == null) {
+                throw new ConstructionOfReifiedObjectFailedException(
+                    "Cannot locate this constructor in class " + targetClass +
+                    " : " + targetConstructorArgs);
             }
         }
         return new ConstructorCallImpl(targetConstructor, constructorParameters);
@@ -853,54 +857,26 @@ public abstract class MOP {
     //	}
 
     /**
-         * Tries to solve ambiguity problems in constructors
-         *
-         * @param targetClass
-         *            the class
-         * @param targetConstructorArgs
-         *            The arguments which will determine wich constructor is to be
-         *            used
-         * @return The corresponding Constructor
-         */
-    private static Constructor investigateAmbiguity(Class<?> targetClass,
-        Class<?>[] targetConstructorArgs) {
-        // Find the number of possible constructors ambiguities
-        int n = 1;
-        for (int i = 0; i < targetConstructorArgs.length; i++) {
-            if (Utils.isWrapperClass(targetConstructorArgs[i])) {
-                n = n * 2;
-            }
-        }
-        if (n == 1) {
-            return null; // No wrapper found
-        }
-
-        for (int i = 0; i < targetConstructorArgs.length; i++) {
-            if (Utils.isWrapperClass(targetConstructorArgs[i])) {
-                targetConstructorArgs[i] = Utils.getPrimitiveType(targetConstructorArgs[i]);
-            }
-        }
-        return findReifiedConstructor(targetClass, targetConstructorArgs);
-    }
-
-    /**
      * Finds the reified constructor
      * @param targetClass The class
      * @param the effective arguments
      * @return The constructor
+     * @throws ConstructionOfReifiedObjectFailedException
      */
-    private static Constructor findReifiedConstructor(Class<?> targetClass,
-        Class<?>[] targetConstructorArgs) {
-        Constructor[] publicConstructors;
-        Constructor currentConstructor;
-        Class<?>[] currentConstructorParameterTypes;
+    private static Constructor<?> findReifiedConstructor(Class<?> targetClass,
+        Class<?>[] targetConstructorArgs)
+        throws ConstructionOfReifiedObjectFailedException {
         boolean match;
 
-        publicConstructors = targetClass.getConstructors();
+        TreeMap<HashSet<Constructor<?>>, HashSet<Constructor<?>>> matchingConstructors =
+            new TreeMap<HashSet<Constructor<?>>, HashSet<Constructor<?>>>(new ConstructorComparator(
+                    targetConstructorArgs));
+        Constructor<?>[] publicConstructors = targetClass.getConstructors();
+
         // For each public constructor of the reified class
         for (int i = 0; i < publicConstructors.length; i++) {
-            currentConstructor = publicConstructors[i];
-            currentConstructorParameterTypes = currentConstructor.getParameterTypes();
+            Constructor<?> currentConstructor = publicConstructors[i];
+            Class<?>[] currentConstructorParameterTypes = currentConstructor.getParameterTypes();
             match = true;
 
             // Check if the parameters types of this constructor are
@@ -908,8 +884,25 @@ public abstract class MOP {
             if (currentConstructorParameterTypes.length == targetConstructorArgs.length) {
                 for (int j = 0; j < currentConstructorParameterTypes.length;
                         j++) {
-                    if (!(currentConstructorParameterTypes[j].isAssignableFrom(
-                                targetConstructorArgs[j]))) {
+                    if (targetConstructorArgs[j] != null) {
+                        if (!(currentConstructorParameterTypes[j].isAssignableFrom(
+                                    targetConstructorArgs[j]))) {
+                            if (Utils.isWrapperClass(targetConstructorArgs[j])) {
+                                // If the parameter is a wrapper class we try to find a constructor
+                                // with the corresponding primitive type
+                                Class<?> primitive = Utils.getPrimitiveType(targetConstructorArgs[j]);
+                                if (!(currentConstructorParameterTypes[j].isAssignableFrom(
+                                            primitive))) {
+                                    match = false;
+                                    break;
+                                }
+                            } else {
+                                match = false;
+                                break;
+                            }
+                        }
+                    } else if (currentConstructorParameterTypes[j].isPrimitive()) {
+                        // we suppose that null is assignable to anything not primitive
                         match = false;
                         break;
                     }
@@ -918,8 +911,30 @@ public abstract class MOP {
                 match = false;
             }
             if (match == true) {
-                return currentConstructor;
+                HashSet<Constructor<?>> newSet = new HashSet<Constructor<?>>();
+                newSet.add(currentConstructor);
+                if (matchingConstructors.containsKey(newSet)) {
+                    HashSet<Constructor<?>> oldSet = matchingConstructors.remove(newSet);
+                    oldSet.add(currentConstructor);
+                    matchingConstructors.put(oldSet, oldSet);
+                }
+                matchingConstructors.put(newSet, newSet);
             }
+        }
+
+        HashSet<Constructor<?>> bestConstructors = matchingConstructors.lastKey();
+        if (bestConstructors.size() > 1) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            pw.println(
+                "Choice of a constructor is ambiguous, possible choices are :");
+            for (Constructor c : bestConstructors) {
+                pw.println(c);
+            }
+            throw new ConstructionOfReifiedObjectFailedException(sw.toString());
+        }
+        if (bestConstructors.size() == 1) {
+            return bestConstructors.iterator().next();
         }
         return null;
     }
@@ -1070,6 +1085,113 @@ public abstract class MOP {
         } catch (ClassNotFoundException e) {
             throw new ConstructionOfProxyObjectFailedException(
                 "Class can't be found e=" + e);
+        }
+    }
+
+    private static class ConstructorComparator implements Comparator<HashSet<Constructor<?>>> {
+        Class<?>[] parameterTypes;
+
+        public ConstructorComparator(Class<?>[] parameterTypes) {
+            this.parameterTypes = parameterTypes;
+        }
+
+        public int compare(HashSet<Constructor<?>> set1,
+            HashSet<Constructor<?>> set2) {
+            Integer result = null;
+
+            // This function compares each element of set to each element of set2
+            for (Constructor<?> c1 : set1) {
+                for (Constructor<?> c2 : set2) {
+                    int test = compareConstructors(c1, c2);
+                    if (test == 0) {
+                        // if two elements are equals then the sets are considered equal
+                        return 0;
+                    }
+                    if (result == null) {
+                        result = test;
+                    } else if ((test * result) < 0) {
+                        // if two elements have contradictory orders then the sets are considered equal
+                        return 0;
+                    }
+
+                    // Otherwise 
+                }
+            }
+            return result;
+        }
+
+        private void exceptionInComparison(Class<?> c1, Class<?> c2) {
+            throw new IllegalArgumentException(c1 + " and " + c2 +
+                " are not comparable.");
+        }
+
+        public int compareConstructors(Constructor c1, Constructor c2) {
+            // Compare two constructors using the following principles
+            // if every parameters of c1 are assignable to the corresponding parameters in c2 
+            // ==> then c1 is more pertinent than c2 (and resp)
+            // if there exist both one parameter of c1 assignable to the param in c2 and one parameter of c2 assigable to the param in c1, 
+            // ==> then the constructors are equivalent (ambiguous)
+            Class<?>[] c1PT = c1.getParameterTypes();
+            Class<?>[] c2PT = c2.getParameterTypes();
+            Integer result = null;
+            for (int i = 0; i < c1PT.length; i++) {
+                int currentResult;
+                if (parameterTypes[i] == null) {
+                    // if the specified parameter is null, we can't make any supposition
+                    currentResult = 0;
+                } else if (c1PT[i].equals(c2PT[i])) {
+                    // not decidable
+                    currentResult = 0;
+                } else if (c1PT[i].isPrimitive() && c2PT[i].isPrimitive()) {
+                    // c1 and c2 are not comparable, this should not happen
+                    exceptionInComparison(c1PT[i], c2PT[i]);
+                    currentResult = 0;
+                } else if (c1PT[i].isPrimitive()) {
+                    Class<?> wrapper = Utils.getWrapperClass(c1PT[i]);
+                    if (c2PT[i].isAssignableFrom(wrapper)) {
+                        // c1 is more pertinent
+                        currentResult = 1;
+                    } else {
+                        // c1 and c2 are not comparable, this should not happen
+                        exceptionInComparison(c1PT[i], c2PT[i]);
+                        currentResult = 0;
+                    }
+                } else if (c2PT[i].isPrimitive()) {
+                    Class<?> wrapper = Utils.getWrapperClass(c2PT[i]);
+                    if (c1PT[i].isAssignableFrom(wrapper)) {
+                        // c2 is more pertinent
+                        currentResult = -1;
+                    } else {
+                        // c1 and c2 are not comparable, this should not happen
+                        exceptionInComparison(c1PT[i], c2PT[i]);
+                        currentResult = 0;
+                    }
+                } else {
+                    if (c1PT[i].isAssignableFrom(c2PT[i])) {
+                        // c2 is more pertinent
+                        currentResult = -1;
+                    } else if (c2PT[i].isAssignableFrom(c1PT[i])) {
+                        // c1 is more pertinent
+                        currentResult = 1;
+                    } else {
+                        // c1 and c2 are not comparable, this should not happen
+                        throw new IllegalArgumentException(c1PT[i] + " and " +
+                            c2PT[i] + " are not comparable.");
+                    }
+                }
+                if (result == null) {
+                    if (currentResult != 0) {
+                        result = currentResult;
+                    }
+                } else if ((currentResult * result) < 0) {
+                    // The only case when we know they are equivalent (ambiguous)
+                    return 0;
+                }
+            }
+            if (result == null) {
+                result = 0;
+            }
+            return result;
         }
     }
 }
