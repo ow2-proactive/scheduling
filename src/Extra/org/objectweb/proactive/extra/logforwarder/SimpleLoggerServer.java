@@ -38,6 +38,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -52,6 +53,9 @@ public class SimpleLoggerServer implements Runnable {
 
     // connection
     private ServerSocket serverSocket;
+
+    // name of the appender in which append log events
+    private String appenderName;
 
     /**
      * Create a new logger server on any free port. This port can be
@@ -68,14 +72,36 @@ public class SimpleLoggerServer implements Runnable {
     }
 
     /**
-     * Create a logger server on a given port.
-     * @param port the binding port of the created server.
+     * Create a new logger server on any free port. This port can be
+     * retreived using getPort().
+     * @param appenderName the name of the appender in which redirect log events.
+     * if null, events are redirected into all appenders.
+     * @return the created server.
      * @throws IOException
      */
-    public SimpleLoggerServer(int port) throws IOException {
+
+    // TODO cdelbe : Unused ; see  ConnectionHandler.run()
+    public static SimpleLoggerServer createLoggerServer(String appenderName)
+        throws IOException {
+        SimpleLoggerServer simpleLoggerServer = new SimpleLoggerServer(appenderName);
+        Thread simpleLoggerServerThread = new Thread(simpleLoggerServer);
+        simpleLoggerServerThread.start();
+        return simpleLoggerServer;
+    }
+
+    /**
+     * Create a logger server on a given port.
+     * @param port the binding port of the created server.
+     * @param appenderName the name of the appender in which redirect log events.
+     * if null, events are redirected into all appenders.
+     * @throws IOException
+     */
+    public SimpleLoggerServer(int port, String appenderName)
+        throws IOException {
         this.connections = new Vector<ConnectionHandler>();
         this.serverSocket = new ServerSocket(port);
         this.port = this.serverSocket.getLocalPort();
+        this.appenderName = appenderName;
     }
 
     /**
@@ -84,7 +110,18 @@ public class SimpleLoggerServer implements Runnable {
      * @throws IOException
      */
     public SimpleLoggerServer() throws IOException {
-        this(0);
+        this(0, null);
+    }
+
+    /**
+     * Create a logger server on any free port. This port can be
+     * retreived using getPort().
+     * @param appenderName the name of the appender in which redirect log events.
+     * if null, events are redirected into all appenders.
+     * @throws IOException
+     */
+    public SimpleLoggerServer(String appenderName) throws IOException {
+        this(0, appenderName);
     }
 
     /**
@@ -93,6 +130,15 @@ public class SimpleLoggerServer implements Runnable {
      */
     public int getPort() {
         return this.port;
+    }
+
+    /**
+     * Return the name of the appender in which events are redirected, or null
+     * if all events are redirected into all appenders.
+     * @return the name of the appender in which events are redirected.
+     */
+    public String getAppenderName() {
+        return this.appenderName;
     }
 
     /**
@@ -149,7 +195,7 @@ public class SimpleLoggerServer implements Runnable {
         public void run() {
             LoggingEvent currentEvent;
             Logger localLogger;
-
+            String aName = SimpleLoggerServer.this.getAppenderName();
             try {
                 while (!terminate) {
                     // read an event from the wire
@@ -161,7 +207,17 @@ public class SimpleLoggerServer implements Runnable {
                     if (currentEvent.getLevel()
                                         .isGreaterOrEqual(localLogger.getEffectiveLevel())) {
                         // finally log the event as if was generated locally
-                        localLogger.callAppenders(currentEvent);
+                        // TODO cdelbe : aName not used ; appender could be null
+                        if (aName != null) {
+                            // only in aName appender 
+                            Appender a = localLogger.getAppender(aName);
+                            if (a != null) {
+                                a.doAppend(currentEvent);
+                            }
+                        } else {
+                            // in all appenders
+                            localLogger.callAppenders(currentEvent);
+                        }
                     }
                 }
             } catch (EOFException e) {
@@ -174,7 +230,6 @@ public class SimpleLoggerServer implements Runnable {
 
             // close stream
             try {
-                //                System.out.println(this + " is terminating...");
                 this.inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();

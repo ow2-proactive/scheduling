@@ -4,26 +4,26 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
- *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
@@ -31,31 +31,26 @@
 package org.objectweb.proactive.extra.logforwarder;
 
 import java.util.LinkedList;
+import java.util.Vector;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.net.SocketAppender;
 import org.apache.log4j.spi.LoggingEvent;
+import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 
 
 /**
  * This class defines a appender that bufferizes logs until a sink appender is given ; the buffer is
- * then flushed into the sink. This buffer can be keeped or deleted when sink is activated (see keepLogs).
+ * then flushed into the sink. This buffer can be keeped or deleted when a sink is activated (see keepBuffer).
  * @author cdelbe
  * @since 3.2.1
  */
-public class BufferedAppender extends AppenderSkeleton {
+public class BufferedAppender extends AppenderSkeleton implements JobLogs {
 
     /**
      * Default buffer size.
      */
     public static final int DEFAULT_BUFFER_SIZE = 1024;
-
-    /**
-     * Default appender name.
-     * @see AppenderSkeleton.getName()
-     */
-    public static final String DEFAULT_NAME = "BufferSocketAppender";
 
     /**
      * By default, the buffer is deleted if sink is activated.
@@ -73,19 +68,18 @@ public class BufferedAppender extends AppenderSkeleton {
     private int nbFiredEvents = 0;
 
     // if true, log buffer is not deleted even if sink is activated
-    private boolean keepLogs;
+    private boolean keepBuffer;
 
-    // sink appender
-    private Appender sink;
+    // sinks appender
+    private transient Vector<Appender> sinks;
 
     /**
      * Create a BufferAppender with default parameters.
-     * @see BufferedAppender.DEFAULT_NAME
      * @see BufferedAppender.DEFAULT_BUFFER_SIZE
      * @see BufferedAppender.DEFAULT_KEEP_MODE
      */
     public BufferedAppender() {
-        this(DEFAULT_NAME, DEFAULT_BUFFER_SIZE, DEFAULT_KEEP_MODE);
+        this(null, DEFAULT_BUFFER_SIZE, DEFAULT_KEEP_MODE);
     }
 
     /**
@@ -94,16 +88,26 @@ public class BufferedAppender extends AppenderSkeleton {
      * logs events are stored in FIFO manner.
      */
     public BufferedAppender(int bufferSize) {
-        this(DEFAULT_NAME, bufferSize, DEFAULT_KEEP_MODE);
+        this(null, bufferSize, DEFAULT_KEEP_MODE);
+    }
+
+    /**
+     * Create a BufferAppender.
+     * @param keepBuffer it false, the buffer is deleted if the sink appender is
+     * activated
+     */
+    public BufferedAppender(boolean keepBuffer) {
+        this(null, DEFAULT_BUFFER_SIZE, keepBuffer);
     }
 
     /**
      * Create a BufferAppender.
      * @param name the name of the appender.
-     * @see @see AppenderSkeleton.getName()
+     * @param keepBuffer it false, the buffer is deleted if the sink appender is
+     * activated
      */
-    public BufferedAppender(String name) {
-        this(name, DEFAULT_BUFFER_SIZE, DEFAULT_KEEP_MODE);
+    public BufferedAppender(String name, boolean keepBuffer) {
+        this(name, DEFAULT_BUFFER_SIZE, keepBuffer);
     }
 
     /**
@@ -111,14 +115,15 @@ public class BufferedAppender extends AppenderSkeleton {
      * @param name the name of the appender.
      * @param bufferSize the size of the buffer. If the buffer is full,
      * logs events are stored in FIFO manner.
-     * @param keepLogs it false, the buffer is deleted if the sink appender is
+     * @param keepBuffer it false, the buffer is deleted if the sink appender is
      * activated
      */
-    public BufferedAppender(String name, int bufferSize, boolean keepLogs) {
+    public BufferedAppender(String name, int bufferSize, boolean keepBuffer) {
         this.name = name;
         this.bufferSize = (bufferSize == 0) ? Integer.MAX_VALUE : bufferSize;
         this.buffer = new LinkedList<LoggingEvent>();
-        this.keepLogs = keepLogs;
+        this.keepBuffer = keepBuffer;
+        this.sinks = new Vector<Appender>();
     }
 
     /**
@@ -126,24 +131,16 @@ public class BufferedAppender extends AppenderSkeleton {
      * is false, the buffer is deleted.
      * @param sink the sink appender
      */
-    public synchronized void activateSink(Appender sink) {
-        // activate only if not activated...
-        if (this.sink == null) {
-            // create socket
-            this.sink = sink;
-            if (this.nbFiredEvents > this.bufferSize) { // ADD SPECIFIC HEADER FOR CUT LOGS ??
-                System.out.println(
-                    "::::::::::::::::::::::::::::::::::::::: SIZE EXCEED ::::::::::::::::::::::::::::::::::::::::::::::");
-            }
-
-            // flush the buffer into the sink
-            for (LoggingEvent e : this.buffer) {
-                this.sink.doAppend(e);
-            }
-            if (!this.keepLogs) {
-                // delete buffer
-                this.buffer = null;
-            }
+    public synchronized void addSink(Appender sink) {
+        // flush the buffer into the sink
+        for (LoggingEvent e : this.buffer) {
+            sink.doAppend(e);
+        }
+        // add sink to the sinks
+        this.sinks.add(sink);
+        // still fill in buffer if required
+        if (!this.keepBuffer) {
+            this.buffer = null;
         }
     }
 
@@ -151,7 +148,7 @@ public class BufferedAppender extends AppenderSkeleton {
      * Return all the logs buffered in this BufferedAppender, null if the buffer has been deleted.
      * @return all the logs buffered in this BufferedAppender, null if the buffer has been deleted.
      */
-    public synchronized StringBuffer getAllOutput() {
+    public synchronized StringBuffer getAllLogs() {
         if (this.buffer != null) {
             StringBuffer logs = new StringBuffer(this.buffer.size());
             for (LoggingEvent e : this.buffer) {
@@ -163,32 +160,22 @@ public class BufferedAppender extends AppenderSkeleton {
         }
     }
 
-    /**
-     * Flush all the logs buffered in the appender app.
-     * @param app the appender to flush into.
-     */
-    public synchronized void flushBufferInto(Appender app) {
-        if (this.buffer != null) {
-            // flush the buffer into the appender app
-            for (LoggingEvent e : this.buffer) {
-                app.doAppend(e);
-            }
-        }
-    }
-
     /* (non-Javadoc)
      * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
      */
     @Override
     protected synchronized void append(LoggingEvent event) {
-        if (this.sink == null) {
-            // fill in buffer since sink is not activated
+        if (this.sinks.size() == 0) {
+            // fill in buffer since no sink is activated
             this.fillInBuffer(event);
         } else {
-            // send into sink
-            this.sink.doAppend(event);
+            for (Appender s : this.sinks) {
+                // send into sink
+                s.doAppend(event);
+            }
+
             // still fill in buffer if required
-            if (this.keepLogs) {
+            if (this.keepBuffer) {
                 this.fillInBuffer(event);
             }
         }
@@ -197,11 +184,10 @@ public class BufferedAppender extends AppenderSkeleton {
     /**
      * Add event into the buffer. If the buffer is full, the first element is removed
      * (FIFO behavior)
-     * @param event the log evenet to be added in the buffer.
+     * @param event the log event to be added in the buffer.
      */
     private void fillInBuffer(LoggingEvent event) {
         assert (this.buffer.size() <= this.bufferSize);
-
         if (this.nbFiredEvents > this.bufferSize) {
             this.buffer.removeFirst();
         }
@@ -214,9 +200,14 @@ public class BufferedAppender extends AppenderSkeleton {
      */
     @Override
     public synchronized void close() {
-        this.buffer = null;
-        if (this.sink != null) {
-            this.sink.close();
+        if (!this.keepBuffer) {
+            this.buffer = null;
+        }
+        if (this.sinks.size() != 0) {
+            for (Appender s : this.sinks) {
+                // close sink
+                s.close();
+            }
         }
     }
 

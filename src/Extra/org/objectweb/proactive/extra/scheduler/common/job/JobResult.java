@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
@@ -79,4 +80,16 @@ public interface JobResult extends Serializable {
      * @return the task result as a map.
      */
     public HashMap<String, TaskResult> getTaskResults();
+
+    /**
+     * Return the output logs of this job.
+     * @return the output logs of this job.
+     */
+    public JobLogs getOutput();
+
+    /**
+     * Set the output logs of this job.
+     * @param op the output logs of this job.
+     */
+    public void setOutput(JobLogs op);
 }

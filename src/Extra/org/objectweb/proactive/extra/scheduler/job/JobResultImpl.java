@@ -32,7 +32,9 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import java.util.HashMap;
 
+import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
@@ -54,6 +56,7 @@ public class JobResultImpl implements JobResult {
     private JobId id = null;
     private String name = null;
     private HashMap<String, TaskResult> taskResults = null;
+    private JobLogs jobOutput;
 
     /**
      * ProActive empty constructor
@@ -132,5 +135,16 @@ public class JobResultImpl implements JobResult {
             }
         }
         return toReturn.toString();
+    }
+
+    @Override
+    public JobLogs getOutput() {
+        return this.jobOutput;
+    }
+
+    @Override
+    public void setOutput(JobLogs op) {
+        assert (this.jobOutput == null);
+        this.jobOutput = op;
     }
 }

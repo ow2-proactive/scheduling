@@ -59,6 +59,7 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
@@ -99,9 +100,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
     /** Scheduler logger */
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-
-    /** Prefix for logger system redirection. */
-    public static final String LOGGER_PREFIX = "logger.scheduler.";
 
     /** Path for the result serialization */
     public static final String SERIALIZING_PATH = "/tmp/";
@@ -170,6 +168,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             //logger
             host = URIBuilder.getLocalAddress().getHostName();
             try {
+                // redirect event only into JobLogs
                 SimpleLoggerServer slf = SimpleLoggerServer.createLoggerServer();
                 this.port = slf.getPort();
             } catch (IOException e) {
@@ -433,15 +432,15 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * Ping every nodes on which a task is currently running and repair the task if need.
      */
     private void pingDeployedNodes() {
-        logger.info("SCHEDULER >>> Search for down nodes !");
+        logger.info("[SCHEDULER] Search for down nodes !");
         for (int i = 0; i < runningJobs.size(); i++) {
             InternalJob job = runningJobs.get(i);
             for (InternalTask td : job.getTasks()) {
                 if ((td.getStatus() == Status.RUNNNING) &&
                         !ProActiveObject.pingActiveObject(
                             td.getExecuterInformations().getLauncher())) {
-                    logger.info("<<<<<<<< Node failed on job " + job.getId() +
-                        ", task [ " + td.getId() + " ]");
+                    logger.info("[SCHEDULER] Node failed on job " +
+                        job.getId() + ", task [ " + td.getId() + " ]");
                     if (td.getRerunnableLeft() > 0) {
                         td.setRerunnableLeft(td.getRerunnableLeft() - 1);
                         job.reStartTask(td);
@@ -519,7 +518,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //put the job result in the job Info.
         job.getJobInfo().setResult(results.get(job.getId()));
         // terminate loggers
-        Logger l = Logger.getLogger(LOGGER_PREFIX + job.getId());
+        Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + job.getId());
         l.removeAllAppenders();
         //send event to listeners.
         frontend.runningToFinishedJobEvent(job.getJobInfo());
@@ -610,9 +609,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 finishedJobs.add(job);
                 logger.info("[SCHEDULER] Terminated job " + jobId);
                 // terminate loggers
-                Logger l = Logger.getLogger(LOGGER_PREFIX + job.getId());
-                l.removeAllAppenders();
-                //put the job result in the job Info.
+                Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX +
+                        job.getId());
+                l.removeAllAppenders(); // appender are closed...
+                                        //put the job result in the job Info.
+
                 job.getJobInfo().setResult(results.get(job.getId()));
                 //send event to listeners.
                 frontend.runningToFinishedJobEvent(job.getJobInfo());
@@ -651,18 +652,24 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 "Scheduler is stopped, cannot submit new job !");
         }
         job.submit();
+        // add job to core
         jobs.put(job.getId(), job);
         pendingJobs.add(job);
-        // create appender for this job
-        Logger l = Logger.getLogger(LOGGER_PREFIX + job.getId());
-        if (l.getAppender(BufferedAppender.DEFAULT_NAME) == null) {
-            l.addAppender(new BufferedAppender());
-        }
-
-        //creating job result storage
+        //create job result storage
         JobResult jobResult = new JobResultImpl(job.getId(), job.getName());
         //store the job result until user get it
         results.put(job.getId(), jobResult);
+        //create appender for this job
+        Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + job.getId());
+        if (l.getAppender(JobLogs.JOB_APPENDER_NAME) == null) {
+            BufferedAppender op = new BufferedAppender(JobLogs.JOB_APPENDER_NAME,
+                    true);
+            jobResult.setOutput(op);
+            l.addAppender(op);
+        } else {
+            throw new RuntimeException("[SCHEDULER] Appender for job " +
+                job.getId() + " is already activated");
+        }
         //sending event to client
         frontend.newPendingJobEvent(job);
         logger.info("New job added containing " + job.getTotalNumberOfTasks() +
@@ -685,20 +692,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
     /**
      * Listen for the tasks user log.
-     *
+     * WARNING : This method is served as immediate service
      * @param jobId the id of the job to listen to.
      * @param hostname the host name where to send the log.
      * @param port the port number on which the log will be sent.
      */
     public void listenLog(JobId jobId, String hostname, int port) {
-        Logger l = Logger.getLogger(LOGGER_PREFIX + jobId);
-        BufferedAppender a = (BufferedAppender) l.getAppender(BufferedAppender.DEFAULT_NAME);
-        if (a != null) {
-            a.activateSink(new SocketAppender(hostname, port));
-        } else {
-            throw new RuntimeException("Appender for job " + jobId +
-                " is not activated");
-        }
+        JobResult r = results.get(jobId);
+        r.getOutput().addSink(new SocketAppender(hostname, port));
     }
 
     /**

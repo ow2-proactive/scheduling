@@ -84,6 +84,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     protected Vector<InternalTask> finalTasks = new Vector<InternalTask>();
 
     /** informations about job execution */
+    // FIXME jlscheef,jfradj this variable can change ???? 
     protected JobEvent jobInfo = new JobEvent();
 
     /** Light job for dependences management */

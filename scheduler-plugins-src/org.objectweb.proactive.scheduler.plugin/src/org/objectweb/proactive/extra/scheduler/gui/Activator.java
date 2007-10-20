@@ -45,9 +45,6 @@ public class Activator extends AbstractUIPlugin {
     /** The plug-in ID */
     public static final String PLUGIN_ID = "Scheduler_Plugin";
 
-    /** The listen port for logs */
-    public static final int LISTEN_PORT = 1987;
-
     // The shared instance
     private static Activator plugin;
     private static String hostname = null;
@@ -69,10 +66,7 @@ public class Activator extends AbstractUIPlugin {
         plugin = this;
 
         // start the log server
-        simpleLoggerServer = new SimpleLoggerServer(LISTEN_PORT);
-        simpleLoggerServerThread = new Thread(simpleLoggerServer);
-        simpleLoggerServerThread.start();
-
+        simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
         try {
             //FIXME cmathieu
             hostname = java.net.InetAddress.getLocalHost().getHostName();
@@ -107,5 +101,17 @@ public class Activator extends AbstractUIPlugin {
      */
     public static String getHostname() {
         return hostname;
+    }
+
+    /**
+     * Return the port on which logs are listened.
+     * @return the port on which logs are listened.
+     */
+    public static int getListenPortNumber() {
+        if (simpleLoggerServer != null) {
+            return simpleLoggerServer.getPort();
+        } else {
+            throw new RuntimeException("Logger server is not created yet");
+        }
     }
 }

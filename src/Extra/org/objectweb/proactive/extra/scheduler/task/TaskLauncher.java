@@ -51,6 +51,7 @@ import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
@@ -184,7 +185,7 @@ public class TaskLauncher implements InitActive, Serializable {
         Appender out = new SocketAppender(this.host, this.port);
 
         // create logger
-        Logger l = Logger.getLogger(SchedulerCore.LOGGER_PREFIX + jobId);
+        Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + jobId);
         l.removeAllAppenders();
         l.addAppender(EmptyAppender.SINK);
         l.addAppender(out);

@@ -46,10 +46,10 @@ import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
 
 public class JobLauncher {
@@ -109,8 +109,7 @@ public class JobLauncher {
                     scheduler.listenLog(id,
                         URIBuilder.getLocalAddress().getHostName(),
                         simpleLoggerServer.getPort());
-                    Logger l = Logger.getLogger(SchedulerCore.LOGGER_PREFIX +
-                            id);
+                    Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + id);
 
                     // coucou Guillaume !
                     DateFormat dateFormat = new SimpleDateFormat(
