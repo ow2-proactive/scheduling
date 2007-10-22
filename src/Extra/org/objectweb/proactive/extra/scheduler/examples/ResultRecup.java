@@ -89,9 +89,10 @@ public class ResultRecup {
                                     System.out.println("\t " + e.getKey() +
                                         " : " + tRes.value());
                                 } catch (Throwable e1) {
-                                    System.out.println("\t ERROR : " +
-                                        e.getKey() + " : " +
-                                        tRes.getException().getMessage());
+                                    System.out.println(
+                                        "\t ERROR during execution of " +
+                                        e.getKey() + "... ");
+                                    tRes.getException().printStackTrace();
                                 }
                             }
                         } else {
