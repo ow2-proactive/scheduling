@@ -48,9 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class ListenerAdapter implements NotificationListener {
-
-	private Logger JMX_NOTIFICATION =  ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
-
+    private Logger JMX_NOTIFICATION = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
     private NotificationListener listener;
     private transient MBeanServer mbs;
     private ObjectName name;
@@ -59,30 +57,29 @@ public class ListenerAdapter implements NotificationListener {
      *
      * @param listener
      */
-    public ListenerAdapter(NotificationListener listener,MBeanServer mbs,ObjectName name) {
+    public ListenerAdapter(NotificationListener listener, MBeanServer mbs,
+        ObjectName name) {
         this.listener = listener;
         this.mbs = mbs;
         this.name = name;
     }
-
 
     /**
      * @see javax.management.NotificationListener#handleNotification(javax.management.Notification, java.lang.Object)
      */
     public void handleNotification(Notification notification, Object handback) {
         try {
-            System.out.println(listener.getClass());
             this.listener.handleNotification(notification, handback);
         } catch (Exception e) {
-          JMX_NOTIFICATION.debug("an exception occured ("+ e.getMessage()+") while sending the notification -- removing the listener");
+            JMX_NOTIFICATION.debug("an exception occured (" + e.getMessage() +
+                ") while sending the notification -- removing the listener");
             try {
-				mbs.removeNotificationListener(name, this);
-			} catch (InstanceNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (ListenerNotFoundException e1) {
-				e1.printStackTrace();
-			}
-
+                mbs.removeNotificationListener(name, this);
+            } catch (InstanceNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (ListenerNotFoundException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 }
