@@ -29,7 +29,7 @@
 					<element name="configFile" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="JDLFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="JDLRemoteFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="arguments" type="pa:TextOrVariableType" minOccurs="0" />
+					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
 					<element name="inputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
 					<element name="outputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
 				</sequence>

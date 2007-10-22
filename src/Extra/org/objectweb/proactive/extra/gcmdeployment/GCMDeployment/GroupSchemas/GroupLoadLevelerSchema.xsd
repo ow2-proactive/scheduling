@@ -16,7 +16,7 @@
 					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="arguments" type="string" minOccurs="0" />
+					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
 					<element name="nbTasks" type="pa:PosintOrVariableType" minOccurs="0" />
 					<element name="cpusPerTask" type="pa:PosintOrVariableType" minOccurs="0" />
 					<element name="tasksPerHost" type="pa:PosintOrVariableType" minOccurs="0" />

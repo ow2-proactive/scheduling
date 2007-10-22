@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<simpleType name="variableRefType">
 		<restriction base="string">
@@ -76,19 +74,13 @@
 	</simpleType>
 
 	<complexType name="pathElementType">
-		<attribute name="base" type="pa:pathElementBaseType"
-			use="required">
-		</attribute>
-		<attribute name="relpath" type="pa:pathElementGeneralType"
-			use="required">
-		</attribute>
+		<attribute name="base" type="pa:pathElementBaseType" use="required"></attribute>
+		<attribute name="relpath" type="pa:pathElementGeneralType" use="required"></attribute>
 	</complexType>
 
 	<complexType name="pathType">
 		<sequence>
-			<element name="pathElement" type="pa:pathElementType"
-				maxOccurs="unbounded" minOccurs="1">
-			</element>
+			<element name="pathElement" type="pa:pathElementType" maxOccurs="unbounded" minOccurs="1"></element>
 		</sequence>
 	</complexType>
 
@@ -111,16 +103,12 @@
 		<all>
 			<element name="source">
 				<complexType>
-					<attribute name="path"
-						type="pa:pathElementGeneralType">
-					</attribute>
+					<attribute name="path" type="pa:pathElementGeneralType"></attribute>
 				</complexType>
 			</element>
 			<element name="dest">
 				<complexType>
-					<attribute name="relpath"
-						type="pa:pathElementGeneralType">
-					</attribute>
+					<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
 				</complexType>
 			</element>
 		</all>
@@ -166,15 +154,9 @@
 		</attribute>
 	</complexType>
 
-	<element name="abstractVariable" abstract="true"
-		type="pa:variableType">
-	</element>
-	<element name="descriptorVariable"
-		substitutionGroup="pa:abstractVariable" type="pa:variableType">
-	</element>
-	<element name="javaPropertyVariable"
-		substitutionGroup="pa:abstractVariable" type="pa:variableType">
-	</element>
+	<element name="abstractVariable" abstract="true" type="pa:variableType"></element>
+	<element name="descriptorVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="javaPropertyVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
 
 	<complexType name="dummyType"></complexType>
 
@@ -184,7 +166,11 @@
 		</sequence>
 	</complexType>
 
-
+	<complexType name="argumentListType">
+		<sequence>
+			<element name="arg" type="string" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
 
 
 </schema>

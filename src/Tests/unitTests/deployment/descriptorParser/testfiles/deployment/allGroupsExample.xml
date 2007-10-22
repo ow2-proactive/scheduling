@@ -15,6 +15,14 @@
 		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
+	<resources>
+		<bridge refid="SEA" />
+
+		<group refid="LAN_INRIA">
+			<host refid="INRIA_x86_64" />
+		</group>
+	</resources>
+
 	<infrastructure>
 		<hosts>
 			<host id="INRIA_x86_64" os="unix" hostCapacity="4" vmCapacity="2">
@@ -108,11 +116,22 @@
 				<paext:stdout>trace/results.log</paext:stdout>
 				<paext:stderr>trace/err.log</paext:stderr>
 				<paext:maxTime>15000000</paext:maxTime>
-				<paext:arguments>arg1, 25, "foo bar"</paext:arguments>
+				<paext:arguments>
+					<pa:arg>arg1</pa:arg>
+					<pa:arg>25</pa:arg>
+					<pa:arg>foo bar</pa:arg>
+				</paext:arguments>
 				<paext:nbTasks>10</paext:nbTasks>
 				<paext:tasksPerHost>1</paext:tasksPerHost>
 			</paext:loadLevelerGroup>
 
+			<paext:gridbusGroup id="gridbusgroup">
+				<pa:scriptPath base="root" relpath="./calc" />
+				<paext:arguments>
+					<pa:arg>arg1</pa:arg>
+					<pa:arg>arg2</pa:arg>
+				</paext:arguments>
+			</paext:gridbusGroup>
 		</groups>
 
 		<bridges>
@@ -120,14 +139,6 @@
 		</bridges>
 	</infrastructure>
 
-
-	<resources>
-		<bridge refid="SEA" />
-
-		<group refid="LAN_INRIA">
-			<host refid="INRIA_x86_64" />
-		</group>
-	</resources>
 
 
 
