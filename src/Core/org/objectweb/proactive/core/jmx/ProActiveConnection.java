@@ -261,7 +261,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
         NotificationListener listener, NotificationFilter filter,
         Object handback) throws InstanceNotFoundException, IOException {
         try {
-            ListenerAdapter tl = new ListenerAdapter(listener);
+            ListenerAdapter tl = new ListenerAdapter(listener,mbs,name);
 
             this.listenerMap.put(listener, tl);
             this.mbs.addNotificationListener(name, tl, filter, handback);
