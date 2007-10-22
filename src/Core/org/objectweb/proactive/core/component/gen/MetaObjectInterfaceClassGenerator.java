@@ -121,7 +121,7 @@ public class MetaObjectInterfaceClassGenerator
                 //this.fcInterfaceName = fcInterfaceName;
                 //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
                 //                                                    .equals(ComponentParameters.PRIMITIVE);
-                List interfacesToImplement = new ArrayList();
+                List<CtClass> interfacesToImplement = new ArrayList<CtClass>();
 
                 // add interface to reify
                 CtClass functional_itf = pool.get(interfaceType.getFcItfSignature());
@@ -139,7 +139,7 @@ public class MetaObjectInterfaceClassGenerator
                         StubObject.class.getName()));
 
                 //interfacesToImplement.add(pool.get(StubObject.class.getName()));
-                List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
+                List<CtClass> interfacesToImplementAndSuperInterfaces = new ArrayList<CtClass>(interfacesToImplement);
                 addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
 
                 generatedCtClass.setSuperclass(pool.get(
@@ -172,16 +172,16 @@ public class MetaObjectInterfaceClassGenerator
                 generatedCtClass.addField(genericTypesMappingField);
 
                 // list all methods to implement
-                Map methodsToImplement = new HashMap();
-                List classesIndexer = new Vector();
+                Map<String, CtMethod> methodsToImplement = new HashMap<String, CtMethod>();
+                List<String> classesIndexer = new Vector<String>();
 
                 CtClass[] params;
                 CtClass itf;
 
                 // now get the methods from implemented interfaces
-                Iterator it = interfacesToImplementAndSuperInterfaces.iterator();
+                Iterator<CtClass> it = interfacesToImplementAndSuperInterfaces.iterator();
                 while (it.hasNext()) {
-                    itf = (CtClass) it.next();
+                    itf = it.next();
                     if (!classesIndexer.contains(itf.getName())) {
                         classesIndexer.add(itf.getName());
                     }
@@ -205,13 +205,13 @@ public class MetaObjectInterfaceClassGenerator
                     }
                 }
 
-                reifiedMethods = (CtMethod[]) (methodsToImplement.values()
-                                                                 .toArray(new CtMethod[methodsToImplement.size()]));
+                reifiedMethods = (methodsToImplement.values()
+                                                    .toArray(new CtMethod[methodsToImplement.size()]));
 
                 // Determines which reifiedMethods are valid for reification
                 // It is the responsibility of method checkMethod in class Utils
                 // to decide if a method is valid for reification or not
-                Vector v = new Vector();
+                Vector<CtMethod> v = new Vector<CtMethod>();
                 int initialNumberOfMethods = reifiedMethods.length;
 
                 for (int i = 0; i < initialNumberOfMethods; i++) {
