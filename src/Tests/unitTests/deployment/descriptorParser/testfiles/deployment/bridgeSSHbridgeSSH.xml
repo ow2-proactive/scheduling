@@ -3,6 +3,14 @@
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
+
+	<resources>
+		<bridge refid="bSchubby">	
+			<bridge refid="bSchubby">	
+				<host refid="hSchubby"/>	
+			</bridge>
+		</bridge>
+	</resources>
 	
 	<infrastructure>
 		<hosts>
@@ -20,12 +28,5 @@
 		</bridges>
 	</infrastructure>
 
-	<resources>
-		<bridge refid="bSchubby">	
-			<bridge refid="bSchubby">	
-				<host refid="hSchubby"/>	
-			</bridge>
-		</bridge>
-	</resources>
 
 </GCMDeployment>

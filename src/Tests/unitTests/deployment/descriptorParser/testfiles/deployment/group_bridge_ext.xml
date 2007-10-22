@@ -10,6 +10,12 @@
 		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
+	<resources>
+		<group refid="gINRIAEXT">
+			<host refid="hSchubby" />
+		</group>
+	</resources>
+
 	<infrastructure>
 		<hosts>
 			<host id="hSchubby" os="unix" hostCapacity="1"
@@ -26,12 +32,5 @@
 			<paext:myBridge id="bINRIAEXT" someattr="somevalue" />
 		</bridges>
 	</infrastructure>
-
-	<resources>
-		<group refid="gINRIAEXT">
-			<host refid="hSchubby" />
-		</group>
-	</resources>
-
 
 </GCMDeployment>

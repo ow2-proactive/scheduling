@@ -3,9 +3,17 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
+	<resources>
+		<host refid="schubby" />
+	</resources>
+
 	<acquisition>
-		<lookup hostlist="schubby" type="RMI" />
+		<lookup hostList="schubby" type="RMI" />
 		<p2p nodesAsked="3">
+			<localClient />
+			<peerSet>
+				<peer>http://localhost</peer>
+			</peerSet>
 		</p2p>
 	</acquisition>
 
@@ -16,10 +24,5 @@
 			</host>
 		</hosts>
 	</infrastructure>
-
-	<resources>
-		<host refid="schubby" />
-	</resources>
-
 
 </GCMDeployment>

@@ -3,6 +3,24 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
+
+	<resources>
+		<bridge refid="bSchubby">
+			<host refid="hSchubby" />
+		</bridge>
+	</resources>
+
+	<acquisition>
+		<lookup type="RMI" port="6666" hostList="host[0-9].grid.fr"></lookup>
+		<p2p nodesAsked="50">
+			<localClient protocol="RMI" port="2410" />
+			<peerSet>
+				<peer>rmi://schubby.inria.fr</peer>
+				<peer>http://gaudi.inria.fr</peer>
+			</peerSet>
+		</p2p>
+	</acquisition>
+
 	<infrastructure>
 		<hosts>
 			<host id="hSchubby" os="unix" hostCapacity="1" vmCapacity="1">
@@ -17,11 +35,5 @@
 
 		</bridges>
 	</infrastructure>
-
-	<resources>
-		<bridge refid="bSchubby">
-			<host refid="hSchubby" />
-		</bridge>
-	</resources>
 
 </GCMDeployment>

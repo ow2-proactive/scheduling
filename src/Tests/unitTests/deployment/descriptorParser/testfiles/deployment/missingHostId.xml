@@ -2,6 +2,11 @@
 <pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd ">
+
+	<pa:resources>
+		<pa:host refid="WRONG_ID" />
+	</pa:resources>
+
 	<pa:infrastructure>
 		<pa:hosts>
 			<pa:host id="foobar" os="unix">
@@ -10,7 +15,4 @@
 		</pa:hosts>
 	</pa:infrastructure>
 
-	<pa:resources>
-		<pa:host refid="WRONG_ID" />
-	</pa:resources>
 </pa:GCMDeployment>

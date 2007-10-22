@@ -3,6 +3,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
+	<resources>
+		<group refid="gINRIA">
+			<host refid="hSchubby" />
+		</group>
+	</resources>
 
 	<infrastructure>
 		<hosts>
@@ -17,11 +22,5 @@
 			<rshGroup id="grINRIA" hostList="schubby cheypa duff" username="cmathieu" />
 		</groups>
 	</infrastructure>
-
-	<resources>
-		<group refid="gINRIA">
-			<host refid="hSchubby" />
-		</group>
-	</resources>
 
 </GCMDeployment>

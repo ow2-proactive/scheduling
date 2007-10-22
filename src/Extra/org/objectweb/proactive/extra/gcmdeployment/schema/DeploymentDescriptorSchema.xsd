@@ -6,7 +6,7 @@
 
 	<complexType name="abstractGroupElementType" abstract="true">
 		<sequence>
-			<element name="environment" type="pa:environmentType" minOccurs="0"/>
+			<element name="environment" type="pa:environmentType" minOccurs="0" />
 			<element name="scriptPath" type="pa:pathElementType" minOccurs="0" />
 		</sequence>
 		<attribute name="id" type="pa:idType" use="required" />
@@ -47,45 +47,55 @@
 	<element name="sshGroup" substitutionGroup="pa:abstractShElement" type="pa:groupTypeSSH"></element>
 	<element name="rshGroup" substitutionGroup="pa:abstractShElement" type="pa:groupTypeRSH"></element>
 
-	<complexType name="peerSetType"></complexType>
-	<complexType name="abstractAcquisitionType" abstract="true"></complexType>
+	<complexType name="peerSetType">
+		<sequence>
+			<element name="peer" type="string" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+	<!-- a 'MAX' string constant -->
+	<simpleType name="MAX">
+		<restriction base="string">
+			<enumeration value="MAX"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="lookupProtocolType">
+		<restriction base="string">
+			<enumeration value="RMI"></enumeration>
+			<enumeration value="HTTP"></enumeration>
+			<enumeration value="IBIS"></enumeration>
+		</restriction>
+	</simpleType>
+
+	<complexType name="localClientType">
+		<attribute name="protocol" type="pa:lookupProtocolType"></attribute>
+		<attribute name="port" type="positiveInteger"></attribute>
+	</complexType>
 
 	<complexType name="p2pType">
-		<complexContent>
-			<extension base="pa:abstractAcquisitionType">
-				<sequence>
-					<element name="peerSet" type="pa:peerSetType"></element>
-				</sequence>
-				<attribute name="nodesAsked" type="positiveInteger"></attribute>
-			</extension>
-		</complexContent>
+		<sequence>
+			<element name="localClient" type="pa:localClientType"></element>
+			<element name="peerSet" type="pa:peerSetType"></element>
+		</sequence>
+		<attribute name="nodesAsked">
+			<simpleType>
+				<union memberTypes="positiveInteger pa:MAX" />
+			</simpleType>
+		</attribute>
 	</complexType>
 
 	<complexType name="lookupType">
-		<complexContent>
-			<extension base="pa:abstractAcquisitionType">
-				<attribute name="type">
-					<simpleType>
-						<restriction base="string">
-							<enumeration value="RMI"></enumeration>
-							<enumeration value="HTTP"></enumeration>
-							<enumeration value="IBIS"></enumeration>
-						</restriction>
-					</simpleType>
-				</attribute>
-				<attribute name="hostlist" type="string"></attribute>
-				<attribute name="port" type="positiveInteger"></attribute>
-			</extension>
-		</complexContent>
+		<attribute name="type" type="pa:lookupProtocolType"></attribute>
+		<attribute name="hostList" type="string"></attribute>
+		<attribute name="port" type="positiveInteger"></attribute>
 	</complexType>
 
-	<element name="abstractAcquisitionElement" type="pa:abstractAcquisitionType"></element>
-	<element name="lookup" type="pa:lookupType" substitutionGroup="pa:abstractAcquisitionElement"></element>
-	<element name="p2p" type="pa:p2pType" substitutionGroup="pa:abstractAcquisitionElement"></element>
 
 	<complexType name="acquisitionType">
 		<sequence>
-			<element ref="pa:abstractAcquisitionElement" maxOccurs="unbounded"></element>
+			<element name="lookup" type="pa:lookupType" minOccurs="1" maxOccurs="1" />
+			<element name="p2p" type="pa:p2pType" minOccurs="0" />
 		</sequence>
 	</complexType>
 
@@ -232,9 +242,9 @@
 		<complexType>
 			<sequence>
 				<element name="environment" type="pa:environmentType" minOccurs="0" />
+				<element name="resources" type="pa:resourceType" />
 				<element name="acquisition" type="pa:acquisitionType" minOccurs="0" />
 				<element name="infrastructure" type="pa:infrastructureType" />
-				<element name="resources" type="pa:resourceType" />
 			</sequence>
 		</complexType>
 

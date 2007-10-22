@@ -34,4 +34,5 @@
 			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
 		</bridges>
 	</infrastructure>
+
 </GCMDeployment>

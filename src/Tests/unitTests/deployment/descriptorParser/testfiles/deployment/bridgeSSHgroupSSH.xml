@@ -4,6 +4,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
 
+	<resources>
+		<bridge refid="bSea">
+			<group refid="gINRIA">
+				<host refid="hSchubby"/>	
+			</group>
+		</bridge>
+	</resources>
 	
 	<infrastructure>
 		<hosts>
@@ -24,13 +31,5 @@
 				username="cmathieu"/>
 		</groups>		
 	</infrastructure>
-
-	<resources>
-		<bridge refid="bSea">
-			<group refid="gINRIA">
-				<host refid="hSchubby"/>	
-			</group>
-		</bridge>
-	</resources>
 
 </GCMDeployment>
