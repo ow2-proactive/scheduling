@@ -36,7 +36,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
@@ -666,6 +668,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     true);
             jobResult.setOutput(op);
             l.addAppender(op);
+            // log into file if required
+            if (job.getLogFile() != null) {
+                try {
+                    FileAppender fa = new FileAppender(new PatternLayout(
+                                "%m %n"), job.getLogFile());
+                    op.addSink(fa);
+                } catch (IOException e) {
+                    logger.warn("[SCHEDULER] Cannot open log file " +
+                        job.getLogFile() + " : " + e.getMessage());
+                }
+            }
         } else {
             throw new RuntimeException("[SCHEDULER] Appender for job " +
                 job.getId() + " is already activated");

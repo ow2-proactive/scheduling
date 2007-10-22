@@ -114,6 +114,7 @@ public class JobFactory {
         String name = null;
         String priority = null;
         String description = null;
+        String logFile = null;
         boolean cancelOnError = false;
         JobType jt = null;
         Map<Task, String> tasks = new HashMap<Task, String>();
@@ -150,6 +151,13 @@ public class JobFactory {
                             "Invalid XML : Job must have a valid type");
                     }
                 }
+                // JOB LOG FILE
+                node = jobAttr.getNamedItem("logFile");
+                if (node != null) {
+                    logFile = node.getNodeValue();
+                    System.out.println("Job log file = " + logFile);
+                }
+
                 // JOB DESCRIPTION
                 description = (String) xpath.evaluate("/job/description", doc,
                         XPathConstants.STRING);
@@ -267,6 +275,7 @@ public class JobFactory {
                 jobA.setName(name);
                 jobA.setPriority(getPriority(priority));
                 jobA.setDescription(description);
+                jobA.setLogFile(logFile);
 
                 ApplicationTask td2 = new ApplicationTask();
                 jobA.setTask(td2);
@@ -295,6 +304,7 @@ public class JobFactory {
             jobTF.setPriority(getPriority(priority));
             job.setCancelOnError(cancelOnError);
             job.setDescription(description);
+            job.setLogFile(logFile);
         }
 
         // Dependencies

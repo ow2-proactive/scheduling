@@ -97,17 +97,21 @@ public class InternalJobFactory implements Serializable {
             throw new SchedulerException(
                 "You must specify an application task !");
         }
+
+        // TODO cdelbe,jlscheef,jfradj : extremely UGLY "design" pattern...
         if (userTask.getTaskClass() != null) {
             job = new InternalApplicationJob(userJob.getName(),
                     userJob.getPriority(), userJob.getRuntimeLimit(),
                     userJob.isCancelOnError(), userJob.getDescription(),
                     userTask.getNumberOfNodesNeeded(), userTask.getTaskClass());
+            job.setLogFile(userJob.getLogFile());
         } else if (userTask.getTaskInstance() != null) {
             job = new InternalApplicationJob(userJob.getName(),
                     userJob.getPriority(), userJob.getRuntimeLimit(),
                     userJob.isCancelOnError(), userJob.getDescription(),
                     userTask.getNumberOfNodesNeeded(),
                     userTask.getTaskInstance());
+            job.setLogFile(userJob.getLogFile());
         } else {
             throw new SchedulerException(
                 "You must specify your own executable application task to be launched (in the application task) !");
@@ -131,9 +135,12 @@ public class InternalJobFactory implements Serializable {
         if (userJob.getTasks().size() == 0) {
             throw new SchedulerException("This job must contains tasks !");
         }
+
+        // TODO cdelbe,jlscheef,jfradj : extremely UGLY "design" pattern...
         InternalJob job = new InternalTaskFlowJob(userJob.getName(),
                 userJob.getPriority(), userJob.getRuntimeLimit(),
                 userJob.isCancelOnError(), userJob.getDescription());
+        job.setLogFile(userJob.getLogFile());
         HashMap<Task, InternalTask> tasksList = new HashMap<Task, InternalTask>();
         boolean hasFinalTask = false;
         for (Task t : userJob.getTasks()) {

@@ -111,7 +111,6 @@ public class JobLauncher {
                         simpleLoggerServer.getPort());
                     Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + id);
 
-                    // coucou Guillaume !
                     DateFormat dateFormat = new SimpleDateFormat(
                             "hh'h'mm'm'_dd-MM-yy");
                     FileAppender fa = new FileAppender(new PatternLayout(

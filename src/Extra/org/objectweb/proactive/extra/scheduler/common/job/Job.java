@@ -51,6 +51,9 @@ public abstract class Job implements Serializable {
     /** Is this job has to cancel when an exception occurs in a task */
     protected boolean cancelOnError = false;
 
+    /** logs are written in logFile if not null */
+    protected String logFile = null;
+
     /** Short description of this job */
     protected String description = "Default description";
 
@@ -161,5 +164,21 @@ public abstract class Job implements Serializable {
      */
     public void setPriority(JobPriority priority) {
         this.priority = priority;
+    }
+
+    /**
+     * set a log file for this job.
+     * @param fileName the path of the log file.
+     */
+    public void setLogFile(String filePath) {
+        this.logFile = filePath;
+    }
+
+    /**
+     * Return the path to the log file, or null if not logged.
+     * @return the path to the log file, or null if not logged.
+     */
+    public String getLogFile() {
+        return this.logFile;
     }
 }
