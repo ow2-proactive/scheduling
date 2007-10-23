@@ -17,6 +17,12 @@
             icon="icons/sample.gif"
             id="org.objectweb.proactive.ic2d.timit.views.TimerTreeView"
             name="Timer Tree View"/>
+      <view
+            category="org.objectweb.proactive.ic2d.monitoring.category"
+            class="org.objectweb.proactive.ic2d.timit.views.TimeLineView"
+            icon="icons/sample.gif"
+            id="org.objectweb.proactive.ic2d.timit.views.TimeLineView"
+            name="Time Line View"/>
    </extension>
    <extension
          point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">

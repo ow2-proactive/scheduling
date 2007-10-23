@@ -40,8 +40,8 @@ import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
-import org.objectweb.proactive.ic2d.timit.data.ChartContainerObject;
-import org.objectweb.proactive.ic2d.timit.data.ChartObject;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 
@@ -56,7 +56,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
 public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
     public static final String GET_TIMER_SNAPSHOT = "Get timer snapshot";
     private AbstractData object;
-    private ChartContainerObject container;
+    private BasicChartContainerObject container;
 
     public GetTimerSnapshotAction() {
         super.setId(GET_TIMER_SNAPSHOT);
@@ -76,9 +76,9 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
             IViewPart part = page.showView(
                     "org.objectweb.proactive.ic2d.timit.views.TimItView");
 
-            if (ChartObject.DEBUG) {
-                new ChartObject(((TimItView) part).getChartContainer(), null,
-                    null);
+            if (BasicChartObject.DEBUG) {
+                new BasicChartObject(((TimItView) part).getChartContainer(),
+                    null, null);
                 return;
             }
 
@@ -105,9 +105,9 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
 
     public final void setActiveSelect(final ActiveObject ref) {
         if (this.container != null) {
-            ChartObject chartObject = this.container.getChartObjectById(ref.getUniqueID());
-            if (chartObject != null) {
-                chartObject.getEp().handleSelection(true);
+            BasicChartObject basicChartObject = this.container.getChartObjectById(ref.getUniqueID());
+            if (basicChartObject != null) {
+                basicChartObject.getEp().handleSelection(true);
             }
         }
     }

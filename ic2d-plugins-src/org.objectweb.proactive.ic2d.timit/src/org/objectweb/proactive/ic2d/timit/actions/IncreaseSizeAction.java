@@ -32,37 +32,31 @@ package org.objectweb.proactive.ic2d.timit.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.timit.data.TimerObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
 
 
-public class DeleteTreeAction extends Action {
-    public static final String DELETE_TREE_ACTION = "Delete Tree";
-    private TimerObject target;
+public class IncreaseSizeAction extends Action {
+    public static final String INCREASE_SIZE_ACTION = "Increase Size Action";
+    private DurationChartEditPart durationChartEditPart;
 
-    public DeleteTreeAction() {
-        super.setId(DELETE_TREE_ACTION);
+    public IncreaseSizeAction() {
+        super.setId(INCREASE_SIZE_ACTION);
         super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "delete_obj.gif"));
-        super.setToolTipText(DELETE_TREE_ACTION);
+                this.getClass(), "increase_width.gif"));
+        super.setToolTipText(INCREASE_SIZE_ACTION);
         super.setEnabled(false);
+    }
+
+    public final void setTarget(
+        final DurationChartEditPart durationChartEditPart) {
+        super.setEnabled(true);
+        this.durationChartEditPart = durationChartEditPart;
     }
 
     @Override
     public final void run() {
-        TimerTreeHolder t = TimerTreeHolder.getInstance();
-        if (t != null) {
-            t.firePropertyChange(TimerTreeHolder.P_REMOVE_SELECTED, null, target);
-            //t.removeDummyRoot(target);
+        if (this.durationChartEditPart != null) {
+            this.durationChartEditPart.increaseWidth();
         }
-    }
-
-    public final void setTarget(final TimerObject target) {
-        if (target == null) {
-            this.setEnabled(false);
-            return;
-        }
-        this.target = target;
-        this.setEnabled(true);
     }
 }

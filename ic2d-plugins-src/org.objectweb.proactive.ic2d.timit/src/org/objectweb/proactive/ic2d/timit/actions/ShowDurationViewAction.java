@@ -37,42 +37,40 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
-import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 
-public class ShowInTreeViewAction extends Action {
-    public static final String SHOW_IN_TREE_VIEW_ACTION = "Show in Tree View";
-    private BasicChartObject target;
+public class ShowDurationViewAction extends Action {
+    public static final String SHOW_DURATION_VIEW_ACTION = "Show Duration View";
+    private TimeLineView timeLineView;
+    StartDurationRecordAction startDurationRecordAction;
 
-    public ShowInTreeViewAction() {
-        super.setId(SHOW_IN_TREE_VIEW_ACTION);
+    public ShowDurationViewAction(
+        StartDurationRecordAction startDurationRecordAction) {
+        super.setId(SHOW_DURATION_VIEW_ACTION);
         super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "treeview.gif"));
-        super.setToolTipText(SHOW_IN_TREE_VIEW_ACTION);
+                this.getClass(), "duration.gif"));
+        super.setToolTipText(SHOW_DURATION_VIEW_ACTION);
         super.setEnabled(false);
+        this.startDurationRecordAction = startDurationRecordAction;
     }
 
-    public final void setTarget(final BasicChartObject target) {
-        super.setEnabled(true);
-        this.target = target;
-    }
-
-    @Override
+    // @Override
     public final void run() {
-        IWorkbench iworkbench = PlatformUI.getWorkbench();
-        IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
-        IWorkbenchPage page = currentWindow.getActivePage();
-        try {
-            IViewPart part = page.showView(
-                    "org.objectweb.proactive.ic2d.timit.views.TimerTreeView");
-
-            if (target != null) {
-                TimerTreeHolder.getInstance().provideChartObject(target, false);
-                target = null;
+        if (this.timeLineView == null) {
+            IWorkbench iworkbench = PlatformUI.getWorkbench();
+            IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+            IWorkbenchPage page = currentWindow.getActivePage();
+            try {
+                IViewPart part = page.showView(
+                        "org.objectweb.proactive.ic2d.timit.views.TimeLineView");
+                this.timeLineView = (TimeLineView) part;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        this.setEnabled(false);
+        this.timeLineView.getContainer().stopRecordAndBuildChart();
+        this.startDurationRecordAction.setEnabled(true);
     }
 }

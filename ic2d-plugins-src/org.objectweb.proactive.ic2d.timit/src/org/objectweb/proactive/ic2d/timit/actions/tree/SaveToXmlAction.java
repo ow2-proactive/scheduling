@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.actions;
+package org.objectweb.proactive.ic2d.timit.actions.tree;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -43,9 +43,9 @@ import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.benchmarks.timit.util.basic.ResultBag;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.timit.Activator;
-import org.objectweb.proactive.ic2d.timit.data.ChartObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 import org.objectweb.proactive.ic2d.timit.editparts.SafeSaveDialog;
 
 
@@ -88,12 +88,12 @@ public class SaveToXmlAction extends Action {
         List<ResultBag> results = new java.util.ArrayList<ResultBag>(this.timerTreeHolder.getChartObjectSources()
                                                                                          .size());
 
-        for (ChartObject c : this.timerTreeHolder.getChartObjectSources()) {
+        for (BasicChartObject c : this.timerTreeHolder.getChartObjectSources()) {
             List<BasicTimer> timersList = new ArrayList<BasicTimer>(c.getTimersList()
                                                                      .size());
 
             // Fill the timers list with original basic timers
-            for (TimerObject t : c.getTimersList()) {
+            for (TimerTreeNodeObject t : c.getTimersList()) {
                 if ((t.getCurrentTimer() != null) && t.isViewed()) {
                     timersList.add(t.getCurrentTimer());
                 }

@@ -37,8 +37,8 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.timit.data.ChartContainerObject;
-import org.objectweb.proactive.ic2d.timit.data.ChartObject;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 
@@ -47,7 +47,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  * @author vbodnart
  *
  */
-public class ChartContainerEditPart extends AbstractGraphicalEditPart
+public class BasicChartContainerEditPart extends AbstractGraphicalEditPart
     implements Runnable {
     protected TimItView timItView;
 
@@ -55,10 +55,10 @@ public class ChartContainerEditPart extends AbstractGraphicalEditPart
      * The constructor of this edit part
      * @param model
      */
-    public ChartContainerEditPart(ChartContainerObject model,
+    public BasicChartContainerEditPart(BasicChartContainerObject model,
         TimItView timItView) {
-        this.setModel(model);
         model.setEp(this);
+        setModel(model);
         this.timItView = timItView;
     }
 
@@ -85,8 +85,8 @@ public class ChartContainerEditPart extends AbstractGraphicalEditPart
      * @return The list of children
      */
     @Override
-    protected List<ChartObject> getModelChildren() {
-        List<ChartObject> l = ((ChartContainerObject) getModel()).getChildrenList();
+    protected List<BasicChartObject> getModelChildren() {
+        List<BasicChartObject> l = ((BasicChartContainerObject) getModel()).getChildrenList();
 
         // If the list is not empty the
         if (l.size() != 0) {

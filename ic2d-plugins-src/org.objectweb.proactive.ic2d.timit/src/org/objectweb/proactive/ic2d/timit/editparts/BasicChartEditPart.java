@@ -36,44 +36,46 @@ import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.timit.data.ChartObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
-import org.objectweb.proactive.ic2d.timit.figures.ChartFigure;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.figures.BasicChartFigure;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 
-public class ChartEditPart extends AbstractGraphicalEditPart
+public class BasicChartEditPart extends AbstractGraphicalEditPart
     implements MouseListener, Runnable {
     public static final int CHART_HEIGHT = 280;
     protected TimItView timItView;
-    protected ChartObject chartObject;
+    protected BasicChartObject basicChartObject;
 
-    public ChartEditPart(final ChartObject chartObject) {
-        super.setModel(chartObject);
-        this.chartObject = chartObject;
-        this.chartObject.setEp(this);
+    public BasicChartEditPart(final BasicChartObject model) {
+        model.setEp(this);
+        setModel(model);
+        this.basicChartObject = model;
+        this.basicChartObject.setEp(this);
     }
 
     @Override
     protected final IFigure createFigure() {
-        ChartFigure chartFigure = new ChartFigure(this.chartObject.provideChart());
-        chartFigure.setPreferredSize(this.getViewer().getControl().getBounds().width -
-            20, CHART_HEIGHT);
-        chartFigure.setMinimumSize(new Dimension(300, CHART_HEIGHT));
-        chartFigure.addMouseListener(this);
-        return chartFigure;
+        BasicChartFigure basicChartFigure = new BasicChartFigure(this.basicChartObject.provideChart());
+        basicChartFigure.setPreferredSize(this.getViewer().getControl()
+                                              .getBounds().width - 20,
+            CHART_HEIGHT);
+        basicChartFigure.setMinimumSize(new Dimension(300, CHART_HEIGHT));
+        basicChartFigure.addMouseListener(this);
+        return basicChartFigure;
     }
 
     @Override
     protected final void fireSelectionChanged() {
         super.fireSelectionChanged();
         if (this.timItView == null) {
-            this.timItView = ((ChartContainerEditPart) this.getParent()).timItView;
+            this.timItView = ((BasicChartContainerEditPart) this.getParent()).timItView;
         }
 
-        ChartObject model = (ChartObject) this.getModel();
+        BasicChartObject model = (BasicChartObject) this.getModel();
         switch (this.getSelected()) {
-        case ChartEditPart.SELECTED_PRIMARY:
+        case BasicChartEditPart.SELECTED_PRIMARY:
             this.timItView.getRefreshSelectedButton().setEnabled(true);
             // Update the text of the timerLevelButton
             this.timItView.getTimerLevelButton()
@@ -83,15 +85,15 @@ public class ChartEditPart extends AbstractGraphicalEditPart
             this.timItView.getTimerLevelButton().setEnabled(true);
             this.timItView.getShowInTreeViewAction().setTarget(model);
             // Delegate the selection to the figure
-            ((ChartFigure) this.getFigure()).setSelected();
+            ((BasicChartFigure) this.getFigure()).setSelected();
             // If Tree View is used then set selected the tree view of the this
             // chart
             if (TimerTreeHolder.getInstance() != null) {
                 TimerTreeHolder.getInstance().provideChartObject(model, true);
             }
             break;
-        case ChartEditPart.SELECTED_NONE:
-            ((ChartFigure) this.getFigure()).setUnselected();
+        case BasicChartEditPart.SELECTED_NONE:
+            ((BasicChartFigure) this.getFigure()).setUnselected();
         }
     }
 
@@ -101,9 +103,9 @@ public class ChartEditPart extends AbstractGraphicalEditPart
         }
         if (this.getViewer().getSelectedEditParts().size() != 0) {
             // Only one object can be selected at time
-            ChartEditPart lastSelected = (ChartEditPart) this.getViewer()
-                                                             .getSelectedEditParts()
-                                                             .get(0);
+            BasicChartEditPart lastSelected = (BasicChartEditPart) this.getViewer()
+                                                                       .getSelectedEditParts()
+                                                                       .get(0);
             // deselect it
             lastSelected.getViewer().deselect(lastSelected);
         }
@@ -115,9 +117,10 @@ public class ChartEditPart extends AbstractGraphicalEditPart
         Display.getDefault().asyncExec(this);
     }
 
+    @Override
     public final void run() {
-        ChartFigure figure = (ChartFigure) getFigure();
-        figure.setChart(this.chartObject.provideChart());
+        BasicChartFigure figure = (BasicChartFigure) getFigure();
+        figure.setChart(this.basicChartObject.provideChart());
         figure.setPreferredSize(this.getViewer().getControl().getBounds().width -
             20, CHART_HEIGHT);
         refresh();

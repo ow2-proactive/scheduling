@@ -40,7 +40,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.timit.Activator;
-import org.objectweb.proactive.ic2d.timit.editparts.ChartEditPart;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
+import org.objectweb.proactive.ic2d.timit.editparts.BasicChartEditPart;
 
 
 /**
@@ -49,7 +50,7 @@ import org.objectweb.proactive.ic2d.timit.editparts.ChartEditPart;
  * @author vbodnart
  *
  */
-public class ChartObject {
+public class BasicChartObject {
     public static final boolean DEBUG = false;
     public static final String[] BASIC_LEVEL = new String[] {
             "Total", "Serve", "SendRequest", "SendReply", "WaitByNecessity",
@@ -62,28 +63,20 @@ public class ChartObject {
             "GroupAsyncCall"
         };
     protected BarChartBuilder barChartBuilder;
-    protected ChartContainerObject parent;
-    protected Map<String, TimerObject> timersMap;
-    protected List<TimerObject> timersList;
-    protected TimerObject rootTimer;
+    protected BasicChartContainerObject parent;
+    protected Map<String, TimerTreeNodeObject> timersMap;
+    protected List<TimerTreeNodeObject> timersList;
+    protected TimerTreeNodeObject rootTimer;
     protected ActiveObject aoObject;
-    protected ChartEditPart ep;
+    protected BasicChartEditPart ep;
     protected boolean hasChanged;
     protected String[] currentTimerLevel = BASIC_LEVEL;
 
-    public TimerObject getRootTimer() {
-        return rootTimer;
-    }
-
-    public void setRootTimer(TimerObject rootTimer) {
-        this.rootTimer = rootTimer;
-    }
-
-    public ChartObject(final ChartContainerObject parent,
+    public BasicChartObject(final BasicChartContainerObject parent,
         final List<BasicTimer> basicTimersList, final ActiveObject aoObject) {
         this.parent = parent;
-        this.timersMap = new java.util.HashMap<String, TimerObject>();
-        this.timersList = new ArrayList<TimerObject>();
+        this.timersMap = new java.util.HashMap<String, TimerTreeNodeObject>();
+        this.timersList = new ArrayList<TimerTreeNodeObject>();
 
         // Populate the map and update root
         this.updateCurrentTimersList(basicTimersList);
@@ -140,7 +133,7 @@ public class ChartObject {
      * edit part.
      */
     public final void performSnapshot(final boolean updateLevel) {
-        List<BasicTimer> availableTimersList = ChartObject.performSnapshotInternal(this.aoObject,
+        List<BasicTimer> availableTimersList = BasicChartObject.performSnapshotInternal(this.aoObject,
                 this.currentTimerLevel);
 
         // If the received collection is not null
@@ -148,15 +141,16 @@ public class ChartObject {
             // Update the current timers object collection
             updateCurrentTimersList(availableTimersList);
             // Iterate through all timers to fire changes
-            for (final TimerObject t : this.timersList) {
+            for (final TimerTreeNodeObject t : this.timersList) {
                 // If update level is asked then check if the timers name is
                 // filtered
-                if (updateLevel && !t.currentTimer.isUserLevel()) {
+                if (updateLevel && !t.getCurrentTimer().isUserLevel()) {
                     t.setViewed(contains(this.currentTimerLevel,
-                            t.currentTimer.getName()));
+                            t.getCurrentTimer().getName()));
                 }
             }
-            this.rootTimer.firePropertyChange(TimerObject.P_CHILDREN, null, null);
+            this.rootTimer.firePropertyChange(TimerTreeNodeObject.P_CHILDREN,
+                null, null);
             this.hasChanged = true;
             this.ep.asyncRefresh();
         }
@@ -164,30 +158,33 @@ public class ChartObject {
 
     public final void updateCurrentTimersList(final List<BasicTimer> list) {
         for (final BasicTimer basicTimer : list) {
-            TimerObject timerObject = this.timersMap.get(basicTimer.getName());
+            TimerTreeNodeObject timerTreeNodeObject = this.timersMap.get(basicTimer.getName());
 
-            if (timerObject != null) {
+            if (timerTreeNodeObject != null) {
                 // Update the timer object
-                timerObject.updateCurrentTimerAndCompute(basicTimer);
+                timerTreeNodeObject.updateCurrentTimerAndCompute(basicTimer);
             } else {
                 // If is not root
                 if (basicTimer.getParent() != null) {
                     // Retreive parent object
-                    TimerObject parent = this.timersMap.get(basicTimer.getParent()
-                                                                      .getName());
+                    TimerTreeNodeObject parent = this.timersMap.get(basicTimer.getParent()
+                                                                              .getName());
                     if (parent != null) {
                         // Create the timer object
-                        timerObject = new TimerObject(basicTimer, parent);
+                        timerTreeNodeObject = new TimerTreeNodeObject(basicTimer,
+                                parent);
                         // Set the total timer reference
-                        timerObject.setTotalTimerAndCompute(this.rootTimer);
+                        timerTreeNodeObject.setTotalTimerAndCompute(this.rootTimer);
                         // Add to map
-                        this.timersMap.put(basicTimer.getName(), timerObject);
+                        this.timersMap.put(basicTimer.getName(),
+                            timerTreeNodeObject);
                         // Add to list
-                        this.timersList.add(timerObject);
+                        this.timersList.add(timerTreeNodeObject);
                     }
                 } else { // If root then add to map and to list
                     if (this.rootTimer == null) {
-                        this.rootTimer = new TimerObject(basicTimer, null);
+                        this.rootTimer = new TimerTreeNodeObject(basicTimer,
+                                null);
                         this.rootTimer.setTotalTimerAndCompute(this.rootTimer);
                         this.timersMap.put(basicTimer.getName(), this.rootTimer);
                         this.timersList.add(this.rootTimer);
@@ -211,7 +208,7 @@ public class ChartObject {
      *
      * @return The list of timer objects
      */
-    public final List<TimerObject> getTimersList() {
+    public final List<TimerTreeNodeObject> getTimersList() {
         return timersList;
     }
 
@@ -229,7 +226,7 @@ public class ChartObject {
      *
      * @return
      */
-    public final ChartContainerObject getParent() {
+    public final BasicChartContainerObject getParent() {
         return parent;
     }
 
@@ -238,7 +235,7 @@ public class ChartObject {
      *
      * @param parent
      */
-    public final void setParent(final ChartContainerObject parent) {
+    public final void setParent(final BasicChartContainerObject parent) {
         this.parent = parent;
     }
 
@@ -265,7 +262,7 @@ public class ChartObject {
      *
      * @param ep
      */
-    public final void setEp(final ChartEditPart ep) {
+    public final void setEp(final BasicChartEditPart ep) {
         this.ep = ep;
     }
 
@@ -274,7 +271,7 @@ public class ChartObject {
      *
      * @return ep
      */
-    public final ChartEditPart getEp() {
+    public final BasicChartEditPart getEp() {
         return this.ep;
     }
 
@@ -288,12 +285,10 @@ public class ChartObject {
     protected static final List<BasicTimer> performSnapshotInternal(
         final ActiveObject aoObject, final String[] timerLevel) {
         try {
-            //            Spy spy = ((NodeObject) aoObject.getParent()).getSpy();
             Object[] result = (Object[]) aoObject.invoke("getTimersSnapshotFromBody",
                     new Object[] { timerLevel },
                     new String[] { String[].class.getName() });
 
-            //                    timerLevel);
             List<BasicTimer> availableTimersList = (List<BasicTimer>) result[0];
             long remoteTimeStamp = (Long) result[1];
 
@@ -343,5 +338,13 @@ public class ChartObject {
             }
         }
         return false;
+    }
+
+    public TimerTreeNodeObject getRootTimer() {
+        return rootTimer;
+    }
+
+    public void setRootTimer(TimerTreeNodeObject rootTimer) {
+        this.rootTimer = rootTimer;
     }
 }

@@ -28,33 +28,41 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.editparts.tree;
+package org.objectweb.proactive.ic2d.timit.actions.tree;
 
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.EditPartFactory;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
-import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
 
 
-public class TreeEditPartFactory implements EditPartFactory {
-    private TimerTreeView timerTreeView;
+public class DeleteTreeAction extends Action {
+    public static final String DELETE_TREE_ACTION = "Delete Tree";
+    private TimerTreeNodeObject target;
 
-    public TreeEditPartFactory(final TimerTreeView timerTreeView) {
-        this.timerTreeView = timerTreeView;
+    public DeleteTreeAction() {
+        super.setId(DELETE_TREE_ACTION);
+        super.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "delete_obj.gif"));
+        super.setToolTipText(DELETE_TREE_ACTION);
+        super.setEnabled(false);
     }
 
-    public final EditPart createEditPart(final EditPart context,
-        final Object model) {
-        EditPart part = null;
-        if (model instanceof TimerTreeHolder) {
-            part = new TimerTreeHolderEditPart();
-        } else if (model instanceof TimerTreeNodeObject) {
-            part = new TimerEditPart(timerTreeView);
+    @Override
+    public final void run() {
+        TimerTreeHolder t = TimerTreeHolder.getInstance();
+        if (t != null) {
+            t.firePropertyChange(TimerTreeHolder.P_REMOVE_SELECTED, null, target);
+            //t.removeDummyRoot(target);
         }
-        if (part != null) {
-            part.setModel(model);
+    }
+
+    public final void setTarget(final TimerTreeNodeObject target) {
+        if (target == null) {
+            this.setEnabled(false);
+            return;
         }
-        return part;
+        this.target = target;
+        this.setEnabled(true);
     }
 }

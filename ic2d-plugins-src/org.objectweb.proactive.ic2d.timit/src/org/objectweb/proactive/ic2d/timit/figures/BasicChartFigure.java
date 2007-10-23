@@ -48,7 +48,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 
-public class ChartFigure extends Figure {
+public class BasicChartFigure extends Figure {
     public static final Color UNSELECTED_BORDER_COLOR = Display.getCurrent()
                                                                .getSystemColor(SWT.COLOR_DARK_GRAY);
     public static final Color SELECTED_BORDER_COLOR = Display.getCurrent()
@@ -69,7 +69,7 @@ public class ChartFigure extends Figure {
     private boolean bDirty;
     private Bounds bo;
 
-    public ChartFigure(final Chart chart) {
+    public BasicChartFigure(final Chart chart) {
         this.chart = chart;
 
         this.currentBorderColor = UNSELECTED_BORDER_COLOR;
@@ -137,7 +137,6 @@ public class ChartFigure extends Figure {
                 if (this.imgChart != null) {
                     this.imgChart.dispose();
                 }
-                this.bDirty = true;
 
                 this.imgChart = new Image(d, r.width, r.height);
                 this.gc = new GC(this.imgChart);

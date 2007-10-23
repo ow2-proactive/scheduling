@@ -43,7 +43,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
-import org.objectweb.proactive.ic2d.timit.editparts.ChartContainerEditPart;
+import org.objectweb.proactive.ic2d.timit.editparts.BasicChartContainerEditPart;
 
 
 /**
@@ -51,14 +51,14 @@ import org.objectweb.proactive.ic2d.timit.editparts.ChartContainerEditPart;
  *
  * @author vbodnart
  */
-public class ChartContainerObject {
-    protected List<ChartObject> childrenList;
-    protected Map<UniqueID, ChartObject> childrenMap;
-    protected ChartContainerEditPart ep;
+public class BasicChartContainerObject {
+    protected List<BasicChartObject> childrenList;
+    protected Map<UniqueID, BasicChartObject> childrenMap;
+    protected BasicChartContainerEditPart ep;
 
-    public ChartContainerObject() {
-        this.childrenList = new ArrayList<ChartObject>();
-        this.childrenMap = new HashMap<UniqueID, ChartObject>();
+    public BasicChartContainerObject() {
+        this.childrenList = new ArrayList<BasicChartObject>();
+        this.childrenMap = new HashMap<UniqueID, BasicChartObject>();
     }
 
     public final void recognizeAndCreateChart(final AbstractData object) {
@@ -119,48 +119,48 @@ public class ChartContainerObject {
     protected final void createFromAOObject(final ActiveObject aoObject) {
         // First look if this active object is already registred
         if (this.childrenMap.containsKey(aoObject.getUniqueID())) {
-            ChartObject chartObject = this.childrenMap.get(aoObject.getUniqueID());
-            chartObject.performSnapshot();
+            BasicChartObject basicChartObject = this.childrenMap.get(aoObject.getUniqueID());
+            basicChartObject.performSnapshot();
             return;
         }
 
         // Before ChartObject instanciation try to take a snapshot of timers
-        List<BasicTimer> timersCollection = ChartObject.performSnapshotInternal(aoObject,
-                ChartObject.BASIC_LEVEL);
+        List<BasicTimer> timersCollection = BasicChartObject.performSnapshotInternal(aoObject,
+                BasicChartObject.BASIC_LEVEL);
         if (timersCollection != null) {
-            new ChartObject(this, timersCollection, aoObject);
+            new BasicChartObject(this, timersCollection, aoObject);
         }
     }
 
-    public ChartObject getChartObjectById(UniqueID id) {
+    public BasicChartObject getChartObjectById(UniqueID id) {
         return this.childrenMap.get(id);
     }
 
-    public List<ChartObject> getChildrenList() {
+    public List<BasicChartObject> getChildrenList() {
         return this.childrenList;
     }
 
-    public void addChild(ChartObject child) {
+    public void addChild(BasicChartObject child) {
         this.childrenList.add(child);
-        if (!ChartObject.DEBUG) {
+        if (!BasicChartObject.DEBUG) {
             this.childrenMap.put(child.aoObject.getUniqueID(), child);
         }
         this.update(false);
     }
 
-    public void removeChild(ChartObject child) {
+    public void removeChild(BasicChartObject child) {
         this.childrenList.remove(child);
         this.childrenMap.remove(child.aoObject.getUniqueID());
         this.update(false);
     }
 
-    public void setEp(ChartContainerEditPart ep) {
+    public void setEp(BasicChartContainerEditPart ep) {
         this.ep = ep;
     }
 
     public void update(boolean forceRefresh) {
         if (forceRefresh) {
-            for (ChartObject o : this.childrenList) {
+            for (BasicChartObject o : this.childrenList) {
                 o.ep.asyncRefresh();
             }
             return;

@@ -28,33 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.editparts.tree;
+package org.objectweb.proactive.ic2d.timit.editparts.duration;
 
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
-import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
-import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.Label;
+import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.objectweb.proactive.ic2d.timit.data.duration.SequenceObject;
+import org.objectweb.proactive.ic2d.timit.figures.duration.SequenceFigure;
 
 
-public class TreeEditPartFactory implements EditPartFactory {
-    private TimerTreeView timerTreeView;
+public class SequenceEditPart extends AbstractGraphicalEditPart {
+    protected Label sequenceLabelFigure;
+    protected SequenceFigure sequenceFigure;
 
-    public TreeEditPartFactory(final TimerTreeView timerTreeView) {
-        this.timerTreeView = timerTreeView;
+    public SequenceEditPart(SequenceObject model) {
+        setModel(model);
+        model.setEp(this);
     }
 
-    public final EditPart createEditPart(final EditPart context,
-        final Object model) {
-        EditPart part = null;
-        if (model instanceof TimerTreeHolder) {
-            part = new TimerTreeHolderEditPart();
-        } else if (model instanceof TimerTreeNodeObject) {
-            part = new TimerEditPart(timerTreeView);
-        }
-        if (part != null) {
-            part.setModel(model);
-        }
-        return part;
+    @Override
+    protected IFigure createFigure() {
+        SequenceObject model = (SequenceObject) getModel();
+        DurationChartEditPart parent = (DurationChartEditPart) getParent();
+        this.sequenceFigure = new SequenceFigure(parent.getTimeIntervalManager(),
+                model, (ScrollingGraphicalViewer) parent.getViewer());
+        return sequenceFigure;
+    }
+
+    @Override
+    protected void createEditPolicies() {
     }
 }

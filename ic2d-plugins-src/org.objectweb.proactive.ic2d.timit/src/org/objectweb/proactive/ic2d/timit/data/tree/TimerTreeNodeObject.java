@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.data;
+package org.objectweb.proactive.ic2d.timit.data.tree;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,9 +37,10 @@ import java.util.List;
 import java.util.Locale;
 
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
+import org.objectweb.proactive.ic2d.timit.data.AbstractObject;
 
 
-public class TimerObject extends AbstractObject {
+public class TimerTreeNodeObject extends AbstractObject {
     public static final String P_CHILDREN = "0";
     public static final String P_LABEL = "1";
     public static final String P_SELECTION = "2";
@@ -50,21 +51,22 @@ public class TimerObject extends AbstractObject {
     protected double percentageFromTotal;
     protected double currentTotalTimeInMsInDouble;
     protected String labelName;
-    protected TimerObject parent;
-    protected TimerObject totalTimer;
+    protected TimerTreeNodeObject parent;
+    protected TimerTreeNodeObject totalTimer;
     protected BasicTimer currentTimer;
-    protected List<TimerObject> children;
+    protected List<TimerTreeNodeObject> children;
 
     /** boolean used during the build of a chart **/
     protected boolean isViewed;
 
-    public TimerObject(String name, boolean isViewed) {
+    public TimerTreeNodeObject(String name, boolean isViewed) {
         this.labelName = name;
         this.isViewed = isViewed;
-        this.children = new ArrayList<TimerObject>();
+        this.children = new ArrayList<TimerTreeNodeObject>();
     }
 
-    public TimerObject(BasicTimer currentTimer, TimerObject parent) {
+    public TimerTreeNodeObject(BasicTimer currentTimer,
+        TimerTreeNodeObject parent) {
         this.parent = parent;
         this.currentTimer = currentTimer;
         this.labelName = currentTimer.getName();
@@ -72,10 +74,11 @@ public class TimerObject extends AbstractObject {
         if (parent != null) {
             parent.children.add(this);
         }
-        this.children = new ArrayList<TimerObject>();
+        this.children = new ArrayList<TimerTreeNodeObject>();
     }
 
-    public final void setTotalTimerAndCompute(final TimerObject totalTimer) {
+    public final void setTotalTimerAndCompute(
+        final TimerTreeNodeObject totalTimer) {
         this.totalTimer = totalTimer;
         if (this.currentTimer.getTotalTime() != 0L) {
             this.compute();
@@ -108,7 +111,7 @@ public class TimerObject extends AbstractObject {
         }
     }
 
-    public List<TimerObject> getChildren() {
+    public List<TimerTreeNodeObject> getChildren() {
         return this.children;
     }
 
@@ -143,11 +146,11 @@ public class TimerObject extends AbstractObject {
         this.isViewed = isViewedNew;
     }
 
-    public TimerObject getParent() {
+    public TimerTreeNodeObject getParent() {
         return parent;
     }
 
-    public void setParent(TimerObject parent) {
+    public void setParent(TimerTreeNodeObject parent) {
         this.parent = parent;
     }
 
@@ -175,9 +178,9 @@ public class TimerObject extends AbstractObject {
     // SORT CHILDREN UTILITY METHODS
     public final void sortChildrenByTime(final boolean up) {
         Collections.sort(this.children,
-            new Comparator<TimerObject>() {
-                public final int compare(final TimerObject t1,
-                    final TimerObject t2) {
+            new Comparator<TimerTreeNodeObject>() {
+                public final int compare(final TimerTreeNodeObject t1,
+                    final TimerTreeNodeObject t2) {
                     return (up
                     ? Double.compare(t1.currentTotalTimeInMsInDouble,
                         t2.currentTotalTimeInMsInDouble)
@@ -189,9 +192,9 @@ public class TimerObject extends AbstractObject {
 
     public final void sortChildrenByTotalPercent(final boolean up) {
         Collections.sort(this.children,
-            new Comparator<TimerObject>() {
-                public final int compare(final TimerObject t1,
-                    final TimerObject t2) {
+            new Comparator<TimerTreeNodeObject>() {
+                public final int compare(final TimerTreeNodeObject t1,
+                    final TimerTreeNodeObject t2) {
                     return (up
                     ? Double.compare(t1.currentTotalTimeInMsInDouble,
                         t2.currentTotalTimeInMsInDouble)
@@ -203,9 +206,9 @@ public class TimerObject extends AbstractObject {
 
     public final void sortChildrenByInvocations(final boolean up) {
         Collections.sort(this.children,
-            new Comparator<TimerObject>() {
-                public final int compare(final TimerObject t1,
-                    final TimerObject t2) {
+            new Comparator<TimerTreeNodeObject>() {
+                public final int compare(final TimerTreeNodeObject t1,
+                    final TimerTreeNodeObject t2) {
                     return (up
                     ? ((Integer) t1.currentTimer.getStartStopCoupleCount()).compareTo(t2.currentTimer.getStartStopCoupleCount())
                     : ((Integer) t2.currentTimer.getStartStopCoupleCount()).compareTo(t1.currentTimer.getStartStopCoupleCount()));
@@ -215,9 +218,9 @@ public class TimerObject extends AbstractObject {
 
     public final void sortChildrenByParentPercent(final boolean up) {
         Collections.sort(this.children,
-            new Comparator<TimerObject>() {
-                public final int compare(final TimerObject t1,
-                    final TimerObject t2) {
+            new Comparator<TimerTreeNodeObject>() {
+                public final int compare(final TimerTreeNodeObject t1,
+                    final TimerTreeNodeObject t2) {
                     return (up
                     ? Double.compare(t1.percentageFromParent,
                         t2.percentageFromParent)
@@ -225,5 +228,9 @@ public class TimerObject extends AbstractObject {
                         t1.percentageFromParent));
                 }
             });
+    }
+
+    public double getCurrentTotalTimeInMsInDouble() {
+        return currentTotalTimeInMsInDouble;
     }
 }

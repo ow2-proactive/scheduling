@@ -32,31 +32,31 @@ package org.objectweb.proactive.ic2d.timit.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.timit.data.TimerObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
 
 
-public class ExpandAllAction extends Action {
-    public static final String EXPAND_ALL = "Expand All";
-    private TimerTreeHolder timerTreeHolder;
+public class DecreaseSizeAction extends Action {
+    public static final String DECREASE_SIZE_ACTION = "Decrease Size Action";
+    private DurationChartEditPart durationChartEditPart;
 
-    public ExpandAllAction(TimerTreeHolder t) {
-        this.timerTreeHolder = t;
-        this.setId(EXPAND_ALL);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "expandall.gif"));
-        this.setToolTipText(EXPAND_ALL);
-        this.setEnabled(true);
+    public DecreaseSizeAction() {
+        super.setId(DECREASE_SIZE_ACTION);
+        super.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "decrease_width.gif"));
+        super.setToolTipText(DECREASE_SIZE_ACTION);
+        super.setEnabled(false);
+    }
+
+    public final void setTarget(
+        final DurationChartEditPart durationChartEditPart) {
+        super.setEnabled(true);
+        this.durationChartEditPart = durationChartEditPart;
     }
 
     @Override
-    public void run() {
-        if ((this.timerTreeHolder == null) ||
-                (this.timerTreeHolder.getChildren() == null)) {
-            return;
-        }
-        for (TimerObject t : timerTreeHolder.getChildren()) {
-            t.firePropertyChange(TimerObject.P_EXPAND_STATE, null, true);
+    public final void run() {
+        if (this.durationChartEditPart != null) {
+            this.durationChartEditPart.decreaseWidth();
         }
     }
 }

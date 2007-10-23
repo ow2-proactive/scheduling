@@ -28,28 +28,40 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.editparts;
+package org.objectweb.proactive.ic2d.timit.editparts.duration;
 
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
-import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
-import org.objectweb.proactive.ic2d.timit.views.TimItView;
+import org.objectweb.proactive.ic2d.timit.actions.DecreaseSizeAction;
+import org.objectweb.proactive.ic2d.timit.actions.ExpandSizeAction;
+import org.objectweb.proactive.ic2d.timit.actions.FitSizeAction;
+import org.objectweb.proactive.ic2d.timit.actions.IncreaseSizeAction;
+import org.objectweb.proactive.ic2d.timit.data.duration.DurationChartObject;
+import org.objectweb.proactive.ic2d.timit.data.duration.SequenceObject;
+import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 
-public class TimItEditPartFactory implements EditPartFactory {
-    private TimItView timItView;
+public class DurationEditPartFactory implements EditPartFactory {
+    private TimeLineView view;
 
-    public TimItEditPartFactory(TimItView t) {
-        this.timItView = t;
+    public DurationEditPartFactory(TimeLineView view) {
+        this.view = view;
     }
 
     public EditPart createEditPart(EditPart context, Object model) {
-        if (model instanceof BasicChartContainerObject) {
-            return new BasicChartContainerEditPart((BasicChartContainerObject) model,
-                this.timItView);
-        } else if (model instanceof BasicChartObject) {
-            return new BasicChartEditPart((BasicChartObject) model);
+        if (model instanceof DurationChartObject) {
+            DurationChartEditPart d = new DurationChartEditPart((DurationChartObject) model);
+            IncreaseSizeAction inc = view.getInc();
+            inc.setTarget(d);
+            DecreaseSizeAction dec = view.getDec();
+            dec.setTarget(d);
+            FitSizeAction fit = view.getFit();
+            fit.setTarget(d);
+            ExpandSizeAction exp = view.getExp();
+            exp.setTarget(d);
+            return d;
+        } else if (model instanceof SequenceObject) {
+            return new SequenceEditPart((SequenceObject) model);
         } else {
             return null;
         }

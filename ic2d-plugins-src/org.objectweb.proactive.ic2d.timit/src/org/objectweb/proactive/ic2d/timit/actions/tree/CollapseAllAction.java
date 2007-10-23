@@ -28,33 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.editparts.tree;
+package org.objectweb.proactive.ic2d.timit.actions.tree;
 
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.EditPartFactory;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
-import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
 
 
-public class TreeEditPartFactory implements EditPartFactory {
-    private TimerTreeView timerTreeView;
+public class CollapseAllAction extends Action {
+    public static final String COLLAPSE_ALL = "Collapse All";
+    private TimerTreeHolder timerTreeHolder;
 
-    public TreeEditPartFactory(final TimerTreeView timerTreeView) {
-        this.timerTreeView = timerTreeView;
+    public CollapseAllAction(TimerTreeHolder t) {
+        this.timerTreeHolder = t;
+        this.setId(COLLAPSE_ALL);
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "collapseall.gif"));
+        this.setToolTipText(COLLAPSE_ALL);
+        this.setEnabled(true);
     }
 
-    public final EditPart createEditPart(final EditPart context,
-        final Object model) {
-        EditPart part = null;
-        if (model instanceof TimerTreeHolder) {
-            part = new TimerTreeHolderEditPart();
-        } else if (model instanceof TimerTreeNodeObject) {
-            part = new TimerEditPart(timerTreeView);
+    @Override
+    public void run() {
+        if ((this.timerTreeHolder == null) ||
+                (this.timerTreeHolder.getChildren() == null)) {
+            return;
         }
-        if (part != null) {
-            part.setModel(model);
+        for (TimerTreeNodeObject t : timerTreeHolder.getChildren()) {
+            t.firePropertyChange(TimerTreeNodeObject.P_EXPAND_STATE, null, false);
         }
-        return part;
     }
 }

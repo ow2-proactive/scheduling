@@ -28,33 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.editparts.tree;
+package org.objectweb.proactive.ic2d.timit.actions;
 
-import org.eclipse.gef.EditPart;
-import org.eclipse.gef.EditPartFactory;
-import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
-import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
-import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
 
 
-public class TreeEditPartFactory implements EditPartFactory {
-    private TimerTreeView timerTreeView;
+public class ExpandSizeAction extends Action {
+    public static final String EXPAND_TIMELINE_ACTION = "Expand TimeLine Action";
+    private DurationChartEditPart durationChartEditPart;
 
-    public TreeEditPartFactory(final TimerTreeView timerTreeView) {
-        this.timerTreeView = timerTreeView;
+    public ExpandSizeAction() {
+        super.setId(EXPAND_TIMELINE_ACTION);
+        super.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "expand_timeline.gif"));
+        super.setToolTipText(EXPAND_TIMELINE_ACTION);
+        super.setEnabled(false);
     }
 
-    public final EditPart createEditPart(final EditPart context,
-        final Object model) {
-        EditPart part = null;
-        if (model instanceof TimerTreeHolder) {
-            part = new TimerTreeHolderEditPart();
-        } else if (model instanceof TimerTreeNodeObject) {
-            part = new TimerEditPart(timerTreeView);
+    public final void setTarget(
+        final DurationChartEditPart durationChartEditPart) {
+        super.setEnabled(true);
+        this.durationChartEditPart = durationChartEditPart;
+    }
+
+    @Override
+    public final void run() {
+        if (this.durationChartEditPart != null) {
+            this.durationChartEditPart.expandWidth();
         }
-        if (part != null) {
-            part.setModel(model);
-        }
-        return part;
     }
 }
