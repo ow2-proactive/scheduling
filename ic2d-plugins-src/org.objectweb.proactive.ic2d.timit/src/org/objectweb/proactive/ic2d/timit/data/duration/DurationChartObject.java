@@ -102,7 +102,7 @@ public class DurationChartObject {
             // Subscribe to notif manager
             JMXNotificationManager.getInstance()
                                   .subscribe(a.getObjectName(), sequenceObject,
-                a.getHostUrlServer(), a.getServerName());
+                a.getParent().getParent().getUrl());
         }
         return sequenceObject;
     }
