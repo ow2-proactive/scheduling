@@ -224,10 +224,10 @@ public class SchedulerFrontend implements InitActive,
         }
 
         //asking the scheduler for the result
-        JobResult result = scheduler.getResults(jobId);
+        JobResult result = scheduler.getJobResult(jobId);
         if (result == null) {
             throw new SchedulerException(
-                "Error while getting the result of this job !");
+                "The result of this job is no longer available !");
         }
         //removing jobs from the global list : this job is no more managed
         jobs.remove(jobId);
@@ -240,8 +240,29 @@ public class SchedulerFrontend implements InitActive,
     @Override
     public TaskResult getTaskResult(JobId jobId, String taskName)
         throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
+        //checking permissions
+        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
+                                     .getSourceBodyID();
+        if (!identifications.containsKey(id)) {
+            throw new SchedulerException(ACCESS_DENIED);
+        }
+        IdentifyJob ij = jobs.get(jobId);
+        if (ij == null) {
+            throw new SchedulerException(
+                "The job represented by this ID is unknow !");
+        }
+        if (!ij.hasRight(identifications.get(id))) {
+            throw new SchedulerException(
+                "You do not have permission to access this job !");
+        }
+
+        //asking the scheduler for the result
+        TaskResult result = scheduler.getTaskResult(jobId, taskName);
+        if (result == null) {
+            throw new SchedulerException(
+                "Error while getting the result of this task !");
+        }
+        return result;
     }
 
     /**
@@ -283,7 +304,7 @@ public class SchedulerFrontend implements InitActive,
         jobs.put(job.getId(),
             new IdentifyJob(job.getId(), identifications.get(id)));
         //make the light job
-        job.setLightJob(new JobDescriptor(job));
+        job.setJobDescriptor(new JobDescriptor(job));
         scheduler.submit(job);
         //stats
         stats.increaseSubmittedJobCount(job.getType());

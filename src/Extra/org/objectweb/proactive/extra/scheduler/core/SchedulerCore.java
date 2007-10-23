@@ -44,6 +44,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProException;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -303,13 +304,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //get light job list with eligible jobs (running and pending)
         ArrayList<JobDescriptor> LightJobList = new ArrayList<JobDescriptor>();
         for (InternalJob j : runningJobs) {
-            LightJobList.add(j.getLightJob());
+            LightJobList.add(j.getJobDescriptor());
         }
 
         //if scheduler is paused it only finishes running jobs
         if (state != SchedulerState.PAUSED) {
             for (InternalJob j : pendingJobs) {
-                LightJobList.add(j.getLightJob());
+                LightJobList.add(j.getJobDescriptor());
             }
         }
 
@@ -704,11 +705,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * To get the results.
+     * To get the result of a job.
      *
-     * @return the results.
+     * @return the result of a job.
      */
-    public JobResult getResults(JobId jobId) {
+    public JobResult getJobResult(JobId jobId) {
         JobResult result = null;
         InternalJob job = jobs.get(jobId);
         if (job != null) {
@@ -718,6 +719,26 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             finishedJobs.remove(job);
             frontend.removeFinishedJobEvent(job.getJobInfo());
             logger.info("[SCHEDULER] Removed result for job " + jobId);
+        }
+        return result;
+    }
+
+    /**
+     * To get the result of a task.
+     *
+     * @return the result of a task.
+     */
+    public TaskResult getTaskResult(JobId jobId, String taskName) {
+        TaskResult result = null;
+        InternalJob job = jobs.get(jobId);
+        if (job != null) {
+            result = job.getJobResult().getTaskResults().get(taskName);
+            if (!ProFuture.isAwaited(result)) {
+                logger.info("[SCHEDULER] Get '" + taskName +
+                    "' task result for job " + jobId);
+            } else {
+                return null;
+            }
         }
         return result;
     }

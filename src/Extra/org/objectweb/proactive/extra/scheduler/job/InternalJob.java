@@ -87,7 +87,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     protected JobEvent jobInfo = new JobEvent();
 
     /** Light job for dependences management */
-    private JobDescriptor lightJob;
+    private JobDescriptor jobDescriptor;
 
     /** Job result */
     private JobResult jobResult;
@@ -251,7 +251,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         if (getState() == JobState.STALLED) {
             setState(JobState.RUNNING);
         }
-        lightJob.start(td.getId());
+        jobDescriptor.start(td.getId());
         td.setStatus(Status.RUNNNING);
         td.setStartTime(System.currentTimeMillis());
         td.setExecutionHostName(hostName);
@@ -265,12 +265,12 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     public void reStartTask(InternalTask task) {
         setNumberOfPendingTasks(getNumberOfPendingTask() + 1);
         setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
-        lightJob.reStart(task.getId());
+        jobDescriptor.reStart(task.getId());
         if (getState() == JobState.PAUSED) {
             task.setStatus(Status.PAUSED);
             HashMap<TaskId, Status> hts = new HashMap<TaskId, Status>();
             hts.put(task.getId(), task.getStatus());
-            lightJob.update(hts);
+            jobDescriptor.update(hts);
         } else {
             task.setStatus(Status.PENDING);
         }
@@ -293,7 +293,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             setState(JobState.STALLED);
         }
         //terminate this task
-        lightJob.terminate(taskId);
+        jobDescriptor.terminate(taskId);
 
         //creating list of status
         HashMap<TaskId, Status> hts = new HashMap<TaskId, Status>();
@@ -301,7 +301,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             hts.put(td.getId(), td.getStatus());
         }
         //updating light job for eligible task
-        lightJob.update(hts);
+        jobDescriptor.update(hts);
         return descriptor;
     }
 
@@ -321,7 +321,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
                                                            : Status.CANCELLED);
         setState(jobState);
         //terminate this lightjob
-        lightJob.failed();
+        jobDescriptor.failed();
 
         //creating list of status
         HashMap<TaskId, Status> hts = new HashMap<TaskId, Status>();
@@ -394,7 +394,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             }
             hts.put(td.getId(), td.getStatus());
         }
-        lightJob.update(hts);
+        jobDescriptor.update(hts);
         setTaskStatusModify(hts);
         return true;
     }
@@ -429,7 +429,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             }
             hts.put(td.getId(), td.getStatus());
         }
-        lightJob.update(hts);
+        jobDescriptor.update(hts);
         setTaskStatusModify(hts);
         return true;
     }
@@ -456,7 +456,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     @Override
     public void setPriority(JobPriority priority) {
         jobInfo.setPriority(priority);
-        lightJob.setPriority(priority);
+        jobDescriptor.setPriority(priority);
     }
 
     /**
@@ -675,21 +675,21 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * To get the lightJob
+     * To get the jobDescriptor
      *
-     * @return the lightJob
+     * @return the jobDescriptor
      */
-    public JobDescriptor getLightJob() {
-        return lightJob;
+    public JobDescriptor getJobDescriptor() {
+        return jobDescriptor;
     }
 
     /**
-     * To set the lightJob
+     * To set the jobDescriptor
      *
-     * @param lightJob the lightJob to set
+     * @param lightJob the jobDescriptor to set
      */
-    public void setLightJob(JobDescriptor lightJob) {
-        this.lightJob = lightJob;
+    public void setJobDescriptor(JobDescriptor jobDescriptor) {
+        this.jobDescriptor = jobDescriptor;
     }
 
     /**
