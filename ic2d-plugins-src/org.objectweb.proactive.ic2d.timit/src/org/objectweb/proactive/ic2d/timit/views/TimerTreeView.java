@@ -42,12 +42,12 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.timit.actions.CollapseAllAction;
-import org.objectweb.proactive.ic2d.timit.actions.DeleteTreeAction;
-import org.objectweb.proactive.ic2d.timit.actions.ExpandAllAction;
-import org.objectweb.proactive.ic2d.timit.actions.SaveToXmlAction;
-import org.objectweb.proactive.ic2d.timit.data.TimerObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.actions.tree.CollapseAllAction;
+import org.objectweb.proactive.ic2d.timit.actions.tree.DeleteTreeAction;
+import org.objectweb.proactive.ic2d.timit.actions.tree.ExpandAllAction;
+import org.objectweb.proactive.ic2d.timit.actions.tree.SaveToXmlAction;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 import org.objectweb.proactive.ic2d.timit.editparts.tree.TreeEditPartFactory;
 
 
@@ -130,12 +130,12 @@ public class TimerTreeView extends ViewPart {
                     }
                     final int columnIndex = tree.indexOf(currentColumn);
                     boolean up = (dir == SWT.UP);
-                    for (final TimerObject t : timerTreeHolder.getDummyRoots()) {
+                    for (final TimerTreeNodeObject t : timerTreeHolder.getDummyRoots()) {
                         // Get first child of each dummy root and fire sort event
-                        TimerObject target = t.getChildren().get(0);
-                        target.firePropertyChange(TimerObject.P_SORT,
+                        TimerTreeNodeObject target = t.getChildren().get(0);
+                        target.firePropertyChange(TimerTreeNodeObject.P_SORT,
                             columnIndex, up);
-                        target.firePropertyChange(TimerObject.P_EXPAND_STATE,
+                        target.firePropertyChange(TimerTreeNodeObject.P_EXPAND_STATE,
                             null, true);
                     }
                     tree.setSortDirection(dir);

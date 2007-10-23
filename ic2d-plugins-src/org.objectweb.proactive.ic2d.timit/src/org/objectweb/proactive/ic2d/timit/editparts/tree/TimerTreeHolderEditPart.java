@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.gef.EditPart;
-import org.objectweb.proactive.ic2d.timit.data.TimerObject;
-import org.objectweb.proactive.ic2d.timit.data.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 
 public class TimerTreeHolderEditPart extends AbstractTimerTreeEditPart {
@@ -49,7 +49,7 @@ public class TimerTreeHolderEditPart extends AbstractTimerTreeEditPart {
             refreshChildren();
         } else if (evt.getPropertyName()
                           .equals(TimerTreeHolder.P_REMOVE_SELECTED)) {
-            ((TimerTreeHolder) this.getModel()).removeDummyRoot((TimerObject) evt.getNewValue());
+            ((TimerTreeHolder) this.getModel()).removeDummyRoot((TimerTreeNodeObject) evt.getNewValue());
             List<EditPart> l = this.getViewer().getSelectedEditParts();
 
             // In order to avoid concurrent exception create a temporary list to be filled with parts to delete

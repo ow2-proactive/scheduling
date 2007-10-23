@@ -50,6 +50,7 @@ import org.eclipse.birt.chart.model.component.impl.SeriesImpl;
 import org.eclipse.birt.chart.model.data.NumberDataSet;
 import org.eclipse.birt.chart.model.data.SeriesDefinition;
 import org.eclipse.birt.chart.model.data.TextDataSet;
+import org.eclipse.birt.chart.model.data.impl.NumberDataElementImpl;
 import org.eclipse.birt.chart.model.data.impl.NumberDataSetImpl;
 import org.eclipse.birt.chart.model.data.impl.SeriesDefinitionImpl;
 import org.eclipse.birt.chart.model.data.impl.TextDataSetImpl;
@@ -57,6 +58,7 @@ import org.eclipse.birt.chart.model.impl.ChartWithAxesImpl;
 import org.eclipse.birt.chart.model.type.BarSeries;
 import org.eclipse.birt.chart.model.type.impl.BarSeriesImpl;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
+import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 
 
 /**
@@ -217,8 +219,9 @@ public class BarChartBuilder {
      * @param filter
      *            Used to filter timers
      */
-    public Chart createChart(List<TimerObject> timerObjectList, String[] filter) {
-        if (ChartObject.DEBUG) {
+    public Chart createChart(List<TimerTreeNodeObject> timerObjectList,
+        String[] filter) {
+        if (BasicChartObject.DEBUG) {
             this.series = new String[] {
                     "Total", "Serve", "SendRequest", "SendReply",
                     "WaitForRequest", "WaitByNecessity", "User1", "User2",
@@ -233,8 +236,9 @@ public class BarChartBuilder {
             int paLevelIndex = 0;
             int userLevelIndex = 0;
 
-            for (TimerObject to : timerObjectList) {
-                if ((to.currentTimer != null) && to.currentTimer.isUserLevel()) {
+            for (TimerTreeNodeObject to : timerObjectList) {
+                if ((to.getCurrentTimer() != null) &&
+                        to.getCurrentTimer().isUserLevel()) {
                     userTimersSize++;
                 }
             }
@@ -259,12 +263,12 @@ public class BarChartBuilder {
                 values[userTimersSize] = USER_DEFINED_ELEMENT_VALUE;
             }
 
-            for (TimerObject t : timerObjectList) {
+            for (TimerTreeNodeObject t : timerObjectList) {
                 double value = 0;
-                if (t.currentTimer.getTotalTime() == 0) {
+                if (t.getCurrentTimer().getTotalTime() == 0) {
                     value = -1;
                 } else {
-                    value = t.currentTotalTimeInMsInDouble;
+                    value = t.getCurrentTotalTimeInMsInDouble();
                     //value = Math.ceil((double) t.currentTimer.getTotalTime() / 1000000d); // total
                     // time
                     // is
@@ -273,13 +277,13 @@ public class BarChartBuilder {
                 }
 
                 // Choose destination index
-                if (t.currentTimer.isUserLevel()) {
-                    series[userLevelIndex] = t.currentTimer.getName();
+                if (t.getCurrentTimer().isUserLevel()) {
+                    series[userLevelIndex] = t.getCurrentTimer().getName();
                     values[userLevelIndex] = value;
                     userLevelIndex++;
                 } else {
-                    if (t.isViewed) {
-                        series[paLevelIndex] = t.currentTimer.getName();
+                    if (t.isViewed()) {
+                        series[paLevelIndex] = t.getCurrentTimer().getName();
                         values[paLevelIndex] = value;
                         paLevelIndex++;
                     }
@@ -345,7 +349,8 @@ public class BarChartBuilder {
 
         yAxis.setType(AxisType.LOGARITHMIC_LITERAL);
         yAxis.getOrigin().setType(IntersectionType.VALUE_LITERAL);
-        yAxis.getScale().setStep(1.0);
+        yAxis.getScale().setMin(NumberDataElementImpl.create(0));
+        yAxis.getScale().setMax(NumberDataElementImpl.create(90));
     }
 
     /**
