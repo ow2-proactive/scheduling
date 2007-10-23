@@ -161,9 +161,8 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                 ", userData=" + userData);
         }
 
-        Notification notification = new Notification(type, source, counter++);
-        notification.setUserData(userData);
-
+        Notification notification = new Notification(type, source, counter++,System.nanoTime()/1000); // timeStamp in microseconds
+        notification.setUserData(userData);        
         // If the migration is finished, we need to inform the
         // JMXNotificationManager
         if (type.equals(NotificationType.migrationFinished)) {
