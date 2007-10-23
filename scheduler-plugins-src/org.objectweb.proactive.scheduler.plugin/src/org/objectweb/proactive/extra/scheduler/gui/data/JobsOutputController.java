@@ -123,6 +123,7 @@ public class JobsOutputController {
                 Activator.getListenPortNumber());
             JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE +
                         jobId));
+            joa.setLayout(JobLogs.DEFAULT_LOG_LAYOUT);
             Logger log = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + jobId);
             log.setLevel(Level.ALL);
             log.removeAllAppenders();

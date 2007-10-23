@@ -39,6 +39,7 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -186,6 +187,7 @@ public class TaskLauncher implements InitActive, Serializable {
 
         // create logger
         Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + jobId);
+        MDC.getContext().put(JobLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();
         l.addAppender(EmptyAppender.SINK);
         l.addAppender(out);

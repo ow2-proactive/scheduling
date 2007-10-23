@@ -78,22 +78,28 @@ public class JobOutputAppender extends AppenderSkeleton {
      */
     @Override
     protected void append(LoggingEvent event) {
+        String msg = null;
+        if (this.layout != null) {
+            msg = this.layout.format(event);
+        } else {
+            msg = event.getRenderedMessage();
+        }
         if (event.getLevel().equals(Level.DEBUG)) {
-            jobOutput.debug(event.getRenderedMessage());
+            jobOutput.debug(msg);
         } else if (event.getLevel().equals(Level.ERROR)) {
-            jobOutput.error(event.getRenderedMessage());
+            jobOutput.error(msg);
         } else if (event.getLevel().equals(Level.FATAL)) {
-            jobOutput.fatal(event.getRenderedMessage());
+            jobOutput.fatal(msg);
         } else if (event.getLevel().equals(Level.INFO)) {
-            jobOutput.info(event.getRenderedMessage());
+            jobOutput.info(msg);
         } else if (event.getLevel().equals(Level.OFF)) {
             jobOutput.off();
         } else if (event.getLevel().equals(Level.TRACE)) {
-            jobOutput.trace(event.getRenderedMessage());
+            jobOutput.trace(msg);
         } else if (event.getLevel().equals(Level.WARN)) {
-            jobOutput.warn(event.getRenderedMessage());
+            jobOutput.warn(msg);
         } else {
-            jobOutput.log(event.getRenderedMessage());
+            jobOutput.log(msg);
         }
     }
 

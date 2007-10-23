@@ -671,8 +671,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             // log into file if required
             if (job.getLogFile() != null) {
                 try {
-                    FileAppender fa = new FileAppender(new PatternLayout(
-                                "%m %n"), job.getLogFile());
+                    FileAppender fa = new FileAppender(JobLogs.DEFAULT_LOG_LAYOUT,
+                            job.getLogFile(), false);
                     op.addSink(fa);
                 } catch (IOException e) {
                     logger.warn("[SCHEDULER] Cannot open log file " +

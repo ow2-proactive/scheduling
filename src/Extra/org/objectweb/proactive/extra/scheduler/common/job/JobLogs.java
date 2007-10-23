@@ -31,6 +31,8 @@
 package org.objectweb.proactive.extra.scheduler.common.job;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.PatternLayout;
 
 
 /**
@@ -46,6 +48,13 @@ public interface JobLogs extends java.io.Serializable {
 
     /** Appender name for jobs */
     public static final String JOB_APPENDER_NAME = "JobLoggerAppender";
+
+    /** Logj context variable name for task ids */
+    public static final String MDC_TASK_ID = "taskid";
+
+    /** Default layout for logs */
+    public static final Layout DEFAULT_LOG_LAYOUT = new PatternLayout("[%X{" +
+            JobLogs.MDC_TASK_ID + "}@%d{HH:mm:ss}]" + " %m %n");
 
     /**
      * Add a sink to the logs. Logs are then redirected into the sink.

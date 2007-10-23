@@ -113,8 +113,7 @@ public class JobLauncher {
 
                     DateFormat dateFormat = new SimpleDateFormat(
                             "hh'h'mm'm'_dd-MM-yy");
-                    FileAppender fa = new FileAppender(new PatternLayout(
-                                "%m %n"),
+                    FileAppender fa = new FileAppender(JobLogs.DEFAULT_LOG_LAYOUT,
                             "./logs/job[" + j.getName() + "," + id + "]_" +
                             dateFormat.format(new Date()) + ".log", true);
                     l.addAppender(fa);

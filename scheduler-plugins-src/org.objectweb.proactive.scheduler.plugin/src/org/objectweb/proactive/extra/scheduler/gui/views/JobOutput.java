@@ -100,7 +100,7 @@ public class JobOutput extends MessageConsole {
                 public void run() {
                     MessageConsoleStream stream = newMessageStream();
                     stream.setColor(col);
-                    stream.println(mess);
+                    stream.print(mess);
                 }
             });
     }

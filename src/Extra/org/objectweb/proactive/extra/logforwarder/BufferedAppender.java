@@ -46,6 +46,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
  * @since 3.2.1
  */
 public class BufferedAppender extends AppenderSkeleton implements JobLogs {
+    // TODO cdelbe : should implement AppenderAttachable (see AsyncAppender ?)
 
     /**
      * Default buffer size.
