@@ -59,7 +59,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * adding task and job creation are not on their final implementation.
  * TaskDescriptor may also be removed from user view.
  *
- * @author jlscheef
+ * @author jlscheef - ProActiveTeam
  *
  */
 public class SimpleHelloWorld {
@@ -146,7 +146,7 @@ public class SimpleHelloWorld {
             while (result == null) {
                 try {
                     Thread.sleep(2000);
-                    result = scheduler.getResult(jobId);
+                    result = scheduler.getJobResult(jobId);
                     //the result is null if the job is not finished.
                 } catch (SchedulerException se) {
                     se.printStackTrace();

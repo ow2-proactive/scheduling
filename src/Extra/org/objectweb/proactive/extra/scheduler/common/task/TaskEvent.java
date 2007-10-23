@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  * These informations are in an other class in order to permit
  * the scheduler listener to send this class as event.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 25, 2007
  * @since ProActive 3.2
  */
@@ -73,12 +73,6 @@ public class TaskEvent implements Serializable {
 
     /** name of the host where the task is executed */
     private String executionHostName;
-
-    /** Task result : if null, the task result is not available or the task has no result.
-     * If not null the result of this task is available.
-     * WARNING : This field is transient in order to be send only to the scheduler persistence listener.
-     * This field will not be sent to an external user.*/
-    private transient TaskResult result = null;
 
     /**
      * To get the jobEvent
@@ -245,23 +239,5 @@ public class TaskEvent implements Serializable {
      */
     public void setRerunnableLeft(int rerunnableLeft) {
         this.rerunnableLeft = rerunnableLeft;
-    }
-
-    /**
-     * Returns the result.
-     *
-     * @return the result.
-     */
-    public TaskResult getResult() {
-        return result;
-    }
-
-    /**
-     * Sets the result to the given result value.
-     *
-     * @param result the result to set.
-     */
-    public void setResult(TaskResult result) {
-        this.result = result;
     }
 }

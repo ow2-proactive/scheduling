@@ -38,6 +38,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
@@ -45,7 +46,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
  * This interface provides methods to managed the user task and jobs on the scheduler.
  * A user will only be able to managed his jobs and tasks, and also see the entire scheduling process.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
@@ -73,14 +74,26 @@ public interface UserSchedulerInterface extends Serializable {
      * @return a job Result containing information about the result.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
-    public JobResult getResult(JobId jobId) throws SchedulerException;
+    public JobResult getJobResult(JobId jobId) throws SchedulerException;
+
+    /**
+     * Get the result for the given task name in the given jobId.
+     * A user can only get HIS result back.
+     *
+     * @param jobId the job in which the task result is.
+     * @param taskName the name of the task in which the result is.
+     * @return a job Result containing information about the result.
+     * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
+     */
+    public TaskResult getTaskResult(JobId jobId, String taskName)
+        throws SchedulerException;
 
     /**
      * Listen for the tasks user log.
      * A user can only listen to HIS jobs.
      *
      * @param jobId the id of the job to listen to.
-     * @param hostname the hostname where to send the log.
+     * @param hostname the host name where to send the log.
      * @param port the port number on which the log will be sent.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
@@ -150,7 +163,7 @@ public interface UserSchedulerInterface extends Serializable {
     /**
      * Change the priority of the job represented by jobId.
      *
-     * @param jobId the job on whitch to change the priority.
+     * @param jobId the job on which to change the priority.
      * @throws SchedulerException (can be due to insufficient permission)
      */
     public void changePriority(JobId jobId, JobPriority priority)

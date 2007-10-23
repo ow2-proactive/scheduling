@@ -44,13 +44,14 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventLi
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
  * Scheduler user interface.
  * This class provides method to managed jobs for a user.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */
@@ -68,8 +69,17 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    public JobResult getResult(JobId jobId) throws SchedulerException {
-        return schedulerFrontend.getResult(jobId);
+    public JobResult getJobResult(JobId jobId) throws SchedulerException {
+        return schedulerFrontend.getJobResult(jobId);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extra.scheduler.common.job.JobId, java.lang.String)
+     */
+    @Override
+    public TaskResult getTaskResult(JobId jobId, String taskName)
+        throws SchedulerException {
+        return schedulerFrontend.getTaskResult(jobId, taskName);
     }
 
     /**

@@ -32,14 +32,17 @@ package org.objectweb.proactive.extra.scheduler.common.exception;
 
 
 /**
- * @author cdelbe
+ * @author jlscheef - ProActiveTeam
  * @since 2.2
  */
 public class TaskCreationException extends SchedulerException {
 
+    /** Serial version UID */
+    private static final long serialVersionUID = 7699281034780102890L;
+
     /**
-     * @param arg0
-     */
+    * @param arg0
+    */
     public TaskCreationException(String arg0) {
         super(arg0);
         // TODO Auto-generated constructor stub

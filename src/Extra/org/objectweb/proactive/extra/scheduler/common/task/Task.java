@@ -48,7 +48,7 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
  * You will be also able to add dependences (if necessary) to this task. The dependences mechanism are
  * best describe below. @see #addDependence(Task)
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
@@ -75,7 +75,7 @@ public abstract class Task implements Serializable {
     /** Maximum amount of time during which a task can be running. */
     protected long runTimeLimit;
 
-    /** Is this task rerunnable and how many times ? (0 if not) */
+    /** Is this task re-runnable and how many times ? (0 if not) */
     protected int rerunnable = 1;
 
     /** Is this task a final task. */
@@ -115,7 +115,7 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * To get the decsription of this task.
+     * To get the description of this task.
      *
      * @return the description of this task.
      */

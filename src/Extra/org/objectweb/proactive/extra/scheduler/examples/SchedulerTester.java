@@ -231,7 +231,7 @@ public class SchedulerTester {
                 Vector<JobId> resultsTmp = (Vector<JobId>) this.results.clone();
                 for (JobId id : resultsTmp) {
                     try {
-                        if (scheduler.getResult(id) != null) {
+                        if (scheduler.getJobResult(id) != null) {
                             this.results.remove(id);
                         }
                     } catch (SchedulerException e) {

@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
@@ -59,6 +58,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.job.IdentifyJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.InternalJobFactory;
@@ -201,9 +201,9 @@ public class SchedulerFrontend implements InitActive,
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getJobResult(org.objectweb.proactive.extra.scheduler.common.job.JobId)
      */
-    public JobResult getResult(JobId jobId) throws SchedulerException {
+    public JobResult getJobResult(JobId jobId) throws SchedulerException {
         //checking permissions
         UniqueID id = ProActiveObject.getContext().getCurrentRequest()
                                      .getSourceBodyID();
@@ -235,11 +235,17 @@ public class SchedulerFrontend implements InitActive,
     }
 
     /**
-     * Submit a new job to the scheduler core.
-     *
-     * @param job the new job to schedule.
-     * @return the job id of the given job.
-     * @throws UserException an exception containing explicit error message.
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extra.scheduler.common.job.JobId, java.lang.String)
+     */
+    @Override
+    public TaskResult getTaskResult(JobId jobId, String taskName)
+        throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.common.job.Job)
      */
     public JobId submit(Job userJob) throws SchedulerException {
         UniqueID id = ProActiveObject.getContext().getCurrentRequest()
@@ -285,7 +291,7 @@ public class SchedulerFrontend implements InitActive,
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId, java.lang.String, int)
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.common.job.JobId, java.lang.String, int)
      */
     public void listenLog(JobId jobId, String hostname, int port)
         throws SchedulerException {
@@ -318,7 +324,6 @@ public class SchedulerFrontend implements InitActive,
             throw new SchedulerException(ACCESS_DENIED);
         }
         if (events.length > 0) {
-            System.out.println(events);
             identifications.get(id).setUserEvents(events);
         }
         schedulerListeners.put(id, sel);

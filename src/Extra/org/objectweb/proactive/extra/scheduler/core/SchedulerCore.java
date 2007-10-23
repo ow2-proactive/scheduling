@@ -38,7 +38,6 @@ import java.util.Vector;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
@@ -55,7 +54,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
-import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
@@ -138,12 +136,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
     /** list of finished jobs among the managed jobs */
     private Vector<InternalJob> finishedJobs = new Vector<InternalJob>();
-
-    /** associated map between TaskId and and taskResult */
-    private HashMap<TaskId, TaskResult> taskResults = new HashMap<TaskId, TaskResult>();
-
-    /** Job result storage */
-    private HashMap<JobId, JobResult> results = new HashMap<JobId, JobResult>();
 
     /** Scheduler current state */
     private SchedulerState state = SchedulerState.STOPPED;
@@ -276,19 +268,20 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //stop the pinger thread.
         pinger.interrupt();
         //if normal shutdown, serialize
-        if (state == SchedulerState.SHUTTING_DOWN) {
-            try {
-                logger.info("Serializing results...");
-                Serializer.serializeResults(results, SERIALIZING_PATH);
-            } catch (Exception e) {
-                e.printStackTrace();
-                //if an error occurs during serialization, we wait until the result to be got back
-                while ((results.size() > 0) &&
-                        (state == SchedulerState.SHUTTING_DOWN)) {
-                    service.blockingServeOldest();
-                }
-            }
-        }
+        //TODO DO NOT SERIALIZE ANYMORE ?? IT'S IN DATABASE -> delete Serializer class ?
+        //        if (state == SchedulerState.SHUTTING_DOWN) {
+        //            try {
+        //                logger.info("Serializing results...");
+        //                Serializer.serializeResults(results, SERIALIZING_PATH);
+        //            } catch (Exception e) {
+        //                e.printStackTrace();
+        //                //if an error occurs during serialization, we wait until the result to be got back
+        //                while ((results.size() > 0) &&
+        //                        (state == SchedulerState.SHUTTING_DOWN)) {
+        //                    service.blockingServeOldest();
+        //                }
+        //            }
+        //        }
         logger.info("Terminating...");
         //shutdown resource manager proxy
         resourceManager.shutdownProxy();
@@ -356,7 +349,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                                 i++) {
                             nodes.add(nodeSet.remove(0));
                         }
-                        taskResults.put(internalTask.getId(),
+                        currentJob.getJobResult()
+                                  .addTaskResult(internalTask.getName(),
                             ((AppliTaskLauncher) launcher).doTask(
                                 (SchedulerCore) ProActiveObject.getStubOnThis(),
                                 (ExecutableApplicationTask) internalTask.getTask(),
@@ -370,16 +364,24 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                                 (resultSize > 0)) {
                             TaskResult[] params = new TaskResult[resultSize];
                             for (int i = 0; i < resultSize; i++) {
-                                params[i] = taskResults.get(taskDescriptor.getParents()
-                                                                          .get(i)
-                                                                          .getId());
+                                //get parent task number i
+                                InternalTask parentTask = currentJob.getHMTasks()
+                                                                    .get(taskDescriptor.getParents()
+                                                                                       .get(i)
+                                                                                       .getId());
+                                //set the task result in the arguments array.
+                                params[i] = currentJob.getJobResult()
+                                                      .getTaskResults()
+                                                      .get(parentTask.getName());
                             }
-                            taskResults.put(internalTask.getId(),
+                            currentJob.getJobResult()
+                                      .addTaskResult(internalTask.getName(),
                                 launcher.doTask(
                                     (SchedulerCore) ProActiveObject.getStubOnThis(),
                                     internalTask.getTask(), params));
                         } else {
-                            taskResults.put(internalTask.getId(),
+                            currentJob.getJobResult()
+                                      .addTaskResult(internalTask.getName(),
                                 launcher.doTask(
                                     (SchedulerCore) ProActiveObject.getStubOnThis(),
                                     internalTask.getTask()));
@@ -498,9 +500,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 //deleting task result
                 if ((jobState == JobState.CANCELLED) &&
                         td.getId().equals(task.getId())) {
-                    taskResult = taskResults.remove(td.getId());
-                } else {
-                    taskResults.remove(td.getId());
+                    taskResult = job.getJobResult().getTaskResults()
+                                    .get(task.getName());
                 }
             }
         }
@@ -508,24 +509,20 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         job.failed(task.getId(), jobState);
         //store the exception into jobResult
         if (jobState == JobState.FAILED) {
-            results.get(job.getId())
-                   .addTaskResult(task.getName(),
+            job.getJobResult()
+               .addTaskResult(task.getName(),
                 new TaskResultImpl(task.getId(), new Throwable(errorMsg)));
         } else {
-            results.get(job.getId()).addTaskResult(task.getName(), taskResult);
+            job.getJobResult().addTaskResult(task.getName(), taskResult);
         }
         //move the job
         runningJobs.remove(job);
         finishedJobs.add(job);
-        //put the job result in the job Info.
-        job.getJobInfo().setResult(results.get(job.getId()));
         // terminate loggers
         Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + job.getId());
         l.removeAllAppenders();
         //send event to listeners.
         frontend.runningToFinishedJobEvent(job.getJobInfo());
-        //no need to keep the result in the event
-        job.getJobInfo().setResult(null);
         //don't forget to set the task status modify to null after a job.failed(...) method.
         job.setTaskStatusModify(null);
         job.setTaskFinishedTimeModify(null);
@@ -554,7 +551,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             //check if the task result future has an error due to node death.
             //if the node has died, a runtimeException is sent instead of the result
             TaskResult res = null;
-            res = taskResults.get(taskId);
+            res = job.getJobResult().getTaskResults().get(descriptor.getName());
             if (res != null) {
                 if (ProException.isException(res)) {
                     //in this case, it is a node error.
@@ -576,11 +573,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             try {
                 Object resValue = res.value();
                 if (descriptor instanceof InternalNativeTask) {
-                    // an error occured if res is not 0
+                    // an error occurred if res is not 0
                     errorOccured = ((Integer) resValue) != 0;
                 }
             } catch (Throwable e) {
-                // An exception occured during task execution
+                // An exception occurred during task execution
                 errorOccured = true;
             }
             if (errorOccured && job.isCancelOnError()) {
@@ -593,18 +590,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
             descriptor = job.terminateTask(taskId);
             frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
-            //store this result if the job is PARAMETER_SWIPPING or APPLI or if it is a final task.
-            if ((job.getType() != JobType.TASKSFLOW) ||
-                    descriptor.isFinalTask()) {
-                results.get(job.getId()).addTaskResult(descriptor.getName(), res);
-            }
+            //store this task result in the job result.
+            job.getJobResult().addTaskResult(descriptor.getName(), res);
 
             //if this job is finished (every task are finished)
             if (job.getNumberOfFinishedTask() == job.getTotalNumberOfTasks()) {
-                //deleting all task results
-                for (InternalTask td : job.getTasks()) {
-                    taskResults.remove(td.getId());
-                }
                 //terminating job
                 job.terminate();
                 runningJobs.remove(job);
@@ -614,13 +604,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX +
                         job.getId());
                 l.removeAllAppenders(); // appender are closed...
-                                        //put the job result in the job Info.
+                                        //send event to listeners.
 
-                job.getJobInfo().setResult(results.get(job.getId()));
-                //send event to listeners.
                 frontend.runningToFinishedJobEvent(job.getJobInfo());
-                //no need to keep the result in the event
-                job.getJobInfo().setResult(null);
             }
             //free every execution nodes
             resourceManager.freeNodes(descriptor.getExecuterInformations()
@@ -634,7 +620,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                         descriptor.getExecuterInformations().getNodeName()),
                     descriptor.getPostTask());
             } catch (NodeException e1) {
-                System.out.println("SchedulerCore.terminate()");
+                //the freeNodes has failed, try to get it back as a string (the node may be down)
+                resourceManager.freeDownNode(descriptor.getExecuterInformations()
+                                                       .getNodeName());
             }
         } catch (NullPointerException eNull) {
             //the task has been killed. Nothing to do anymore with this one.
@@ -660,7 +648,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //create job result storage
         JobResult jobResult = new JobResultImpl(job.getId(), job.getName());
         //store the job result until user get it
-        results.put(job.getId(), jobResult);
+        job.setJobResult(jobResult);
         //create appender for this job
         Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + job.getId());
         if (l.getAppender(JobLogs.JOB_APPENDER_NAME) == null) {
@@ -711,7 +699,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @param port the port number on which the log will be sent.
      */
     public void listenLog(JobId jobId, String hostname, int port) {
-        JobResult r = results.get(jobId);
+        JobResult r = jobs.get(jobId).getJobResult();
         r.getOutput().addSink(new SocketAppender(hostname, port));
     }
 
@@ -721,9 +709,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @return the results.
      */
     public JobResult getResults(JobId jobId) {
-        JobResult result = results.remove(jobId);
-        if (result != null) {
-            InternalJob job = jobs.remove(jobId);
+        JobResult result = null;
+        InternalJob job = jobs.get(jobId);
+        if (job != null) {
+            jobs.remove(jobId);
+            result = job.getJobResult();
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
             frontend.removeFinishedJobEvent(job.getJobInfo());
@@ -862,8 +852,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         pendingJobs.clear();
         runningJobs.clear();
         finishedJobs.clear();
-        taskResults.clear();
-        results.clear();
         //finally : shutdown
         state = SchedulerState.KILLED;
         logger.info("[SCHEDULER] Scheduler has just been killed !");
@@ -958,14 +946,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     resourceManager.freeNode(td.getExecuterInformations()
                                                .getNode());
                 }
-                taskResults.remove(td.getId());
             }
         }
         if (runningJobs.remove(job) || pendingJobs.remove(job) ||
                 finishedJobs.remove(job)) {
             ;
         }
-        results.remove(jobId);
         logger.info("[SCHEDULER] Job " + jobId + " has just been killed !");
         frontend.jobKilledEvent(jobId);
         return new BooleanWrapper(true);

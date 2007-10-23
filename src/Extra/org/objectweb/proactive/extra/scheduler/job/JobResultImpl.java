@@ -44,7 +44,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * identify the job result, it provides the id of the job in the scheduler and
  * the job name.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 5, 2007
  * @since ProActive 3.2
  */
@@ -64,12 +64,10 @@ public class JobResultImpl implements JobResult {
     }
 
     /**
-     * Instanciate a new JobResult with a jobId and a result
+     * Instantiate a new JobResult with a jobId and a result
      *
      * @param id
      *            the jobId associated with this result
-     * @param result
-     *            the result associated with this result
      * @param name
      *            the name of the job that has generate this result.
      */

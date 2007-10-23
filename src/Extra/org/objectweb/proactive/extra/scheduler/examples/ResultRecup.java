@@ -43,6 +43,14 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
+/**
+ * ResultRecup ...
+ *
+ * @author jlscheef - ProActiveTeam
+ * @date 23 oct. 07
+ * @version 3.2
+ *
+ */
 public class ResultRecup {
     public static void main(String[] args) {
         try {
@@ -78,7 +86,7 @@ public class ResultRecup {
                 }
                 for (int i = begin; i <= end; i++) {
                     try {
-                        JobResult result = scheduler.getResult(JobId.makeJobId(i +
+                        JobResult result = scheduler.getJobResult(JobId.makeJobId(i +
                                     ""));
                         if (result != null) {
                             System.out.println("Job " + i + " Result => ");

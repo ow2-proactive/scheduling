@@ -49,7 +49,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * The internal scheduler job is not sent to the policy.
  * Only a restricted number of properties on each jobs is sent to the policy.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 6, 2007
  * @since ProActive 3.2
  */
@@ -76,7 +76,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     /** Job paused tasks */
     private HashMap<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
 
-    //TODO penser à mettre ici un champ pour connaitre le nb de tache total du job.
+    //TODO think about a field to know the total number of tasks.
 
     /**
      * Constructor of light job.

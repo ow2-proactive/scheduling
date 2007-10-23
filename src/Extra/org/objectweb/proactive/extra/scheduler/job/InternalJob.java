@@ -53,7 +53,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * Specific jobs may extend this class.
  * It provides method to order the job and to set and get every needed properties.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
@@ -76,7 +76,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /** Owner of the job */
     private String owner = "";
 
-    // TODO a way for the user to put whatever he wants in the job and refind it in policy for example.
+    // TODO a way for the user to put whatever he wants in the job and re-find it in policy for example.
     // Then user can interact in the policy using this new field.
     protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
@@ -84,11 +84,13 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     protected Vector<InternalTask> finalTasks = new Vector<InternalTask>();
 
     /** informations about job execution */
-    // FIXME jlscheef,jfradj this variable can change ???? 
     protected JobEvent jobInfo = new JobEvent();
 
     /** Light job for dependences management */
     private JobDescriptor lightJob;
+
+    /** Job result */
+    private JobResult jobResult;
 
     /**
      * ProActive empty constructor.
@@ -131,11 +133,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      * @param jobInfo the jobInfo to set
      */
     public synchronized void update(JobEvent jobInfo) {
-        JobResult res = this.jobInfo.getResult();
         this.jobInfo = jobInfo;
-        if (res != null) {
-            this.jobInfo.setResult(res);
-        }
         if (jobInfo.getTaskStatusModify() != null) {
             for (TaskId id : tasks.keySet()) {
                 tasks.get(id).setStatus(jobInfo.getTaskStatusModify().get(id));
@@ -726,6 +724,24 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    /**
+     * Returns the jobResult.
+     *
+     * @return the jobResult.
+     */
+    public JobResult getJobResult() {
+        return jobResult;
+    }
+
+    /**
+     * Sets the jobResult to the given jobResult value.
+     *
+     * @param jobResult the jobResult to set.
+     */
+    public void setJobResult(JobResult jobResult) {
+        this.jobResult = jobResult;
     }
 
     /**

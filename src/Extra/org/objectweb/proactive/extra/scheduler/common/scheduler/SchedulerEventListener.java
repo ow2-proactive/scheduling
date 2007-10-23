@@ -41,11 +41,15 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 /**
  * Class providing events that the scheduler is able to send using the described listener.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */
 public interface SchedulerEventListener<E extends Job> extends Serializable {
+    //TODO
+    /*        Ça ne me semble pas consistant, par exemple
+             runningToFinishedJobEvent(JobEvent)  ---> jobRunningToFinishedEvent
+            pour avoir toujours [job|task|scheduler] en premier. Fab.*/
 
     /**
      * Invoked when the scheduler has just been started.

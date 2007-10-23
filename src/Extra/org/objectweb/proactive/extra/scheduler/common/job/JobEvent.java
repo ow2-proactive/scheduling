@@ -40,11 +40,12 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 /**
  * JobEvent provides some informations about a job.
  * These informations and only them are able to change,
- * that's what the scheduler will send to each listener.
+ * that's what the scheduler will send to each listener.event.getJobEvent();
+        tasks.get(event.getTaskID()).update(event);
  * To have the jog up to date, user must use Job.setJobInfo(JobEvent); .
  * This will automatically put the job up to date.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 25, 2007
  * @since ProActive 3.2
  */
@@ -91,11 +92,6 @@ public class JobEvent implements Serializable {
 
     /** If this finished time is not null, it means the tasks have to change their finished time */
     private HashMap<TaskId, Long> taskFinishedTimeModify = null;
-
-    /** Job result : if null, the job result is not available, if not null it is.
-     * WARNING : This field is transient in order to be send only to the scheduler persistence listener.
-     * This field will not be sent to an external user.*/
-    private transient JobResult result = null;
 
     /**
      * To get the jobId
@@ -330,23 +326,5 @@ public class JobEvent implements Serializable {
      */
     public void setState(JobState state) {
         this.state = state;
-    }
-
-    /**
-     * Returns the result.
-     *
-     * @return the result.
-     */
-    public JobResult getResult() {
-        return result;
-    }
-
-    /**
-     * Sets the result to the given result value.
-     *
-     * @param result the result to set.
-     */
-    public void setResult(JobResult result) {
-        this.result = result;
     }
 }
