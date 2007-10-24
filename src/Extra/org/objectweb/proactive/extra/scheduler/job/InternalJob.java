@@ -80,7 +80,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     // Then user can interact in the policy using this new field.
     protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
-    /** Instances of the final task, important to know which results will be sent to user */
+    /** Instances of the final task, important to know which results the user wants */
     protected Vector<InternalTask> finalTasks = new Vector<InternalTask>();
 
     /** informations about job execution */
@@ -231,7 +231,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         if (task.isFinalTask()) {
             finalTasks.add(task);
         }
-        task.setId(TaskId.nextId(getId(),task.getName()));
+        task.setId(TaskId.nextId(getId(), task.getName()));
         boolean result = (tasks.put(task.getId(), task) == null);
         if (result) {
             jobInfo.setTotalNumberOfTasks(jobInfo.getTotalNumberOfTasks() + 1);

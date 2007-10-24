@@ -179,7 +179,17 @@ public class SchedulerFrontend implements InitActive,
     public void connect() {
         authenticationInterface = (SchedulerAuthentication) ProActiveObject.getContext()
                                                                            .getStubOnCaller();
-        //authenticationInterface.activate();
+    }
+
+    /**
+     * Called by the scheduler core to recover the front-end.
+     * This method may have to rebuild the different list of userIdentification
+     * and job/user association.
+     * TODO explain what is done...
+     */
+    public void recover(HashMap<JobId, InternalJob> jobList) {
+        //activate scheduler communication
+        authenticationInterface.activate();
     }
 
     /**
@@ -297,7 +307,7 @@ public class SchedulerFrontend implements InitActive,
         job.setOwner(identifications.get(id).getUsername());
         TaskId.initialize();
         for (InternalTask td : job.getTasks()) {
-            job.setTaskId(td, TaskId.nextId(job.getId(),td.getName()));
+            job.setTaskId(td, TaskId.nextId(job.getId(), td.getName()));
             td.setJobInfo(job.getJobInfo());
         }
         jobs.put(job.getId(),

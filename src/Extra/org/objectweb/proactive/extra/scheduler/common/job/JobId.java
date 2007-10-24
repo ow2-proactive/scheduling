@@ -56,8 +56,8 @@ public final class JobId implements Comparable<JobId>, Serializable {
      *
      * @param id the initial value to set
      */
-    public static void setInitialValue(int initialId) {
-        currentId = initialId;
+    public static void setInitialValue(JobId jobId) {
+        currentId = jobId.id;
     }
 
     /**
@@ -95,15 +95,6 @@ public final class JobId implements Comparable<JobId>, Serializable {
      */
     private JobId(int id) {
         this.id = id;
-    }
-
-    /**
-     * To get the value
-     *
-     * @return the value
-     */
-    public int getValue() {
-        return id;
     }
 
     /**

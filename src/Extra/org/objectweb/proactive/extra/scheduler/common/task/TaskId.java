@@ -66,6 +66,9 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
     /** Human readable name */
     private String readableName = DEFAULT_TASK_NAME;
 
+    /** Job id */
+    private JobId jobId = null;
+
     /**
      * To reinitialize the initial id value
      */
@@ -79,7 +82,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      * @return the next available id.
      */
     public static synchronized TaskId nextId(JobId jobId) {
-        return new TaskId((jobId.getValue() * JOB_FACTOR) + (++currentId));
+        return new TaskId(jobId);
     }
 
     /**
@@ -88,8 +91,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      * @return the next available id with task name set.
      */
     public static synchronized TaskId nextId(JobId jobId, String readableName) {
-        return new TaskId((jobId.getValue() * JOB_FACTOR) + (++currentId),
-            readableName);
+        return new TaskId(jobId, readableName);
     }
 
     /**
@@ -97,30 +99,41 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      *
      * @param id the task id to set.
      */
-    private TaskId(int id) {
-        this.id = id;
+    private TaskId(JobId jobId) {
+        this.jobId = jobId;
+        this.id = (jobId.hashCode() * JOB_FACTOR) + (++currentId);
     }
 
     /**
      * Set id and name.
+     *
      * @param id the task id to set.
      * @param name the human readable task name.
      */
-    private TaskId(int id, String name) {
-        this.id = id;
+    private TaskId(JobId jobId, String name) {
+        this(jobId);
         this.readableName = name;
     }
 
     /**
-     * Return the human readable name associated to this id.
-     * @return the human readable name associated to this id.
+     * Returns the jobId.
+     *
+     * @return the jobId.
      */
+    public JobId getJobId() {
+        return jobId;
+    }
+
+    /**
+    * Return the human readable name associated to this id.
+    *
+    * @return the human readable name associated to this id.
+    */
     public String getReadableName() {
         return this.readableName;
     }
 
     /**
-     *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(TaskId taskId) {

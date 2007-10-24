@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.apache.log4j.FileAppender;
@@ -69,8 +70,11 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitial
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Status;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.core.db.RecoverableState;
+import org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extra.scheduler.job.JobResultImpl;
@@ -101,9 +105,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
     /** Scheduler logger */
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-
-    /** Path for the result serialization */
-    public static final String SERIALIZING_PATH = "/tmp/";
 
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = 2000;
@@ -216,6 +217,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
     public void runActivity(Body body) {
+        //Rebuild the scheduler if a crash has occurred.
+        //recover();
+        //listen log as immediate Service.
         ProActiveObject.setImmediateService("listenLog");
         Service service = new Service(body);
 
@@ -268,21 +272,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         }
         //stop the pinger thread.
         pinger.interrupt();
-        //if normal shutdown, serialize
-        //TODO DO NOT SERIALIZE ANYMORE ?? IT'S IN DATABASE -> delete Serializer class ?
-        //        if (state == SchedulerState.SHUTTING_DOWN) {
-        //            try {
-        //                logger.info("Serializing results...");
-        //                Serializer.serializeResults(results, SERIALIZING_PATH);
-        //            } catch (Exception e) {
-        //                e.printStackTrace();
-        //                //if an error occurs during serialization, we wait until the result to be got back
-        //                while ((results.size() > 0) &&
-        //                        (state == SchedulerState.SHUTTING_DOWN)) {
-        //                    service.blockingServeOldest();
-        //                }
-        //            }
-        //        }
+        //TODO something to do with the database ??
         logger.info("Terminating...");
         //shutdown resource manager proxy
         resourceManager.shutdownProxy();
@@ -988,5 +978,73 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         InternalJob job = jobs.get(jobId);
         job.setPriority(priority);
         frontend.changeJobPriorityEvent(job.getJobInfo());
+    }
+
+    /**
+     * Rebuild the scheduler after a crash.
+     * Get data base instance, connect it and ask if a rebuild is needed.
+     * The steps to recover the core are visible below.
+     */
+    private void recover() {
+        //connect to data base
+        SchedulerDB dataBase = SchedulerDB.getInstance();
+        RecoverableState recoverable = dataBase.getRecoverableState();
+        if (recoverable == null) {
+            return;
+        }
+
+        // Recover the scheduler core
+        //------------------------------------------------------------------------
+        //----------------------    Re-build jobs lists  --------------------------
+        //------------------------------------------------------------------------
+        JobId tId = JobId.makeJobId("0");
+        for (InternalJob job : recoverable.getJobs()) {
+            jobs.put(job.getId(), job);
+            switch (job.getState()) {
+            case PENDING:
+                pendingJobs.add(job);
+                break;
+            case STALLED:
+            case RUNNING:
+                runningJobs.add(job);
+                break;
+            case FINISHED:
+            case CANCELLED:
+            case FAILED:
+                finishedJobs.add(job);
+                break;
+            case PAUSED:
+                if ((job.getNumberOfPendingTask() +
+                        job.getNumberOfRunningTask() +
+                        job.getNumberOfFinishedTask()) == 0) {
+                    pendingJobs.add(job);
+                } else {
+                    runningJobs.add(job);
+                }
+            }
+            if (job.getId().compareTo(tId) == 1) {
+                tId = job.getId();
+            }
+        }
+        //------------------------------------------------------------------------
+        //--------------------    Initialize job id count   ----------------------
+        //------------------------------------------------------------------------
+        JobId.setInitialValue(tId);
+        //------------------------------------------------------------------------
+        //--------    Re-affect JobEvent/taskEvent to the jobs/tasks   -----------
+        //------------------------------------------------------------------------
+        for (Entry<JobId, JobEvent> entry : recoverable.getJobEvents().entrySet()) {
+            jobs.get(entry.getKey()).update(entry.getValue());
+        }
+        for (Entry<TaskId, TaskEvent> entry : recoverable.getTaskEvents()
+                                                         .entrySet()) {
+            jobs.get(entry.getKey().getJobId()).update(entry.getValue());
+        }
+        //------------------------------------------------------------------------
+        //------------------    Re-create task dependences   ---------------------
+        //------------------------------------------------------------------------
+
+        // Recover the scheduler front-end
+        frontend.recover(jobs);
     }
 }

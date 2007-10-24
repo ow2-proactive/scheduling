@@ -117,10 +117,10 @@ public class AdminScheduler extends UserScheduler
             logger.info("Creating scheduler authentication interface...");
             schedulerAuth = (SchedulerAuthentication) ProActiveObject.newActive(SchedulerAuthentication.class.getName(),
                     new Object[] { loginFile, groupFile, schedulerFrontend });
-            // adding NFE listener to managed non fonctionnal exceptions
+            // adding NFE listener to managed non functional exceptions
             // that occurs in Proactive Core
             //ProActive.addNFEListenerOnAO(schedulerFrontend,
-            //    new NFEHandler("Scheduler Frontend"));
+            //    new NFEHandler("Scheduler Front-end"));
             //ProActive.addNFEListenerOnAO(schedulerAuth,
             //    new NFEHandler("Scheduler authentication"));
             // registering the scheduler proxy at the given URL
