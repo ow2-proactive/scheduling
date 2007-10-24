@@ -7,6 +7,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 
@@ -21,14 +22,14 @@ public class RecoverableState {
     /** all jobs snapshot at their submission */
     private List<InternalJob> jobs = null;
 
+    /** all job result */
+    private List<JobResult> jobResults = null;
+
     /** all job events */
     private Map<JobId, JobEvent> jobEvents = null;
 
     /** all task events */
-    private Map<JobId, TaskEvent> taskEvents = null;
-
-    /** all job result */
-    private List<JobResult> jobResults = null;
+    private Map<TaskId, TaskEvent> taskEvents = null;
 
     /**
      * The default constructor
@@ -39,12 +40,12 @@ public class RecoverableState {
      * @param jobsResults all job result
      */
     public RecoverableState(List<InternalJob> jobs,
-        Map<JobId, JobEvent> jobsEvents, Map<JobId, TaskEvent> tasksEvents,
-        List<JobResult> jobsResults) {
+        List<JobResult> jobsResults, Map<JobId, JobEvent> jobsEvents,
+        Map<TaskId, TaskEvent> tasksEvents) {
         this.jobs = jobs;
+        this.jobResults = jobsResults;
         this.jobEvents = jobsEvents;
         this.taskEvents = tasksEvents;
-        this.jobResults = jobsResults;
     }
 
     /**
@@ -63,6 +64,24 @@ public class RecoverableState {
      */
     public void setJobs(List<InternalJob> jobs) {
         this.jobs = jobs;
+    }
+
+    /**
+     * To get the jobResults
+     *
+     * @return the jobResults
+     */
+    public List<JobResult> getJobResults() {
+        return jobResults;
+    }
+
+    /**
+     * To set the jobResults
+     *
+     * @param jobResults the jobResults to set
+     */
+    public void setJobResults(List<JobResult> jobResults) {
+        this.jobResults = jobResults;
     }
 
     /**
@@ -88,7 +107,7 @@ public class RecoverableState {
      *
      * @return the taskEvents
      */
-    public Map<JobId, TaskEvent> getTaskEvents() {
+    public Map<TaskId, TaskEvent> getTaskEvents() {
         return taskEvents;
     }
 
@@ -97,25 +116,7 @@ public class RecoverableState {
      *
      * @param taskEvents the taskEvents to set
      */
-    public void setTaskEvents(Map<JobId, TaskEvent> taskEvents) {
+    public void setTaskEvents(Map<TaskId, TaskEvent> taskEvents) {
         this.taskEvents = taskEvents;
-    }
-
-    /**
-     * To get the jobResults
-     *
-     * @return the jobResults
-     */
-    public List<JobResult> getJobResults() {
-        return jobResults;
-    }
-
-    /**
-     * To set the jobResults
-     *
-     * @param jobResults the jobResults to set
-     */
-    public void setJobResults(List<JobResult> jobResults) {
-        this.jobResults = jobResults;
     }
 }

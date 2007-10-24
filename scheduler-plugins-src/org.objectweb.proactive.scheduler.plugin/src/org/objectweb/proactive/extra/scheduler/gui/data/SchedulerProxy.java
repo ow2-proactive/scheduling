@@ -46,6 +46,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventLi
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
@@ -111,9 +112,23 @@ public class SchedulerProxy implements AdminSchedulerInterface {
      * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     @Override
-    public JobResult getResult(JobId jobId) {
+    public JobResult getJobResult(JobId jobId) {
         try {
-            return scheduler.getResult(jobId);
+            return scheduler.getJobResult(jobId);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extra.scheduler.common.job.JobId,
+     *      java.lang.String)
+     */
+    @Override
+    public TaskResult getTaskResult(JobId jobId, String taskName) {
+        try {
+            return scheduler.getTaskResult(jobId, taskName);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }

@@ -938,13 +938,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public boolean init() {
         SchedulerInitialState<InternalJob> state = null;
-        try {
-            state = SchedulerProxy.getInstance()
-                                  .addSchedulerEventListener(((SchedulerEventListener) ProActiveObject.getStubOnThis()));
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        state = SchedulerProxy.getInstance()
+                              .addSchedulerEventListener(((SchedulerEventListener) ProActiveObject.getStubOnThis()));
 
         if (state == null) { // addSchedulerEventListener failed
             return false;
