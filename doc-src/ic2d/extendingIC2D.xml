@@ -2283,7 +2283,6 @@ public class ExamplePerspective implements IPerspectiveFactory {
 				<listitem><para><ulink url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">Eclipse Wiki : Rich Client Platform</ulink></para></listitem>
 				<listitem><para><ulink url="http://wiki.eclipse.org/RCP_FAQ">RCP Eclipse FAQ</ulink></para></listitem>
 				<listitem><para><ulink url="http://www-128.ibm.com/developerworks/edu/os-dw-os-ecl-rcpapp.html">Developing your first Eclipse RCP application</ulink></para></listitem>
-				<listitem><para><ulink url=""></ulink></para></listitem>				
 			</itemizedlist>
 		</sect2>
 	</sect1>
