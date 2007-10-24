@@ -112,8 +112,7 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         for (UniversalBody ub : activeObjects) {
             UniqueID id = ub.getID();
 
-            System.out.println("NodeWrapper.getActiveObjects() " + id);
-
+            //System.out.println("NodeWrapper.getActiveObjects() " + id);
             ObjectName name = FactoryName.createActiveObjectName(id);
             onames.add(name);
         }
