@@ -844,17 +844,30 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //destroying running active object launcher
         for (InternalJob j : runningJobs) {
             for (InternalTask td : j.getTasks()) {
-                try {
-                    NodeSet nodes = td.getExecuterInformations().getLauncher()
-                                      .getNodes();
+                if (td.getStatus() == Status.RUNNNING) {
                     try {
-                        td.getExecuterInformations().getLauncher().terminate();
-                    } catch (Exception e) { /* Tested, nothing to do */
+                        NodeSet nodes = td.getExecuterInformations()
+                                          .getLauncher().getNodes();
+                        try {
+                            td.getExecuterInformations().getLauncher()
+                              .terminate();
+                        } catch (Exception e) { /* Tested, nothing to do */
+                        }
+                        try {
+                            resourceManager.freeNodes(nodes, td.getPostTask());
+                        } catch (Exception e) {
+                            try {
+                                // try to get the node back to the IM
+                                resourceManager.freeNode(td.getExecuterInformations()
+                                                           .getNode());
+                            } catch (Exception e1) {
+                                resourceManager.freeDownNode(td.getExecuterInformations()
+                                                               .getNodeName());
+                            }
+                        }
+                    } catch (Exception e) {
+                        //do nothing, the task is already terminated.
                     }
-                    resourceManager.freeNodes(nodes, td.getPostTask());
-                } catch (Exception e) {
-                    resourceManager.freeNode(td.getExecuterInformations()
-                                               .getNode());
                 }
             }
         }
@@ -1022,12 +1035,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     runningJobs.add(job);
                 }
             }
+
+            //search last JobId
             if (job.getId().compareTo(tId) == 1) {
                 tId = job.getId();
             }
         }
         //------------------------------------------------------------------------
-        //--------------------    Initialize job id count   ----------------------
+        //--------------------    Initialize jobId count   ----------------------
         //------------------------------------------------------------------------
         JobId.setInitialValue(tId);
         //------------------------------------------------------------------------

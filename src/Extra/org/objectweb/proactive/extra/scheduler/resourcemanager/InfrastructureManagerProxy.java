@@ -189,7 +189,6 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
         if (postScript == null) {
             freeNodes(nodes);
         } else {
-            System.err.println("POOOOOOOOOST");
             for (Node node : nodes) {
                 try {
                     ScriptHandler handler = ScriptLoader.createHandler(node);
