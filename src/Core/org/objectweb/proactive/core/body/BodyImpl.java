@@ -608,7 +608,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (!isProActiveInternalObject && (mbean != null)) {
                 ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
                                                                       .getJMXServerConnector();
-                if (serverConnector != null) {
+
+                // If the connector server is not active the connectorID can be null
+                if ((serverConnector != null) &&
+                        serverConnector.getConnectorServer().isActive()) {
                     UniqueID connectorID = serverConnector.getUniqueID();
                     if (!connectorID.equals(destinationBody.getID())) {
                         mbean.sendNotification(NotificationType.requestSent,

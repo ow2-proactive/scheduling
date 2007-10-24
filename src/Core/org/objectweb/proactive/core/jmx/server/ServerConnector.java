@@ -94,4 +94,8 @@ public class ServerConnector {
     public UniqueID getUniqueID() {
         return ((ProActiveConnectorServer) cs).getUniqueID();
     }
+
+    public ProActiveConnectorServer getConnectorServer() {
+        return (ProActiveConnectorServer) cs;
+    }
 }
