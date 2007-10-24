@@ -237,7 +237,6 @@ public class SchedulerFrontend implements InitActive,
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extra.scheduler.common.job.JobId, java.lang.String)
      */
-    @Override
     public TaskResult getTaskResult(JobId jobId, String taskName)
         throws SchedulerException {
         //checking permissions

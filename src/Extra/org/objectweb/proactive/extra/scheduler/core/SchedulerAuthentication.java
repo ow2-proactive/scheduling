@@ -117,7 +117,6 @@ public class SchedulerAuthentication implements InitActive,
     /**
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
-    @Override
     public void initActivity(Body body) {
         scheduler.connect();
     }

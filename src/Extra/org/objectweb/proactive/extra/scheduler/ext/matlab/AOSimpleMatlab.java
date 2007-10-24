@@ -28,7 +28,6 @@ public class AOSimpleMatlab implements Serializable {
         this.inputScript = inputScript;
         this.scriptLines = scriptLines;
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
                 public void run() {
                     MatlabEngine.close();
                 }

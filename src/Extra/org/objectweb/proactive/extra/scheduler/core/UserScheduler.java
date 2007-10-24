@@ -76,7 +76,6 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extra.scheduler.common.job.JobId, java.lang.String)
      */
-    @Override
     public TaskResult getTaskResult(JobId jobId, String taskName)
         throws SchedulerException {
         return schedulerFrontend.getTaskResult(jobId, taskName);

@@ -139,12 +139,10 @@ public class JobResultImpl implements JobResult {
         return toReturn.toString();
     }
 
-    @Override
     public JobLogs getOutput() {
         return this.jobOutput;
     }
 
-    @Override
     public void setOutput(JobLogs op) {
         assert (this.jobOutput == null);
         this.jobOutput = op;
