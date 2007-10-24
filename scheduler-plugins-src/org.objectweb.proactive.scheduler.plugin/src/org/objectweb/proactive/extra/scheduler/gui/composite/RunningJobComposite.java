@@ -54,6 +54,8 @@ import org.objectweb.proactive.extra.scheduler.gui.data.EventTasksListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.RunningJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 
@@ -223,13 +225,72 @@ public class RunningJobComposite extends AbstractJobComposite
      */
     @Override
     public void removeRunningJob(JobId jobId) {
-        removeJob(jobId);
-        // TODO : deux problème ici :
-        // - je ne dispose ni la progress ni le tableEditor
-        // - j'envoi le notifyListeners sur toutes les colonnes...
-        TableColumn[] cols = getTable().getColumns();
-        for (TableColumn col : cols)
-            col.notifyListeners(SWT.Move, null);
+        //		removeJob(jobId);
+        //		// TODO : deux problème ici :
+        //		// - je ne dispose ni la progress ni le tableEditor
+        //		// - j'envoi le notifyListeners sur toutes les colonnes...
+        //		Display.getDefault().asyncExec(new Runnable() {
+        //			public void run() {
+        //				TableColumn[] cols = getTable().getColumns();
+        //				for (TableColumn col : cols)
+        //					col.notifyListeners(SWT.Move, null);
+        //			}
+        //		});
+        if (!isDisposed()) {
+            Vector<JobId> jobsId = getJobs();
+            int tmp = -1;
+            for (int i = 0; i < jobsId.size(); i++) {
+                if (jobsId.get(i).equals(jobId)) {
+                    tmp = i;
+                    break;
+                }
+            }
+            if (tmp == -1) {
+                throw new IllegalArgumentException("jobId unknown : " + jobId);
+            }
+            final int i = tmp;
+            getDisplay().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        int j = getTable().getSelectionIndex();
+                        if (i == j) {
+                            JobInfo jobInfo = JobInfo.getInstance();
+                            if (jobInfo != null) {
+                                jobInfo.clear();
+                            }
+
+                            TaskView taskView = TaskView.getInstance();
+                            if (taskView != null) {
+                                taskView.clear();
+                            }
+
+                            // enabling/disabling button permitted with this job
+                            ObtainJobOutputAction.getInstance().setEnabled(false);
+                            PriorityIdleJobAction.getInstance().setEnabled(false);
+                            PriorityLowestJobAction.getInstance()
+                                                   .setEnabled(false);
+                            PriorityLowJobAction.getInstance().setEnabled(false);
+                            PriorityNormalJobAction.getInstance()
+                                                   .setEnabled(false);
+                            PriorityHighJobAction.getInstance().setEnabled(false);
+                            PriorityHighestJobAction.getInstance()
+                                                    .setEnabled(false);
+                            PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
+                            pauseResumeJobAction.setEnabled(false);
+                            pauseResumeJobAction.setPauseResumeMode();
+                            KillJobAction.getInstance().setEnabled(false);
+                        }
+                        TableItem item = getTable().getItem(i);
+                        ((ProgressBar) item.getData("bar")).dispose();
+                        ((TableEditor) item.getData("editor")).dispose();
+                        getTable().remove(i);
+                        TableColumn[] cols = getTable().getColumns();
+                        for (TableColumn col : cols)
+                            col.notifyListeners(SWT.Move, null);
+                        decreaseCount();
+                    }
+                });
+        }
     }
 
     // -------------------------------------------------------------------- //

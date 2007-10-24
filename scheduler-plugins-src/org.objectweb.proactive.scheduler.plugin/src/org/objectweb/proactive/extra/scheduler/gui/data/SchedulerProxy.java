@@ -333,14 +333,17 @@ public class SchedulerProxy implements AdminSchedulerInterface {
             }
             return CONNECTED;
         } catch (SchedulerException e) {
-            return COULD_NOT_CONNECT_SCHEDULER;
-        } catch (LoginException e) {
-            return LOGIN_OR_PASSWORD_WRONG;
-        } catch (Exception e) {
-            return CONNECTION_REFUSED;
-        } finally {
             userName = null;
             logAsAdmin = false;
+            return COULD_NOT_CONNECT_SCHEDULER;
+        } catch (LoginException e) {
+            userName = null;
+            logAsAdmin = false;
+            return LOGIN_OR_PASSWORD_WRONG;
+        } catch (Exception e) {
+            userName = null;
+            logAsAdmin = false;
+            return CONNECTION_REFUSED;
         }
     }
 
