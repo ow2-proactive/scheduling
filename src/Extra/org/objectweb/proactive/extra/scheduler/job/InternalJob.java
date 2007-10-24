@@ -231,7 +231,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         if (task.isFinalTask()) {
             finalTasks.add(task);
         }
-        task.setId(TaskId.nextId(getId()));
+        task.setId(TaskId.nextId(getId(),task.getName()));
         boolean result = (tasks.put(task.getId(), task) == null);
         if (result) {
             jobInfo.setTotalNumberOfTasks(jobInfo.getTotalNumberOfTasks() + 1);

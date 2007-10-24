@@ -297,7 +297,7 @@ public class SchedulerFrontend implements InitActive,
         job.setOwner(identifications.get(id).getUsername());
         TaskId.initialize();
         for (InternalTask td : job.getTasks()) {
-            job.setTaskId(td, TaskId.nextId(job.getId()));
+            job.setTaskId(td, TaskId.nextId(job.getId(),td.getName()));
             td.setJobInfo(job.getJobInfo());
         }
         jobs.put(job.getId(),
