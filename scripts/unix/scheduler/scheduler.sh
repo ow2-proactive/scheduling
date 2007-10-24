@@ -16,7 +16,9 @@ CLASSPATH=$workingDir/../../scheduler-plugins-src/org.objectweb.proactive.schedu
 
 echo $JAVACMD
 
-$JAVACMD -Xmx512m -Xms512m -agentlib:yjpagent org.objectweb.proactive.extra.scheduler.examples.LocalSchedulerExample $RM $SCHEDULER_URL
+yjp=-agentlib:yjpagent
+
+$JAVACMD -Xmx512m -Xms512m org.objectweb.proactive.extra.scheduler.examples.LocalSchedulerExample $RM $SCHEDULER_URL
 
 echo
 
