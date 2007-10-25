@@ -32,7 +32,7 @@ public abstract class AbstractSchedulerDB {
      */
     public static AbstractSchedulerDB getInstance() {
         if (instance == null) {
-            instance = new SchedulerDBImpl();
+            instance = new SchedulerDB();
         }
         return instance;
     }

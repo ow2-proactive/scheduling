@@ -7,7 +7,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 /**
  * @author FRADJ Johann
  */
-public class SchedulerDBImpl extends AbstractSchedulerDB {
+public class SchedulerDB extends AbstractSchedulerDB {
 
     /**
      * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#addJob()
