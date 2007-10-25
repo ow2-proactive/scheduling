@@ -68,7 +68,7 @@
 				<include name="unitTests/**/*.class" />
 				<exclude name="**/*$*.class" />
 				<include name="functionalTests/*/**/*Test*.class" />
-                                <!-- <exclude name="functionalTests/security/*/*.class" /> -->
+                <!-- <exclude name="functionalTests/security/*/*.class" /> -->
 				<exclude name="functionalTests/*.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class" />
@@ -207,6 +207,7 @@
 	<target name="-configurationCopy" depends="-init">
 		<copy toDir="${cl.proactive.dir}">
 			<fileset dir="${src.proactive.dir}">
+				<include name="org/objectweb/proactive/core/config/proactive-log4j" />
 				<include name="org/**/*.xml" />
 				<include name="org/**/*.fractal" />
 				<include name="org/**/*.properties" />
