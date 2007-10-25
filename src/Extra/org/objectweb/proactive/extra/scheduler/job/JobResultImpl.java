@@ -30,13 +30,10 @@
  */
 package org.objectweb.proactive.extra.scheduler.job;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
@@ -57,7 +54,6 @@ public class JobResultImpl implements JobResult {
     private JobId id = null;
     private String name = null;
     private HashMap<String, TaskResult> taskResults = null;
-    private HashMap<String, Class<?extends ResultDescriptor>> taskDescriptors = null;
 
     /**
      * ProActive empty constructor
@@ -109,41 +105,6 @@ public class JobResultImpl implements JobResult {
             taskResults = new HashMap<String, TaskResult>();
         }
         taskResults.put(taskName, taskResult);
-    }
-
-    public void addTaskDescriptor(String taskName,
-        Class<?extends ResultDescriptor> desc) {
-        if (taskDescriptors == null) {
-            taskDescriptors = new HashMap<String, Class<?extends ResultDescriptor>>();
-        }
-        taskDescriptors.put(taskName, desc);
-    }
-
-    public ResultDescriptor getTaskDescriptor(String taskName) {
-        Class<?extends ResultDescriptor> descClass = this.taskDescriptors.get(taskName);
-        TaskResult res = this.taskResults.get(taskName);
-        ResultDescriptor desc = null;
-        if ((desc != null) && (res != null)) {
-            // create ResultDescriptor
-            //            try {
-            //                Constructor<?extends ResultDescriptor> construct = descClass.getDeclaredConstructor(TaskResult.class,
-            //                        StringBuffer.class);
-            //                desc = construct.newInstance(res,this.jobOutput.getLogs(res.getTaskId()));
-            //            } catch (SecurityException e) {
-            //                e.printStackTrace();
-            //            } catch (NoSuchMethodException e) {
-            //                e.printStackTrace();
-            //            } catch (IllegalArgumentException e) {
-            //                e.printStackTrace();
-            //            } catch (InstantiationException e) {
-            //                e.printStackTrace();
-            //            } catch (IllegalAccessException e) {
-            //                e.printStackTrace();
-            //            } catch (InvocationTargetException e) {
-            //                e.printStackTrace();
-            //            }
-        }
-        return desc;
     }
 
     /**
