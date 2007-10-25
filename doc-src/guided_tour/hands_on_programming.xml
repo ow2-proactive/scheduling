@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="hands_on_programming">
-  <title>Hands-on programming</title>
-<para>You've already seen quite sophisticated examples in the section <xref
-  linkend="Introduction_Proactive_Features" />. Here is an introduction to
+<chapter id="step_by_step">
+  <title>Step by step tutorial</title>
+<para>In this chapter we present a step by step introduction to
   programming with ProActive.</para>
 
   <para>The program that we will develop is a classic 'HelloWorld' example. We
@@ -28,24 +27,27 @@
     </listitem>
 
     <listitem>
-      <para>Third, we will add mobility to this active object.</para>
+      <para>Third, we will add mobility to this active object and have it migrate
+      to another computer and say hello.</para>
     </listitem>
 
     <listitem>
-      <para>Eventually, we will attach a graphical interface to the active
-      object, and will show how to move the widget between virtual machines
-      (like in the penguin example).</para>
+      <para>In the last example we show how to compute the first N primes using several
+      computers and the master-worker architecture.</para>
     </listitem>
   </itemizedlist>
-
+	<para>
+		Throughout the tutorial the classes from which we will instantiate active objects
+		are represented in red in the UML diagrams.
+	</para>
 
 	<sect1>
-		<title> First Active Object class</title>
+		<title> First Active Object Class</title>
 	<para>
 		Welcome to your first ProActive program! This is the simplest application that can be
 		written. It is composed of two classes with a master-worker structure. 
 	</para>
-	<figure> <title>Diagram of simple master-worker structure</title>
+	<figure> <title> Master-Worker architecture</title>
 		  <mediaobject>
           <imageobject>
             <imagedata contentwidth="100"
@@ -55,14 +57,18 @@
         </mediaobject>
       </figure>
 	<para>	
-		The example illustrates the creation of a active object from the HelloWorld class that will be
-		used by the Main class to retrieve a string and print it to the standard output.		
-		The Main class corresponds to the client, and is only a container for the main() method, while 
-		the HelloWorld class corresponds to the server and its instance is an active object which provides a sayHello
+		The example illustrates the creation of a active object from the 
+		<literal>HelloWorld</literal> class that will be
+		used by the <literal>Main</literal> class to retrieve a string
+		 and print it to the standard output.		
+		The <literal>Main</literal> class corresponds to the client, and is
+		 only a container for the <literal>main()</literal> method, while 
+		the <literal>HelloWorld</literal> class corresponds to the server and its instance is an active object which provides a sayHello
 		method as a remote service.
 	</para>		
 	<para>
-		To safely use the HelloWorld class as an active object we have to meet three requirements.
+		To safely use the <literal>HelloWorld</literal> class as an active object
+		we have to meet three requirements.
 	</para>
 		<itemizedlist>
 			<listitem><para><emphasis role="bold">no direct access to field variables</emphasis> - If
@@ -81,8 +87,7 @@
 							If there is no constructor defined, the Java compiler
 							will automatically create a no-argument constructor that initializes all instance variables
 							to the default value. However, if there is an already defined constructor with arguments 
-							then no default no-argument constructor will be created by the compiler. In this case (overloaded constructor)
-							the definition of a no-argument constructor is mandatory for stub creation. The safest way is
+							then no default no-argument constructor will be created by the compiler. In this case 							the definition of a no-argument constructor is mandatory for stub creation. The safest way is
 							to always define a no-argument constructor.
 							Also, the constructor should be empty so that on stub creation no 
 							initialization is done on the stub.    
@@ -92,19 +97,21 @@
 			<listitem><para><emphasis role="bold">provide remote functionalities as public methods with reifiable type</emphasis> - Since
 			the stub is created through inheritance, the only methods it can use for communication are
 			the inherited public methods from the superclass. The return types of the methods have to be 
-			 reifiable (?) and therefore not final. ProActive provides several wrappers for Java types
+			 reifiable  and therefore not final. ProActive provides several wrappers for Java types
 			 that are final.The example uses the <literal>StringWrapper</literal> class in order to provide a wrapper for the 
-			final String class.  Since ProActive uses a proxy mechanism and the String class is final, it’s not
+			final <literal>String</literal> class.  Since ProActive uses a proxy mechanism and
+			 the <literal>String</literal> class is final, it’s not
 			possible to subclass a String and to perform asynchronous calls.	
-			ProActive provides several wrappers for final classes: StringWrapper, BooleanWrapper, 
-		IntegerWrapper, DoubleWrapper and FloatWrapper. These have to be used in
-		replacement of String, Boolean, Integer, Double and Float
-		in classes which will be active objects. Since ProActive uses a proxy
-		mechanism and theses classes are final, it’s not
-		possible to subclass them and to perform asynchronous calls. The
-		subclasses is necessary in order to create the stub class uses in 
-		communication. 
-		If you don’t use wrappers, method calls will be synchronous.
+			ProActive provides several wrappers for final classes: <literal>StringWrapper, BooleanWrapper, 
+			IntegerWrapper, DoubleWrapper</literal> and <literal>FloatWrapper</literal>.
+			 These have to be used in
+			replacement of <literal>String, Boolean, Integer, Double</literal> and <literal>Float</literal>
+			in classes which will be active objects. Since ProActive uses a proxy
+			mechanism and theses classes are final, it’s not
+			possible to subclass them and to perform asynchronous calls. The
+			subclasses is necessary in order to create the stub class uses in 
+			communication. 
+			If you don’t use wrappers, method calls will be synchronous.
 			<programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/public_method.txt"></textdata></textobject></programlisting>
 			</para>	
 			</listitem>
@@ -115,14 +122,15 @@
 	</para>	
 	 <programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/SimpleHelloWorld/src/active/HelloWorld.java" /></textobject></programlisting>
 	
-<para>We will now show how to create the server object. For now, we want the HelloWorld active object 
+<para>We will now show how to create the server object. For now, we want the
+<literal> HelloWorld</literal> active object 
  to be created on the current Node (we will see later how to distribute the program). To create an instance of
   a remotely accessible object we must use the <literal>ProActive.newActive</literal> primitive.
   <programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/ao_creation.txt"></textdata></textobject></programlisting>
 </para>
 	<para>
-		<emphasis role="bold"> [[EXPLAIN WAIT BY NECESSITY BETTER]]</emphasis>
-		Invoking a method on a remote active object is transparent and is similar to  invoking a method on
+		Invoking a method on a remote active object is transparent and is similar 
+		for the user to  invoking a method on
 		a local object of the same type. The user does not have to deal with catching exceptions
 		related to the remote communication. The only modification brought to the code by ProActive
 		is during the active objects creation. All the rest of the code can remain unmodified, 
@@ -139,7 +147,7 @@
 		For now the application will be deployed on the local Node. To compile and run the application you need the 
 		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
 		include the following jar files: 
-		  	<literal>ProActive/ProActive.jar</literal>,
+		  	<literal>ProActive/dist/ProActive.jar</literal>,
           	<literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
@@ -148,7 +156,7 @@
            and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
            and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
             The steps necessary are explained in <xref linkend="Installation"/>.
-           Also, the full code for the example is available in [[[FOLDER NAME]]] as a ready to run Eclipse project.
+           
 		</para>	
 		<para>
 			The command line for running the application is: 
@@ -193,7 +201,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       Main class.</para>
 
       <para><figure>
-      		<title> Diagram of the master-worker structure with a worker that does initialization</title> 
+      		<title> Master-Worker architecture with initialization</title> 
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
@@ -232,14 +240,13 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
-      	You also have to include the following jar files: ProActive/ProActive.jar, ProActive/lib/javassist.jar,
+      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
        	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
        	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
        	 <literal>-Djava.security.policy=pathToFile </literal> 
        	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
             The steps necessary are explained in 
-       	<xref linkend="Installation"/>. Also, the full code for the example is available in
-       	  [[[FOLDER NAME]]] as a ready to run Eclipse project.</para>
+       	<xref linkend="Installation"/>.</para>
  		<para>	The command line for running the application is: </para> 
 	<para>
 			<screen>
@@ -438,14 +445,13 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
-      	You also have to include the following jar files: ProActive/ProActive.jar, ProActive/lib/javassist.jar,
+      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
        	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
        	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
        	 <literal>-Djava.security.policy=pathToFile </literal> 
        	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
             The steps necessary are explained in 
-       	<xref linkend="Installation"/>. Also, the full code for the example is available in
-       	  [[[FOLDER NAME]]] as a ready to run Eclipse project.</para>
+       	<xref linkend="Installation"/>.</para>
  			<para>
  			The command line for running the application is:
  			</para> 
@@ -457,7 +463,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	</sect1>
 
   <sect1>
-    <title>A simple migration example</title>
+    <title>A Simple Migration Example</title>
 
     <indexterm>
       <primary>Migration</primary>
@@ -483,24 +489,24 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       <title>Design</title>
 
       
-      <para>We create a MigrateableHello class, that derives from
-      InitializedHello. This class will implement all the non-functionnal
+      <para>We create a MigratableHello class, that derives from
+      InitializedHello. This class will implement all the non-functional
       behavior concerning the migration, for which this example is created.
       The Hello and InitializedHello classes are left unmodified.</para>
 
       <para>The migration has to be initiated
-      by the active object itself. We will have to write the migrate method in the code of MigrateableHello -
+      by the active object itself. We will have to write the migrate method in the code of MigratableHello -
       i.e. a method that contains an explicit call to the migration primitive.
       </para>
     
       <para>The class diagram for the application is the following:</para>
 
       <para><figure>
-      	<title>The Migrateable HelloWorld architecture</title>
+      	<title>Migratable HelloWorld architecture</title>
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/MigrateableHelloWorld.png"
+                         fileref="guided_tour/pics/hello/MigratableHelloWorld.png"
                          format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
@@ -513,19 +519,19 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	In the deployment descriptor file we will define a new virtual node,
       </para>
       <para>	
-      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migrateable_hello/component_definition.txt"></textdata></textobject></programlisting>
+      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/component_definition.txt"></textdata></textobject></programlisting>
       </para>
       <para>	
       	another JVM to be started in the virtual node,
       </para>
       <para>
-      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migrateable_hello/jvms.txt"></textdata></textobject></programlisting>
+      	<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/jvms.txt"></textdata></textobject></programlisting>
       </para>	
       <para>
       	 and a host on which the new virtual node will be located. 
 	 
       </para>	 
-      		<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migrateable_hello/infrastructure.txt"></textdata></textobject></programlisting>
+      		<programlisting lang="xml"><textobject><textdata fileref="code_snippets/migratable_hello/infrastructure.txt"></textdata></textobject></programlisting>
       <para>
     	The full deployment descriptor file is:
 		</para>
@@ -538,14 +544,14 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	makes the active object instantiated from the new class able to migrate. The new class also
 	has to implement the <literal>Serializable</literal> interface in order to be sent over
 	the network.</para>
-	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/MigrateableHello.java"></textdata></textobject></programlisting>
+	<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/MigratableHelloWorld/src/active/MigratableHello.java"></textdata></textobject></programlisting>
 	
 	<para>
 		We also have to change the <literal>Main</literal>class to retrieve the node
 		to which the active object will migrate. For this we will add a method that
 		returns the node contained in the virtual node on the second remote machine. 
 	</para>
-      	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migrateable_hello/node_retrieving_method.txt"></textdata></textobject></programlisting>
+      	<programlisting lang="java"><textobject><textdata fileref="code_snippets/migratable_hello/node_retrieving_method.txt"></textdata></textobject></programlisting>
 	<para>
 		The full new <literal> Main </literal> class is: 
 	</para>	
@@ -559,36 +565,28 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 
    
    <sect2>
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="guided_tour/pics/hello/agent_execution.png"
-                         format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
+     
 
       <para>During the execution, a default node is first created. It then
       hosts the created active object. Then the active object is migrated from
-      node to node, each time returning 'hello' and telling the client program
+      node to node, each time returning 'Hello' and the computer 
       where it is located.</para>
     </sect2>
     
     
        <sect2>
-      <title>Running the InitializedHelloWorld application</title>
+      <title>Running the MigratableHello application</title>
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
-      	 MigrateableHello class,and the new Main class,.
-      	You also have to include the following jar files: ProActive/ProActive.jar, ProActive/lib/javassist.jar,
+      	 MigratableHello class,and the new Main class,.
+      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
        	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
        	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
        	 <literal>-Djava.security.policy=pathToFile </literal> 
        	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
             The steps necessary are explained in 
-       	<xref linkend="Installation"/>. Also, the full code for the example is available in
-       	  [[[FOLDER NAME]]] as a ready to run Eclipse project.</para>
+       	<xref linkend="Installation"/>.</para>
  		<para>	The command line for running the application is: </para> 
 	<para>
 			<screen>
@@ -596,158 +594,139 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			</screen>
  	</para>
     </sect2>
-    
-  </sect1>
-
-  <sect1>
-    <title>migration of graphical interfaces</title>
-
-    <para>Graphical interfaces are not serializable, yet it is possible to
-    migrate them with ProActive.</para>
-
-    <para>The idea is to associate the graphical object to an active object.
-    The active object will control the activation and desactivation of this
-    graphical entity during migrations.</para>
-
-    <para>Of course, this is a very basic example, but you can later build
-    more sophisticated frames.</para>
-
-    <sect2>
-      <title>Design of the migrateable application</title>
-
-      <para>We will write a new active object class, that extends
-      MigrateableHello. The sayHello method will create a window containing the
-      hello message. This window is defined in the class HelloFrame</para>
-
-      <para><informalfigure>
+    </sect1>
+    <sect1>
+      		<title>An Application To Find The First N Primes</title>
+  		<para>In the next section we will write a  Master-Worker application to find the first N primes. </para>
+	  	<sect2>
+	  		<title>Application architecture </title>
+			<para>
+			The application works as follows. Each worker knows a set of prime numbers, zero
+			numbers on creation, and learns
+			new ones gradually. To determine if a number is prime or not, the master asks to each worker if
+			the number can be prime according to the worker's memory. If all workers say this number
+			can be prime then it is. If a number is prime is then sent randomly to one of the workers.
+			The same process is used for the next number. 
+	 	</para>
+	 	<para><figure>
+      	<title>DistributedPrimes architecture</title>
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
-                         fileref="guided_tour/pics/hello/hellogui.png"
+                         fileref="guided_tour/pics/hello/DistributedPrimes.png"
                          format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
-        </informalfigure></para>
-    </sect2>
-
-    <sect2>
-      <title>Programming</title>
-
-      <sect3>
-        <title>HelloFrameController</title>
-
-        <para>The code of the HelloFrameController is in <xref
-        linkend="tutorialCodeSrc.HelloFrameController.java" />.</para>
-
-        <para>This class extends MigrateableHello, and adds an activity and a
-        migration strategy manager to the object .</para>
-
-        <para>It creates a graphical frame upon call of the sayHello
-        method.</para>
-
-        <para>Here we have a more complex migration process than with the
-        previous example. We need to make the graphical window disappear
-        before and reappear in a new location after the migration (in this
-        example though, we wait for a call to sayHello). The migration of the
-        frame is actually controlled by a MigrationStrategyManager, that will
-        be attached to the body of the active object.. An ideal location for
-        this operation is the initActivity method (from InitActive interface),
-        that we override:</para>
-
-        <programlisting lang="java">/**
- * This method attaches a migration strategy manager to the current active object.
- * The migration strategy manager will help to define which actions to take before
- * and after migrating
- */
-public void initActivity(Body body) {
-        // add a migration strategy manager on the current active object
-        migrationStrategyManager = new MigrationStrategyManagerImpl((Migrateable) ProActive.getBodyOnThis());
-        // specify what to do when the active object is about to migrate
-        // the specified method is then invoked by reflection
-        migrationStrategyManager.onDeparture('clean');
-}          </programlisting>
-
-        <para>The MigrationStrategyManager defines methods such as
-        'onDeparture', that can be configured in the application. For example
-        here, the method 'clean' will be called before the migration,
-        conveniently killing the frame:</para>
-
-        <programlisting lang="java">public void clean() {
-        System.out.println("killing frame");
-        helloFrame.dispose();
-        helloFrame = null;
-        System.out.println("frame is killed");
-}          </programlisting>
-      </sect3>
-
-      <sect3>
-        <title>HelloFrame</title>
-
-        <para>This is an example of a graphical class that could be associated
-        with the active object (see code in <xref
-        linkend="tutorialCodeSrc.HelloFrame.java" /> ).</para>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Execution</title>
-
-      <itemizedlist>
-        <listitem>
-          <para>Create a new class HelloFrameControllerClient: take the code
-          of MigrateableHelloClient used in the previous part, change the class
-          declaration to HelloFrameControllerClient and replace the
-          line</para>
-        </listitem>
-      </itemizedlist>
-
-      <para><literal>MigrateableHello migrateable_hello =
-      MigrateableHello.createMigrateableHello("agent1");</literal></para>
-
-      <para>with</para>
-
-      <para><literal>MigrateableHello migrateable_hello =
-      HelloFrameController.createHelloFrameController("agent1");</literal></para>
-
-      <itemizedlist>
-        <listitem>
-          <para>Similarly to the simple migration example (use the
-          HelloFrameControllerClient class), you will start remote nodes and
-          specify a migration path.</para>
-        </listitem>
-
-        <listitem>
-          <para>you have 2 ways for handling the display of the graphical
-          objects:</para>
-        </listitem>
-      </itemizedlist>
-
-      <para><itemizedlist>
-          <listitem>
-            <para>look on the display screens of the machines</para>
-          </listitem>
-        </itemizedlist></para>
-
-      <para><itemizedlist>
-          <listitem>
-            <para>export the displays: in startNode.sh, you should add the
-            following lines before the java command:</para>
-
-            <para><literal>DISPLAY=myhost:0 export DISPLAY</literal></para>
-          </listitem>
-        </itemizedlist></para>
-
-      <para><informalfigure>
-          <mediaobject>
+        </figure></para>
+        
+	 	<para> 
+			When trying to decide if 2 is prime or not, the question is asked to each worker.
+			Since their local memory is empty, all will respond it can be a prime. Receiving all yes,
+			the master concludes that 2 is prime and adds randomly it to the memory of one worker.
+		</para>
+		<figure>
+			<title>Bootstrap process</title>
+		  <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.png"
-                         format="PNG" />
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/hello/distributed_primes_bootstrap.png"
+                         format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
-        </informalfigure></para>
+        </figure>
 
-      <para>The displayed window: it just contains a text label with the
-      location of the active object.</para>
+		<para>
+			When trying to determine if 15 is prime or not the master asks all of the workers and at least one
+			of them answers that it is not. The master discards the number and repeats the process with 16 
+			which will also be discarded and then with 17 which will be prime. 17 will be sent randomly to one
+			of the workers.  
+		</para>
+		<figure>
+			<title>Prime checking process</title>
+		  <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/hello/distributed_primes_regular.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+        
+		<para>
+			This architecture is efficient at computing big sieves. If it computes only 200 primes, communication overhead
+			will be big compared to computation time, but if it computes the first 10 000 000 primes,
+			then this approach is effective. Distribution allows you to compute more numbers because memory
+			consumption is balanced between workers and it also allows you to compute faster since solution space is explored in parallel.
+		</para>
+		
+		
+		<para>
+		The worker and master classes have several methods implementing the mechanism described above. The
+		master class has a method for adding workers to its list - <literal> addWorker</literal>,
+		one for randomly sending primes to 	one of the workers in the list - <literal> sendPrime</literal>,
+		 and a method that sends messages to the workers and prints out the primes - <literal> startComputation</literal>.
+		 The worker class has a method that checks if a number is prime <literal>isPrime</literal> and a method
+		 that adds a prime to its list of numbers <literal>addPrime</literal>.
+		
+		For this example the master and worker classes without code look like this. Try to 
+		fill in the code for the methods. An example implementation is also provided below.  
+		</para>
+		<programlisting lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_master.txt"></textdata></textobject></programlisting>
+		
+		<programlisting lang="java"><textobject><textdata fileref="code_snippets/distributed_primes/code_stub_worker.txt"></textdata></textobject></programlisting>
+		
+		</sect2>
+		<sect2> <title>DistributedPrimes Implementation </title>
+		<para>
+		This is one of the possible implementations. We use a simple algorithm for the <literal> isPrime </literal> method in 
+		the workers, however more efficient implementations can be used. 
+		In the main class we will create a master active object and several workers active objects deployed one on each machine specified in the 
+		deployment descriptor. 
+		</para>
+		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/Main.java"></textdata></textobject></programlisting>
+		
+		<para>
+		In the <literal>startComputation</literal> methode in the <literal>PrimeManager</literal> class we use a special way of calling
+		the <literal>isPrime </literal> method on the workers so the answers to the requests can be received in any  order. First
+		we create a Vector <literal> answers</literal>  which contains the futures from the workers. We use the static method
+		 <literal> ProFuture.waitForAny(Vector)</literal> method which blocks the call until one of the futures
+		stored in the Vector is updated. When one of the futures is updated we check if it is true or not and then remove it from the Vector.
+		When the Vector is empty all the workers have sent their response. 
+		</para>
+		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeManager.java"></textdata></textobject></programlisting>
+		<para>
+		PrimeWorker class:
+		</para>
+		<programlisting lang="java"><textobject><textdata fileref="guided_tour/examples/DistributedPrimes/src/active/PrimeWorker.java"></textdata></textobject></programlisting>
+		</sect2> 
+ 		<sect2><title>Deployment Descriptor</title>
+ 			<para> The deployment descriptor for the DistrbutedPrimes application is similar to the
+ 			one from the previous examples. If you want to deploy on more machines the only change necessary
+ 			is adding the needed definitions for JVMs, protocols, and host in the deployment descriptor.
+ 			</para>  
+ 		</sect2>
+ 		    <sect2>
+      <title>Running the DistributedPrimes application</title>
+
+      <para>To compile and run the application you need the
+      	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
+      	 MigratableHello class,and the new Main class,.
+      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
+       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
+       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
+       	 <literal>-Djava.security.policy=pathToFile </literal> 
+       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in 
+       	<xref linkend="Installation"/>.</para>
+ 		<para>	The command line for running the application is the following the second
+ 		 parameter being the number of primes to be computed: </para> 
+	<para>
+			<screen>
+java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml  10000
+			</screen>
+ 	</para>
     </sect2>
   </sect1>
-</chapter>
+  
+
+  </chapter>
