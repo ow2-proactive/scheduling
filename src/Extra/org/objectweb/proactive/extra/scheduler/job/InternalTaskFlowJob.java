@@ -88,7 +88,7 @@ public class InternalTaskFlowJob extends InternalJob {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.job.JobU#getType()
+     * @see org.objectweb.proactive.extra.scheduler.job.InternalJob#getType()
      */
     @Override
     public JobType getType() {

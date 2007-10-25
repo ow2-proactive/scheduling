@@ -67,6 +67,9 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     /** Job type */
     private JobType type;
 
+    /** Total number of tasks. */
+    private int numberOfTasks;
+
     /** Job tasks to be able to be schedule */
     private HashMap<TaskId, EligibleTaskDescriptor> eligibleTasks = new HashMap<TaskId, EligibleTaskDescriptor>();
 
@@ -75,8 +78,6 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
 
     /** Job paused tasks */
     private HashMap<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
-
-    //TODO think about a field to know the total number of tasks.
 
     /**
      * Constructor of light job.
@@ -88,6 +89,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
         id = job.getId();
         priority = job.getPriority();
         type = job.getType();
+        numberOfTasks = job.getTasks().size();
         if (type == JobType.TASKSFLOW) {
             //build dependence tree
             makeTree(job);
@@ -141,8 +143,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      * @param taskId the task that has just been started.
      */
     void start(TaskId taskId) {
-        runningTasks.put(taskId, eligibleTasks.get(taskId));
-        eligibleTasks.remove(taskId);
+        runningTasks.put(taskId, eligibleTasks.remove(taskId));
     }
 
     /**
@@ -178,7 +179,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-     * Failed this light job by removing every tasks from eligible and running list.
+     * Failed this job descriptor by removing every tasks from eligible and running list.
      * This function considered that the taskIds are in eligible tasks list.
      * Visibility is package because user cannot use this method.
      */
@@ -259,8 +260,17 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     * Returns the number Of Tasks.
+     *
+     * @return the number Of Tasks.
      */
+    public int getNumberOfTasks() {
+        return numberOfTasks;
+    }
+
+    /**
+    * @see java.lang.Comparable#compareTo(java.lang.Object)
+    */
     public int compareTo(JobDescriptor o) {
         return o.priority.compareTo(priority);
     }

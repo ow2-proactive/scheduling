@@ -312,7 +312,7 @@ public class SchedulerFrontend implements InitActive,
         }
         jobs.put(job.getId(),
             new IdentifyJob(job.getId(), identifications.get(id)));
-        //make the light job
+        //make the job descriptor
         job.setJobDescriptor(new JobDescriptor(job));
         scheduler.submit(job);
         //stats

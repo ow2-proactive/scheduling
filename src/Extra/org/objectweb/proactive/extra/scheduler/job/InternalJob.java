@@ -78,15 +78,18 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
 
     // TODO a way for the user to put whatever he wants in the job and re-find it in policy for example.
     // Then user can interact in the policy using this new field.
+
+    /** List of every tasks in this job. */
     protected HashMap<TaskId, InternalTask> tasks = new HashMap<TaskId, InternalTask>();
 
     /** Instances of the final task, important to know which results the user wants */
+    //TODO : jlscheef : useless, may be removed ??
     protected Vector<InternalTask> finalTasks = new Vector<InternalTask>();
 
-    /** informations about job execution */
+    /** Informations about job execution */
     protected JobEvent jobInfo = new JobEvent();
 
-    /** Light job for dependences management */
+    /** Job descriptor for dependences management */
     private JobDescriptor jobDescriptor;
 
     /** Job result */
@@ -300,9 +303,20 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         for (InternalTask td : tasks.values()) {
             hts.put(td.getId(), td.getStatus());
         }
-        //updating light job for eligible task
+        //updating job descriptor for eligible task
         jobDescriptor.update(hts);
         return descriptor;
+    }
+
+    /**
+     * Simulate that a task have been started and terminated.
+     * Used only by the recovery method in scheduler core.
+     *
+     * @param id the id of the task to start and terminate.
+     */
+    public void simulateStartAndTerminate(TaskId id) {
+        jobDescriptor.start(id);
+        jobDescriptor.terminate(id);
     }
 
     /**
@@ -320,7 +334,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         descriptor.setStatus((jobState == JobState.FAILED) ? Status.FAILED
                                                            : Status.CANCELLED);
         setState(jobState);
-        //terminate this lightjob
+        //terminate this job descriptor
         jobDescriptor.failed();
 
         //creating list of status
@@ -460,7 +474,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     }
 
     /**
-     * To get the tasks as an arraylist.
+     * To get the tasks as an array list.
      *
      * @return the tasks
      */
@@ -686,7 +700,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     /**
      * To set the jobDescriptor
      *
-     * @param lightJob the jobDescriptor to set
+     * @param jobDescriptor the jobDescriptor to set
      */
     public void setJobDescriptor(JobDescriptor jobDescriptor) {
         this.jobDescriptor = jobDescriptor;

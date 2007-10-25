@@ -67,9 +67,9 @@ public enum Status implements java.io.Serializable {
      */
     NOT_STARTED("Could not start"),
     /**
-     * The task has finished execution
+     * The task has been canceled.
      */
-    CANCELLED("Cancelled"),
+    CANCELLED("Canceled"),
     /**
      * The task has been aborted by an exception on an other task
      */
