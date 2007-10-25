@@ -28,7 +28,7 @@ IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTI
 
 set JARS=
 FOR %%j IN (%PROACTIVE%\lib\*.jar) DO SET JARS=!JARS!;%%j
-SET CLASSPATH=%CLASSPATH%;%JARS%
+SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib;%JARS%
 
 
 set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy" -Dlog4j.configuration=file:"%PROACTIVE%\scripts\proactive-log4j"
