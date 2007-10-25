@@ -70,7 +70,7 @@ public class Test1 extends TestCase {
         try {
             // Verifying script
             VerifyingScript verif = new VerifyingScript(new File(
-                        "/user/jmartin/home/scripts/test.js"));
+                        "/user/jmartin/home/scripts/test.js"), null);
 
             // Dispay total nodes
             int total = monitor.getNumberOfAllResources().intValue();
