@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.scheduler.core.db;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
@@ -14,7 +15,7 @@ import org.objectweb.proactive.extra.scheduler.job.InternalJob;
  * @author FRADJ Johann
  */
 public abstract class AbstractSchedulerDB {
-    //TODO comments
+    // TODO comments
     private static AbstractSchedulerDB instance = null;
 
     public abstract boolean addJob(InternalJob internalJob);
@@ -36,15 +37,30 @@ public abstract class AbstractSchedulerDB {
 
     public abstract TaskResult getTaskResult();
 
+    public abstract void disconnect();
+
     /**
-     * If the instance is null, this method create a new instance before returning it.
+     * If the instance is null, this method create a new instance before
+     * returning it.
      *
      * @return the SchedulerDB instance.
      */
     public static AbstractSchedulerDB getInstance() {
         if (instance == null) {
-            instance = new SchedulerDB();
+            try {
+                instance = new SchedulerDB();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return instance;
+    }
+
+    /**
+     * Set instance to null BUT BEFORE doing that, call the disconnect method !
+     */
+    public static void clearInstance() {
+        instance.disconnect();
+        instance = null;
     }
 }
