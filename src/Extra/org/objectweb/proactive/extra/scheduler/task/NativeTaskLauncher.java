@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
@@ -78,7 +78,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @param taskId represents the task the launcher will execute.
      * @param jobId represents the job where the task is located.
      */
-    public NativeTaskLauncher(TaskId taskId, JobId jobId, Script<?> pre,
+    public NativeTaskLauncher(TaskId taskId, JobId jobId, PreScript pre,
         String host, Integer port) {
         super(taskId, jobId, pre, host, port);
     }
@@ -97,17 +97,24 @@ public class NativeTaskLauncher extends TaskLauncher {
         TaskResult... results) {
         this.initLoggers();
         try {
-            //launch pre script
-            String cmd = null;
-            if (pre != null) {
-                cmd = this.executePreScript(null);
-            } //unused for the moment
+            ExecutableNativeTask toBeLaunched = (ExecutableNativeTask) executableTask;
 
+            //launch pre script
+            if (pre != null) {
+                String preScriptDefinedCommand = this.executePreScript(null);
+
+                // if preScriptDefinedCommand is not null, a new command 
+                // has been defined by the prescript
+                if (preScriptDefinedCommand != null) {
+                    // a new NativeExecTask should be created
+                    toBeLaunched = new ExecutableNativeTask(preScriptDefinedCommand);
+                }
+            }
             //get process
-            process = ((ExecutableNativeTask) executableTask).getProcess();
+            process = toBeLaunched.getProcess();
             //launch task
             TaskResult result = new TaskResultImpl(taskId,
-                    executableTask.execute(results),
+                    toBeLaunched.execute(results),
                     new Log4JTaskLogs(this.logBuffer.getBuffer()));
 
             //return result

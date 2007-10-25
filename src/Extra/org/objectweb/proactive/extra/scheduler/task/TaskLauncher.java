@@ -53,6 +53,7 @@ import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
@@ -60,7 +61,6 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
@@ -80,7 +80,7 @@ public class TaskLauncher implements InitActive, Serializable {
     private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
     protected JobId jobId;
-    protected Script<?> pre;
+    protected PreScript pre;
     protected String host;
     protected Integer port;
 
@@ -119,7 +119,7 @@ public class TaskLauncher implements InitActive, Serializable {
      * @param host the host on which to append the standard output/input.
      * @param port the port number on which to send the standard output/input.
      */
-    public TaskLauncher(TaskId taskId, JobId jobId, Script<?> pre, String host,
+    public TaskLauncher(TaskId taskId, JobId jobId, PreScript pre, String host,
         Integer port) {
         this(taskId, jobId, host, port);
         System.out.println("TaskLauncher.TaskLauncher() : " + pre);
@@ -215,7 +215,7 @@ public class TaskLauncher implements InitActive, Serializable {
     protected void finalizeLoggers() {
         //Unhandle loggers
         this.logBuffer.close();
-        LogManager.shutdown();
+        // LogManager.shutdown();
         System.setOut(this.stdout);
         System.setErr(this.stderr);
     }
