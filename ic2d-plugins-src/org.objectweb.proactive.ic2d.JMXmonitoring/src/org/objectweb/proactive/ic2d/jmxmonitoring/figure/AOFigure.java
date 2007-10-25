@@ -79,8 +79,8 @@ public class AOFigure extends AbstractFigure {
         COLOR_WHEN_WAITING_FOR_REQUEST = new Color(device, 225, 225, 225);
         COLOR_WHEN_WAITING_BY_NECESSITY = new Color(device, 255, 205, 110);
         COLOR_WHEN_ACTIVE = new Color(device, 180, 255, 180); // green
-        COLOR_WHEN_SERVING_REQUEST = new Color(device, 255, 255, 255); //white
-        COLOR_WHEN_MIGRATING = new Color(device, 0, 0, 255); // blue
+        COLOR_WHEN_SERVING_REQUEST = new Color(device, 0, 0, 255); // blue was white: new Color(device, 255, 255, 255);
+        COLOR_WHEN_MIGRATING = new Color(device, 150, 0, 255); // violet was blue: new Color(device, 0, 0, 255);
         COLOR_WHEN_NOT_RESPONDING = new Color(device, 255, 0, 0); // red
 
         DEFAULT_BORDER_COLOR = new Color(device, 200, 200, 200);
