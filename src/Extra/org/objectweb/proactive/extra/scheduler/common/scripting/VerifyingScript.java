@@ -74,26 +74,28 @@ public class VerifyingScript extends Script<Boolean> {
     }
 
     /** Create a script from a file. */
-    public VerifyingScript(File file) throws InvalidScriptException {
-        super(file);
+    public VerifyingScript(File file, String[] parameters)
+        throws InvalidScriptException {
+        super(file, parameters);
     }
 
     /** Create a script from a file. */
-    public VerifyingScript(File file, boolean dynamic)
+    public VerifyingScript(File file, String[] parameters, boolean dynamic)
         throws InvalidScriptException {
-        super(file);
+        super(file, parameters);
         this.dynamic = dynamic;
     }
 
     /** Create a script from an URL. */
-    public VerifyingScript(URL url) throws InvalidScriptException {
-        super(url);
+    public VerifyingScript(URL url, String[] parameters)
+        throws InvalidScriptException {
+        super(url, parameters);
     }
 
     /** Create a script from an URL. */
-    public VerifyingScript(URL url, boolean dynamic)
+    public VerifyingScript(URL url, String[] parameters, boolean dynamic)
         throws InvalidScriptException {
-        super(url);
+        super(url, parameters);
         this.dynamic = dynamic;
     }
 

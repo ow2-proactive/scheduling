@@ -70,11 +70,11 @@ public class TestIMProxy {
         try {
             // Verifying script
             VerifyingScript verif = new VerifyingScript(new File(
-                        "/user/jmartin/home/scripts/test.js"));
+                        "/user/jmartin/home/scripts/test.js"), null);
             VerifyingScript post1 = new VerifyingScript(new File(
-                        "/user/jmartin/home/scripts/clean2.js"));
+                        "/user/jmartin/home/scripts/clean2.js"), null);
             VerifyingScript post2 = new VerifyingScript(new File(
-                        "/user/jmartin/home/scripts/clean5.js"));
+                        "/user/jmartin/home/scripts/clean5.js"), null);
 
             // Dispay total nodes
             int total = proxy.getNumberOfAllResources().intValue();

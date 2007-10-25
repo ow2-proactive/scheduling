@@ -70,13 +70,15 @@ public class PreScript extends Script<String> {
     }
 
     /** Create a script from a file. */
-    public PreScript(File file) throws InvalidScriptException {
-        super(file);
+    public PreScript(File file, String[] parameters)
+        throws InvalidScriptException {
+        super(file, parameters);
     }
 
     /** Create a script from an URL. */
-    public PreScript(URL url) throws InvalidScriptException {
-        super(url);
+    public PreScript(URL url, String[] parameters)
+        throws InvalidScriptException {
+        super(url, parameters);
     }
 
     /* (non-Javadoc)
@@ -128,6 +130,6 @@ public class PreScript extends Script<String> {
      */
     @Override
     protected void prepareSpecialBindings(Bindings bindings) {
-        bindings.put(RESULT_VARIABLE, new String("NULL"));
+        bindings.put(RESULT_VARIABLE, DEFAULT_COMMAND_VALUE);
     }
 }

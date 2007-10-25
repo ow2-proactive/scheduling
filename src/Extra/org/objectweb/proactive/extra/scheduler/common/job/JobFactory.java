@@ -221,10 +221,13 @@ public class JobFactory {
                 // TASK NEEDED_NODES
                 String needstr = (String) xpath.evaluate("@neededNodes",
                         taskNode, XPathConstants.STRING);
-                try {
-                    jobAppliNeededNodes = Integer.parseInt(needstr);
-                } catch (NumberFormatException e) {
-                    System.err.println("Error parsing attribute @neededNodes");
+                if (!"".equals(needstr)) {
+                    try {
+                        jobAppliNeededNodes = Integer.parseInt(needstr);
+                    } catch (NumberFormatException e) {
+                        System.err.println(
+                            "Error parsing attribute @neededNodes");
+                    }
                 }
 
                 // TASK FINAL
@@ -469,11 +472,23 @@ public class JobFactory {
 
     private Script<?> createScript(Node node, XPath xpath)
         throws XPathExpressionException, InvalidScriptException {
+        String[] parameters = null;
         String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
         if ((url != null) && (!url.equals(""))) {
             try {
+                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
+                        node, XPathConstants.NODESET);
+                if (args != null) {
+                    parameters = new String[args.getLength()];
+                    for (int i = 0; i < args.getLength(); i++) {
+                        Node arg = args.item(i);
+                        String value = (String) xpath.evaluate("@value", arg,
+                                XPathConstants.STRING);
+                        parameters[i] = value;
+                    }
+                }
                 System.out.println(url);
-                return new SimpleScript(new URL(url));
+                return new SimpleScript(new URL(url), parameters);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (InvalidScriptException e) {
@@ -484,8 +499,19 @@ public class JobFactory {
                 XPathConstants.STRING);
         if ((path != null) && (!path.equals(""))) {
             try {
+                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
+                        node, XPathConstants.NODESET);
+                if (args != null) {
+                    parameters = new String[args.getLength()];
+                    for (int i = 0; i < args.getLength(); i++) {
+                        Node arg = args.item(i);
+                        String value = (String) xpath.evaluate("@value", arg,
+                                XPathConstants.STRING);
+                        parameters[i] = value;
+                    }
+                }
                 System.out.println(path);
-                return new SimpleScript(new File(path));
+                return new SimpleScript(new File(path), parameters);
             } catch (InvalidScriptException e) {
                 e.printStackTrace();
             }
@@ -510,11 +536,23 @@ public class JobFactory {
     private VerifyingScript createVerifyingScript(Node node, XPath xpath)
         throws XPathExpressionException, InvalidScriptException {
         // TODO Verify if script is dynamic or static (default : dynamic)
+        String[] parameters = null;
         String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
         if ((url != null) && (!url.equals(""))) {
             try {
+                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
+                        node, XPathConstants.NODESET);
+                if (args != null) {
+                    parameters = new String[args.getLength()];
+                    for (int i = 0; i < args.getLength(); i++) {
+                        Node arg = args.item(i);
+                        String value = (String) xpath.evaluate("@value", arg,
+                                XPathConstants.STRING);
+                        parameters[i] = value;
+                    }
+                }
                 System.out.println(url);
-                return new VerifyingScript(new URL(url));
+                return new VerifyingScript(new URL(url), parameters);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (InvalidScriptException e) {
@@ -525,8 +563,19 @@ public class JobFactory {
                 XPathConstants.STRING);
         if ((path != null) && (!path.equals(""))) {
             try {
+                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
+                        node, XPathConstants.NODESET);
+                if (args != null) {
+                    parameters = new String[args.getLength()];
+                    for (int i = 0; i < args.getLength(); i++) {
+                        Node arg = args.item(i);
+                        String value = (String) xpath.evaluate("@value", arg,
+                                XPathConstants.STRING);
+                        parameters[i] = value;
+                    }
+                }
                 System.out.println(path);
-                return new VerifyingScript(new File(path));
+                return new VerifyingScript(new File(path), parameters);
             } catch (InvalidScriptException e) {
                 e.printStackTrace();
             }
@@ -547,27 +596,53 @@ public class JobFactory {
     private PreScript createPreScript(Node node, XPath xpath)
         throws XPathExpressionException, InvalidScriptException {
         // TODO Verify if script is dynamic or static (default : dynamic)
+        String[] parameters = null;
         String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
         if ((url != null) && (!url.equals(""))) {
             try {
+                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
+                        node, XPathConstants.NODESET);
+                if (args != null) {
+                    parameters = new String[args.getLength()];
+                    for (int i = 0; i < args.getLength(); i++) {
+                        Node arg = args.item(i);
+                        String value = (String) xpath.evaluate("@value", arg,
+                                XPathConstants.STRING);
+                        parameters[i] = value;
+                    }
+                }
                 System.out.println(url);
-                return new PreScript(new URL(url));
+                return new PreScript(new URL(url), parameters);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (InvalidScriptException e) {
                 e.printStackTrace();
             }
         }
+
         String path = (String) xpath.evaluate("@file", node,
                 XPathConstants.STRING);
         if ((path != null) && (!path.equals(""))) {
             try {
+                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
+                        node, XPathConstants.NODESET);
+                if (args != null) {
+                    parameters = new String[args.getLength()];
+                    for (int i = 0; i < args.getLength(); i++) {
+                        Node arg = args.item(i);
+                        String value = (String) xpath.evaluate("@value", arg,
+                                XPathConstants.STRING);
+                        parameters[i] = value;
+                    }
+                }
                 System.out.println(path);
-                return new PreScript(new File(path));
+                return new PreScript(new File(path), parameters);
             } catch (InvalidScriptException e) {
                 e.printStackTrace();
             }
         }
+
+        // no parameters
         String engine = (String) xpath.evaluate("@engine", node,
                 XPathConstants.STRING);
         if ((engine != null) && (node.getTextContent() != null)) {
