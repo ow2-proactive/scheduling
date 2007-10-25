@@ -561,4 +561,174 @@ scripts/windows/components$ c3d.bat ..\..\..\descriptors\components\C3D_all.xml<
             </mediaobject>
           </informalfigure></para>
       </sect3>
+
   ================= Philosophers visualizations IC2D end ======================
+  
+  
+  ================= FROM Hands On - Migratable Interface Example ======================
+  
+  
+   <para><informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="guided_tour/pics/hello/agent_execution.png"
+                         format="PNG" />
+            </imageobject>
+          </mediaobject>
+        </informalfigure></para>
+  
+  
+  
+  <sect1>
+    <title>migration of graphical interfaces</title>
+
+    <para>Graphical interfaces are not serializable, yet it is possible to
+    migrate them with ProActive.</para>
+
+    <para>The idea is to associate the graphical object to an active object.
+    The active object will control the activation and desactivation of this
+    graphical entity during migrations.</para>
+
+    <para>Of course, this is a very basic example, but you can later build
+    more sophisticated frames.</para>
+
+    <sect2>
+      <title>Design of the migratable application</title>
+
+      <para>We will write a new active object class, that extends
+      MigratableHello. The sayHello method will create a window containing the
+      hello message. This window is defined in the class HelloFrame</para>
+
+      <para><informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/hello/hellogui.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </informalfigure></para>
+    </sect2>
+
+    <sect2>
+      <title>Programming</title>
+
+      <sect3>
+        <title>HelloFrameController</title>
+
+        <para>The code of the HelloFrameController is in <xref
+        linkend="tutorialCodeSrc.HelloFrameController.java" />.</para>
+
+        <para>This class extends MigratableHello, and adds an activity and a
+        migration strategy manager to the object .</para>
+
+        <para>It creates a graphical frame upon call of the sayHello
+        method.</para>
+
+        <para>Here we have a more complex migration process than with the
+        previous example. We need to make the graphical window disappear
+        before and reappear in a new location after the migration (in this
+        example though, we wait for a call to sayHello). The migration of the
+        frame is actually controlled by a MigrationStrategyManager, that will
+        be attached to the body of the active object.. An ideal location for
+        this operation is the initActivity method (from InitActive interface),
+        that we override:</para>
+
+        <programlisting lang="java">/**
+ * This method attaches a migration strategy manager to the current active object.
+ * The migration strategy manager will help to define which actions to take before
+ * and after migrating
+ */
+public void initActivity(Body body) {
+        // add a migration strategy manager on the current active object
+        migrationStrategyManager = new MigrationStrategyManagerImpl((Migratable) ProActive.getBodyOnThis());
+        // specify what to do when the active object is about to migrate
+        // the specified method is then invoked by reflection
+        migrationStrategyManager.onDeparture('clean');
+}          </programlisting>
+
+        <para>The MigrationStrategyManager defines methods such as
+        'onDeparture', that can be configured in the application. For example
+        here, the method 'clean' will be called before the migration,
+        conveniently killing the frame:</para>
+
+        <programlisting lang="java">public void clean() {
+        System.out.println("killing frame");
+        helloFrame.dispose();
+        helloFrame = null;
+        System.out.println("frame is killed");
+}          </programlisting>
+      </sect3>
+
+      <sect3>
+        <title>HelloFrame</title>
+
+        <para>This is an example of a graphical class that could be associated
+        with the active object (see code in <xref
+        linkend="tutorialCodeSrc.HelloFrame.java" /> ).</para>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>Execution</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Create a new class HelloFrameControllerClient: take the code
+          of MigratableHelloClient used in the previous part, change the class
+          declaration to HelloFrameControllerClient and replace the
+          line</para>
+        </listitem>
+      </itemizedlist>
+
+      <para><literal>MigratableHello migratable_hello =
+      MigratableHello.createMigratableHello("agent1");</literal></para>
+
+      <para>with</para>
+
+      <para><literal>MigratableHello migratable_hello =
+      HelloFrameController.createHelloFrameController("agent1");</literal></para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Similarly to the simple migration example (use the
+          HelloFrameControllerClient class), you will start remote nodes and
+          specify a migration path.</para>
+        </listitem>
+
+        <listitem>
+          <para>you have 2 ways for handling the display of the graphical
+          objects:</para>
+        </listitem>
+      </itemizedlist>
+
+      <para><itemizedlist>
+          <listitem>
+            <para>look on the display screens of the machines</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para><itemizedlist>
+          <listitem>
+            <para>export the displays: in startNode.sh, you should add the
+            following lines before the java command:</para>
+
+            <para><literal>DISPLAY=myhost:0 export DISPLAY</literal></para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para><informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.png"
+                         format="PNG" />
+            </imageobject>
+          </mediaobject>
+        </informalfigure></para>
+
+      <para>The displayed window: it just contains a text label with the
+      location of the active object.</para>
+    </sect2>
+  </sect1>
+  
+    ================= FROM Hands On - Migratable Interface Example end======================
