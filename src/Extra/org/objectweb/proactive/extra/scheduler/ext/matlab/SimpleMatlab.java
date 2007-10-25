@@ -2,8 +2,10 @@ package org.objectweb.proactive.extra.scheduler.ext.matlab;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,7 +36,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
     // This hostname, for debugging purpose
     protected String host;
 
-    // the index when the input is the result of a SplitTask 
+    // the index when the input is the result of a SplitTask
     protected int index = -1;
 
     // the lines of inputScript
@@ -62,7 +64,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
     // the name of the arch dir to find native libraries (can be win32, glnx86, ...)
     private String matlabLibDirName = null;
 
-    // the Active Object worker located in the spawned JVM 
+    // the Active Object worker located in the spawned JVM
     private AOSimpleMatlab matlabWorker;
 
     // the OS where this JVM is running
@@ -71,7 +73,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
     // The process holding the spanwned JVM
     private Process process = null;
 
-    // ProActive No Arg Constructor	
+    // ProActive No Arg Constructor    
     public SimpleMatlab() {
     }
 
@@ -89,7 +91,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
                 (new Date()).getTime()).toString();
         System.out.println("[" + host +
             " MATLAB TASK] Starting the Java Process");
-        // We spawn a new JVM with the MATLAB library paths 
+        // We spawn a new JVM with the MATLAB library paths
         process = startProcess(uri);
         // We define the loggers which will write on standard output what comes from the java process
         isLogger = new LoggingThread(process.getInputStream(),
@@ -97,7 +99,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
         esLogger = new LoggingThread(process.getErrorStream(),
                 "[" + host + " MATLAB TASK: SUBPROCESS ERR]");
 
-        // We start the loggers thread 
+        // We start the loggers thread
         Thread t1 = new Thread(isLogger);
         t1.start();
         Thread t2 = new Thread(esLogger);
@@ -107,7 +109,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
         // finally we call the internal version of the execute method
         Object res = executeInternal(uri, results);
 
-        // When the task is finished, we first tell the threads to stop logging and exit 
+        // When the task is finished, we first tell the threads to stop logging and exit
         synchronized (isLogger.goon) {
             isLogger.goon = false;
         }
@@ -237,12 +239,16 @@ public class SimpleMatlab extends ExecutableJavaTask {
         env.put("LD_LIBRARY_PATH", libPath);
         // we add matlab directories to PATH (Windows)
         String path = env.get("PATH");
+        if (path == null) {
+            path = env.get("Path");
+        }
         env.put("PATH", addMatlabToPath(path));
 
         // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
         //     "/bin/java");
-        // we set as well the java.library.path property (precaution) 
-        javaCommandBuilder.setJvmOptions("-Djava.library.path=" + libPath);
+        // we set as well the java.library.path property (precaution)
+        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath +
+            "\"");
         pb.command(javaCommandBuilder.getJavaCommand());
 
         return pb.start();
@@ -254,9 +260,14 @@ public class SimpleMatlab extends ExecutableJavaTask {
      * @return an augmented path
      */
     private String addMatlabToPath(String path) {
-        String newPath = path;
-        newPath = newPath + os.pathSeparator() +
-            (matlabHome + os.fileSeparator() + "bin");
+        String newPath;
+        if (path == null) {
+            newPath = "";
+        } else {
+            newPath = path + os.pathSeparator();
+        }
+
+        newPath = newPath + (matlabHome + os.fileSeparator() + "bin");
         newPath = newPath + os.pathSeparator() +
             (matlabHome + os.fileSeparator() + "bin" + os.fileSeparator() +
             matlabLibDirName);
@@ -274,39 +285,76 @@ public class SimpleMatlab extends ExecutableJavaTask {
      */
     private final void findMatlab()
         throws IOException, InterruptedException, MatlabInitException {
-        // We have a script for 
+        System.out.println("[" + host +
+            " MATLAB TASK] launching script to find Matlab");
+        Process p1 = null;
         if (os.equals(OperatingSystem.unix)) {
-            System.out.println("[" + host +
-                " MATLAB TASK] launching script to find Matlab");
+            // Under linux we launch an instance of the Shell
+            // and then pipe to it the script's content
             InputStream is = SimpleMatlab.class.getResourceAsStream(
                     "find_matlab_command.sh");
-            final Process p1 = LinuxShellExecuter.executeShellScript(is,
-                    Shell.Bash);
+            p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
+        } else if (os.equals(OperatingSystem.windows)) {
+            // We can't execute the script on Windows the same way,
+            // we need to write the content of the batch file locally and then launch the file
+            InputStream is = SimpleMatlab.class.getResourceAsStream(
+                    "find_matlab_command.bat");
 
-            List<String> lines = getContentAsList(p1.getInputStream());
-
-            if (p1.waitFor() == 0) {
-                String full_command = lines.get(0);
-                System.out.println("[" + host +
-                    " MATLAB TASK] Found Matlab at : " + full_command);
-                File file = new File(full_command);
-                matlabCommandName = file.getName();
-                matlabHome = file.getParentFile().getParentFile()
-                                 .getAbsolutePath();
-                matlabLibDirName = lines.get(1);
-            } else {
-                StringWriter error_message = new StringWriter();
-                PrintWriter pw = new PrintWriter(error_message);
-                pw.println("Error during find_matlab script execution:");
-                for (String l : lines) {
-                    pw.println(l);
-                }
-                throw new MatlabInitException(error_message.toString());
+            // Code for writing the content of the stream inside a local file
+            List<String> inputLines = getContentAsList(is);
+            File batchFile = new File("find_matlab_command.bat");
+            if (batchFile.exists()) {
+                batchFile.delete();
             }
+            batchFile.createNewFile();
+            batchFile.deleteOnExit();
+
+            if (batchFile.canWrite()) {
+                PrintWriter pw = new PrintWriter(new BufferedWriter(
+                            new FileWriter(batchFile)));
+                for (String line : inputLines) {
+                    pw.println(line);
+                    pw.flush();
+                }
+                pw.close();
+            } else {
+                throw new MatlabInitException("can't write in : " + batchFile);
+            }
+            // End of this code
+
+            // finally we launch the batch file
+            p1 = Runtime.getRuntime().exec("find_matlab_command.bat");
         } else {
             throw new UnsupportedOperationException("[" + host +
                 " MATLAB TASK] Finding Matlab on " + os +
                 " is not supported yet");
+        }
+
+        List<String> lines = getContentAsList(p1.getInputStream());
+
+        for (String ln : lines) {
+            System.out.println(ln);
+        }
+
+        // The batch file is supposed to write, if it's successful, two lines :
+        // 1st line : the full path to the matlab command
+        // 2nd line : the name of the os-dependant arch dir
+        if (p1.waitFor() == 0) {
+            String full_command = lines.get(0);
+            System.out.println("[" + host + " MATLAB TASK] Found Matlab at : " +
+                full_command);
+            File file = new File(full_command);
+            matlabCommandName = file.getName();
+            matlabHome = file.getParentFile().getParentFile().getAbsolutePath();
+            matlabLibDirName = lines.get(1);
+        } else {
+            StringWriter error_message = new StringWriter();
+            PrintWriter pw = new PrintWriter(error_message);
+            pw.println("Error during find_matlab script execution:");
+            for (String l : lines) {
+                pw.println(l);
+            }
+            throw new MatlabInitException(error_message.toString());
         }
     }
 
