@@ -30,44 +30,29 @@
  */
 package active;
 import java.io.IOException;
+import java.util.Vector;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.api.ProActiveObject;
 
 public class Main{
-	private static Node deploy(String descriptor)
+	private static VirtualNode[] deploy(String descriptor)
 	{
 		ProActiveDescriptor pad;
-		Node node;
 		try {
 			pad = ProDeployment.getProactiveDescriptor(descriptor);
 			//active all Virtual Nodes
 			pad.activateMappings();
 			//get the first Node available in the first Virtual Node 
 			//specified in the descriptor file
-			node = pad.getVirtualNodes()[0].getNode();
-			return node;
-		}
-		catch (NodeException nodeExcep){
-			System.err.println(nodeExcep.getMessage());
-		}
-		catch(ProActiveException proExcep){
-			System.err.println(proExcep.getMessage());
-		}
-		return null;
-	}
-	private static Node getNextNode(String descriptor){
-		ProActiveDescriptor pad;
-		Node node;
-		try {
-			pad = ProDeployment.getProactiveDescriptor(descriptor);
-			node = pad.getVirtualNodes()[1].getNode();
-			return node;
+			return pad.getVirtualNodes();	
 		}
 		catch (NodeException nodeExcep){
 			System.err.println(nodeExcep.getMessage());
@@ -80,17 +65,28 @@ public class Main{
 	public static void main(String args[])
 	{
 		try{
-			Node node =  deploy(args[0]);
-			MigrateableHello ao = (MigrateableHello)ProActiveObject.newActive(
-					MigrateableHello.class.getName(),
+			VirtualNode[] listOfVN = deploy(args[0]);
+			//create the active object on the first node on
+			//the first virtual node available
+			MigratableHello ao = (MigratableHello)ProActiveObject.newActive(
+					MigratableHello.class.getName(),
 		            new Object [] {},
-		           	node);
+		            listOfVN[0].getNode());
+		
 			//say hello from the first node
 			System.out.println(ao.sayHello()); //possible wait-by-necessity
-			//start migration
-			ao.packUpMyVariablesAndHitTheRoad(getNextNode(args[0]));
-			//say hello from the second node
-			System.out.println(ao.sayHello()); //possible wait-by-necessity
+			//iterate through all the nodes and migrate to
+			//the first node on each VN available
+			Node node;
+			for (VirtualNode vn : listOfVN) 
+			{
+				node = vn.getNode();
+				//start migration
+				ao.packUpMyVariablesAndHitTheRoad(node);
+				//say hello from the second node
+				System.out.println(ao.sayHello()); //possible wait-by-necessity
+			}
+			//tell the Active Object to stop its thread
 			ao.terminate();
 		}
 		catch (NodeException nodeExcep){

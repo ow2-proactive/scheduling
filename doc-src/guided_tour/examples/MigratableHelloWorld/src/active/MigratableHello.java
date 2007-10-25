@@ -32,18 +32,20 @@ package active;
 
 import java.io.Serializable;
 import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 
-public class MigrateableHello extends InitializedHelloWorld implements
+public class MigratableHello extends InitializedHelloWorld implements
 		Serializable {
 	public void packUpMyVariablesAndHitTheRoad(Node whereTo){
-		System.out.println("Packing up and starting migration to " + whereTo);
 		try {
+			System.out.println("Packing up and starting migration to "
+					+ whereTo.getNodeInformation().getURL());
 			//should be the last call in the method
 			ProMobileAgent.migrateTo(whereTo);
 		}
-		catch (MigrationException moveExcep)	{
+		catch (ProActiveException moveExcep)	{
 			System.err.println(moveExcep.getMessage());
 		}
 		
