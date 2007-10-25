@@ -30,7 +30,9 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
@@ -58,6 +60,9 @@ public class TaskResultImpl implements TaskResult {
     /** The exception throwed by the task */
     private Throwable exception = null;
 
+    /** Task output */
+    private TaskLogs output = null;
+
     /** ProActive empty constructor. */
     public TaskResultImpl() {
     }
@@ -68,9 +73,10 @@ public class TaskResultImpl implements TaskResult {
      * @param id the identification of the task that send this result.
      * @param value the result of the task.
      */
-    public TaskResultImpl(TaskId id, Object value) {
+    public TaskResultImpl(TaskId id, Object value, TaskLogs output) {
         this.id = id;
         this.value = value;
+        this.output = output;
     }
 
     /**
@@ -79,9 +85,10 @@ public class TaskResultImpl implements TaskResult {
      * @param id the identification of the task that send this result.
      * @param exception the exception that occured in the task.
      */
-    public TaskResultImpl(TaskId id, Throwable exception) {
+    public TaskResultImpl(TaskId id, Throwable exception, TaskLogs output) {
         this.id = id;
         this.exception = exception;
+        this.output = output;
     }
 
     /**
@@ -114,5 +121,12 @@ public class TaskResultImpl implements TaskResult {
      */
     public Throwable getException() {
         return exception;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getOutput()
+     */
+    public TaskLogs getOuput() {
+        return this.output;
     }
 }

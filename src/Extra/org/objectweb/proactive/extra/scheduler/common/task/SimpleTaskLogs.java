@@ -30,52 +30,53 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.task;
 
-import java.io.Serializable;
-
 
 /**
- * Interface representing the task result.
- * A task result can be an exception or an object that you have to cast into your own type.
- * Before getting the object it is recommended that you call the hadException() method.
- * It will tell you if an exception occured in the task that generate this result.
- *
- * @author ProActive Team
- * @version 1.0, Aug 3, 2007
- * @since ProActive 3.2
+ * A simple String based implementation of TaskLogs.
+ * @author cdelbe
+ * @since 2.2
  */
-public interface TaskResult extends Serializable {
+public class SimpleTaskLogs implements TaskLogs {
+    // logs on standard output
+    private final String standardLogs;
+
+    // logs on error output
+    private final String errorlogs;
 
     /**
-     * To know if an exception has occurred on this task.
-     *
-     * @return true if an exception occurred, false if not.
+     * Create a new SimpleTaskLogs.
+     * @param stdLogs the standard output.
+     * @param errLogs the error output.
      */
-    public boolean hadException();
+    public SimpleTaskLogs(String stdLogs, String errLogs) {
+        this.standardLogs = stdLogs;
+        this.errorlogs = errLogs;
+    }
 
     /**
-     * To get the id of the task.
-     *
-     * @return the id of the task.
+     * Timestamp parameter is not relevant for this TaskLogs implementation.
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getAllLogs(boolean)
      */
-    public TaskId getTaskId();
+    @Override
+    public String getAllLogs(boolean timeStamp) {
+        return this.standardLogs + this.errorlogs;
+    }
 
     /**
-     * To get the value of the task.
-     *
-     * @return the value of the task.
+     * Timestamp parameter is not relevant for this TaskLogs implementation.
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getStderrLogs(boolean)
      */
-    public Object value() throws Throwable;
+    @Override
+    public String getStderrLogs(boolean timeStamp) {
+        return this.errorlogs;
+    }
 
     /**
-     * To get the exception of the task.
-     *
-     * @return the exception of the task.
+     * Timestamp parameter is not relevant for this TaskLogs implementation.
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getStdoutLogs(boolean)
      */
-    public Throwable getException();
-
-    /**
-     * Return the output of the execution, including stdout and stderr.
-     * @return the output of the execution, including stdout and stderr.
-     */
-    public TaskLogs getOuput();
+    @Override
+    public String getStdoutLogs(boolean timeStamp) {
+        return this.standardLogs;
+    }
 }

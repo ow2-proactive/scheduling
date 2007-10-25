@@ -28,11 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.common.job;
-
-import org.apache.log4j.Appender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.PatternLayout;
+package org.objectweb.proactive.extra.scheduler.common.task;
 
 
 /**
@@ -41,30 +37,23 @@ import org.apache.log4j.PatternLayout;
  * @version 1.0
  * @since ProActive 3.2.1
  */
-public interface JobLogs extends java.io.Serializable {
-
-    /** Prefix for job logger */
-    public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
-
-    /** Appender name for jobs */
-    public static final String JOB_APPENDER_NAME = "JobLoggerAppender";
-
-    /** Logj context variable name for task ids */
-    public static final String MDC_TASK_ID = "taskid";
-
-    /** Default layout for logs */
-    public static final Layout DEFAULT_LOG_LAYOUT = new PatternLayout("[%X{" +
-            JobLogs.MDC_TASK_ID + "}@%d{HH:mm:ss}]" + " %m %n");
+public interface TaskLogs extends java.io.Serializable {
 
     /**
-     * Add a sink to the logs. Logs are then redirected into the sink.
-     * @param sink the appender to write into.
+     * Return the logs generated on standard output.
+     * @return a String containing the logs generated on standard output.
      */
-    public void addSink(Appender sink);
+    public String getStdoutLogs(boolean timeStamp);
 
     /**
-     * Return the currently stored logs, or null if any.
-     * @return a StringBuffer containing stored logs, or null if any.
+     * Return the logs generated on error output.
+     * @return a String containing the logs generated on error output.
      */
-    public StringBuffer getAllLogs();
+    public String getStderrLogs(boolean timeStamp);
+
+    /**
+     * Return all the logs generated on standard and error output.
+     * @return a String containing stored logs, or null if any.
+     */
+    public String getAllLogs(boolean timeStamp);
 }

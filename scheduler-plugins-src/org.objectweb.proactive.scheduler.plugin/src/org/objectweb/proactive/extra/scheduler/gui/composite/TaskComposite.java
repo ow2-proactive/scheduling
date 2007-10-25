@@ -338,7 +338,7 @@ public class TaskComposite extends Composite {
             for (int i = 0; i < cols.length; i++) {
                 String title = cols[i].getText();
                 if (title.equals(COLUMN_ID_TITLE)) {
-                    item.setText(i, internalTask.getId().toString());
+                    item.setText(i, "" + internalTask.getId().hashCode());
                 } else if (title.equals(COLUMN_STATUS_TITLE)) {
                     item.setText(i, internalTask.getStatus().toString());
                 } else if (title.equals(COLUMN_NAME_TITLE)) {

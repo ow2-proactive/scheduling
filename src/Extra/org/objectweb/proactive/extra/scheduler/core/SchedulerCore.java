@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -61,7 +62,6 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
@@ -69,9 +69,12 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobType;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
+import org.objectweb.proactive.extra.scheduler.common.task.SimpleTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.Status;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.db.RecoverableState;
 import org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB;
@@ -144,6 +147,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
     /** Thread that will ping the running nodes */
     private Thread pinger;
+
+    /** Store logs for running jobs : SHOULD BE REMOVED */
+    private Hashtable<JobId, BufferedAppender> jobLogs = new Hashtable<JobId, BufferedAppender>();
 
     /**
      * Pro Active empty constructor
@@ -499,10 +505,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //failed the job
         job.failed(task.getId(), jobState);
         //store the exception into jobResult
+        // TODO : cdelbe, jlscheef : task is not a final task -> we should not store its result
+        // TODO : cdelbe, jlscheef : where is the original exception ... ?
         if (jobState == JobState.FAILED) {
             job.getJobResult()
                .addTaskResult(task.getName(),
-                new TaskResultImpl(task.getId(), new Throwable(errorMsg)));
+                new TaskResultImpl(task.getId(), new Throwable(errorMsg),
+                    new SimpleTaskLogs("", errorMsg)));
         } else {
             job.getJobResult().addTaskResult(task.getName(), taskResult);
         }
@@ -510,7 +519,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         runningJobs.remove(job);
         finishedJobs.add(job);
         // terminate loggers
-        Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + job.getId());
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                job.getId());
         l.removeAllAppenders();
         //send event to listeners.
         frontend.runningToFinishedJobEvent(job.getJobInfo());
@@ -592,7 +602,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 finishedJobs.add(job);
                 logger.info("[SCHEDULER] Terminated job " + jobId);
                 // terminate loggers
-                Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX +
+                Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                         job.getId());
                 l.removeAllAppenders(); // appender are closed...
                                         //send event to listeners.
@@ -641,16 +651,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //store the job result until user get it
         job.setJobResult(jobResult);
         //create appender for this job
-        Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + job.getId());
-        if (l.getAppender(JobLogs.JOB_APPENDER_NAME) == null) {
-            BufferedAppender op = new BufferedAppender(JobLogs.JOB_APPENDER_NAME,
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                job.getId());
+        if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME) == null) {
+            BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
                     true);
-            jobResult.setOutput(op);
+            this.jobLogs.put(job.getId(), op);
             l.addAppender(op);
             // log into file if required
             if (job.getLogFile() != null) {
                 try {
-                    FileAppender fa = new FileAppender(JobLogs.DEFAULT_LOG_LAYOUT,
+                    FileAppender fa = new FileAppender(Log4JTaskLogs.DEFAULT_LOG_LAYOUT,
                             job.getLogFile(), false);
                     op.addSink(fa);
                 } catch (IOException e) {
@@ -690,8 +701,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @param port the port number on which the log will be sent.
      */
     public void listenLog(JobId jobId, String hostname, int port) {
-        JobResult r = jobs.get(jobId).getJobResult();
-        r.getOutput().addSink(new SocketAppender(hostname, port));
+        this.jobLogs.get(jobId).addSink(new SocketAppender(hostname, port));
     }
 
     /**
@@ -708,6 +718,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
             frontend.removeFinishedJobEvent(job.getJobInfo());
+            this.jobLogs.remove(jobId).close();
             logger.info("[SCHEDULER] Removed result for job " + jobId);
         }
         return result;

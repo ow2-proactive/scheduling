@@ -38,6 +38,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
@@ -121,13 +122,15 @@ public class AppliTaskLauncher extends TaskLauncher {
 
             //launch task
             TaskResult result = new TaskResultImpl(taskId,
-                    executableTask.execute(nodes));
+                    executableTask.execute(nodes),
+                    new Log4JTaskLogs(this.logBuffer.getBuffer()));
 
             //return result
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex);
+            return new TaskResultImpl(taskId, ex,
+                new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // reset stdout/err
             try {

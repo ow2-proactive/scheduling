@@ -38,7 +38,6 @@ import java.util.Date;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -46,10 +45,10 @@ import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 
 
 public class JobLauncher {
@@ -109,11 +108,12 @@ public class JobLauncher {
                     scheduler.listenLog(id,
                         URIBuilder.getLocalAddress().getHostName(),
                         simpleLoggerServer.getPort());
-                    Logger l = Logger.getLogger(JobLogs.JOB_LOGGER_PREFIX + id);
+                    Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                            id);
 
                     DateFormat dateFormat = new SimpleDateFormat(
                             "hh'h'mm'm'_dd-MM-yy");
-                    FileAppender fa = new FileAppender(JobLogs.DEFAULT_LOG_LAYOUT,
+                    FileAppender fa = new FileAppender(Log4JTaskLogs.DEFAULT_LOG_LAYOUT,
                             "./logs/job[" + j.getName() + "," + id + "]_" +
                             dateFormat.format(new Date()) + ".log", true);
                     l.addAppender(fa);

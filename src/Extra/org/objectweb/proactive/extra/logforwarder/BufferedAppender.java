@@ -36,7 +36,6 @@ import java.util.Vector;
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
-import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
 
 
 /**
@@ -45,7 +44,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobLogs;
  * @author cdelbe
  * @since 3.2.1
  */
-public class BufferedAppender extends AppenderSkeleton implements JobLogs {
+public class BufferedAppender extends AppenderSkeleton {
     // TODO cdelbe : should implement AppenderAttachable (see AsyncAppender ?)
 
     /**
@@ -59,7 +58,7 @@ public class BufferedAppender extends AppenderSkeleton implements JobLogs {
     public static final boolean DEFAULT_KEEP_MODE = false;
 
     // logEvents buffer
-    private LinkedList<LoggingEvent> buffer;
+    private transient LinkedList<LoggingEvent> buffer;
 
     // buffer size
     private int bufferSize;
@@ -72,7 +71,7 @@ public class BufferedAppender extends AppenderSkeleton implements JobLogs {
     private boolean keepBuffer;
 
     // sinks appender
-    private transient Vector<Appender> sinks;
+    private final transient Vector<Appender> sinks;
 
     /**
      * Create a BufferAppender with default parameters.
@@ -145,22 +144,6 @@ public class BufferedAppender extends AppenderSkeleton implements JobLogs {
         }
     }
 
-    /**
-     * Return all the logs buffered in this BufferedAppender, null if the buffer has been deleted.
-     * @return all the logs buffered in this BufferedAppender, null if the buffer has been deleted.
-     */
-    public synchronized StringBuffer getAllLogs() {
-        if (this.buffer != null) {
-            StringBuffer logs = new StringBuffer(this.buffer.size());
-            for (LoggingEvent e : this.buffer) {
-                logs.append(e.getMessage());
-            }
-            return logs;
-        } else {
-            return null;
-        }
-    }
-
     /* (non-Javadoc)
      * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
      */
@@ -196,6 +179,14 @@ public class BufferedAppender extends AppenderSkeleton implements JobLogs {
         this.nbFiredEvents++;
     }
 
+    /**
+     * Return a clone of the current logging event buffer.
+     * @return a cloned linked list containing all logged events.
+     */
+    public synchronized LinkedList<LoggingEvent> getBuffer() {
+        return (LinkedList<LoggingEvent>) this.buffer.clone();
+    }
+
     /* (non-Javadoc)
      * @see org.apache.log4j.AppenderSkeleton#close()
      */
@@ -210,6 +201,7 @@ public class BufferedAppender extends AppenderSkeleton implements JobLogs {
                 s.close();
             }
         }
+        this.closed = true;
     }
 
     /* (non-Javadoc)

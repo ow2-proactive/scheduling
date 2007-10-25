@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.task;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
@@ -104,13 +105,15 @@ public class NativeTaskLauncher extends TaskLauncher {
             process = ((ExecutableNativeTask) executableTask).getProcess();
             //launch task
             TaskResult result = new TaskResultImpl(taskId,
-                    executableTask.execute(results));
+                    executableTask.execute(results),
+                    new Log4JTaskLogs(this.logBuffer.getBuffer()));
 
             //return result
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex);
+            return new TaskResultImpl(taskId, ex,
+                new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // reset stdout/err
             try {

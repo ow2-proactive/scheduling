@@ -164,6 +164,6 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      */
     @Override
     public String toString() {
-        return this.readableName + "(" + id + ")";
+        return this.readableName;
     }
 }
