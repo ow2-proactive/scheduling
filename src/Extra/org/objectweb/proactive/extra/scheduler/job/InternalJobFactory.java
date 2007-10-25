@@ -231,5 +231,6 @@ public class InternalJobFactory implements Serializable {
         taskToSet.setRerunnable(task.getRerunnable());
         taskToSet.setRunTimeLimit(task.getRunTimeLimit());
         taskToSet.setVerifyingScript(task.getVerifyingScript());
+        taskToSet.setResultDescriptor(task.getResultDescriptor());
     }
 }

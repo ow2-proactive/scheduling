@@ -53,6 +53,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.scripting.InvalidScriptException;
+import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
@@ -61,6 +62,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplication
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -206,6 +208,16 @@ public class JobFactory {
                         taskNode, XPathConstants.STRING));
                 System.out.println("desc = " + desc.getDescription());
 
+                // TASK RESULT DESCRIPTION
+                String descriptorClassName = (String) xpath.evaluate("@resultDescriptor",
+                        taskNode, XPathConstants.STRING);
+                if (!descriptorClassName.equals("")) {
+                    System.out.println("Descriptor class = " +
+                        descriptorClassName);
+                    Class<?extends ResultDescriptor> descriptorClass = (Class<?extends ResultDescriptor>) Class.forName(descriptorClassName);
+                    desc.setResultDescriptor(descriptorClass);
+                }
+
                 // TASK NEEDED_NODES
                 String needstr = (String) xpath.evaluate("@neededNodes",
                         taskNode, XPathConstants.STRING);
@@ -247,7 +259,7 @@ public class JobFactory {
                 Node preNode = (Node) xpath.evaluate("preTask/script",
                         taskNode, XPathConstants.NODE);
                 if (preNode != null) {
-                    desc.setPreTask(createScript(preNode, xpath));
+                    desc.setPreTask(createPreScript(preNode, xpath));
                 }
 
                 // TASK POST
@@ -525,6 +537,43 @@ public class JobFactory {
             String script = node.getTextContent();
             try {
                 return new VerifyingScript(script, engine);
+            } catch (InvalidScriptException e) {
+                e.printStackTrace();
+            }
+        }
+        throw new InvalidScriptException("The script is not recognized");
+    }
+
+    private PreScript createPreScript(Node node, XPath xpath)
+        throws XPathExpressionException, InvalidScriptException {
+        // TODO Verify if script is dynamic or static (default : dynamic)
+        String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
+        if ((url != null) && (!url.equals(""))) {
+            try {
+                System.out.println(url);
+                return new PreScript(new URL(url));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (InvalidScriptException e) {
+                e.printStackTrace();
+            }
+        }
+        String path = (String) xpath.evaluate("@file", node,
+                XPathConstants.STRING);
+        if ((path != null) && (!path.equals(""))) {
+            try {
+                System.out.println(path);
+                return new PreScript(new File(path));
+            } catch (InvalidScriptException e) {
+                e.printStackTrace();
+            }
+        }
+        String engine = (String) xpath.evaluate("@engine", node,
+                XPathConstants.STRING);
+        if ((engine != null) && (node.getTextContent() != null)) {
+            String script = node.getTextContent();
+            try {
+                return new PreScript(script, engine);
             } catch (InvalidScriptException e) {
                 e.printStackTrace();
             }

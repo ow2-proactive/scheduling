@@ -34,19 +34,21 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
 
 /**
- * Definition of a task for the user.
- * A task contains some properties that can be set but also :
- * A verifying script that can be used to select a specific execution node for this task.
- * A preTask that will be launched before the real task (can be used to set environment vars).
- * A postTask that will be launched just after the end of the real task. (this can be used to
- * unset vars you set in the preTask).
- * You will be also able to add dependences (if necessary) to this task. The dependences mechanism are
- * best describe below. @see #addDependence(Task)
+ * Definition of a task for the user. A task contains some properties that can
+ * be set but also : A verifying script that can be used to select a specific
+ * execution node for this task. A preTask that will be launched before the real
+ * task (can be used to set environment vars). A postTask that will be launched
+ * just after the end of the real task. (this can be used to unset vars you set
+ * in the preTask). You will be also able to add dependences (if necessary) to
+ * this task. The dependences mechanism are best describe below.
+ *
+ * @see #addDependence(Task)
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
@@ -57,19 +59,31 @@ public abstract class Task implements Serializable {
     /** Number of nodes asked by the user. */
     protected int numberOfNodesNeeded = 1;
 
-    /**  Name of the task. */
+    /** Name of the task. */
     protected String name;
 
     /** Description of the task. */
     protected String description;
 
-    /** Verifying script : can be launched before getting a node in order to verify some computer specificity. */
+    /** Description of the result of the task */
+    protected Class<?extends ResultDescriptor> resultDescriptor;
+
+    /**
+     * Verifying script : can be launched before getting a node in order to
+     * verify some computer specificity.
+     */
     protected VerifyingScript verifyingScript;
 
-    /** Pre-task script : can be used to launch script just before the task execution. */
-    protected Script<?> preTask;
+    /**
+     * Pre-task script : can be used to launch script just before the task
+     * execution.
+     */
+    protected PreScript preTask;
 
-    /** Pre-task script : can be used to launch script just after the task execution even if a problem occurs. */
+    /**
+     * Pre-task script : can be used to launch script just after the task
+     * execution even if a problem occurs.
+     */
     protected Script<?> postTask;
 
     /** Maximum amount of time during which a task can be running. */
@@ -85,14 +99,14 @@ public abstract class Task implements Serializable {
     protected ArrayList<Task> dependences = null;
 
     /**
-     * Add a dependence to the task.
-     * Warning : the dependence order is very important.
-     * In fact, it is in this order that you will get back the result in the child task.
-     * For example : if you add to the task t3, the dependences t1 then t2
-     * The parents of t3 will be t1 and t2 in this order and the parameters of t3 will be
-     * the results of t1 and t2 in this order.
+     * Add a dependence to the task. Warning : the dependence order is very
+     * important. In fact, it is in this order that you will get back the result
+     * in the child task. For example : if you add to the task t3, the
+     * dependences t1 then t2 The parents of t3 will be t1 and t2 in this order
+     * and the parameters of t3 will be the results of t1 and t2 in this order.
      *
-     * @param task the parent task to add to this task.
+     * @param task
+     *            the parent task to add to this task.
      */
     public void addDependence(Task task) {
         if (dependences == null) {
@@ -102,10 +116,11 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * Same as the {@link #addDependence(Task) AddDependence} method in the same class,
-     * but for a list of dependences.
+     * Same as the {@link #addDependence(Task) AddDependence} method in the same
+     * class, but for a list of dependences.
      *
-     * @param tasks the parent list of tasks to add to this task.
+     * @param tasks
+     *            the parent list of tasks to add to this task.
      */
     public void addDependences(List<Task> tasks) {
         if (dependences == null) {
@@ -126,10 +141,27 @@ public abstract class Task implements Serializable {
     /**
      * To set the description of this task.
      *
-     * @param description the description to set.
+     * @param description
+     *            the description to set.
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the resultDescriptor
+     */
+    public Class<?extends ResultDescriptor> getResultDescriptor() {
+        return resultDescriptor;
+    }
+
+    /**
+     * @param resultDescriptor
+     *            the resultDescriptor to set
+     */
+    public void setResultDescriptor(
+        Class<?extends ResultDescriptor> resultDescriptor) {
+        this.resultDescriptor = resultDescriptor;
     }
 
     /**
@@ -144,7 +176,8 @@ public abstract class Task implements Serializable {
     /**
      * Set if the task is final or not.
      *
-     * @param finalTask true if the task is final, false if not.
+     * @param finalTask
+     *            true if the task is final, false if not.
      */
     public void setFinalTask(boolean finalTask) {
         this.finalTask = finalTask;
@@ -162,7 +195,8 @@ public abstract class Task implements Serializable {
     /**
      * To set the name of this task.
      *
-     * @param name the name to set.
+     * @param name
+     *            the name to set.
      */
     public void setName(String name) {
         this.name = name;
@@ -180,7 +214,8 @@ public abstract class Task implements Serializable {
     /**
      * To set the post task of this task.
      *
-     * @param postTask the postTask to set.
+     * @param postTask
+     *            the postTask to set.
      */
     public void setPostTask(Script<?> postTask) {
         this.postTask = postTask;
@@ -191,16 +226,17 @@ public abstract class Task implements Serializable {
      *
      * @return the preTask of this task.
      */
-    public Script<?> getPreTask() {
+    public PreScript getPreTask() {
         return preTask;
     }
 
     /**
      * To set the pre task of this task.
      *
-     * @param preTask the preTask to set.
+     * @param preTask
+     *            the preTask to set.
      */
-    public void setPreTask(Script<?> preTask) {
+    public void setPreTask(PreScript preTask) {
         this.preTask = preTask;
     }
 
@@ -216,7 +252,8 @@ public abstract class Task implements Serializable {
     /**
      * To set number of times this task can be restart if an error occurs.
      *
-     * @param rerunnable the number of times this task can be restart.
+     * @param rerunnable
+     *            the number of times this task can be restart.
      */
     public void setRerunnable(int rerunnable) {
         this.rerunnable = rerunnable;
@@ -225,7 +262,8 @@ public abstract class Task implements Serializable {
     /**
      * To get the maximum amount of time during witch the task will be running.
      *
-     * @return the the maximum amount of time during witch the task will be running.
+     * @return the the maximum amount of time during witch the task will be
+     *         running.
      */
     public long getRunTimeLimit() {
         return runTimeLimit;
@@ -234,15 +272,15 @@ public abstract class Task implements Serializable {
     /**
      * To set the maximum amount of time during witch the task will be running.
      *
-     * @param runTimeLimit the runTimeLimit to set.
+     * @param runTimeLimit
+     *            the runTimeLimit to set.
      */
     public void setRunTimeLimit(long runTimeLimit) {
         this.runTimeLimit = runTimeLimit;
     }
 
     /**
-     * To get the verifying script.
-     * This is the script that will select a node.
+     * To get the verifying script. This is the script that will select a node.
      *
      * @return the verifying Script.
      */
@@ -253,7 +291,8 @@ public abstract class Task implements Serializable {
     /**
      * To set the verifying script.
      *
-     * @param verifyingScript the verifyingScript to set.
+     * @param verifyingScript
+     *            the verifyingScript to set.
      */
     public void setVerifyingScript(VerifyingScript verifyingScript) {
         this.verifyingScript = verifyingScript;
@@ -269,8 +308,7 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * Get the number of nodes needed for this task.
-     * (by default : 1)
+     * Get the number of nodes needed for this task. (by default : 1)
      *
      * @return the number Of Nodes Needed
      */

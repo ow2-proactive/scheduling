@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
@@ -62,6 +62,10 @@ public class TaskResultImpl implements TaskResult {
 
     /** Task output */
     private TaskLogs output = null;
+
+    /** Description definition of this result */
+    private Class<?extends ResultDescriptor> descriptorClass = null;
+    private transient ResultDescriptor descriptor = null;
 
     /** ProActive empty constructor. */
     public TaskResultImpl() {
@@ -128,5 +132,52 @@ public class TaskResultImpl implements TaskResult {
      */
     public TaskLogs getOuput() {
         return this.output;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getGraphicalDescription()
+     */
+    public Object getGraphicalDescription() {
+        //TODO : implement with SWT object ?
+        return null;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getTextualDescription()
+     */
+    public String getTextualDescription() {
+        boolean instanciation = false;
+        try {
+            instanciation = this.instanciateDescriptor();
+        } catch (InstantiationException e) {
+            return "[SCHEDULER] Cannot create descriptor : " + e.getMessage();
+        } catch (IllegalAccessException e) {
+            return "[SCHEDULER] Cannot create descriptor : " + e.getMessage();
+        }
+        if (instanciation) {
+            return this.descriptor.getTextualDescription(this);
+        } else if (!this.hadException()) {
+            return this.value.toString();
+        } else {
+            // yes, Guillaume, I know...
+            return this.exception.getMessage();
+        }
+    }
+
+    /**
+     * Create the descriptor instance if descriptor class is available.
+     * @return true if the creation occurs, false otherwise
+     */
+    private boolean instanciateDescriptor()
+        throws InstantiationException, IllegalAccessException {
+        if (this.descriptorClass == null) {
+            // no descriptor available
+            return false;
+        } else if (this.descriptor == null) {
+            this.descriptor = this.descriptorClass.newInstance();
+            return true;
+        } else {
+            return true;
+        }
     }
 }

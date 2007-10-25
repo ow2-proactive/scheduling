@@ -34,52 +34,25 @@ import java.io.Serializable;
 
 
 /**
- * Interface representing the task result.
- * A task result can be an exception or an object that you have to cast into your own type.
- * Before getting the object it is recommended that you call the hadException() method.
- * It will tell you if an exception occured in the task that generate this result.
- *
- * @author ProActive Team
- * @version 1.0, Aug 3, 2007
- * @since ProActive 3.2
+ * This class defines a way to represent the result of a given task.
+ * @author cdelbe
+ * @since 2.2
  */
-public interface TaskResult extends Serializable {
+public abstract class ResultDescriptor implements Serializable {
 
     /**
-     * To know if an exception has occurred on this task.
-     *
-     * @return true if an exception occurred, false if not.
+     * Create a textual representation of the result.
+     * @param result the result to be described.
+     * @return the textual representation.
      */
-    public boolean hadException();
+    public abstract String getTextualDescription(TaskResult result);
 
     /**
-     * To get the id of the task.
-     *
-     * @return the id of the task.
+     * Create a graphical representation of the result.
+     * @param result the result to be described.
+     * @return the graphical representation.
      */
-    public TaskId getTaskId();
 
-    /**
-     * To get the value of the task.
-     *
-     * @return the value of the task.
-     */
-    public Object value() throws Throwable;
-
-    /**
-     * To get the exception of the task.
-     *
-     * @return the exception of the task.
-     */
-    public Throwable getException();
-
-    /**
-     * Return the output of the execution, including stdout and stderr.
-     * @return the output of the execution, including stdout and stderr.
-     */
-    public TaskLogs getOuput();
-
-    public Object getGraphicalDescription();
-
-    public String getTextualDescription();
+    //TODO cdelbe, jfradj : return type ?
+    public abstract Object getGraphicalDescription(TaskResult result);
 }

@@ -225,17 +225,19 @@ public class TaskLauncher implements InitActive, Serializable {
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occured during the execution of the script
+     * @return the value of the variable PreScript.COMMAND_NAME after the script evaluation.
      */
-    protected void executePreScript(Node n)
+    protected String executePreScript(Node n)
         throws ActiveObjectCreationException, NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(n);
-        ScriptResult<Object> res = handler.handle(pre);
+        ScriptResult<String> res = handler.handle(pre);
         if (res.errorOccured()) {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
             throw new UserException(
                 "PreTask script has failed on the current node");
         }
+        return res.getResult();
     }
 
     /**

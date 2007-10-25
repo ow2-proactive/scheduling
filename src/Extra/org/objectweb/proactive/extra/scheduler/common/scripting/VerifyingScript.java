@@ -38,13 +38,14 @@ import javax.script.*;
 
 /**
  * A Verifying Script : return true if the resource tested is correct.
- *
- *
  * @author ProActive Team
  * @version 1.0, Jun 8, 2007
  * @since ProActive 3.2
  */
 public class VerifyingScript extends Script<Boolean> {
+
+    /**  */
+    private static final long serialVersionUID = 120693403230482727L;
 
     /**
      * The variable name which must be set after the evaluation
@@ -52,107 +53,48 @@ public class VerifyingScript extends Script<Boolean> {
      */
     public static final String RESULT_VARIABLE = "script_result";
 
-    /**  */
-    private static final long serialVersionUID = 120693403230482727L;
-    private boolean dynamic;
-    private String scriptEngine = null;
-    private String script = null;
-    private String id = null;
+    /** If true, script result is not cached */
+    private boolean dynamic = false;
 
     /** ProActive needed constructor */
     public VerifyingScript() {
     }
 
+    /** Directly create a script with a string. */
     public VerifyingScript(String script, String engineName)
         throws InvalidScriptException {
-        this(script, engineName, true);
+        super(script, engineName);
     }
 
     /** Directly create a script with a string. */
     public VerifyingScript(String script, String engineName, boolean dynamic)
         throws InvalidScriptException {
+        super(script, engineName);
         this.dynamic = dynamic;
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName(engineName);
-        if (engine == null) {
-            throw new InvalidScriptException("The engine '" + engineName +
-                "' is not valid");
-        } else {
-            scriptEngine = engine.getFactory().getNames().get(0);
-        }
-        this.script = script;
-        this.id = script;
     }
 
     /** Create a script from a file. */
     public VerifyingScript(File file) throws InvalidScriptException {
-        this(file, true);
+        super(file);
     }
 
     /** Create a script from a file. */
     public VerifyingScript(File file, boolean dynamic)
         throws InvalidScriptException {
+        super(file);
         this.dynamic = dynamic;
-        getEngineName(file.getPath());
-        try {
-            storeScript(file);
-        } catch (IOException e) {
-            throw new InvalidScriptException("Unable to read script : ", e);
-        }
-        this.id = file.getPath();
     }
 
     /** Create a script from an URL. */
     public VerifyingScript(URL url) throws InvalidScriptException {
-        this(url, true);
+        super(url);
     }
 
     /** Create a script from an URL. */
     public VerifyingScript(URL url, boolean dynamic)
         throws InvalidScriptException {
+        super(url);
         this.dynamic = dynamic;
-        getEngineName(url.getFile());
-        try {
-            storeScript(url);
-        } catch (IOException e) {
-            throw new InvalidScriptException("Unable to read script : ", e);
-        }
-        this.id = url.toExternalForm();
-    }
-
-    private void storeScript(URL url) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(
-                    url.openStream()));
-        StringBuilder builder = new StringBuilder();
-        String tmp = null;
-        while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp + "\n");
-        }
-        script = builder.toString();
-    }
-
-    private void storeScript(File file) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(file)));
-        StringBuilder builder = new StringBuilder();
-        String tmp = null;
-        while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp + "\n");
-        }
-        script = builder.toString();
-    }
-
-    private void getEngineName(String filepath) throws InvalidScriptException {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        for (ScriptEngineFactory sef : manager.getEngineFactories())
-            for (String ext : sef.getExtensions())
-                if (filepath.endsWith(ext)) {
-                    scriptEngine = sef.getNames().get(0);
-                    break;
-                }
-        if (scriptEngine == null) {
-            throw new InvalidScriptException("No script engine corresponding");
-        }
     }
 
     @Override
@@ -206,8 +148,8 @@ public class VerifyingScript extends Script<Boolean> {
      * There is no parameter to give to the verifying script.
      */
     @Override
-    protected void prepareBindings(Bindings bindings) {
-        bindings.put("script_result", new Boolean(true));
+    protected void prepareSpecialBindings(Bindings bindings) {
+        bindings.put(RESULT_VARIABLE, new Boolean(true));
     }
 
     @Override

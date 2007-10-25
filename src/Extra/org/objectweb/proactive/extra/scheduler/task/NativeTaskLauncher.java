@@ -98,9 +98,11 @@ public class NativeTaskLauncher extends TaskLauncher {
         this.initLoggers();
         try {
             //launch pre script
+            String cmd = null;
             if (pre != null) {
-                this.executePreScript(null);
-            }
+                cmd = this.executePreScript(null);
+            } //unused for the moment
+
             //get process
             process = ((ExecutableNativeTask) executableTask).getProcess();
             //launch task

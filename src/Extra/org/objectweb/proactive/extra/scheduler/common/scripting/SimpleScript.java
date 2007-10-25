@@ -30,18 +30,14 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.scripting;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 
@@ -51,8 +47,6 @@ public class SimpleScript extends Script {
     private static final long serialVersionUID = -263217514047549052L;
 
     /**  */
-    private String scriptEngine = null;
-    private String script = null;
     private String id = null;
 
     /** Directly create a script with a string. */
@@ -92,41 +86,6 @@ public class SimpleScript extends Script {
         this.id = url.toExternalForm();
     }
 
-    private void storeScript(URL url) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(
-                    url.openStream()));
-        StringBuilder builder = new StringBuilder();
-        String tmp = null;
-        while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp + "\n");
-        }
-        script = builder.toString();
-    }
-
-    private void storeScript(File file) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(file)));
-        StringBuilder builder = new StringBuilder();
-        String tmp = null;
-        while ((tmp = buf.readLine()) != null) {
-            builder.append(tmp + "\n");
-        }
-        script = builder.toString();
-    }
-
-    private void getEngineName(String filepath) throws InvalidScriptException {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        for (ScriptEngineFactory sef : manager.getEngineFactories())
-            for (String ext : sef.getExtensions())
-                if (filepath.endsWith(ext)) {
-                    scriptEngine = sef.getNames().get(0);
-                    break;
-                }
-        if (scriptEngine == null) {
-            throw new InvalidScriptException("No script engine corresponding");
-        }
-    }
-
     @Override
     public String getId() {
         return this.id;
@@ -160,6 +119,6 @@ public class SimpleScript extends Script {
      * There is no parameter to give to the verifying script.
      */
     @Override
-    protected void prepareBindings(Bindings bindings) {
+    protected void prepareSpecialBindings(Bindings bindings) {
     }
 }
