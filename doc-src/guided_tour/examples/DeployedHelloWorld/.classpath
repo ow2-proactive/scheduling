@@ -2,11 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/dist/ProActive/ProActive.jar" sourcepath="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive"/>
-	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/lib/bouncycastle.jar"/>
-	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/lib/fractal.jar"/>
-	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/lib/log4j.jar"/>
-	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/lib/javassist.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SimpleHelloWorld"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
