@@ -7,9 +7,9 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 /**
  * @author FRADJ Johann
  */
-public abstract class SchedulerDB {
+public abstract class AbstractSchedulerDB {
     //TODO comments
-    private static SchedulerDB instance = null;
+    private static AbstractSchedulerDB instance = null;
 
     public abstract void addJob();
 
@@ -30,7 +30,7 @@ public abstract class SchedulerDB {
      *
      * @return the SchedulerDB instance.
      */
-    public static SchedulerDB getInstance() {
+    public static AbstractSchedulerDB getInstance() {
         if (instance == null) {
             instance = new SchedulerDBImpl();
         }

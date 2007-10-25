@@ -76,8 +76,8 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB;
 import org.objectweb.proactive.extra.scheduler.core.db.RecoverableState;
-import org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extra.scheduler.job.JobResultImpl;
@@ -1011,7 +1011,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      */
     private void recover() {
         //connect to data base
-        SchedulerDB dataBase = SchedulerDB.getInstance();
+        AbstractSchedulerDB dataBase = AbstractSchedulerDB.getInstance();
         RecoverableState recoverable = dataBase.getRecoverableState();
         if (recoverable == null) {
             return;

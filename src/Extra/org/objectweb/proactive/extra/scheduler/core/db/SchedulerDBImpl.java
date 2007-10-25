@@ -7,10 +7,10 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 /**
  * @author FRADJ Johann
  */
-public class SchedulerDBImpl extends SchedulerDB {
+public class SchedulerDBImpl extends AbstractSchedulerDB {
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB#addJob()
+     * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#addJob()
      */
     @Override
     public void addJob() {
@@ -18,7 +18,7 @@ public class SchedulerDBImpl extends SchedulerDB {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB#addTaskResult()
+     * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#addTaskResult()
      */
     @Override
     public void addTaskResult() {
@@ -26,7 +26,7 @@ public class SchedulerDBImpl extends SchedulerDB {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB#getJobResult()
+     * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#getJobResult()
      */
     @Override
     public JobResult getJobResult() {
@@ -35,7 +35,7 @@ public class SchedulerDBImpl extends SchedulerDB {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB#getTaskResult()
+     * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#getTaskResult()
      */
     @Override
     public TaskResult getTaskResult() {
@@ -44,7 +44,7 @@ public class SchedulerDBImpl extends SchedulerDB {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB#setJobStatus()
+     * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#setJobStatus()
      */
     @Override
     public void setJobStatus() {
@@ -52,7 +52,7 @@ public class SchedulerDBImpl extends SchedulerDB {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB#setTaskStatus()
+     * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#setTaskStatus()
      */
     @Override
     public void setTaskStatus() {
@@ -60,7 +60,7 @@ public class SchedulerDBImpl extends SchedulerDB {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.db.SchedulerDB#getRecoverableState()
+     * @see org.objectweb.proactive.extra.scheduler.core.db.AbstractSchedulerDB#getRecoverableState()
      */
     @Override
     public RecoverableState getRecoverableState() {
