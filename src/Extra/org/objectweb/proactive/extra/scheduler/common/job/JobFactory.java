@@ -552,7 +552,7 @@ public class JobFactory {
                     }
                 }
                 System.out.println(url);
-                return new VerifyingScript(new URL(url), parameters);
+                return new VerifyingScript(new URL(url), parameters, true);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (InvalidScriptException e) {
@@ -575,7 +575,7 @@ public class JobFactory {
                     }
                 }
                 System.out.println(path);
-                return new VerifyingScript(new File(path), parameters);
+                return new VerifyingScript(new File(path), parameters, true);
             } catch (InvalidScriptException e) {
                 e.printStackTrace();
             }
@@ -585,7 +585,7 @@ public class JobFactory {
         if ((engine != null) && (node.getTextContent() != null)) {
             String script = node.getTextContent();
             try {
-                return new VerifyingScript(script, engine);
+                return new VerifyingScript(script, engine, true);
             } catch (InvalidScriptException e) {
                 e.printStackTrace();
             }
