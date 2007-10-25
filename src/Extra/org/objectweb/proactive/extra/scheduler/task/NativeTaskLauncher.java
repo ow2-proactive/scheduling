@@ -105,7 +105,9 @@ public class NativeTaskLauncher extends TaskLauncher {
 
                 // if preScriptDefinedCommand is not null, a new command 
                 // has been defined by the prescript
-                if (preScriptDefinedCommand != null) {
+                if ((preScriptDefinedCommand != null) &&
+                        (!PreScript.DEFAULT_COMMAND_VALUE.equals(
+                            preScriptDefinedCommand))) {
                     // a new NativeExecTask should be created
                     toBeLaunched = new ExecutableNativeTask(preScriptDefinedCommand);
                 }
