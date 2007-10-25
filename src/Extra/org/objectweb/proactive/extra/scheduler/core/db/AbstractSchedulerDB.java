@@ -1,7 +1,13 @@
 package org.objectweb.proactive.extra.scheduler.core.db;
 
+import java.util.List;
+
+import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
+import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
 
 /**
@@ -11,13 +17,18 @@ public abstract class AbstractSchedulerDB {
     //TODO comments
     private static AbstractSchedulerDB instance = null;
 
-    public abstract void addJob();
+    public abstract boolean addJob(InternalJob internalJob);
 
-    public abstract void setJobStatus();
+    public abstract boolean removeJob(JobId jobId);
 
-    public abstract void setTaskStatus();
+    public abstract boolean setJobEvent(JobEvent jobEvent);
 
-    public abstract void addTaskResult();
+    public abstract boolean setTaskEvent(TaskEvent taskEvent);
+
+    public abstract boolean setJobAndTasksEvents(JobEvent jobEvent,
+        List<TaskEvent> tasksEvents);
+
+    public abstract boolean addTaskResult(TaskResult taskResult);
 
     public abstract RecoverableState getRecoverableState();
 
