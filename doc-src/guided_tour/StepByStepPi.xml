@@ -1,40 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="StepByStepPi">
-  <title>PI (3.14...) - Step By Step</title>
+  <title>PI (3.14...)</title>
 
   <para>In this document we show how to create a distributed application to
   compute the number PI using the ProActive Grid Middleware. Distributed
   programming is achieved using the ProActive deployment framework combined
   with the active object model.</para>
 
-  <sect1>
-    <title>Software Installation</title>
-
-    <sect2>
-      <title>Installing the Java Virtual Machine</title>
-
-      <itemizedlist>
-        <listitem>
-          <para>Download and install the <emphasis role="bold">JDK 5.0 Update
-          9</emphasis> from <ulink
-          url="http://java.sun.com/javase/downloads/index_jdk5.jsp">here</ulink>.</para>
-        </listitem>
-
-        <listitem>
-          <para>Set the environment variable <emphasis
-          role="bold">JAVA_HOME</emphasis> to the java installation
-          location.</para>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-
-    <sect2>
-      <title>Download and install ProActive</title>
-
-      <para>Download and decompress ProActive from http://</para>
-    </sect2>
-  </sect1>
 
   <sect1>
     <title>Implementation</title>

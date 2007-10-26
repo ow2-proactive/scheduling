@@ -125,11 +125,12 @@
     </itemizedlist>
   
 -->
-</sect1>
-
-	<para>The last part consists in generating the web archive file using the ant target called 'proActiveWar'
+<para>The last part consists in generating the web archive file using the ant target called 'proActiveWar'
 	and copying it under the TOMCAT/webapps directory. Tomcat will automatically uncompress and install the web application. 
 	</para>
+</sect1>
+
+	
 
   <sect1>
     <title>Steps to expose an active object or a component as a web

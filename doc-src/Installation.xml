@@ -18,7 +18,7 @@
 
       <itemizedlist>
         <listitem>
-          <para>Download and expand the ProActive archive</para>
+         <para> Download and expand the ProActive archive</para>
         </listitem>
 
         <listitem>
@@ -41,14 +41,9 @@
         </listitem>
 
         <listitem>
-          <indexterm>
-            <primary>CLASSPATH</primary>
-
-            <secondary>configuration</secondary>
-          </indexterm>
-
+          
           <para>Include in your <literal>CLASSPATH</literal> the 
-          	ProActive jar file <literal>ProActive/ProActive.jar</literal>
+          	ProActive jar file <literal>ProActive/dist/ProActive.jar</literal>
           		along with <literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
@@ -203,12 +198,7 @@
       </listitem>
 
       <listitem>
-        <indexterm>
-          <primary>Log4j</primary>
-
-          <secondary>command argument</secondary>
-        </indexterm>
-
+       
         <para><literal>lib/log4j.jar</literal> - <ulink url="http://logging.apache.org/log4j/docs/manual.html">logging</ulink>
           mechanism used in ProActive.</para>
       </listitem>
@@ -223,7 +213,7 @@
       <listitem>
         <para><literal>lib/components/fractal.jar</literal>
         - component model used for ProActive Components (see
-        <xref linkend="intro" />).</para>
+        <xref linkend="configuration" />).</para>
       </listitem>
 
       <listitem>
@@ -349,8 +339,11 @@
           <para>source : <literal>examples/readers</literal></para>
         </listitem>
       </itemizedlist></sect3>
-    	<sect3><title>Local Example 3: The Dining Philosophers</title><para>This example is one possible implementation of the well-known Dining Philosophers synchronization problem. This
-      example is based on a easy to use Swing GUI.</para><itemizedlist>
+    	<sect3><title>Local Example 3: The Dining Philosophers</title>
+    	<para>This example is one possible implementation of the well-known Dining
+    	 Philosophers synchronization problem. This
+      example is based on a easy to use Swing GUI.</para>
+      <itemizedlist>
         <listitem>
           <para>script : <literal>philosophers.sh</literal> or
           <literal>philosophers.bat</literal></para>
@@ -360,6 +353,7 @@
           <para>source : <literal>examples/philosophers</literal></para>
         </listitem>
       </itemizedlist></sect3>
+      
     	<sect3><title>Local Example 4: The N-Body Simulation</title><para>This example can be used later on as a deployment example for
     	 several machines, and also for the fault-tolerance features. <itemizedlist>
           <listitem>
@@ -371,5 +365,11 @@
             <para>source : <literal>examples/nbody</literal></para>
           </listitem>
         </itemizedlist></para></sect3></sect2>
+	 </sect1>
+	 <sect1>
+	 	<title>IC2D Installation</title>
+	 	<para>
+	 		<emphasis role="bold">//TODO</emphasis>
+	 	</para>
 	 </sect1>
 </chapter>

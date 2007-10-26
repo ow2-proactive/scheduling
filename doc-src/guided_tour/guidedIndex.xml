@@ -152,7 +152,8 @@
       If you have not installed java3d (<ulink
       url="http://java3d.dev.java.net/"></ulink>), it will not compile
       (missing dependencies). So you should remove it from your project build.
-      To do that, from the navigator view: <itemizedlist>
+      To do that, from the navigator view: 
+      <itemizedlist>
           <listitem>
             <para>right-click on your ProActive project</para>
           </listitem>

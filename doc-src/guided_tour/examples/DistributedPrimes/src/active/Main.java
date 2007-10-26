@@ -89,6 +89,7 @@ public class Main{
 			}
 			//tell the master to start
 			master.startComputation(new LongWrapper(Long.parseLong(args[1])));
+			listOfVN[0].killAll(false);
 		}
 		catch (NodeException nodeExcep){
 			System.err.println(nodeExcep.getMessage());
@@ -97,6 +98,6 @@ public class Main{
 			System.err.println(aoExcep.getMessage());
 		}
 		//quitting
-		//ProActive.exitSuccess();
+		
 	}
 }

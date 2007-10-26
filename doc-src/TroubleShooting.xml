@@ -19,11 +19,14 @@
 
     <itemizedlist>
       <listitem>
-        <para><emphasis role="bold">Permission denied when trying to launch
+      <para>
+        <emphasis role="bold">Permission denied when trying to launch
         scripts under Linux</emphasis> Files have the wrong permissions set. 
         You will have to change the permissions by executing <literal>chmod
-        755 *.sh</literal></para> in the <literal>ProActive/scripts/unix directory</literal>. The command will 
+        755 *.sh</literal>
+         in the <literal>ProActive/scripts/unix directory</literal>. The command will 
         set the files to executable and readable for all users and also writeable for the current user.
+      </para>
       </listitem>
 
       <listitem>
@@ -54,7 +57,7 @@
         <literal>-Dlog4j.configuration</literal> property to the java command.
         Be sure that the given path is right, try also to add <literal>file:</literal> before the
         path.</para>
-<programlisting lang="java"><textobject><textdata fileref="code_snippets/log4j_notfound_error.txt"/></textobject></programlisting>
+		<programlisting lang="java"><textobject><textdata fileref="code_snippets/log4j_notfound_error.txt"/></textobject></programlisting>
       </listitem>
 
       <listitem>
@@ -139,7 +142,8 @@
 
     <itemizedlist>
       <listitem>
-        <para><literal>ProActlive/lib/ganymed-ssh2-build210.jar</literal> must be included in the <literal>CLASSPATH</literal> of the
+        <para><literal>ProActlive/lib/ganymed-ssh2-build210.jar</literal> 
+        must be included in the <literal>CLASSPATH</literal> of the
         concerned machines.</para>
       </listitem>
 

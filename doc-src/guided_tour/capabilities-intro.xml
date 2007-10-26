@@ -66,13 +66,19 @@
 	or  <literal>ProActive/scripts/windows</literal>:
 	<itemizedlist>
 		<listitem>
-	 		<literal>c3d_one_user.sh</literal> or <literal>c3d_one_user.bat </literal> launches  the C3D Dispatcher with four rendering engines and one user.
+			<para><literal>c3d_one_user.sh</literal> or <literal>c3d_one_user.bat
+			 </literal> launches  the C3D Dispatcher with four rendering engines and one user.</para>
+		</listitem>
+ 		<listitem><para>
+			<literal>c3d_no_user.sh</literal> or <literal>c3d_no_user.bat</literal> 
+			launches the C3D Dispatcher with four rendering engines and no user
+			</para>
 		</listitem>
 		<listitem>
-			<literal>c3d_no_user.sh</literal> or <literal>c3d_no_user.bat</literal> launches the C3D Dispatcher with four rendering engines and no user
-		</listitem>
-		<listitem>
-			<literal>c3d_add_user.sh</literal> or <literal>c3d_add_user.bat</literal> adds another users
+			<para>
+			<literal>c3d_add_user.sh</literal> or <literal>
+			c3d_add_user.bat</literal> adds another users
+			</para>
 		</listitem>
 	</itemizedlist>
 	

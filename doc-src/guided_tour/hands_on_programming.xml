@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="step_by_step">
+<chapter id="hands_on_programming">
   <title>Step by step tutorial</title>
 <para>In this chapter we present a step by step introduction to
   programming with ProActive.</para>
@@ -112,8 +112,9 @@
 			subclasses is necessary in order to create the stub class uses in 
 			communication. 
 			If you don’t use wrappers, method calls will be synchronous.
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/public_method.txt"></textdata></textobject></programlisting>
 			</para>	
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/helloworld_example/public_method.txt"></textdata></textobject></programlisting>
+			
 			</listitem>
 		</itemizedlist>	
 		
@@ -190,7 +191,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     <para>The following example will help you to understand how and when you
     can initialize and clean the activity. The example will implement the <literal>InitActive</literal> and
     <literal>EndActive</literal> interfaces. To understand how to use the more complex
-    <literal>RunActive</literal> interface read <xref linkend="AOCreation"/> </para>
+    <literal>RunActive</literal> interface read <xref linkend="ActiveObjectCreation"/> </para>
 
 
     <sect2>
@@ -240,13 +241,19 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
-      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
-       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
-       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
-       	 <literal>-Djava.security.policy=pathToFile </literal> 
-       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in 
-       	<xref linkend="Installation"/>.</para>
+      	To compile and run the application you need the 
+		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
+		include the following jar files: 
+		  	<literal>ProActive/dist/ProActive.jar</literal>,
+          	<literal>ProActive/lib/javassist.jar</literal>,
+          		<literal>ProActive/lib/log4j.jar</literal>, 
+          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
+          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		and <literal>ProActive/lib/bouncycastle.jar</literal>
+           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
+           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in <xref linkend="Installation"/>.
+            </para>
  		<para>	The command line for running the application is: </para> 
 	<para>
 			<screen>
@@ -267,9 +274,9 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			<para>
 				A first principle is to fully eliminate from the source code the following elements:
 				<itemizedlist>
-					<listitem>machine names</listitem>
-					<listitem>creation protocols</listitem>
-					<listitem>registry lookup protocols</listitem>
+					<listitem><para>machine names</para></listitem>
+					<listitem><para>creation protocols</para></listitem>
+					<listitem><para>registry lookup protocols</para></listitem>
 				</itemizedlist>
 			</para>
 			<para>
@@ -300,22 +307,23 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				the underlying execution platform, and to allow a source-independent deployment, a framework has 
 				to provide the following elements:
 				<itemizedlist>
-					<listitem>an abstract description of the distributed entities of a parallel program or component,
+					<listitem><para>an abstract description of the distributed entities of a parallel program or component,	</para>
 					</listitem>
-					<listitem>an external mapping of those entities to real machines, using actual creation, registry, and lookup protocols.
+					<listitem><para>an external mapping of those entities to real machines, using 
+					actual creation, registry, and lookup protocols.</para>
 					</listitem>
 				</itemizedlist>
 			</para>
 			<para>
 				To reach that goal, the programming model relies on the specific notion of Virtual Nodes (VNs):
 				<itemizedlist>
-					<listitem>a VN is identified as a name (a simple string)
+					<listitem><para>a VN is identified as a name (a simple string)</para>
 					</listitem>
-					<listitem>a VN is used in a program source
+					<listitem><para>a VN is used in a program source </para>
 					</listitem>
-					<listitem>a VN is defined and configured in a deployment descriptor (XML)
+					<listitem><para>a VN is defined and configured in a deployment descriptor (XML) </para>
 					</listitem>
-					<listitem>a VN, after activation, is mapped to one or to a set of actual ProActive Nodes
+					<listitem><para>a VN, after activation, is mapped to one or to a set of actual ProActive Nodes</para>
 					</listitem>
 				</itemizedlist>
 			</para>
@@ -335,13 +343,14 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				the mapping. This mapping can be specified in an XML descriptor. By definition, the following 
 				operations can be configured in such a deployment descriptor:
 				<itemizedlist>
-					<listitem>the mapping of VNs to Nodes and to JVMs</listitem>
-					<listitem>the way to create or to acquire JVMs</listitem>
-					<listitem>the way to register or to lookup VNs</listitem>
+					<listitem><para>the mapping of VNs to Nodes and to JVMs</para></listitem>
+					<listitem><para>the way to create or to acquire JVMs</para></listitem>
+					<listitem><para>the way to register or to lookup VNs</para></listitem>
 				</itemizedlist>
 				
 			</para>
 		</sect2>
+	
 		<sect2>
 			<title>Deployment Descriptor File</title>
 			<para>	
@@ -349,14 +358,14 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				We will use a simple XML file to deploy the Hello World application on a remote 
 				The deployment XML file is composed of several parts, each with different options. For our
 				example we will use a simple version. To find out more about deployment and deployment 
-				descriptors reader <xref linkend="Descriptor"/>.
+				descriptors reader <xref linkend="XML_Descriptors"/>.
 			</para>
 			<para>
-				The document uses the XML Schema present at the
-				<xref ulink="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">INRIA</xref> site.
+				The document uses the <ulink url="http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd"> XML Schema  </ulink>
+				present at the site.
 			</para>
 			<para>	
-				To avoid mistake when building XML descriptors, ProActive provides an XML Schema called
+				To avoid mistakes when building XML descriptors, ProActive provides an XML Schema called
 				DescriptorSchema.xsd. To validate your file against this schema,
 				the following line must be put at the top of the XML document.
 			</para>
@@ -394,7 +403,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 				that has a reference to it (<literal>processReference</literal>). It will use
 				the paths provided to locate the Java and ProActive files on the remote machine. 
 				Here we are using rsh to start the JVM but several other protocols can be used
-				as described in <xref linkend="Descriptor"/>. 
+				as described in <xref linkend="XML_Descriptors"/>. 
 				<programlisting lang="xml"><textobject><textdata fileref="code_snippets/deployment_descriptor/infrastructure.txt"></textdata></textobject></programlisting>
 			</para>
 			<para>
@@ -445,13 +454,18 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the new Main class, and the InitializedHelloWorld class.
-      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
-       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
-       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
-       	 <literal>-Djava.security.policy=pathToFile </literal> 
-       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in 
-       	<xref linkend="Installation"/>.</para>
+      	To compile and run the application you need the 
+		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
+		include the following jar files: 
+		  	<literal>ProActive/dist/ProActive.jar</literal>,
+          	<literal>ProActive/lib/javassist.jar</literal>,
+          		<literal>ProActive/lib/log4j.jar</literal>, 
+          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
+          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		and <literal>ProActive/lib/bouncycastle.jar</literal>
+           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
+           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in <xref linkend="Installation"/>.</para>
  			<para>
  			The command line for running the application is:
  			</para> 
@@ -465,11 +479,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   <sect1>
     <title>A Simple Migration Example</title>
 
-    <indexterm>
-      <primary>Migration</primary>
-    </indexterm>
-
-    <para>Our next example deals with migrating the active objects between 
+       <para>Our next example deals with migrating the active objects between 
     remote nodes. We will start the active object on one machine and then move it 
     to another one. We will need to change the descriptor file to specify the
     second virtual node and machine and add a method that enables us to 
@@ -481,8 +491,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       <para>An active object must implement the Serializable interface (as it will be transferred
       through the network) in order to be able to migrate.</para>
 
-      <para> For more information on the topic of object migration, check <xref
-      linkend="Migration" /> .</para>
+      <para> For more information on the topic of object migration, check <xref linkend="Migration" /> .</para>
     </sect2>
 
     <sect2>
@@ -559,18 +568,13 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	
 
         <para>Note that the call to the ProActive primitive
-        <literal>migrateTo</literal> is the last one of the method moveTo. See
-        <xref linkend="Migration" /> for more information.</para>
-    </sect2>
+        <literal>migrateTo</literal> is the last one of the method <literal>packUpMyVariablesAndHitTheRoad </literal>.
+        See   <xref linkend="Migration" /> for more information.</para>
 
-   
-   <sect2>
-     
-
-      <para>During the execution, a default node is first created. It then
-      hosts the created active object. Then the active object is migrated from
-      node to node, each time returning 'Hello' and the computer 
-      where it is located.</para>
+      <para>During the execution the JVMs are started according to the descriptor and one active
+      object is started on the first JVM. The active object is then migrated to the first node on each virtual node
+      created, each time returning Hello and the computer on wich is located. 
+    </para>
     </sect2>
     
     
@@ -580,13 +584,18 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
       	 MigratableHello class,and the new Main class,.
-      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
-       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
-       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
-       	 <literal>-Djava.security.policy=pathToFile </literal> 
-       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in 
-       	<xref linkend="Installation"/>.</para>
+      	To compile and run the application you need the 
+		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
+		include the following jar files: 
+		  	<literal>ProActive/dist/ProActive.jar</literal>,
+          	<literal>ProActive/lib/javassist.jar</literal>,
+          		<literal>ProActive/lib/log4j.jar</literal>, 
+          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
+          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		and <literal>ProActive/lib/bouncycastle.jar</literal>
+           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
+           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in <xref linkend="Installation"/>.</para>
  		<para>	The command line for running the application is: </para> 
 	<para>
 			<screen>
@@ -711,15 +720,20 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       <para>To compile and run the application you need the
       	 HelloWorld class from the previous example, the InitializedHelloWorld class, the 
       	 MigratableHello class,and the new Main class,.
-      	You also have to include the following jar files: ProActive/dist/ProActive.jar, ProActive/lib/javassist.jar,
-       	ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, and 
-       	ProActive/lib/bouncycastle.jar  and explicitly set the Java security policy with the
-       	 <literal>-Djava.security.policy=pathToFile </literal> 
-       	and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
-            The steps necessary are explained in 
-       	<xref linkend="Installation"/>.</para>
+      	To compile and run the application you need the 
+		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
+		include the following jar files: 
+		  	<literal>ProActive/dist/ProActive.jar</literal>,
+          	<literal>ProActive/lib/javassist.jar</literal>,
+          		<literal>ProActive/lib/log4j.jar</literal>, 
+          		<literal>ProActive/lib/xercesImpl.jar</literal>, 
+          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		and <literal>ProActive/lib/bouncycastle.jar</literal>
+           and explicitly set the Java security policy with the  <literal>-Djava.security.policy=pathToFile</literal>
+           and the logging policy with  <literal>-Dlog4j.configuration=file:proactive-log4j</literal>.
+            The steps necessary are explained in <xref linkend="Installation"/>.</para>
  		<para>	The command line for running the application is the following the second
- 		 parameter being the number of primes to be computed: </para> 
+ 		 parameter being the number of primes compute: </para> 
 	<para>
 			<screen>
 java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j Main deployment.xml  10000
