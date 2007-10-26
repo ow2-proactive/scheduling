@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.core;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -114,6 +115,7 @@ public class SchedulerFrontend implements InitActive,
         new HashMap<UniqueID, SchedulerEventListener<?extends Job>>();
 
     /** Scheduler's statistics */
+    //TODO not restored after a scheduler failure.
     private StatsImpl stats = new StatsImpl();
 
     /* ########################################################################################### */
@@ -185,9 +187,13 @@ public class SchedulerFrontend implements InitActive,
      * Called by the scheduler core to recover the front-end.
      * This method may have to rebuild the different list of userIdentification
      * and job/user association.
-     * TODO explain what is done...
      */
     public void recover(HashMap<JobId, InternalJob> jobList) {
+        for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
+            UserIdentification uIdent = new UserIdentification(e.getValue()
+                                                                .getOwner());
+            jobs.put(e.getKey(), new IdentifyJob(e.getKey(), uIdent));
+        }
         //activate scheduler communication
         authenticationInterface.activate();
     }
@@ -207,6 +213,7 @@ public class SchedulerFrontend implements InitActive,
                 "This active object is already connected to the scheduler !");
         }
         logger.info(identification.getUsername() + " successfully connected !");
+        //TODO : restore admin state to the userIdentification.
         identifications.put(sourceBodyID, identification);
     }
 

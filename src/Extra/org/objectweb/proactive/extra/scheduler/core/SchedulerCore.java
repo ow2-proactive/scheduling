@@ -1061,6 +1061,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         AbstractSchedulerDB dataBase = AbstractSchedulerDB.getInstance();
         RecoverableState recoverable = dataBase.getRecoverableState();
         if (recoverable == null) {
+            logger.info("No recoverable state.");
             return;
         }
 
@@ -1068,6 +1069,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //------------------------------------------------------------------------
         //----------------------    Re-build jobs lists  --------------------------
         //------------------------------------------------------------------------
+        logger.info("Re-build jobs lists");
         JobId maxId = JobId.makeJobId("0");
         for (InternalJob job : recoverable.getJobs()) {
             jobs.put(job.getId(), job);
@@ -1102,10 +1104,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //------------------------------------------------------------------------
         //--------------------    Initialize jobId count   ----------------------
         //------------------------------------------------------------------------
+        logger.info("Initialize jobId count");
         JobId.setInitialValue(maxId);
         //------------------------------------------------------------------------
         //--------    Re-affect JobEvent/taskEvent to the jobs/tasks   -----------
         //------------------------------------------------------------------------
+        logger.info("Re-affect JobEvent/taskEvent to the jobs/tasks");
         for (Entry<JobId, JobEvent> entry : recoverable.getJobEvents().entrySet()) {
             jobs.get(entry.getKey()).update(entry.getValue());
         }
@@ -1117,6 +1121,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //------------------------------------------------------------------------
         //------------------    Re-create task dependences   ---------------------
         //------------------------------------------------------------------------
+        logger.info("Re-create task dependences");
         for (InternalJob job : runningJobs) {
             ArrayList<InternalTask> tasksList = new ArrayList<InternalTask>();
 
@@ -1142,6 +1147,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //------------------------------------------------------------------------
         //--------------    Re-set job results list in each job   ----------------
         //------------------------------------------------------------------------
+        logger.info("Re-set job results list in each job");
         for (JobResult result : recoverable.getJobResults()) {
             jobs.get(result.getId()).setJobResult(result);
         }
