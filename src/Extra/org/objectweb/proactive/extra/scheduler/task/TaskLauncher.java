@@ -37,9 +37,9 @@ import java.util.Collection;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
+import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -54,13 +54,13 @@ import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
-import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
@@ -85,8 +85,8 @@ public class TaskLauncher implements InitActive, Serializable {
     protected Integer port;
 
     // handle streams
-    protected final transient PrintStream stdout = System.out;
-    protected final transient PrintStream stderr = System.err;
+    protected transient PrintStream redirectedStdout;
+    protected transient PrintStream redirectedStderr;
     protected transient BufferedAppender logBuffer;
 
     /**
@@ -153,16 +153,14 @@ public class TaskLauncher implements InitActive, Serializable {
             if (pre != null) {
                 this.executePreScript(null);
             }
-
             //init task
             executableTask.init();
-
             //launch task
             Object userResult = executableTask.execute(results);
 
             //logBuffer is filled up
-            TaskResult result = new TaskResultImpl(taskId, userResult,
-                    new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
+            TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
 
             //return result
             return result;
@@ -190,10 +188,11 @@ public class TaskLauncher implements InitActive, Serializable {
      */
     @SuppressWarnings("unchecked")
     protected void initLoggers() {
-        Appender out = new SocketAppender(this.host, this.port);
-
+        // error about log should not be logged
+        LogLog.setQuietMode(true);
         // create logger
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+        Appender out = new SocketAppender(this.host, this.port);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();
         l.addAppender(EmptyAppender.SINK);
@@ -203,10 +202,12 @@ public class TaskLauncher implements InitActive, Serializable {
         this.logBuffer.addSink(out);
         l.addAppender(this.logBuffer);
         // redirect stdout and err
-        System.setOut(new PrintStream(new LoggingOutputStream(l, Level.INFO),
-                true));
-        System.setErr(new PrintStream(new LoggingOutputStream(l, Level.ERROR),
-                true));
+        this.redirectedStdout = new PrintStream(new LoggingOutputStream(l,
+                    Level.INFO), true);
+        this.redirectedStderr = new PrintStream(new LoggingOutputStream(l,
+                    Level.ERROR), true);
+        System.setOut(redirectedStdout);
+        System.setErr(redirectedStderr);
     }
 
     /**
@@ -214,10 +215,13 @@ public class TaskLauncher implements InitActive, Serializable {
      */
     protected void finalizeLoggers() {
         //Unhandle loggers
+        this.redirectedStdout.flush();
+        this.redirectedStderr.flush();
         this.logBuffer.close();
-        // LogManager.shutdown();
-        System.setOut(this.stdout);
-        System.setErr(this.stderr);
+        //FIXME : want to close only the task logger !
+        //LogManager.shutdown();
+        System.setOut(System.out);
+        System.setErr(System.err);
     }
 
     /**

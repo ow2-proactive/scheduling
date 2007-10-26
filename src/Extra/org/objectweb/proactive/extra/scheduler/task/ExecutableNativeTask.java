@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.task;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
@@ -80,14 +81,20 @@ public class ExecutableNativeTask extends ExecutableTask {
     public Object execute(TaskResult... results) {
         try {
             process = Runtime.getRuntime().exec(this.command);
-            new Thread(new ThreadReader(
-                    new BufferedReader(
-                        new InputStreamReader(process.getInputStream())))).start();
-
-            new Thread(new ThreadReader(
-                    new BufferedReader(
-                        new InputStreamReader(process.getErrorStream())))).start();
+            // redirect streams
+            BufferedReader sout = new BufferedReader(new InputStreamReader(
+                        process.getInputStream()));
+            BufferedReader serr = new BufferedReader(new InputStreamReader(
+                        process.getErrorStream()));
+            Thread tsout = new Thread(new ThreadReader(sout, System.out));
+            Thread tserr = new Thread(new ThreadReader(serr, System.err));
+            tsout.start();
+            tserr.start();
+            // wait for process completion
             process.waitFor();
+            // wait for log flush
+            tsout.join();
+            tserr.join();
             return process.exitValue();
         } catch (Exception e) {
             //TODO send the exception or error to the user ?
@@ -102,18 +109,21 @@ public class ExecutableNativeTask extends ExecutableTask {
             "This method should have NEVER been called in this context !!");
     }
 
+    /** Pipe between two streams */
     protected class ThreadReader implements Runnable {
-        private BufferedReader r;
+        private BufferedReader in;
+        private PrintStream out;
 
-        public ThreadReader(BufferedReader r) {
-            this.r = r;
+        public ThreadReader(BufferedReader in, PrintStream out) {
+            this.in = in;
+            this.out = out;
         }
 
         public void run() {
             String str = null;
             try {
-                while ((str = r.readLine()) != null) {
-                    System.out.println(str);
+                while ((str = in.readLine()) != null) {
+                    out.println(str);
                 }
             } catch (IOException e) {
                 //FIXME cdelbe gros vilain tu dois throw exception

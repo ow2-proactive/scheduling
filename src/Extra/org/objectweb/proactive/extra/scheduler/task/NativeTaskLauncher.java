@@ -30,11 +30,14 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import java.io.FileWriter;
+
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
@@ -114,10 +117,13 @@ public class NativeTaskLauncher extends TaskLauncher {
             }
             //get process
             process = toBeLaunched.getProcess();
+
             //launch task
-            TaskResult result = new TaskResultImpl(taskId,
-                    toBeLaunched.execute(results),
-                    new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            Object userResult = executableTask.execute(results);
+
+            //logBuffer is filled up
+            TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
+            TaskResult result = new TaskResultImpl(taskId, userResult, taskLogs);
 
             //return result
             return result;
