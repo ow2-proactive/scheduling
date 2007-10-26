@@ -60,6 +60,8 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder#getRuntimeObjects(HostObject)
      */
     public Collection<RuntimeObject> getRuntimeObjects(HostObject host) {
+        int nbZombieStubs = 0;
+
         String hostUrl = host.getUrl();
 
         Map<String, RuntimeObject> runtimeObjects = new HashMap<String, RuntimeObject>();
@@ -94,6 +96,10 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
 
                         /*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
                         RemoteObject ro = RemoteObjectHelper.lookup(url);
+                        if (!validateRemoteObj(ro)) {
+                            nbZombieStubs++;
+                            continue;
+                        }
 
                         /*Object stub = ro.getObjectProxy();*/
                         Object stub = RemoteObjectHelper.generatedObjectStub(ro);
@@ -126,7 +132,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                         pae.printStackTrace();
                         console.warn("Found active object in registry at " +
                             url);
-                    }
+                    }                   
                 }
             }
         } catch (Exception e) {
@@ -137,6 +143,16 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                 console.logException(e);
             }
         }
+
+        if (nbZombieStubs > 0) {
+            console.warn(nbZombieStubs + " invalid stubs on host " +
+                host.getHostName() + ":" + host.getPort());
+        }
         return runtimeObjects.values();
+    }
+
+    private boolean validateRemoteObj(RemoteObject ro) {
+        return (!((ro.getTargetClass() == null) || (ro.getClassName() == null) ||
+        (ro.getClassName().equals(""))));
     }
 }
