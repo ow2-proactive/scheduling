@@ -115,7 +115,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             process = toBeLaunched.getProcess();
 
             //launch task
-            Object userResult = executableTask.execute(results);
+            Object userResult = toBeLaunched.execute(results);
 
             //logBuffer is filled up
             TaskLogs taskLogs = new Log4JTaskLogs(this.logBuffer.getBuffer());
