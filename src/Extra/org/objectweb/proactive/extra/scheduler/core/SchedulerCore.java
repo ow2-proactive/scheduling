@@ -247,7 +247,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      */
     public void runActivity(Body body) {
         //Rebuild the scheduler if a crash has occurred.
-        recover();
+        //recover();
         //listen log as immediate Service.
         ProActiveObject.setImmediateService("listenLog");
         Service service = new Service(body);
@@ -435,12 +435,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                             node.getNodeInformation().getVMInformation()
                                 .getHostName());
                         // send task event to front-end
-                        try {
-                            System.out.println("--*-*-*-*-*-*-*-*-*-**");
-                            currentJob.update(internalTask.getTaskInfo());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                         frontend.pendingToRunningTaskEvent(internalTask.getTaskInfo());
                         // and to data base
                         AbstractSchedulerDB.getInstance()
