@@ -308,15 +308,13 @@ public class BasicChartObject {
             return availableTimersList;
         } catch (Exception e) {
             Console console = Console.getInstance(Activator.CONSOLE_NAME);
-            console.log("Cannot perform timers snapshot on " +
-                aoObject.getName() + ". Reason : " + e.getMessage());
-            if (e instanceof NullPointerException) {
-                console.log(
-                    "Be sure to attach a TimIt technical service to the virtual node : " +
-                    aoObject.getParent().getParent().getName());
+            String message = "Cannot perform timers snapshot on " +
+                aoObject.getName() + ". ";
+            if (e.getCause() instanceof javax.management.RuntimeMBeanException) {
+                message += ("No available TimItTechnicalService for the virtual node : " +
+                aoObject.getParent().getVirtualNodeName());
             }
-
-            // e.printStackTrace();
+            console.log(message);
         }
         return null;
     }

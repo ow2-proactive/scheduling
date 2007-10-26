@@ -48,9 +48,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.timit.actions.ShowDurationViewAction;
 import org.objectweb.proactive.ic2d.timit.actions.ShowInTreeViewAction;
-import org.objectweb.proactive.ic2d.timit.actions.StartDurationRecordAction;
+import org.objectweb.proactive.ic2d.timit.actions.StartRecordingTimeLineAction;
+import org.objectweb.proactive.ic2d.timit.actions.StopRecordingTimeLineAction;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
 import org.objectweb.proactive.ic2d.timit.editparts.BasicChartEditPart;
@@ -144,13 +144,13 @@ public class TimItView extends ViewPart {
         this.showInTreeViewAction = new ShowInTreeViewAction();
         toolBarManager.add(showInTreeViewAction);
 
-        StartDurationRecordAction startDurationRecordAction = new StartDurationRecordAction();
-        startDurationRecordAction.setTarget(this.chartContainer);
-        toolBarManager.add(startDurationRecordAction);
+        StartRecordingTimeLineAction startRecordingTimeLineAction = new StartRecordingTimeLineAction();
+        startRecordingTimeLineAction.setTarget(this.chartContainer);
+        toolBarManager.add(startRecordingTimeLineAction);
 
-        ShowDurationViewAction showDurationViewAction = new ShowDurationViewAction(startDurationRecordAction);
-        startDurationRecordAction.setShowDurationViewAction(showDurationViewAction);
-        toolBarManager.add(showDurationViewAction);
+        StopRecordingTimeLineAction stopRecordingTimeLineAction = new StopRecordingTimeLineAction(startRecordingTimeLineAction);
+        startRecordingTimeLineAction.setStopRecordingTimeLineAction(stopRecordingTimeLineAction);
+        toolBarManager.add(stopRecordingTimeLineAction);
     }
 
     /**

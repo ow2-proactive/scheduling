@@ -41,19 +41,18 @@ import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 
-public class StartDurationRecordAction extends Action {
-    public static final String START_DURATION_RECORD_ACTION = "Start Duration Record Action";
-    private ShowDurationViewAction showDurationViewAction;
+public class StartRecordingTimeLineAction extends Action {
+    public static final String START_RECORDING_TIMELINE_ACTION = "Start Recording Time Line";
+    private StopRecordingTimeLineAction stopRecordingTimeLineAction;
     private BasicChartContainerObject sourceContainer;
     private TimeLineView timeLineView;
 
-    public StartDurationRecordAction() {
-        super.setId(START_DURATION_RECORD_ACTION);
+    public StartRecordingTimeLineAction() {
+        super.setId(START_RECORDING_TIMELINE_ACTION);
         super.setImageDescriptor(ImageDescriptor.createFromFile(
                 this.getClass(), "start_rec.gif"));
-        super.setToolTipText(START_DURATION_RECORD_ACTION);
+        super.setToolTipText(START_RECORDING_TIMELINE_ACTION);
         super.setEnabled(false);
-        this.showDurationViewAction = showDurationViewAction;
     }
 
     public final void setTarget(final BasicChartContainerObject container) {
@@ -61,9 +60,9 @@ public class StartDurationRecordAction extends Action {
         this.sourceContainer = container;
     }
 
-    public void setShowDurationViewAction(
-        ShowDurationViewAction showDurationViewAction) {
-        this.showDurationViewAction = showDurationViewAction;
+    public void setStopRecordingTimeLineAction(
+        StopRecordingTimeLineAction stopRecordingTimeLineAction) {
+        this.stopRecordingTimeLineAction = stopRecordingTimeLineAction;
     }
 
     @Override
@@ -83,6 +82,6 @@ public class StartDurationRecordAction extends Action {
         this.timeLineView.getContainer()
                          .provideSourceContainer(this.sourceContainer);
         this.setEnabled(false);
-        this.showDurationViewAction.setEnabled(true);
+        this.stopRecordingTimeLineAction.setEnabled(true);
     }
 }

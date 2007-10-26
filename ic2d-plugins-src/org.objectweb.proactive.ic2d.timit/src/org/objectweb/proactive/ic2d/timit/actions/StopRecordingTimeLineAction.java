@@ -40,19 +40,19 @@ import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.timit.views.TimeLineView;
 
 
-public class ShowDurationViewAction extends Action {
-    public static final String SHOW_DURATION_VIEW_ACTION = "Show Duration View";
+public class StopRecordingTimeLineAction extends Action {
+    public static final String STOP_RECORDING_TIMELINE_ACTION = "Stop Recording Time Line";
     private TimeLineView timeLineView;
-    StartDurationRecordAction startDurationRecordAction;
+    StartRecordingTimeLineAction startRecordingTimeLineAction;
 
-    public ShowDurationViewAction(
-        StartDurationRecordAction startDurationRecordAction) {
-        super.setId(SHOW_DURATION_VIEW_ACTION);
+    public StopRecordingTimeLineAction(
+        StartRecordingTimeLineAction startRecordingTimeLineAction) {
+        super.setId(STOP_RECORDING_TIMELINE_ACTION);
         super.setImageDescriptor(ImageDescriptor.createFromFile(
                 this.getClass(), "duration.gif"));
-        super.setToolTipText(SHOW_DURATION_VIEW_ACTION);
+        super.setToolTipText(STOP_RECORDING_TIMELINE_ACTION);
         super.setEnabled(false);
-        this.startDurationRecordAction = startDurationRecordAction;
+        this.startRecordingTimeLineAction = startRecordingTimeLineAction;
     }
 
     // @Override
@@ -71,6 +71,6 @@ public class ShowDurationViewAction extends Action {
         }
         this.setEnabled(false);
         this.timeLineView.getContainer().stopRecordAndBuildChart();
-        this.startDurationRecordAction.setEnabled(true);
+        this.startRecordingTimeLineAction.setEnabled(true);
     }
 }

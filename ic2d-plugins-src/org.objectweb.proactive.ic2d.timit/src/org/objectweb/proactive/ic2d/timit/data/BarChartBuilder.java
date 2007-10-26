@@ -303,7 +303,7 @@ public class BarChartBuilder {
     public void updateTitle() {
         this.now.setTime(System.currentTimeMillis());
         this.chart.getTitle().getLabel().getCaption()
-                  .setValue(title + " \nSnapshot time : " +
+                  .setValue(title + " \nLast Refresh : " +
             BarChartBuilder.df.format(this.now));
     }
 
