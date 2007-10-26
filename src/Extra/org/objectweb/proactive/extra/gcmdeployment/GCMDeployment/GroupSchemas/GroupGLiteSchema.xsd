@@ -35,7 +35,7 @@
 				</sequence>
 				<attribute name="hostname" type="string" />
 				<attribute name="virtualOrganisation" type="string" use="required" />
-				<attribute name="JDLFileName" type="string" use="required" />
+				<attribute name="JDLFileName" type="string" />
 				<attribute name="Type" type="string" default="job" />
 				<attribute name="executable" type="string" default="/bin/sh" />
 				<attribute name="jobType" type="string" default="normal" />

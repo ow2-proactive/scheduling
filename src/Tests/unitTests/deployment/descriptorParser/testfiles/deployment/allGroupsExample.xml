@@ -59,7 +59,7 @@
 				<paext:stderr>jobs/jobtrace_err.txt</paext:stderr>
 			</paext:gridEngineGroup>
 
-			<paext:gLiteGroup id="gliteGroup" virtualOrganisation="proactive" JDLFileName="job.jdl" jobType="normal"
+			<paext:gLiteGroup id="gliteGroup2" virtualOrganisation="proactive" JDLFileName="job.jdl" jobType="normal"
 				retryCount="3">
 				<paext:requirements>
 					other.GlueCEUniqueID == "grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj"
@@ -77,6 +77,14 @@
 				<paext:outputSandbox>error.log stdout.log</paext:outputSandbox>
 			</paext:gLiteGroup>
 
+			<paext:gLiteGroup id="gliteGroup" virtualOrganisation="proactive" jobType="normal"
+				retryCount="3">
+				<paext:rank>-other.GlueCEStateEstimatedResponseTime</paext:rank>
+				<paext:stdout>stdout.log</paext:stdout>
+				<paext:stderr>error.log</paext:stderr>
+				<paext:configFile>scripts/unix/proactiveVO/proactiveVO.conf</paext:configFile>
+			</paext:gLiteGroup>
+
 			<paext:globusGroup hostname="globus_frontend" id="globusgroup">
 				<paext:count>8</paext:count>
 				<paext:maxTime>120</paext:maxTime>
@@ -89,6 +97,10 @@
 				<paext:resource nodes="2" cpu="4" />
 				<paext:stderr>trace/err.log</paext:stderr>
 			</paext:oarGroup>
+
+			<paext:oarshGroup id="oarshgroup" hostList="host1 host2" jobId="42">
+				<pa:scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
+			</paext:oarshGroup>
 
 			<paext:lsfGroup id="lsfgroup">
 				<pa:scriptPath base="proactive" relpath="scripts/unix/cluster/startRuntime.sh" />
@@ -132,10 +144,24 @@
 					<pa:arg>arg2</pa:arg>
 				</paext:arguments>
 			</paext:gridbusGroup>
+
+
+			<paext:cgspGroup id="cgspgroup" hostname="cgsp.inria.fr">
+				<pa:scriptPath base="root" relpath="./calc" />
+				<paext:count>50</paext:count>
+				<paext:directory>datadir/jobdata1</paext:directory>
+				<paext:stdout>trace/results.log</paext:stdout>
+				<paext:stderr>trace/err.log</paext:stderr>
+				
+			</paext:cgspGroup>
+
 		</groups>
 
 		<bridges>
 			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
+			
+			<oarshBridge id="oarbridge" hostname="oargrid.inria.fr" jobId="12" />
+			
 		</bridges>
 	</infrastructure>
 

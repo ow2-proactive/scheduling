@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+
+	<complexType name="oarshProcessType">
+		<complexContent>
+			<extension base="pa:groupTypeSSH">
+				<attribute name="jobId" type="pa:PosintOrVariableType" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="oarshGroup" type="paext:oarshProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+</schema>

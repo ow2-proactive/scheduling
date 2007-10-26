@@ -8,22 +8,21 @@
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
 
-	<complexType name="globusProcessType">
+	<complexType name="cgspProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="count" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
+ 					<element name="count" type="pa:PosintOrVariableType" minOccurs="0" />
 					<element name="directory" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
 				</sequence>
-				<attribute name="hostname" type="string" use="required" />
-				<attribute name="queue" type="string" use="optional" />
+				<attribute name="hostname" type="string" />
+				<attribute name="queue" type="string" />
 			</extension>
 		</complexContent>
 	</complexType>
 
-	<element name="globusGroup" type="paext:globusProcessType" substitutionGroup="pa:abstractShElement"></element>
+	<element name="cgspGroup" type="paext:cgspProcessType" substitutionGroup="pa:abstractShElement"></element>
 
 </schema>

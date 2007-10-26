@@ -27,7 +27,7 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="privateKey" type="pa:pathElementType" minOccurs="0" maxOccurs="1"></element>
+					<element name="privateKey" type="pa:pathElementType" minOccurs="0" maxOccurs="1" />
 				</sequence>
 				<attribute name="commandOptions" type="string"></attribute>
 				<attribute name="hostList" type="string" use="required"></attribute>
@@ -213,6 +213,9 @@
 	<complexType name="bridgeTypeSSH">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
+				<sequence>
+					<element name="privateKey" type="pa:pathElementType" minOccurs="0" maxOccurs="1" />
+				</sequence>
 				<attribute name="hostname" type="pa:hostnameType" use="required" />
 				<attribute name="username" type="pa:usernameType"></attribute>
 				<attribute name="commandPath" type="string"></attribute>
@@ -221,8 +224,17 @@
 		</complexContent>
 	</complexType>
 
+	<complexType name="bridgeTypeOARSH">
+		<complexContent>
+			<extension base="pa:bridgeTypeSSH">
+				<attribute name="jobId" type="pa:PosintOrVariableType" use="required"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
 	<element name="rshBridge" type="pa:bridgeTypeRSH" substitutionGroup="pa:abstractBridgeElement"></element>
 	<element name="sshBridge" type="pa:bridgeTypeSSH" substitutionGroup="pa:abstractBridgeElement"></element>
+	<element name="oarshBridge" type="pa:bridgeTypeOARSH" substitutionGroup="pa:abstractBridgeElement"></element>
 
 	<complexType name="bridgesType">
 		<sequence>

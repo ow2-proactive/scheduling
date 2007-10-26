@@ -4,6 +4,7 @@
 	elementFormDefault="qualified">
 
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupARCSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupCGSPSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupFuraSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGLiteSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGlobusSchema.xsd" />
@@ -11,8 +12,8 @@
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupGridEngineSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupLSFSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupLoadLevelerSchema.xsd" />
-	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARGridSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARSchema.xsd" />	
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARSHSchema.xsd" />	
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPBSSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPrunSchema.xsd" />
 
