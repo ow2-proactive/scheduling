@@ -1,30 +1,27 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ * Initial developer(s): The ProActive Team
+ * http://proactive.inria.fr/team_members.htm Contributor(s):
  *
  * ################################################################
  */
@@ -42,7 +39,9 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -51,6 +50,12 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
+import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
+import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extra.scheduler.gui.views.TaskResult;
+import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
+import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -231,6 +236,26 @@ public class TaskComposite extends Composite {
         tc7.setMoveable(true);
         tc8.setMoveable(true);
         tc9.setMoveable(true);
+
+        table.addListener(SWT.Selection,
+            new Listener() {
+                public void handleEvent(Event event) {
+                    // get the taskId
+                    TaskId taskId = (TaskId) event.item.getData();
+
+                    InternalJob job = JobsController.getLocalView()
+                                                    .getJobById(taskId.getJobId());
+
+                    InternalTask task = job.getHMTasks().get(taskId);
+
+                    // update its tasks informations
+                    TaskResult taskResult = TaskResult.getInstance();
+                    if (taskResult != null) {
+                        taskResult.update(task);
+                    }
+                }
+            });
+
         return table;
     }
 
@@ -403,8 +428,8 @@ public class TaskComposite extends Composite {
 
     /**
      * This method allow to replace only one line on the task table. This method
-     * identify the "good" item with the taskId. The internalTask is use to
-     * fill item.
+     * identify the "good" item with the taskId. The internalTask is use to fill
+     * item.
      *
      * @param taskId the taskId which must be updated
      * @param internalTask all informations for fill item

@@ -103,7 +103,7 @@ public class TaskView extends ViewPart {
         Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    taskComposite.changeLine(aTaskEvent.getTaskID(),
+                    taskComposite.changeLine(aTaskEvent.getTaskId(),
                         aTaskDescriptor);
                 }
             });

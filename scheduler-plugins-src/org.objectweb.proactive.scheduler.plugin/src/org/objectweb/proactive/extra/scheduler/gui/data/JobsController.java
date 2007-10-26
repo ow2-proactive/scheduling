@@ -400,7 +400,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
                             taskView.lineUpdate(taskEvent,
-                                getTaskDescriptorById(job, taskEvent.getTaskID()));
+                                getTaskDescriptorById(job, taskEvent.getTaskId()));
                         }
                     }
                 });
@@ -435,7 +435,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
                             taskView.lineUpdate(taskEvent,
-                                getTaskDescriptorById(job, taskEvent.getTaskID()));
+                                getTaskDescriptorById(job, taskEvent.getTaskId()));
                         }
                     }
                 });

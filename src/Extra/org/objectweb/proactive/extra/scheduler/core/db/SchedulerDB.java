@@ -29,18 +29,6 @@ import org.objectweb.proactive.extra.scheduler.job.JobResultImpl;
 import org.objectweb.proactive.extra.scheduler.util.DatabaseManager;
 
 
-// "create table JOB_AND_JOB_EVENTS(jobid_hashcode INTEGER,job BLOB," +
-// "jobevent BLOB,CONSTRAINT JOB_AND_JOB_EVENTS_PK PRIMARY
-// KEY(jobid_hashcode))");
-
-// create table TASK_EVENTS_AND_TASK_RESULTS(" +
-// "jobid_hashcode INTEGER, taskid_hashcode INTEGER, " +
-// "taskevent BLOB, taskresult BLOB," +
-// "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_PK PRIMARY KEY(jobid_hashcode,
-// taskid_hashcode)," +
-// "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_FK FOREIGN KEY (jobid_hashcode)
-// REFERENCES JOB_AND_JOB_EVENTS)");
-
 /**
  * @author FRADJ Johann
  */
@@ -281,6 +269,12 @@ public class SchedulerDB extends AbstractSchedulerDB {
                     (TaskResult) deserialize(rs.getBlob(2)));
             }
 
+            if ((internalJobList.size() == 0) && (jobResultMap.size() == 0) &&
+                    (jobEventMap.size() == 0) && (taskEventMap.size() == 0) &&
+                    commit()) {
+                return null;
+            }
+
             Collection<JobResult> col = jobResultMap.values();
             for (JobResult jr : col)
                 jobResultList.add(jr);
@@ -368,6 +362,9 @@ public class SchedulerDB extends AbstractSchedulerDB {
     public boolean setJobAndTasksEvents(JobEvent jobEvent,
         List<TaskEvent> tasksEvents) {
         // TODO Factoriser le code....
+        PreparedStatement updatePreparedStatement = null;
+        PreparedStatement insertPreparedStatement = null;
+        PreparedStatement tmpPreparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(
                     "UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
@@ -376,14 +373,30 @@ public class SchedulerDB extends AbstractSchedulerDB {
             int nb = preparedStatement.executeUpdate();
             int count = 1;
 
-            preparedStatement = connection.prepareStatement(
+            updatePreparedStatement = connection.prepareStatement(
                     "UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
-            for (TaskEvent taskEvent : tasksEvents) {
-                preparedStatement.setBlob(1, serialize(taskEvent));
-                preparedStatement.setInt(2, taskEvent.getJobId().hashCode());
-                preparedStatement.setInt(3, taskEvent.getTaskId().hashCode());
 
-                nb += preparedStatement.executeUpdate();
+            insertPreparedStatement = connection.prepareStatement(
+                    "INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
+
+            int jobid_hashcode;
+            int taskid_hashcode;
+
+            for (TaskEvent taskEvent : tasksEvents) {
+                jobid_hashcode = taskEvent.getJobId().hashCode();
+                taskid_hashcode = taskEvent.getTaskId().hashCode();
+
+                if (alreadyExistInTaskTable(jobid_hashcode, taskid_hashcode)) {
+                    tmpPreparedStatement = preparedStatement;
+                } else {
+                    tmpPreparedStatement = insertPreparedStatement;
+                }
+
+                tmpPreparedStatement.setBlob(1, serialize(taskEvent));
+                tmpPreparedStatement.setInt(2, jobid_hashcode);
+                tmpPreparedStatement.setInt(3, taskid_hashcode);
+
+                nb += tmpPreparedStatement.executeUpdate();
                 count++;
             }
 
@@ -392,6 +405,20 @@ public class SchedulerDB extends AbstractSchedulerDB {
             }
         } catch (SQLException e) {
             rollback();
+        } finally {
+            try {
+                if (insertPreparedStatement != null) {
+                    insertPreparedStatement.close();
+                }
+                if (updatePreparedStatement != null) {
+                    updatePreparedStatement.close();
+                }
+                if (tmpPreparedStatement != null) {
+                    tmpPreparedStatement.close();
+                }
+            } catch (SQLException e) {
+                // Nothing to do
+            }
         }
         return false;
     }
