@@ -30,17 +30,12 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask;
 import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
@@ -102,11 +97,10 @@ public class InternalNativeTask extends InternalTask {
         NativeTaskLauncher launcher;
         if (getPreTask() == null) {
             launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), getJobId(), host, port }, node);
+                    new Object[] { getId(), host, port }, node);
         } else {
             launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), getJobId(), getPreTask(), host, port },
-                    node);
+                    new Object[] { getId(), getPreTask(), host, port }, node);
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;

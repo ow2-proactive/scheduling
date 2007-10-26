@@ -52,7 +52,6 @@ import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
 import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
@@ -72,14 +71,13 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
  * You can extend this launcher in order to create a specific launcher.
  * With this default launcher, you can get the node on which the task is running and kill the task.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 10, 2007
  * @since ProActive 3.2
  */
 public class TaskLauncher implements InitActive, Serializable {
     private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
-    protected JobId jobId;
     protected PreScript pre;
     protected String host;
     protected Integer port;
@@ -99,13 +97,11 @@ public class TaskLauncher implements InitActive, Serializable {
      * Constructor with task identification
      *
      * @param taskId represents the task the launcher will execute.
-     * @param jobId represents the job where the task is located.
      * @param host the host on which to append the standard output/input.
      * @param port the port number on which to send the standard output/input.
      */
-    public TaskLauncher(TaskId taskId, JobId jobId, String host, Integer port) {
+    public TaskLauncher(TaskId taskId, String host, Integer port) {
         this.taskId = taskId;
-        this.jobId = jobId;
         this.host = host;
         this.port = port;
     }
@@ -114,14 +110,12 @@ public class TaskLauncher implements InitActive, Serializable {
      * Constructor with task identification
      *
      * @param taskId represents the task the launcher will execute.
-     * @param jobId represents the job where the task is located.
      * @param pre the script executed before the task.
      * @param host the host on which to append the standard output/input.
      * @param port the port number on which to send the standard output/input.
      */
-    public TaskLauncher(TaskId taskId, JobId jobId, PreScript pre, String host,
-        Integer port) {
-        this(taskId, jobId, host, port);
+    public TaskLauncher(TaskId taskId, PreScript pre, String host, Integer port) {
+        this(taskId, host, port);
         System.out.println("TaskLauncher.TaskLauncher() : " + pre);
         this.pre = pre;
     }
@@ -173,13 +167,13 @@ public class TaskLauncher implements InitActive, Serializable {
             try {
                 this.finalizeLoggers();
             } catch (RuntimeException e) {
-                // exception should not be thrown to te scheduler core
+                // exception should not be thrown to the scheduler core
                 // the result has been computed and must be returned !
                 // TODO : logger.warn
                 System.err.println("WARNING : Loggers are not shut down !");
             }
             //terminate the task
-            core.terminate(taskId, jobId);
+            core.terminate(taskId);
         }
     }
 
@@ -191,7 +185,8 @@ public class TaskLauncher implements InitActive, Serializable {
         // error about log should not be logged
         LogLog.setQuietMode(true);
         // create logger
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                this.taskId.getJobId());
         Appender out = new SocketAppender(this.host, this.port);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();

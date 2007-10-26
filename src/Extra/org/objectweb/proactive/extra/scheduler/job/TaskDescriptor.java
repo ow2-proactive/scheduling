@@ -55,9 +55,6 @@ public class TaskDescriptor implements Serializable {
     /** Task id */
     private TaskId id;
 
-    /** job id */
-    private JobId jobId;
-
     /** number of parents remaining (initial value must be 0) */
     private int count = 0;
 
@@ -74,7 +71,6 @@ public class TaskDescriptor implements Serializable {
      */
     public TaskDescriptor(InternalTask td) {
         this.id = td.getId();
-        this.jobId = td.getJobId();
     }
 
     /**
@@ -116,7 +112,7 @@ public class TaskDescriptor implements Serializable {
      * @return the jobId
      */
     public JobId getJobId() {
-        return jobId;
+        return this.id.getJobId();
     }
 
     /**

@@ -222,16 +222,24 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
     /**
      * Create the list of taskEvent containing in the given job.
+     * Clear the task event modify status. It is used to change all status of all tasks
+     * with only one request. It has to be cleared after sending events.
+     * Send the change to the data base.
      *
      * @param currentJob the job where the task event are.
-     * @return the list of taskEvent containing in each task.
      */
-    private ArrayList<TaskEvent> createTaskEventsList(InternalJob currentJob) {
+    private void updateTaskEventsList(InternalJob currentJob) {
         ArrayList<TaskEvent> events = new ArrayList<TaskEvent>();
         for (TaskId id : currentJob.getJobInfo().getTaskStatusModify().keySet()) {
             events.add(currentJob.getHMTasks().get(id).getTaskInfo());
         }
-        return events;
+        // don't forget to set the task status modify to null
+        currentJob.setTaskStatusModify(null);
+        // used when a job has failed
+        currentJob.setTaskFinishedTimeModify(null);
+        // and to database
+        AbstractSchedulerDB.getInstance()
+                           .setJobAndTasksEvents(currentJob.getJobInfo(), events);
     }
 
     /**
@@ -273,11 +281,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 JobEvent event = job.getJobInfo();
                 //send event to front_end
                 frontend.jobResumedEvent(event);
-                event.setTaskStatusModify(null);
-                // and to data base
-                AbstractSchedulerDB.getInstance()
-                                   .setJobAndTasksEvents(event,
-                    createTaskEventsList(job));
+                updateTaskEventsList(job);
             }
         }
 
@@ -423,12 +427,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                             runningJobs.add(currentJob);
                             // send job event to front-end
                             frontend.pendingToRunningJobEvent(currentJob.getJobInfo());
-                            // don't forget to set the task status modify to null after a Job.start() method;
-                            currentJob.setTaskStatusModify(null);
-                            // and to database
-                            AbstractSchedulerDB.getInstance()
-                                               .setJobAndTasksEvents(currentJob.getJobInfo(),
-                                createTaskEventsList(currentJob));
+                            //create tasks events list
+                            updateTaskEventsList(currentJob);
                         }
                         // set the different informations on task
                         currentJob.startTask(internalTask,
@@ -606,13 +606,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         l.removeAllAppenders();
         //send event to listeners.
         frontend.runningToFinishedJobEvent(job.getJobInfo());
-        //don't forget to set the task status modify to null after a job.failed(...) method.
-        job.setTaskStatusModify(null);
-        job.setTaskFinishedTimeModify(null);
-        //and to data base
-        AbstractSchedulerDB.getInstance()
-                           .setJobAndTasksEvents(job.getJobInfo(),
-            createTaskEventsList(job));
+        //create tasks events list
+        updateTaskEventsList(job);
         logger.info("[SCHEDULER] Terminated job (failed/Cancelled) " +
             job.getId());
     }
@@ -622,12 +617,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * This method can be invoke just a little amount of time before the result arrival.
      * That's why it can block the execution but only for short time.
      *
-     * @param node the node on which the task has been executed.
      * @param taskId the identification of the executed task.
-     * @param jobId the executed task's job identification.
      */
-    public void terminate(TaskId taskId, JobId jobId) {
+    public void terminate(TaskId taskId) {
+        JobId jobId = taskId.getJobId();
         InternalJob job = jobs.get(jobId);
+
         InternalTask descriptor = job.getHMTasks().get(taskId);
         try {
             //The task is terminated but it's possible to have to
@@ -965,11 +960,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             logger.info("[SCHEDULER] Job " + jobId + " has just been paused !");
         }
         frontend.jobPausedEvent(event);
-        event.setTaskStatusModify(null);
-        //add to data base
-        AbstractSchedulerDB.getInstance()
-                           .setJobAndTasksEvents(event,
-            createTaskEventsList(job));
+        //create tasks events list
+        updateTaskEventsList(job);
         return new BooleanWrapper(change);
     }
 
@@ -996,11 +988,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 " has just been resumed !");
         }
         frontend.jobResumedEvent(event);
-        event.setTaskStatusModify(null);
-        //add to data base
-        AbstractSchedulerDB.getInstance()
-                           .setJobAndTasksEvents(event,
-            createTaskEventsList(job));
+        //create tasks events list
+        updateTaskEventsList(job);
         return new BooleanWrapper(change);
     }
 

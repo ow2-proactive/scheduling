@@ -113,11 +113,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
         TaskLauncher launcher;
         if (getPreTask() == null) {
             launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId(), getJobId(), host, port }, node);
+                    new Object[] { getId(), host, port }, node);
         } else {
             launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId(), getJobId(), getPreTask(), host, port },
-                    node);
+                    new Object[] { getId(), getPreTask(), host, port }, node);
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;
@@ -199,7 +198,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * Add a dependence to the list of dependences for this taskDescriptor.
      * The tasks in this list represents the tasks this tasks have to wait for before starting.
      *
-     * @param task a supertask of this task.
+     * @param task a super task of this task.
      */
     public void addDependence(InternalTask task) {
         if (dependences == null) {
@@ -325,16 +324,16 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @return the taskID
      */
     public TaskId getId() {
-        return taskInfo.getTaskID();
+        return taskInfo.getTaskId();
     }
 
     /**
      * To set the taskId
      *
-     * @param taskID the taskID to set
+     * @param taskId the taskId to set
      */
-    public void setId(TaskId taskID) {
-        taskInfo.setTaskID(taskID);
+    public void setId(TaskId taskId) {
+        taskInfo.setTaskId(taskId);
     }
 
     /**
@@ -439,7 +438,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     }
 
     /**
-     * Set the number of rerunn left.
+     * Set the number of re-run left.
      *
      * @param rerunnableLeft the rerunnableLeft to set
      */

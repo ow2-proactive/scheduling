@@ -127,7 +127,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public synchronized void update(TaskEvent event) {
         jobInfo = event.getJobEvent();
-        tasks.get(event.getTaskID()).update(event);
+        tasks.get(event.getTaskId()).update(event);
     }
 
     /**

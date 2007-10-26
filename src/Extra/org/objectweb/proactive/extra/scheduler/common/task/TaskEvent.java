@@ -51,7 +51,7 @@ public class TaskEvent implements Serializable {
     private static final long serialVersionUID = -7625483185225564284L;
 
     /** id of the task */
-    private TaskId taskID = null;
+    private TaskId taskId = null;
 
     /** informations about the job */
     private JobEvent jobEvent = null;
@@ -152,21 +152,21 @@ public class TaskEvent implements Serializable {
     }
 
     /**
-     * To get the taskID
+     * To get the taskId
      *
-     * @return the taskID
+     * @return the taskId
      */
-    public TaskId getTaskID() {
-        return taskID;
+    public TaskId getTaskId() {
+        return taskId;
     }
 
     /**
-     * To set the taskID
+     * To set the taskId
      *
-     * @param taskID the taskID to set
+     * @param taskID the taskId to set
      */
-    public void setTaskID(TaskId taskID) {
-        this.taskID = taskID;
+    public void setTaskId(TaskId taskID) {
+        this.taskId = taskID;
     }
 
     /**

@@ -113,11 +113,10 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
         AppliTaskLauncher launcher;
         if (getPreTask() == null) {
             launcher = (AppliTaskLauncher) ProActiveObject.newActive(AppliTaskLauncher.class.getName(),
-                    new Object[] { getId(), getJobId(), host, port }, node);
+                    new Object[] { getId(), host, port }, node);
         } else {
             launcher = (AppliTaskLauncher) ProActiveObject.newActive(AppliTaskLauncher.class.getName(),
-                    new Object[] { getId(), getJobId(), getPreTask(), host, port },
-                    node);
+                    new Object[] { getId(), getPreTask(), host, port }, node);
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;

@@ -35,7 +35,6 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
@@ -45,9 +44,9 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
 
 /**
- * Appli task Launcher.
+ * Appli task Launcher will be able to launch an application task
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 10, 2007
  * @since ProActive 3.2
  */
@@ -65,9 +64,8 @@ public class AppliTaskLauncher extends TaskLauncher {
     public AppliTaskLauncher() {
     }
 
-    public AppliTaskLauncher(TaskId taskId, JobId jobId, String host,
-        Integer port) {
-        super(taskId, jobId, host, port);
+    public AppliTaskLauncher(TaskId taskId, String host, Integer port) {
+        super(taskId, host, port);
     }
 
     /**
@@ -142,7 +140,7 @@ public class AppliTaskLauncher extends TaskLauncher {
                 System.err.println("WARNING : Loggers are not shut down !");
             }
             //terminate the task
-            core.terminate(taskId, jobId);
+            core.terminate(taskId);
         }
     }
 
