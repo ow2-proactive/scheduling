@@ -36,10 +36,10 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 
 
 /**
- * This class represented an authentificate job.
+ * This class represented an authenticate job.
  * It is what the scheduler should be able to managed.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 4, 2007
  * @since ProActive 3.2
  */
