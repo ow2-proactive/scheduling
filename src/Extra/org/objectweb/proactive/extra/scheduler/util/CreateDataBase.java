@@ -7,14 +7,14 @@ import java.sql.Statement;
 
 /**
  * This class "try" to create a new database with two new table
- * (JOB_AND_JOB_EVENTS and TASK_EVENTS_AND_TASK_RESULTS) Why "try" ? because it
- * can failed the creation if the database already exist, or if hasn't the right
+ * (JOB_AND_JOB_EVENTS and TASK_EVENTS_AND_TASK_RESULTS) Why "try" ? because the
+ * creation can failed if the database already exist, or if hasn't the right
  * permissions..
  *
  * @author FRADJ Johann
  */
 public class CreateDataBase {
-    public static void main(String[] args) {
+    public static void createDataBase() {
         Connection conn = null;
         Statement stmt = null;
         try {
@@ -79,5 +79,9 @@ public class CreateDataBase {
                 System.out.println("Database shut down with problems");
             }
         }
+    }
+
+    public static void main(String[] args) {
+        createDataBase();
     }
 }

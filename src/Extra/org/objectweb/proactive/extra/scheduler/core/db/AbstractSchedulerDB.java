@@ -50,7 +50,8 @@ public abstract class AbstractSchedulerDB {
             try {
                 instance = new SchedulerDB();
             } catch (SQLException e) {
-                e.printStackTrace();
+                // The database doesn't exist
+                instance = new EmptySchedulerDB();
             }
         }
         return instance;

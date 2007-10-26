@@ -31,13 +31,13 @@ public class ProgressProblem {
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         for (int i = 0; i < 3; i++) {
-            new TableColumn(table, SWT.NONE);
+            new TableColumn(table, SWT.NONE).setMoveable(true);
         }
         table.getColumn(0).setText("Task");
         table.getColumn(1).setText("Progress");
-        for (int i = 0; i < 10; i++) {
+        for (int i = 10; i >= 0; i--) {
             TableItem item = new TableItem(table, SWT.NONE);
-            item.setText("Task " + i);
+            item.setText("Task " + (10 - i));
             ProgressBar bar = new ProgressBar(table, SWT.NONE);
             bar.setSelection(i * 10);
             TableEditor editor = new TableEditor(table);
@@ -53,12 +53,15 @@ public class ProgressProblem {
         ok.addSelectionListener(new SelectionAdapter() {
                 public void widgetSelected(SelectionEvent e) {
                     int i = new Integer(text.getText());
+
                     ((ProgressBar) (table.getItem(i).getData("bar"))).dispose();
-                    ((TableEditor) (table.getItem(i).getData("editor"))).layout();
                     ((TableEditor) (table.getItem(i).getData("editor"))).dispose();
-                    ((TableEditor) (table.getItem(i).getData("editor"))).layout();
-                    //table.remove(i);
-                    table.layout(true);
+                    table.remove(i);
+
+                    for (TableColumn col : table.getColumns())
+                        col.notifyListeners(SWT.Move, null);
+
+                    // table.layout(true);
 
                     /* ???????????????????????????????????? */
                     /* ???????????????????????????????????? */
