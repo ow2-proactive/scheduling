@@ -36,7 +36,7 @@ import java.net.UnknownHostException;
 public class HelloWorld {
 	public HelloWorld(){//empty constructor is required by ProActive
 	}
-	// the method returns StringWrapper so the calls can be ansychronous	
+	// the method returns StringWrapper so the calls can be asynchronous	
 	public StringWrapper sayHello()
 	{
 		String hostname="Unkown";

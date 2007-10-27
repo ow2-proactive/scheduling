@@ -4,7 +4,7 @@
   <title>ProActive Security Mechanism</title>
 
   <para>In order to use the Proactive Security features, you have to
-  install<emphasis role="bold">the Java(TM) Cryptography Extension (JCE)
+  install <emphasis role="bold">the Java(TM) Cryptography Extension (JCE)
   Unlimited Strength Jurisdiction Policy Files</emphasis> available at <ulink
   url="http://www.java.sun.com">Sun's website</ulink>. Extract the file and
   copy jar files to your &lt;jre_home&gt;/lib/security.</para>
