@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -195,16 +196,22 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
 
         // Try if URL is the address of a RmiRemoteBody
         try {
+            LOGGER_RO.debug("trying to acquire " + uri.toString());
             o = java.rmi.Naming.lookup(URIBuilder.removeProtocol(uri).toString());
+            LOGGER_RO.debug(uri.toString() + " looked up successfully");
         } catch (IOException e) {
             // connection failed, try to find a rmiregistry at proactive.rmi.port port
             URI url2 = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(uri),
-                    URIBuilder.getHostNameFromUrl(uri));
-
+                    URIBuilder.getNameFromURI(uri));
+            url2 = RemoteObjectHelper.expandURI(url2);
+            LOGGER_RO.debug("Lookup of " + uri.toString() +
+                " failed, failbacking on default port : " + url2.toString());
             try {
-                o = java.rmi.Naming.lookup(url2.toString());
+                o = java.rmi.Naming.lookup(URIBuilder.removeProtocol(url2)
+                                                     .toString());
+                LOGGER_RO.warn("Lookup of " + url2.toString() + " succeed");
             } catch (Exception e1) {
-                LOGGER_RO.warn("Lookup of " + url2.toString() + " failed", e);
+                LOGGER_RO.warn("Lookup of " + url2.toString() + " failed");
             }
         } catch (java.rmi.NotBoundException e) {
             // there are one rmiregistry on target computer but nothing bound to this url isn t bound

@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.util.IbisProperties;
@@ -187,8 +188,10 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
             // connection failed, try to find a rmiregistry at proactive.rmi.port port
             URI url2 = URIBuilder.buildURI(url1.getHost(),
                     URIBuilder.getNameFromURI(url1));
+            url2 = RemoteObjectHelper.expandURI(url2);
             try {
-                o = ibis.rmi.Naming.lookup(url2.toString());
+                o = ibis.rmi.Naming.lookup(URIBuilder.removeProtocol(url2)
+                                                     .toString());
             } catch (Exception e1) {
                 throw new ProActiveException(e);
             }
