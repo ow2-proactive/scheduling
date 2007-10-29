@@ -252,7 +252,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     // traitement special
                     e.printStackTrace();
                 }
-            } while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
+            } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) &&
                     (found < nb.intValue()));
         } else {
             logger.info("[RESOURCE] Nodes with dynamic verif script");
@@ -325,7 +325,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     // traitement special
                     e.printStackTrace();
                 }
-            } while (!scriptResults.isEmpty() && !nodes.isEmpty() &&
+            } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) &&
                     (found < nb.intValue()));
         }
 
