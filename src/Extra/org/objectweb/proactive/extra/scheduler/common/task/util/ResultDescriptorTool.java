@@ -36,28 +36,55 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
 
 
 /**
  * Static util methods for result descriptor definition
  * @author cdelbe
- * @since 3.2.1
+ * @since 3.9
  */
 public class ResultDescriptorTool {
 
     /**
+     * Name of the environment variable for windows home directory
+     * on the common file system.
+     */
+    public static final String WINDOWS_HOME_ENV_VAR = "WINDOWS_HOME";
+
+    /**
+     * Name of the environment variable for unix home directory
+     * on the common file system.
+     */
+    public static final String UNIX_HOME_ENV_VAR = "UNIX_HOME";
+
+    /**
      * Convert path parameter into system compliant path on a common file system
      * @param path the path to convert
-     * @param winHome windows home directory on the common file system
-     * @param unixHome unix home directory on the common file system
      * @return converted path
      */
-    public static String getSystemCompliantPath(String path, String winHome,
-        String unixHome) {
+    public static String getSystemCompliantPath(String path) {
+        //Check home dir env variable
+        String winHome = System.getenv(WINDOWS_HOME_ENV_VAR);
+        String unixHome = System.getenv(UNIX_HOME_ENV_VAR);
+
+        System.out.println("[RESULT_DESCRIPTOR] WINHOME: [" + winHome + "]");
+        System.out.println("[RESULT_DESCRIPTOR] UNIXHOME: [" + unixHome + "]");
+
+        if ((winHome == null) || (unixHome == null)) {
+            System.err.println(
+                "[RESULT_DESCRIPTOR] Warning : home directories variables are not set !");
+            return path;
+        }
+
         if (System.getProperty("os.name").contains("Windows")) {
             // on windows
             if (path.contains("/") && !path.contains("\\")) {
@@ -78,9 +105,9 @@ public class ResultDescriptorTool {
     }
 
     /**
-     *
+     * Simple JPanel for displaying image
      * @author cdelbe
-     * @since 2.2
+     * @since 3.9
      */
     public static class SimpleImagePanel extends JPanel {
         private Image img;
@@ -97,6 +124,7 @@ public class ResultDescriptorTool {
             setMinimumSize(size);
             setMaximumSize(size);
             setSize(size);
+            setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
             setLayout(null);
         }
 
@@ -111,25 +139,25 @@ public class ResultDescriptorTool {
     }
 
     /**
-     *
+     * Simple JPanel for displaying text message
      * @author cdelbe
-     * @since 2.2
+     * @since 3.9
      */
     public static class SimpleTextPanel extends JPanel {
         private String text;
         JTextArea textZone = new JTextArea(15, 40);
-        JPanel internalPanel = new JPanel();
 
         public SimpleTextPanel(String text) {
             this.text = text;
             setBackground(Color.DARK_GRAY);
             setLayout(new BorderLayout());
-            internalPanel.setLayout(new BorderLayout(0, 0));
-            textZone.setFont(new Font("Arial", Font.PLAIN, 11));
-            add(internalPanel, BorderLayout.NORTH);
+            Font f = new Font("Arial", Font.BOLD, 12);
+            textZone.setFont(f);
             add(textZone, BorderLayout.CENTER);
             textZone.setEditable(false);
+            textZone.setMargin(new Insets(7, 7, 7, 7));
             textZone.setText(text);
+            setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         }
 
         public String toString() {

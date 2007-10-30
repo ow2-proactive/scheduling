@@ -36,6 +36,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 
 
 public class TaskResultDisplay extends ViewPart {
@@ -51,7 +52,6 @@ public class TaskResultDisplay extends ViewPart {
     private static Frame container;
     private static JPanel toBeDisplayed;
     private static JScrollPane scrollableContainer;
-    private static boolean hasBeenModified;
 
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
@@ -80,24 +80,18 @@ public class TaskResultDisplay extends ViewPart {
     }
 
     public void update(JPanel tbd) {
-        System.out.println("TaskResultDisplay.update()");
-        try {
+        if (tbd != toBeDisplayed) {
             toBeDisplayed = tbd;
-            if (toBeDisplayed != null) { //test if TBD has changed...
-                container.removeAll();
-                container.repaint();
-                scrollableContainer = new JScrollPane(toBeDisplayed);
-                container.add(scrollableContainer);
-                container.pack();
-                container.repaint();
-                scrollableContainer.repaint();
-                root.redraw();
-            } else {
-                //SHOULD DISPLAY SOMETHING...
-            }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+            container.removeAll();
+            scrollableContainer = new JScrollPane(toBeDisplayed);
+            container.add(scrollableContainer);
+            toBeDisplayed.revalidate();
         }
+        container.repaint();
+        root.pack();
+        root.redraw();
+        root.update();
+        root.getParent().layout();
     }
 
     // -------------------------------------------------------------------- //
@@ -110,18 +104,14 @@ public class TaskResultDisplay extends ViewPart {
     public void createPartControl(Composite theParent) {
         parent = theParent;
         isDisposed = false;
-
         root = new Composite(parent, SWT.EMBEDDED);
         root.setVisible(true);
         container = SWT_AWT.new_Frame(root);
         container.pack();
         container.setVisible(true);
+        root.pack();
         parent.pack();
-
-        //SimpleImagePanel img = new SimpleImagePanel("/user/cdelbe/home/mkrisJeune.jpg");
-
-        //        SimpleTextPanel img = new SimpleTextPanel("TEST : This is a test message");
-        //        this.update(img);
+        this.update(new SimpleTextPanel("No selected task"));
     }
 
     /**
@@ -139,14 +129,6 @@ public class TaskResultDisplay extends ViewPart {
         // updateInfos(JobsController.getInstance().getJobById((IntWrapper)
         // item.getData()));
         // }
-        try {
-            //container.repaint();
-            //scrollableContainer.repaint();
-            root.redraw();
-        } catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**

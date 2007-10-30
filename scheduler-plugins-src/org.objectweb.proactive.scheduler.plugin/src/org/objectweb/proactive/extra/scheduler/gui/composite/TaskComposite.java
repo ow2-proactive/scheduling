@@ -47,6 +47,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
 import org.objectweb.proactive.extra.scheduler.common.task.Status;
@@ -246,6 +251,17 @@ public class TaskComposite extends Composite {
 
                     InternalJob job = JobsController.getLocalView()
                                                     .getJobById(taskId.getJobId());
+
+                    // set Focus on task result
+                    IWorkbench iworkbench = PlatformUI.getWorkbench();
+                    IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+                    IWorkbenchPage page = currentWindow.getActivePage();
+                    try {
+                        IViewPart part = page.showView(TaskResultDisplay.ID);
+                        part.setFocus();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     // test job owner
                     if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
