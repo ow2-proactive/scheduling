@@ -32,6 +32,8 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.io.Serializable;
 
+import javax.swing.JPanel;
+
 
 /**
  * This class defines a way to represent the result of a given task.
@@ -52,7 +54,5 @@ public abstract class ResultDescriptor implements Serializable {
      * @param result the result to be described.
      * @return the graphical representation.
      */
-
-    //TODO cdelbe, jfradj : return type ?
-    public abstract Object getGraphicalDescription(TaskResult result);
+    public abstract JPanel getGraphicalDescription(TaskResult result);
 }

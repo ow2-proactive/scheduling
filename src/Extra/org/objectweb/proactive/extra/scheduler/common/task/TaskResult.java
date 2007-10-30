@@ -32,6 +32,8 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.io.Serializable;
 
+import javax.swing.JPanel;
+
 
 /**
  * Interface representing the task result.
@@ -79,7 +81,21 @@ public interface TaskResult extends Serializable {
      */
     public TaskLogs getOuput();
 
-    public Object getGraphicalDescription();
+    /**
+     * Set the class that is able to describe this result. See ResultDescriptor.
+     * @param descClass the class that is able to describe this result.
+     */
+    public void setDescriptorClass(Class<?extends ResultDescriptor> descClass);
 
+    /**
+     * Return a swing panel describing this result.
+     * @return a swing panel describing this result.
+     */
+    public JPanel getGraphicalDescription();
+
+    /**
+     * Return a string describing this result.
+     * @return a string describing this result.
+     */
     public String getTextualDescription();
 }

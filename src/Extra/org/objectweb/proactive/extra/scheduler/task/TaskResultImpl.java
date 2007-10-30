@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
+import javax.swing.JPanel;
+
 import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 
 
 /**
@@ -135,11 +138,35 @@ public class TaskResultImpl implements TaskResult {
     }
 
     /**
+     *  @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#setDescriptorClass(Class)
+     */
+    public void setDescriptorClass(Class<?extends ResultDescriptor> descClass) {
+        if (this.descriptorClass != null) {
+            throw new RuntimeException("Descriptor class cannot be changed");
+        } else {
+            this.descriptorClass = descClass;
+        }
+    }
+
+    /**
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#getGraphicalDescription()
      */
-    public Object getGraphicalDescription() {
-        //TODO : implement with SWT object ?
-        return null;
+    public JPanel getGraphicalDescription() {
+        boolean instanciation = false;
+        try {
+            instanciation = this.instanciateDescriptor();
+        } catch (InstantiationException e) {
+            return new SimpleTextPanel(
+                "[SCHEDULER] Cannot create descriptor : " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            return new SimpleTextPanel(
+                "[SCHEDULER] Cannot create descriptor : " + e.getMessage());
+        }
+        if (instanciation) {
+            return this.descriptor.getGraphicalDescription(this);
+        } else {
+            return new SimpleTextPanel(this.getTextualDescription());
+        }
     }
 
     /**
@@ -157,10 +184,10 @@ public class TaskResultImpl implements TaskResult {
         if (instanciation) {
             return this.descriptor.getTextualDescription(this);
         } else if (!this.hadException()) {
-            return this.value.toString();
+            return "[DEFAULT DESCRIPTION] " + this.value.toString();
         } else {
             // yes, Guillaume, I know...
-            return this.exception.getMessage();
+            return "[DEFAULT DESCRIPTION] " + this.exception.getMessage();
         }
     }
 
