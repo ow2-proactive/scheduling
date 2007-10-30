@@ -634,15 +634,13 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             //if the node has died, a runtimeException is sent instead of the result
             TaskResult res = null;
             res = job.getJobResult().getTaskResults().get(descriptor.getName());
+            // unwrap future
+            res = (TaskResult) ProFuture.getFutureValue(res);
 
-            // TMP : HANDLE DESCIPTORS
+            // HANDLE DESCIPTORS
             if (res != null) {
                 res.setDescriptorClass(descriptor.getResultDescriptor());
             }
-            // ARGGGGL : UGLYYYYY
-
-            // set descriptor if any
-            descriptor.getResultDescriptor();
 
             if (res != null) {
                 if (ProException.isException(res)) {
