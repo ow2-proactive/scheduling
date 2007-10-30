@@ -28,7 +28,6 @@
 package org.objectweb.proactive.extra.scheduler.gui.views;
 
 import java.awt.Frame;
-import java.awt.GridLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -37,7 +36,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extra.scheduler.common.task.util.SimpleTextPanel;
 
 
 public class TaskResultDisplay extends ViewPart {
