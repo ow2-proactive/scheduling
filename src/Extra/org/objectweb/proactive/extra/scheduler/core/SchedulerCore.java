@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.core;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -249,7 +250,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //Rebuild the scheduler if a crash has occurred.
         //recover();
         //listen log as immediate Service.
-        ProActiveObject.setImmediateService("listenLog");
+        //ProActiveObject.setImmediateService("listenLog");
         Service service = new Service(body);
 
         //set the filter for serveAll method
@@ -749,7 +750,34 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @param port the port number on which the log will be sent.
      */
     public void listenLog(JobId jobId, String hostname, int port) {
-        this.jobLogs.get(jobId).addSink(new SocketAppender(hostname, port));
+        BufferedAppender bufferForJobId = this.jobLogs.get(jobId);
+        if (bufferForJobId != null) {
+            this.jobLogs.get(jobId).addSink(new SocketAppender(hostname, port));
+        } else {
+            // job has been removed _or_ scheduler has recovered
+            // create appender for this job
+            InternalJob target = this.jobs.get(jobId);
+            if (target != null) {
+                Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                        jobId);
+                BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
+                        true);
+                this.jobLogs.put(jobId, op);
+                l.addAppender(op);
+                op.addSink(new SocketAppender(hostname, port));
+
+                // retreive already stored output of job jobid in task logs in task results
+                Collection<TaskResult> allRes = target.getJobResult()
+                                                      .getTaskResults().values();
+                for (TaskResult tr : allRes) {
+                    // if taskResult is not awaited, task is terminated
+                    if (!ProFuture.isAwaited(tr)) {
+                        l.info(tr.getOuput().getStdoutLogs(false));
+                        l.error(tr.getOuput().getStderrLogs(false));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -769,7 +797,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             frontend.removeFinishedJobEvent(job.getJobInfo());
             //and to data base
             AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
-            this.jobLogs.remove(jobId).close();
+            BufferedAppender jobLog = this.jobLogs.remove(jobId);
+            if (jobLog != null) {
+                jobLog.close();
+            }
             logger.info("[SCHEDULER] Removed result for job " + jobId);
         }
         return result;
