@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import java.util.ArrayList;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
@@ -40,7 +39,6 @@ import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationExce
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.Status;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
@@ -83,9 +81,6 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
 
     /** Task information : this is the informations that can change during process. */
     private TaskEvent taskInfo = new TaskEvent();
-
-    /** User-defined description of the result of this task */
-    private Class<?extends ResultDescriptor> resultDescriptor;
 
     /**
      * ProActive Empty constructor
