@@ -224,7 +224,6 @@ public class SchedulerFrontend implements InitActive,
                 "This active object is already connected to the scheduler !");
         }
         logger.info(identification.getUsername() + " successfully connected !");
-        //TODO : restore admin state to the userIdentification.
         identifications.put(sourceBodyID, identification);
     }
 

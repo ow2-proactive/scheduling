@@ -132,7 +132,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                         pae.printStackTrace();
                         console.warn("Found active object in registry at " +
                             url);
-                    }                   
+                    }
                 }
             }
         } catch (Exception e) {

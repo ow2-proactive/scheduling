@@ -1138,8 +1138,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 jobs.get(entry.getKey().getJobId()).update(entry.getValue());
             } catch (NullPointerException e) {
                 //do nothing, the job has not to be managed anymore
-                //the job stay in database until someone removed it
-                //its job result can be get until previous removing.
+                //the job stays in database until someone removed it (1)
+                //its job result can be get until previous removing (1).
             }
         }
         for (Entry<JobId, JobEvent> entry : recoverable.getJobEvents().entrySet()) {
@@ -1210,16 +1210,22 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
                 //set the task to pause inside the job if it is paused.
                 if (job.getState() == JobState.PAUSED) {
-                    for (InternalTask task : job.getTasks()) {
-                        if (task.getStatus() == Status.PENDING) {
-                            task.setStatus(Status.PAUSED);
-                        }
-                    }
+                    job.setState(JobState.STALLED);
+                    job.setPaused();
+                    job.setTaskStatusModify(null);
                 }
                 //update the count of pending and running task.
                 job.setNumberOfPendingTasks(job.getNumberOfPendingTask() +
                     job.getNumberOfRunningTask());
                 job.setNumberOfRunningTasks(0);
+            }
+        }
+        for (InternalJob job : pendingJobs) {
+            //set the task to pause inside the job if it is paused.
+            if (job.getState() == JobState.PAUSED) {
+                job.setState(JobState.STALLED);
+                job.setPaused();
+                job.setTaskStatusModify(null);
             }
         }
 
@@ -1250,7 +1256,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         }
 
         //------------------------------------------------------------------------
-        //---------------    Removed non-managed jobs (optional)   ---------------
+        //---------    Removed non-managed jobs (result has been sent)   ---------
         //------------------------------------------------------------------------
         Iterator<InternalJob> iterJob = jobs.values().iterator();
         while (iterJob.hasNext()) {

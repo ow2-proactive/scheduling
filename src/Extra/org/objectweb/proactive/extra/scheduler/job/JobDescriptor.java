@@ -200,8 +200,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());
                 if (lt != null) {
                     pausedTasks.put(tid.getKey(),
-                        eligibleTasks.get(tid.getKey()));
-                    eligibleTasks.remove(tid.getKey());
+                        eligibleTasks.remove(tid.getKey()));
                 }
             } else if ((tid.getValue() == Status.PENDING) ||
                     (tid.getValue() == Status.SUBMITTED)) {

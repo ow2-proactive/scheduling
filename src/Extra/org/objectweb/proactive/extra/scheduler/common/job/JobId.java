@@ -109,7 +109,7 @@ public final class JobId implements Comparable<JobId>, Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof JobId) {
+        if ((o != null) && o instanceof JobId) {
             return ((JobId) o).id == id;
         }
         return false;

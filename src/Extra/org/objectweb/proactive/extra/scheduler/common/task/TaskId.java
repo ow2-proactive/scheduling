@@ -145,7 +145,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof TaskId) {
+        if ((o != null) && o instanceof TaskId) {
             return ((TaskId) o).id == id;
         }
         return false;
