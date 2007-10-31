@@ -80,17 +80,16 @@ public class LocalSchedulerExample {
                         "../../../descriptors/scheduler/deployment/test.xml"),
                     null);
 
-                Runtime.getRuntime().addShutdownHook(new Thread() {
-                        public void run() {
-                            try {
-                                admin.killAll();
-                            } catch (ProActiveException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-
+                //                Runtime.getRuntime().addShutdownHook(new Thread() {
+                //                        public void run() {
+                //                            try {
+                //                                admin.killAll();
+                //                            } catch (ProActiveException e) {
+                //                                // TODO Auto-generated catch block
+                //                                e.printStackTrace();
+                //                            }
+                //                        }
+                //                    });
                 imp = InfrastructureManagerProxy.getProxy(new URI(
                             "rmi://localhost:" +
                             System.getProperty("proactive.rmi.port") + "/"));
@@ -99,14 +98,11 @@ public class LocalSchedulerExample {
                     ProActiveObject.getActiveObjectNodeUrl(imp));
             }
 
-            AdminSchedulerInterface adminAPI = AdminScheduler.createScheduler(LocalSchedulerExample.class.getResource(
-                        "login.cfg").getFile(),
-                    LocalSchedulerExample.class.getResource("groups.cfg")
-                                               .getFile(), "admin", "admin",
-                    imp,
-                    "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
-
-            adminAPI.start();
+            AdminScheduler.createScheduler(LocalSchedulerExample.class.getResource(
+                    "login.cfg").getFile(),
+                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
+                imp,
+                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");
         } catch (Exception e) {
             e.printStackTrace();
         }
