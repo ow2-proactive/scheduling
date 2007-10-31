@@ -60,13 +60,13 @@ public class JobEvent implements Serializable {
     /** job submitted time */
     private long submittedTime = -1;
 
-    /** job started time */
+    /** job started time : IMPORTANT TO BE SET TO -1 */
     private long startTime = -1;
 
-    /** job finished time */
+    /** job finished time : IMPORTANT TO BE SET TO -1 */
     private long finishedTime = -1;
 
-    /** job removed time (it means the user got back the result of the job) */
+    /** job removed time (it means the user got back the result of the job) : IMPORTANT TO BE SET TO -1 */
     private long removedTime = -1;
 
     /** total number of tasks */

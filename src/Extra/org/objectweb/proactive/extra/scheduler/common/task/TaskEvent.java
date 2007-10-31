@@ -62,7 +62,7 @@ public class TaskEvent implements Serializable {
     /** task started time */
     private long startTime = -1;
 
-    /** task finished time */
+    /** task finished time : IMPORTANT TO BE SET TO -1 */
     private long finishedTime = -1;
 
     /** Number of reRunnable left */

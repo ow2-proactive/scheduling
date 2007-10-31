@@ -189,10 +189,21 @@ public class SchedulerFrontend implements InitActive,
      * and job/user association.
      */
     public void recover(HashMap<JobId, InternalJob> jobList) {
-        for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
-            UserIdentification uIdent = new UserIdentification(e.getValue()
-                                                                .getOwner());
-            jobs.put(e.getKey(), new IdentifyJob(e.getKey(), uIdent));
+        if (jobList != null) {
+            for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
+                UserIdentification uIdent = new UserIdentification(e.getValue()
+                                                                    .getOwner());
+                IdentifyJob ij = new IdentifyJob(e.getKey(), uIdent);
+                jobs.put(e.getKey(), ij);
+                //if the job is finished set it
+                switch (e.getValue().getState()) {
+                case CANCELLED:
+                case FINISHED:
+                case FAILED:
+                    ij.setFinished(true);
+                    break;
+                }
+            }
         }
         //activate scheduler communication
         authenticationInterface.activate();

@@ -37,11 +37,21 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
+/**
+ * AdminCommunicator ...
+ *
+ * @author jlscheef - ProActiveTeam
+ * @date 24 oct. 07
+ * @version 3.2
+ *
+ */
 public class AdminCommunicator {
     private static AdminSchedulerInterface scheduler;
     private static final String STAT_CMD = "stat";
@@ -56,6 +66,7 @@ public class AdminCommunicator {
     private static final String PAUSEJOB_CMD = "pausejob";
     private static final String RESUMEJOB_CMD = "resumejob";
     private static final String KILLJOB_CMD = "killjob";
+    private static final String GET_RESULT_CMD = "result";
     private static boolean stopCommunicator;
 
     /**
@@ -223,6 +234,53 @@ public class AdminCommunicator {
                 output("Error while killing this job !! : " + e.getMessage() +
                     "\n");
             }
+        } else if (command.startsWith(GET_RESULT_CMD)) {
+            try {
+                String jID = command.replaceFirst(GET_RESULT_CMD, "");
+                jID = jID.trim();
+                int begin = 0;
+                int end = 0;
+                if (jID.matches(".* to .*")) {
+                    String[] TjID = jID.split(" to ");
+                    begin = Integer.parseInt(TjID[0]);
+                    end = Integer.parseInt(TjID[1]);
+                } else {
+                    begin = Integer.parseInt(jID);
+                    end = Integer.parseInt(jID);
+                }
+                for (int i = begin; i <= end; i++) {
+                    try {
+                        JobResult result = scheduler.getJobResult(JobId.makeJobId(i +
+                                    ""));
+                        if (result != null) {
+                            System.out.println("Job " + i + " Result => ");
+                            for (Entry<String, TaskResult> e : result.getTaskResults()
+                                                                     .entrySet()) {
+                                TaskResult tRes = e.getValue();
+                                try {
+                                    System.out.println("\t " + e.getKey() +
+                                        " : " + tRes.value());
+                                } catch (Throwable e1) {
+                                    System.out.println(
+                                        "\t ERROR during execution of " +
+                                        e.getKey() + "... ");
+                                    tRes.getException().printStackTrace();
+                                }
+                            }
+                        } else {
+                            System.out.println("Job " + i +
+                                " is not finished or unknown !");
+                        }
+                    } catch (SchedulerException e) {
+                        System.out.println("Error on job " + i + " : " +
+                            e.getMessage());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                output("Error while getting this job result !! : " +
+                    e.getMessage() + "\n");
+            }
         } else {
             output(
                 "UNKNOWN COMMAND!!... Please type '?' or 'help' to see the list of commands\n");
@@ -276,6 +334,8 @@ public class AdminCommunicator {
             RESUMEJOB_CMD);
         out += String.format(" %1$-18s\t Kill the given job (killjob num_job)\n",
             KILLJOB_CMD);
+        out += String.format(" %1$-18s\t get the result of the given job (result num_job | result num_job to num_job)\n",
+            GET_RESULT_CMD);
         out += String.format(" %1$-18s\t Exits Communicator\n", EXIT_CMD);
         output(out);
     }

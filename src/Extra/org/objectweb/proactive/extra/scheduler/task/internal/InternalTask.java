@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import java.util.ArrayList;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;

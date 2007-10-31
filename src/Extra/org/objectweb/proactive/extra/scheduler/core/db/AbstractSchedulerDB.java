@@ -51,6 +51,7 @@ public abstract class AbstractSchedulerDB {
                 instance = new SchedulerDB();
             } catch (SQLException e) {
                 // The database doesn't exist
+                System.out.println("[SCHEDULER-DATABASE] empty !");
                 instance = new EmptySchedulerDB();
             }
         }

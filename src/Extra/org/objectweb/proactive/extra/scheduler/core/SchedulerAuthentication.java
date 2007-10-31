@@ -83,7 +83,7 @@ public class SchedulerAuthentication implements InitActive,
     /** Active state of the authentication interface :
       * If false, user can not access the scheduler,
       * If true user can connect to the scheduler.*/
-    private boolean activated = true;
+    private boolean activated = false;
 
     /**
      * ProActive empty constructor.

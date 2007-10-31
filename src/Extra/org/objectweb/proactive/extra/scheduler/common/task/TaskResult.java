@@ -39,7 +39,7 @@ import javax.swing.JPanel;
  * Interface representing the task result.
  * A task result can be an exception or an object that you have to cast into your own type.
  * Before getting the object it is recommended that you call the hadException() method.
- * It will tell you if an exception occured in the task that generate this result.
+ * It will tell you if an exception occurred in the task that generate this result.
  *
  * @author ProActive Team
  * @version 1.0, Aug 3, 2007

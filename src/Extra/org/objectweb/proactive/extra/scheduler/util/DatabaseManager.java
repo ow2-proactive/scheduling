@@ -72,6 +72,7 @@ public class DatabaseManager {
         String url = protocol + databasePath + databaseName +
             ((create) ? ";create=true" : ";");
 
+        System.out.println("[SCHEDULER-DATABASE] url=" + url);
         try {
             Class.forName(driver).newInstance();
             return DriverManager.getConnection(url, user, password);

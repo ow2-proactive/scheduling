@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -232,7 +233,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     private void updateTaskEventsList(InternalJob currentJob) {
         ArrayList<TaskEvent> events = new ArrayList<TaskEvent>();
         for (TaskId id : currentJob.getJobInfo().getTaskStatusModify().keySet()) {
-            events.add(currentJob.getHMTasks().get(id).getTaskInfo());
+            TaskEvent ev = currentJob.getHMTasks().get(id).getTaskInfo();
+            if (ev.getStatus() != Status.RUNNNING) {
+                events.add(ev);
+            }
         }
         // don't forget to set the task status modify to null
         currentJob.setTaskStatusModify(null);
@@ -248,9 +252,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      */
     public void runActivity(Body body) {
         //Rebuild the scheduler if a crash has occurred.
-        //recover();
+        recover();
         //listen log as immediate Service.
-        //ProActiveObject.setImmediateService("listenLog");
+        ProActiveObject.setImmediateService("listenLog");
         Service service = new Service(body);
 
         //set the filter for serveAll method
@@ -437,9 +441,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                                 .getHostName());
                         // send task event to front-end
                         frontend.pendingToRunningTaskEvent(internalTask.getTaskInfo());
-                        // and to data base
-                        AbstractSchedulerDB.getInstance()
-                                           .setTaskEvent(internalTask.getTaskInfo());
+                        //no need to set this state in database
                     } else {
                         //if no task can be launched on this job, go to the next job.
                         resourceManager.freeNodes(nodeSet);
@@ -586,6 +588,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 }
             }
         }
+        taskResult = (TaskResult) ProFuture.getFutureValue(taskResult);
         //failed the job
         job.failed(task.getId(), jobState);
         //store the exception into jobResult
@@ -683,12 +686,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             descriptor = job.terminateTask(taskId);
             //send event
             frontend.runningToFinishedTaskEvent(descriptor.getTaskInfo());
+            //store this task result in the job result.
+            job.getJobResult().addTaskResult(descriptor.getName(), res);
             //and to data base
             AbstractSchedulerDB.getInstance()
                                .setTaskEvent(descriptor.getTaskInfo());
-            //store this task result in the job result.
-            job.getJobResult().addTaskResult(descriptor.getName(), res);
-            //and in data base
             AbstractSchedulerDB.getInstance().addTaskResult(res);
 
             //if this job is finished (every task are finished)
@@ -768,7 +770,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 l.addAppender(op);
                 op.addSink(new SocketAppender(hostname, port));
 
-                // retreive already stored output of job jobid in task logs in task results
+                // Retrieve already stored output of job id in task logs in task results
                 Collection<TaskResult> allRes = target.getJobResult()
                                                       .getTaskResults().values();
                 for (TaskResult tr : allRes) {
@@ -795,7 +797,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             result = job.getJobResult();
             job.setRemovedTime(System.currentTimeMillis());
             finishedJobs.remove(job);
-            //send event to frontend
+            //send event to front-end
             frontend.removeFinishedJobEvent(job.getJobInfo());
             //and to data base
             AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
@@ -1102,7 +1104,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         AbstractSchedulerDB dataBase = AbstractSchedulerDB.getInstance();
         RecoverableState recoverable = dataBase.getRecoverableState();
         if (recoverable == null) {
-            logger.info("No recoverable state.");
+            logger.info("[SCHEDULER-RECOVERY-SYSTEM] No recoverable state.");
+            frontend.recover(null);
             return;
         }
 
@@ -1110,10 +1113,47 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //------------------------------------------------------------------------
         //----------------------    Re-build jobs lists  --------------------------
         //------------------------------------------------------------------------
-        logger.info("Re-build jobs lists");
+        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-build jobs lists");
         JobId maxId = JobId.makeJobId("0");
         for (InternalJob job : recoverable.getJobs()) {
             jobs.put(job.getId(), job);
+            //search last JobId
+            if (job.getId().compareTo(maxId) > 0) {
+                maxId = job.getId();
+            }
+        }
+        //------------------------------------------------------------------------
+        //--------------------    Initialize jobId count   ----------------------
+        //------------------------------------------------------------------------
+        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Initialize jobId count");
+        JobId.setInitialValue(maxId);
+        //------------------------------------------------------------------------
+        //--------    Re-affect JobEvent/taskEvent to the jobs/tasks   -----------
+        //------------------------------------------------------------------------
+        logger.info(
+            "[SCHEDULER-RECOVERY-SYSTEM] Re-affect JobEvent/taskEvent to the jobs/tasks");
+        for (Entry<TaskId, TaskEvent> entry : recoverable.getTaskEvents()
+                                                         .entrySet()) {
+            try {
+                jobs.get(entry.getKey().getJobId()).update(entry.getValue());
+            } catch (NullPointerException e) {
+                //do nothing, the job has not to be managed anymore
+                //the job stay in database until someone removed it
+                //its job result can be get until previous removing.
+            }
+        }
+        for (Entry<JobId, JobEvent> entry : recoverable.getJobEvents().entrySet()) {
+            try {
+                jobs.get(entry.getKey()).update(entry.getValue());
+            } catch (NullPointerException e) {
+                //same thing
+            }
+        }
+        //------------------------------------------------------------------------
+        //-----------    Re-build pending/running/finished lists  ----------------
+        //------------------------------------------------------------------------
+        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-build jobs lists");
+        for (InternalJob job : jobs.values()) {
             switch (job.getState()) {
             case PENDING:
                 pendingJobs.add(job);
@@ -1121,6 +1161,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             case STALLED:
             case RUNNING:
                 runningJobs.add(job);
+                //reset the finished events in the order they they have occurred
+                ArrayList<InternalTask> tasksList = copyAndSort(job.getTasks(),
+                        true);
+                for (InternalTask task : tasksList) {
+                    job.update(task.getTaskInfo());
+                }
                 break;
             case FINISHED:
             case CANCELLED:
@@ -1134,40 +1180,107 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     pendingJobs.add(job);
                 } else {
                     runningJobs.add(job);
+
+                    //reset the finished events in the order they have occurred
+                    ArrayList<InternalTask> tasksListP = copyAndSort(job.getTasks(),
+                            true);
+                    for (InternalTask task : tasksListP) {
+                        job.update(task.getTaskInfo());
+                    }
                 }
             }
-
-            //search last JobId
-            if (job.getId().compareTo(maxId) > 0) {
-                maxId = job.getId();
-            }
         }
-        //------------------------------------------------------------------------
-        //--------------------    Initialize jobId count   ----------------------
-        //------------------------------------------------------------------------
-        logger.info("Initialize jobId count");
-        JobId.setInitialValue(maxId);
-        //------------------------------------------------------------------------
-        //--------    Re-affect JobEvent/taskEvent to the jobs/tasks   -----------
-        //------------------------------------------------------------------------
-        logger.info("Re-affect JobEvent/taskEvent to the jobs/tasks");
-        for (Entry<JobId, JobEvent> entry : recoverable.getJobEvents().entrySet()) {
-            jobs.get(entry.getKey()).update(entry.getValue());
-        }
-        for (Entry<TaskId, TaskEvent> entry : recoverable.getTaskEvents()
-                                                         .entrySet()) {
-            jobs.get(entry.getKey().getJobId()).update(entry.getValue());
-        }
-
         //------------------------------------------------------------------------
         //------------------    Re-create task dependences   ---------------------
         //------------------------------------------------------------------------
-        logger.info("Re-create task dependences");
+        logger.info("[SCHEDULER-RECOVERY-SYSTEM] Re-create task dependences");
         for (InternalJob job : runningJobs) {
-            ArrayList<InternalTask> tasksList = new ArrayList<InternalTask>();
+            ArrayList<InternalTask> tasksList = copyAndSort(job.getTasks(), true);
 
-            //copy the list with only the finished task.
-            for (InternalTask task : job.getTasks()) {
+            //simulate the running execution to recreate the tree.
+            for (InternalTask task : tasksList) {
+                job.simulateStartAndTerminate(task.getId());
+            }
+            if ((job.getState() == JobState.RUNNING) ||
+                    (job.getState() == JobState.PAUSED)) {
+                //set the state to stalled because the scheduler start in stopped mode.
+                if (job.getState() == JobState.RUNNING) {
+                    job.setState(JobState.STALLED);
+                }
+
+                //set the task to pause inside the job if it is paused.
+                if (job.getState() == JobState.PAUSED) {
+                    for (InternalTask task : job.getTasks()) {
+                        if (task.getStatus() == Status.PENDING) {
+                            task.setStatus(Status.PAUSED);
+                        }
+                    }
+                }
+                //update the count of pending and running task.
+                job.setNumberOfPendingTasks(job.getNumberOfPendingTask() +
+                    job.getNumberOfRunningTask());
+                job.setNumberOfRunningTasks(0);
+            }
+        }
+
+        //------------------------------------------------------------------------
+        //--------------    Re-set job results list in each job   ----------------
+        //------------------------------------------------------------------------
+        logger.info(
+            "[SCHEDULER-RECOVERY-SYSTEM] Re-set job results list in each job");
+        for (JobResult result : recoverable.getJobResults()) {
+            try {
+                jobs.get(result.getId()).setJobResult(result);
+            } catch (NullPointerException e) {
+                //same thing
+            }
+        }
+        //------------------------------------------------------------------------
+        //-------------    Re-set jobEvent reference to all task   ---------------
+        //------------------------------------------------------------------------
+        logger.info(
+            "[SCHEDULER-RECOVERY-SYSTEM] Re-set Job event reference to all task");
+        for (InternalJob job : jobs.values()) {
+            JobEvent event = job.getJobInfo();
+
+            //for each tasks, set the same reference to the jobEvent.
+            for (InternalTask tasks : job.getTasks()) {
+                tasks.setJobInfo(event);
+            }
+        }
+
+        //------------------------------------------------------------------------
+        //---------------    Removed non-managed jobs (optional)   ---------------
+        //------------------------------------------------------------------------
+        Iterator<InternalJob> iterJob = jobs.values().iterator();
+        while (iterJob.hasNext()) {
+            InternalJob job = iterJob.next();
+            if (job.getRemovedTime() > 0) {
+                //        		jobs.remove(job.getId());
+                iterJob.remove();
+                finishedJobs.remove(job);
+            }
+        }
+        // Recover the scheduler front-end
+        frontend.recover(jobs);
+    }
+
+    /**
+     * Make a copy of the given argument with the restriction 'onlyFinished'.
+     * Then sort the array according to finished time order.
+     *
+     * @param tasks the list of internal tasks to copy.
+     * @param onlyFinished true if the copy must contains only the finished task,
+     *                                                 false to contains every tasks.
+     * @return the sorted copy of the given argument.
+     */
+    private ArrayList<InternalTask> copyAndSort(ArrayList<InternalTask> tasks,
+        boolean onlyFinished) {
+        ArrayList<InternalTask> tasksList = new ArrayList<InternalTask>();
+
+        //copy the list with only the finished task.
+        for (InternalTask task : tasks) {
+            if (onlyFinished) {
                 switch (task.getStatus()) {
                 case ABORTED:
                 case CANCELLED:
@@ -1175,25 +1288,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 case FINISHED:
                     tasksList.add(task);
                 }
-            }
-            //sort the finished task according to their finish time.
-            //to be sure to be in the right tree browsing.
-            Collections.sort(tasksList, new FinishTimeComparator());
-            //simulate the running execution to recreate the tree.
-            for (InternalTask task : tasksList) {
-                job.simulateStartAndTerminate(task.getId());
+            } else {
+                tasksList.add(task);
             }
         }
-
-        //------------------------------------------------------------------------
-        //--------------    Re-set job results list in each job   ----------------
-        //------------------------------------------------------------------------
-        logger.info("Re-set job results list in each job");
-        for (JobResult result : recoverable.getJobResults()) {
-            jobs.get(result.getId()).setJobResult(result);
-        }
-        // Recover the scheduler front-end
-        frontend.recover(jobs);
+        //sort the finished task according to their finish time.
+        //to be sure to be in the right tree browsing.
+        Collections.sort(tasksList, new FinishTimeComparator());
+        return tasksList;
     }
 
     /**
