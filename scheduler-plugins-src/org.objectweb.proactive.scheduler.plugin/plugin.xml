@@ -42,10 +42,10 @@
       <view
             allowMultiple="false"
             category="org.objectweb.proactive.extra.scheduler.gui"
-            class="org.objectweb.proactive.extra.scheduler.gui.views.TaskResult"
+            class="org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview"
             icon="icons/info.png"
-            id="org.objectweb.proactive.extra.scheduler.gui.views.TaskResult"
-            name="TaskResult">
+            id="org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview"
+            name="Result Preview">
       </view>
    </extension>
    <extension
@@ -79,7 +79,7 @@
                id="org.objectweb.proactive.extra.scheduler.gui.views.TaskView">
          </viewShortcut>
          <viewShortcut
-               id="org.objectweb.proactive.extra.scheduler.gui.views.TaskResult">
+               id="org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview">
          </viewShortcut>
       </perspectiveExtension>
    </extension>

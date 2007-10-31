@@ -53,7 +53,7 @@ public class ObtainJobOutputAction extends Action {
     @Override
     public void run() {
         TableItem item = TableManager.getInstance().getLastSelectedItem();
-        if (item != null) {
+        if ((item != null) && (!item.isDisposed())) {
             JobId jobId = (JobId) item.getData();
             JobsOutputController.getInstance().createJobOutput(jobId);
         }

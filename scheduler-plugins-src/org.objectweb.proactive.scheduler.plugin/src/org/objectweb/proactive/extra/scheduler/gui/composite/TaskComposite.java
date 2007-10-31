@@ -60,7 +60,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
-import org.objectweb.proactive.extra.scheduler.gui.views.TaskResultDisplay;
+import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
@@ -257,7 +257,7 @@ public class TaskComposite extends Composite {
                     IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
                     IWorkbenchPage page = currentWindow.getActivePage();
                     try {
-                        IViewPart part = page.showView(TaskResultDisplay.ID);
+                        IViewPart part = page.showView(ResultPreview.ID);
                         part.setFocus();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -270,14 +270,14 @@ public class TaskComposite extends Composite {
                         // update its tasks informations if task is finished
                         if (task.getStatus() == Status.FINISHED) {
                             try {
-                                TaskResultDisplay taskResultDisplay = TaskResultDisplay.getInstance();
-                                if (taskResultDisplay != null) {
+                                ResultPreview resultPreview = ResultPreview.getInstance();
+                                if (resultPreview != null) {
                                     // get result from scheduler
                                     // TODO : NO ACCESS TO SCHED HERE ...
-                                    TaskResult tr = TaskComposite.this.getTaskResult(job.getId(),
+                                    TaskResult tr = getTaskResult(job.getId(),
                                             taskId);
                                     if (tr != null) {
-                                        taskResultDisplay.update(tr.getGraphicalDescription());
+                                        resultPreview.update(tr.getGraphicalDescription());
                                     } else {
                                         throw new RuntimeException("Task " +
                                             taskId +
@@ -406,7 +406,7 @@ public class TaskComposite extends Composite {
 
             TableColumn[] cols = table.getColumns();
 
-            // I'm must fill item by this way, because all columns are moveable
+            // I'm must fill item by this way, because all columns are movable
             // !
             // So i don't know if the column "Id" is at the first or the "nth"
             // position
