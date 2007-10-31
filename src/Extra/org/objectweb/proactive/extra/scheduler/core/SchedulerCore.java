@@ -519,6 +519,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //create appender for this job
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                 job.getId());
+        l.setAdditivity(false);
         if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME) == null) {
             BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
                     true);
@@ -752,7 +753,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     public void listenLog(JobId jobId, String hostname, int port) {
         BufferedAppender bufferForJobId = this.jobLogs.get(jobId);
         if (bufferForJobId != null) {
-            this.jobLogs.get(jobId).addSink(new SocketAppender(hostname, port));
+            bufferForJobId.addSink(new SocketAppender(hostname, port));
         } else {
             // job has been removed _or_ scheduler has recovered
             // create appender for this job
@@ -760,6 +761,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             if (target != null) {
                 Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                         jobId);
+                l.setAdditivity(false);
                 BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
                         true);
                 this.jobLogs.put(jobId, op);

@@ -125,6 +125,7 @@ public class JobsOutputController {
             joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
             Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                     jobId);
+            log.setAdditivity(false);
             log.setLevel(Level.ALL);
             log.removeAllAppenders();
             log.addAppender(joa);

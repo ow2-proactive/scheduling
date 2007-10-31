@@ -187,6 +187,7 @@ public class TaskLauncher implements InitActive, Serializable {
         // create logger
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                 this.taskId.getJobId());
+        l.setAdditivity(false);
         Appender out = new SocketAppender(this.host, this.port);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();
