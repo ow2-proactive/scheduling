@@ -35,6 +35,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -56,6 +57,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     implements RemoteObjectFactory {
+    protected String protocolIdentifier = Constants.XMLHTTP_PROTOCOL_IDENTIFIER;
 
     static {
         createClassServer();
@@ -226,5 +228,10 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
      */
     public int getPort() {
         return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
+    }
+
+    @Override
+    public String getProtocolId() {
+        return this.protocolIdentifier;
     }
 }

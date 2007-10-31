@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
+    protected static String protocolIdentifier = Constants.RMISSH_PROTOCOL_IDENTIFIER;
 
     static {
         createClassServer();
@@ -126,5 +127,10 @@ public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public String getProtocolId() {
+        return protocolIdentifier;
     }
 }

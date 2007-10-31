@@ -101,4 +101,6 @@ public interface RemoteObjectFactory {
      * @return return the port number
      */
     public int getPort();
+
+    public String getProtocolId();
 }

@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
@@ -190,7 +189,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
                 SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-                this.stub = (Object) reply.getSynchResult();
+                this.stub = reply.getSynchResult();
             } catch (SecurityException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -207,8 +206,6 @@ public class RemoteObjectAdapter implements RemoteObject {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
-            //                ((SynchronousProxy) ((StubObject) this.stub).getProxy()).setRemoteObject(this);
         }
         return this.stub;
     }
@@ -218,14 +215,14 @@ public class RemoteObjectAdapter implements RemoteObject {
         if (this.stub == null) {
             try {
                 Method m = InternalRemoteRemoteObject.class.getDeclaredMethod("getObjectProxy",
-                        new Class<?>[] {  });
+                        new Class<?>[] { RemoteRemoteObject.class });
                 MethodCall mc = MethodCall.getMethodCall(m,
                         new Object[] { rmo }, new HashMap());
                 Request r = new InternalRemoteRemoteObjectRequest(mc);
 
                 SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-                this.stub = (Object) reply.getSynchResult();
+                this.stub = reply.getSynchResult();
             } catch (SecurityException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();

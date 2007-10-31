@@ -198,6 +198,7 @@ public class RemoteObjectHelper {
         try {
             Object reifiedObjectStub = MOP.createStubObject(ro.getClassName(),
                     ro.getTargetClass(), new Class[] {  });
+
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(
                     null, new Object[] { ro }));
 

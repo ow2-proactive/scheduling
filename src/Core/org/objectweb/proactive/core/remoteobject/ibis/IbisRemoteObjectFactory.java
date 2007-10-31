@@ -55,6 +55,7 @@ import ibis.rmi.RemoteException;
 public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
     implements RemoteObjectFactory {
     protected static RegistryHelper registryHelper;
+    protected String protocolIdentifier = Constants.IBIS_PROTOCOL_IDENTIFIER;
 
     static {
         IbisProperties.load();
@@ -215,5 +216,10 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
      */
     public int getPort() {
         return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
+    }
+
+    @Override
+    public String getProtocolId() {
+        return this.protocolIdentifier;
     }
 }

@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
     implements RemoteObjectFactory {
+    protected String protocolIdentifier = Constants.RMI_PROTOCOL_IDENTIFIER;
     protected static RegistryHelper registryHelper;
     static final Logger LOGGER_RO = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
 
@@ -233,5 +234,10 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
      */
     public int getPort() {
         return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
+    }
+
+    @Override
+    public String getProtocolId() {
+        return this.protocolIdentifier;
     }
 }

@@ -61,6 +61,10 @@ public class RemoteObjectProtocolFactoryRegistry {
         remoteObjectFactories.put(protocol, factory);
     }
 
+    public static void remove(String protocol) {
+        remoteObjectFactories.remove(protocol);
+    }
+
     public static Class<?extends RemoteObjectFactory> get(String protocol) {
         return remoteObjectFactories.get(protocol);
     }

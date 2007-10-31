@@ -32,12 +32,7 @@ package org.objectweb.proactive.core.remoteobject;
 
 import java.util.Hashtable;
 
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
-import org.objectweb.proactive.core.remoteobject.http.HTTPRemoteObjectFactory;
-import org.objectweb.proactive.core.remoteobject.ibis.IbisRemoteObjectFactory;
-import org.objectweb.proactive.core.remoteobject.rmi.RmiRemoteObjectFactory;
-import org.objectweb.proactive.core.remoteobject.rmissh.RmiSshRemoteObjectFactory;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
