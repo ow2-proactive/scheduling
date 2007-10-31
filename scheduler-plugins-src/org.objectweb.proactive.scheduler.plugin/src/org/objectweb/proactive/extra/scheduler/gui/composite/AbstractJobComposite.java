@@ -1,30 +1,27 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ * Initial developer(s): The ProActive Team
+ * http://proactive.inria.fr/team_members.htm Contributor(s):
  *
  * ################################################################
  */
@@ -47,10 +44,16 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
@@ -63,6 +66,7 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
@@ -320,6 +324,12 @@ public abstract class AbstractJobComposite extends Composite {
                     InternalJob job = JobsController.getLocalView()
                                                     .getJobById(jobId);
 
+                    if (job == null) {
+                        System.err.println(
+                            "LE JOB EST NULL .......... jobId ==> " + jobId);
+                        return;
+                    }
+
                     // show its output
                     // TODO est-ce que je laisse ou pas ???
                     JobsOutputController.getInstance().showJobOutput(jobId);
@@ -328,12 +338,29 @@ public abstract class AbstractJobComposite extends Composite {
                     JobInfo jobInfo = JobInfo.getInstance();
                     if (jobInfo != null) {
                         jobInfo.updateInfos(job);
+
+                        // set Focus on job info
+                        IWorkbench iworkbench = PlatformUI.getWorkbench();
+                        IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+                        IWorkbenchPage page = currentWindow.getActivePage();
+                        try {
+                            IViewPart part = page.showView(JobInfo.ID);
+                            part.setFocus();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     // update its tasks informations
                     TaskView taskView = TaskView.getInstance();
                     if (taskView != null) {
                         taskView.fullUpdate(job);
+                    }
+
+                    ResultPreview resultPreview = ResultPreview.getInstance();
+                    if (resultPreview != null) {
+                        resultPreview.update(new SimpleTextPanel(
+                                "No selected task"));
                     }
 
                     jobSelected(job);
@@ -400,9 +427,12 @@ public abstract class AbstractJobComposite extends Composite {
                         }
 
                         if (item == null) {
-                            throw new IllegalArgumentException(
-                                "the item which represent the job : " + jobId +
-                                " is unknown !");
+                            // TODO
+                            // throw new IllegalArgumentException("the item which represent the job : " +
+                            // jobId
+                            // + " is unknown !");
+                            //TODO System.err.println("the item which represent the job : " + jobId + " is unknown !");
+                            return;
                         }
 
                         TableColumn[] cols = table.getColumns();
@@ -445,9 +475,9 @@ public abstract class AbstractJobComposite extends Composite {
                             }
 
                         if (item == null) {
-                            throw new IllegalArgumentException(
-                                "the item which represent the job : " + jobId +
-                                " is unknown !");
+                            //						TODO throw new IllegalArgumentException("the item which represent the job : " + jobId
+                            //								+ " is unknown !");
+                            return;
                         }
 
                         TableColumn[] cols = table.getColumns();
@@ -527,7 +557,9 @@ public abstract class AbstractJobComposite extends Composite {
                 }
             }
             if (tmp == -1) {
-                throw new IllegalArgumentException("jobId unknown : " + jobId);
+                //TODO
+                //				throw new IllegalArgumentException("jobId unknown : " + jobId);
+                return;
             }
             final int i = tmp;
             getDisplay().asyncExec(new Runnable() {
@@ -538,6 +570,12 @@ public abstract class AbstractJobComposite extends Composite {
                             JobInfo jobInfo = JobInfo.getInstance();
                             if (jobInfo != null) {
                                 jobInfo.clear();
+                            }
+
+                            ResultPreview resultPreview = ResultPreview.getInstance();
+                            if (resultPreview != null) {
+                                resultPreview.update(new SimpleTextPanel(
+                                        "No selected task"));
                             }
 
                             TaskView taskView = TaskView.getInstance();
@@ -559,12 +597,12 @@ public abstract class AbstractJobComposite extends Composite {
                             PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
                             pauseResumeJobAction.setEnabled(false);
                             pauseResumeJobAction.setPauseResumeMode();
-                            KillJobAction.getInstance().setEnabled(false);
+                            KillRemoveJobAction.getInstance().setEnabled(false);
                         }
                         table.remove(i);
-                        //TODO je pense qu'il ne servent à rien
-                        //table.redraw();
-                        //table.update();
+                        // TODO je pense qu'il ne servent à rien
+                        // table.redraw();
+                        // table.update();
                         decreaseCount();
                     }
                 });
@@ -602,6 +640,12 @@ public abstract class AbstractJobComposite extends Composite {
      * @param job the job selected
      */
     public abstract void jobSelected(InternalJob job);
+
+    /**
+     * To clear properly the composite. This method will be called on
+     * disconnection only.
+     */
+    public abstract void clear();
 
     // -------------------------------------------------------------------- //
     // ------------------------ extends composite ------------------------- //

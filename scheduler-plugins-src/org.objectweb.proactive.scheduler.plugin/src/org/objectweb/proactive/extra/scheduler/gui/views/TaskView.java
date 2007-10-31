@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
@@ -129,6 +130,10 @@ public class TaskView extends ViewPart {
         if (taskComposite != null) {
             taskComposite.setEnabled(isEnabled);
         }
+    }
+
+    public TaskId getIdOfSelectedTask() {
+        return taskComposite.getIdOfSelectedTask();
     }
 
     /**

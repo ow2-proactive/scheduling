@@ -57,6 +57,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
 import org.objectweb.proactive.extra.scheduler.common.task.Status;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
@@ -142,6 +143,7 @@ public class TaskComposite extends Composite {
     }
 
     private Table createTable(Composite parent) {
+        //The table must be create with the SWT.SINGLE option !
         table = new Table(this, SWT.BORDER | SWT.SINGLE);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
@@ -267,25 +269,25 @@ public class TaskComposite extends Composite {
                     if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
                         InternalTask task = job.getHMTasks().get(taskId);
 
-                        // update its tasks informations if task is finished
-                        if (task.getStatus() == Status.FINISHED) {
-                            try {
-                                ResultPreview resultPreview = ResultPreview.getInstance();
-                                if (resultPreview != null) {
-                                    // get result from scheduler
-                                    // TODO : NO ACCESS TO SCHED HERE ...
-                                    TaskResult tr = getTaskResult(job.getId(),
-                                            taskId);
-                                    if (tr != null) {
-                                        resultPreview.update(tr.getGraphicalDescription());
-                                    } else {
-                                        throw new RuntimeException("Task " +
-                                            taskId +
-                                            " is finished but result is null");
-                                    }
+                        ResultPreview resultPreview = ResultPreview.getInstance();
+                        if (resultPreview != null) {
+                            // update its tasks informations if task is finished
+                            if (task.getStatus() == Status.FINISHED) {
+                                // get result from scheduler
+                                // TODO : NO ACCESS TO SCHED HERE ...
+                                // je vien de faire un copuier collé de ce code dans JobsController...
+                                TaskResult tr = getTaskResult(job.getId(),
+                                        taskId);
+                                if (tr != null) {
+                                    resultPreview.update(tr.getGraphicalDescription());
+                                } else {
+                                    //							TODO	throw new RuntimeException("Task " + taskId
+                                    //										+ " is finished but result is null");
                                 }
-                            } catch (RuntimeException e) {
-                                e.printStackTrace();
+                            } else { //Available 
+                                resultPreview.update(new SimpleTextPanel(
+                                        "No preview is available because the task is " +
+                                        task.getStatus() + "..."));
                             }
                         }
                     }
@@ -295,15 +297,15 @@ public class TaskComposite extends Composite {
         return table;
     }
 
-    // TMP MKRIS
-    private Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
+    // TODO TMP MKRIS/JO
+    private static Hashtable<TaskId, TaskResult> cachedTaskResult = new Hashtable<TaskId, TaskResult>();
 
-    private TaskResult getTaskResult(JobId jid, TaskId tid) {
-        TaskResult tr = this.cachedTaskResult.get(tid);
+    public static TaskResult getTaskResult(JobId jid, TaskId tid) {
+        TaskResult tr = cachedTaskResult.get(tid);
         if (tr == null) {
             tr = SchedulerProxy.getInstance()
                                .getTaskResult(jid, tid.getReadableName());
-            this.cachedTaskResult.put(tid, tr);
+            cachedTaskResult.put(tid, tr);
         }
         return tr;
     }
@@ -462,8 +464,7 @@ public class TaskComposite extends Composite {
      * This method remove all item of the table and fill it with the tasks
      * vector. The label is also updated.
      *
-     * @param jobId
-     *            the jobId, just for the label.
+     * @param jobId the jobId, just for the label.
      * @param tasks
      */
     public void setTasks(JobId jobId, ArrayList<InternalTask> tasks) {
@@ -482,10 +483,8 @@ public class TaskComposite extends Composite {
      * identify the "good" item with the taskId. The internalTask is use to fill
      * item.
      *
-     * @param taskId
-     *            the taskId which must be updated
-     * @param internalTask
-     *            all informations for fill item
+     * @param taskId the taskId which must be updated
+     * @param internalTask all informations for fill item
      */
     public void changeLine(TaskId taskId, InternalTask internalTask) {
         if (!table.isDisposed()) {
@@ -540,5 +539,13 @@ public class TaskComposite extends Composite {
         if (table != null) {
             table.setVisible(visible);
         }
+    }
+
+    public TaskId getIdOfSelectedTask() {
+        TableItem[] items = table.getSelection();
+        if (items.length == 0) {
+            return null;
+        }
+        return (TaskId) items[0].getData();
     }
 }

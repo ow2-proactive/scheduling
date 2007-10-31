@@ -40,7 +40,8 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobState;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
@@ -55,6 +56,7 @@ import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 import org.objectweb.proactive.extra.scheduler.gui.data.RunningJobsListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 
@@ -154,7 +156,27 @@ public class RunningJobComposite extends AbstractJobComposite
         }
 
         ObtainJobOutputAction.getInstance().setEnabled(enabled);
-        KillJobAction.getInstance().setEnabled(enabled);
+
+        KillRemoveJobAction killRemoveJobAction = KillRemoveJobAction.getInstance();
+        killRemoveJobAction.setKillMode();
+        killRemoveJobAction.setEnabled(enabled);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.gui.composite.AbstractJobComposite#clear()
+     */
+    @Override
+    public void clear() {
+        TableItem[] items = getTable().getItems();
+        for (TableItem item : items) {
+            ((ProgressBar) item.getData("bar")).dispose();
+            ((TableEditor) item.getData("editor")).dispose();
+        }
+
+        // TODO
+        // TableColumn[] cols = getTable().getColumns();
+        // for (TableColumn col : cols)
+        // col.notifyListeners(SWT.Move, null);
     }
 
     /**
@@ -225,17 +247,17 @@ public class RunningJobComposite extends AbstractJobComposite
      */
     @Override
     public void removeRunningJob(JobId jobId) {
-        //		removeJob(jobId);
-        //		// TODO : deux problème ici :
-        //		// - je ne dispose ni la progress ni le tableEditor
-        //		// - j'envoi le notifyListeners sur toutes les colonnes...
-        //		Display.getDefault().asyncExec(new Runnable() {
-        //			public void run() {
-        //				TableColumn[] cols = getTable().getColumns();
-        //				for (TableColumn col : cols)
-        //					col.notifyListeners(SWT.Move, null);
-        //			}
-        //		});
+        // removeJob(jobId);
+        // // TODO : deux problème ici :
+        // // - je ne dispose ni la progress ni le tableEditor
+        // // - j'envoi le notifyListeners sur toutes les colonnes...
+        // Display.getDefault().asyncExec(new Runnable() {
+        // public void run() {
+        // TableColumn[] cols = getTable().getColumns();
+        // for (TableColumn col : cols)
+        // col.notifyListeners(SWT.Move, null);
+        // }
+        // });
         if (!isDisposed()) {
             Vector<JobId> jobsId = getJobs();
             int tmp = -1;
@@ -246,7 +268,8 @@ public class RunningJobComposite extends AbstractJobComposite
                 }
             }
             if (tmp == -1) {
-                throw new IllegalArgumentException("jobId unknown : " + jobId);
+                //TODO throw new IllegalArgumentException("jobId unknown : " + jobId);
+                return;
             }
             final int i = tmp;
             getDisplay().asyncExec(new Runnable() {
@@ -257,6 +280,12 @@ public class RunningJobComposite extends AbstractJobComposite
                             JobInfo jobInfo = JobInfo.getInstance();
                             if (jobInfo != null) {
                                 jobInfo.clear();
+                            }
+
+                            ResultPreview resultPreview = ResultPreview.getInstance();
+                            if (resultPreview != null) {
+                                resultPreview.update(new SimpleTextPanel(
+                                        "No selected task"));
                             }
 
                             TaskView taskView = TaskView.getInstance();
@@ -278,7 +307,7 @@ public class RunningJobComposite extends AbstractJobComposite
                             PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
                             pauseResumeJobAction.setEnabled(false);
                             pauseResumeJobAction.setPauseResumeMode();
-                            KillJobAction.getInstance().setEnabled(false);
+                            KillRemoveJobAction.getInstance().setEnabled(false);
                         }
                         TableItem item = getTable().getItem(i);
                         ((ProgressBar) item.getData("bar")).dispose();
@@ -327,9 +356,9 @@ public class RunningJobComposite extends AbstractJobComposite
                             }
 
                         if (item == null) {
-                            throw new IllegalArgumentException(
-                                "the item which represent the job : " +
-                                taskEvent.getJobId() + " is unknown !");
+                            //					TODO	throw new IllegalArgumentException("the item which represent the job : "
+                            //								+ taskEvent.getJobId() + " is unknown !");
+                            return;
                         }
 
                         TableColumn[] cols = table.getColumns();
@@ -338,7 +367,8 @@ public class RunningJobComposite extends AbstractJobComposite
                         for (int i = 0; i < cols.length; i++) {
                             String title = cols[i].getText();
                             if ((title != null) &&
-                                    (title.equals(COLUMN_PROGRESS_BAR_TITLE))) {
+                                    (title.equals(COLUMN_PROGRESS_BAR_TITLE) &&
+                                    (!item.isDisposed()))) {
                                 ((ProgressBar) item.getData("bar")).setSelection(job.getNumberOfFinishedTask());
                             } else if ((title != null) &&
                                     (title.equals(COLUMN_PROGRESS_TEXT_TITLE))) {

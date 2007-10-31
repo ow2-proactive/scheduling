@@ -116,21 +116,26 @@ public class JobsOutputController {
      * @throws SchedulerException
      */
     public void createJobOutput(JobId jobId) {
-        if (!showJobOutput(jobId)) {
-            SchedulerProxy.getInstance()
-                          .listenLog(jobId, Activator.getHostname(),
-                Activator.getListenPortNumber());
-            JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE +
-                        jobId));
-            joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
-            Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
-                    jobId);
-            log.setAdditivity(false);
-            log.setLevel(Level.ALL);
-            log.removeAllAppenders();
-            log.addAppender(joa);
-            appenders.put(jobId, joa);
-            showJobOutput(jobId);
+        try {
+            if (!showJobOutput(jobId)) {
+                SchedulerProxy.getInstance()
+                              .listenLog(jobId, Activator.getHostname(),
+                    Activator.getListenPortNumber());
+                JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE +
+                            jobId));
+                joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
+                Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                        jobId);
+                log.setAdditivity(false);
+                log.setLevel(Level.ALL);
+                log.removeAllAppenders();
+                log.addAppender(joa);
+                appenders.put(jobId, joa);
+                showJobOutput(jobId);
+            }
+        } catch (Exception e) {
+            //TODO a virer c t pour les tests....
+            e.printStackTrace();
         }
     }
 

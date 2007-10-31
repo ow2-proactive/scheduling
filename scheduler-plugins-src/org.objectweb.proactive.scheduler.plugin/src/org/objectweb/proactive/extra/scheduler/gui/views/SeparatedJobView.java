@@ -41,10 +41,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ChangeViewModeAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
@@ -204,7 +205,7 @@ public class SeparatedJobView extends ViewPart {
         obtainJobOutputAction = ObtainJobOutputAction.newInstance();
         submitJob = SubmitJobAction.newInstance(parent);
         pauseResumeJobAction = PauseResumeJobAction.newInstance();
-        killJobAction = KillJobAction.newInstance(shell);
+        killJobAction = KillRemoveJobAction.newInstance(shell);
 
         priorityIdleJobAction = PriorityIdleJobAction.newInstance();
         priorityLowestJobAction = PriorityLowestJobAction.newInstance();
@@ -272,6 +273,10 @@ public class SeparatedJobView extends ViewPart {
         setVisible(false);
         ConnectDeconnectSchedulerAction.getInstance().setDisconnectionMode();
 
+        if (runningJobComposite != null) {
+            runningJobComposite.clear();
+        }
+
         TaskView taskView = TaskView.getInstance();
         if (taskView != null) {
             taskView.clear();
@@ -280,6 +285,11 @@ public class SeparatedJobView extends ViewPart {
         JobInfo jobInfo = JobInfo.getInstance();
         if (jobInfo != null) {
             jobInfo.clear();
+        }
+
+        ResultPreview resultPreview = ResultPreview.getInstance();
+        if (resultPreview != null) {
+            resultPreview.update(new SimpleTextPanel("No selected task"));
         }
 
         JobsOutputController jobsOutputController = JobsOutputController.getInstance();
@@ -295,7 +305,7 @@ public class SeparatedJobView extends ViewPart {
         SchedulerProxy.clearInstance();
 
         ChangeViewModeAction.getInstance().setEnabled(false);
-        KillJobAction.getInstance().setEnabled(false);
+        KillRemoveJobAction.getInstance().setEnabled(false);
         ObtainJobOutputAction.getInstance().setEnabled(false);
         PauseResumeJobAction.getInstance().setEnabled(false);
         SubmitJobAction.getInstance().setEnabled(false);
@@ -380,6 +390,12 @@ public class SeparatedJobView extends ViewPart {
         if (jobInfo != null) {
             jobInfo.clear();
         }
+
+        ResultPreview resultPreview = ResultPreview.getInstance();
+        if (resultPreview != null) {
+            resultPreview.update(new SimpleTextPanel("No selected task"));
+        }
+
         JobsOutputController.clearInstance();
         ProActiveObject.terminateActiveObject(JobsController.getActiveView(),
             false);

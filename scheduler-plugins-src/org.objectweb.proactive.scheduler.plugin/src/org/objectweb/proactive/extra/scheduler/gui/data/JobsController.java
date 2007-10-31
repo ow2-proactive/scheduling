@@ -42,8 +42,9 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitial
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
@@ -59,7 +60,9 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerActi
 import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.composite.AbstractJobComposite;
+import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
 import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
 import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
@@ -434,8 +437,23 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
                         TaskView taskView = TaskView.getInstance();
                         if (taskView != null) {
+                            TaskId taskId = taskEvent.getTaskId();
                             taskView.lineUpdate(taskEvent,
-                                getTaskDescriptorById(job, taskEvent.getTaskId()));
+                                getTaskDescriptorById(job, taskId));
+
+                            if (taskId.equals(taskView.getIdOfSelectedTask())) {
+                                TaskResult tr = TaskComposite.getTaskResult(job.getId(),
+                                        taskId);
+                                if (tr != null) {
+                                    ResultPreview resultPreview = ResultPreview.getInstance();
+                                    if (resultPreview != null) {
+                                        resultPreview.update(tr.getGraphicalDescription());
+                                    }
+                                } else {
+                                    // TODO throw new RuntimeException("Task " + taskId
+                                    // + " is finished but result is null");
+                                }
+                            }
                         }
                     }
                 });
@@ -460,7 +478,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             PriorityHighJobAction.getInstance().setEnabled(false);
             PriorityHighestJobAction.getInstance().setEnabled(false);
             PauseResumeJobAction.getInstance().setEnabled(false);
-            KillJobAction.getInstance().setEnabled(false);
+            KillRemoveJobAction.getInstance().setEnabled(false);
         } else if (tableManager.isItTheLastSelectedTable(
                     AbstractJobComposite.FINISHED_TABLE_ID)) {
             ObtainJobOutputAction.getInstance()
@@ -474,7 +492,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             PriorityHighestJobAction.getInstance().setEnabled(false);
             PauseResumeJobAction.getInstance().setEnabled(false);
             PauseResumeJobAction.getInstance().setPauseResumeMode();
-            KillJobAction.getInstance().setEnabled(false);
+            KillRemoveJobAction.getInstance().setEnabled(false);
         } else { // The table selected is the pending or the running table
             boolean enabled = SchedulerProxy.getInstance()
                                             .isItHisJob(job.getOwner());
@@ -500,7 +518,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                 PauseResumeJobAction.getInstance().setPauseResumeMode();
             }
 
-            KillJobAction.getInstance().setEnabled(enabled);
+            KillRemoveJobAction.getInstance().setEnabled(enabled);
         }
     }
 
@@ -514,19 +532,19 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
         if (job == null) {
             ObtainJobOutputAction.getInstance().setEnabled(false);
-            KillJobAction.getInstance().setEnabled(false);
+            KillRemoveJobAction.getInstance().setEnabled(false);
         } else if (tableManager.isItTheLastSelectedTable(
                     AbstractJobComposite.FINISHED_TABLE_ID)) {
             ObtainJobOutputAction.getInstance()
                                  .setEnabled(SchedulerProxy.getInstance()
                                                            .isItHisJob(job.getOwner()));
-            KillJobAction.getInstance().setEnabled(false);
+            KillRemoveJobAction.getInstance().setEnabled(false);
         } else { // The table selected is the pending or the running table
             boolean enabled = SchedulerProxy.getInstance()
                                             .isItHisJob(job.getOwner());
             // enabling/disabling button permitted with this job
             ObtainJobOutputAction.getInstance().setEnabled(enabled);
-            KillJobAction.getInstance().setEnabled(enabled);
+            KillRemoveJobAction.getInstance().setEnabled(enabled);
         }
 
         SubmitJobAction.getInstance().setEnabled(false);
@@ -678,7 +696,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         SubmitJobAction.getInstance().setEnabled(false);
         ObtainJobOutputAction.getInstance().setEnabled(true);
         PauseResumeJobAction.getInstance().setEnabled(false);
-        KillJobAction.getInstance().setEnabled(false);
+        KillRemoveJobAction.getInstance().setEnabled(false);
 
         PriorityIdleJobAction.getInstance().setEnabled(false);
         PriorityLowestJobAction.getInstance().setEnabled(false);
@@ -916,8 +934,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             if (job.getId().equals(id)) {
                 return job;
             }
-        throw new IllegalArgumentException("there are no jobs with the id : " +
-            id);
+
+        // TODO a verifier...
+        // throw new IllegalArgumentException("there are no jobs with the id : " +
+        // id);
+        System.err.println("Warning : there are no jobs with the id " + id +
+            "\nMaybe this call arrived too late...");
+        return null;
     }
 
     public InternalTask getTaskDescriptorById(InternalJob job, TaskId id) {

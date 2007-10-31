@@ -34,7 +34,7 @@ import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
@@ -98,10 +98,10 @@ public class FinishedJobComposite extends AbstractJobComposite
      */
     @Override
     public void jobSelected(InternalJob job) {
+        boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
+
         // enabling/disabling button permitted with this job
-        ObtainJobOutputAction.getInstance()
-                             .setEnabled(SchedulerProxy.getInstance()
-                                                       .isItHisJob(job.getOwner()));
+        ObtainJobOutputAction.getInstance().setEnabled(enabled);
 
         PriorityIdleJobAction.getInstance().setEnabled(false);
         PriorityLowestJobAction.getInstance().setEnabled(false);
@@ -113,7 +113,18 @@ public class FinishedJobComposite extends AbstractJobComposite
         PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
         pauseResumeJobAction.setEnabled(false);
         pauseResumeJobAction.setPauseResumeMode();
-        KillJobAction.getInstance().setEnabled(false);
+
+        KillRemoveJobAction killRemoveJobAction = KillRemoveJobAction.getInstance();
+        killRemoveJobAction.setRemoveMode();
+        killRemoveJobAction.setEnabled(enabled);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.gui.composite.AbstractJobComposite#clear()
+     */
+    @Override
+    public void clear() {
+        // Nothing to do
     }
 
     // -------------------------------------------------------------------- //
