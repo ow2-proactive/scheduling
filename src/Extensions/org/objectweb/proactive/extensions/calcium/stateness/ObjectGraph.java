@@ -82,7 +82,7 @@ public class ObjectGraph {
         ArrayList<Field> field = getAllInheritedFields(parent.getClass());
 
         for (Field f : field) {
-            Class c = f.getType();
+            Class<?> c = f.getType();
 
             // primitives & static vars are not considered
             if (c.isPrimitive() || Modifier.isStatic(f.getModifiers())) {
@@ -135,7 +135,7 @@ public class ObjectGraph {
      * @param cls A Class.
      * @return All the Fields of this class, including the inherited ones.
      */
-    static public ArrayList<Field> getAllInheritedFields(Class cls) {
+    static public ArrayList<Field> getAllInheritedFields(Class<?> cls) {
         ArrayList<Field> array = new ArrayList<Field>();
 
         // Reached the top of the recurtion. This class is stateless.
