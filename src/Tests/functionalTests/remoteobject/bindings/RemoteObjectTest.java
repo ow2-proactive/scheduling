@@ -33,6 +33,7 @@ package functionalTests.remoteobject.bindings;
 import java.net.URI;
 
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
@@ -41,6 +42,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 import functionalTests.FunctionalTest;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -68,6 +71,40 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p1 = (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro);
 
         assertTrue(p.getURL().equals(p1.getURL()));
+    }
+
+    @org.junit.Test
+    public void doubleRegister() throws Exception {
+        // get an object
+        ProActiveRuntime p = ProActiveRuntimeImpl.getProActiveRuntime();
+
+        // create a remote object exposer for this object
+        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(),
+                p);
+
+        RemoteObject ro = roe.getRemoteObject();
+
+        // generate an uri where to rebind the runtime
+        URI uri = RemoteObjectHelper.generateUrl("myruntime");
+        InternalRemoteRemoteObject irro = roe.activateProtocol(uri);
+
+        // looking for the remote object
+        RemoteObject ro1 = RemoteObjectHelper.lookup(uri);
+
+        ProActiveRuntime p1 = (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro1);
+
+        // registering on a second url
+        URI uri2 = RemoteObjectHelper.generateUrl("myruntime-2");
+
+        // this time using the register method from the helper class
+        RemoteObjectHelper.register(ro, uri2, false);
+
+        // new lookup
+        RemoteObject ro2 = RemoteObjectHelper.lookup(uri2);
+
+        ProActiveRuntime p2 = (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro2);
+
+        assertTrue(p1.getURL().equals(p2.getURL()));
     }
 
     @org.junit.Test
@@ -101,5 +138,37 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p2 = (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro2);
 
         assertTrue(p2.getURL().equals(p1.getURL()));
+    }
+
+    @org.junit.Test
+    public void unregister() throws Exception {
+        // get an object
+        ProActiveRuntime p = ProActiveRuntimeImpl.getProActiveRuntime();
+
+        // create a remote object exposer for this object
+        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(),
+                p);
+
+        // generate an uri where to rebind the runtime
+        URI uri = RemoteObjectHelper.generateUrl("myruntime");
+
+        InternalRemoteRemoteObject irro = roe.activateProtocol(uri);
+
+        // looking for the remote object
+        RemoteObject ro = RemoteObjectHelper.lookup(uri);
+
+        assertNotNull(ro);
+
+        RemoteObjectHelper.unregister(uri);
+
+        RemoteObject ro1 = null;
+
+        // looking for the remote object
+        try {
+            ro1 = RemoteObjectHelper.lookup(uri);
+        } catch (ProActiveException e) {
+        }
+
+        assertNull(ro1);
     }
 }
