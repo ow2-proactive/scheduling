@@ -218,7 +218,7 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory
         return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
     }
 
-    @Override
+
     public String getProtocolId() {
         return this.protocolIdentifier;
     }

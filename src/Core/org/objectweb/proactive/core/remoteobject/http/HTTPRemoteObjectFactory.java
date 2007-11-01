@@ -230,7 +230,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
         return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
     }
 
-    @Override
+
     public String getProtocolId() {
         return this.protocolIdentifier;
     }
