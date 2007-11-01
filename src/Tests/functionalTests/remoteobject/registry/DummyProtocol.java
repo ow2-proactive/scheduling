@@ -40,39 +40,32 @@ import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 
 
 public class DummyProtocol implements RemoteObjectFactory {
-    @Override
     public int getPort() {
         return 452;
     }
 
-    @Override
     public String getProtocolId() {
         return "dummy";
     }
 
-    @Override
     public URI[] list(URI url) throws ProActiveException {
         return new URI[] {  };
     }
 
-    @Override
     public RemoteObject lookup(URI url) throws ProActiveException {
         return null;
     }
 
-    @Override
     public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
         throws ProActiveException {
         return null;
     }
 
-    @Override
     public RemoteRemoteObject register(InternalRemoteRemoteObject target,
         URI url, boolean replacePreviousBinding) throws ProActiveException {
         return null;
     }
 
-    @Override
     public void unregister(URI url) throws ProActiveException {
     }
 }
