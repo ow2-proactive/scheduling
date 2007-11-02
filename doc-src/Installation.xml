@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?><chapter id="Installation">
-  <title>ProActive Installation</title>
+  <title>ProActive And IC2D Installation</title>
 
   <para>ProActive is available for <ulink
   url="http://proactive.inria.fr/download_proactive_latest.htm">download </ulink>under 
@@ -11,7 +11,7 @@
   version prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
 
   <sect1>
-    <title>Installation Overview</title>
+    <title>ProActive Installation Overview</title>
 
     <sect2>
       <title>To Test ProActive With The Examples</title>
@@ -74,7 +74,7 @@
   </sect1>
 
   <sect1>
-    <title>Detailed Installation Steps</title>
+    <title>ProActive Detailed Installation Steps</title>
 
     <sect2>
     	<title>Download And Expand The Archive</title>
@@ -190,7 +190,7 @@
     following jar files :</para>
     <itemizedlist>
       <listitem>
-        <para><literal>lib/ProActive.jar</literal> - main library</para>
+        <para><literal>dist/ProActive/ProActive.jar</literal> - main library</para>
       </listitem>
 
       <listitem>
@@ -368,8 +368,24 @@
 	 </sect1>
 	 <sect1>
 	 	<title>IC2D Installation</title>
-	 	<para>
-	 		<emphasis role="bold">//TODO</emphasis>
+    	<para>You can download the archive file (a standard zip file) containing 
+    	IC2D from the <ulink url="http://proactive.inria.fr/download_ic2d_latest.htm">
+    	 download section </ulink> of the ProActive home page. You will be asked to accept 
+    	 the license agreement and provide a few details including your email address.
+    	 Within a few minutes you will  receive an email containing 
+    	 a password and an URL where you will be able to download the latest release of IC2D.</para>
+    	 <para>Unzip the archive using your favorite ZIP program, such as 
+    	 <ulink url="http://www.winzip.com/">Winzip</ulink> under Windows or 
+    	 the <ulink url="http://www.info-zip.org/pub/infozip/"> unzip </ulink>
+    	 command-line utility under most Linux/Unix systems. 
+    	 Unzipping the archive creates an IC2D directory and all the files contained in 
+    	 the archive go into this directory and its subdirectories.</para>
+    	 <para>
+    	 	Run IC2D from the installation folder to start monitoring.
+    	 	For information on using IC2D read <xref linkend="IC2D_EclipsePlugin"/> 
+    	 </para>
+    	 <para>
+
 	 	</para>
 	 </sect1>
 </chapter>
