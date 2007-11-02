@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.timit.views;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
@@ -43,78 +40,55 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.ic2d.timit.actions.DecreaseSizeAction;
-import org.objectweb.proactive.ic2d.timit.actions.ExpandSizeAction;
-import org.objectweb.proactive.ic2d.timit.actions.FitSizeAction;
-import org.objectweb.proactive.ic2d.timit.actions.IncreaseSizeAction;
-import org.objectweb.proactive.ic2d.timit.data.duration.DurationChartObject;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationEditPartFactory;
+import org.objectweb.proactive.ic2d.timit.actions.timeline.ClearTimeLineAction;
+import org.objectweb.proactive.ic2d.timit.actions.timeline.DecreaseSizeAction;
+import org.objectweb.proactive.ic2d.timit.actions.timeline.ExpandSizeAction;
+import org.objectweb.proactive.ic2d.timit.actions.timeline.FitSizeAction;
+import org.objectweb.proactive.ic2d.timit.actions.timeline.IncreaseSizeAction;
+import org.objectweb.proactive.ic2d.timit.data.timeline.TimeLineChartObject;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineEditPartFactory;
 
 
 public class TimeLineView extends ViewPart {
     public static final String ID = "org.objectweb.proactive.ic2d.timit.views.TimeLineView";
     protected ScrollingGraphicalViewer viewer;
-    protected DurationChartObject container;
-    protected IncreaseSizeAction inc;
-    protected DecreaseSizeAction dec;
-    protected FitSizeAction fit;
-    protected ExpandSizeAction exp;
-
-    public IncreaseSizeAction getInc() {
-        return inc;
-    }
-
-    public DecreaseSizeAction getDec() {
-        return dec;
-    }
+    protected TimeLineChartObject container;
+    protected IToolBarManager toolBarManager;
 
     public TimeLineView() {
-        this.container = new DurationChartObject();
+        this.container = new TimeLineChartObject();
     }
 
     @Override
     public void createPartControl(Composite parent) {
-        // create graphical viewer
+        // Create graphical viewer
         this.viewer = new ScrollingGraphicalViewer();
         this.viewer.createControl(parent);
-        // configure the viewer
+        // Configure the viewer
         this.viewer.getControl().setBackground(ColorConstants.white);
         ScalableFreeformRootEditPart root = new ScalableFreeformRootEditPart();
-
-        //System.out.println("DurationStateView.createPartControl() -------> " + root.get);
-        //		System.out.println("DurationStateView.createPartControl() ------> " + );
-        //		root.getFigure()addEditPartListener(new Test implements EditPartListener {
-        //			
-        //		}):
-        //		List zoomLevels = new ArrayList(3);
-        //		zoomLevels.add(ZoomManager.FIT_ALL);
-        //		zoomLevels.add(ZoomManager.FIT_WIDTH);
-        //		zoomLevels.add(ZoomManager.FIT_HEIGHT);
-        //		root.getZoomManager().setZoomLevelContributions(zoomLevels);
         this.viewer.setRootEditPart(root);
 
-        // activate the viewer as selection provider for Eclipse
+        // Activate the viewer as selection provider for Eclipse
         this.getSite().setSelectionProvider(this.viewer);
 
-        IToolBarManager toolBarManager = getViewSite()
-                                             .getActionBars().getToolBarManager();
+        // Get the toolbarManager and add all actions
+        this.toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
-        toolBarManager.add(new ZoomInAction(root.getZoomManager()));
-        toolBarManager.add(new ZoomOutAction(root.getZoomManager())); //omComboContributionItem(this, zoomStrings));
-
+        // Create all actions for this view        
+        toolBarManager.add(new ClearTimeLineAction());
         toolBarManager.add(new Separator());
+        toolBarManager.add(new ZoomInAction(root.getZoomManager()));
+        toolBarManager.add(new ZoomOutAction(root.getZoomManager()));
+        toolBarManager.add(new Separator());
+        toolBarManager.add(new IncreaseSizeAction());
+        toolBarManager.add(new DecreaseSizeAction());
+        toolBarManager.add(new FitSizeAction());
+        toolBarManager.add(new ExpandSizeAction());
 
-        this.inc = new IncreaseSizeAction();
-        toolBarManager.add(inc);
-        this.dec = new DecreaseSizeAction();
-        toolBarManager.add(dec);
-        this.fit = new FitSizeAction();
-        toolBarManager.add(fit);
-        this.exp = new ExpandSizeAction();
-        toolBarManager.add(exp);
-
-        // initialize the viewer with input
-        this.viewer.setEditPartFactory(new DurationEditPartFactory(this));
+        // Initialize the viewer with input
+        this.viewer.setEditPartFactory(new TimeLineEditPartFactory(this));
 
         /////////////////////////////////////////////////////
         // Add contents
@@ -126,7 +100,7 @@ public class TimeLineView extends ViewPart {
         // TODO Auto-generated method stub
     }
 
-    public DurationChartObject getContainer() {
+    public TimeLineChartObject getContainer() {
         return container;
     }
 
@@ -138,11 +112,21 @@ public class TimeLineView extends ViewPart {
         return super.getAdapter(adapter);
     }
 
-    public FitSizeAction getFit() {
-        return fit;
-    }
+    /**
+     * Call this method after the main edit part is created to
+     * set the target of all actions in the toolbar manager
+     * @param target The target of all actions in the toolbar
+     */
+    public void initActionsTarget(TimeLineChartEditPart target) {
+        if (this.toolBarManager == null) {
+            return;
+        }
 
-    public ExpandSizeAction getExp() {
-        return exp;
+        // Add the target to all actions
+        ((IncreaseSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(IncreaseSizeAction.INCREASE_SIZE_ACTION)).getAction()).setTarget(target);
+        ((DecreaseSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(DecreaseSizeAction.DECREASE_SIZE_ACTION)).getAction()).setTarget(target);
+        ((FitSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(FitSizeAction.FIT_SIZE_ACTION)).getAction()).setTarget(target);
+        ((ExpandSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(ExpandSizeAction.EXPAND_TIMELINE_ACTION)).getAction()).setTarget(target);
+        ((ClearTimeLineAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(ClearTimeLineAction.CLEAR_TIMELINE_ACTION)).getAction()).setTarget(target);
     }
 }

@@ -28,27 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.actions;
+package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
-public class FitSizeAction extends Action {
-    public static final String FIT_SIZE_ACTION = "Fit Size Action";
-    private DurationChartEditPart durationChartEditPart;
+public class IncreaseSizeAction extends Action {
+    public static final String INCREASE_SIZE_ACTION = "Increase Size Action";
+    private TimeLineChartEditPart durationChartEditPart;
 
-    public FitSizeAction() {
-        super.setId(FIT_SIZE_ACTION);
+    public IncreaseSizeAction() {
+        super.setId(INCREASE_SIZE_ACTION);
         super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "fit_timeline.gif"));
-        super.setToolTipText(FIT_SIZE_ACTION);
+                this.getClass(), "increase_width.gif"));
+        super.setToolTipText(INCREASE_SIZE_ACTION);
         super.setEnabled(false);
     }
 
     public final void setTarget(
-        final DurationChartEditPart durationChartEditPart) {
+        final TimeLineChartEditPart durationChartEditPart) {
         super.setEnabled(true);
         this.durationChartEditPart = durationChartEditPart;
     }
@@ -56,7 +56,7 @@ public class FitSizeAction extends Action {
     @Override
     public final void run() {
         if (this.durationChartEditPart != null) {
-            this.durationChartEditPart.fitWidth();
+            this.durationChartEditPart.increaseWidth();
         }
     }
 }

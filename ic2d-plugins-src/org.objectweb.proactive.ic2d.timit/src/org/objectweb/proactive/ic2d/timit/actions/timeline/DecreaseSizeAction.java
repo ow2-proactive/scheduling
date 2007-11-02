@@ -28,25 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.data.duration;
+package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
-public class Stamp {
-    public State state;
-    public long startTime;
-    public long endTime;
+public class DecreaseSizeAction extends Action {
+    public static final String DECREASE_SIZE_ACTION = "Decrease Size Action";
+    private TimeLineChartEditPart durationChartEditPart;
 
-    public Stamp() {
+    public DecreaseSizeAction() {
+        super.setId(DECREASE_SIZE_ACTION);
+        super.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "decrease_width.gif"));
+        super.setToolTipText(DECREASE_SIZE_ACTION);
+        super.setEnabled(false);
     }
 
-    public Stamp(State state, long startTime) {
-        this.state = state;
-        this.startTime = startTime;
+    public final void setTarget(
+        final TimeLineChartEditPart durationChartEditPart) {
+        super.setEnabled(true);
+        this.durationChartEditPart = durationChartEditPart;
     }
 
-    public final String toString() {
-        return state.ordinal() + " " + startTime + " " + endTime;
+    @Override
+    public final void run() {
+        if (this.durationChartEditPart != null) {
+            this.durationChartEditPart.decreaseWidth();
+        }
     }
 }

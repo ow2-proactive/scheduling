@@ -122,7 +122,7 @@ public class BasicChartEditPart extends AbstractGraphicalEditPart
         BasicChartFigure figure = (BasicChartFigure) getFigure();
         figure.setChart(this.basicChartObject.provideChart());
         figure.setPreferredSize(this.getViewer().getControl().getBounds().width -
-            20, CHART_HEIGHT);
+            20, CHART_HEIGHT); // HERE SOMETIMES SOMTHING IS NULL TODO: FIND IT !
         refresh();
         figure.repaint(); // TODO : check if refresh() calls the
                           // figure.repaint() method

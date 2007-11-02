@@ -28,27 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.timit.actions;
+package org.objectweb.proactive.ic2d.timit.actions.timeline;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.objectweb.proactive.ic2d.timit.editparts.duration.DurationChartEditPart;
+import org.objectweb.proactive.ic2d.timit.editparts.timeline.TimeLineChartEditPart;
 
 
-public class ExpandSizeAction extends Action {
-    public static final String EXPAND_TIMELINE_ACTION = "Expand TimeLine Action";
-    private DurationChartEditPart durationChartEditPart;
+public class ClearTimeLineAction extends Action {
+    public static final String CLEAR_TIMELINE_ACTION = "Clear TimeLine";
+    private TimeLineChartEditPart durationChartEditPart;
 
-    public ExpandSizeAction() {
-        super.setId(EXPAND_TIMELINE_ACTION);
+    public ClearTimeLineAction() {
+        super.setId(CLEAR_TIMELINE_ACTION);
         super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "expand_timeline.gif"));
-        super.setToolTipText(EXPAND_TIMELINE_ACTION);
+                this.getClass(), "delete_obj.gif"));
+        super.setToolTipText(CLEAR_TIMELINE_ACTION);
         super.setEnabled(false);
     }
 
     public final void setTarget(
-        final DurationChartEditPart durationChartEditPart) {
+        final TimeLineChartEditPart durationChartEditPart) {
         super.setEnabled(true);
         this.durationChartEditPart = durationChartEditPart;
     }
@@ -56,7 +56,7 @@ public class ExpandSizeAction extends Action {
     @Override
     public final void run() {
         if (this.durationChartEditPart != null) {
-            this.durationChartEditPart.expandWidth();
+            this.durationChartEditPart.removeAndClearAll();
         }
     }
 }
