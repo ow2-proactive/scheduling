@@ -36,6 +36,10 @@
       computers and the master-worker architecture.</para>
     </listitem>
   </itemizedlist>
+		<para>
+			We will also show the <ulink url="">IC2D</ulink>  view of the examples in this chapter. 
+		</para>
+	
 	<para>
 		Throughout the tutorial the classes from which we will instantiate active objects
 		are represented in red in the UML diagrams.
@@ -166,6 +170,29 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			</screen>
 		</para>
 	</sect2>
+	<sect2>
+		<title>Monitoring The HelloWorld Application</title>
+		<para>
+			To see the the active object running start  <ulink url="">IC2D</ulink> and start 
+			monitoring the local machine. To prevent the active object from stopping its
+			thread remove from the 
+			code above the line <literal>ProActive.exitSuccess();</literal>. IC2D will
+			show the hostname, the node names, and the active objects running. 
+		</para>
+		<para>
+			
+			<figure>
+      		<title> IC2D view of the SimpleHello example</title> 
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/ic2d_simplehello.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+		</para>
+	</sect2>
 	</sect1>
 
   <sect1>
@@ -261,6 +288,33 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			</screen>
  	</para>
     </sect2>
+  
+  	<sect2>
+		<title>Monitoring The InitializedHello Application</title>
+		<para>
+			To see the the active object running start  <ulink url="">IC2D</ulink> and start 
+			monitoring the local machine. To prevent the active object from stopping its
+			thread remove from the 
+			code above the line <literal>ProActive.exitSuccess();</literal> and
+			<literal>ao.terminate();</literal>. IC2D will
+			show the hostname, the node names, and the active objects running - in
+			this case InitializedHello. 
+		</para>
+		<para>
+			<figure>
+      		<title> IC2D view of the InitializedHello example</title> 
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/ic2d_initialized_hello.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+		</para>
+	</sect2>
+  
+  
   </sect1>
 	<sect1>
 		<title>Application Deployment</title>
@@ -474,6 +528,31 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
  	</para>
     </sect2>
 
+	<sect2>
+		<title>Monitoring The DeployedHello Application</title>
+		<para>
+			To see the the active object running, start  <ulink url="">IC2D</ulink> and start 
+			monitoring the remote machine on which you deployed. To prevent the active object
+			from stopping its	thread remove from the 
+			code above the line <literal>ProActive.exitSuccess();</literal> and
+			<literal>ao.terminate();</literal>. IC2D will
+			show the hostname, the node names, and the active objects running on the
+			remote host - in
+			this case InitializedHello. 
+		</para>
+		<para>
+			<figure>
+      		<title> IC2D view of the InitializedHello example</title> 
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/ic2d_deployed_hello.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+		</para>
+	</sect2>
 	</sect1>
 
   <sect1>
@@ -603,6 +682,54 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			</screen>
  	</para>
     </sect2>
+    
+    <sect2>
+		<title>Monitoring The MigratableHello Application</title>
+		<para>
+			To monitor the movement of the active object between hosts,
+			we will add a small change to the  <literal>Main</literal> class
+			in the <literal>for</literal> loop. Just add <literal> System.in.read()</literal>
+			before <literal>ao.packUpMyVariablesAndHitTheRoad(node);</literal>.
+			Now on each Enter press the object will migrate to the next node. 
+		</para>
+		<para>
+			To see the the active object migrating start  <ulink url="">IC2D</ulink> and start 
+			monitoring the remote machines on which the JVMs were started. On pressing Enter
+			the active object will migrate from machine to machine
+		</para>
+
+		<para>
+			<figure>
+      		<title> IC2D view of the MigratableHello example</title> 
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_started.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+		</para>
+		<para>
+			With this example it is also possible to migrate the active object using IC2D.
+			All you have to do is drag the active object from its node to a node on another
+			JVM. The active object will migrate and then continue running.  
+		</para>
+		<para>
+			<figure>
+      		<title> IC2D view of the MigratableHello example after migration</title> 
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/ic2d_migratable_hello_final.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+		</para>
+		
+	</sect2>
+	    
     </sect1>
     <sect1>
       		<title>An Application To Find The First N Primes</title>
@@ -740,6 +867,53 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			</screen>
  	</para>
     </sect2>
+
+    <sect2>
+		<title>Monitoring The Distributed Primes</title>
+        <para>
+			To see the the DistributePrimes example running  start <ulink url="">IC2D</ulink> and start 
+			monitoring the remote machines on which the JVMs were started. IC2D will show the
+			active objects and the communication between them. You will see that the communication
+			only takes place between the PrimeManager and the PrimeWorkers. 
+		</para>
+		
+		<para>
+			<figure>
+      		<title> IC2D view of the DistributedPrimes example</title> 
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/ic2d_primes.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+		</para>
+		<para>
+			It is possible to migrate workers to other machines while the example is running.
+			Bellow is an example of how all of the workers were moved on the same machine. 
+			Because of the way the PrimeManager is designed it is impossible to move it to another machine.
+			Migration happens after the current task of the active object is finished.
+			Since the task of the PrimeManager is  continously running until the end of the computation,
+			it is impossible to 
+			move the PrimeManager to another machine.
+		</para>	
+	<para>
+			<figure>
+      		<title> IC2D view of the DistributedPrimes example after migration</title> 
+          
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/ic2d_primes_migrated.png"
+                         format="PNG" width="6in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+		</para>
+	</sect2>
+
+
   </sect1>
   
 
