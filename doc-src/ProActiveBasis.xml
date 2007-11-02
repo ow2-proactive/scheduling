@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="ProActiveBasis">
-  <title>ProActive Basis, Active Object Definition</title>
+  <title>Active Object Definition</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ProActiveBasis.html  -->
 
+  
   <sect1>
-    <title>Active objects basis</title>
+  	<sect2>
+  		<title>Overview</title>
+  		<para>//TODO</para>
+  	</sect2>
+    <sect2 id="ProActiveBasis_html_def">
+    <title>Active Object Structure</title>
 
     <para>Active objects are the basic units of activity and distribution used
-    for building concurrent applications using ProActive. An active object
-    runs with its own thread. This thread only executes the methods invoked on
-    this active object by other active objects and those of the passive
-    objects of the subsystem that belongs to this active object. With
-    ProActive, the programmer does not have to explicitly manipulate Thread
-    objects, unlike in standard Java.</para>
+    for building concurrent applications using ProActive. As opposed to passive(regular)
+    objects, an active object is an object that has its own thread and execution queue. 
+    The active object thread executes only the methods invoked on
+    the active object by other active objects or by passive
+    objects of the subsystem of the active object. However, the use of this 
+    thread is transparent for the user. ProActive manages the active objects threads
+    relieving the programmer from explicitly manipulating Thread
+    objects.</para>
 
     <para>Active objects can be created on any of the hosts involved in the
     computation. Once an active object is created, its activity (the fact that
@@ -22,22 +30,47 @@
     perfectly transparent. As a matter of fact, any active object can be
     manipulated just like if it were a passive instance of the same
     class.</para>
+    
+	 <para>The active object is actually the composition of two objects: a
+    <emphasis>body</emphasis> and a standard Java object. The body is not
+    visible from the outside of the active object therefore the active
+    object looks exactly like a standard object from the user's perspective.</para>
 
-    <para>ProActive is a library designed for developing applications in a
-    model introduced by the Eiffel// language. Its main features are:</para>
+    <para>The body is responsible for receiving calls on the active object,
+    storing these calls in the queue of pending calls (also called requests).
+    It will execute these calls in an order
+    specified by a specific synchronization policy. If no specific
+    synchronization policy is provided, calls are managed in a FIFO manner
+    (first come, first served). It is important to note
+    that no parallelism is provided inside an active object. This is an
+    important decision in the design of ProActive which enables the use of
+    pre and post conditions and class invariants.</para>
 
-    <itemizedlist>
+    <para>On the side of the subsystem which sends a call to an active object,
+    this active object is represented by a <emphasis>proxy</emphasis>, whose
+    main responsibility is to generate future objects for representing future
+    values, transform calls into request objects (in terms of meta-object programming, this
+    is a reification) and perform deep-copy of passive objects passed as
+    parameters.</para>
+  	</sect2>
+	
+	<sect2>
+		<title> Active Object Behavior</title>
+	  <itemizedlist>
       <listitem>
-        <para>The application is structured in subsystems. There is one active
-        object (and therefore one thread) for each subsystem and one subsystem
-        for each active object (or thread). Each subsystem is thus composed of
-        one active object and any number of passive objects (possibly zero).
-        The thread of one subsystem only executes methods in the objects of
-        this subsystem.</para>
+        <para>An application based on active objects is structured in subsystems.
+        A subsystem is composed of only one active object (with its own thread) and several passive 
+        objects (possibly zero). This is an effect of to the way active objects communicate 
+		using proxies. The thread of one subsystem only executes methods in the objects of
+        this subsystem and any call on a another active object passes through a proxy and is
+        executed in the subsystem of the remote active object.  
+        </para>
       </listitem>
 
       <listitem>
-        <para>There are no shared passive objects between subsystems.</para>
+        <para>The passive objects are not shared between subsystems. Any call on an remote active object
+        using passive objects as arguments leads to a deep-copy of the passive objects on the subsystem of
+        the remote active object. </para>
       </listitem>
     </itemizedlist>
 
@@ -118,34 +151,8 @@
           </imageobject>
         </mediaobject>
       </figure></para>
+      </sect2>
   </sect1>
 
-  <sect1 id="ProActiveBasis_html_def">
-    <title>What is an active object</title>
-
-    <para>The active object is actually the composition of two objects: a
-    <emphasis>body</emphasis> and a standard Java object. The body is not
-    visible from the outside of the active object, then everything looks like
-    if the standard object was active.</para>
-
-    <para>The body is responsible for receiving calls on the active object,
-    storing these calls in a queue of pending calls (we also call
-    <emphasis>requests</emphasis>. It also executes these calls in an order
-    specified by a specific synchronization policy. If no specific
-    synchronization policy is provided, calls are managed in a FIFO manner
-    (first come, first served)).</para>
-
-    <para>Then, the thread of an active object alternatively chooses a method
-    in the queue of pending requests and executes it. It is important to note
-    that no parallelism is provided inside an active object. This is an
-    important decision in the design of ProActive which enables the use of
-    pre-post conditions and class invariants.</para>
-
-    <para>On the side of the subsystem which sends a call to an active object,
-    this active object is represented by a <emphasis>proxy</emphasis>, whose
-    main responsibility is to generate future objects for representing future
-    values, transform calls into Request objects (in terms of metaobject, this
-    is a reification) and perform deep-copy of passive objects passed as
-    parameters.</para>
-  </sect1>
+  
 </chapter>
