@@ -22,7 +22,7 @@
 					<element name="requirements" type="pa:TextOrVariableType" minOccurs="0" />
 					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
 					<element name="rank" type="paext:gLiteRankType" />
-					<element name="JdlTransferDeploy" type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
+					<element name="JDLTransferDeploy" type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
 					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
@@ -42,7 +42,7 @@
 				<attribute name="outputse" type="string" />
 				<attribute name="retryCount" type="string" />
 				<attribute name="myProxyServer" type="string" />
-				<attribute name="nodeNumber" type="string" />
+				<attribute name="nodes" type="string" />
 			</extension>
 		</complexContent>
 	</complexType>

@@ -38,15 +38,15 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 public class GroupGLite extends AbstractGroup {
     private String fileName;
-    private PathElement filePath;
+    private String filePath;
     private String gLiteCommandPath;
     private int jobNodeNumber;
     private String jobType;
     private String jobJobType;
     private String jobExecutable;
-    private String jobStdOutput;
-    private String jobStdInput;
-    private String jobStdError;
+    private String stdout;
+    private String stdin;
+    private String stderr;
     private String jobOutputStorageElement;
     private String jobVO;
     private String jobRetryCount;
@@ -58,13 +58,14 @@ public class GroupGLite extends AbstractGroup {
     private String jobRank;
     private String jobFuzzyRank;
     private String netServer;
-    private PathElement configFile;
+    private String configFile;
     private boolean jdlRemote;
-    private PathElement remoteFilePath;
+    private String remoteFilePath;
     private boolean configFileOption;
     private String jobArgument;
     private LinkedList jobInputSB;
     private LinkedList jobOutputSB;
+    private String dataCatalog;
 
     @Override
     public List<String> internalBuildCommands() {
@@ -89,15 +90,15 @@ public class GroupGLite extends AbstractGroup {
     /**
      * @return Returns the filePath.
      */
-    public PathElement getFilePath() {
+    public String getFilePath() {
         return filePath;
     }
 
     /**
-     * @param path The filePath to set.
+     * @param nodeValue The filePath to set.
      */
-    public void setFilePath(PathElement path) {
-        this.filePath = path;
+    public void setFilePath(String nodeValue) {
+        this.filePath = nodeValue;
     }
 
     /**
@@ -177,43 +178,43 @@ public class GroupGLite extends AbstractGroup {
     /**
      * @return output filename (must also figure in the OutputSandbox to be usefull)
      */
-    public String getJobStdOutput() {
-        return jobStdOutput;
+    public String getStdout() {
+        return stdout;
     }
 
     /**
-     * @param jobStdOutput output filename (must also figure in the OutputSandbox to be usefull)
+     * @param stdout output filename (must also figure in the OutputSandbox to be usefull)
      */
-    public void setJobStdOutput(String jobStdOutput) {
-        this.jobStdOutput = jobStdOutput;
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
     }
 
     /**
      * @return input filename
      */
-    public String getJobStdInput() {
-        return jobStdInput;
+    public String getStdin() {
+        return stdin;
     }
 
     /**
-     * @param jobStdInput input filename
+     * @param stdin input filename
      */
-    public void setJobStdInput(String jobStdInput) {
-        this.jobStdInput = jobStdInput;
+    public void setStdin(String stdin) {
+        this.stdin = stdin;
     }
 
     /**
      * @return stderr filename  (must also figure in the OutputSandbox to be useful)
      */
-    public String getJobStdError() {
-        return jobStdError;
+    public String getStderr() {
+        return stderr;
     }
 
     /**
-     * @param jobStdError stderr filename  (must also figure in the OutputSandbox to be useful)
+     * @param stderr stderr filename  (must also figure in the OutputSandbox to be useful)
      */
-    public void setJobStdError(String jobStdError) {
-        this.jobStdError = jobStdError;
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
     }
 
     /**
@@ -374,14 +375,14 @@ public class GroupGLite extends AbstractGroup {
     /**
      * @return Returns the configFile.
      */
-    public PathElement getConfigFile() {
+    public String getConfigFile() {
         return configFile;
     }
 
     /**
      * @param path The configFile to set.
      */
-    public void setConfigFile(PathElement path) {
+    public void setConfigFile(String path) {
         this.configFile = path;
     }
 
@@ -406,14 +407,14 @@ public class GroupGLite extends AbstractGroup {
     /**
      * @return Returns the remoteFilePath.
      */
-    public PathElement getRemoteFilePath() {
+    public String getRemoteFilePath() {
         return remoteFilePath;
     }
 
     /**
      * @param path The remoteFilePath to set.
      */
-    public void setRemoteFilePath(PathElement path) {
+    public void setRemoteFilePath(String path) {
         this.remoteFilePath = path;
     }
 
@@ -451,5 +452,9 @@ public class GroupGLite extends AbstractGroup {
             jobOutputSB = new LinkedList();
         }
         return jobOutputSB.add(entry);
+    }
+
+    public void setDataCatalog(String dataCatalog) {
+        this.dataCatalog = dataCatalog;
     }
 }
