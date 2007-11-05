@@ -11,12 +11,20 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupARC;
-import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupGLite;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
 public class GroupARCParser extends AbstractGroupParser {
+    private static final String NODE_NAME_NOTIFY = "notify";
+    private static final String NODE_NAME_MAX_TIME = "maxTime";
+    private static final String NODE_NAME_STDIN = "stdin";
+    private static final String NODE_NAME_STDERR = "stderr";
+    private static final String NODE_NAME_STDOUT = "stdout";
+    private static final String NODE_NAME_OUTPUT_FILES = "outputFiles";
+    private static final String NODE_NAME_INPUT_FILES = "inputFiles";
+    private static final String NODE_NAME_ARGUMENTS = "arguments";
+    private static final String NODE_NAME_COUNT = "count";
     private static final String NODE_NAME = "arcGroup";
     private static final String ATTR_JOB_NAME = "jobName";
 
@@ -49,29 +57,29 @@ public class GroupARCParser extends AbstractGroupParser {
                 String nodeName = child.getNodeName();
                 String nodeValue = GCMParserHelper.getElementValue(child);
 
-                if (nodeName.equals("count")) {
+                if (nodeName.equals(NODE_NAME_COUNT)) {
                     arcGroup.setCount(nodeValue);
-                } else if (nodeName.equals("arguments")) {
+                } else if (nodeName.equals(NODE_NAME_ARGUMENTS)) {
                     List<String> args = GCMParserHelper.parseArgumentListNode(xpath,
                             child);
                     arcGroup.setArguments(args);
-                } else if (nodeName.equals("inputFiles")) {
+                } else if (nodeName.equals(NODE_NAME_INPUT_FILES)) {
                     List<FileTransfer> inputFilesList = parseFileTransferList(child,
                             xpath);
                     arcGroup.setInputFiles(inputFilesList);
-                } else if (nodeName.equals("outputFiles")) {
+                } else if (nodeName.equals(NODE_NAME_OUTPUT_FILES)) {
                     List<FileTransfer> outputFilesList = parseFileTransferList(child,
                             xpath);
                     arcGroup.setOutputFiles(outputFilesList);
-                } else if (nodeName.equals("stdout")) {
+                } else if (nodeName.equals(NODE_NAME_STDOUT)) {
                     arcGroup.setStdout(nodeValue);
-                } else if (nodeName.equals("stderr")) {
+                } else if (nodeName.equals(NODE_NAME_STDERR)) {
                     arcGroup.setStderr(nodeValue);
-                } else if (nodeName.equals("stdin")) {
+                } else if (nodeName.equals(NODE_NAME_STDIN)) {
                     arcGroup.setStdin(nodeValue);
-                } else if (nodeName.equals("maxTime")) {
+                } else if (nodeName.equals(NODE_NAME_MAX_TIME)) {
                     arcGroup.setMaxTime(nodeValue);
-                } else if (nodeName.equals("notify")) {
+                } else if (nodeName.equals(NODE_NAME_NOTIFY)) {
                     arcGroup.setNotify(nodeValue);
                 }
             }
@@ -81,14 +89,16 @@ public class GroupARCParser extends AbstractGroupParser {
     }
 
     public class FileTransfer {
+        private static final String ATTR_LOCATION = "location";
+        private static final String ATTR_FILENAME = "filename";
         public String filename;
         public String location;
 
         FileTransfer(Node fileTransferNode) {
             filename = GCMParserHelper.getAttributeValue(fileTransferNode,
-                    "filename");
+                    ATTR_FILENAME);
             location = GCMParserHelper.getAttributeValue(fileTransferNode,
-                    "location");
+                    ATTR_LOCATION);
         }
     }
 
