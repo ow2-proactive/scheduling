@@ -29,8 +29,14 @@
 	</complexType>
 
 	<complexType name="arcFileTransferType">
-		<attribute name="filename" type="string" />
-		<attribute name="location" type="string" />
+		<sequence>
+			<element name="transfer">
+				<complexType>
+					<attribute name="filename" type="string" />
+					<attribute name="location" type="string" />
+				</complexType>
+			</element>
+		</sequence>
 	</complexType>
 
 	<element name="arcGroup" type="paext:arcProcessType" substitutionGroup="pa:abstractShElement"></element>

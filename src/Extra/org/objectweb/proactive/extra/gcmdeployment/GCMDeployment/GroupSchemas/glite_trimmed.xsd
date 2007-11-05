@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+
+
+	<!--gLiteProcess element has six children: processReference element, gLiteOptions which contains JDLFilePath child and SdtOutput child 
+		environment, rank, inputData, requirements-->
+	<!--Environment : List of string representing environment settings that hava to be performed on the execution machine.-->
+	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
+	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
+	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
+	<complexType name="gLiteProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
+					<element name="rank" type="paext:gLiteRankType" />
+					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="configFile" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
+				</sequence>
+				<attribute name="hostname" type="string" />
+				<attribute name="virtualOrganisation" type="string" use="required" />
+				<attribute name="Type" type="string" default="job" />
+				<attribute name="executable" type="string" default="/bin/sh" />
+				<attribute name="jobType" type="string" default="normal" />
+				<attribute name="nodeNumber" type="string" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<!--gLiteRankType-->
+	<complexType name="gLiteRankType">
+		<simpleContent>
+			<extension base="pa:TextOrVariableType">
+				<attribute name="fuzzyrank" type="pa:BooleanOrVariableType" default="false" />
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--gLiteInputDataType-->
+	<complexType name="gLiteInputDataType">
+		<attribute name="dataAccessProtocol" type="string" />
+		<attribute name="storageIndex" type="string" />
+		<attribute name="dataCatalog" type="string" />
+	</complexType>
+	<!-- end of gLiteProcessType -->
+
+	<element name="gLiteGroup" type="paext:gLiteProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+</schema>

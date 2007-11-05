@@ -157,4 +157,19 @@ public class GCMParserHelper implements GCMParserConstants {
 
         return pathElement;
     }
+
+    public static List<String> parseArgumentListNode(XPath xpath,
+        Node argumentListNode) throws XPathExpressionException {
+        ArrayList<String> args = new ArrayList<String>();
+
+        NodeList argNodes = (NodeList) xpath.evaluate("pa:arg",
+                argumentListNode, XPathConstants.NODESET);
+
+        for (int i = 0; i < argNodes.getLength(); ++i) {
+            Node argNode = argNodes.item(i);
+            args.add(getElementValue(argNode));
+        }
+
+        return args;
+    }
 }
