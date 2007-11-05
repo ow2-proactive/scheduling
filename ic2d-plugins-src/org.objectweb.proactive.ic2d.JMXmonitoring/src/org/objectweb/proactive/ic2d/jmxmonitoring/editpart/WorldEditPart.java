@@ -51,9 +51,18 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     private MonitoringView monitoringView;
     private WorldObject castedModel;
     private IFigure castedFigure;
-    private Set<IFigure> figuresToUpdate;
-    private Set<GraphicalCommunication> communicationsToDraw;
+    private final Set<IFigure> figuresToUpdate;
+    private final java.util.Map<Integer, GraphicalCommunication> communicationsToDraw;
     private boolean shouldRepaint = true;
+    private final Runnable drawRunnable = new Runnable() {
+            public final void run() {
+                for (final GraphicalCommunication communication : communicationsToDraw.values()) {
+                    communication.draw();
+                }
+                communicationsToDraw.clear();
+                getFigure().repaint();
+            }
+        };
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -63,37 +72,24 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
         this.monitoringView = monitoringView;
 
         this.figuresToUpdate = Collections.synchronizedSet(new HashSet<IFigure>());
-        this.communicationsToDraw = Collections.synchronizedSet(new HashSet<GraphicalCommunication>());
+        this.communicationsToDraw = new java.util.concurrent.ConcurrentHashMap<Integer, GraphicalCommunication>(); //Collections.synchronizedSet(new HashSet<GraphicalCommunication>());        		
 
         new Thread() {
                 @Override
-                public void run() {
-                    while (shouldRepaint) {
-                        try {
+                public final void run() {
+                    try {
+                        Control control;
+                        while (shouldRepaint) {
                             Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        Control control = getViewer()
-                                              .getControl();
-                        if (control == null) {
-                            return;
-                        }
-                        control.getDisplay().asyncExec(new Runnable() {
-                                public void run() {
-                                    for (GraphicalCommunication communication : communicationsToDraw) {
-                                        communication.draw();
-                                    }
-                                    communicationsToDraw.clear();
 
-                                    /*for (IFigure figure : figuresToUpdate) {
-                                            figure.repaint();
-                                    }
-                                    figuresToUpdate.clear();*/
-                                    getFigure().repaint();
-                                }
-                            });
+                            control = getViewer().getControl();
+                            if (control != null) {
+                                control.getDisplay()
+                                       .asyncExec(WorldEditPart.this.drawRunnable);
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }.start();
@@ -104,7 +100,10 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     //
     @Override
     public void addGraphicalCommunication(GraphicalCommunication communication) {
-        communicationsToDraw.add(communication);
+        if (!communicationsToDraw.containsKey(communication.hashcode())) {
+            this.communicationsToDraw.put(communication.hashcode(),
+                communication);
+        }
     }
 
     @Override

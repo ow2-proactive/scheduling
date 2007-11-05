@@ -36,10 +36,13 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 
 
 public class GraphicalCommunication {
+    private final static int RIGHT_MASK = 0xFFFF; // 00000000000000001111111111111111
+    private final static int LEFT_MASK = 0xFFFF << 16; // 11111111111111110000000000000000
     private AOFigure source;
     private AOFigure destination;
     private IFigure panel;
     private Color color;
+    private final int hashcode;
 
     /**
      *
@@ -53,6 +56,11 @@ public class GraphicalCommunication {
         this.destination = destination;
         this.panel = panel;
         this.color = color;
+        // To achieve unicity for a directed communication   
+        // we take the right 16 bits of the source hashcode and 16 bits of dest hashcode
+        // this is used to avoid a + b = b + a
+        this.hashcode = (this.source.hashCode() & RIGHT_MASK) +
+            (this.destination.hashCode() & LEFT_MASK) + this.panel.hashCode();
     }
 
     public Color getColor() {
@@ -76,6 +84,11 @@ public class GraphicalCommunication {
      */
     public void draw() {
         source.addConnection(destination, panel, color);
+    }
+
+    @Override
+    public int hashcode() {
+        return this.hashcode;
     }
 
     @Override
