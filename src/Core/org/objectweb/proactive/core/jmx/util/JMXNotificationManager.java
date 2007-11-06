@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.jmx.util;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -188,15 +189,17 @@ public class JMXNotificationManager implements NotificationListener {
                 // Store the connection in order to be able to close the connection later
                 connectionsWithRuntimeUrl.put(runtimeUrl, connection);
             }
+
             // Add the objectName to the established connection
-            connection.addObjectName(objectName);
-
-            // Subscribes the JMXNotificationManager to the notifications of this MBean.
-            notificationlistener.subscribe(connection.getConnection(),
-                objectName, null, null);
-
-            // Updates our map
-            connectionsWithObjectName.put(objectName, connection);
+            //if the object name is not already monitored through the connection
+            if (!connection.objectNames.contains(objectName)) {
+                connection.addObjectName(objectName);
+                // Subscribes the JMXNotificationManager to the notifications of this MBean.
+                this.notificationlistener.subscribe(connection.getConnection(),
+                    objectName, null, null);
+                // Updates our map
+                connectionsWithObjectName.put(objectName, connection);
+            } //if not contains
         }
 
         // Add the listener to the set of listeners to notify
@@ -209,58 +212,44 @@ public class JMXNotificationManager implements NotificationListener {
      * @param listener The notification listener.
      */
     public void unsubscribe(ObjectName objectName, NotificationListener listener) {
-        // ------------- Try to unsubscribe to a LOCAL MBean Server ------------
-        try {
-            ManagementFactory.getPlatformMBeanServer()
-                             .removeNotificationListener(objectName, listener);
-        } catch (InstanceNotFoundException e) {
-            //---------- Try to unsubscribe to a REMOTE MBean Server -----------
-            ConcurrentLinkedQueue<NotificationListener> listeners = allListeners.get(objectName);
+        //---------- Try to unsubscribe to an MBean Server - always use a connection to do this, wheater is a REMOTE or a LOCAL BeanServer -----------
+        ConcurrentLinkedQueue<NotificationListener> listeners = allListeners.get(objectName);
 
-            // No listener listen this objectName, so we display an error message.
-            if (listeners == null) {
+        // No listener listen this objectName, so we display an error message.
+        if (listeners == null) {
+            logger.warn("The unsubscribe action has failed : The objectName=" +
+                objectName + " has been already unsubscribe");
+            return;
+        }
+        // We have to remove the listener.
+        else {
+            // Try to remove the listener
+            boolean isRemoved = listeners.remove(listener);
+
+            // The listener didn't be listening this objectName, so we display an error message.
+            if (!isRemoved) {
                 logger.warn(
-                    "The unsubscribe action has failed : The objectName=" +
-                    objectName + " has been already unsubscribe");
+                    "The unsubscribe action has failed : The given listener doesn't listen the objectName=" +
+                    objectName);
                 return;
             }
-            // We have to remove the listener.
-            else {
-                // Try to remove the listener
-                boolean isRemoved = listeners.remove(listener);
 
-                // The listener didn't be listening this objectName, so we display an error message.
-                if (!isRemoved) {
-                    logger.warn(
-                        "The unsubscribe action has failed : The given listener doesn't listen the objectName=" +
-                        objectName);
-                    return;
-                }
-
-                // None listeners listen this objectName, so we stop to listen this one.
-                if (listeners.isEmpty()) {
-                    allListeners.remove(objectName);
-
-                    Connection connection = connectionsWithObjectName.get(objectName);
-
-                    // Remove the objectName to the established connection
-                    connection.removeObjectName(objectName);
-
-                    // The connection is not used, so we close this connection
-                    if (!connection.isUsed()) {
-                        // Unsubscribes to the JMX notifications of the remote MBean.
-                        notificationlistener.unsubscribe(connection.getConnection(),
-                            objectName, null, null);
-
-                        // Updates our map
-                        connectionsWithRuntimeUrl.remove(connection.getRuntimeUrl());
-                    }
+            // None listeners listen this objectName, so we stop to listen this one.
+            if (listeners.isEmpty()) {
+                allListeners.remove(objectName);
+                Connection connection = connectionsWithObjectName.get(objectName);
+                // Remove the objectName to the established connection
+                connection.removeObjectName(objectName);
+                notificationlistener.unsubscribe(connection.getConnection(),
+                    objectName, null, null);
+                // The connection is not used, so we close this connection
+                if (!connection.isUsed()) {
                     // Updates our map
-                    connectionsWithObjectName.remove(objectName);
+                    connectionsWithRuntimeUrl.remove(connection.getRuntimeUrl());
                 }
+                // Updates our map
+                connectionsWithObjectName.remove(objectName);
             }
-        } catch (ListenerNotFoundException e) {
-            logger.error("The listener is not registered in the MBean.", e);
         }
     }
 
@@ -438,4 +427,31 @@ public class JMXNotificationManager implements NotificationListener {
             return connection;
         }
     }
+
+    /**
+     * Unsubscribes the notificationlistener from all remote mbeans
+     *
+     */
+    public void kill() {
+        Iterator<ObjectName> allObjectNames = connectionsWithObjectName.keySet()
+                                                                       .iterator();
+        while (allObjectNames.hasNext()) {
+            ObjectName objectName = allObjectNames.next();
+            Connection connection = connectionsWithObjectName.get(objectName);
+            connection.removeObjectName(objectName);
+            //if (!connection.isUsed()) 
+            { // Unsubscribes to the JMX notifications of the remote/local MBean.
+                try {
+                    notificationlistener.unsubscribe(connection.getConnection(),
+                        objectName, null, null);
+                } catch (Exception e) {
+                    System.out.println("Exception when removing jmx listener:" +
+                        e.getMessage() + " caused by" +
+                        e.getCause().getMessage());
+                }
+            } //if !connection.isUsed()
+        } //forall objectNames
+        System.out.println(
+            "JMXNotification manager have unsubscribed all listeners to the local and remote beans.");
+    } //kill()
 }

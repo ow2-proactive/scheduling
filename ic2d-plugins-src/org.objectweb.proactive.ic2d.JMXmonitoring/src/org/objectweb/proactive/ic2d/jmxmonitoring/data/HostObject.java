@@ -207,11 +207,6 @@ public class HostObject extends AbstractData {
             // If this child is not yet monitored.
             if (child == null) {
                 child = runtimeObject;
-                ObjectName oname = runtimeObject.getObjectName();
-                JMXNotificationManager.getInstance()
-                                      .subscribe(oname,
-                    new RuntimeObjectListener(runtimeObject),
-                    runtimeObject.getUrl());
                 addChild(runtimeObject);
                 updateOSNameAndVersion(runtimeObject.getConnection());
             } else {
@@ -257,5 +252,18 @@ public class HostObject extends AbstractData {
     public ProActiveConnection getConnection() {
         // A host object has no JMX ProActiveConnection
         return null;
+    }
+
+    @Override
+    public synchronized void addChild(AbstractData child) {
+        if (child instanceof RuntimeObject) {
+            RuntimeObject runtimeObject = (RuntimeObject) child;
+            ObjectName oname = runtimeObject.getObjectName();
+            JMXNotificationManager.getInstance()
+                                  .subscribe(oname,
+                runtimeObject.getListener(), runtimeObject.getUrl());
+        }
+
+        super.addChild(child);
     }
 }

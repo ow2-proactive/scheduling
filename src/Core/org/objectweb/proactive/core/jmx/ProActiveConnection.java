@@ -76,7 +76,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      */
     protected static final long serialVersionUID = 1245L;
     private transient MBeanServer mbs;
-    private HashMap<NotificationListener, ListenerAdapter> listenerMap = new HashMap<NotificationListener, ListenerAdapter>();
+
+    //private HashMap<NotificationListener, ListenerAdapter> listenerMap = new HashMap<NotificationListener, ListenerAdapter>();
+    private HashMap<ObjectName, ListenerAdapter> objectNameToListenerMap = new HashMap<ObjectName, ListenerAdapter>();
 
     /**
      * Empty no arg constructor
@@ -250,6 +252,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     public void addNotificationListener(ObjectName name, ObjectName listener,
         NotificationFilter filter, Object handback)
         throws InstanceNotFoundException, IOException {
+        // System.out.println("ProActiveConnection: add Notification Listener " +
+        //    listener.toString() + " for object " + name);
         this.mbs.addNotificationListener(name, listener, filter, handback);
     }
 
@@ -262,8 +266,10 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
         Object handback) throws InstanceNotFoundException, IOException {
         try {
             ListenerAdapter tl = new ListenerAdapter(listener, mbs, name);
-
-            this.listenerMap.put(listener, tl);
+            //    System.out.println("ProActiveConnection: add ListenerAdapter " +
+            //        tl.toString() + " for object " + name);
+            //  this.listenerMap.put(listener, tl);
+            this.objectNameToListenerMap.put(name, tl);
             this.mbs.addNotificationListener(name, tl, filter, handback);
         } catch (Exception e) {
             e.printStackTrace();
@@ -276,7 +282,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     @SuppressWarnings("unused")
     public void removeNotificationListener(ObjectName name, ObjectName listener)
         throws InstanceNotFoundException, ListenerNotFoundException, IOException {
-        ListenerAdapter tl = this.listenerMap.get(listener);
+        // ListenerAdapter tl = this.listenerMap.get(listener);
+        ListenerAdapter tl = this.objectNameToListenerMap.get(name);
         this.mbs.removeNotificationListener(name, tl);
     }
 
@@ -287,7 +294,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     public void removeNotificationListener(ObjectName name,
         ObjectName listener, NotificationFilter filter, Object handback)
         throws InstanceNotFoundException, ListenerNotFoundException, IOException {
-        ListenerAdapter tl = this.listenerMap.get(listener);
+        ListenerAdapter tl = this.objectNameToListenerMap.get(name);
         this.mbs.removeNotificationListener(name, tl, filter, handback);
     }
 
@@ -298,7 +305,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     public void removeNotificationListener(ObjectName name,
         NotificationListener listener)
         throws InstanceNotFoundException, ListenerNotFoundException, IOException {
-        ListenerAdapter tl = this.listenerMap.get(listener);
+        ListenerAdapter tl = this.objectNameToListenerMap.get(name);
         this.mbs.removeNotificationListener(name, tl);
     }
 
@@ -310,7 +317,10 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
         NotificationListener listener, NotificationFilter filter,
         Object handback)
         throws InstanceNotFoundException, ListenerNotFoundException, IOException {
-        ListenerAdapter tl = this.listenerMap.get(listener);
+        // ListenerAdapter tl = this.listenerMap.get(listener);
+        ListenerAdapter tl = this.objectNameToListenerMap.get(name);
+        //     System.out.println("ProActiveConnection: removing ListenerAdapter " +
+        //         tl.toString() + " for object " + name);
         this.mbs.removeNotificationListener(name, tl, filter, handback);
     }
 

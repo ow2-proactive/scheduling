@@ -35,7 +35,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerInvocationHandler;
+import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -45,6 +47,7 @@ import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
@@ -70,6 +73,9 @@ public class RuntimeObject extends AbstractData {
     private String serverName;
     private ProActiveRuntimeWrapperMBean proxyMBean;
 
+    /** JMX Notification listener */
+    private javax.management.NotificationListener listener;
+
     public RuntimeObject(HostObject parent, String runtimeUrl,
         ObjectName objectName, String hostUrl, String serverName) {
         super(objectName);
@@ -79,6 +85,8 @@ public class RuntimeObject extends AbstractData {
 
         this.hostUrlServer = hostUrl;
         this.serverName = serverName;
+
+        this.listener = new RuntimeObjectListener(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -118,6 +126,25 @@ public class RuntimeObject extends AbstractData {
      */
     public String getUrl() {
         return this.url;
+    }
+
+    @Override
+    public void destroy() {
+        //    this.resetCommunications();
+        //    System.out.println("Destroying Runtime Representation Object "+this.getObjectName().getCanonicalName());
+        //      JMXNotificationManager.getInstance()
+        //      .unsubscribe(this.getObjectName(), this.getListener());
+        //    System.out.println("Runtime Listener unsubscribed");
+        //      
+        super.destroy();
+    }
+
+    @Override
+    public void stopMonitoring(boolean log) {
+        super.stopMonitoring(log);
+        JMXNotificationManager.getInstance()
+                              .unsubscribe(this.getObjectName(),
+            this.getListener());
     }
 
     /**
@@ -247,5 +274,9 @@ public class RuntimeObject extends AbstractData {
     @Override
     public String toString() {
         return "Runtime: " + getUrl();
+    }
+
+    public NotificationListener getListener() {
+        return this.listener;
     }
 }

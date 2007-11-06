@@ -30,17 +30,24 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.ListenerNotFoundException;
 import javax.management.MalformedObjectNameException;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -77,6 +84,7 @@ public class WorldObject extends AbstractData {
     private int currentAutoResetTime = DEFAULT_AUTO_RESET_TIME;
     private boolean enableAutoReset = DEFAULT_ENABLE_AUTO_RESET;
     private String name;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
 
     /** Contains all virtual nodes. */
     private Map<String, VNObject> vnChildren;
@@ -218,8 +226,6 @@ public class WorldObject extends AbstractData {
 
         ao.resetCommunications();
         ao.getParent().removeChild(ao);
-        JMXNotificationManager.getInstance()
-                              .unsubscribe(ao.getObjectName(), ao.getListener());
     }
 
     @Override

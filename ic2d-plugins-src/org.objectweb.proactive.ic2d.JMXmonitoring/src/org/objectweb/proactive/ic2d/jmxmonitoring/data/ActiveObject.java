@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -41,6 +44,7 @@ import javax.management.ObjectName;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
@@ -272,8 +276,8 @@ public class ActiveObject extends AbstractData {
         ActiveObject source = getWorldObject().findActiveObject(sourceID);
         if (source == null) {
             //TODO A faire Traiter l'erreur
-            System.err.println("Can't draw a communication from id :" +
-                sourceID + " to " + this);
+            //  System.err.println("Can't draw a communication from id :" +
+            //     sourceID + " to " + this);
             return;
         }
         this.addCommunication(source);
@@ -289,8 +293,8 @@ public class ActiveObject extends AbstractData {
                                        .findActiveObject(destinationID);
         if (destination == null) {
             //TODO A faire Traiter l'erreur
-            System.err.println("Can't draw a communication from " + this +
-                " to id :" + destinationID);
+            //     System.err.println("Can't draw a communication from " + this +
+            //       " to id :" + destinationID);
             return;
         }
         destination.addCommunication(this);
@@ -320,6 +324,15 @@ public class ActiveObject extends AbstractData {
             setChanged();
             notifyObservers(requestQueueLength);
         }
+    }
+
+    @Override
+    public void stopMonitoring(boolean log) {
+        super.stopMonitoring(log);
+        JMXNotificationManager.getInstance()
+                              .unsubscribe(this.getObjectName(),
+            this.getListener());
+        this.destroy();
     }
 
     public String getJobId() {

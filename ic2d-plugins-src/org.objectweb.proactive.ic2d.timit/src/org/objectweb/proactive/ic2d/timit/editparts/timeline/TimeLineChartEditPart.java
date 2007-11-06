@@ -142,7 +142,6 @@ public class TimeLineChartEditPart extends AbstractGraphicalEditPart
         Display.getDefault().asyncExec(this);
     }
 
-    
     public final void run() {
         refresh();
     }

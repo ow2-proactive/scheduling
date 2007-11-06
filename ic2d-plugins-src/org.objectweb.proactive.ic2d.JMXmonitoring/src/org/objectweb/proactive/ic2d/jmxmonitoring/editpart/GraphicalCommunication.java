@@ -86,7 +86,6 @@ public class GraphicalCommunication {
         source.addConnection(destination, panel, color);
     }
 
-    @Override
     public int hashcode() {
         return this.hashcode;
     }
