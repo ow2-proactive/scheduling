@@ -78,7 +78,6 @@ public class Log4JTaskLogs implements TaskLogs {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getAllLogs(boolean timeStamp)
      */
-    @Override
     public String getAllLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer(this.allEvents.size());
         for (LoggingEvent e : this.allEvents) {
@@ -91,7 +90,6 @@ public class Log4JTaskLogs implements TaskLogs {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getStderrLogs(boolean timeStamp)
      */
-    @Override
     public String getStderrLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer();
         for (LoggingEvent e : this.allEvents) {
@@ -106,7 +104,6 @@ public class Log4JTaskLogs implements TaskLogs {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getStdoutLogs(boolean timeStamp)
      */
-    @Override
     public String getStdoutLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer();
         for (LoggingEvent e : this.allEvents) {

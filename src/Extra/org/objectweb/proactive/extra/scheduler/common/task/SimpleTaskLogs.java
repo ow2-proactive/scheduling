@@ -57,7 +57,6 @@ public class SimpleTaskLogs implements TaskLogs {
      * Timestamp parameter is not relevant for this TaskLogs implementation.
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getAllLogs(boolean)
      */
-    @Override
     public String getAllLogs(boolean timeStamp) {
         return this.standardLogs + this.errorlogs;
     }
@@ -66,7 +65,6 @@ public class SimpleTaskLogs implements TaskLogs {
      * Timestamp parameter is not relevant for this TaskLogs implementation.
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getStderrLogs(boolean)
      */
-    @Override
     public String getStderrLogs(boolean timeStamp) {
         return this.errorlogs;
     }
@@ -75,7 +73,6 @@ public class SimpleTaskLogs implements TaskLogs {
      * Timestamp parameter is not relevant for this TaskLogs implementation.
      * @see org.objectweb.proactive.extra.scheduler.common.task.TaskLogs#getStdoutLogs(boolean)
      */
-    @Override
     public String getStdoutLogs(boolean timeStamp) {
         return this.standardLogs;
     }
