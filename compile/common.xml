@@ -93,7 +93,6 @@
 		<pathelement location="${cl.extra.dir}" />
 		<pathelement location="${cl.utils.dir}" />
 		<pathelement location="${cl.test.dir}"/>
-		<pathelement location="${cl.ic2d.dir}"/>
 		<path refid="project.libs"/>
 	</path>
 
