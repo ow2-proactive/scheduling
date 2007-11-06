@@ -349,12 +349,12 @@
                 The Master/Slave API entry point and main class is the
                 following:
             </para>
-            <screen><![CDATA[org.objectweb.proactive.examples.masterslave.ProActiveMaster]]></screen>
+            <screen><![CDATA[org.objectweb.proactive.examples.masterworker.ProActiveMaster]]></screen>
             <para>
                 The methods of this class are described in the
                 interface:
             </para>
-            <screen><![CDATA[org.objectweb.proactive.examples.masterslave.interfaces.Master]]></screen>
+            <screen><![CDATA[org.objectweb.proactive.examples.masterworker.interfaces.Master]]></screen>
             <para>
                 The user has the possibility to create either a local
                 master or a remote master.
@@ -461,7 +461,7 @@
 
             <para>
                 The task interface is defined at:
-                <screen><![CDATA[org.objectweb.proactive.examples.masterslave.interfaces.Task]]></screen>
+                <screen><![CDATA[org.objectweb.proactive.examples.masterworker.interfaces.Task]]></screen>
             </para>
 
             <programlisting lang="java"><![CDATA[public interface Task<R extends Serializable> extends Serializable {
@@ -635,7 +635,7 @@
             source directory:
         </para>
 
-        <screen><![CDATA[org.objectweb.proactive.examples.masterslave]]></screen>
+        <screen><![CDATA[org.objectweb.proactive.examples.masterworker]]></screen>
 
         <para>
             First, the task definition: creates randomly a set of points
