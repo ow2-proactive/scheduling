@@ -43,11 +43,14 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupGlobusParser extends AbstractGroupParser {
-    private static final String NODE_NAME_ERROR_FILE = "errorFile";
-    private static final String NODE_NAME_OUTPUT_FILE = "outputFile";
+    private static final String ATTR_QUEUE = "queue";
+    private static final String ATTR_HOSTNAME = "hostname";
+    private static final String NODE_NAME_STDERR = "stderr";
+    private static final String NODE_NAME_STDOUT = "stdout";
+    private static final String NODE_NAME_STDIN = "stdin";
+    private static final String NODE_NAME_DIRECTORY = "directory";
     private static final String NODE_NAME_MAX_TIME = "maxTime";
     private static final String NODE_NAME_COUNT = "count";
-    private static final String XPATH_GLOBUS_OPTION = "globusOption";
     private static final String NODE_NAME = "globusProcess";
 
     @Override
@@ -65,31 +68,37 @@ public class GroupGlobusParser extends AbstractGroupParser {
 
         GroupGlobus globusGroup = (GroupGlobus) getGroup();
 
-        try {
-            Node optionNode = (Node) xpath.evaluate(XPATH_GLOBUS_OPTION,
-                    groupNode, XPathConstants.NODE);
+        String hostname = GCMParserHelper.getAttributeValue(groupNode,
+                ATTR_HOSTNAME);
 
-            NodeList childNodes = optionNode.getChildNodes();
-            for (int j = 0; j < childNodes.getLength(); ++j) {
-                Node child = childNodes.item(j);
-                if (child.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
+        globusGroup.setHostname(hostname);
 
-                String nodeValue = GCMParserHelper.getElementValue(child);
-                String nodeName = child.getNodeName();
-                if (nodeName.equals(NODE_NAME_COUNT)) {
-                    globusGroup.setCount(nodeValue);
-                } else if (nodeName.equals(NODE_NAME_MAX_TIME)) {
-                    globusGroup.setMaxTime(nodeValue);
-                } else if (nodeName.equals(NODE_NAME_OUTPUT_FILE)) {
-                    globusGroup.setStdout(nodeValue);
-                } else if (nodeName.equals(NODE_NAME_ERROR_FILE)) {
-                    globusGroup.setStderr(nodeValue);
-                }
+        String queue = GCMParserHelper.getAttributeValue(groupNode, ATTR_QUEUE);
+
+        globusGroup.setQueue(queue);
+
+        NodeList childNodes = groupNode.getChildNodes();
+        for (int j = 0; j < childNodes.getLength(); ++j) {
+            Node child = childNodes.item(j);
+            if (child.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
             }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
+
+            String nodeValue = GCMParserHelper.getElementValue(child);
+            String nodeName = child.getNodeName();
+            if (nodeName.equals(NODE_NAME_COUNT)) {
+                globusGroup.setCount(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_MAX_TIME)) {
+                globusGroup.setMaxTime(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_STDOUT)) {
+                globusGroup.setStdout(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_STDERR)) {
+                globusGroup.setStderr(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_STDIN)) {
+                globusGroup.setStdin(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_DIRECTORY)) {
+                globusGroup.setDirectory(nodeValue);
+            }
         }
     }
 }

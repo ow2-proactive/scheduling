@@ -39,6 +39,9 @@ public class GroupGlobus extends AbstractGroup {
     private String maxTime;
     private String stderr;
     private String stdout;
+    private String stdin;
+    private String directory;
+    private String hostname;
 
     @Override
     public List<String> internalBuildCommands() {
@@ -110,5 +113,17 @@ public class GroupGlobus extends AbstractGroup {
      */
     public void setStdout(String stdout) {
         this.stdout = stdout;
+    }
+
+    public void setStdin(String stdin) {
+        this.stdin = stdin;
+    }
+
+    public void setDirectory(String directory) {
+        this.directory = directory;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
     }
 }
