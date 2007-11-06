@@ -35,11 +35,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.util.Properties;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.runtime.IPlatformRunnable;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
@@ -53,6 +58,26 @@ public class Application implements IPlatformRunnable {
      */
     public Object run(Object args) throws Exception {
         searchJavaPolicyFile();
+
+        // initialize the default log4j configuration
+        if (System.getProperty("log4j.configuration") == null) {
+            try {
+                InputStream in = PAProperties.class.getResourceAsStream(
+                        "proactive-log4j");
+
+                // testing the availability of the file
+                Properties p = new Properties();
+                p.load(in);
+                PropertyConfigurator.configure(p);
+                System.setProperty("log4j.configuration",
+                    PAProperties.class.getResource("proactive-log4j").toString());
+            } catch (Exception e) {
+                URL u = PAProperties.class.getResource("proactive-log4j");
+                System.err.println(
+                    "IC2D:the default log4j configuration file (" + u +
+                    ") is not accessible, logging is disabled");
+            }
+        }
 
         Display display = PlatformUI.createDisplay();
         try {

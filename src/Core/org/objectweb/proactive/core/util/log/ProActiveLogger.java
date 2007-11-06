@@ -30,10 +30,11 @@
  */
 package org.objectweb.proactive.core.util.log;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -50,14 +51,18 @@ public class ProActiveLogger extends Logger {
 
     static {
         if (System.getProperty("log4j.configuration") == null) {
-            URL u = PAProperties.class.getResource("proactive-log4j");
             try {
-                // testing the avaibility of the file
-                u.openStream().close();
-                PropertyConfigurator.configure(u);
-            } catch (IOException e) {
+                InputStream in = PAProperties.class.getResourceAsStream(
+                        "proactive-log4j");
+
+                // testing the availability of the file
+                Properties p = new Properties();
+                p.load(in);
+                PropertyConfigurator.configure(p);
+            } catch (Exception e) {
+                URL u = PAProperties.class.getResource("proactive-log4j");
                 System.err.println("the default log4j configuration file (" +
-                    u.toString() + ") is not accessible, logging is disabled");
+                    u + ") is not accessible, logging is disabled");
             }
         }
     }
