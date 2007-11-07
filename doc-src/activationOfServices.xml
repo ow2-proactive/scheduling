@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
+<chapter id="activation_of_services">
+  <title>Step by step tutorial</title>
+	<sect1>
+		<title>Distributed Garbage Collecting</title>
+		<para>//TODO</para>
+	</sect1>
+	<sect1>
+		<title>Fault Tolerance</title>
+		<para>//TODO</para>
+	</sect1>
+	<sect1>
+		<title>Load Balancing</title>
+		<para>//TODO</para>
+	</sect1>
+	<sect1>
+		<title>File Transfer</title>
+		<para>//TODO</para>
+	</sect1>
+	<sect1>
+		<title>Security</title>
+		<para>//TODO</para>
+	</sect1>
+	<sect1>
+		<title>Web Services</title>
+		<para>//TODO</para>
+	</sect1>
+
+</chapter>
