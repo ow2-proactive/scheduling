@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="MasterSlave">
-    <title>Master/Slave API</title>
+    <title>Master/Worker API</title>
 
     <para>The outline of this short handbook:</para>
 
@@ -40,7 +40,7 @@
         <title>Overview</title>
 
         <para>
-            <emphasis>Master/Slave computations</emphasis>
+            <emphasis>Master/Worker computations</emphasis>
             are the most common case of distributed computations. They
             are often described as
             <emphasis>embarrassingly parallel problems</emphasis>
@@ -51,7 +51,7 @@
         </para>
 
         <para>
-            The main goal of the Master/Slave API is to provide an
+            The main goal of the Master/Worker API is to provide an
             <emphasis>easy to use framework</emphasis>
             to parallelize these embarrassingly parallel applications.
         </para>
@@ -63,7 +63,7 @@
                 <para>
                     Automatic
                     <emphasis>scheduling</emphasis>
-                    of tasks to the slaves.
+                    of tasks to the Workers.
                 </para>
             </listitem>
 
@@ -71,7 +71,7 @@
                 <para>
                     Automatic
                     <emphasis>load-balancing</emphasis>
-                    between the slaves.
+                    between the Workers.
                 </para>
             </listitem>
 
@@ -79,7 +79,7 @@
                 <para>
                     Automatic
                     <emphasis>fault-tolerance</emphasis>
-                    mechanism (i.e. when a slave is missing, the task is
+                    mechanism (i.e. when a Worker is missing, the task is
                     rescheduled).
                 </para>
             </listitem>
@@ -106,10 +106,10 @@
     </sect1>
 
     <sect1 id="ms_principle">
-        <title>The Master/Slave API Principles and Usage</title>
+        <title>The Master/Worker API Principles and Usage</title>
 
         <para>
-            The usage of the Master/Slave API is simple and it consists
+            The usage of the Master/Worker API is simple and it consists
             basically of four steps:
         </para>
 
@@ -117,7 +117,7 @@
             <listitem>
                 <para>
                     <emphasis>Deployment</emphasis>
-                    of the master/slave framework.
+                    of the Master/Worker framework.
                 </para>
             </listitem>
 
@@ -148,13 +148,13 @@
         </orderedlist>
 
         <sect2 id="ms_principle_deployment">
-            <title>Deployment of the master/slave framework</title>
+            <title>Deployment of the Master/Worker framework</title>
 
             <para>
-                The deployment of the Master/Slave framework relies on
+                The deployment of the Master/Worker framework relies on
                 the
                 <emphasis>ProActive deployment mechanism</emphasis>
-                . In order to deploy a set of worker, the master needs
+                . In order to deploy a set of workers, the master needs
                 either:
             </para>
 
@@ -190,13 +190,13 @@
             <para>
                 <figure>
                     <title>
-                        Deployment of the master/slave framework
+                        Deployment of the Master/Worker framework
                     </title>
 
                     <mediaobject>
                         <imageobject>
                             <imagedata contentwidth="100"
-                                fileref="images/MasterSlave1.png"
+                                fileref="images/MasterWorker1.png"
                                 format="PNG" width="6in" />
                         </imageobject>
                     </mediaobject>
@@ -213,12 +213,12 @@
             <para>
                 In order to submit tasks to the Master, the
                 <emphasis>Task</emphasis>
-                interface from the Master/Slave API needs to be
+                interface from the Master/Worker API needs to be
                 implemented. In this interface, the unique method
                 <emphasis>run</emphasis>
                 will correspond to the code being executed remotely.
                 After tasks have been submitted to him, the master will
-                dispatch tasks automatically to the slaves.
+                dispatch tasks automatically to the workers.
             </para>
             <para>
                 <emphasis>Warning !</emphasis>
@@ -226,7 +226,7 @@
                 (i.e. a user task) is submitted to the master, the
                 object will be deep-copied to the master. In
                 consequence, every referenced objects will also be
-                copied. When tasks are submitted to the remote slaves,
+                copied. When tasks are submitted to the remote workers,
                 the user task objects will be
                 <emphasis>serialized</emphasis>
                 and sent though the network. As a consequence,
@@ -242,7 +242,7 @@
                     <mediaobject>
                         <imageobject>
                             <imagedata contentwidth="100"
-                                fileref="images/MasterSlave2.png"
+                                fileref="images/MasterWorker2.png"
                                 format="PNG" width="6in" />
                         </imageobject>
                     </mediaobject>
@@ -272,7 +272,7 @@
                     <mediaobject>
                         <imageobject>
                             <imagedata contentwidth="100"
-                                fileref="images/MasterSlave3.png"
+                                fileref="images/MasterWorker3.png"
                                 format="PNG" width="6in" />
                         </imageobject>
                     </mediaobject>
@@ -346,7 +346,7 @@
             <title>Master creation and deployment</title>
 
             <para>
-                The Master/Slave API entry point and main class is the
+                The Master/Worker API entry point and main class is the
                 following:
             </para>
             <screen><![CDATA[org.objectweb.proactive.examples.masterworker.ProActiveMaster]]></screen>
@@ -412,8 +412,8 @@
                 <title>Adding Resources</title>
                 <para>
                     Now that the master has been created, resources
-                    (slaves) must be added to it. The following methods
-                    can be used for creating slaves:
+                    (Workers) must be added to it. The following methods
+                    can be used for creating workers:
                 </para>
                 <programlisting lang="java"><![CDATA[    /**
      * Adds the given Collection of nodes to the master <br/>
@@ -443,10 +443,10 @@
     void addResources(URL descriptorURL, String virtualNodeName);]]></programlisting>
                 <para>
                     The first two methods will tell the master to create
-                    slaves on already deployed ProActive resources. The
+                    workers on already deployed ProActive resources. The
                     last two methods will ask the master to deploy
                     resources using a ProActive descriptor and to create
-                    Slaves on top of these resources. For a complete
+                    workers on top of these resources. For a complete
                     explanation of ProActive's deployment mechanism,
                     please refer to
                     <xref linkend="XML_Descriptors" />
@@ -467,20 +467,20 @@
             <programlisting lang="java"><![CDATA[public interface Task<R extends Serializable> extends Serializable {
     /**
      * A task to be executed
-     * @param memory access to the slave memory
+     * @param memory access to the Worker memory
      * @return the result
      * @throws Exception
      */
-    public R run(SlaveMemory memory) throws Exception;
+    public R run(WorkerMemory memory) throws Exception;
 };]]></programlisting>
 
             <para>
                 Users need to implement the
                 <emphasis>Task</emphasis>
                 interface to define their tasks. The
-                <emphasis>SlaveMemory</emphasis>
+                <emphasis>WorkerMemory</emphasis>
                 parameter is explained in the
-                <link linkend="ms_slavememory">Advanced Usage</link>
+                <link linkend="ms_Workermemory">Advanced Usage</link>
                 chapter.
             </para>
         </sect2>
@@ -647,7 +647,7 @@
         public ComputePIMonteCarlo() {
         }
 
-        public Long run(SlaveMemory memory) throws Exception {
+        public Long run(WorkerMemory memory) throws Exception {
             long remaining = NUMBER_OF_EXPERIENCES;
             long successes = 0;
             while (remaining > 0) {
@@ -676,7 +676,7 @@
         
         // adding resources
         master.addResources(PIExample.class.getResource(
-                "/org/objectweb/proactive/examples/masterslave/WorkersLocal.xml"));]]></programlisting>
+                "/org/objectweb/proactive/examples/masterWorker/WorkersLocal.xml"));]]></programlisting>
 
         <para>
             Then, the tasks are created and submitted to the master.
@@ -722,12 +722,12 @@
         <title>Advanced Usage</title>
 
         <sect2 id="ms_configuration">
-            <title>Configuration of the Master/Slave</title>
+            <title>Configuration of the Master/Worker</title>
             <sect3>
                 <title>Ping Period</title>
                 <para>
                     At regular intervals, the Master sends a "ping"
-                    message to every Slaves to check if they are alive
+                    message to every Workers to check if they are alive
                     and reachable. The
                     <emphasis>Ping period</emphasis>
                     configuration parameter is the period in millisecond
@@ -740,29 +740,28 @@
                     described underneath can be called :
                 </para>
                 <programlisting lang="java"><![CDATA[    /**
-     * Sets the period at which ping messages are sent to the slaves <br/>
+     * Sets the period at which ping messages are sent to the Workers <br/>
      * @param periodMillis the new ping period
      */
     void setPingPeriod(long periodMillis);]]></programlisting>
             </sect3>
         </sect2>
-        <sect2 id="ms_slavememory">
-            <title>Using the Slave Memory</title>
+        <sect2 id="ms_Workermemory">
+            <title>Using the Worker Memory</title>
             <sect3>
                 <title>Principle</title>
                 <para>
-                    The Slave Memory principle is to allow users to
+                    The Worker Memory principle is to allow users to
                     store and retrieve data from a
-                    <emphasis>slave's address space</emphasis>
-                    . The typical use case is when one uses the master
-                    slave API to compute an iterative process. An
+                    <emphasis>Worker's address space</emphasis>
+                    . The typical use case is when one uses the Master/Worker API to compute an iterative process. An
                     iterative process consists generally of an
                     initialization step 0, followed by n computation
                     steps, where step n needs the results of step n-1.
                     The initialization steps often requires that a large
-                    amount of information is "loaded" into the slave.
-                    Without the slave memory access, this information
-                    will be lost at each step of the iteration, which
+                    amount of information is "loaded" into the worker.
+                    Without the worker memory access, this information
+                    would be lost at each step of the iteration, which
                     means that the initialization step 0 needs to be
                     done at step 1,2, ... n, etc...
 
@@ -773,7 +772,7 @@
                 <sect4>
                     <title>Structure and API</title>
                     <para>
-                        The slave memory structure is very simple: it
+                        The Worker memory structure is very simple: it
                         consists of
                         <emphasis>&lt;key, value&gt;</emphasis>
                         associations. A java object value is therefore
@@ -782,18 +781,18 @@
                         later on.
                     </para>
                     <para>
-                        The Slave Memory API consists of three methods
+                        The Worker Memory API consists of three methods
                         <emphasis>save</emphasis>
                         ,
                         <emphasis>load</emphasis>
                         , and
                         <emphasis>erase</emphasis>
-                        . The interface to the slave memory is available
+                        . The interface to the worker memory is available
                         when running a Task as a parameter of the run
                         method. The user can therefore use this
                         interface to save, load or erase objects in the
-                        local slave's memory. Below is the detailed
-                        SlaveMemory interface:
+                        local worker's memory. Below is the detailed
+                        WorkerMemory interface:
                     </para>
                     <programlisting lang="java"><![CDATA[    /**
      * Save data under a specific name
@@ -818,15 +817,15 @@
                 <sect4>
                     <title>Storing data</title>
                     <para>
-                        A user can store data in the Slaves' memory
+                        A user can store data in the Workers' memory
                         either when :
                     </para>
                     <orderedlist>
                         <listitem>
-                            <para>Slaves are created remotely</para>
+                            <para>Workers are created remotely</para>
                         </listitem>
                         <listitem>
-                            <para>A task is run on the slave.</para>
+                            <para>A task is run on the Worker.</para>
                         </listitem>
                     </orderedlist>
                     <para>
@@ -836,16 +835,16 @@
                         class. Every constructors detailed above have a
                         version including this extra parameter. The
                         given list will be the initial memory of every
-                        slaves created by the master.
+                        Workers created by the master.
                     </para>
                     <para>
                         Usage of the second mechanism is done by using
                         the
-                        <emphasis>SlaveMemory</emphasis>
+                        <emphasis>WorkerMemory</emphasis>
                         parameter in the Task interface's
                         <emphasis>run</emphasis>
                         method. In contradiction with the first method,
-                        only the slave currently running the Task will
+                        only the Worker currently running the Task will
                         store the given data.
 
                     </para>
@@ -853,9 +852,9 @@
                 <sect4>
                     <title>Retrieving and using the data</title>
                     <para>
-                        Loading and using any object stored in a Slave's
+                        Loading and using any object stored in a Worker's
                         memory is simply done through the
-                        <emphasis>SlaveMemory</emphasis>
+                        <emphasis>WorkerMemory</emphasis>
                         parameter in the
                         <emphasis>run</emphasis>
                         method of the

@@ -14,7 +14,7 @@
 <!ENTITY OOSPMD SYSTEM "OOSPMD.xml">
 <!ENTITY Migration SYSTEM "Migration.xml">
 <!ENTITY exceptions SYSTEM "exceptions.xml">
-<!ENTITY MasterSlave SYSTEM "masterslave.xml">
+<!ENTITY MasterWorker SYSTEM "masterworker.xml">
 <!ENTITY bnb SYSTEM "bnb.xml">
 <!ENTITY Calcium SYSTEM "Calcium.xml">
 <!ENTITY PAConfiguration SYSTEM "Configuration.xml">
@@ -99,7 +99,7 @@
   
     <part id="HighLevelAPI">
    <title>High Level APIs</title>
-    &MasterSlave;
+    &MasterWorker;
     &bnb;
     &Calcium;
     &OOSPMD;
