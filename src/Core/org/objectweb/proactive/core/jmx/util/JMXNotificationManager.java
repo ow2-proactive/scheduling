@@ -290,19 +290,17 @@ public class JMXNotificationManager implements NotificationListener {
                 // Subscribes to the JMX notifications
                 notificationlistener.subscribe(establishedConnection.getConnection(),
                     ob, null, null);
-                
+
                 //Unsubscribes to the JMXNotifications within the old connection 
-               // - the one used before the migration
-                
+                // (the one used before the migration)
                 Connection oldConnection = connectionsWithObjectName.get(ob);
-                if (oldConnection==null)
-                {
-                	logger.warn("Could not unsubscribe listener for object "+ob+" from the old host after migration");
-                }
-                else
-                {
-                	oldConnection.removeObjectName(ob);
-                	notificationlistener.unsubscribe(oldConnection.getConnection(), ob, null, null);
+                if (oldConnection == null) {
+                    logger.warn("Could not unsubscribe listener for object " +
+                        ob + " from the old host after migration");
+                } else {
+                    oldConnection.removeObjectName(ob);
+                    notificationlistener.unsubscribe(oldConnection.getConnection(),
+                        ob, null, null);
                 }
                 // Updates our map
                 connectionsWithObjectName.put(ob, establishedConnection);
