@@ -48,7 +48,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterslave/slavememory/MasterSlaveMemory.xml");
+            "/functionalTests/masterworker/slavememory/MasterSlaveMemory.xml");
     private Master<MemoryTask, String> master;
     private List<MemoryTask> tasks;
     public static final int NB_TASKS = 3;

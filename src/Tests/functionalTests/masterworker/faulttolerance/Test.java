@@ -52,7 +52,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterslave/faulttolerance/MasterSlaveFT.xml");
+            "/functionalTests/masterworker/faulttolerance/MasterSlaveFT.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     private ProActiveDescriptorInternal pad;
