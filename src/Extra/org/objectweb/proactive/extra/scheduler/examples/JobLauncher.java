@@ -118,7 +118,7 @@ public class JobLauncher {
                             dateFormat.format(new Date()) + ".log", true);
                     l.addAppender(fa);
                 }
-                System.out.println("Here is your job id : "+id);
+                System.out.println("Here is your job id : " + id);
             }
         } catch (Exception e) {
             e.printStackTrace();
