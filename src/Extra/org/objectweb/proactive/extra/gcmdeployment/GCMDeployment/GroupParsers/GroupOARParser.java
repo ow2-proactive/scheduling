@@ -31,12 +31,8 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupOAR;
 import org.w3c.dom.Node;
@@ -44,7 +40,6 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupOARParser extends AbstractGroupParser {
-    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
     private static final String NODE_NAME_RESOURCES = "resources";
     private static final String NODE_NAME_DIRECTORY = "directory";
     private static final String NODE_NAME_STDOUT = "stdout";
@@ -110,10 +105,11 @@ public class GroupOARParser extends AbstractGroupParser {
             }
 
             String nodeName = childNode.getNodeName();
+            String nodeValue = GCMParserHelper.getElementValue(childNode);
+
             if (nodeName.equals(NODE_NAME_RESOURCES)) {
-                String elementValue = GCMParserHelper.getElementValue(childNode);
-                if (elementValue != null) {
-                    oarGroup.setResources(elementValue);
+                if (nodeValue != null) {
+                    oarGroup.setResources(nodeValue);
                 } else {
                     String nodes = GCMParserHelper.getAttributeValue(childNode,
                             ATTR_RESOURCES_NODES);
@@ -131,18 +127,12 @@ public class GroupOARParser extends AbstractGroupParser {
                         oarGroup.setCore(core);
                     }
                 }
-            } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
-                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                oarGroup.setScriptLocation(path);
             } else if (nodeName.equals(NODE_NAME_DIRECTORY)) {
-                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                oarGroup.setDirectory(path);
+                oarGroup.setDirectory(nodeValue);
             } else if (nodeName.equals(NODE_NAME_STDOUT)) {
-                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                oarGroup.setStdOutFile(path);
+                oarGroup.setStdout(nodeValue);
             } else if (nodeName.equals(NODE_NAME_STDERR)) {
-                PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                oarGroup.setStdErrFile(path);
+                oarGroup.setStderr(nodeValue);
             }
         }
     }

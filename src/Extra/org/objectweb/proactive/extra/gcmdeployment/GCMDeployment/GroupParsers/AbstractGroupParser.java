@@ -30,12 +30,18 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers;
 
-import javax.xml.xpath.XPath;
+import java.util.List;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 public abstract class AbstractGroupParser implements GroupParser {
@@ -47,9 +53,41 @@ public abstract class AbstractGroupParser implements GroupParser {
 
     public void parseGroupNode(Node groupNode, XPath xpath) {
         String id = GCMParserHelper.getAttributeValue(groupNode, "id");
-
         group.setId(id);
-        // TODO        
+
+        String username = GCMParserHelper.getAttributeValue(groupNode,
+                "username");
+        group.setUsername(username);
+
+        String commandPath = GCMParserHelper.getAttributeValue(groupNode,
+                "commandPath");
+        group.setCommandPath(commandPath);
+
+        String bookedNodesAccess = GCMParserHelper.getAttributeValue(groupNode,
+                "bookedNodesAccess");
+        group.setBookedNodesAccess(bookedNodesAccess);
+
+        try {
+            Node environmentNode = (Node) xpath.evaluate("pa:environment",
+                    groupNode, XPathConstants.NODESET);
+
+            if (environmentNode != null) {
+                List<String> enviroment = GCMParserHelper.parseEnviromentNode(xpath,
+                        environmentNode);
+
+                // TODO - properly handle environment
+                //                group.setEnvironment(env);
+            }
+
+            Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode,
+                    XPathConstants.NODESET);
+
+            if (scriptPath != null) {
+                group.setScriptPath(scriptPath);
+            }
+        } catch (XPathExpressionException e) {
+            GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
+        }
     }
 
     public Group getGroup() {

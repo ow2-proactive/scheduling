@@ -39,6 +39,7 @@ import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.w3c.dom.Node;
 
 
 public abstract class AbstractGroup implements Group {
@@ -46,6 +47,9 @@ public abstract class AbstractGroup implements Group {
     private String commandPath;
     private String env;
     private String id;
+    private String username;
+    private String bookedNodesAccess;
+    private Node scriptPath;
 
     public AbstractGroup() {
     }
@@ -125,4 +129,16 @@ public abstract class AbstractGroup implements Group {
     }
 
     abstract public List<String> internalBuildCommands();
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setBookedNodesAccess(String bookedNodesAccess) {
+        this.bookedNodesAccess = bookedNodesAccess;
+    }
+
+    public void setScriptPath(Node scriptPath) {
+        this.scriptPath = scriptPath;
+    }
 }

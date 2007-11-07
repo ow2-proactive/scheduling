@@ -45,9 +45,9 @@ public class GroupOAR extends AbstractGroup {
     protected String queueName;
     protected String accessProtocol;
     private PathElement scriptLocation;
-    private PathElement directory;
-    private PathElement stdOutFile;
-    private PathElement stdErrFile;
+    private String directory;
+    private String stdout;
+    private String stderr;
     private String type = "deploy";
     private String nodes = null;
     private String cpu = null;
@@ -81,14 +81,14 @@ public class GroupOAR extends AbstractGroup {
             commandBuf.append(directory);
         }
 
-        if (stdOutFile != null) {
+        if (stdout != null) {
             commandBuf.append(" --stdout=");
-            commandBuf.append(stdOutFile.toString());
+            commandBuf.append(stdout.toString());
         }
 
-        if (stdErrFile != null) {
+        if (stderr != null) {
             commandBuf.append(" --stderr=");
-            commandBuf.append(stdErrFile.toString());
+            commandBuf.append(stderr.toString());
         }
 
         // argument - must be last append
@@ -137,16 +137,16 @@ public class GroupOAR extends AbstractGroup {
         this.core = core;
     }
 
-    public void setDirectory(PathElement directory) {
+    public void setDirectory(String directory) {
         this.directory = directory;
     }
 
-    public void setStdOutFile(PathElement stdOutFile) {
-        this.stdOutFile = stdOutFile;
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
     }
 
-    public void setStdErrFile(PathElement stdErrFile) {
-        this.stdErrFile = stdErrFile;
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
     }
 
     protected String computeResourcesString() {

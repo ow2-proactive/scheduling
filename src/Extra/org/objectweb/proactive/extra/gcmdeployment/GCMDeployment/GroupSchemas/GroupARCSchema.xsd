@@ -16,7 +16,6 @@
 					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
 					<element name="inputFiles" type="paext:arcFileTransferType" minOccurs="0" />
 					<element name="outputFiles" type="paext:arcFileTransferType" minOccurs="0" />
-					<element name="directory" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
