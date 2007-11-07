@@ -35,22 +35,9 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.management.InstanceNotFoundException;
-import javax.management.ListenerNotFoundException;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.ssh.httpssh.Handler;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
@@ -96,96 +83,10 @@ public class Activator extends AbstractUIPlugin {
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        //System.out.println("!!!!!!!!!!Stopp!!!!!!!!!");
-
-        //    stopMonitoringAllHosts();
-        JMXNotificationManager nm = JMXNotificationManager.getInstance();
-        nm.kill();
         plugin = null;
         super.stop(context);
     }
 
-    private void stopMonitoringAllHosts() {
-        org.objectweb.proactive.ic2d.jmxmonitoring.data.ModelRecorder mr = org.objectweb.proactive.ic2d.jmxmonitoring.data.ModelRecorder.getInstance();
-
-        Iterator<String> names = mr.getNames().iterator();
-        while (names.hasNext()) {
-            String modelName = names.next();
-            WorldObject wo = mr.getModel(modelName);
-            List<AbstractData> monitoredChildren = wo.getMonitoredChildrenAsList();
-            Iterator<AbstractData> mci = monitoredChildren.iterator();
-            while (mci.hasNext()) {
-                AbstractData child = mci.next();
-                if (child instanceof HostObject) {
-                    HostObject ho = (HostObject) child;
-
-                    Iterator<AbstractData> runtimes = ho.getMonitoredChildrenAsList()
-                                                        .iterator();
-                    while (runtimes.hasNext()) {
-                        AbstractData ro = runtimes.next();
-                        if (ro instanceof RuntimeObject) {
-                            RuntimeObject runtimeObj = (RuntimeObject) ro;
-
-                            //        					
-                            //        					try {
-                            //								runtimeObj.getConnection().removeNotificationListener(runtimeObj.getObjectName(), runtimeObj.getListener());
-                            //							} catch (InstanceNotFoundException e) {
-                            //								// TODO Auto-generated catch block
-                            //								e.printStackTrace();
-                            //							} catch (ListenerNotFoundException e) {
-                            //								// TODO Auto-generated catch block
-                            //								e.printStackTrace();
-                            //							} catch (IOException e) {
-                            //								// TODO Auto-generated catch block
-                            //								e.printStackTrace();
-                            //							}
-                            JMXNotificationManager.getInstance()
-                                                  .unsubscribe(runtimeObj.getObjectName(),
-                                runtimeObj.getListener());
-
-                            Iterator<AbstractData> nodes = runtimeObj.getMonitoredChildrenAsList()
-                                                                     .iterator();
-                            while (nodes.hasNext()) {
-                                AbstractData nodeAD = nodes.next();
-                                if (nodeAD instanceof NodeObject) {
-                                    NodeObject nodeObj = (NodeObject) nodeAD;
-
-                                    Iterator<AbstractData> aoIt = nodeObj.getMonitoredChildrenAsList()
-                                                                         .iterator();
-                                    while (aoIt.hasNext()) {
-                                        AbstractData aoAD = aoIt.next();
-                                        if (aoAD instanceof ActiveObject) {
-                                            ActiveObject ao = (ActiveObject) aoAD;
-                                            try {
-                                                ao.getConnection()
-                                                  .removeNotificationListener(ao.getObjectName(),
-                                                    ao.getListener());
-                                            } catch (InstanceNotFoundException e) {
-                                                // TODO Auto-generated catch block
-                                                e.printStackTrace();
-                                            } catch (ListenerNotFoundException e) {
-                                                // TODO Auto-generated catch block
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                // TODO Auto-generated catch block
-                                                e.printStackTrace();
-                                            }
-                                            wo.removeActiveObject(ao.getUniqueID());
-                                        }
-                                    }
-                                } //if nodeAD is nodeObject
-                            } //while nodes has next
-                        } //ro instanceof runtime
-                    } //while runtimes hasnext
-
-                    ho.stopMonitoring(false);
-                    //	wo.removeChild(ho);
-                    //	ho.
-                } //if child instanceof hostobject
-                  //System.out.println(child.getClass()+"...."+child.toString()+"... name:" +child.getName());
-            } //while mci has next
-        }
-    }
 
     /**
      * Returns the shared instance

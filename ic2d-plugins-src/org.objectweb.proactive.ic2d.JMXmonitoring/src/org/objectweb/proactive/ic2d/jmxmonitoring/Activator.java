@@ -34,6 +34,7 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.osgi.framework.BundleContext;
@@ -80,7 +81,9 @@ public class Activator extends AbstractUIPlugin {
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        plugin = null;
+        JMXNotificationManager nm = JMXNotificationManager.getInstance();
+        nm.kill();
+    	plugin = null;
         super.stop(context);
     }
 
