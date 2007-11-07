@@ -32,8 +32,8 @@ package org.objectweb.proactive.extra.masterworker.core;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.Identifiable;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskIntern;
 
@@ -119,7 +119,8 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
     /**
      * {@inheritDoc}
      */
-    public Serializable run(final SlaveMemory memory) throws Exception {
+    public Serializable run(final WorkerMemory memory)
+        throws Exception {
         return this.realTask.run(memory);
     }
 

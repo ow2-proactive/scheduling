@@ -43,11 +43,11 @@ import java.io.Serializable;
 public interface TaskProvider<R extends Serializable> {
     /**
      * Returns a task which needs to be executed
-     * @param slave the slave object which asks the tasks (stub)
+     * @param worker the slave object which asks the tasks (stub)
      * @param slaveName the name of the slave which asks the tasks
      * @return a new task to compute
      */
-    TaskIntern<R> getTask(Slave slave, String slaveName);
+    TaskIntern<R> getTask(Worker worker, String slaveName);
 
     /**
      * Returns the result of a task to the provider

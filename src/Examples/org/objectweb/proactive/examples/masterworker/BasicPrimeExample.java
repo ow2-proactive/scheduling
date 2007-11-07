@@ -40,12 +40,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.extra.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extra.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterworker.TaskException;
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 
 
 /**
- * This simple test class is an example on how to use the Master/Slave API
+ * This simple test class is an example on how to use the Master/Worker API
  * The tasks wait for a period between 15 and 20 seconds (by ex)
  * The main program displays statistics about the speedup due to parallelization
  * @author fviale
@@ -63,7 +63,7 @@ public class BasicPrimeExample extends AbstractExample {
      * @param results results of the test
      * @param startTime starting time of the test
      * @param endTime ending time of the test
-     * @param nbSlaves number of slaves used during the test
+     * @param nbSlaves number of workers used during the test
      */
     public void displayResult(Collection<Boolean> results, long startTime,
         long endTime, int nbSlaves) {
@@ -131,7 +131,7 @@ public class BasicPrimeExample extends AbstractExample {
         List<Boolean> results = instance.master.waitAllResults();
         long endTime = System.currentTimeMillis();
 
-        // Displaying results, the slavepoolSize method displays the number of slaves used by the master
+        // Displaying results, the slavepoolSize method displays the number of workers used by the master
         instance.displayResult(results, startTime, endTime,
             instance.master.slavepoolSize());
 
@@ -193,9 +193,9 @@ public class BasicPrimeExample extends AbstractExample {
         }
 
         /* (non-Javadoc)
-         * @see org.objectweb.proactive.extra.masterworker.interfaces.Task#run(org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory)
+         * @see org.objectweb.proactive.extra.masterworker.interfaces.Task#run(org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory)
          */
-        public Boolean run(SlaveMemory memory) {
+        public Boolean run(WorkerMemory memory) {
             for (long divider = begin; divider < end; divider++) {
                 if ((candidate % divider) == 0) {
                     return new Boolean(false);

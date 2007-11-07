@@ -42,7 +42,7 @@ import org.objectweb.proactive.extra.masterworker.TaskException;
 
 
 /**
- * User Interface for the Master/Slave API <br/>
+ * User Interface for the Master/Worker API <br/>
  * @author fviale
  *
  * @param <T> Task of result R
@@ -94,14 +94,14 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     void addResources(VirtualNode virtualnode);
 
     /**
-     * This method returns the number of slaves currently in the slave pool
-     * @return number of slaves
+     * This method returns the number of workers currently in the slave pool
+     * @return number of workers
      */
     int slavepoolSize();
 
     /**
      * Terminates the slave manager and (eventually free every resources) <br/>
-     * @param freeResources tells if the Slave Manager should as well free the node resources
+     * @param freeResources tells if the Worker Manager should as well free the node resources
      */
     void terminate(boolean freeResources);
 
@@ -162,7 +162,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     void setResultReceptionOrder(OrderingMode mode);
 
     /**
-     * Sets the period at which ping messages are sent to the slaves <br/>
+     * Sets the period at which ping messages are sent to the workers <br/>
      * @param periodMillis the new ping period
      */
     void setPingPeriod(long periodMillis);

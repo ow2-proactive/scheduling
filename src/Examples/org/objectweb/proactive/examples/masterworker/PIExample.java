@@ -36,8 +36,8 @@ import java.util.Vector;
 import org.objectweb.proactive.extra.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extra.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extra.masterworker.TaskException;
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 
 
 public class PIExample {
@@ -89,7 +89,7 @@ public class PIExample {
         public ComputePIMonteCarlo() {
         }
 
-        public Long run(SlaveMemory memory) throws Exception {
+        public Long run(WorkerMemory memory) throws Exception {
             long remaining = NUMBER_OF_EXPERIENCES;
             long successes = 0;
             while (remaining > 0) {

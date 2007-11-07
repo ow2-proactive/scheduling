@@ -48,19 +48,19 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.Slave;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.SlaveDeadListener;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.SlaveWatcher;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.Worker;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.WorkerDeadListener;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.WorkerWatcher;
 
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * The Pinger Active Object is responsible for watching slaves'activity. <br>
- * It reports slaves failure to the Master<br>
+ * The Pinger Active Object is responsible for watching workers'activity. <br>
+ * It reports workers failure to the Master<br>
  * @author fviale
  *
  */
-public class AOPinger implements SlaveWatcher, RunActive, InitActive,
+public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     Serializable {
 
     /**
@@ -84,24 +84,24 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     protected boolean terminated;
 
     /**
-     * interval when slaves are sent a ping message
+     * interval when workers are sent a ping message
      */
     protected long pingPeriod;
 
     /**
-     * Who will be notified when slaves are dead (in general : the master)
+     * Who will be notified when workers are dead (in general : the master)
      */
-    protected SlaveDeadListener listener;
+    protected WorkerDeadListener listener;
 
     /**
      * Stub to slave group
      */
-    protected Slave slaveGroupStub;
+    protected Worker workerGroupStub;
 
     /**
-     * Slave group
+     * Worker group
      */
-    protected Group<Slave> slaveGroup;
+    protected Group<Worker> workerGroup;
 
     /**
      * for internal use
@@ -118,7 +118,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
      * Creates a pinger with the given listener
      * @param listener object which will be notified when a slave is dead
      */
-    public AOPinger(final SlaveDeadListener listener) {
+    public AOPinger(final WorkerDeadListener listener) {
         this.listener = listener;
         terminated = false;
         pingPeriod = Long.parseLong(PAProperties.PA_MASTERSLAVE_PINGPERIOD.getValue());
@@ -127,8 +127,8 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     /**
      * {@inheritDoc}
      */
-    public void addSlaveToWatch(final Slave slave) {
-        slaveGroup.add(slave);
+    public void addWorkerToWatch(final Worker worker) {
+        workerGroup.add(worker);
     }
 
     /**
@@ -137,8 +137,8 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         try {
-            slaveGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
-            slaveGroup = ProGroup.getGroup(slaveGroupStub);
+            workerGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
+            workerGroup = ProGroup.getGroup(workerGroupStub);
             stubOnThis = (AOPinger) ProActiveObject.getStubOnThis();
             body.setImmediateService("terminate");
         } catch (ClassNotReifiableException e) {
@@ -151,8 +151,8 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     /**
      * {@inheritDoc}
      */
-    public void removeSlaveToWatch(final Slave slave) {
-        slaveGroup.remove(slave);
+    public void removeWorkerToWatch(final Worker worker) {
+        workerGroup.remove(worker);
     }
 
     /**
@@ -167,7 +167,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
                 service.serveOldest();
             }
             try {
-                slaveGroupStub.heartBeat();
+                workerGroupStub.heartBeat();
             } catch (Exception e) {
                 if (e instanceof ExceptionListException) {
                     ExceptionListException ele = (ExceptionListException) e;
@@ -175,7 +175,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
                         Iterator<ExceptionInGroup> it = ele.iterator();
                         while (it.hasNext()) {
                             ExceptionInGroup eig = it.next();
-                            stubOnThis.slaveMissing((Slave) eig.getObject());
+                            stubOnThis.workerMissing((Worker) eig.getObject());
                         }
                     }
                 }
@@ -199,18 +199,18 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
 
     /**
      * Reports that a slave is missing
-     * @param slave the missing slave
+     * @param worker the missing slave
      */
-    public void slaveMissing(final Slave slave) {
-        synchronized (slaveGroup) {
+    public void workerMissing(final Worker worker) {
+        synchronized (workerGroup) {
             if (logger.isDebugEnabled()) {
                 logger.debug(
                     "A slave is missing...reporting back to the Master");
             }
 
-            if (slaveGroup.contains(slave)) {
-                listener.isDead(slave);
-                slaveGroup.remove(slave);
+            if (workerGroup.contains(worker)) {
+                listener.isDead(worker);
+                workerGroup.remove(worker);
             }
         }
     }
@@ -230,7 +230,7 @@ public class AOPinger implements SlaveWatcher, RunActive, InitActive,
     }
 
     /*
-     * TODO: handle exceptions with stubOnThis.slaveMissing((Slave) eig.getObject()); for each
+     * TODO: handle exceptions with stubOnThis.slaveMissing((Worker) eig.getObject()); for each
      * member in the ExceptionListException
      */
 }

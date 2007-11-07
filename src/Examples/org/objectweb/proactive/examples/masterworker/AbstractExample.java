@@ -60,7 +60,7 @@ public abstract class AbstractExample {
     }
 
     /**
-     * Returns the url of the descriptor which defines the slaves
+     * Returns the url of the descriptor which defines the workers
      * @return descriptor url
      */
     public URL getDescriptor_url() {
@@ -68,7 +68,7 @@ public abstract class AbstractExample {
     }
 
     /**
-     * Sets the url of the descriptors which defines the slaves
+     * Sets the url of the descriptors which defines the workers
      * @param descriptor_url
      */
     public void setDescriptor_url(URL descriptor_url) {
@@ -76,7 +76,7 @@ public abstract class AbstractExample {
     }
 
     /**
-     * Returns the virtual node name of the slaves
+     * Returns the virtual node name of the workers
      * @return virtual node name
      */
     public String getVn_name() {
@@ -84,7 +84,7 @@ public abstract class AbstractExample {
     }
 
     /**
-     * Sets the virtual node name of the slaves
+     * Sets the virtual node name of the workers
      * @param vn_name virtual node name
      */
     public void setVn_name(String vn_name) {
@@ -175,7 +175,7 @@ public abstract class AbstractExample {
     protected abstract void after_init();
 
     /**
-     * Internal class which handles shutdown of Master/Slave applications
+     * Internal class which handles shutdown of Master/Worker applications
      * @author fviale
      *
      */

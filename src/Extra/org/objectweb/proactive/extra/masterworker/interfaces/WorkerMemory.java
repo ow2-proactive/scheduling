@@ -28,39 +28,34 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.masterworker.interfaces.internal;
-
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+package org.objectweb.proactive.extra.masterworker.interfaces;
 
 
 /**
- * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * A SlaveWatcher is responsible of watching slaves'activity<br/>
+ * This interface gives access to the memory of a slave, a task can record data in this memory under a specific name. <br/>
+ * This data could be loaded later on by another task <br/>
  * @author fviale
+ *
  */
-public interface SlaveWatcher {
+public interface WorkerMemory {
 
     /**
-     * adds a slave to be watched
-     * @param slave slave which must be watched
+     * Save data under a specific name
+     * @param name name of the data
+     * @param data data to be saved
      */
-    void addSlaveToWatch(Slave slave);
+    void save(String name, Object data);
 
     /**
-     * stops watching a slave
-     * @param slave slaves which needn't be watched anymore
+     * Load some data previously saved
+     * @param name the name under which the data was saved
+     * @return the data
      */
-    void removeSlaveToWatch(Slave slave);
+    Object load(String name);
 
     /**
-     * Sets the period at which ping messages are sent to the slaves <br/>
-     * @param periodMillis the new ping period
+     * Erase some data previously saved
+     * @param name the name of the data which need to be erased
      */
-    void setPingPeriod(long periodMillis);
-
-    /**
-     * terminates the watcher's activity
-     * @return true if the object terminated successfully
-     */
-    BooleanWrapper terminate();
+    void erase(String name);
 }

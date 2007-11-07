@@ -37,7 +37,7 @@ import org.objectweb.proactive.extra.masterworker.interfaces.Task;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * Internal view of a task in the Master/Slave API<br/>
+ * Internal view of a task in the Master/Worker API<br/>
  * Adds the notion of a "Task ID"<br/>
  * @author fviale
  *

@@ -30,12 +30,12 @@
  */
 package functionalTests.masterworker.slavememory;
 
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 
 
 public class MemoryTask implements Task<String> {
-    public String run(SlaveMemory memory) throws Exception {
+    public String run(WorkerMemory memory) throws Exception {
         String mes = (String) memory.load("message");
         if (mes.equals("Hello0")) {
             memory.save("message", "Hello1");

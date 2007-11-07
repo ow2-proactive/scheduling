@@ -33,15 +33,15 @@ package org.objectweb.proactive.extra.masterworker.interfaces.internal;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * An object implementing this interface expects to be notified when a Slave is missing<br/>
+ * An object implementing this interface expects to be notified when a Worker is missing<br/>
  * @author fviale
  *
  */
-public interface SlaveDeadListener {
+public interface WorkerDeadListener {
 
     /**
      * Callback function called when a slave is missing
-     * @param slave the missing slave
+     * @param worker the missing slave
      */
-    void isDead(Slave slave);
+    void isDead(Worker worker);
 }

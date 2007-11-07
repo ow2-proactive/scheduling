@@ -55,30 +55,30 @@ import org.objectweb.proactive.extra.masterworker.interfaces.internal.ResultInte
 
 
 /**
- * Entry point of the Master/Slave API.<br/>
- * Here is how the Master/Slave API is used :
+ * Entry point of the Master/Worker API.<br/>
+ * Here is how the Master/Worker API is used :
  * <ol>
  * <li>Create a ProActiveMaster object through the different constructors</li>
  * <li>Submit tasks through the use of the <b><i>solve</i></b> methods</li>
  * <li>Collect results through the <b><i>wait</i></b> methods</li>
  * </ol>
  * <br/>
- * The <b><i>SlaveMemory</i></b> concept is meant to allow user to store information directly inside the slaves where tasks are executed. <br/>
- * The SlaveMemory has the same structure as a Dictionary with &lt;key, value&gt; pairs where keys are string and values are any Java object. <br/>
+ * The <b><i>WorkerMemory</i></b> concept is meant to allow user to store information directly inside the workers where tasks are executed. <br/>
+ * The WorkerMemory has the same structure as a Dictionary with &lt;key, value&gt; pairs where keys are string and values are any Java object. <br/>
  * <br/>
  * A user can specify, when creating the master, the initial memory that every slave will have by providing a Map of &lt;String,Object&gt; pairs to the ProActiveMaster constructors.<br/>
  * <br/>
- * When tasks will later on be executed on the slaves, the tasks will be able to access this memory through the slavememory parameter of the <b><i>run</i></b> method.
+ * When tasks will later on be executed on the workers, the tasks will be able to access this memory through the slavememory parameter of the <b><i>run</i></b> method.
  * <br/>
  * The results can be received using two different reception order modes: <br/>
  * <ul>
- * <li>In the <b><i>CompletionOrder mode</i></b>, which is the default, results are received in the same order as they are completed by the slaves (i.e. order is unspecified).</li>
+ * <li>In the <b><i>CompletionOrder mode</i></b>, which is the default, results are received in the same order as they are completed by the workers (i.e. order is unspecified).</li>
  * <li>In the <b><i>SubmissionOrder mode</i></b>, results are received in the same order as they are submitted to the master.</li>
  * </ul>
  * <br/>
  *
  * @see org.objectweb.proactive.extra.masterworker.interfaces.Task
- * @see org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory
+ * @see org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory
  * @see org.objectweb.proactive.extra.masterworker.interfaces.Master
  *
  *
@@ -116,7 +116,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * Creates an empty remote master that will be created on top of the given Node with an initial slave memory
      * @param remoteNodeToUse this Node will be used to create the remote master
-     * @param initialMemory initial memory that every slaves deployed by the master will have
+     * @param initialMemory initial memory that every workers deployed by the master will have
      */
     public ProActiveMaster(Node remoteNodeToUse,
         Map<String, Object> initialMemory) {
@@ -136,7 +136,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
 
     /**
      * Creates an empty local master with an initial slave memory
-     * @param initialMemory initial memory that every slaves deployed by the master will have
+     * @param initialMemory initial memory that every workers deployed by the master will have
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {
         try {
@@ -167,7 +167,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * The master will be created on top of a single resource deployed by this virtual node
      * @param descriptorURL url of the ProActive descriptor
      * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
-     * @param initialMemory initial memory that every slaves deployed by the master will have
+     * @param initialMemory initial memory that every workers deployed by the master will have
      */
     public ProActiveMaster(URL descriptorURL, String masterVNName,
         Map<String, Object> initialMemory) {

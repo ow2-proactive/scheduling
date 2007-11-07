@@ -112,12 +112,12 @@ public class NQueensExample extends AbstractExample {
         int nbslaves = instance.master.slavepoolSize();
 
         System.out.println("Total number of configurations found for n = " +
-            nqueen_board_size + " and with " + nbslaves + " slaves : " +
+            nqueen_board_size + " and with " + nbslaves + " workers : " +
             sumResults);
-        System.out.println("Time needed with " + nbslaves + " slaves : " +
+        System.out.println("Time needed with " + nbslaves + " workers : " +
             ((end - begin) / 3600000) +
             String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
-        System.out.println("Total slaves calculation time : " +
+        System.out.println("Total workers calculation time : " +
             (sumTime / 3600000) +
             String.format("h %1$tMm %1$tSs %1$tLms", sumTime));
 

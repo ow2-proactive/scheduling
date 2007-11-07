@@ -61,14 +61,14 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.Slave;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.SlaveManager;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskProvider;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.Worker;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.WorkerManager;
 
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * The Slave Manager Active Object is responsible for the deployment of Slaves :<br>
+ * The Worker Manager Active Object is responsible for the deployment of Slaves :<br>
  * <ul>
  * <li> Through a ProActive deployment descriptor</li>
  * <li> Using an existing VirtualNode object</li>
@@ -78,8 +78,8 @@ import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskProvid
  * @author fviale
  *
  */
-public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
-    InitActive, Serializable {
+public class AOWorkerManager implements WorkerManager,
+    NodeCreationEventListener, InitActive, Serializable {
 
     /**
          *
@@ -97,7 +97,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     protected Object stubOnThis;
 
     /**
-     * how many slaves have been created
+     * how many workers have been created
      */
     protected long slaveNameCounter;
 
@@ -117,32 +117,32 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     protected boolean isTerminated;
 
     /**
-     * the entity which will provide tasks to the slaves
+     * the entity which will provide tasks to the workers
      */
     protected TaskProvider<Serializable> provider;
 
     /**
-     * Initial memory of the slaves
+     * Initial memory of the workers
      */
     protected Map<String, Object> initialMemory;
 
     /**
-     * slaves deployed so far
+     * workers deployed so far
      */
-    protected Map<String, Slave> slaves;
+    protected Map<String, Worker> workers;
 
     /**
      * ProActive no arg constructor
      */
-    public AOSlaveManager() {
+    public AOWorkerManager() {
     }
 
     /**
      * Creates a task manager with the given task provider
-     * @param provider the entity that will give tasks to the slaves created
-     * @param initialMemory the initial memory of the slaves
+     * @param provider the entity that will give tasks to the workers created
+     * @param initialMemory the initial memory of the workers
      */
-    public AOSlaveManager(final TaskProvider<Serializable> provider,
+    public AOWorkerManager(final TaskProvider<Serializable> provider,
         final Map<String, Object> initialMemory) {
         this.provider = provider;
         this.initialMemory = initialMemory;
@@ -235,12 +235,13 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
                     slaveNameCounter++;
 
                 // Creates the slave which will automatically connect to the master
-                slaves.put(slavename,
-                    (Slave) ProActiveObject.newActive(AOSlave.class.getName(),
+                workers.put(slavename,
+                    (Worker) ProActiveObject.newActive(
+                        AOWorker.class.getName(),
                         new Object[] { slavename, provider, initialMemory },
                         node));
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Slave " + slavename + " created on " +
+                    logger.debug("Worker " + slavename + " created on " +
                         node.getNodeInformation().getName());
                 }
             } catch (ActiveObjectCreationException e) {
@@ -257,7 +258,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     public void initActivity(final Body body) {
         stubOnThis = ProActiveObject.getStubOnThis();
         slaveNameCounter = 0;
-        slaves = new HashMap<String, Slave>();
+        workers = new HashMap<String, Worker>();
         vnlist = new Vector<VirtualNode>();
         isTerminated = false;
         if (logger.isDebugEnabled()) {
@@ -287,7 +288,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
         isTerminated = true;
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Terminating SlaveManager...");
+            logger.debug("Terminating WorkerManager...");
         }
 
         try {
@@ -311,16 +312,16 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             threadPool.awaitTermination(120, TimeUnit.SECONDS);
 
             // we send the terminate message to every thread
-            for (Entry<String, Slave> slave : slaves.entrySet()) {
+            for (Entry<String, Worker> worker : workers.entrySet()) {
                 try {
-                    BooleanWrapper term = slave.getValue().terminate();
+                    BooleanWrapper term = worker.getValue().terminate();
                     ProFuture.waitFor(term);
                     if (logger.isDebugEnabled()) {
-                        logger.debug(slave.getKey() + " freed.");
+                        logger.debug(worker.getKey() + " freed.");
                     }
                 } catch (SendRequestCommunicationException exp) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug(slave.getKey() + " is already freed.");
+                        logger.debug(worker.getKey() + " is already freed.");
                     }
                 }
             }
@@ -340,7 +341,7 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
             ProActiveObject.terminateActiveObject(true);
             // success
             if (logger.isDebugEnabled()) {
-                logger.debug("SlaveManager terminated...");
+                logger.debug("WorkerManager terminated...");
             }
 
             return new BooleanWrapper(true);
@@ -352,14 +353,14 @@ public class AOSlaveManager implements SlaveManager, NodeCreationEventListener,
     }
 
     /**
-     * Internal class which creates slaves on top of nodes
+     * Internal class which creates workers on top of nodes
      * @author fviale
      *
      */
     protected class SlaveCreationHandler implements Runnable {
 
         /**
-         * node on which slaves will be created
+         * node on which workers will be created
          */
         private Node node = null;
 

@@ -38,8 +38,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 
 
 /**
@@ -140,9 +140,9 @@ public class NativeTask implements Task<String[]> {
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.extra.masterworker.interfaces.Task#run(org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory)
+     * @see org.objectweb.proactive.extra.masterworker.interfaces.Task#run(org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory)
      */
-    public String[] run(SlaveMemory memory)
+    public String[] run(WorkerMemory memory)
         throws IOException, URISyntaxException {
         ArrayList<String> lines = new ArrayList<String>();
         Runtime runtime = Runtime.getRuntime();

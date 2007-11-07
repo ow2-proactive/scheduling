@@ -30,8 +30,8 @@
  */
 package functionalTests.masterworker;
 
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 
 
 public class A implements Task<Integer> {
@@ -54,7 +54,7 @@ public class A implements Task<Integer> {
         this.exception = exception;
     }
 
-    public Integer run(SlaveMemory memory) throws Exception {
+    public Integer run(WorkerMemory memory) throws Exception {
         if (exception) {
             int a = 1 / 0;
             System.out.println(a);

@@ -43,21 +43,21 @@ import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.ResultIntern;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.Slave;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskProvider;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.Worker;
 
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * The Slaves Active Objects are the workers in the Master/Slave API.<br>
+ * The Slaves Active Objects are the workers in the Master/Worker API.<br>
  * They execute tasks needed by the master
  * @author fviale
  */
-public class AOSlave implements InitActive, RunActive, Serializable, Slave,
-    SlaveMemory {
+public class AOWorker implements InitActive, RunActive, Serializable, Worker,
+    WorkerMemory {
 
     /**
          *
@@ -104,7 +104,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
     /**
      * ProActive no arg contructor
      */
-    public AOSlave() {
+    public AOWorker() {
     }
 
     /**
@@ -113,7 +113,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * @param provider the entity which will provide tasks to the slave
      * @param initialMemory initial memory of the slave
      */
-    public AOSlave(final String name,
+    public AOWorker(final String name,
         final TaskProvider<Serializable> provider,
         final Map<String, Object> initialMemory) {
         this.name = name;
@@ -125,8 +125,8 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
      * {@inheritDoc}
      */
     public boolean equals(final Object obj) {
-        if (obj instanceof AOSlave) {
-            return name.equals(((Slave) obj).getName());
+        if (obj instanceof AOWorker) {
+            return name.equals(((Worker) obj).getName());
         }
 
         return false;
@@ -190,7 +190,7 @@ public class AOSlave implements InitActive, RunActive, Serializable, Slave,
         }
 
         // InitialTask
-        TaskIntern<Serializable> currentTask = provider.getTask((Slave) stubOnThis,
+        TaskIntern<Serializable> currentTask = provider.getTask((Worker) stubOnThis,
                 name);
         // we make sure that we have the real task object and not a future)
         currentTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(currentTask);

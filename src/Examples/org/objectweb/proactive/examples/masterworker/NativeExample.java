@@ -45,7 +45,7 @@ import org.objectweb.proactive.extra.masterworker.tasks.NativeTask;
 
 
 /**
- * This simple test class is an example on how to launch Native commands using the Master/Slave API
+ * This simple test class is an example on how to launch Native commands using the Master/Worker API
  * The program launches the command "hostname" on a set of remote machines and display the results.
  * @author fviale
  *

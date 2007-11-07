@@ -33,8 +33,8 @@ package org.objectweb.proactive.examples.masterworker.nqueens.query;
 import java.io.Serializable;
 
 import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extra.masterworker.interfaces.SlaveMemory;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
 
 
 public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
@@ -44,7 +44,7 @@ public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
         this.query = query;
     }
 
-    public Pair<Long, Long> run(SlaveMemory memory) {
+    public Pair<Long, Long> run(WorkerMemory memory) {
         long begin = System.currentTimeMillis();
         long answer = query.run();
         long time = System.currentTimeMillis() - begin;

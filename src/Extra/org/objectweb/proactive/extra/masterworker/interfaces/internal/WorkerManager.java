@@ -40,11 +40,11 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * Admin interface of the Slave Manager in the Master/Slave API (allows to extend the pool of slaves, or terminate the manager)<br/>
+ * Admin interface of the Worker Manager in the Master/Worker API (allows to extend the pool of workers, or terminate the manager)<br/>
  * @author fviale
  *
  */
-public interface SlaveManager {
+public interface WorkerManager {
 
     /**
      * Asks the slave manager to activate every virtual nodes inside the given descriptor
@@ -75,7 +75,7 @@ public interface SlaveManager {
 
     /**
      * Terminates the slave manager and free every resources (if asked)
-     * @param freeResources tells if the Slave Manager should as well free the node resources
+     * @param freeResources tells if the Worker Manager should as well free the node resources
      * @return success
      */
     BooleanWrapper terminate(boolean freeResources);

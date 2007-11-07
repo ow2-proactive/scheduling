@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * @author fviale
  *
  */
-public interface Slave {
+public interface Worker {
 
     /**
      * Returns the name of this slave

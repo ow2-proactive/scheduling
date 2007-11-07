@@ -62,24 +62,24 @@ import org.objectweb.proactive.extra.masterworker.interfaces.Master;
 import org.objectweb.proactive.extra.masterworker.interfaces.Task;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.MasterIntern;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.ResultIntern;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.Slave;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.SlaveDeadListener;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.SlaveManager;
-import org.objectweb.proactive.extra.masterworker.interfaces.internal.SlaveWatcher;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskProvider;
 import org.objectweb.proactive.extra.masterworker.interfaces.internal.TaskRepository;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.Worker;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.WorkerDeadListener;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.WorkerManager;
+import org.objectweb.proactive.extra.masterworker.interfaces.internal.WorkerWatcher;
 import org.objectweb.proactive.extra.masterworker.util.HashSetQueue;
 
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * Main Active Object of the Master/Slave API <br>
+ * Main Active Object of the Master/Worker API <br>
  * Literally : the entity to which an user can submit tasks to be solved<br>
  * @author fviale
  */
 public class AOMaster implements Serializable, TaskProvider<Serializable>,
-    InitActive, RunActive, MasterIntern, SlaveDeadListener {
+    InitActive, RunActive, MasterIntern, WorkerDeadListener {
 
     /**
          *
@@ -105,14 +105,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
     // Active objects references
     /**
-     * Slave manager entity (deploy slaves)
+     * Worker manager entity (deploy workers)
      */
-    protected SlaveManager smanager;
+    protected WorkerManager smanager;
 
     /**
-     * Pinger (checks that slaves are alive)
+     * Pinger (checks that workers are alive)
      */
-    protected SlaveWatcher pinger;
+    protected WorkerWatcher pinger;
 
     /**
      * The repository where to locate tasks
@@ -121,43 +121,43 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
     // Slaves resources
     /**
-     * stub to access group of slaves
+     * stub to access group of workers
      */
-    protected Slave slaveGroupStub;
+    protected Worker workerGroupStub;
 
     /**
-     * Group of slaves
+     * Group of workers
      */
-    protected Group<Slave> slaveGroup;
+    protected Group<Worker> workerGroup;
 
     /**
-     * Initial memory of the slaves
+     * Initial memory of the workers
      */
     protected Map<String, Object> initialMemory;
 
-    // Sleeping slaves (we might want to wake them up)
+    // Sleeping workers (we might want to wake them up)
     /**
-     * Stub to group of sleeping slaves
+     * Stub to group of sleeping workers
      */
-    protected Slave sleepingGroupStub;
+    protected Worker sleepingGroupStub;
 
     /**
-     * Group of sleeping slaves
+     * Group of sleeping workers
      */
-    protected Group<Slave> sleepingGroup;
+    protected Group<Worker> sleepingGroup;
 
     /**
-     * Associations of slaves and slaves names
+     * Associations of workers and workers names
      */
-    protected HashMap<String, Slave> slavesByName;
+    protected HashMap<String, Worker> workersByName;
 
     /**
-     * Reverse associations of slaves and slaves names
+     * Reverse associations of workers and workers names
      */
-    protected HashMap<Slave, String> slavesByNameRev;
+    protected HashMap<Worker, String> workersByNameRev;
 
     /**
-     * Activity of slaves, which slaves is doing which task
+     * Activity of workers, which workers is doing which task
      */
     protected HashMap<String, Long> slavesActivity;
 
@@ -191,9 +191,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     }
 
     /**
-     * Creates the master with the initial memory of the slaves
+     * Creates the master with the initial memory of the workers
      * @param repository repository where the tasks can be found
-     * @param initialMemory initial memory of the slaves
+     * @param initialMemory initial memory of the workers
      */
     public AOMaster(final TaskRepository<Task<Serializable>> repository,
         final Map<String, Object> initialMemory) {
@@ -206,14 +206,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * {@inheritDoc}
      */
     public void addResources(Collection<Node> nodes) {
-        ((SlaveManager) smanager).addResources(nodes);
+        ((WorkerManager) smanager).addResources(nodes);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final URL descriptorURL) {
-        ((SlaveManager) smanager).addResources(descriptorURL);
+        ((WorkerManager) smanager).addResources(descriptorURL);
     }
 
     /**
@@ -221,14 +221,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     public void addResources(final URL descriptorURL,
         final String virtualNodeName) {
-        ((SlaveManager) smanager).addResources(descriptorURL, virtualNodeName);
+        ((WorkerManager) smanager).addResources(descriptorURL, virtualNodeName);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final VirtualNode virtualnode) {
-        ((SlaveManager) smanager).addResources(virtualnode);
+        ((WorkerManager) smanager).addResources(virtualnode);
     }
 
     /**
@@ -250,21 +250,21 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public TaskIntern<Serializable> getTask(final Slave slave,
+    public TaskIntern<Serializable> getTask(final Worker worker,
         final String slaveName) {
         // if we don't know him, we record the slave in our system
-        if (!slavesByName.containsKey(slaveName)) {
-            recordSlave(slave, slaveName);
+        if (!workersByName.containsKey(slaveName)) {
+            recordWorker(worker, slaveName);
         }
 
         if (emptyPending()) {
             slavesActivity.put(slaveName, TaskIntern.NULL_TASK_ID);
-            sleepingGroup.add(slave);
+            sleepingGroup.add(worker);
             // we return the null task, this will cause the slave to sleep for a while
             return new TaskWrapperImpl();
         } else {
-            if (sleepingGroup.contains(slave)) {
-                sleepingGroup.remove(slave);
+            if (sleepingGroup.contains(worker)) {
+                sleepingGroup.remove(worker);
             }
 
             Iterator<Long> it = pendingTasks.iterator();
@@ -297,15 +297,15 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
         // Slaves
         try {
-            // Slave Group
-            slaveGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
-            slaveGroup = ProGroup.getGroup(slaveGroupStub);
-            // Group of sleeping slaves
-            sleepingGroupStub = (Slave) ProGroup.newGroup(AOSlave.class.getName());
+            // Worker Group
+            workerGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
+            workerGroup = ProGroup.getGroup(workerGroupStub);
+            // Group of sleeping workers
+            sleepingGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
             sleepingGroup = ProGroup.getGroup(sleepingGroupStub);
             slavesActivity = new HashMap<String, Long>();
-            slavesByName = new HashMap<String, Slave>();
-            slavesByNameRev = new HashMap<Slave, String>();
+            workersByName = new HashMap<String, Worker>();
+            workersByNameRev = new HashMap<Worker, String>();
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -314,11 +314,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
         try {
             // The resource manager
-            smanager = (AOSlaveManager) ProActiveObject.newActive(AOSlaveManager.class.getName(),
+            smanager = (AOWorkerManager) ProActiveObject.newActive(AOWorkerManager.class.getName(),
                     new Object[] { stubOnThis, initialMemory });
 
             // The slave pinger
-            pinger = (SlaveWatcher) ProActiveObject.newActive(AOPinger.class.getName(),
+            pinger = (WorkerWatcher) ProActiveObject.newActive(AOPinger.class.getName(),
                     new Object[] { stubOnThis });
         } catch (ActiveObjectCreationException e1) {
             e1.printStackTrace();
@@ -330,31 +330,31 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * {@inheritDoc}
      */
-    public void isDead(final Slave slave) {
-        String slaveName = slavesByNameRev.get(slave);
+    public void isDead(final Worker worker) {
+        String slaveName = workersByNameRev.get(worker);
         if (logger.isInfoEnabled()) {
             logger.info(slaveName + " reported missing... removing it");
         }
 
         // we remove the slave from our lists
-        if (slaveGroup.contains(slave)) {
-            slaveGroup.remove(slave);
-            if (sleepingGroup.contains(slave)) {
-                sleepingGroup.remove(slave);
+        if (workerGroup.contains(worker)) {
+            workerGroup.remove(worker);
+            if (sleepingGroup.contains(worker)) {
+                sleepingGroup.remove(worker);
             }
 
-            slavesByNameRev.remove(slave);
-            slavesByName.remove(slaveName);
+            workersByNameRev.remove(worker);
+            workersByName.remove(slaveName);
             // if the slave was handling a task we put the task back to the pending queue
             Long taskId = slavesActivity.get(slaveName);
             if ((taskId != TaskIntern.NULL_TASK_ID) &&
                     launchedTasks.contains(taskId)) {
                 launchedTasks.remove(taskId);
                 if (pendingTasks.isEmpty()) {
-                    // if the queue was empty before the task is rescheduled, we wake-up all sleeping slaves
+                    // if the queue was empty before the task is rescheduled, we wake-up all sleeping workers
                     if (sleepingGroup.size() > 0) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Waking up sleeping slaves...");
+                            logger.debug("Waking up sleeping workers...");
                         }
 
                         // We wake up the sleeping guys
@@ -378,17 +378,17 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
     /**
      * Record the given slave in our system
-     * @param slave the slave to record
+     * @param worker the slave to record
      * @param slaveName the name of the slave
      */
-    public void recordSlave(final Slave slave, final String slaveName) {
+    public void recordWorker(final Worker worker, final String slaveName) {
         // We record the slave in our system
-        slavesByName.put(slaveName, slave);
-        slavesByNameRev.put(slave, slaveName);
-        slaveGroup.add(slave);
+        workersByName.put(slaveName, worker);
+        workersByNameRev.put(worker, slaveName);
+        workerGroup.add(worker);
 
         // We tell the pinger to watch for this new slave
-        pinger.addSlaveToWatch(slave);
+        pinger.addWorkerToWatch(worker);
     }
 
     /**
@@ -411,7 +411,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
                 }
             }
 
-            // we serve directly every methods from the slaves
+            // we serve directly every methods from the workers
             service.serveAll("getTask");
             service.serveAll("sendResultAndGetTask");
             service.serveAll("isDead");
@@ -451,7 +451,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         }
 
         // We assign a new task to the slave
-        TaskIntern<Serializable> newTask = getTask(slavesByName.get(
+        TaskIntern<Serializable> newTask = getTask(workersByName.get(
                     originatorName), originatorName);
         return newTask;
     }
@@ -507,7 +507,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * {@inheritDoc}
      */
     public int slavepoolSize() {
-        return slaveGroup.size();
+        return workerGroup.size();
     }
 
     /**
@@ -535,7 +535,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             pendingTasks.add(taskId);
             if (sleepingGroup.size() > 0) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Waking up sleeping slaves...");
+                    logger.debug("Waking up sleeping workers...");
                 }
 
                 // We wake up the sleeping guys
@@ -577,8 +577,8 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         launchedTasks.clear();
 
         slavesActivity.clear();
-        slavesByName.clear();
-        slavesByNameRev.clear();
+        workersByName.clear();
+        workersByNameRev.clear();
 
         terminated = true;
         return true;
