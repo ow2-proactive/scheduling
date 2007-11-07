@@ -72,7 +72,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
         this.monitoringView = monitoringView;
 
         this.figuresToUpdate = Collections.synchronizedSet(new HashSet<IFigure>());
-        this.communicationsToDraw = new java.util.concurrent.ConcurrentHashMap<Integer, GraphicalCommunication>(); //Collections.synchronizedSet(new HashSet<GraphicalCommunication>());        		
+        this.communicationsToDraw = new java.util.concurrent.ConcurrentHashMap<Integer, GraphicalCommunication>(); //Collections.synchronizedSet(new HashSet<GraphicalCommunication>());
 
         new Thread() {
                 @Override
@@ -100,8 +100,8 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     //
     @Override
     public void addGraphicalCommunication(GraphicalCommunication communication) {
-        if (!communicationsToDraw.containsKey(communication.hashcode())) {
-            this.communicationsToDraw.put(communication.hashcode(),
+        if (!communicationsToDraw.containsKey(communication.hashCode())) {
+            this.communicationsToDraw.put(communication.hashCode(),
                 communication);
         }
     }

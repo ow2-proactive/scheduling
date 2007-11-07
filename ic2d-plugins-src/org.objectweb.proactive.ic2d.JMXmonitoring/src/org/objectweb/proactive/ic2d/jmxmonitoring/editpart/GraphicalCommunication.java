@@ -56,7 +56,7 @@ public class GraphicalCommunication {
         this.destination = destination;
         this.panel = panel;
         this.color = color;
-        // To achieve unicity for a directed communication   
+        // To achieve unicity for a directed communication
         // we take the right 16 bits of the source hashcode and 16 bits of dest hashcode
         // this is used to avoid a + b = b + a
         this.hashcode = (this.source.hashCode() & RIGHT_MASK) +
@@ -86,7 +86,8 @@ public class GraphicalCommunication {
         source.addConnection(destination, panel, color);
     }
 
-    public int hashcode() {
+    @Override
+    public int hashCode() {
         return this.hashcode;
     }
 
