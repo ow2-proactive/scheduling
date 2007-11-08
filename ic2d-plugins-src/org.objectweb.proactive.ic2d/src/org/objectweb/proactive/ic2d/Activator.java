@@ -35,6 +35,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Hashtable;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.core.ssh.httpssh.Handler;
@@ -86,7 +87,6 @@ public class Activator extends AbstractUIPlugin {
         plugin = null;
         super.stop(context);
     }
-
 
     /**
      * Returns the shared instance

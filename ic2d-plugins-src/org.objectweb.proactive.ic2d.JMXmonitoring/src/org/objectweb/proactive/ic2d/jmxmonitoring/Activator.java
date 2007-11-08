@@ -83,7 +83,7 @@ public class Activator extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         JMXNotificationManager nm = JMXNotificationManager.getInstance();
         nm.kill();
-    	plugin = null;
+        plugin = null;
         super.stop(context);
     }
 
