@@ -44,13 +44,14 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupGridEngineParser extends AbstractGroupParser {
-    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
-    private static final String NODE_NAME_BOOKING_DURATION = "bookingDuration";
+    private static final String NODE_NAME_WALL_TIME = "wallTime";
     private static final String NODE_NAME_PARALLEL_ENVIRONMENT = "parallelEnvironment";
     private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
-    private static final String XPATH_GRID_ENGINE_OPTION = "gridEngineOption";
     private static final String ATTR_QUEUE = "queue";
     private static final String NODE_NAME = "gridEngineGroup";
+    private static final String NODE_NAME_STDOUT = "stdout";
+    private static final Object NODE_NAME_STDERR = "stderr";
+    private static final Object NODE_NAME_DIRECTORY = "directory";
 
     @Override
     public AbstractGroup createGroup() {
@@ -69,36 +70,30 @@ public class GroupGridEngineParser extends AbstractGroupParser {
 
         String queueName = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_QUEUE);
-        gridGroup.setQueueName(queueName);
+        gridGroup.setQueue(queueName);
 
-        try {
-            Node optionNode = (Node) xpath.evaluate(XPATH_GRID_ENGINE_OPTION,
-                    groupNode, XPathConstants.NODE);
-
-            NodeList childNodes = optionNode.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); ++i) {
-                Node childNode = childNodes.item(i);
-                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                String nodeName = childNode.getNodeName();
-                String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
-                    gridGroup.setHostsNumber(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_PARALLEL_ENVIRONMENT)) {
-                    gridGroup.setParallelEnvironment(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_BOOKING_DURATION)) {
-                    gridGroup.setBookingDuration(nodeExpandedValue);
-                    //                    } else if (nodeName.equals(OUTPUT_FILE)) {
-                    //                        gridGroup.setOutputFile(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
-                    PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                    gridGroup.setScriptLocation(path);
-                }
+        NodeList childNodes = groupNode.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); ++i) {
+            Node childNode = childNodes.item(i);
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
             }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
+
+            String nodeName = childNode.getNodeName();
+            String nodeValue = GCMParserHelper.getElementValue(childNode);
+            if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
+                gridGroup.setHostsNumber(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_PARALLEL_ENVIRONMENT)) {
+                gridGroup.setParallelEnvironment(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_WALL_TIME)) {
+                gridGroup.setWallTime(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_DIRECTORY)) {
+                gridGroup.setDirectory(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_STDOUT)) {
+                gridGroup.setStdout(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_STDERR)) {
+                gridGroup.setStderr(nodeValue);
+            }
         }
     }
 }

@@ -36,11 +36,13 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 
 
 public class GroupGridEngine extends AbstractGroup {
-    private String queueName;
+    private String queue;
     private String hostNumber;
-    private String bookingDuration;
-    private PathElement scriptLocation;
+    private String wallTime;
     private String parallelEnvironment;
+    private String stdout;
+    private String stderr;
+    private String directory;
 
     @Override
     public List<String> internalBuildCommands() {
@@ -48,16 +50,16 @@ public class GroupGridEngine extends AbstractGroup {
         return null;
     }
 
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
+    public void setQueue(String queue) {
+        this.queue = queue;
     }
 
     /**
      *  Set the booking duration of the cluster's nodes. The default is 00:01:00
      * @param d duration
      */
-    public void setBookingDuration(String d) {
-        this.bookingDuration = d;
+    public void setWallTime(String d) {
+        this.wallTime = d;
     }
 
     /**
@@ -77,14 +79,6 @@ public class GroupGridEngine extends AbstractGroup {
     }
 
     /**
-     * Sets the location of the script on the remote host
-     * @param location
-     */
-    public void setScriptLocation(PathElement location) {
-        this.scriptLocation = location;
-    }
-
-    /**
      * Sets the parallel environment for this GridEngineSubProcess
      * @param p the parallel environment to use
      */
@@ -98,5 +92,17 @@ public class GroupGridEngine extends AbstractGroup {
      */
     public String getParallelEnvironment() {
         return this.parallelEnvironment;
+    }
+
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
+    }
+
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
+    }
+
+    public void setDirectory(String directory) {
+        this.directory = directory;
     }
 }
