@@ -58,8 +58,8 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Gr
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGridBusParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGridEngineParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupLSFParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARGridParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupPBSParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupPrunParser;
@@ -151,7 +151,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerGroupParser(new GroupGridEngineParser());
         registerGroupParser(new GroupLSFParser());
         registerGroupParser(new GroupOARParser());
-        registerGroupParser(new GroupOARGridParser());
+        registerGroupParser(new GroupOARSHParser());
         registerGroupParser(new GroupPBSParser());
         registerGroupParser(new GroupPrunParser());
         registerGroupParser(new GroupRSHParser());

@@ -13,9 +13,15 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="hostsNumber" type="positiveInteger" minOccurs="0" />
+					<element name="nodes" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="processorPerNodes" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="mailWhen" type="string" minOccurs="0" />
+					<element name="mailTo" type="string" minOccurs="0" />
+					<element name="joinOutput" type="pa:BooleanOrVariableType" minOccurs="0" />
+					<element name="wallTime" type="pa:TimeOrVariableType" minOccurs="0" />
+					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
 				</sequence>
-				<attribute name="interactive" type="pa:BooleanOrVariableType" use="optional" />
 				<attribute name="queue" type="string" use="optional" />
 				<attribute name="jobName" type="string" use="required" />
 			</extension>

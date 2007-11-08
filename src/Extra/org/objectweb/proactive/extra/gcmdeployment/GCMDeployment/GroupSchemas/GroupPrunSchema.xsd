@@ -14,8 +14,15 @@
 				<sequence>
 					<element name="hostList" type="pa:ListType" minOccurs="0" />
 					<element name="hostsNumber" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="processorPerNode" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="bookingDuration" type="pa:TimeOrVariableType" minOccurs="0" />
+					<element name="processorPerNode" minOccurs="0">
+						<simpleType>
+							<restriction base="integer">
+								<minInclusive value="1" />
+								<maxInclusive value="2" />
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="wallTime" type="pa:TimeOrVariableType" minOccurs="0" />
 					<element name="stdout" type="pa:TextOrVariableType" minOccurs="0" />
 				</sequence>
 				<attribute name="queue" type="string" use="optional" />

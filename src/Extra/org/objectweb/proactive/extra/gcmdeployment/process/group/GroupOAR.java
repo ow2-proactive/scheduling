@@ -43,7 +43,6 @@ public class GroupOAR extends AbstractGroup {
     protected String OARSUB = "oarsub";
     protected String interactive = "false";
     protected String queueName;
-    protected String accessProtocol;
     private PathElement scriptLocation;
     private String directory;
     private String stdout;
@@ -107,10 +106,6 @@ public class GroupOAR extends AbstractGroup {
 
     public void setQueueName(String queueName) {
         this.queueName = queueName;
-    }
-
-    public void setAccessProtocol(String accessProtocol) {
-        this.accessProtocol = accessProtocol;
     }
 
     public void setResources(String res) {

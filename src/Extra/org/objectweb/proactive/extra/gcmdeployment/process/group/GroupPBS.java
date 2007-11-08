@@ -32,18 +32,19 @@ package org.objectweb.proactive.extra.gcmdeployment.process.group;
 
 import java.util.List;
 
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
-
 
 public class GroupPBS extends AbstractGroup {
     private String hostList;
     private String hostNumber;
     private String processorPerNode;
-    private String bookingDuration;
-    private String outputFile;
-    private PathElement scriptLocation;
+    private String wallTime;
     private String queueName;
     private String interactive;
+    private String stdout;
+    private String stderr;
+    private String mailWhen;
+    private String mailTo;
+    private String joinOutput;
 
     @Override
     public List<String> internalBuildCommands() {
@@ -63,7 +64,7 @@ public class GroupPBS extends AbstractGroup {
         this.hostList = hostList;
     }
 
-    public void setHostsNumber(String nodeNumber) {
+    public void setNodes(String nodeNumber) {
         this.hostNumber = nodeNumber;
     }
 
@@ -71,15 +72,31 @@ public class GroupPBS extends AbstractGroup {
         this.processorPerNode = processorPerNode;
     }
 
-    public void setBookingDuration(String bookingDuration) {
-        this.bookingDuration = bookingDuration;
+    public void setWallTime(String wallTime) {
+        this.wallTime = wallTime;
     }
 
-    public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
+    public void setStdout(String outputFile) {
+        this.stdout = outputFile;
     }
 
-    public void setScriptLocation(PathElement location) {
-        this.scriptLocation = location;
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
+    }
+
+    public void setMailWhen(String mailWhen) {
+        this.mailWhen = mailWhen;
+    }
+
+    public void setMailTo(String mailTo) {
+        this.mailTo = mailTo;
+    }
+
+    public void setJoinOutput(String nodeValue) {
+        if ((nodeValue != null) && nodeValue.equals("true")) {
+            this.joinOutput = "oe";
+        } else {
+            this.joinOutput = null;
+        }
     }
 }

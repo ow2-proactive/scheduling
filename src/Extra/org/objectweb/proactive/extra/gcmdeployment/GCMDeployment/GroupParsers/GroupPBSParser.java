@@ -44,16 +44,18 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPBSParser extends AbstractGroupParser {
-    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
-    private static final String NODE_NAME_OUTPUT_FILE = "outputFile";
-    private static final String NODE_NAME_BOOKING_DURATION = "bookingDuration";
+    private static final String NODE_NAME_MAIL_TO = "mailTo";
+    private static final String NODE_NAME_MAIL_WHEN = "mailWhen";
+    private static final String NODE_NAME_JOIN_OUTPUT = "joinOutput";
+    private static final String NODE_NAME_WALL_TIME = "wallTime";
     private static final String NODE_NAME_PROCESSOR_PER_NODE = "processorPerNode";
-    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
+    private static final String NODE_NAME_NODES = "nodes";
     private static final String NODE_NAME_HOSTLIST = "hostlist";
-    private static final String XPATH_PBS_OPTIONS = "pbsOptions";
     private static final String ATTR_QUEUE_NAME = "queueName";
     private static final String ATTR_INTERACTIVE = "interactive";
     private static final String NODE_NAME = "pbsProcess";
+    private static final String NODE_NAME_STDOUT = "stdout";
+    private static final Object NODE_NAME_STDERR = "stderr";
 
     @Override
     public AbstractGroup createGroup() {
@@ -82,37 +84,34 @@ public class GroupPBSParser extends AbstractGroupParser {
             pbsGroup.setQueueName(queueName);
         }
 
-        Node optionNode;
-        try {
-            optionNode = (Node) xpath.evaluate(XPATH_PBS_OPTIONS, groupNode,
-                    XPathConstants.NODE);
-
-            NodeList childNodes = optionNode.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); ++i) {
-                Node childNode = childNodes.item(i);
-                if (childNode.getNodeType() != Node.ELEMENT_NODE) {
-                    continue;
-                }
-
-                String nodeName = childNode.getNodeName();
-                String nodeExpandedValue = GCMParserHelper.getElementValue(childNode);
-                if (nodeName.equals(NODE_NAME_HOSTLIST)) {
-                    pbsGroup.setHostList(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_HOSTS_NUMBER)) {
-                    pbsGroup.setHostsNumber(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_PROCESSOR_PER_NODE)) {
-                    pbsGroup.setProcessorPerNodeNumber(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_BOOKING_DURATION)) {
-                    pbsGroup.setBookingDuration(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_OUTPUT_FILE)) {
-                    pbsGroup.setOutputFile(nodeExpandedValue);
-                } else if (nodeName.equals(NODE_NAME_SCRIPT_PATH)) {
-                    PathElement path = GCMParserHelper.parsePathElementNode(childNode);
-                    pbsGroup.setScriptLocation(path);
-                }
+        NodeList childNodes = groupNode.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); ++i) {
+            Node childNode = childNodes.item(i);
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
             }
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
+
+            String nodeName = childNode.getNodeName();
+            String nodeValue = GCMParserHelper.getElementValue(childNode);
+            if (nodeName.equals(NODE_NAME_HOSTLIST)) {
+                pbsGroup.setHostList(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_NODES)) {
+                pbsGroup.setNodes(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_PROCESSOR_PER_NODE)) {
+                pbsGroup.setProcessorPerNodeNumber(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_WALL_TIME)) {
+                pbsGroup.setWallTime(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_STDOUT)) {
+                pbsGroup.setStdout(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_STDERR)) {
+                pbsGroup.setStderr(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_JOIN_OUTPUT)) {
+                pbsGroup.setJoinOutput(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_MAIL_WHEN)) {
+                pbsGroup.setMailWhen(nodeValue);
+            } else if (nodeName.equals(NODE_NAME_MAIL_TO)) {
+                pbsGroup.setMailTo(nodeValue);
+            }
         }
     }
 }

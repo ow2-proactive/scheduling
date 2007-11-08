@@ -36,7 +36,7 @@ import java.util.List;
 public class GroupPrun extends AbstractGroup {
     private String queueName;
     private String hostList;
-    private String bookingDuration;
+    private String wallTime;
     private String hosts;
     private String processorPerNode;
     private String outputFile;
@@ -83,16 +83,16 @@ public class GroupPrun extends AbstractGroup {
      *  Set the booking duration of the cluster's nodes. The default is 00:01:00
      * @param d duration
      */
-    public void setBookingDuration(String d) {
-        this.bookingDuration = d;
+    public void setWallTime(String d) {
+        this.wallTime = d;
     }
 
     /**
      *  Return the booking duration of the cluster's nodes.
      * @return String
      */
-    public String getBookingDuration() {
-        return this.bookingDuration;
+    public String getWallTime() {
+        return this.wallTime;
     }
 
     /**
@@ -134,7 +134,7 @@ public class GroupPrun extends AbstractGroup {
      * using the -o option
      * @param string
      */
-    public void setOutputFile(String string) {
+    public void setStdout(String string) {
         this.outputFile = string;
     }
 }

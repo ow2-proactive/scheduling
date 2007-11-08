@@ -82,13 +82,6 @@ public class GroupOARParser extends AbstractGroupParser {
             oarGroup.setQueueName(queueName);
         }
 
-        String accessProtocol = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_BOOKED_NODES_ACCESS);
-
-        if (accessProtocol != null) {
-            oarGroup.setAccessProtocol(accessProtocol);
-        }
-
         String type = GCMParserHelper.getAttributeValue(groupNode, ATTR_TYPE);
         if (type != null) {
             oarGroup.setType(type);
