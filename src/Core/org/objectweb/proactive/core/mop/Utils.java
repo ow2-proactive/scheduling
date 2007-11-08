@@ -457,23 +457,60 @@ public abstract class Utils extends Object {
      * @param source The source array to copy
      * @return The deep copy of the source array
      */
-    public static final Object[] makeDeepCopy(Object[] source)
+    public static final Object[] makeDeepCopy(final Object[] source)
         throws java.io.IOException {
         if (source == null) {
             return null;
         }
         Class<?> cl;
         Object obj;
-        final Object[] ret = new Object[source.length];
+
+        // Check if there is only primitive type or array of primitive types
+        for (int i = source.length; --i >= 0;) {
+            if ((obj = source[i]) == null) {
+                continue;
+            }
+
+            // If the class of the current obj is not a string or a primitive wrapper or an
+            // array of primitive type use the classic deep copy method
+            if (((cl = obj.getClass()) != String.class) &&
+                    !Utils.isWrapperClass(cl) &&
+                    (!cl.isArray() || !cl.getComponentType().isPrimitive())) {
+                return (Object[]) Utils.makeDeepCopy((Object) source);
+            }
+        }
+
+        // At this point we can be sure that elements in the source array
+        // are not complex type objects so we can optimize the copy of the source array
+        int i;
+        int j;
         int len = 0;
-        for (int i = 0; i < ret.length; i++) {
-            if (((obj = source[i]) != null) && (cl = obj.getClass()).isArray() &&
-                    cl.getComponentType().isPrimitive()) {
+
+        // The result array will be the copy of the source array
+        final Object[] ret = new Object[source.length];
+        for (i = source.length; --i >= 0;) {
+            // If the current source element was already copied by
+            // the internal loop continue to the next element  
+            if (ret[i] != null) {
+                continue;
+            }
+
+            // If the current element is an array of primitive type use the arraycopy method
+            if (((obj = source[i]) != null) && (cl = obj.getClass()).isArray()) {
                 len = Array.getLength(obj);
                 ret[i] = Array.newInstance(cl.getComponentType(), len);
                 System.arraycopy(obj, 0, ret[i], 0, len);
+                // Here we need to seek through all other source args to find same references
+                // to preserve the sematics of the source array
+                for (j = i; --j >= 0;) {
+                    if ((ret[j] == null) && (source[i] == source[j])) {
+                        ret[j] = ret[i];
+                    }
+                }
             } else {
-                ret[i] = makeDeepCopy(obj);
+                // If the source element is a primitive wrapper or a string (immutable type)
+                // just pass the reference 
+                ret[i] = obj;
             }
         }
         return ret;
