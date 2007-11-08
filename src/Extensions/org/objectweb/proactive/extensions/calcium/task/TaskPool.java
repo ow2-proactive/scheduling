@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.calcium.task;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
@@ -59,17 +60,17 @@ public class TaskPool implements Serializable {
 
     //State Queues
     private ReadyQueue ready; //Tasks ready for execution
-    private Hashtable<Task<?>, Task<?>> waiting; //Tasks waiting for subtasks completition
+    private Hashtable<TaskId, Task<?>> waiting; //Tasks waiting for subtasks completition
     private Vector<Task<?>> results; //Finished root-tasks
-    private Hashtable<Task<?>, Task<?>> processing; //Tasks being processed at this moment
+    private Hashtable<TaskId, Task<?>> processing; //Tasks being processed at this moment
     private PanicException panicException; //In case the system colapses
     private StatsGlobalImpl stats; //Statistics
 
     public TaskPool() {
         this.ready = new ReadyQueue();
-        this.waiting = new Hashtable<Task<?>, Task<?>>();
+        this.waiting = new Hashtable<TaskId, Task<?>>();
         this.results = new Vector<Task<?>>();
-        this.processing = new Hashtable<Task<?>, Task<?>>();
+        this.processing = new Hashtable<TaskId, Task<?>>();
         this.stats = new StatsGlobalImpl();
         this.panicException = null;
     }
@@ -138,7 +139,7 @@ public class TaskPool implements Serializable {
         Task<?> task = ready.poll(); //get the highest priority task
         task.getStats().exitReadyState();
 
-        processing.put(task, task);
+        processing.put(task.taskId, task);
         if (logger.isDebugEnabled()) {
             logger.debug("Serving taskId=" + task);
         }
@@ -147,37 +148,19 @@ public class TaskPool implements Serializable {
     }
 
     public synchronized Vector<Task> getReadyTasks(long timeout) {
-        long lastinit = System.currentTimeMillis();
-        timeout = (timeout > 0) ? timeout : 0; //if timeout<0 => timeout=0
-
-        while (ready.isEmpty()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Waiting for ready task:" +
-                    Thread.currentThread().getId());
-            }
-
-            try {
-                wait(timeout);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            long newinit = System.currentTimeMillis();
-            timeout -= (newinit - lastinit);
-            lastinit = newinit;
-
-            if (timeout <= 0) {
-                return null;
-            }
+        Task t = getReadyTask(timeout);
+        if (t == null) {
+            return new Vector<Task>(0);
         }
 
-        Vector<Task> v = ready.getReadyTasks(); //get the highest priority tasks
+        Vector<Task> v = ready.getBrotherTasks(t); //get the highest priority tasks
+
         for (Task task : v) {
             task.getStats().exitReadyState();
             if (logger.isDebugEnabled()) {
                 logger.debug("Serving taskId=" + task);
             }
-            processing.put(task, task);
+            processing.put(task.taskId, task);
         }
 
         return v;
@@ -191,7 +174,7 @@ public class TaskPool implements Serializable {
         //TODO uncomment this !
         //if(isPaniqued()) throw panicException;
         if (processing.contains(task) || ready.contains(task)) {
-            logger.error("Dropping duplicated taskId=" + task.taskId.getId());
+            logger.error("Dropping duplicated taskId=" + task.taskId.value());
         }
 
         if (logger.isDebugEnabled()) {
@@ -202,8 +185,14 @@ public class TaskPool implements Serializable {
         notifyAll();
     }
 
+    public void putProcessedTask(Vector<Task> taskV) {
+        for (Task t : taskV) {
+            putProcessedTask(t);
+        }
+    }
+
     public synchronized void putProcessedTask(Task<?> task) {
-        Task<?> processingTask = processing.remove(task);
+        Task<?> processingTask = processing.remove(task.taskId);
 
         //get a snapshot of the current used resources
         task.getStats()
@@ -255,7 +244,7 @@ public class TaskPool implements Serializable {
         Exception e = task.getException();
 
         if (e instanceof PanicException) {
-            kernelPanic((PanicException) e); //Panic exception
+            panic((PanicException) e); //Panic exception
             return;
         }
 
@@ -270,7 +259,7 @@ public class TaskPool implements Serializable {
         if (task.isFinished()) {
             String msg = "Panic Error. Task with exceptions cannot be a finished task!";
             logger.error(msg);
-            kernelPanic(new PanicException(msg));
+            panic(new PanicException(msg));
         }
 
         if (task.isRootTask()) { //if its a root task then thats all folks
@@ -286,7 +275,7 @@ public class TaskPool implements Serializable {
         if (!task.isFinished()) {
             String msg = "Error, updating unfinished task as finished!";
             logger.debug(msg);
-            kernelPanic(new PanicException(msg));
+            panic(new PanicException(msg));
             return;
         }
 
@@ -307,7 +296,7 @@ public class TaskPool implements Serializable {
         } else { //task is a subtask
             stats.increaseSolvedTasks(task);
 
-            int parentId = task.taskId.getParentId();
+            TaskId parentId = task.taskId.getParentId();
             if (!this.waiting.containsKey(parentId)) {
                 logger.error("Error. Parent task id=" + parentId +
                     " is not waiting for child tasks");
@@ -326,10 +315,10 @@ public class TaskPool implements Serializable {
             //If this was the last subtask, then the parent is ready for execution
             if (parent.isReady()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Parent taskId=" + parent.taskId.getId() +
+                    logger.debug("Parent taskId=" + parent.taskId.value() +
                         " is ready");
                 }
-                if (waiting.remove(parent) == null) {
+                if (waiting.remove(parent.taskId) == null) {
                     logger.error(
                         "Error, parent not waiting when it should have been.");
                 }
@@ -345,11 +334,11 @@ public class TaskPool implements Serializable {
             ready.addReadyChilds(task.family);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Parent Task taskId=" + task.taskId.getId() +
+                logger.debug("Parent Task taskId=" + task.taskId.value() +
                     " is waiting");
             }
 
-            waiting.put(task, task); //the parent task will wait for it's subtasks
+            waiting.put(task.taskId, task); //the parent task will wait for it's subtasks
             return;
         }
     } //method
@@ -380,7 +369,7 @@ public class TaskPool implements Serializable {
             root.setException(blackSheepTask.getException());
             results.add(root);
         } catch (PanicException e) {
-            kernelPanic(e); //panic if can not get root task
+            panic(e); //panic if can not get root task
             return;
         }
 
@@ -391,8 +380,9 @@ public class TaskPool implements Serializable {
         Enumeration<Task<?>> enumeration = waiting.elements();
         while (enumeration.hasMoreElements()) {
             Task<?> task = enumeration.nextElement();
-            if (task.taskId.getFamilyId() == blackSheepTask.taskId.getFamilyId()) {
-                waiting.remove(task);
+            if (task.taskId.getFamilyId()
+                               .equals(blackSheepTask.taskId.getFamilyId())) {
+                waiting.remove(task.taskId);
                 task.getStats().exitWaitingState();
             }
         }
@@ -428,18 +418,18 @@ public class TaskPool implements Serializable {
             return task;
         }
 
-        if (this.waiting.contains(task.taskId.getFamilyId())) {
+        if (this.waiting.containsKey(task.taskId.getFamilyId())) {
             Task<?> root = waiting.remove(task.taskId.getFamilyId());
             root.getStats().exitWaitingState();
             return root;
         }
 
-        if (this.processing.contains(task.taskId.getFamilyId())) {
+        if (this.processing.containsKey(task.taskId.getFamilyId())) {
             throw new PanicException("Error, root taskId=" +
                 task.taskId.getFamilyId() + " found in processing queue");
         }
 
-        if (ready.contains(task.taskId.getFamilyId())) {
+        if (this.ready.contains(task)) {
             throw new PanicException("Error, root taskId=" +
                 task.taskId.getFamilyId() + " found in ready queue");
         }
@@ -447,7 +437,7 @@ public class TaskPool implements Serializable {
         return null;
     }
 
-    private void kernelPanic(PanicException e) {
+    public synchronized void panic(PanicException e) {
         logger.error("Kernel Panic:" + e.getCause());
         this.panicException = e;
 
@@ -469,7 +459,7 @@ public class TaskPool implements Serializable {
             while (family.hasReadyChildTask()) {
                 Task child = family.getReadyChild();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Child taskId=" + child.taskId.getId() +
+                    logger.debug("Child taskId=" + child.taskId.value() +
                         " is ready");
                 }
                 addReady(child); //child will have more priority than uncles
@@ -496,10 +486,6 @@ public class TaskPool implements Serializable {
             return newRoots.contains(task) || older.contains(task);
         }
 
-        public boolean contains(int taskId) {
-            return newRoots.contains(taskId) || older.contains(taskId);
-        }
-
         public Task<?> poll() {
             if (!older.isEmpty()) {
                 return older.poll();
@@ -519,22 +505,23 @@ public class TaskPool implements Serializable {
         /**
          * @return A vector of at least one ready task, all having the same priority.
          */
-        public Vector<Task> getReadyTasks() {
+        public Vector<Task> getBrotherTasks(Task task) {
             Vector<Task> v = new Vector<Task>();
+            v.add(task);
 
-            if (isEmpty()) {
+            if (older.isEmpty() || task.isRootTask()) {
                 return v;
             }
 
-            Task last = poll();
-
-            v.add(last);
-
-            Task task = peek();
-            while ((task != null) && (last.compareTo(task) == 0)) {
-                v.add(poll());
-                task = peek();
+            Iterator<Task<?>> it = older.iterator();
+            while (it.hasNext()) {
+                Task t = it.next();
+                if (t.taskId.isBrotherTask(task.taskId)) {
+                    v.add(t);
+                    it.remove();
+                }
             }
+
             return v;
         }
 
@@ -544,7 +531,8 @@ public class TaskPool implements Serializable {
 
         public void deleteFamily(Task<?> blackSheep) {
             for (Task<?> task : older) {
-                if (task.taskId.getFamilyId() == blackSheep.taskId.getFamilyId()) {
+                if (task.taskId.getFamilyId()
+                                   .equals(blackSheep.taskId.getFamilyId())) {
                     older.remove(task);
                     task.getStats().exitReadyState();
                 }

@@ -48,14 +48,14 @@ public class TaskFamily<T> implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS);
     Task<T> parent;
     public Vector<Task<T>> childrenReady; //sub tasks ready for execution
-    Hashtable<Task<?>, Task<T>> childrenWaiting; //sub tasks being awaited (computed)
+    Hashtable<TaskId, Task<T>> childrenWaiting; //sub tasks being awaited (computed)
     public Vector<Task<T>> childrenFinished; //sub tasks completed
 
     public TaskFamily(Task<T> parent) {
         this.parent = parent;
 
         childrenReady = new Vector<Task<T>>();
-        childrenWaiting = new Hashtable<Task<?>, Task<T>>();
+        childrenWaiting = new Hashtable<TaskId, Task<T>>();
         childrenFinished = new Vector<Task<T>>();
     }
 
@@ -77,7 +77,7 @@ public class TaskFamily<T> implements Serializable {
         }
 
         Task<T> task = this.childrenReady.remove(0);
-        this.childrenWaiting.put(task, task);
+        this.childrenWaiting.put(task.taskId, task);
         return task;
     }
 
@@ -124,19 +124,19 @@ public class TaskFamily<T> implements Serializable {
             return false;
         }
 
-        if (task.taskId.getParentId() != parent.taskId.getId()) {
+        if (task.taskId.getParentId().value() != parent.taskId.value()) {
             logger.error("Setting other task's child as my child: child.id=" +
                 " task.parent.id=" + task.taskId.getParentId());
             return false; //not my child
         }
 
-        if (!this.childrenWaiting.containsKey(task)) {
-            logger.error("Parent id=" + parent.taskId.getId() +
-                " not waiting for child: task.id=" + task.taskId.getId());
+        if (!this.childrenWaiting.containsKey(task.taskId)) {
+            logger.error("Parent id=" + parent.taskId.value() +
+                " not waiting for child: task.id=" + task.taskId.value());
             return false;
         }
 
-        childrenWaiting.remove(task);
+        childrenWaiting.remove(task.taskId);
 
         childrenFinished.add((Task<T>) task);
 

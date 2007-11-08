@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.calcium.futures;
 
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
+import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
 import org.objectweb.proactive.extensions.calcium.statistics.Stats;
 
 
@@ -40,7 +41,7 @@ public interface Future<R> {
     public boolean isDone();
 
     //public T get(long timeout, TimeUnit unit) throws InterruptedException, MuscleException, TimeoutException;
-    public R get() throws InterruptedException, MuscleException;
+    public R get() throws InterruptedException, MuscleException, TaskException;
 
     public Stats getStats() throws InterruptedException;
     //public Stats getStatus();

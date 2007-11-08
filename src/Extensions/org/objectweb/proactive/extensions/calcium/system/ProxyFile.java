@@ -54,7 +54,7 @@ import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 public class ProxyFile extends File {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
     File wspace;
-    File relative;
+    public File relative;
     File current; //current = wspace+"/"+relative
     RemoteFile remote;
     FileServerClient fserver;
@@ -166,7 +166,8 @@ public class ProxyFile extends File {
         if (isNormal()) { //&& (refCAfter - refCBefore !=0)){
             if (logger.isDebugEnabled()) {
                 logger.debug("Updating normal file: [" + refCBefore + "," +
-                    refCAfter + "] " + relative + " (" + current + ")");
+                    refCAfter + "] " + "name=" + relative + " id=" +
+                    remote.fileId + " (" + current + ")");
             }
 
             fserver.commit(remote.fileId, refCAfter - refCBefore);

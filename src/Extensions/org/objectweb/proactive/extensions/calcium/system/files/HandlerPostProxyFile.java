@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.system.files;
 
-import java.io.IOException;
 import java.util.IdentityHashMap;
 
 import org.apache.log4j.Logger;
@@ -43,18 +42,19 @@ import org.objectweb.proactive.extensions.calcium.system.ProxyFile;
 
 class HandlerPostProxyFile implements Handler<ProxyFile> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
-    IdentityHashMap<ProxyFile, ProxyFile> files;
+    IdentityHashMap<ProxyFile, ProxyFile> allFiles;
     FileServerClient fserver;
 
     public HandlerPostProxyFile(FileServerClient fserver,
-        IdentityHashMap<ProxyFile, ProxyFile> files) { //IdentityHashMap<ProxyFile,ProxyFile> files){
-        this.files = files;
+        IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
+        this.allFiles = allFiles;
         this.fserver = fserver;
     }
 
-    public ProxyFile transform(ProxyFile pfile) throws IOException {
+    public ProxyFile transform(ProxyFile pfile) {
         pfile.refCAfter++;
-        files.put(pfile, pfile);
+
+        allFiles.put(pfile, pfile);
 
         return pfile;
     }

@@ -43,7 +43,7 @@ import java.net.URL;
  *
  * @author The ProActive Team (mleyton)
  */
-public class WSpaceImpl implements WSpace {
+public class WSpaceImpl implements WSpace, java.io.Serializable {
     File wspace;
 
     public WSpaceImpl(File wspace) throws IOException {

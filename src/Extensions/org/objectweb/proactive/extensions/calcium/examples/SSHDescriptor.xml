@@ -5,8 +5,8 @@
 		<descriptorVariable name="INTERPRETERS_VN" value="interpreters" />
  	    <programDefaultVariable name="MAX_CINTERPRETERS" value="3"/>
  	    
- 	    <descriptorVariable name="PROACTIVE_HOME" value="/auto/pollux/u/pollux/home/mleyton/ProActive"/>
-  	    <descriptorVariable name="JAVA_HOME" value="/usr/lib/jvm/jre-1.5.0-sun"/>
+ 	    <descriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
+  	    <descriptorVariable name="JAVA_HOME" value="/user/mleyton/home/NOSAVE/jdk1.6.0_i586"/>
     </variables>
 	
 	<componentDefinition>
@@ -56,25 +56,35 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					
 				<classpath>
-						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
-                        <!--absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/-->
-                        <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Core"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Examples"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Extensions"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Extra"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Tests"/>
+						<absolutePath value="${PROACTIVE_HOME}/classes/Utils"/>
+																								
+                         <!--absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/-->
 
+                        <absolutePath value="${PROACTIVE_HOME}/lib/\*"/>                        
+                        <!-- absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
                         <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-                        <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/-->
 				</classpath>
 					
 					<javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath>
-					<log4jpropertiesFile><absolutePath value="${PROACTIVE_HOME}/compile/proactive-log4j"/></log4jpropertiesFile>
+					<log4jpropertiesFile>
+					    <absolutePath value="${PROACTIVE_HOME}/compile/proactive-log4j"/>
+					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter value="-Dproactive.rmi.port=7199" />
-						<parameter value="-Dproactive.test=true"/>
 						<parameter value="-Dproactive.skeletons.filetransfer.policy=hybrid"/>
 					</jvmParameters>
 					<policyFile><absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/></policyFile>
-				</jvmProcess>	
+					
+				</jvmProcess>
 			</processDefinition>
 			
 			<processDefinition id="localJVM">

@@ -30,22 +30,35 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class AOInterpreterPool implements RunActive {
+public class AOInterpreterPool implements RunActive, InitActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
-    Vector<AOInterpreter> pool;
+    private Vector<AOStageIn> pool;
+    private boolean shutdown;
+    Collection<AOInterpreter> interpreterList;
+    int times;
 
+    /**
+     * Empty constructor for ProActive  MOP
+     * Do not use directly!!!
+     */
+    @Deprecated
     public AOInterpreterPool() {
     }
 
@@ -54,20 +67,43 @@ public class AOInterpreterPool implements RunActive {
      *
      * @param aoi The AOInterpreter array
      */
-    public void init(AOInterpreter[] aoi) {
-        pool = new Vector<AOInterpreter>();
+    public AOInterpreterPool(Collection<AOInterpreter> aoi, Integer times) {
+        shutdown = false;
+        pool = new Vector<AOStageIn>();
+        this.times = Math.max(1, times); //in case someone passed an argument < 0
 
-        for (AOInterpreter i : aoi) {
-            pool.add(i);
-        }
+        interpreterList = aoi;
     }
 
-    public void registerAsAvailable(AOInterpreter aoi) {
+    public void initActivity(Body body) {
+        AOInterpreterPool thisStub = (AOInterpreterPool) ProActiveObject.getStubOnThis();
+
+        ArrayList<AOStageIn> list = new ArrayList<AOStageIn>(interpreterList.size());
+        for (AOInterpreter interp : interpreterList) {
+            list.add(interp.getStageIn(thisStub));
+        }
+
+        for (int i = 0; i < times; i++) {
+            pool.addAll(list);
+        }
+
+        logger.debug("Interpreter Pool size: " + pool.size());
+    }
+
+    public void put(AOStageIn aoi) {
         pool.add(aoi);
     }
 
-    public AOInterpreter getAOInterpreter() {
+    public AOStageIn get() throws ProActiveException {
+        if (shutdown) {
+            throw new ProActiveException("Interpreter pool is shutting down");
+        }
         return pool.remove(0);
+    }
+
+    public void shutdown() {
+        logger.info("InterpreterPool is shutting down");
+        this.shutdown = true;
     }
 
     //Producer-Consumer
@@ -75,10 +111,10 @@ public class AOInterpreterPool implements RunActive {
         Service service = new Service(body);
 
         while (true) {
-            String allowedMethodNames = "init|registerAsAvailable";
+            String allowedMethodNames = "put|shutdown";
 
             if ((pool != null) && !pool.isEmpty()) {
-                allowedMethodNames += "getAOInterpreter";
+                allowedMethodNames += "get";
             }
 
             service.blockingServeOldest(new RequestFilterOnAllowedMethods(

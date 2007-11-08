@@ -27,43 +27,52 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.extensions.calcium.environment.Interpreter;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
+import org.objectweb.proactive.extensions.calcium.task.Task;
 
 
-public class AOInterpreter {
-    AOStageIn stageIn;
-    AOStageOut stageOut;
+public class AOStageIn {
+    FileServerClientImpl fserver;
     AOStageCompute stageCompute;
+    AOTaskPool taskpool;
+    Interpreter interpreter;
 
     /**
      * Empty constructor for ProActive  MOP
      * Do not use directly!!!
      */
     @Deprecated
-    public AOInterpreter() {
+    public AOStageIn() {
     }
 
-    public AOInterpreter(AOTaskPool taskpool, FileServerClientImpl fserver)
-        throws NodeException, ActiveObjectCreationException {
-        Node localnode = NodeFactory.getDefaultNode();
+    /**
+     * @param fserver
+     * @param next
+     * @param taskpool
+     */
+    public AOStageIn(AOTaskPool taskpool, FileServerClientImpl fserver,
+        AOStageCompute stageCompute) {
+        super();
+        this.fserver = fserver;
+        this.stageCompute = stageCompute;
+        this.taskpool = taskpool;
 
-        this.stageOut = (AOStageOut) ProActiveObject.newActive(AOStageOut.class.getName(),
-                new Object[] { taskpool, fserver }, localnode);
-
-        this.stageCompute = (AOStageCompute) ProActiveObject.newActive(AOStageCompute.class.getName(),
-                new Object[] { taskpool, stageOut }, localnode);
-
-        this.stageIn = (AOStageIn) ProActiveObject.newActive(AOStageIn.class.getName(),
-                new Object[] { taskpool, fserver, stageCompute }, localnode);
+        interpreter = new Interpreter();
     }
 
-    public AOStageIn getStageIn(AOInterpreterPool interpool) {
-        stageOut.setStageInAndInterPool(stageIn, interpool);
+    public void stageIn(Task task) {
+        //task = (Task) ProFuture.getFutureValue(task);
+        try {
+            SkeletonSystemImpl system = new SkeletonSystemImpl();
+            FileStaging files = interpreter.stageIn(task, system, fserver);
+            stageCompute.computeTheLoop(new InterStageParam(task, files, system));
 
-        return stageIn;
+            //TODO put my self in the AOI pool
+        } catch (Exception e) {
+            task.setException(e);
+            taskpool.putProcessedTask(task);
+        }
     }
 }

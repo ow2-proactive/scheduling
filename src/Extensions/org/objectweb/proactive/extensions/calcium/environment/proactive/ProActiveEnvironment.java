@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
@@ -50,12 +48,11 @@ public class ProActiveEnvironment implements EnvironmentFactory {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
     ProActiveDescriptor pad;
     AOTaskPool taskpool;
+    AOInterpreterPool interpool;
     TaskDispatcher dispatcher;
     FileServerClientImpl fserver;
-    AOInterpreterPool interPool;
 
     public ProActiveEnvironment(String descriptor) throws ProActiveException {
-        //get the local node: NodeFactory.getDefaultNode();
         VariableContract vc = new VariableContract();
         vc.setVariableFromProgram("SKELETON_FRAMEWORK_VN", "",
             VariableContractType.DescriptorVariable);
@@ -73,16 +70,11 @@ public class ProActiveEnvironment implements EnvironmentFactory {
         Node[] nodes = Util.getInterpreterNodes(pad, vc);
 
         taskpool = Util.createActiveTaskPool(frameworkNode);
-        interPool = Util.createActiveInterpreterPool(frameworkNode);
         fserver = Util.createFileServer(frameworkNode);
-        AOInterpreter[] aoi = Util.createAOinterpreter(nodes);
+        interpool = Util.createAOInterpreterPool(taskpool, fserver,
+                frameworkNode, nodes, maxCInterp);
 
-        try {
-            dispatcher = new TaskDispatcher(maxCInterp, taskpool, fserver,
-                    interPool, aoi);
-        } catch (ClassNotFoundException e) {
-            throw new ProActiveException(e);
-        }
+        dispatcher = new TaskDispatcher(taskpool, interpool);
     }
 
     public TaskPool getTaskPool() {
@@ -94,8 +86,10 @@ public class ProActiveEnvironment implements EnvironmentFactory {
     }
 
     public void shutdown() {
+        interpool.shutdown();
         dispatcher.shutdown();
         fserver.shutdown();
+
         try {
             pad.killall(true);
         } catch (ProActiveException e) {

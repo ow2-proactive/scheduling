@@ -31,65 +31,58 @@
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
+import org.objectweb.proactive.extensions.calcium.environment.Interpreter;
+import org.objectweb.proactive.extensions.calcium.statistics.Timer;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
+import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
-public class TaskDispatcher extends Thread {
+public class AOStageCompute {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
-    private AOTaskPool taskpool;
-    private AOInterpreterPool interpool;
-    private boolean shutdown;
+    private TaskPool taskpool;
+    private AOStageOut stageOut;
+    private Timer unusedCPUTimer;
+    private Interpreter interpreter;
 
-    public TaskDispatcher(AOTaskPool taskpool, AOInterpreterPool interpool) {
+    /**
+     * Empty constructor for ProActive  MOP
+     * Do not use directly!!!
+     */
+    @Deprecated
+    public AOStageCompute() {
+    }
+
+    /**
+         * @param taskpool
+         * @param stageOut
+         * @param fserver
+         */
+    public AOStageCompute(TaskPool taskpool, AOStageOut stageOut) {
         super();
-        shutdown = false;
-
         this.taskpool = taskpool;
-        this.interpool = interpool;
+        this.stageOut = stageOut;
+
+        unusedCPUTimer = new Timer();
+        unusedCPUTimer.start();
+
+        interpreter = new Interpreter();
     }
 
-    public void run() {
-        shutdown = false;
+    public void computeTheLoop(InterStageParam param) {
+        Task<?> task = param.task;
+        SkeletonSystemImpl system = param.system;
+        FileStaging fstaging = param.fstaging;
 
-        while (!shutdown) {
-            //TODO fix this blocking call
-            Task task = taskpool.getReadyTask(0);
-            task = (Task) ProFuture.getFutureValue(task);
-
-            try {
-                //block until there is an available interpreter
-                AOStageIn interp = null;
-
-                while (interp == null) {
-                    interp = interpool.get();
-
-                    if (shutdown) {
-                        interpool.put(interp);
-                        task.setException(new TaskException("Shutting down"));
-                        taskpool.putProcessedTask(task);
-
-                        return;
-                    }
-                }
-
-                interp.stageIn(task); //remote async call
-            } catch (Exception e) {
-                if (task != null) {
-                    task.setException(e);
-                    taskpool.putProcessedTask(task);
-                }
-            }
+        try {
+            task = interpreter.theLoop(task, system, unusedCPUTimer);
+            stageOut.stageOut(new InterStageParam(task, fstaging, system));
+        } catch (Exception e) {
+            task.setException(e);
+            taskpool.putProcessedTask(task);
         }
-
-        logger.info("TaskDispatcher has shut down");
-    }
-
-    public void shutdown() {
-        logger.info("TaskDispatcher is shutting down");
-        shutdown = true;
     }
 }

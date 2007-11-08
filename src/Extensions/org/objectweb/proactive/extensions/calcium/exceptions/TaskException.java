@@ -38,4 +38,12 @@ public class TaskException extends Exception {
     public TaskException(Exception e) {
         super(e);
     }
+
+    public TaskException(String msg, Exception e) {
+        super(msg, e);
+    }
+
+    public TaskException(String string, Throwable throwable) {
+        super(string, throwable);
+    }
 }

@@ -36,10 +36,12 @@ import java.util.concurrent.BlockingQueue;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
+import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
 import org.objectweb.proactive.extensions.calcium.statistics.Stats;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
+import org.objectweb.proactive.extensions.calcium.task.TaskId;
 
 
 /**
@@ -52,12 +54,12 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  */
 public class FutureImpl<R> implements Future<R> {
     Task<R> task;
-    int taskId;
+    TaskId taskId;
     BlockingQueue<Future<R>> callback;
     FileServerClient fserver;
     File outDir;
 
-    public FutureImpl(int taskId, FileServerClient fserver, File outRootDir) {
+    public FutureImpl(TaskId taskId, FileServerClient fserver, File outRootDir) {
         this.task = null;
         this.taskId = taskId;
         this.fserver = fserver;
@@ -68,10 +70,10 @@ public class FutureImpl<R> implements Future<R> {
 
     @Override
     public int hashCode() {
-        return taskId;
+        return taskId.hashCode();
     }
 
-    public int getTaskId() {
+    public TaskId getTaskId() {
         return this.taskId;
     }
 
@@ -90,14 +92,20 @@ public class FutureImpl<R> implements Future<R> {
      * @throws MuscleException Is thrown if a functional exception happens during the execution
      * of the skeleton's muscle.
      */
-    public synchronized R get() throws InterruptedException, MuscleException {
+    public synchronized R get()
+        throws InterruptedException, MuscleException, TaskException {
         while (!isDone()) {
             wait();
         }
 
         //TODO fix this exception cast!!!
         if (task.hasException()) {
-            throw (MuscleException) task.getException();
+            Exception ex = task.getException();
+            if (ex instanceof MuscleException) {
+                throw (MuscleException) ex;
+            } else {
+                throw new TaskException(ex);
+            }
         }
 
         return task.getObject();

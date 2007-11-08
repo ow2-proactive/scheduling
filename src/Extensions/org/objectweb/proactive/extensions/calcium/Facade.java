@@ -40,6 +40,7 @@ import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
 import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
+import org.objectweb.proactive.extensions.calcium.task.TaskId;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
@@ -86,11 +87,11 @@ class Facade {
      * @author The ProActive Team (mleyton)
      */
     class FutureUpdateThread extends Thread {
-        Hashtable<Integer, FutureImpl<?>> pending;
+        Hashtable<TaskId, FutureImpl<?>> pending;
         boolean shutdown;
 
         public FutureUpdateThread() {
-            pending = new Hashtable<Integer, FutureImpl<?>>();
+            pending = new Hashtable<TaskId, FutureImpl<?>>();
             shutdown = false;
         }
 
@@ -100,7 +101,7 @@ class Facade {
          * @param task The task to store.
          */
         synchronized void put(FutureImpl<?> future) {
-            int taskId = future.getTaskId();
+            TaskId taskId = future.getTaskId();
 
             if (pending.containsKey(taskId)) {
                 logger.error("Future already registered for task=" + taskId);
@@ -111,13 +112,13 @@ class Facade {
         }
 
         private synchronized void updateFuture(Task<?> task) {
-            if (!pending.containsKey(task.taskId.getId())) {
+            if (!pending.containsKey(task.taskId)) {
                 logger.error("No future is waiting for task:" +
-                    task.taskId.getId());
+                    task.taskId.value());
                 return;
             }
 
-            FutureImpl<?> future = pending.remove(task.taskId.getId());
+            FutureImpl<?> future = pending.remove(task.taskId);
             future.setFinishedTask(task);
         }
 

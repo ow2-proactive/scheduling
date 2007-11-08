@@ -38,7 +38,6 @@ import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
-import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
@@ -98,7 +97,7 @@ public class Blast {
             System.out.println("Result in:" + res + " " + res.length() +
                 " [bytes]");
             System.out.println(future.getStats());
-        } catch (MuscleException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

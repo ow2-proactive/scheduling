@@ -32,6 +32,8 @@ package org.objectweb.proactive.extensions.calcium.system.files;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Vector;
@@ -56,7 +58,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  */
 public class FileStaging implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
-    IdentityHashMap<ProxyFile, ProxyFile> allFiles;
+    ArrayList<ProxyFile> beforeProxyFiles;
 
     public <T>FileStaging(Task<T> task, FileServerClient fserver,
         WSpaceImpl wspace) throws Exception {
@@ -66,7 +68,7 @@ public class FileStaging implements Serializable {
             logger.debug("Using File Transfer policy: " + policy);
         }
 
-        allFiles = new IdentityHashMap<ProxyFile, ProxyFile>();
+        IdentityHashMap<ProxyFile, ProxyFile> allFiles = new IdentityHashMap<ProxyFile, ProxyFile>();
 
         Handler<ProxyFile> before = null;
 
@@ -81,12 +83,20 @@ public class FileStaging implements Serializable {
 
         navigateObjectGraph(task.family.hasFinishedChild(),
             task.family.childrenFinished, task, before);
+
+        beforeProxyFiles = new ArrayList<ProxyFile>(allFiles.size());
+        beforeProxyFiles.addAll(allFiles.values());
     }
 
     public void stageOut(FileServerClient fserver, Task<?> task)
         throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Staging out for data parallelism");
+        }
+
+        IdentityHashMap<ProxyFile, ProxyFile> allFiles = new IdentityHashMap<ProxyFile, ProxyFile>();
+        for (ProxyFile pfile : beforeProxyFiles) {
+            allFiles.put(pfile, pfile);
         }
 
         Handler<ProxyFile> handler = new HandlerPostProxyFile(fserver, allFiles);

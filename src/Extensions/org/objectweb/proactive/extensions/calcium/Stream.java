@@ -101,7 +101,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
         task.setStack(builder.stack);
         task.setPriority(new TaskPriority(streamPriority));
 
-        FutureImpl<R> future = new FutureImpl<R>(task.taskId.getId(), fserver,
+        FutureImpl<R> future = new FutureImpl<R>(task.taskId, fserver,
                 outputRootDir);
         facade.putTask(task, future);
 

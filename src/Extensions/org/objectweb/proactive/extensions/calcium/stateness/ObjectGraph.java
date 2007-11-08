@@ -43,12 +43,6 @@ public class ObjectGraph {
         IdentityHashMap<Object, Object> visited = new IdentityHashMap<Object, Object>();
         IdentityHashMap<Object, ArrayList<Reference>> found = new IdentityHashMap<Object, ArrayList<Reference>>();
 
-        /*
-        if (handler.matches(root)) {
-            root = handler.transform((T) root);
-            return root;
-        }
-        */
         searchForClass(root, handler, visited, found);
 
         Iterator<Object> it = found.keySet().iterator();

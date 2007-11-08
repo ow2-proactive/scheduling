@@ -56,7 +56,7 @@ import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
  *
  * @author The ProActive Team (mleyton)
  */
-public class SkeletonSystemImpl implements SkeletonSystem {
+public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
     static String DEFAULT_ROOTDIR = System.getProperty("java.io.tmpdir");
     WSpaceImpl wspace; // workspace

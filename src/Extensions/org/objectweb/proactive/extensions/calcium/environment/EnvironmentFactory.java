@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 

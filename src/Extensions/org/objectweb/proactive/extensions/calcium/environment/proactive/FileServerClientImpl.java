@@ -53,6 +53,7 @@ public class FileServerClientImpl implements FileServerClient,
     }
 
     public void commit(long fileId, int refCountDelta) {
+        logger.debug(fserver.getClass());
         fserver.commit(fileId, refCountDelta);
     }
 

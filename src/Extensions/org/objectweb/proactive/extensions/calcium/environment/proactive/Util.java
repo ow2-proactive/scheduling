@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
-import java.io.File;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -62,18 +62,6 @@ public class Util {
         return aom;
     }
 
-    static public AOInterpreterPool createActiveInterpreterPool(
-        Node frameworkNode) throws ActiveObjectCreationException, NodeException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Creating Active Interpreter Pool.");
-        }
-
-        AOInterpreterPool aip = (AOInterpreterPool) ProActiveObject.newActive(AOInterpreterPool.class.getName(),
-                new Object[] {  }, frameworkNode);
-
-        return aip;
-    }
-
     public static FileServerClientImpl createFileServer(Node frameworkNode)
         throws ActiveObjectCreationException, NodeException {
         if (logger.isDebugEnabled()) {
@@ -84,29 +72,39 @@ public class Util {
                 new Object[] {  }, frameworkNode);
         fserver.initFileServer();
 
-        FileServerClientImpl fserverproxy = new FileServerClientImpl(frameworkNode,
+        FileServerClientImpl fserverclient = new FileServerClientImpl(frameworkNode,
                 fserver);
 
-        return fserverproxy;
+        return fserverclient;
     }
 
-    static public AOInterpreter[] createAOinterpreter(Node[] nodes)
-        throws ProActiveException {
+    static public AOInterpreterPool createAOInterpreterPool(
+        AOTaskPool taskpool, FileServerClientImpl fserver, Node frameworknode,
+        Node[] nodes, int times) throws ProActiveException {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating Active Object Interpreters in nodes.");
         }
 
-        Object[][] params = new Object[nodes.length][0];
+        Object[][] params = new Object[nodes.length][2];
+        for (int i = 0; i < nodes.length; i++) {
+            params[i] = new Object[] { taskpool, fserver };
+        }
 
-        AOInterpreter[] aip;
+        AOInterpreter[] ai;
         try {
-            aip = (AOInterpreter[]) ProActiveObject.newActiveInParallel(AOInterpreter.class.getName(),
-                    params, nodes);
+            ai = (AOInterpreter[]) ProActiveObject.newActiveInParallel(AOInterpreter.class.getName(),
+                    new Object[][] {
+                        { taskpool, fserver }
+                    }, nodes);
         } catch (ClassNotFoundException e) {
             throw new ProActiveException(e);
         }
 
-        return aip;
+        AOInterpreterPool interpool = (AOInterpreterPool) ProActiveObject.newActive(AOInterpreterPool.class.getName(),
+                new Object[] { Arrays.asList(ai), new Integer(times) },
+                frameworknode);
+
+        return interpool;
     }
 
     public static Node getFrameWorkNode(ProActiveDescriptor pad,

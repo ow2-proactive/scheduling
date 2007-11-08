@@ -80,7 +80,7 @@ public class DivideDB implements Divide<BlastParams, BlastParams> {
      * Divides a blast file into at most the specified number of parts.
      * If the sequences inside the file are less than numParts, then
      * the each sequeneces will be stored in a different file.
-     * Note that sequences are undividable, thus the length of the divided
+     * Note that sequences are indivisable, thus the length of the divided
      * files will vary.
      * @param space
      *

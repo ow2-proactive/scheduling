@@ -36,21 +36,33 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 
 
 public class TaskId implements Serializable {
-    static public int DEFAULT_ROOT_PARENT_ID = -1;
-    private int familyId; //Id of the root task
-    private int parentId;
+    static final public TaskId DEFAULT_ROOT_PARENT_ID = null;
+    private TaskId familyId; //Id of the root task
+    private TaskId parentId;
     private int id;
 
     public TaskId() {
         this.id = ProActiveRandom.nextPosInt();
         this.parentId = DEFAULT_ROOT_PARENT_ID;
-        this.familyId = id; //Default is root task, head of the family
+        this.familyId = this; //Default is root task, head of the family
     }
 
     /**
-     * @return the familyId
+     * @param familyId
+     * @param parentId
+     * @param id
      */
-    public int getFamilyId() {
+    private TaskId(TaskId familyId, TaskId parentId, int id) {
+        super();
+        this.familyId = familyId;
+        this.parentId = parentId;
+        this.id = id;
+    }
+
+    /**
+    * @return the familyId
+    */
+    public TaskId getFamilyId() {
         return familyId;
     }
 
@@ -58,13 +70,13 @@ public class TaskId implements Serializable {
      * @param familyId the familyId to set
      */
     public void setFamilyId(int familyId) {
-        this.familyId = familyId;
+        this.familyId.id = familyId;
     }
 
     /**
      * @return the id
      */
-    public int getId() {
+    public int value() {
         return id;
     }
 
@@ -78,38 +90,83 @@ public class TaskId implements Serializable {
     /**
      * @return the parentId
      */
-    public int getParentId() {
+    public TaskId getParentId() {
         return parentId;
     }
 
     /**
      * @param parentId the parentId to set
      */
-    public void setParentId(int parentId) {
+    public void setParentId(TaskId parentId) {
         this.parentId = parentId;
-    }
-
-    /**
-     * @param familyId
-     * @param parentId
-     * @param id
-     */
-    public TaskId(int familyId, int parentId, int id) {
-        super();
-        this.familyId = familyId;
-        this.parentId = parentId;
-        this.id = id;
     }
 
     @Override
     public String toString() {
-        return this.familyId + "|" + parentId + "." + this.id;
+        if (isRootTaskId()) {
+            return this.familyId.value() + "|" + this.id;
+        }
+        return this.familyId.value() + "|" + parentId.value() + "." + this.id;
     }
 
     public TaskId getNewChildId() {
         TaskId newId = new TaskId();
         newId.familyId = familyId;
-        newId.parentId = id;
+        newId.parentId = this;
         return newId;
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = (PRIME * result) + id;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+
+        /*
+        if (getClass() != obj.getClass()){
+                return false;
+        }
+        */
+        final TaskId other = (TaskId) obj;
+
+        if (isRootTaskId()) {
+            return (this.id == other.id) &&
+            (familyId.value() == other.familyId.value());
+        }
+        return (this.id == other.id) &&
+        (familyId.value() == other.familyId.value()) &&
+        (parentId.value() == other.parentId.value());
+        //return true;
+    }
+
+    public boolean isRootTaskId() {
+        if (this.parentId == null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isBrotherTask(TaskId taskId) {
+        if ((this.parentId == null) && (taskId.parentId == null)) {
+            return true;
+        }
+
+        if (this.parentId.value() == taskId.parentId.value()) {
+            return true;
+        }
+
+        return false;
     }
 }

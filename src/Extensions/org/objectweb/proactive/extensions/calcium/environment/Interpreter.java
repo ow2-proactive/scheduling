@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extensions.calcium.environment;
 
 import java.io.Serializable;
-import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -64,8 +63,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
 public class Interpreter implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
 
-    public Task interpret(FileServerClient fserver, Task task, Semaphore semIn,
-        Semaphore semCom, Semaphore semOut, Timer tUnusedCPU) {
+    public Task interpret(FileServerClient fserver, Task task, Timer tUnusedCPU) {
         Timer timer = new Timer();
 
         timer.start();
@@ -73,9 +71,9 @@ public class Interpreter implements Serializable {
         try {
             SkeletonSystemImpl system = new SkeletonSystemImpl();
 
-            FileStaging files = stageIn(semIn, task, system, fserver);
-            task = theLoop(semCom, task, system, tUnusedCPU);
-            task = stageOut(semOut, task, files, system, fserver);
+            FileStaging files = stageIn(task, system, fserver);
+            task = theLoop(task, system, tUnusedCPU);
+            task = stageOut(task, files, system, fserver);
         } catch (Exception e) {
             e.printStackTrace();
             task.setException(e);
@@ -89,36 +87,22 @@ public class Interpreter implements Serializable {
         return task;
     }
 
-    private FileStaging stageIn(Semaphore semIn, Task<?> task,
-        SkeletonSystemImpl system, FileServerClient fserver)
-        throws Exception {
+    public FileStaging stageIn(Task<?> task, SkeletonSystemImpl system,
+        FileServerClient fserver) throws Exception {
         //Keep track of current stored files
-        if (semIn != null) {
-            semIn.acquire();
-        }
-
         FileStaging tfiles;
 
         try {
             tfiles = new FileStaging(task, fserver, system.getWorkingSpace());
         } catch (Exception e) {
             throw e;
-        } finally {
-            if (semIn != null) {
-                semIn.release();
-            }
         }
-
         return tfiles;
     }
 
-    private Task<?> theLoop(Semaphore semCom, Task<?> task,
-        SkeletonSystemImpl system, Timer timer) throws Exception {
+    public Task<?> theLoop(Task<?> task, SkeletonSystemImpl system, Timer timer)
+        throws Exception {
         timer.stop();
-        if (semCom != null) {
-            semCom.acquire();
-        }
-
         try {
             //Stop loop if task is finished or has ready children 
             while (task.hasInstruction() && !task.family.hasReadyChildTask()) {
@@ -133,21 +117,14 @@ public class Interpreter implements Serializable {
         } finally {
             task.getStats().addUnusedCPUTime(timer.getTime());
             timer.start();
-            if (semCom != null) {
-                semCom.release();
-            }
         }
 
         return task;
     }
 
-    private Task<?> stageOut(Semaphore semOut, Task<?> task, FileStaging files,
+    public Task<?> stageOut(Task<?> task, FileStaging files,
         SkeletonSystemImpl system, FileServerClient fserver)
         throws Exception {
-        if (semOut != null) {
-            semOut.acquire();
-        }
-
         try {
             //Update new/modified/unreferenced files
             files.stageOut(fserver, task);
@@ -159,10 +136,6 @@ public class Interpreter implements Serializable {
             system.getWorkingSpace().delete();
         } catch (Exception e) {
             throw e;
-        } finally {
-            if (semOut != null) {
-                semOut.release();
-            }
         }
 
         return task;

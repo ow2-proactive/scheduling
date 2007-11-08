@@ -61,6 +61,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
     //Rebirth preserved parameters
     private T param;
     public TaskId taskId;
+    public TaskId parentId;
     TaskPriority priority;
     private boolean isTainted;
     public StatsImpl stats;
@@ -75,6 +76,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
     /**
      * ProActive's empty constructor. Don't use!!
      */
+    @Deprecated
     public Task() {
     }
 
@@ -125,7 +127,8 @@ public class Task<T> implements Serializable, Comparable<Task> {
         }
 
         //if priority is tied then consider fifo order of root task
-        comp = taskId.getFamilyId() - this.taskId.getFamilyId();
+        comp = taskId.getFamilyId().value() -
+            this.taskId.getFamilyId().value();
         if (comp != 0) {
             return comp;
         }
@@ -136,18 +139,28 @@ public class Task<T> implements Serializable, Comparable<Task> {
             return comp;
         }
 
-        //Brothers have the same priority
-        return task.taskId.getParentId() - this.taskId.getParentId();
+        int taskParentValue = (task.taskId.getParentId() != null)
+            ? task.taskId.getParentId().value() : (-1);
+        int thisParentValue = (this.taskId.getParentId() != null)
+            ? this.taskId.getParentId().value() : (-1);
+        return taskParentValue - thisParentValue;
     }
 
     @Override
     public int hashCode() {
-        return taskId.getId();
+        return taskId.value();
     }
 
     @Override
     public boolean equals(Object o) {
-        return this.hashCode() == o.hashCode();
+
+        /*
+            if(!(o instanceof Task)){
+                    return false;
+            }
+            */
+        Task other = (Task) o;
+        return this.taskId.equals(other.taskId);
     }
 
     /**
@@ -201,10 +214,10 @@ public class Task<T> implements Serializable, Comparable<Task> {
     public Task compute(SkeletonSystemImpl system) throws Exception {
         Instruction inst = stack.pop();
 
-        int oldId = taskId.getId();
+        int oldId = taskId.value();
         Task task = inst.compute(system, this);
 
-        if (oldId != task.taskId.getId()) {
+        if (oldId != task.taskId.value()) {
             String msg = "Task Error, task id changed while interpreting! " +
                 inst + " (" + oldId + "->" + task.taskId + ")";
             logger.error(msg);
@@ -232,7 +245,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
     }
 
     public boolean isRootTask() {
-        return this.taskId.getParentId() == taskId.DEFAULT_ROOT_PARENT_ID;
+        return this.taskId.isRootTaskId();
     }
 
     @Override

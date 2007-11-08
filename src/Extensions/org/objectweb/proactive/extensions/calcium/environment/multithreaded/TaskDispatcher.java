@@ -152,7 +152,7 @@ class TaskDispatcher extends Thread {
         public Task call() throws Exception {
             Timer timer = new Timer();
             timer.start();
-            task = interpreter.interpret(fserver, task, null, null, null, timer);
+            task = interpreter.interpret(fserver, task, timer);
             return task;
         }
 
