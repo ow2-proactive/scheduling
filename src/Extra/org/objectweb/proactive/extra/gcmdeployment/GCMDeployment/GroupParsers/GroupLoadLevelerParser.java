@@ -12,8 +12,6 @@ import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupLoadLevele
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.org.apache.xml.internal.utils.NodeVector;
-
 
 public class GroupLoadLevelerParser extends AbstractGroupParser {
     private static final String NODE_NAME_TASKS_PER_HOST = "tasksPerHost";
