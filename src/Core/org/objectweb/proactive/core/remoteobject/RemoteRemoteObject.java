@@ -31,12 +31,10 @@
 package org.objectweb.proactive.core.remoteobject;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
@@ -47,7 +45,7 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  *
  *
  */
-public interface RemoteRemoteObject extends SecurityEntity {
+public interface RemoteRemoteObject {
 
     /**
      * Send a message containing a reified method call to a remote object. the target of the message

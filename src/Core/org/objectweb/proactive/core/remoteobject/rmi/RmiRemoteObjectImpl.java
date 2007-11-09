@@ -31,26 +31,16 @@
 package org.objectweb.proactive.core.remoteobject.rmi;
 
 import java.io.IOException;
-import java.net.URI;
 import java.rmi.RemoteException;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.security.Communication;
-import org.objectweb.proactive.core.security.SecurityContext;
-import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 /**
@@ -60,14 +50,8 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  */
 public class RmiRemoteObjectImpl extends UnicastRemoteObject
     implements RmiRemoteObject {
-
-    /**
-    *
-    */
     protected InternalRemoteRemoteObject internalrrObject;
 
-    //    protected Object stub;
-    //    protected URI uri;
     public RmiRemoteObjectImpl() throws java.rmi.RemoteException {
     }
 
@@ -93,77 +77,4 @@ public class RmiRemoteObjectImpl extends UnicastRemoteObject
 
         return this.internalrrObject.receiveMessage(message);
     }
-
-    public X509Certificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getCertificate();
-    }
-
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getCertificateEncoded();
-    }
-
-    public ArrayList<Entity> getEntities()
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getEntities();
-    }
-
-    public SecurityContext getPolicy(SecurityContext securityContext)
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getPolicy(securityContext);
-    }
-
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
-        return this.internalrrObject.getPublicKey();
-    }
-
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
-        return this.internalrrObject.publicKeyExchange(sessionID, myPublicKey,
-            myCertificate, signature);
-    }
-
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.internalrrObject.randomValue(sessionID, clientRandomValue);
-    }
-
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.internalrrObject.secretKeyExchange(sessionID,
-            encodedAESKey, encodedIVParameters, encodedClientMacKey,
-            encodedLockData, parametersSignature);
-    }
-
-    public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.internalrrObject.startNewSession(policy);
-    }
-
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
-        this.internalrrObject.terminateSession(sessionID);
-    }
-
-    //    public Object getObjectProxy() throws ProActiveException, IOException {
-    //        if (this.stub == null) {
-    //            this.stub = this.internalrrObject.getObjectProxy(this);
-    //
-    //            //            if (stub instanceof Adapter) {
-    //            //            	 ((StubObject) ((Adapter)this.stub).getAdapter()).setProxy(new SynchronousProxy(null, new Object[] { this } ));
-    //            //            } else {
-    //            //            ((StubObject) this.stub).setProxy(new SynchronousProxy(null, new Object[] { this } ));
-    //            //            }
-    //        }
-    //        return this.stub;
-    //    }
 }

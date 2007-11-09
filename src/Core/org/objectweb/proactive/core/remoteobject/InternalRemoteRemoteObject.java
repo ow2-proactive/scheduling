@@ -34,9 +34,11 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.security.SecurityEntity;
 
 
-public interface InternalRemoteRemoteObject extends RemoteRemoteObject {
+public interface InternalRemoteRemoteObject extends RemoteRemoteObject,
+    SecurityEntity {
     public URI getURI() throws ProActiveException, IOException;
 
     public void setURI(URI uri) throws ProActiveException, IOException;
