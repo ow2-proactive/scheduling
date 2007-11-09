@@ -92,7 +92,8 @@ public class GroupRSH extends AbstractGroup {
         this.domain = domain;
     }
 
-    public void setUsername(String username) {
+    @Override
+	public void setUsername(String username) {
         this.username = username;
     }
 

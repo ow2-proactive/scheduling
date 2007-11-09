@@ -35,7 +35,6 @@ import java.util.StringTokenizer;
 import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupGLite;
 import org.w3c.dom.Node;

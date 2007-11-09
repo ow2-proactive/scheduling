@@ -54,7 +54,6 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDe
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;

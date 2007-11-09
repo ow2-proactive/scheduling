@@ -41,7 +41,6 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 public abstract class AbstractGroupParser implements GroupParser {

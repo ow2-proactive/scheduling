@@ -105,7 +105,8 @@ public class GroupSSH extends AbstractGroup {
         return res.toString();
     }
 
-    public void setUsername(String username) {
+    @Override
+	public void setUsername(String username) {
         this.username = username;
     }
 
