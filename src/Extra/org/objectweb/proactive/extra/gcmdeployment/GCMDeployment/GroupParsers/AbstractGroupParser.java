@@ -68,7 +68,7 @@ public abstract class AbstractGroupParser implements GroupParser {
 
         try {
             Node environmentNode = (Node) xpath.evaluate("pa:environment",
-                    groupNode, XPathConstants.NODESET);
+                    groupNode, XPathConstants.NODE);
 
             if (environmentNode != null) {
                 List<String> enviroment = GCMParserHelper.parseEnviromentNode(xpath,
@@ -79,7 +79,7 @@ public abstract class AbstractGroupParser implements GroupParser {
             }
 
             Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode,
-                    XPathConstants.NODESET);
+                    XPathConstants.NODE);
 
             if (scriptPath != null) {
                 group.setScriptPath(scriptPath);
