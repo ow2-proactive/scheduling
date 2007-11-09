@@ -291,8 +291,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * {@inheritDoc}
      */
-    public int slavepoolSize() {
-        return aomaster.slavepoolSize();
+    public int workerpoolSize() {
+        return aomaster.workerpoolSize();
     }
 
     /**

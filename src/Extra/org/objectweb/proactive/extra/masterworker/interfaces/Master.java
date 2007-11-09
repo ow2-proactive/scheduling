@@ -97,7 +97,7 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      * This method returns the number of workers currently in the slave pool
      * @return number of workers
      */
-    int slavepoolSize();
+    int workerpoolSize();
 
     /**
      * Terminates the slave manager and (eventually free every resources) <br/>

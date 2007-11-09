@@ -68,7 +68,7 @@ public class Test extends FunctionalTest {
         vn1.killAll(false);
         List<Integer> ids2 = master.waitAllResults();
         ids.addAll(ids2);
-        assertTrue("Only one slave left", master.slavepoolSize() == 1);
+        assertTrue("Only one slave left", master.workerpoolSize() == 1);
 
         Iterator<Integer> it = ids.iterator();
         int last = it.next();

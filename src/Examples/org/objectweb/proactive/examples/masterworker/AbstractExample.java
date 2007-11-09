@@ -51,7 +51,7 @@ public abstract class AbstractExample {
     protected String usage_message = "Usage: <java_command> descriptor_path virtual_node_name";
     protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> abstract_master;
     protected CommandLine cmd = null;
-    public static final String DEFAULT_DESCRIPTOR = "/org/objectweb/proactive/examples/masterslave/WorkersLocal.xml";
+    public static final String DEFAULT_DESCRIPTOR = "/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml";
 
     public AbstractExample() {
         command_options = new Options();

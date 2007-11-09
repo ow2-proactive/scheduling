@@ -506,7 +506,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * {@inheritDoc}
      */
-    public int slavepoolSize() {
+    public int workerpoolSize() {
         return workerGroup.size();
     }
 

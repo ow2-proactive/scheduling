@@ -51,7 +51,7 @@ public class PIExample {
 
         // adding resources
         master.addResources(PIExample.class.getResource(
-                "/org/objectweb/proactive/examples/masterslave/WorkersLocal.xml"));
+                "/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml"));
 
         // defining tasks
         Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();

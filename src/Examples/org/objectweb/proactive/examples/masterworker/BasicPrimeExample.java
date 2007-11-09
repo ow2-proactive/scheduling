@@ -63,10 +63,10 @@ public class BasicPrimeExample extends AbstractExample {
      * @param results results of the test
      * @param startTime starting time of the test
      * @param endTime ending time of the test
-     * @param nbSlaves number of workers used during the test
+     * @param nbWorkers number of workers used during the test
      */
     public void displayResult(Collection<Boolean> results, long startTime,
-        long endTime, int nbSlaves) {
+        long endTime, int nbWorkers) {
         // Post processing, calculates the statistics
         boolean prime = true;
 
@@ -133,7 +133,7 @@ public class BasicPrimeExample extends AbstractExample {
 
         // Displaying results, the slavepoolSize method displays the number of workers used by the master
         instance.displayResult(results, startTime, endTime,
-            instance.master.slavepoolSize());
+            instance.master.workerpoolSize());
 
         System.exit(0);
     }
