@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers;
 
 import javax.xml.xpath.XPath;
+
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.GroupGlobus;

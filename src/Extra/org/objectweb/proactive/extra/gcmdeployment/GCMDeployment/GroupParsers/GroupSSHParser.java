@@ -46,7 +46,7 @@ public class GroupSSHParser extends AbstractGroupParser {
     static final String NODE_NAME = "sshGroup";
 
     @Override
-	public void parseGroupNode(Node groupNode, XPath xpath) {
+    public void parseGroupNode(Node groupNode, XPath xpath) {
         super.parseGroupNode(groupNode, xpath);
 
         GroupSSH groupSSH = (GroupSSH) getGroup();

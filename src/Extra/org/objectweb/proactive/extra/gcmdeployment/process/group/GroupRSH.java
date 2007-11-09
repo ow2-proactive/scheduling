@@ -93,7 +93,7 @@ public class GroupRSH extends AbstractGroup {
     }
 
     @Override
-	public void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
