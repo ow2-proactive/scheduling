@@ -161,14 +161,15 @@ public interface Loggers {
     static final public String IM_TEST = IM + ".test";
     static final public String IM_ACTIVITY_NODES = IM + ".activitynodes";
 
-    //  Master Slave loggers
-    static final public String MASTERSLAVE = CORE + ".masterslave";
-    static final public String MASTERSLAVE_SLAVEMANAGER = MASTERSLAVE +
-        ".slavemanager";
-    static final public String MASTERSLAVE_PINGER = MASTERSLAVE + ".pinger";
-    static final public String MASTERSLAVE_REPOSITORY = MASTERSLAVE +
+    //  Master Worker loggers
+    static final public String MASTERWORKER = CORE + ".masterworker";
+    static final public String MASTERWORKER_WORKERMANAGER = MASTERWORKER +
+        ".workermanager";
+    static final public String MASTERWORKER_PINGER = MASTERWORKER + ".pinger";
+    static final public String MASTERWORKER_REPOSITORY = MASTERWORKER +
         ".repository";
-    static final public String MASTERSLAVE_SLAVES = MASTERSLAVE + ".slaves";
+    static final public String MASTERWORKER_WORKERS = MASTERWORKER +
+        ".workers";
 
     // remote Objects
     static final public String REMOTEOBJECT = CORE + ".remoteobject";

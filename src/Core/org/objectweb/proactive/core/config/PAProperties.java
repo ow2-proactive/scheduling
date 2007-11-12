@@ -229,10 +229,10 @@ public enum PAProperties {
     /** TODO vbodnart Describe this property */
     PA_TIMIT_ACTIVATION("proactive.timit.activation", false),
 
-    // -------------- Master/Slave
+    // -------------- Master/Worker
 
-    /** The ping period is the default interval at which slaves receive a ping message (to check if they're alive).*/
-    PA_MASTERSLAVE_PINGPERIOD("proactive.masterslave.pingperiod", false),
+    /** The ping period is the default interval at which workers receive a ping message (to check if they're alive).*/
+    PA_MASTERWORKER_PINGPERIOD("proactive.masterworker.pingperiod", false),
 
     // -------------- P2P
 
