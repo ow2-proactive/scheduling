@@ -66,7 +66,6 @@ public class SynchronousProxy implements Proxy, Serializable {
 
         if (reply != null) {
             if (reply.getSynchResult() instanceof Throwable) {
-                ((Throwable) reply.getSynchResult()).printStackTrace();
                 throw (Throwable) reply.getSynchResult();
             }
 
