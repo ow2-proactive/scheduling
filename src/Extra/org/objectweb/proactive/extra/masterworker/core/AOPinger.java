@@ -71,7 +71,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     /**
     * pinger log4j logger
     */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
 
     /**
      * Stub on the active object
@@ -121,7 +121,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     public AOPinger(final WorkerDeadListener listener) {
         this.listener = listener;
         terminated = false;
-        pingPeriod = Long.parseLong(PAProperties.PA_MASTERSLAVE_PINGPERIOD.getValue());
+        pingPeriod = Long.parseLong(PAProperties.PA_MASTERWORKER_PINGPERIOD.getValue());
     }
 
     /**

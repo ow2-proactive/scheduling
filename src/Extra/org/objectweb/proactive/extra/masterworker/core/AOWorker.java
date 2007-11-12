@@ -67,7 +67,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     /**
     * log4j logger of the slave
     */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVES);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
 
     /**
      * stub on this active object

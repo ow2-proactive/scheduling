@@ -89,7 +89,7 @@ public class AOWorkerManager implements WorkerManager,
     /**
     * log4j logger for the slave manager
     */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_SLAVEMANAGER);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
 
     /**
      * stub on this active object

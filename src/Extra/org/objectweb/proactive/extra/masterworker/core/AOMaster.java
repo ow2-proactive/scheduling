@@ -89,7 +89,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
     * log4j logger for the master
     */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
 
     // Global variables
 

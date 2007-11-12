@@ -72,7 +72,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
     /**
     * logger of the task repository
     */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE_REPOSITORY);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_REPOSITORY);
 
     /**
      * set whichs stores the hashcodes of all task objects from the client environment

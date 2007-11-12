@@ -63,7 +63,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
     /**
     * log4j logger of the master
     */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERSLAVE);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
 
     /**
      * current ordering mode
