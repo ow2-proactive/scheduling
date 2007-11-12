@@ -53,7 +53,7 @@ public class GroupCGSPParser extends AbstractGroupParser {
         return new GroupCGSP();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment;
 
+import java.io.Serializable;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
@@ -37,7 +38,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tools;
 
 
-public class PathElement implements Cloneable {
+public class PathElement implements Cloneable, Serializable {
     protected String relPath;
     public enum PathBase {PROACTIVE,
         HOME,

@@ -48,14 +48,14 @@ public class GroupGlobusParser extends AbstractGroupParser {
     private static final String NODE_NAME_DIRECTORY = "directory";
     private static final String NODE_NAME_MAX_TIME = "maxTime";
     private static final String NODE_NAME_COUNT = "count";
-    private static final String NODE_NAME = "globusProcess";
+    private static final String NODE_NAME = "globusGroup";
 
     @Override
     public AbstractGroup createGroup() {
         return new GroupGlobus();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 

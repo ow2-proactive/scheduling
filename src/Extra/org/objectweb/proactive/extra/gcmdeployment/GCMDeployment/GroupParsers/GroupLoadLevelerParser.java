@@ -61,7 +61,7 @@ public class GroupLoadLevelerParser extends AbstractGroupParser {
         return new GroupLoadLeveler();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 

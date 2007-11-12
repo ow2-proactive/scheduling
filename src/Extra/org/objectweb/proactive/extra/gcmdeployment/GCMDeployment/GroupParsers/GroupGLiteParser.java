@@ -42,7 +42,7 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupGLiteParser extends AbstractGroupParser {
-    private static final String NODE_NAME = "gliteGroup";
+    private static final String NODE_NAME = "gLiteGroup";
     private static final String NODE_NAME_ARGUMENTS = "arguments";
     private static final String NODE_NAME_OUTPUT_SANDBOX = "outputSandbox";
     private static final String NODE_NAME_INPUT_SANDBOX = "inputSandbox";
@@ -75,7 +75,7 @@ public class GroupGLiteParser extends AbstractGroupParser {
         return new GroupGLite();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 
@@ -114,7 +114,7 @@ public class GroupGLiteParser extends AbstractGroupParser {
         gliteGroup.setJobMyProxyServer(t);
 
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_NODES);
-        gliteGroup.setJobNodeNumber(Integer.parseInt(t));
+        gliteGroup.setJobNodeNumber(t);
 
         NodeList childNodes = groupNode.getChildNodes();
         for (int j = 0; j < childNodes.getLength(); ++j) {

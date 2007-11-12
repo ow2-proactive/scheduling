@@ -63,7 +63,7 @@ public class GroupARCParser extends AbstractGroupParser {
         return new GroupARC();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 

@@ -46,14 +46,14 @@ public class GroupPrunParser extends AbstractGroupParser {
     private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
     private static final String NODE_NAME_HOSTLIST = "hostlist";
     private static final String ATTR_QUEUE = "queue";
-    private static final String NODE_NAME = "prunProcess";
+    private static final String NODE_NAME = "prunGroup";
 
     @Override
     public AbstractGroup createGroup() {
         return new GroupPrun();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 

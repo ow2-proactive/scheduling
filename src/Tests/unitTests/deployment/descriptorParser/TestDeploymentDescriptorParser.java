@@ -65,6 +65,29 @@ public class TestDeploymentDescriptorParser {
         parser.parseResources();
     }
 
+    @Test
+    public void allGroupsTest()
+        throws IOException, XPathExpressionException, SAXException {
+        File descriptor = new File(this.getClass()
+                                       .getResource("testfiles/deployment/allGroupsExample.xml")
+                                       .getFile());
+
+        String userSchema = getClass()
+                                .getResource("testfiles/deployment/allGroupsSchema.xsd")
+                                .toString();
+
+        ArrayList<String> schemas = new ArrayList<String>();
+        schemas.add(userSchema);
+
+        System.out.println("Parsing " + descriptor.getAbsolutePath());
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor,
+                schemas);
+
+        parser.parseEnvironment();
+        parser.parseInfrastructure();
+        parser.parseResources();
+    }
+
     //
     // Examples of custom group & bridge parsers
     //
@@ -88,7 +111,7 @@ public class TestDeploymentDescriptorParser {
             return new UserGroup();
         }
 
-        public String getNodeName() {
+        public String getBaseNodeName() {
             return "paext:myGroup";
         }
 

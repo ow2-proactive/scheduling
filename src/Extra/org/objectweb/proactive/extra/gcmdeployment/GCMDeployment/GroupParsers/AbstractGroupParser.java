@@ -43,6 +43,8 @@ import org.w3c.dom.Node;
 
 
 public abstract class AbstractGroupParser implements GroupParser {
+    protected static final String NODE_EXT_NAMESPACE = "paext:";
+
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         String id = GCMParserHelper.getAttributeValue(groupNode, "id");
 
@@ -94,5 +96,16 @@ public abstract class AbstractGroupParser implements GroupParser {
         return group;
     }
 
+    /**
+     * Returns the base nodeName associated to a particular parser
+     * (no namespace)
+     * @return the nodeName as a String
+     */
+    protected abstract String getBaseNodeName();
+
     public abstract AbstractGroup createGroup();
+
+    public String getNodeName() {
+        return NODE_EXT_NAMESPACE + getBaseNodeName();
+    }
 }

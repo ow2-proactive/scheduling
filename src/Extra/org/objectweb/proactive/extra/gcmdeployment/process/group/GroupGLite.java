@@ -38,7 +38,7 @@ public class GroupGLite extends AbstractGroup {
     private String fileName;
     private String filePath;
     private String gLiteCommandPath;
-    private int jobNodeNumber;
+    private String jobNodeNumber;
     private String jobType;
     private String jobJobType;
     private String jobExecutable;
@@ -117,7 +117,7 @@ public class GroupGLite extends AbstractGroup {
     *
     * @return number of desired CPUs (just useful if jobType = mpich)
     */
-    public int getJobNodeNumber() {
+    public String getJobNodeNumber() {
         return jobNodeNumber;
     }
 
@@ -125,7 +125,7 @@ public class GroupGLite extends AbstractGroup {
      *
      * @param jobNodeNumber number of desired CPUs (just useful if jobType = mpich)
      */
-    public void setJobNodeNumber(int jobNodeNumber) {
+    public void setJobNodeNumber(String jobNodeNumber) {
         this.jobNodeNumber = jobNodeNumber;
     }
 

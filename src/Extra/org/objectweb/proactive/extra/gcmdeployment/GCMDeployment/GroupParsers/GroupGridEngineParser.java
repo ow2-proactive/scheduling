@@ -54,7 +54,7 @@ public class GroupGridEngineParser extends AbstractGroupParser {
         return new GroupGridEngine();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 

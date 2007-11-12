@@ -60,7 +60,15 @@ public class GroupRSHParser extends AbstractGroupParser {
         return new GroupRSH();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
+    }
+
+    /**
+     * GroupRSH is standard and doesn't have a namespace
+     */
+    @Override
+    public String getNodeName() {
+        return getBaseNodeName();
     }
 }

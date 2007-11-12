@@ -40,12 +40,11 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupLSFParser extends AbstractGroupParser {
+    private static final String NODE_NAME = "lsfGroup";
     private static final String ATTR_INTERACTIVE = "interactive";
-    private static final String NODE_NAME_SCRIPT_PATH = "scriptPath";
     private static final String NODE_NAME_RESOURCE_REQUIREMENT = "resourceRequirement";
     private static final String NODE_NAME_PROCESSOR = "processor";
     private static final String NODE_NAME_HOSTLIST = "hostlist";
-    private static final String XPATH_LSF_OPTION = "lsfOption";
     private static final String ATTR_JOBNAME = "jobname";
     private static final String ATTR_QUEUE = "queue";
 
@@ -54,8 +53,8 @@ public class GroupLSFParser extends AbstractGroupParser {
         return new GroupLSF();
     }
 
-    public String getNodeName() {
-        return "lsfProcess";
+    public String getBaseNodeName() {
+        return NODE_NAME;
     }
 
     @Override

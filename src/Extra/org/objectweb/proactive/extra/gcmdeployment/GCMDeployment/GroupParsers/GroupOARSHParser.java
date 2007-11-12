@@ -59,7 +59,14 @@ public class GroupOARSHParser extends GroupSSHParser {
     }
 
     @Override
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return "oarshGroup";
     }
+    
+    @Override
+    public String getNodeName() {
+        return NODE_EXT_NAMESPACE + getBaseNodeName();
+    }
+
+    
 }

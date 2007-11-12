@@ -58,6 +58,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Gr
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGridBusParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupGridEngineParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupLSFParser;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupLoadLevelerParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupOARSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupPBSParser;
@@ -151,6 +152,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerGroupParser(new GroupGridBusParser());
         registerGroupParser(new GroupGridEngineParser());
         registerGroupParser(new GroupLSFParser());
+        registerGroupParser(new GroupLoadLevelerParser());
         registerGroupParser(new GroupOARParser());
         registerGroupParser(new GroupOARSHParser());
         registerGroupParser(new GroupPBSParser());
@@ -163,6 +165,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected void registerDefaultBridgeParsers() {
         registerBridgeParser(new BridgeSSHParser());
         registerBridgeParser(new BridgeRSHParser());
+        //        registerBridgeParser(new BridgeOARSHParser());
         // TODO add other bridge parsers here
     }
 

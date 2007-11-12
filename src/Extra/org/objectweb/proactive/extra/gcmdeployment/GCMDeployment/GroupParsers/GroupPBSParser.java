@@ -49,7 +49,7 @@ public class GroupPBSParser extends AbstractGroupParser {
     private static final String NODE_NAME_HOSTLIST = "hostlist";
     private static final String ATTR_QUEUE_NAME = "queueName";
     private static final String ATTR_INTERACTIVE = "interactive";
-    private static final String NODE_NAME = "pbsProcess";
+    private static final String NODE_NAME = "pbsGroup";
     private static final String NODE_NAME_STDOUT = "stdout";
     private static final Object NODE_NAME_STDERR = "stderr";
 
@@ -58,7 +58,7 @@ public class GroupPBSParser extends AbstractGroupParser {
         return new GroupPBS();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 
