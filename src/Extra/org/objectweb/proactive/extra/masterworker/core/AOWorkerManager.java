@@ -231,8 +231,8 @@ public class AOWorkerManager implements WorkerManager,
                         node.getNodeInformation().getName());
                 }
 
-                String workername = node.getVMInformation().getHostName() + "_" +
-                    workerNameCounter++;
+                String workername = node.getVMInformation().getHostName() +
+                    "_" + workerNameCounter++;
 
                 // Creates the worker which will automatically connect to the master
                 workers.put(workername,
@@ -332,8 +332,11 @@ public class AOWorkerManager implements WorkerManager,
                     if (logger.isDebugEnabled()) {
                         logger.debug("Killing all active objects...");
                     }
-
-                    ((VirtualNodeImpl) vnlist.get(i)).killAll(false);
+                    try {
+                        ((VirtualNodeImpl) vnlist.get(i)).killAll(false);
+                    } catch (Exception e) {
+                        // ignore exceptions when killing
+                    }
                 }
             }
 
