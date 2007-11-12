@@ -68,7 +68,7 @@ import org.objectweb.proactive.extra.masterworker.interfaces.internal.WorkerMana
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * The Worker Manager Active Object is responsible for the deployment of Slaves :<br>
+ * The Worker Manager Active Object is responsible for the deployment of Workers :<br>
  * <ul>
  * <li> Through a ProActive deployment descriptor</li>
  * <li> Using an existing VirtualNode object</li>
@@ -87,7 +87,7 @@ public class AOWorkerManager implements WorkerManager,
     private static final long serialVersionUID = -1488970573456417472L;
 
     /**
-    * log4j logger for the slave manager
+    * log4j logger for the worker manager
     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
 
@@ -99,20 +99,20 @@ public class AOWorkerManager implements WorkerManager,
     /**
      * how many workers have been created
      */
-    protected long slaveNameCounter;
+    protected long workerNameCounter;
 
     /**
-     * holds the virtual nodes, only used to kill the nodes when the slave manager is terminated
+     * holds the virtual nodes, only used to kill the nodes when the worker manager is terminated
      */
     protected Vector<VirtualNode> vnlist;
 
     /**
-     * a thread pool used for slave creation
+     * a thread pool used for worker creation
      */
     protected ExecutorService threadPool;
 
     /**
-     * true when the slave manager is terminated
+     * true when the worker manager is terminated
      */
     protected boolean isTerminated;
 
@@ -154,7 +154,7 @@ public class AOWorkerManager implements WorkerManager,
     public void addResources(final Collection<Node> nodes) {
         if (!isTerminated) {
             for (Node node : nodes) {
-                threadPool.execute(new SlaveCreationHandler(node));
+                threadPool.execute(new WorkerCreationHandler(node));
             }
         }
     }
@@ -214,34 +214,34 @@ public class AOWorkerManager implements WorkerManager,
             vnlist.add(virtualnode);
             if (logger.isDebugEnabled()) {
                 logger.debug("Virtual Node " + virtualnode.getName() +
-                    " added to slave manager");
+                    " added to worker manager");
             }
         }
     }
 
     /**
-     * Creates a slave object inside the given node
-     * @param node the node on which a slave will be created
+     * Creates a worker object inside the given node
+     * @param node the node on which a worker will be created
      */
-    protected void createSlave(final Node node) {
+    protected void createWorker(final Node node) {
         if (!isTerminated) {
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Creating slave on " +
+                    logger.debug("Creating worker on " +
                         node.getNodeInformation().getName());
                 }
 
-                String slavename = node.getVMInformation().getHostName() + "_" +
-                    slaveNameCounter++;
+                String workername = node.getVMInformation().getHostName() + "_" +
+                    workerNameCounter++;
 
-                // Creates the slave which will automatically connect to the master
-                workers.put(slavename,
+                // Creates the worker which will automatically connect to the master
+                workers.put(workername,
                     (Worker) ProActiveObject.newActive(
                         AOWorker.class.getName(),
-                        new Object[] { slavename, provider, initialMemory },
+                        new Object[] { workername, provider, initialMemory },
                         node));
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Worker " + slavename + " created on " +
+                    logger.debug("Worker " + workername + " created on " +
                         node.getNodeInformation().getName());
                 }
             } catch (ActiveObjectCreationException e) {
@@ -257,7 +257,7 @@ public class AOWorkerManager implements WorkerManager,
      */
     public void initActivity(final Body body) {
         stubOnThis = ProActiveObject.getStubOnThis();
-        slaveNameCounter = 0;
+        workerNameCounter = 0;
         workers = new HashMap<String, Worker>();
         vnlist = new Vector<VirtualNode>();
         isTerminated = false;
@@ -276,7 +276,7 @@ public class AOWorkerManager implements WorkerManager,
         logger.warn("nodeCreated " + event.getNode());
         Node node = event.getNode();
         try {
-            threadPool.execute(new SlaveCreationHandler(node));
+            threadPool.execute(new WorkerCreationHandler(node));
         } catch (java.util.concurrent.RejectedExecutionException e) {
         }
     }
@@ -357,7 +357,7 @@ public class AOWorkerManager implements WorkerManager,
      * @author fviale
      *
      */
-    protected class SlaveCreationHandler implements Runnable {
+    protected class WorkerCreationHandler implements Runnable {
 
         /**
          * node on which workers will be created
@@ -365,10 +365,10 @@ public class AOWorkerManager implements WorkerManager,
         private Node node = null;
 
         /**
-         * Creates a slave on a given node
+         * Creates a worker on a given node
          * @param node
          */
-        public SlaveCreationHandler(final Node node) {
+        public WorkerCreationHandler(final Node node) {
             this.node = node;
         }
 
@@ -376,7 +376,7 @@ public class AOWorkerManager implements WorkerManager,
          * {@inheritDoc}
          */
         public void run() {
-            createSlave(node);
+            createWorker(node);
         }
     }
 }

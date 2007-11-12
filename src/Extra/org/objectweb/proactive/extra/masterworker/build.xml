@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Master/Slave for ProActive" basedir="../../../../../../../compile/">
+<project name="Master/Worker for ProActive" basedir="../../../../../../../compile/">
 	
 	<import file="${basedir}/build.xml" /> 
 	<target name="compile" depends="core, stubGenerator, -compile"/>

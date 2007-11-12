@@ -43,7 +43,7 @@ public interface Task<R extends Serializable> extends Serializable {
 
     /**
      * A task to be executed<br/>
-     * @param memory access to the slave memory
+     * @param memory access to the worker memory
      * @return the result
      * @throws Exception any exception thrown by the task
      */

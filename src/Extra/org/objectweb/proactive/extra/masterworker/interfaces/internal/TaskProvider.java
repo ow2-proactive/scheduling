@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * A Task Provider provides tasks to be executed and excepts results of these tasks (i.e. the Master from the slave point of view)
+ * A Task Provider provides tasks to be executed and excepts results of these tasks (i.e. the Master from the worker point of view)
  * @author fviale
  *
  * @param <R> the type of the result client object
@@ -43,17 +43,17 @@ import java.io.Serializable;
 public interface TaskProvider<R extends Serializable> {
     /**
      * Returns a task which needs to be executed
-     * @param worker the slave object which asks the tasks (stub)
-     * @param slaveName the name of the slave which asks the tasks
+     * @param worker the worker object which asks the tasks (stub)
+     * @param workerName the name of the worker which asks the tasks
      * @return a new task to compute
      */
-    TaskIntern<R> getTask(Worker worker, String slaveName);
+    TaskIntern<R> getTask(Worker worker, String workerName);
 
     /**
      * Returns the result of a task to the provider
      * @param result the result of the completed task
-     * @param slaveName the name of the slave sending the result
+     * @param workerName the name of the worker sending the result
      * @return a new task to compute
      */
-    TaskIntern<R> sendResultAndGetTask(ResultIntern<R> result, String slaveName);
+    TaskIntern<R> sendResultAndGetTask(ResultIntern<R> result, String workerName);
 }

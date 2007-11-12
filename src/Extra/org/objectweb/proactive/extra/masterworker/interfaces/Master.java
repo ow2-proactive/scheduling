@@ -94,13 +94,13 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     void addResources(VirtualNode virtualnode);
 
     /**
-     * This method returns the number of workers currently in the slave pool
+     * This method returns the number of workers currently in the worker pool
      * @return number of workers
      */
     int workerpoolSize();
 
     /**
-     * Terminates the slave manager and (eventually free every resources) <br/>
+     * Terminates the worker manager and (eventually free every resources) <br/>
      * @param freeResources tells if the Worker Manager should as well free the node resources
      */
     void terminate(boolean freeResources);

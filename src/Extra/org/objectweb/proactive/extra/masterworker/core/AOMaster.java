@@ -119,7 +119,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     protected TaskRepository<Task<Serializable>> repository;
 
-    // Slaves resources
+    // Workers resources
     /**
      * stub to access group of workers
      */
@@ -159,12 +159,12 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * Activity of workers, which workers is doing which task
      */
-    protected HashMap<String, Long> slavesActivity;
+    protected HashMap<String, Long> workersActivity;
 
     // Task Queues :
 
     /**
-     * tasks that wait for an available slave
+     * tasks that wait for an available worker
      */
     protected HashSetQueue<Long> pendingTasks;
 
@@ -251,16 +251,16 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     @SuppressWarnings("unchecked")
     public TaskIntern<Serializable> getTask(final Worker worker,
-        final String slaveName) {
-        // if we don't know him, we record the slave in our system
-        if (!workersByName.containsKey(slaveName)) {
-            recordWorker(worker, slaveName);
+        final String workerName) {
+        // if we don't know him, we record the worker in our system
+        if (!workersByName.containsKey(workerName)) {
+            recordWorker(worker, workerName);
         }
 
         if (emptyPending()) {
-            slavesActivity.put(slaveName, TaskIntern.NULL_TASK_ID);
+            workersActivity.put(workerName, TaskIntern.NULL_TASK_ID);
             sleepingGroup.add(worker);
-            // we return the null task, this will cause the slave to sleep for a while
+            // we return the null task, this will cause the worker to sleep for a while
             return new TaskWrapperImpl();
         } else {
             if (sleepingGroup.contains(worker)) {
@@ -273,7 +273,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             it.remove();
             // We add the task inside the launched list
             launchedTasks.add(taskId);
-            slavesActivity.put(slaveName, taskId);
+            workersActivity.put(workerName, taskId);
             TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
             TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(taskfuture);
             repository.saveTask(taskId);
@@ -295,7 +295,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         launchedTasks = new HashSetQueue<Long>();
         resultQueue = new ResultQueue<Serializable>(Master.OrderingMode.CompletionOrder);
 
-        // Slaves
+        // Workers
         try {
             // Worker Group
             workerGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
@@ -303,7 +303,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             // Group of sleeping workers
             sleepingGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
             sleepingGroup = ProGroup.getGroup(sleepingGroupStub);
-            slavesActivity = new HashMap<String, Long>();
+            workersActivity = new HashMap<String, Long>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
         } catch (ClassNotReifiableException e) {
@@ -317,7 +317,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             smanager = (AOWorkerManager) ProActiveObject.newActive(AOWorkerManager.class.getName(),
                     new Object[] { stubOnThis, initialMemory });
 
-            // The slave pinger
+            // The worker pinger
             pinger = (WorkerWatcher) ProActiveObject.newActive(AOPinger.class.getName(),
                     new Object[] { stubOnThis });
         } catch (ActiveObjectCreationException e1) {
@@ -331,12 +331,12 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * {@inheritDoc}
      */
     public void isDead(final Worker worker) {
-        String slaveName = workersByNameRev.get(worker);
+        String workerName = workersByNameRev.get(worker);
         if (logger.isInfoEnabled()) {
-            logger.info(slaveName + " reported missing... removing it");
+            logger.info(workerName + " reported missing... removing it");
         }
 
-        // we remove the slave from our lists
+        // we remove the worker from our lists
         if (workerGroup.contains(worker)) {
             workerGroup.remove(worker);
             if (sleepingGroup.contains(worker)) {
@@ -344,9 +344,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             }
 
             workersByNameRev.remove(worker);
-            workersByName.remove(slaveName);
-            // if the slave was handling a task we put the task back to the pending queue
-            Long taskId = slavesActivity.get(slaveName);
+            workersByName.remove(workerName);
+            // if the worker was handling a task we put the task back to the pending queue
+            Long taskId = workersActivity.get(workerName);
             if ((taskId != TaskIntern.NULL_TASK_ID) &&
                     launchedTasks.contains(taskId)) {
                 launchedTasks.remove(taskId);
@@ -377,17 +377,17 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     }
 
     /**
-     * Record the given slave in our system
-     * @param worker the slave to record
-     * @param slaveName the name of the slave
+     * Record the given worker in our system
+     * @param worker the worker to record
+     * @param workerName the name of the worker
      */
-    public void recordWorker(final Worker worker, final String slaveName) {
-        // We record the slave in our system
-        workersByName.put(slaveName, worker);
-        workersByNameRev.put(worker, slaveName);
+    public void recordWorker(final Worker worker, final String workerName) {
+        // We record the worker in our system
+        workersByName.put(workerName, worker);
+        workersByNameRev.put(worker, workerName);
         workerGroup.add(worker);
 
-        // We tell the pinger to watch for this new slave
+        // We tell the pinger to watch for this new worker
         pinger.addWorkerToWatch(worker);
     }
 
@@ -426,7 +426,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
         // we clear the service to avoid dirty pending requests 
         service.flushAll();
-        // we block the communications because a getTask request might still be coming from a slave created just before the master termination
+        // we block the communications because a getTask request might still be coming from a worker created just before the master termination
         body.blockCommunication();
         // we finally terminate the master
         body.terminate();
@@ -450,7 +450,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             repository.removeTask(taskId);
         }
 
-        // We assign a new task to the slave
+        // We assign a new task to the worker
         TaskIntern<Serializable> newTask = getTask(workersByName.get(
                     originatorName), originatorName);
         return newTask;
@@ -568,7 +568,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
         // We terminate the pinger
         ProFuture.waitFor(pinger.terminate());
-        // We terminate the slave manager
+        // We terminate the worker manager
         ProFuture.waitFor(smanager.terminate(freeResources));
         if (logger.isDebugEnabled()) {
             logger.debug("Master terminated...");
@@ -576,7 +576,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
         launchedTasks.clear();
 
-        slavesActivity.clear();
+        workersActivity.clear();
         workersByName.clear();
         workersByNameRev.clear();
 

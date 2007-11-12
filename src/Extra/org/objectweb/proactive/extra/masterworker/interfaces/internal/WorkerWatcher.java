@@ -41,13 +41,13 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public interface WorkerWatcher {
 
     /**
-     * adds a slave to be watched
-     * @param worker slave which must be watched
+     * adds a worker to be watched
+     * @param worker worker which must be watched
      */
     void addWorkerToWatch(Worker worker);
 
     /**
-     * stops watching a slave
+     * stops watching a worker
      * @param worker workers which needn't be watched anymore
      */
     void removeWorkerToWatch(Worker worker);

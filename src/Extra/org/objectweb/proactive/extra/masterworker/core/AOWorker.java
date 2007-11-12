@@ -52,7 +52,7 @@ import org.objectweb.proactive.extra.masterworker.interfaces.internal.Worker;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * The Slaves Active Objects are the workers in the Master/Worker API.<br>
+ * The Workers Active Objects are the workers in the Master/Worker API.<br>
  * They execute tasks needed by the master
  * @author fviale
  */
@@ -65,7 +65,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     private static final long serialVersionUID = 2385554161935080046L;
 
     /**
-    * log4j logger of the slave
+    * log4j logger of the worker
     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
 
@@ -75,28 +75,28 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     protected Object stubOnThis;
 
     /**
-     * Name of the slave
+     * Name of the worker
      */
     protected String name;
 
     /**
-     * The entity which will provide tasks to the slave (i.e. the master)
+     * The entity which will provide tasks to the worker (i.e. the master)
      */
     protected TaskProvider<Serializable> provider;
 
     /**
-     * Tells if the slave is terminated
+     * Tells if the worker is terminated
      */
     protected boolean terminated;
 
     /**
-     * Tells if the slave is currently sleeping (not asking new tasks)
+     * Tells if the worker is currently sleeping (not asking new tasks)
      */
     protected boolean isSleeping;
 
     /**
-     * The memory of the slave <br>
-     * the slave can keep some data between different tasks executions <br>
+     * The memory of the worker <br>
+     * the worker can keep some data between different tasks executions <br>
      * e.g. connection to a database, file descriptor, etc ...
      */
     protected Map<String, Object> memory;
@@ -108,10 +108,10 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     }
 
     /**
-     * Creates a slave with the given name
-     * @param name name of the slave
-     * @param provider the entity which will provide tasks to the slave
-     * @param initialMemory initial memory of the slave
+     * Creates a worker with the given name
+     * @param name name of the worker
+     * @param provider the entity which will provide tasks to the worker
+     * @param initialMemory initial memory of the worker
      */
     public AOWorker(final String name,
         final TaskProvider<Serializable> provider,

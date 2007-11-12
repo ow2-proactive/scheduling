@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.masterworker.interfaces;
 
 
 /**
- * This interface gives access to the memory of a slave, a task can record data in this memory under a specific name. <br/>
+ * This interface gives access to the memory of a worker, a task can record data in this memory under a specific name. <br/>
  * This data could be loaded later on by another task <br/>
  * @author fviale
  *

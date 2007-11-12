@@ -94,7 +94,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     protected WorkerDeadListener listener;
 
     /**
-     * Stub to slave group
+     * Stub to worker group
      */
     protected Worker workerGroupStub;
 
@@ -116,7 +116,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
 
     /**
      * Creates a pinger with the given listener
-     * @param listener object which will be notified when a slave is dead
+     * @param listener object which will be notified when a worker is dead
      */
     public AOPinger(final WorkerDeadListener listener) {
         this.listener = listener;
@@ -198,14 +198,14 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     }
 
     /**
-     * Reports that a slave is missing
-     * @param worker the missing slave
+     * Reports that a worker is missing
+     * @param worker the missing worker
      */
     public void workerMissing(final Worker worker) {
         synchronized (workerGroup) {
             if (logger.isDebugEnabled()) {
                 logger.debug(
-                    "A slave is missing...reporting back to the Master");
+                    "A worker is missing...reporting back to the Master");
             }
 
             if (workerGroup.contains(worker)) {
@@ -230,7 +230,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     }
 
     /*
-     * TODO: handle exceptions with stubOnThis.slaveMissing((Worker) eig.getObject()); for each
+     * TODO: handle exceptions with stubOnThis.workerMissing((Worker) eig.getObject()); for each
      * member in the ExceptionListException
      */
 }

@@ -40,8 +40,8 @@ package org.objectweb.proactive.extra.masterworker.interfaces.internal;
 public interface WorkerDeadListener {
 
     /**
-     * Callback function called when a slave is missing
-     * @param worker the missing slave
+     * Callback function called when a worker is missing
+     * @param worker the missing worker
      */
     void isDead(Worker worker);
 }

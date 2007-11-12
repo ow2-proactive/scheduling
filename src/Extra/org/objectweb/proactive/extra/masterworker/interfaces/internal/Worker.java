@@ -35,32 +35,32 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
- * The interface of the slave objects <br/>
- * A slave is connected to a TaskProvider (i.e. Master) which will provide tasks to execute <br/>
+ * The interface of the worker objects <br/>
+ * A worker is connected to a TaskProvider (i.e. Master) which will provide tasks to execute <br/>
  * @author fviale
  *
  */
 public interface Worker {
 
     /**
-     * Returns the name of this slave
-     * @return name of the slave
+     * Returns the name of this worker
+     * @return name of the worker
      */
     String getName();
 
     /**
-     * tells that this slave is alive
+     * tells that this worker is alive
      */
     void heartBeat();
 
     /**
-     * terminates this slave
+     * terminates this worker
      * @return true if the object terminated successfully
      */
     BooleanWrapper terminate();
 
     /**
-     * Asks the slave to wake up
+     * Asks the worker to wake up
      */
     void wakeup();
 }

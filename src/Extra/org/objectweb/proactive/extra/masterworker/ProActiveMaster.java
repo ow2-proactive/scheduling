@@ -66,9 +66,9 @@ import org.objectweb.proactive.extra.masterworker.interfaces.internal.ResultInte
  * The <b><i>WorkerMemory</i></b> concept is meant to allow user to store information directly inside the workers where tasks are executed. <br/>
  * The WorkerMemory has the same structure as a Dictionary with &lt;key, value&gt; pairs where keys are string and values are any Java object. <br/>
  * <br/>
- * A user can specify, when creating the master, the initial memory that every slave will have by providing a Map of &lt;String,Object&gt; pairs to the ProActiveMaster constructors.<br/>
+ * A user can specify, when creating the master, the initial memory that every worker will have by providing a Map of &lt;String,Object&gt; pairs to the ProActiveMaster constructors.<br/>
  * <br/>
- * When tasks will later on be executed on the workers, the tasks will be able to access this memory through the slavememory parameter of the <b><i>run</i></b> method.
+ * When tasks will later on be executed on the workers, the tasks will be able to access this memory through the worker memory parameter of the <b><i>run</i></b> method.
  * <br/>
  * The results can be received using two different reception order modes: <br/>
  * <ul>
@@ -114,7 +114,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /**
-     * Creates an empty remote master that will be created on top of the given Node with an initial slave memory
+     * Creates an empty remote master that will be created on top of the given Node with an initial worker memory
      * @param remoteNodeToUse this Node will be used to create the remote master
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
@@ -135,7 +135,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     }
 
     /**
-     * Creates an empty local master with an initial slave memory
+     * Creates an empty local master with an initial worker memory
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
     public ProActiveMaster(Map<String, Object> initialMemory) {

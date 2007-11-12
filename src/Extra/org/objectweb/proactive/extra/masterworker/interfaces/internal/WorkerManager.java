@@ -47,14 +47,14 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public interface WorkerManager {
 
     /**
-     * Asks the slave manager to activate every virtual nodes inside the given descriptor
+     * Asks the worker manager to activate every virtual nodes inside the given descriptor
      * and use the generated nodes as resources
      * @param descriptorURL URL of a deployment descriptor
      */
     void addResources(URL descriptorURL);
 
     /**
-     * Asks the slave manager to activate the given virtual nodes inside the given descriptor
+     * Asks the worker manager to activate the given virtual nodes inside the given descriptor
      * and use the generated nodes as resources
      * @param descriptorURL URL of a deployment descriptor
      * @param virtualNodeName names of the virtual node to activate
@@ -62,19 +62,19 @@ public interface WorkerManager {
     void addResources(URL descriptorURL, String virtualNodeName);
 
     /**
-     * Adds the given Collection of nodes to the slave manager
+     * Adds the given Collection of nodes to the worker manager
      * @param nodes a collection of nodes
      */
     void addResources(Collection<Node> nodes);
 
     /**
-     * Adds the given virtual node to the slave manager
+     * Adds the given virtual node to the worker manager
      * @param virtualnode a virtual node object
      */
     void addResources(VirtualNode virtualnode);
 
     /**
-     * Terminates the slave manager and free every resources (if asked)
+     * Terminates the worker manager and free every resources (if asked)
      * @param freeResources tells if the Worker Manager should as well free the node resources
      * @return success
      */

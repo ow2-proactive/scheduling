@@ -76,8 +76,8 @@ public interface TaskRepository<T extends Task<?extends Serializable>> {
 
     /**
      * Asks the repository to save the task in a compressed format<br/>
-     * This method is called when the task has been launched and is currently running on a slave. <br/>
-     * There is still a chance that the slave will fail and the task will need to be rescheduled, but still most of the times, nothing will happen.<br/>
+     * This method is called when the task has been launched and is currently running on a worker. <br/>
+     * There is still a chance that the worker will fail and the task will need to be rescheduled, but still most of the times, nothing will happen.<br/>
      * @param id id of the task to save
      */
     void saveTask(long id);
