@@ -36,14 +36,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 public class Executor {
     final static private Executor singleton = new Executor();
     private List<Thread> threads;
+    private long jobId;
 
     private Executor() {
         GCMD_LOGGER.trace("Executor started");
         threads = new ArrayList<Thread>();
+        jobId = 0;
     }
 
     static public synchronized Executor getExecutor() {
@@ -51,7 +57,11 @@ public class Executor {
     }
 
     public void submit(String command) {
-        GCMD_LOGGER.trace("Command submited: " + command);
+        Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT + ".job." +
+                jobId);
+        jobId++;
+
+        logger.debug("Command submited: " + command);
         try {
             System.out.println("executing command=" + command);
 
@@ -59,15 +69,15 @@ public class Executor {
                                .exec(new String[] { "sh", "-c", command });
 
             InputStreamMonitor stdoutM = new InputStreamMonitor(MonitorType.STDOUT,
-                    p.getInputStream(), command);
+                    p.getInputStream(), command, logger);
             InputStreamMonitor stderrM = new InputStreamMonitor(MonitorType.STDERR,
-                    p.getErrorStream(), command);
+                    p.getErrorStream(), command, logger);
             stderrM.start();
             stdoutM.start();
             threads.add(stdoutM);
             threads.add(stderrM);
         } catch (IOException e) {
-            GCMD_LOGGER.warn("Cannot execute: " + command, e);
+            logger.warn("Cannot execute: " + command, e);
         }
     }
 
@@ -83,13 +93,16 @@ public class Executor {
         MonitorType type;
         InputStream stream;
         String cmd;
+        Logger logger;
 
         public InputStreamMonitor(MonitorType type, InputStream stream,
-            String cmd) {
-            GCMD_LOGGER.trace("Monitor started: " + type.name() + " " + cmd);
+            String cmd, Logger logger) {
+            this.logger = logger;
+            logger.trace("Monitor started: " + type.name() + " " + cmd);
             this.type = type;
             this.stream = stream;
             this.cmd = cmd;
+            setDaemon(true);
         }
 
         @Override
@@ -100,9 +113,9 @@ public class Executor {
 
                 br = new BufferedReader(new InputStreamReader(stream));
                 while ((line = br.readLine()) != null) {
-                    GCMD_LOGGER.info(line);
+                    logger.info(line);
                 }
-                GCMD_LOGGER.trace("Monitor exited: " + type.name() + " " + cmd);
+                logger.trace("Monitor exited: " + type.name() + " " + cmd);
             } catch (IOException e) {
                 // TODO: handle exception
                 e.printStackTrace();
