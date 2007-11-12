@@ -40,8 +40,6 @@ import org.w3c.dom.Node;
 
 
 public class GroupRSHParser extends AbstractGroupParser {
-    private static final String ATTR_COMMAND_PATH = "commandPath";
-    private static final String ATTR_USERNAME = "username";
     private static final String ATTR_HOST_LIST = "hostList";
     static final String NODE_NAME = "rshGroup";
 
@@ -53,18 +51,6 @@ public class GroupRSHParser extends AbstractGroupParser {
         String hostList = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_HOST_LIST);
         groupSSH.setHostList(hostList);
-
-        String username = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_USERNAME);
-        if (username != null) {
-            groupSSH.setUsername(username);
-        }
-
-        String commandPath = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_COMMAND_PATH);
-        if (commandPath != null) {
-            groupSSH.setCommandPath(commandPath);
-        }
 
         return groupSSH;
     }
