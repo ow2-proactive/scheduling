@@ -36,6 +36,7 @@ import java.util.List;
 
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
+import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
@@ -49,7 +50,7 @@ public abstract class AbstractGroup implements Group {
     private String id;
     private String username;
     private String bookedNodesAccess;
-    private Node scriptPath;
+    private PathElement scriptPath;
 
     public AbstractGroup() {
     }
@@ -62,6 +63,12 @@ public abstract class AbstractGroup implements Group {
                 ? new String(group.commandPath) : null;
             this.env = (group.env != null) ? new String(group.env) : null;
             this.id = (group.id != null) ? new String(group.id) : null;
+            this.username = (group.username != null)
+                ? new String(group.username) : null;
+            this.bookedNodesAccess = (group.bookedNodesAccess != null)
+                ? new String(group.bookedNodesAccess) : null;
+            this.scriptPath = (PathElement) ((group.scriptPath != null)
+                ? Utils.makeDeepCopy(group.scriptPath) : null);
         } catch (IOException e) {
             // can't happen
         }
@@ -138,7 +145,7 @@ public abstract class AbstractGroup implements Group {
         this.bookedNodesAccess = bookedNodesAccess;
     }
 
-    public void setScriptPath(Node scriptPath) {
+    public void setScriptPath(PathElement scriptPath) {
         this.scriptPath = scriptPath;
     }
 }

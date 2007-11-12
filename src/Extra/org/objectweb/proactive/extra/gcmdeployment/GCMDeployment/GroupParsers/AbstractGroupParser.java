@@ -52,15 +52,21 @@ public abstract class AbstractGroupParser implements GroupParser {
 
         String username = GCMParserHelper.getAttributeValue(groupNode,
                 "username");
-        group.setUsername(username);
+        if (username != null) {
+            group.setUsername(username);
+        }
 
         String commandPath = GCMParserHelper.getAttributeValue(groupNode,
                 "commandPath");
-        group.setCommandPath(commandPath);
+        if (commandPath != null) {
+            group.setCommandPath(commandPath);
+        }
 
         String bookedNodesAccess = GCMParserHelper.getAttributeValue(groupNode,
                 "bookedNodesAccess");
-        group.setBookedNodesAccess(bookedNodesAccess);
+        if (bookedNodesAccess != null) {
+            group.setBookedNodesAccess(bookedNodesAccess);
+        }
 
         try {
             Node environmentNode = (Node) xpath.evaluate("pa:environment",
@@ -78,7 +84,8 @@ public abstract class AbstractGroupParser implements GroupParser {
                     XPathConstants.NODE);
 
             if (scriptPath != null) {
-                group.setScriptPath(scriptPath);
+                group.setScriptPath(GCMParserHelper.parsePathElementNode(
+                        scriptPath));
             }
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
