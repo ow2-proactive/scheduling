@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +69,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     private Map<String, VirtualNodeInternal> virtualNodes = null;
     private DeploymentTree deploymentTree;
     private Map<String, GCMDeploymentDescriptor> selectedDeploymentDesc;
+    private Map<Long, String> gcmDeploymentDescriptorMap;
     private ArrayList<String> currentDeploymentPath;
 
     public GCMApplicationDescriptorImpl(String filename)
@@ -80,6 +82,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         throws IllegalArgumentException, SAXException, IOException,
             XPathExpressionException {
         currentDeploymentPath = new ArrayList<String>();
+
+        gcmDeploymentDescriptorMap = new HashMap<Long, String>();
 
         gadFile = Helpers.checkDescriptorFileExist(file);
         try {
@@ -190,6 +194,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         HostInfo hostInfo = group.getHostInfo();
         pushDeploymentPath(hostInfo.getId());
         hostInfo.setDeploymentId(deploymentNode.getId());
+        gcmDeploymentDescriptorMap.put(deploymentNode.getId(),
+            rootNode.getDeploymentDescriptorPath());
         deploymentTree.addNode(deploymentNode, rootNode);
         popDeploymentPath();
     }
@@ -235,6 +241,10 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
     private void popDeploymentPath() {
         currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
+    }
+
+    public String getGCMDeploymentDescriptorId(Long deploymentNodeId) {
+        return gcmDeploymentDescriptorMap.get(deploymentNodeId);
     }
 
     /**
