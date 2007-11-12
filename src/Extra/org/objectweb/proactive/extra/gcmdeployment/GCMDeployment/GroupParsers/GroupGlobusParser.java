@@ -60,10 +60,9 @@ public class GroupGlobusParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupGlobus globusGroup = (GroupGlobus) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupGlobus globusGroup = (GroupGlobus) super.parseGroupNode(groupNode,
+                xpath);
 
         String hostname = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_HOSTNAME);
@@ -97,5 +96,7 @@ public class GroupGlobusParser extends AbstractGroupParser {
                 globusGroup.setDirectory(nodeValue);
             }
         }
+
+        return globusGroup;
     }
 }

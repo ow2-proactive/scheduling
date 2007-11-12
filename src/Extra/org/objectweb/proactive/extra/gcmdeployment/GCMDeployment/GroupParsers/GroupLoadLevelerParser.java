@@ -66,10 +66,9 @@ public class GroupLoadLevelerParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupLoadLeveler loadLevelerGroup = (GroupLoadLeveler) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupLoadLeveler loadLevelerGroup = (GroupLoadLeveler) super.parseGroupNode(groupNode,
+                xpath);
 
         String jobname = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_JOB_NAME);
@@ -112,5 +111,7 @@ public class GroupLoadLevelerParser extends AbstractGroupParser {
                 loadLevelerGroup.setTasksPerHost(nodeValue);
             }
         }
+
+        return loadLevelerGroup;
     }
 }

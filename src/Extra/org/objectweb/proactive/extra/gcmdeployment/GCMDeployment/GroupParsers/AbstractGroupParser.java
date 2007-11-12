@@ -38,20 +38,16 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
 
 
 public abstract class AbstractGroupParser implements GroupParser {
-    protected AbstractGroup group;
-
-    public AbstractGroupParser() {
-        group = createGroup();
-    }
-
-    public void parseGroupNode(Node groupNode, XPath xpath) {
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         String id = GCMParserHelper.getAttributeValue(groupNode, "id");
+
+        AbstractGroup group = createGroup();
+
         group.setId(id);
 
         String username = GCMParserHelper.getAttributeValue(groupNode,
@@ -87,9 +83,7 @@ public abstract class AbstractGroupParser implements GroupParser {
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
         }
-    }
 
-    public Group getGroup() {
         return group;
     }
 

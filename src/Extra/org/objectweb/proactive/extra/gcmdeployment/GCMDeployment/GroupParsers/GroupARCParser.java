@@ -68,9 +68,8 @@ public class GroupARCParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-        GroupARC arcGroup = (GroupARC) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupARC arcGroup = (GroupARC) super.parseGroupNode(groupNode, xpath);
 
         try {
             String t = GCMParserHelper.getAttributeValue(groupNode,
@@ -116,6 +115,8 @@ public class GroupARCParser extends AbstractGroupParser {
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         }
+
+        return arcGroup;
     }
 
     public class FileTransfer {

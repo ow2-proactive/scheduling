@@ -58,10 +58,8 @@ public class GroupFuraParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupFura furaGroup = (GroupFura) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupFura furaGroup = (GroupFura) super.parseGroupNode(groupNode, xpath);
 
         String jobName = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_JOB_NAME);
@@ -91,5 +89,7 @@ public class GroupFuraParser extends AbstractGroupParser {
                 furaGroup.setMaxTime(nodeValue);
             }
         }
+
+        return furaGroup;
     }
 }

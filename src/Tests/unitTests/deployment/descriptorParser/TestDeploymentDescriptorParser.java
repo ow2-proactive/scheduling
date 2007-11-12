@@ -93,11 +93,13 @@ public class TestDeploymentDescriptorParser {
         }
 
         @Override
-        public void parseGroupNode(Node groupNode, XPath xpath) {
-            super.parseGroupNode(groupNode, xpath);
+        public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+            AbstractGroup group = super.parseGroupNode(groupNode, xpath);
 
             System.out.println("User Group Parser - someattr value = " +
                 groupNode.getAttributes().getNamedItem("someattr").getNodeValue());
+
+            return group;
         }
     }
 

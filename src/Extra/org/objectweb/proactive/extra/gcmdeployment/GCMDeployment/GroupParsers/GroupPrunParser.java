@@ -58,10 +58,8 @@ public class GroupPrunParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupPrun prunGroup = (GroupPrun) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupPrun prunGroup = (GroupPrun) super.parseGroupNode(groupNode, xpath);
 
         String queueName = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_QUEUE);
@@ -88,5 +86,7 @@ public class GroupPrunParser extends AbstractGroupParser {
                 prunGroup.setStdout(nodeValue);
             }
         }
+
+        return prunGroup;
     }
 }

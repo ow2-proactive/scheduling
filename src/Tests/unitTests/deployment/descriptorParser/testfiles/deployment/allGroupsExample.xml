@@ -12,7 +12,7 @@
 	-->
 
 	<environment>
-		<descriptorVariable name="USERNAME" value="cmathieu" />
+		<descriptorVariable name="USERNAME" value="jsmith" />
 	</environment>
 
 	<resources>
@@ -43,7 +43,7 @@
 			<paext:pbsGroup id="pbsgroup1" queue="queue01@pbsserver" jobName="demoJob"
 				commandPath="/usr/local/bin/pbs">
 				<pa:scriptPath base="home" relpath="scripts/pbsjob.sh" />
-				<paext:hostsNumber>50</paext:hostsNumber>
+				<paext:nodes>50</paext:nodes>
 			</paext:pbsGroup>
 
 			<paext:prunGroup id="prungroup1" queue="prunqueue">
@@ -54,7 +54,7 @@
 			<paext:gridEngineGroup id="gridEngineGroup">
 				<pa:scriptPath base="home" relpath="jobs/jobscript1.sh" />
 				<paext:hostsNumber>10</paext:hostsNumber>
-				<paext:bookingDuration>500000</paext:bookingDuration>
+				<paext:wallTime>500000</paext:wallTime>
 				<paext:directory>"jobs/job_datas</paext:directory>
 				<paext:stderr>jobs/jobtrace_err.txt</paext:stderr>
 			</paext:gridEngineGroup>

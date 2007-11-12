@@ -47,14 +47,15 @@ public class GroupOARSHParser extends GroupSSHParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupOARSH oarshGroup = (GroupOARSH) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupOARSH oarshGroup = (GroupOARSH) super.parseGroupNode(groupNode,
+                xpath);
 
         String jobId = GCMParserHelper.getAttributeValue(groupNode, ATTR_JOB_ID);
 
         oarshGroup.setJobId(jobId);
+
+        return oarshGroup;
     }
 
     @Override

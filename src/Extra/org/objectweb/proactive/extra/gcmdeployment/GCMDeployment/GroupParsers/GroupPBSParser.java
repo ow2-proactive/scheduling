@@ -63,10 +63,8 @@ public class GroupPBSParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupPBS pbsGroup = (GroupPBS) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupPBS pbsGroup = (GroupPBS) super.parseGroupNode(groupNode, xpath);
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_INTERACTIVE);
@@ -109,5 +107,7 @@ public class GroupPBSParser extends AbstractGroupParser {
                 pbsGroup.setMailTo(nodeValue);
             }
         }
+
+        return pbsGroup;
     }
 }

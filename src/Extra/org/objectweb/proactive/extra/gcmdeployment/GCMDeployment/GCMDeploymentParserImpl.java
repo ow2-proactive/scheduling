@@ -71,6 +71,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
 import org.w3c.dom.Document;
@@ -358,8 +359,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                     "No group parser registered for node <" +
                     groupNode.getNodeName() + ">");
             } else {
-                groupParser.parseGroupNode(groupNode, xpath);
-                infrastructure.addGroup(groupParser.getGroup());
+                AbstractGroup group = groupParser.parseGroupNode(groupNode,
+                        xpath);
+                infrastructure.addGroup(group);
             }
         }
 

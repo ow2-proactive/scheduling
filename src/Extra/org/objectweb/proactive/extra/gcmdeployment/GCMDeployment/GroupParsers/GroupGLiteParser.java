@@ -80,10 +80,9 @@ public class GroupGLiteParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupGLite gliteGroup = (GroupGLite) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupGLite gliteGroup = (GroupGLite) super.parseGroupNode(groupNode,
+                xpath);
 
         String t = GCMParserHelper.getAttributeValue(groupNode, ATTR_TYPE);
         gliteGroup.setJobType(t);
@@ -172,5 +171,7 @@ public class GroupGLiteParser extends AbstractGroupParser {
                 gliteGroup.setStdin(nodeValue);
             }
         }
+
+        return gliteGroup;
     }
 }

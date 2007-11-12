@@ -63,10 +63,8 @@ public class GroupOARParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupOAR oarGroup = (GroupOAR) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupOAR oarGroup = (GroupOAR) super.parseGroupNode(groupNode, xpath);
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_INTERACTIVE);
@@ -128,5 +126,7 @@ public class GroupOARParser extends AbstractGroupParser {
                 oarGroup.setStderr(nodeValue);
             }
         }
+
+        return oarGroup;
     }
 }

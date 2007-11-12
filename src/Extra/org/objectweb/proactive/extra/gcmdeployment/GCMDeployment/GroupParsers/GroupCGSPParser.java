@@ -58,9 +58,8 @@ public class GroupCGSPParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-        GroupCGSP cgspGroup = (GroupCGSP) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupCGSP cgspGroup = (GroupCGSP) super.parseGroupNode(groupNode, xpath);
 
         String hostname = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_HOSTNAME);
@@ -91,5 +90,7 @@ public class GroupCGSPParser extends AbstractGroupParser {
                 cgspGroup.setStderr(nodeValue);
             }
         }
+
+        return cgspGroup;
     }
 }

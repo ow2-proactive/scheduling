@@ -56,10 +56,9 @@ public class GroupGridBusParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupGridBus gridbusGroup = (GroupGridBus) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupGridBus gridbusGroup = (GroupGridBus) super.parseGroupNode(groupNode,
+                xpath);
 
         try {
             Node argumentsNode = (Node) xpath.evaluate("paext:arguments",
@@ -71,5 +70,7 @@ public class GroupGridBusParser extends AbstractGroupParser {
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
         }
+
+        return gridbusGroup;
     }
 }

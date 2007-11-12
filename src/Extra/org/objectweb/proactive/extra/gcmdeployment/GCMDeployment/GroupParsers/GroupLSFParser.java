@@ -59,10 +59,8 @@ public class GroupLSFParser extends AbstractGroupParser {
     }
 
     @Override
-    public void parseGroupNode(Node groupNode, XPath xpath) {
-        super.parseGroupNode(groupNode, xpath);
-
-        GroupLSF lsfGroup = (GroupLSF) getGroup();
+    public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
+        GroupLSF lsfGroup = (GroupLSF) super.parseGroupNode(groupNode, xpath);
 
         String interactive = GCMParserHelper.getAttributeValue(groupNode,
                 ATTR_INTERACTIVE);
@@ -94,5 +92,7 @@ public class GroupLSFParser extends AbstractGroupParser {
                 lsfGroup.setResourceRequirement(nodeValue);
             }
         }
+
+        return lsfGroup;
     }
 }
