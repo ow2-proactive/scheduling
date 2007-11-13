@@ -31,5 +31,5 @@
 package org.objectweb.proactive.core.body.future;
 
 public interface LocalFuture {
-    public void receiveReply(FutureResult obj);
+    public void receiveReply(MethodCallResult obj);
 }

@@ -40,7 +40,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
@@ -178,12 +178,12 @@ public class RequestImpl extends MessageImpl implements Request,
         if (logger.isDebugEnabled()) {
             logger.debug("Serving " + this.getMethodName());
         }
-        FutureResult result;
+        MethodCallResult result;
         try {
             result = serveInternal(targetBody);
         } catch (ServeException e) {
             /* Non Functional Exception */
-            result = new FutureResult(null, new ProActiveRuntimeException(e));
+            result = new MethodCallResult(null, new ProActiveRuntimeException(e));
         }
         if (logger.isDebugEnabled()) {
             logger.debug("result: " + result);
@@ -234,7 +234,7 @@ public class RequestImpl extends MessageImpl implements Request,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected FutureResult serveInternal(Body targetBody)
+    protected MethodCallResult serveInternal(Body targetBody)
         throws ServeException {
         Object result = null;
         Throwable exception = null;
@@ -246,10 +246,10 @@ public class RequestImpl extends MessageImpl implements Request,
             exception = e.getTargetException();
         }
 
-        return new FutureResult(result, exception);
+        return new MethodCallResult(result, exception);
     }
 
-    protected Reply createReply(Body targetBody, FutureResult result) {
+    protected Reply createReply(Body targetBody, MethodCallResult result) {
         ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
 
         return new ReplyImpl(targetBody.getID(), this.sequenceNumber,

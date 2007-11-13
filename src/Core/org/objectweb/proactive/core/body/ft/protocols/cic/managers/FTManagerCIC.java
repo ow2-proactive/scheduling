@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.cic.infos.CheckpointInfoCIC;
 import org.objectweb.proactive.core.body.ft.protocols.cic.infos.MessageInfoCIC;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
@@ -422,7 +422,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                 //} catch (SecurityNotAvailableException e1) {
                 toLog = new ReplyImpl(reply.getSourceBodyID(),
                         reply.getSequenceNumber(), reply.getMethodName(),
-                        (FutureResult) Utils.makeDeepCopy(reply.getResult()),
+                        (MethodCallResult) Utils.makeDeepCopy(reply.getResult()),
                         null);
                 //}
                 ReplyLog log = new ReplyLog(toLog,

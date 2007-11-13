@@ -33,14 +33,14 @@ package org.objectweb.proactive.core.body.reply;
 import java.io.IOException;
 
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 public interface Reply extends Message {
-    public FutureResult getResult();
+    public MethodCallResult getResult();
 
     /**
      * Sends this reply to the body destination

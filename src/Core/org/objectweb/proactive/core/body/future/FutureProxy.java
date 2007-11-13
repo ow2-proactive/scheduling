@@ -78,7 +78,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     /**
      *        The object the proxy sends calls to
      */
-    protected FutureResult target;
+    protected MethodCallResult target;
 
     /**
      * True if this proxy has to be copied for migration or local copie.
@@ -188,7 +188,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * into an object of class InvocationTargetException and returned, just like
      * for any returned object
      */
-    public synchronized void receiveReply(FutureResult obj) {
+    public synchronized void receiveReply(MethodCallResult obj) {
         if (isAvailable()) {
             throw new IllegalStateException(
                 "FutureProxy receives a reply and this target field is not null");
@@ -227,7 +227,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * The method blocks until the future is available
      * @return the result of this future object once available.
      */
-    public synchronized FutureResult getFutureResult() {
+    public synchronized MethodCallResult getFutureResult() {
         waitFor();
         return target;
     }
@@ -473,7 +473,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private synchronized void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         senderID = (UniqueID) in.readObject();
-        target = (FutureResult) in.readObject();
+        target = (MethodCallResult) in.readObject();
         id = (FutureID) in.readObject();
         updater = (UniversalBody) in.readObject();
         // register all incoming futures, even for migration or checkpoiting

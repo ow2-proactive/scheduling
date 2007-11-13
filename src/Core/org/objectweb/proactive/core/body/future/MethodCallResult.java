@@ -46,7 +46,7 @@ class ThisIsNotAnException extends Exception {
  * This class is a placeholder for the result of a method call,
  * it can be an Object or a thrown Exception.
  */
-public class FutureResult implements Serializable {
+public class MethodCallResult implements Serializable {
 
     /** The object to be returned */
     private Object result;
@@ -54,7 +54,7 @@ public class FutureResult implements Serializable {
     /** The exception to throw */
     private Throwable exception;
 
-    public FutureResult(Object result, Throwable exception) {
+    public MethodCallResult(Object result, Throwable exception) {
         this.result = result;
         this.exception = exception;
     }

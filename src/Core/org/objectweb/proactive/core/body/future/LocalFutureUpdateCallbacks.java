@@ -44,9 +44,9 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
 
 
 class ProActiveFuture implements java.util.concurrent.Future<Object> {
-    private FutureResult result;
+    private MethodCallResult result;
 
-    public ProActiveFuture(FutureResult result) {
+    public ProActiveFuture(MethodCallResult result) {
         this.result = result;
     }
 

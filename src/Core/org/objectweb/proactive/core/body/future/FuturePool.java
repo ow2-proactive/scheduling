@@ -75,14 +75,14 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     // table used for storing values which arrive in the futurePool BEFORE the registration
     // of its corresponding future.
-    private java.util.HashMap<String, FutureResult> valuesForFutures;
+    private java.util.HashMap<String, MethodCallResult> valuesForFutures;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public FuturePool() {
         futures = new FutureMap();
-        valuesForFutures = new java.util.HashMap<String, FutureResult>();
+        valuesForFutures = new java.util.HashMap<String, MethodCallResult>();
         this.newState = false;
         if (PAProperties.PA_FUTURE_AC.isTrue()) {
             this.registerACs = true;
@@ -247,7 +247,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param result value to update with the futures
      */
     public synchronized int receiveFutureValue(long id, UniqueID creatorID,
-        FutureResult result, Reply reply) throws java.io.IOException {
+        MethodCallResult result, Reply reply) throws java.io.IOException {
         // get all aiwated futures
         ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id,
                 creatorID);
@@ -273,7 +273,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 setCopyMode(true);
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (futuresToUpdate.get(i));
-                    otherFuture.receiveReply((FutureResult) Utils.makeDeepCopy(
+                    otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(
                             result));
                 }
                 setCopyMode(false);
@@ -299,7 +299,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     // ACs are registred during this deep copy (no copy mode)
                     // Warn : this copy does not avoid the copy for local communications !
                     this.registerDestinations(bodiesToContinue);
-                    FutureResult newResult = (FutureResult) Utils.makeDeepCopy(result);
+                    MethodCallResult newResult = (MethodCallResult) Utils.makeDeepCopy(result);
 
                     // the created futures should be set in copyMode to avoid AC registration
                     // during the effective sending by the AC thread
