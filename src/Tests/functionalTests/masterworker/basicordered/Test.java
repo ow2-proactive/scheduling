@@ -49,7 +49,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterworker/MasterSlave.xml");
+            "/functionalTests/masterworker/MasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     public static final int NB_TASKS = 4;

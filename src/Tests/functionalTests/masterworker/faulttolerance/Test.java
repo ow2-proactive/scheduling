@@ -52,7 +52,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterworker/faulttolerance/MasterSlaveFT.xml");
+            "/functionalTests/masterworker/faulttolerance/MasterWorkerFT.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     private ProActiveDescriptorInternal pad;
@@ -68,7 +68,7 @@ public class Test extends FunctionalTest {
         vn1.killAll(false);
         List<Integer> ids2 = master.waitAllResults();
         ids.addAll(ids2);
-        assertTrue("Only one slave left", master.workerpoolSize() == 1);
+        assertTrue("Only one worker left", master.workerpoolSize() == 1);
 
         Iterator<Integer> it = ids.iterator();
         int last = it.next();
