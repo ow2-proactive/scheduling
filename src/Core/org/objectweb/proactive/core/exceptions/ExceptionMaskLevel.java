@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 
 
 public class ExceptionMaskLevel {
@@ -153,7 +153,7 @@ public class ExceptionMaskLevel {
     /* A future has returned */
     synchronized void removeFuture(FutureProxy f) {
         nbFutures--;
-        FutureResult res = f.getFutureResult();
+        MethodCallResult res = f.getFutureResult();
 
         if (res != null) {
             Throwable exception = f.getFutureResult().getException();

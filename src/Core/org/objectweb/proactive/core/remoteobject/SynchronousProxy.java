@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.remoteobject;
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -65,11 +66,12 @@ public class SynchronousProxy implements Proxy, Serializable {
         SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
         if (reply != null) {
-            if (reply.getSynchResult() instanceof Throwable) {
-                throw (Throwable) reply.getSynchResult();
+            MethodCallResult rr = reply.getResult();
+            if (rr.getException() != null) {
+                throw rr.getException();
             }
 
-            return reply.getSynchResult();
+            return reply.getResult().getResult();
         }
 
         return null;
@@ -79,11 +81,12 @@ public class SynchronousProxy implements Proxy, Serializable {
         SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(m);
 
         if (reply != null) {
-            if (reply.getSynchResult() instanceof Throwable) {
-                throw (Throwable) reply.getSynchResult();
+            MethodCallResult rr = reply.getResult();
+            if (rr.getException() != null) {
+                throw rr.getException();
             }
 
-            return reply.getSynchResult();
+            return reply.getResult().getResult();
         }
 
         return null;

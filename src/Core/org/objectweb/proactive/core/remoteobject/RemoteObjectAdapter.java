@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -144,7 +145,7 @@ public class RemoteObjectAdapter implements RemoteObject {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                            .warn("unable to contact remote object at " +
                 this.uri + " when calling " + message.getMethodName());
-            return new SynchronousReplyImpl(e);
+            return new SynchronousReplyImpl(new MethodCallResult(null, e));
         }
 
         //        return new SynchronousReplyImpl();
@@ -160,7 +161,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (X509Certificate) reply.getSynchResult();
+            return (X509Certificate) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -186,7 +187,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (byte[]) reply.getSynchResult();
+            return (byte[]) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -212,7 +213,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (ArrayList<Entity>) reply.getSynchResult();
+            return (ArrayList<Entity>) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -238,7 +239,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (SecurityContext) reply.getSynchResult();
+            return (SecurityContext) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -264,7 +265,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (PublicKey) reply.getSynchResult();
+            return (PublicKey) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -294,7 +295,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (byte[][]) reply.getSynchResult();
+            return (byte[][]) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -321,7 +322,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (byte[]) reply.getSynchResult();
+            return (byte[]) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -354,7 +355,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (byte[][]) reply.getSynchResult();
+            return (byte[][]) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -381,7 +382,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return ((Long) reply.getSynchResult()).longValue();
+            return ((Long) reply.getResult().getResult()).longValue();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -432,7 +433,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
                 SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-                this.stub = reply.getSynchResult();
+                this.stub = reply.getResult().getResult();
             } catch (SecurityException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -466,7 +467,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (String) reply.getSynchResult();
+            return (String) reply.getResult().getResult();
         } catch (SecurityException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -492,7 +493,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (String) reply.getSynchResult();
+            return (String) reply.getResult().getResult();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -522,7 +523,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (Class<?>) reply.getSynchResult();
+            return (Class<?>) reply.getResult().getResult();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -544,7 +545,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (Class<?>) reply.getSynchResult();
+            return (Class<?>) reply.getResult().getResult();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -567,7 +568,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
-            return (URI) reply.getSynchResult();
+            return (URI) reply.getResult().getResult();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

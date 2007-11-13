@@ -40,7 +40,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.exceptions.GathercastTimeoutException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
@@ -202,7 +202,7 @@ public class GatherRequestsQueue implements Serializable {
         return requests.get(requests.keySet().iterator().next()).isOneWay();
     }
 
-    public void addFutureForGatheredRequest(FutureResult futureResult) {
+    public void addFutureForGatheredRequest(MethodCallResult futureResult) {
         if (timedout && !resultsReturned) {
             // avoids race condition with small timeouts (result is replaced with a timeout exception)
             if (!thrownTimeoutException) {
@@ -212,7 +212,7 @@ public class GatherRequestsQueue implements Serializable {
                         itfTypeInvokedMethod.getMethod().getName() + "]");
                 }
                 thrownTimeoutException = true;
-                futuresHandler.setFutureOfGatheredInvocation(new FutureResult(
+                futuresHandler.setFutureOfGatheredInvocation(new MethodCallResult(
                         null,
                         new GathercastTimeoutException("timeout of " + timeout +
                             " reached before invocations from all clients were received for gather invocation (method " +
@@ -278,7 +278,7 @@ public class GatherRequestsQueue implements Serializable {
             timedout = true;
             if (!resultsReturned) {
                 if (!thrownTimeoutException) {
-                    requestsQueue.addFutureForGatheredRequest(new FutureResult(
+                    requestsQueue.addFutureForGatheredRequest(new MethodCallResult(
                             null,
                             new GathercastTimeoutException("timeout of " +
                                 timeout +

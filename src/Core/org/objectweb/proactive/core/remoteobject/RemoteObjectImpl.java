@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -98,12 +99,13 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
                 o = (message).getMethodCall().execute(this.target);
             }
 
-            return new SynchronousReplyImpl(o);
+            return new SynchronousReplyImpl(new MethodCallResult(o, null));
         } catch (MethodCallExecutionFailedException e) {
             e.printStackTrace();
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
-            return new SynchronousReplyImpl(e.getCause());
+            return new SynchronousReplyImpl(new MethodCallResult(null,
+                    e.getCause()));
         }
     }
 

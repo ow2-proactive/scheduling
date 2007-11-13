@@ -37,19 +37,19 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 public class SynchronousReplyImpl implements Reply, Serializable {
-    protected Object reply;
+    protected MethodCallResult reply;
 
     public SynchronousReplyImpl() {
     }
 
-    public SynchronousReplyImpl(Object reply) {
+    public SynchronousReplyImpl(MethodCallResult reply) {
         this.reply = reply;
     }
 
@@ -59,12 +59,8 @@ public class SynchronousReplyImpl implements Reply, Serializable {
         return false;
     }
 
-    public Object getSynchResult() {
+    public MethodCallResult getResult() {
         return reply;
-    }
-
-    public FutureResult getResult() {
-        return null;
     }
 
     public long getSessionId() {
