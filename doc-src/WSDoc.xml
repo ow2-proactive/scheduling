@@ -7,7 +7,7 @@
     <title>Overview</title>
 
     <para>This feature allows the call and monitoring of active objects and
-    ProActive components from any client written in any foreign
+    GCM components from any client written in any foreign
     language.</para>
 
     <para>Indeed, applications written in C#, for example, cannot communicate
@@ -21,10 +21,10 @@
     <title>Principles</title>
 
     <para>A <emphasis role="bold">web service</emphasis> is a software entity,
-    providing one or several functionnalities, that can be exposed, discovered
+    providing one or several functionalities, that can be exposed, discovered
     and accessed over the network. Moreover, web services technology allows
-    heterogenous applications to communicate and exchange data in a remotely
-    way. In our case, the usefull elements, of web services are:</para>
+    heterogeneous applications to communicate and exchange data in a remotely
+    way. In our case, the useful elements, of web services are:</para>
 
     <itemizedlist>
       <listitem>
@@ -69,7 +69,7 @@
     </itemizedlist>
 
     <para><figure>
-        <title>This figure shows the steps when a active object is called via
+        <title>This figure shows the steps when an active object is called via
         SOAP.</title>
 
         <mediaobject>
@@ -88,7 +88,7 @@
 
     <para>First of all, you need to install the Jakarta Tomcat web server here
     and install it. You can find some documentation about it <ulink
-    url="http://tomcat.apache.org/">here</ulink> .</para>
+    url="http://tomcat.apache.org/">here</ulink>, any version should be fine.</para>
 
     <para>You don't really have to do a lot of installation. Just uncompress
     the archive.</para>
@@ -144,18 +144,18 @@
         <para>Write your active object or your component in a classic way; for
         example:</para>
 
-        <programlisting lang="java"> A a = (A)ProActive.newActive("A", new Object [] {}); </programlisting>
+        <programlisting lang="java"> A a = (A)ProActiveObject.newActive("A", new Object [] {}); </programlisting>
       </listitem>
 
       <listitem>
         <para>Once the element is created and activated, deploy it onto a web
-        server by using:</para>
+        server by using <emphasis role="bold">org.objectweb.proactive.extensions.webservices.WebServices</emphasis> API:</para>
 
         <itemizedlist>
           <listitem>
             <para>For an active object:</para>
 
-            <programlisting lang="java"> <emphasis role="bold">ProActive.exposeAsWebService(Object o, String url, String urn, String [] methods); </emphasis></programlisting>
+            <programlisting lang="java"> <emphasis role="bold">WebServices.exposeAsWebService(Object o, String url, String urn, String [] methods); </emphasis></programlisting>
 
             <para>where:</para>
 
@@ -187,7 +187,7 @@
           <listitem>
             <para>For a component:</para>
 
-            <programlisting lang="java"><emphasis role="bold">Proactive.exposeComponentAsWebService(Component component, String url, String componentName);  </emphasis></programlisting>
+            <programlisting lang="java"><emphasis role="bold">WebServices.exposeComponentAsWebService(Component component, String url, String componentName);  </emphasis></programlisting>
 
             <para>where:</para>
 
@@ -223,7 +223,7 @@
     <para>To undeploy an active object as a service, use the ProActive static
     method:</para>
 
-    <programlisting lang="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String urn, String url );  </emphasis></programlisting>
+    <programlisting lang="java"><emphasis role="bold">WebServices.unExposeAsWebService ( String urn, String url );  </emphasis></programlisting>
 
     <para>where:</para>
 
@@ -241,7 +241,7 @@
     <para>To undeploy a component you have to specify the component name and
     the component( needed to know the interfaces to undeploy):</para>
 
-    <programlisting lang="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
+    <programlisting lang="java"><emphasis role="bold">WebServices.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
   </sect1>
 
   <sect1>
@@ -294,8 +294,8 @@
    public static void main (String [] args) {
 
     try {
-        HelloWorld hw = (HelloWorld)ProActive.newActive("HelloWorld", new Object []{});
-        ProActive.exposeAsWebService(hw,
+        HelloWorld hw = (HelloWorld)ProActiveObject.newActive("HelloWorld", new Object []{});
+        WebServices.exposeAsWebService(hw,
         "helloWorld","http://localhost:8080", new String [] { "helloWorld" }); 
 
     } catch (ActiveObjectCreationException e) {
@@ -368,7 +368,7 @@ string s = hw.helloWorld ();
       in order to a C# client for example controls it. Only one instruction
       has been added in the main method:</para>
 
-      <programlisting lang="java">ProActive.exposeAsWebService (dispatcher, "C3DDispatcher",
+      <programlisting lang="java">WebServices.exposeAsWebService (dispatcher, "C3DDispatcher",
                     "http://localhost:8080",  new String [] {
                     "rotateRight", "getPicture", "rotateLeft", "rotateUp",
                     "rotateDown", "getPixels", "getPixelMax", "waitForImage",
@@ -411,12 +411,12 @@ string s = hw.helloWorld ();
       Although dispatcher can contact ProActive applications, it cannot
       communicate with other applications (it cannot initiate the
       communication). In other words, the dispacher must communicate remotely
-      with an application witten in another language.</para>
+      with an application written in another language.</para>
 
       <para>The answer to this problem is to use .Net web service on the C#
       user machine. Such a web service is waiting for callback requests that
       come from dispatcher. When receiving a request, the service sends it to
-      the client via a .Net Remoting shared objet. Thus, when the .Net web
+      the client via a .Net Remoting shared object. Thus, when the .Net web
       service receives a callback request, the C# client is updated thanks to
       propagated events.</para>
 
