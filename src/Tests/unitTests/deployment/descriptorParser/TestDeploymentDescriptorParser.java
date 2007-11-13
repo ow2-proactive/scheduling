@@ -72,16 +72,8 @@ public class TestDeploymentDescriptorParser {
                                        .getResource("testfiles/deployment/allGroupsExample.xml")
                                        .getFile());
 
-        String userSchema = getClass()
-                                .getResource("testfiles/deployment/allGroupsSchema.xsd")
-                                .toString();
-
-        ArrayList<String> schemas = new ArrayList<String>();
-        schemas.add(userSchema);
-
         System.out.println("Parsing " + descriptor.getAbsolutePath());
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor,
-                schemas);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
 
         parser.parseEnvironment();
         parser.parseInfrastructure();
@@ -112,7 +104,7 @@ public class TestDeploymentDescriptorParser {
         }
 
         public String getBaseNodeName() {
-            return "paext:myGroup";
+            return "myGroup";
         }
 
         @Override
@@ -132,16 +124,18 @@ public class TestDeploymentDescriptorParser {
             return new UserBridge();
         }
 
-        public String getNodeName() {
-            return "paext:myBridge";
+        public String getBaseNodeName() {
+            return "myBridge";
         }
 
         @Override
-        public void parseBridgeNode(Node bridgeNode, XPath xpath) {
-            super.parseBridgeNode(bridgeNode, xpath);
+        public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath) {
+            AbstractBridge bridge = super.parseBridgeNode(bridgeNode, xpath);
             System.out.println("User Bridge Parser - someattr value = " +
                 bridgeNode.getAttributes().getNamedItem("someattr")
                           .getNodeValue());
+
+            return bridge;
         }
     }
 

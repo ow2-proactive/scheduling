@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	elementFormDefault="qualified">
+
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupARCSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupCGSPSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupFuraSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupGLiteSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupGlobusSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupGridBusSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupGridEngineSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupLSFSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupLoadLevelerSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupOARSchema.xsd" />	
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupOARSHSchema.xsd" />	
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupPBSSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupPrunSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupRSHSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/GroupSchemas/GroupSSHSchema.xsd" />
+
+	<include schemaLocation="../GCMDeployment/BridgeSchemas/BridgeRSHSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/BridgeSchemas/BridgeSSHSchema.xsd" />
+	<include schemaLocation="../GCMDeployment/BridgeSchemas/BridgeOARSHSchema.xsd" />
+
+</schema>
+
+

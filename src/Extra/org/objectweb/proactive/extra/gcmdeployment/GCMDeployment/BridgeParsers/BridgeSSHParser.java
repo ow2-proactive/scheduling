@@ -44,8 +44,8 @@ public class BridgeSSHParser extends AbstractBridgeParser {
     static final String NODE_NAME = "sshBridge";
 
     @Override
-    public void parseBridgeNode(Node bridgeNode, XPath xpath) {
-        super.parseBridgeNode(bridgeNode, xpath);
+    public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath) {
+        BridgeSSH bridge = (BridgeSSH) super.parseBridgeNode(bridgeNode, xpath);
 
         String hostname = GCMParserHelper.getAttributeValue(bridgeNode,
                 ATTR_HOSTNAME);
@@ -55,6 +55,8 @@ public class BridgeSSHParser extends AbstractBridgeParser {
         BridgeSSH bridgeSSH = ((BridgeSSH) bridge);
         bridgeSSH.setHostname(hostname);
         bridgeSSH.setUsername(username);
+
+        return bridge;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class BridgeSSHParser extends AbstractBridgeParser {
         return new BridgeSSH();
     }
 
-    public String getNodeName() {
+    public String getBaseNodeName() {
         return NODE_NAME;
     }
 }

@@ -30,10 +30,16 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.process.bridge;
 
-public class BridgeOARSH extends AbstractBridge {
+public class BridgeOARSH extends BridgeSSH {
+    private String jobId;
+
     @Override
     public String internalBuildCommand() {
         // TODO Implements internalBuildCommand for OARSH
         return null;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 }

@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers;
 import javax.xml.xpath.XPath;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
 import org.w3c.dom.Node;
 
@@ -43,14 +42,14 @@ public abstract class AbstractBridgeParser implements BridgeParser {
     static final String ATT_HOSTNAME = "hostname";
     static final String ATT_USERNAME = "username";
     static final String ATT_COMMANDPATH = "commandPath";
-    protected AbstractBridge bridge;
+    static final String NODE_EXT_NAMESPACE = "paext:";
 
     public AbstractBridgeParser() {
-        bridge = createBridge();
     }
 
-    public void parseBridgeNode(Node bridgeNode, XPath xpath) {
+    public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath) {
         String value;
+        AbstractBridge bridge = createBridge();
 
         // Mandatory fields
         value = GCMParserHelper.getAttributeValue(bridgeNode, ATT_ID);
@@ -67,11 +66,15 @@ public abstract class AbstractBridgeParser implements BridgeParser {
         if (value != null) {
             bridge.setCommandPath(value);
         }
-    }
 
-    public Bridge getBridge() {
         return bridge;
     }
 
     public abstract AbstractBridge createBridge();
+
+    protected abstract String getBaseNodeName();
+
+    public String getNodeName() {
+        return NODE_EXT_NAMESPACE + getBaseNodeName();
+    }
 }

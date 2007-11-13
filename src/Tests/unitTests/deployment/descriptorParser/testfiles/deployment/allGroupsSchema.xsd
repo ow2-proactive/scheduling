@@ -16,5 +16,10 @@
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupOARSHSchema.xsd" />	
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPBSSchema.xsd" />
 	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupPrunSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupRSHSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/GroupSSHSchema.xsd" />
+
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/BridgeSchemas/BridgeSSHSchema.xsd" />
+	<include schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/BridgeSchemas/BridgeOARSHSchema.xsd" />
 
 </schema>

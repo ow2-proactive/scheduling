@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd">
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"	
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                 ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd
+
+	">
 
 	<environment>
 		<descriptorVariable name="USERNAME" value="cmathieu" />
@@ -25,13 +30,13 @@
 		</hosts>
 
 		<groups>
-			<sshGroup id="LAN_INRIA" hostList="cheypa schubby petawawa naruto" username="${USERNAME}"
+			<paext:sshGroup id="LAN_INRIA" hostList="cheypa schubby petawawa naruto" username="${USERNAME}"
 				commandPath="/usr/local/bin/ssh">
-			</sshGroup>
+			</paext:sshGroup>
 		</groups>
 
 		<bridges>
-			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
+			<paext:sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
 		</bridges>
 	</infrastructure>
 

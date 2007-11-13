@@ -47,6 +47,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeOARSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeSSHParser;
@@ -72,6 +73,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
+import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.HostInfoImpl;
 import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tool;
@@ -165,7 +167,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected void registerDefaultBridgeParsers() {
         registerBridgeParser(new BridgeSSHParser());
         registerBridgeParser(new BridgeRSHParser());
-        //        registerBridgeParser(new BridgeOARSHParser());
+        registerBridgeParser(new BridgeOARSHParser());
         // TODO add other bridge parsers here
     }
 
@@ -191,12 +193,16 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                                       .getResource(DEPLOYMENT_DESC_LOCATION)
                                       .toString();
 
-        String commonTypesSchema = getClass()
-                                       .getResource(COMMON_TYPES_DESC_LOCATION)
+        String commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION)
                                        .toString();
 
+        String extensionSchemas = getClass()
+                                      .getResource(EXTENSION_SCHEMAS_LOCATION)
+                                      .toString();
+
+        schemas.add(0, extensionSchemas);
         schemas.add(0, deploymentSchema);
-        //        schemas.add(0, commonTypesSchema);
+        //        schemas.add(0, commonTypesSchema); // not needed - it is included by the deployment schema
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
@@ -262,14 +268,27 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         if (nodeName.equals("bridge")) {
             Bridge bridge = getBridge(refid);
+            if (bridge == null) {
+                throw new RuntimeException("no bridge with refid " + refid +
+                    " has been defined");
+            }
             parseBridgeResource(resourceNode, bridge);
             resources.addBridge(bridge);
         } else if (nodeName.equals("group")) {
             Group group = getGroup(refid);
+            if (group == null) {
+                throw new RuntimeException("no group with refid " + refid +
+                    " has been defined");
+            }
             parseGroupResource(resourceNode, group);
             resources.addGroup(group);
         } else if (nodeName.equals("host")) {
             HostInfo hostInfo = getHostInfo(refid);
+            if (hostInfo == null) {
+                throw new RuntimeException("no host with refid " + refid +
+                    " has been defined");
+            }
+
             resources.setHostInfo(hostInfo);
         }
     }
@@ -382,8 +401,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                     "No bridge parser registered for node <" +
                     bridgeNode.getNodeName() + ">");
             } else {
-                bridgeParser.parseBridgeNode(bridgeNode, xpath);
-                infrastructure.addBrige(bridgeParser.getBridge());
+                AbstractBridge bridge = bridgeParser.parseBridgeNode(bridgeNode,
+                        xpath);
+                infrastructure.addBrige(bridge);
             }
         }
 

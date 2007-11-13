@@ -69,12 +69,4 @@ public class GroupSSHParser extends AbstractGroupParser {
     public String getBaseNodeName() {
         return NODE_NAME;
     }
-
-    /**
-     * GroupSSH is standard and doesn't have a namespace
-     */
-    @Override
-    public String getNodeName() {
-        return getBaseNodeName();
-    }
 }

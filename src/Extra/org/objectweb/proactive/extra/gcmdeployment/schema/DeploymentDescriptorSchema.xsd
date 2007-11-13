@@ -23,29 +23,7 @@
 		</attribute>
 	</complexType>
 
-	<complexType name="groupTypeSSH">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="privateKey" type="pa:pathElementType" minOccurs="0" maxOccurs="1" />
-				</sequence>
-				<attribute name="commandOptions" type="string"></attribute>
-				<attribute name="hostList" type="string" use="required"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<complexType name="groupTypeRSH">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<attribute name="hostList" type="string" use="required" />
-			</extension>
-		</complexContent>
-	</complexType>
-
 	<element name="abstractShElement" type="pa:abstractGroupElementType"></element>
-	<element name="sshGroup" substitutionGroup="pa:abstractShElement" type="pa:groupTypeSSH"></element>
-	<element name="rshGroup" substitutionGroup="pa:abstractShElement" type="pa:groupTypeRSH"></element>
 
 	<complexType name="peerSetType">
 		<sequence>
@@ -200,41 +178,6 @@
 
 	<element name="abstractBridgeElement" type="pa:abstractBridgeElementType"></element>
 
-	<complexType name="bridgeTypeRSH">
-		<complexContent>
-			<extension base="pa:abstractBridgeElementType">
-				<attribute name="hostname" type="pa:hostnameType" use="required" />
-				<attribute name="username" type="pa:usernameType"></attribute>
-				<attribute name="commandPath" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<complexType name="bridgeTypeSSH">
-		<complexContent>
-			<extension base="pa:abstractBridgeElementType">
-				<sequence>
-					<element name="privateKey" type="pa:pathElementType" minOccurs="0" maxOccurs="1" />
-				</sequence>
-				<attribute name="hostname" type="pa:hostnameType" use="required" />
-				<attribute name="username" type="pa:usernameType"></attribute>
-				<attribute name="commandPath" type="string"></attribute>
-				<attribute name="commandOptions" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<complexType name="bridgeTypeOARSH">
-		<complexContent>
-			<extension base="pa:bridgeTypeSSH">
-				<attribute name="jobId" type="pa:PosintOrVariableType" use="required"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<element name="rshBridge" type="pa:bridgeTypeRSH" substitutionGroup="pa:abstractBridgeElement"></element>
-	<element name="sshBridge" type="pa:bridgeTypeSSH" substitutionGroup="pa:abstractBridgeElement"></element>
-	<element name="oarshBridge" type="pa:bridgeTypeOARSH" substitutionGroup="pa:abstractBridgeElement"></element>
 
 	<complexType name="bridgesType">
 		<sequence>

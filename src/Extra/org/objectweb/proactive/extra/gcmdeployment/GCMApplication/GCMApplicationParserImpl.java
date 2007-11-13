@@ -146,8 +146,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                                       .getResource(APPLICATION_DESC_LOCATION)
                                       .toString();
 
-        String commonTypesSchema = getClass()
-                                       .getResource(COMMON_TYPES_DESC_LOCATION)
+        String commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION)
                                        .toString();
 
         schemas.add(0, deploymentSchema);

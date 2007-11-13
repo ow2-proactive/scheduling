@@ -35,10 +35,10 @@
 		<groups>
 
 
-			<sshGroup id="LAN_INRIA" hostList="node2 node4 host[10-20]" username="${USERNAME}"
+			<paext:sshGroup id="LAN_INRIA" hostList="node2 node4 host[10-20]" username="${USERNAME}"
 				commandPath="/usr/local/bin/ssh">
 				<pa:scriptPath base="proactive" relpath="myscript.sh" />
-			</sshGroup>
+			</paext:sshGroup>
 
 			<paext:pbsGroup id="pbsgroup1" queue="queue01@pbsserver" jobName="demoJob"
 				commandPath="/usr/local/bin/pbs">
@@ -158,9 +158,9 @@
 		</groups>
 
 		<bridges>
-			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
+			<paext:sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
 			
-			<oarshBridge id="oarbridge" hostname="oargrid.inria.fr" jobId="12" />
+			<paext:oarshBridge id="oarbridge" hostname="oargrid.inria.fr" jobId="12" />
 			
 		</bridges>
 	</infrastructure>
