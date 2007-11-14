@@ -1468,7 +1468,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      *
      */
     private class FinishTimeComparator implements Comparator<InternalTask> {
-        @Override
         public int compare(InternalTask o1, InternalTask o2) {
             return (int) (o1.getFinishedTime() - o2.getFinishedTime());
         }
