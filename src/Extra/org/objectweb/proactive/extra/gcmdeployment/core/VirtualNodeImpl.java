@@ -31,24 +31,40 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-
-
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 public class VirtualNodeImpl implements VirtualNodeInternal {
-    private long requiredCapacity;
+
+    /** The, unique, name of this Virtual Node */
     private String id;
-    private List<GCMDeploymentDescriptor> providers;
+
+    /** The number of Node awaited
+     *
+     * If 0 the Virtual Node will try to get as many node as possible
+     */
+    private long requiredCapacity;
+
+    /** Resource providers contributing to this Virtual Node
+     *
+     * The value indicates how many nodes a resource providers must contribute
+     * to the Virtual Node
+     */
+    private HashSet<GCMDeploymentDescriptor> providers;
 
     /** All File Transfer Block associated to this VN */
     private List<FileTransferBlock> fts;
 
     public VirtualNodeImpl() {
         fts = new ArrayList<FileTransferBlock>();
-        providers = new ArrayList<GCMDeploymentDescriptor>();
+        providers = new HashSet<GCMDeploymentDescriptor>();
     }
 
     public long getRequiredCapacity() {
@@ -67,16 +83,12 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         this.id = id;
     }
 
-    public List<GCMDeploymentDescriptor> getProviders() {
-        return providers;
-    }
-
     public void addProvider(GCMDeploymentDescriptor provider) {
         providers.add(provider);
     }
 
-    public void addProviders(Collection<GCMDeploymentDescriptor> providers) {
-        providers.addAll(providers);
+    public Set<GCMDeploymentDescriptor> getProviders() {
+        return providers;
     }
 
     public void addFileTransfertBlock(FileTransferBlock ftb) {
@@ -95,5 +107,46 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
 
     public void checkDirectMode() throws IllegalStateException {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public DeploymentTree getDeploymentTree() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Set<Node> getNodes() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean isReady() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void addNode(Node node) {
+        if (requiredCapacity != MAX_CAPACITY) {
+            requiredCapacity--;
+            if (requiredCapacity < 0) {
+                GCMA_LOGGER.warn("Virtual Node " + id +
+                    " received to many node !");
+            }
+        }
+    }
+
+    public boolean needContribution() {
+        if (requiredCapacity == MAX_CAPACITY) {
+            return false;
+        }
+
+        if (requiredCapacity < 0) {
+            return false;
+        }
+
+        return true;
     }
 }

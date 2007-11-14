@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 
@@ -55,4 +58,14 @@ public interface GCMDeploymentDescriptor {
      * max capacity cannot be computed UNKNOWN_CAPACITY is returned.
      */
     public long getMaxCapacity();
+
+    public String getDescriptorFilePath();
+
+    public void setContributeTo(VirtualNodeInternal virtualNode, long capacity);
+
+    public long getContributeTo(VirtualNodeInternal virtualNode);
+
+    public void addContributedNode(VirtualNodeInternal virtualNode, Node node);
+
+    public boolean needContribution(VirtualNodeInternal virtualNode);
 }

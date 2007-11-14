@@ -83,6 +83,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_RESOURCE_PROVIDER = "pa:resourceProvider";
     private static final String XPATH_FILETRANSFER = "pa:filetransfer";
     private static final String XPATH_FILE = "pa:file";
+    public static final String ATTR_RP_CAPACITY = "capacity";
     protected File descriptor;
     protected Document document;
     protected DocumentBuilderFactory domFactory;
@@ -295,15 +296,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 // get capacity
                 //
                 String capacity = GCMParserHelper.getAttributeValue(node,
-                        "capacity").trim().toLowerCase();
+                        ATTR_RP_CAPACITY).trim().toLowerCase();
 
-                long capacityI = 0;
-                if (capacity.equals("max")) {
-                    capacityI = VirtualNode.MAX_CAPACITY;
-                } else {
-                    capacityI = Long.parseLong(capacity);
-                }
-                virtualNode.setRequiredCapacity(capacityI);
+                virtualNode.setRequiredCapacity(capacityAsLong(capacity));
 
                 // get resource providers references
                 //
@@ -316,11 +311,15 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     String refId = GCMParserHelper.getAttributeValue(resProv,
                             "refid");
 
-                    GCMDeploymentDescriptor resourceProvider = resourceProvidersMap.get(refId);
-                    providers.add(resourceProvider);
-                }
+                    capacity = GCMParserHelper.getAttributeValue(resProv,
+                            ATTR_RP_CAPACITY);
 
-                virtualNode.addProviders(providers);
+                    GCMDeploymentDescriptor resourceProvider = resourceProvidersMap.get(refId);
+                    resourceProvider.setContributeTo(virtualNode,
+                        capacityAsLong(capacity));
+                    providers.add(resourceProvider);
+                    virtualNode.addProvider(resourceProvider);
+                }
 
                 virtualNodes.put(virtualNode.getId(), virtualNode);
             }
@@ -329,5 +328,23 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         }
 
         return virtualNodes;
+    }
+
+    static private long capacityAsLong(String capacity) {
+        if (capacity == null) {
+            return VirtualNode.MAX_CAPACITY;
+        }
+
+        if (capacity.equals("max")) {
+            return VirtualNode.MAX_CAPACITY;
+        }
+
+        try {
+            return Long.parseLong(capacity);
+        } catch (NumberFormatException e) {
+            GCMDeploymentLoggers.GCMA_LOGGER.warn(
+                "Invalid value for capacity: " + capacity, new Exception());
+            return VirtualNode.MAX_CAPACITY;
+        }
     }
 }

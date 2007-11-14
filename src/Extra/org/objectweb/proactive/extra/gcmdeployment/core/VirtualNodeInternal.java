@@ -30,7 +30,11 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
+import java.util.Set;
+
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 
 
 public interface VirtualNodeInternal extends VirtualNode {
@@ -42,6 +46,10 @@ public interface VirtualNodeInternal extends VirtualNode {
      * @param ftb A File Transfer Block
      */
     public void addFileTransfertBlock(FileTransferBlock ftb);
+
+    public void addProvider(GCMDeploymentDescriptor provider);
+
+    public Set<GCMDeploymentDescriptor> getProviders();
 
     /**
      * Checks that all required informations are here.
@@ -55,4 +63,8 @@ public interface VirtualNodeInternal extends VirtualNode {
      * @throws IllegalStateException If something is missing
      */
     public void checkDirectMode() throws IllegalStateException;
+
+    public void addNode(Node node);
+
+    public boolean needContribution();
 }

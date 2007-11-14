@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
+import java.util.Set;
+
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.node.Node;
 
 
 /**
@@ -62,4 +65,13 @@ public interface VirtualNode {
      * in the GCM Application Descriptor then MAX_CAPACITY is returned.
      */
     public long getRequiredCapacity();
+
+    /** Are user requirement fulfilled  ? */
+    public boolean isReady();
+
+    /** Get all the node currently available */
+    public Set<Node> getNodes();
+
+    /** Get the deployment tree */
+    public DeploymentTree getDeploymentTree();
 }

@@ -71,6 +71,7 @@
 				<complexType>
 					<attribute name="refid" type="pa:idType">
 					</attribute>
+					<attribute name="capacity" type="pa:capacityType"/>			
 				</complexType>
 			</element>
 		</sequence>
