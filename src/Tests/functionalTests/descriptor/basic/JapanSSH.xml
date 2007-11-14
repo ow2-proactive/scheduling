@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	<variables>
+
+		<javaPropertyVariable name="user.home" />
+<!-- 		<javaPropertyVariable name="TEAM" />  -->
+		<descriptorVariable name="TEAM" value="foobar" />
+
+<!-- 
+		<includePropertyFile location="${user.home}/${TEAM}/ProActive.properties" />
+		<includePropertyFile location="${user.home}/${TEAM}/${TEAM}.properties.nochange" />
+ -->
+ 
+		<descriptorVariable name="HOME" value="/home/plugtest" />
+		<descriptorVariable name="USER_HOME" value="${user.home}/${TEAM}" />
+		<descriptorVariable name="USER_PORT" value="6666" />
+		<descriptorVariable name="USER_PROTO" value="http" />
+		<descriptorVariable name="USER_CLOSESTREAM" value="true" />
+		<descriptorVariable name="USER_JVM_PARAMS" value="-Ddummy=foobar" />
+
+		<descriptorVariable name="PA_PATH" value="${HOME}/ProActive" />
+		<descriptorVariable name="JAVA" value="${HOME}/Java/java" />
+		<descriptorVariable name="username" value="plugtest" />
+		<descriptorVariable name="timeout" value="240" />
+
+		<descriptorVariable name="SSH_COMMAND" value="ssh -o ConnectTimeout=5" />
+
+	</variables>
+
+
+	<componentDefinition>
+		<virtualNodesDefinition>
+
+			<virtualNode name="imade" timeout="${timeout}" />
+			<!--
+				<virtualNode name="chiba" timeout="${timeout}"/>
+				<virtualNode name="hongo" timeout="${timeout}"/>
+			-->
+			<virtualNode name="suzuk" timeout="${timeout}" />
+			<virtualNode name="okubo" timeout="${timeout}" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+
+	<deployment>
+		<mapping>
+			<map virtualNode="imade">
+
+				<jvmSet>
+					<vmName value="imade" />
+				</jvmSet>
+			</map>
+			<!--
+				<map virtualNode="chiba">
+				<jvmSet>
+				<vmName value="chiba.c2d"/>
+				<vmName value="chiba.pm"/>
+				</jvmSet>
+				</map>
+				<map virtualNode="hongo">
+				<jvmSet>
+				<vmName value="hongo.c2d"/>
+				<vmName value="hongo.pm"/>
+				</jvmSet>
+				</map>
+			-->
+			<map virtualNode="suzuk">
+				<jvmSet>
+					<vmName value="suzuk" />
+				</jvmSet>
+
+			</map>
+			<map virtualNode="okubo">
+				<jvmSet>
+					<vmName value="okubo" />
+				</jvmSet>
+			</map>
+
+		</mapping>
+
+		<jvms>
+
+			<jvm name="imade" askedNodes="2">
+				<creation>
+					<processReference refid="ssh.imade" />
+				</creation>
+			</jvm>
+			<jvm name="chiba.c2d" askedNodes="2">
+				<creation>
+					<processReference refid="ssh.chiba.c2d" />
+				</creation>
+
+			</jvm>
+			<jvm name="chiba.pm">
+				<creation>
+					<processReference refid="ssh.chiba.pm" />
+				</creation>
+			</jvm>
+
+			<jvm name="hongo.c2d" askedNodes="2">
+				<creation>
+					<processReference refid="ssh.hongo.c2d" />
+
+				</creation>
+			</jvm>
+
+			<jvm name="hongo.pm">
+				<creation>
+					<processReference refid="ssh.hongo.pm" />
+				</creation>
+			</jvm>
+
+			<jvm name="suzuk" askedNodes="2">
+
+				<creation>
+					<processReference refid="ssh.suzuk" />
+				</creation>
+			</jvm>
+
+			<jvm name="okubo" askedNodes="2">
+				<creation>
+					<processReference refid="ssh.okubo" />
+				</creation>
+
+			</jvm>
+		</jvms>
+
+
+	</deployment>
+
+	<infrastructure>
+		<processes>
+
+			<processDefinition id="JVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="${PA_PATH}/lib/\*" />
+
+						<absolutePath value="${USER_HOME}/classes/" />
+						<absolutePath value="${USER_HOME}/libs/\*" />
+					</classpath>
+					<javaPath>
+						<absolutePath value="${JAVA}" />
+					</javaPath>
+					<policyFile>
+						<absolutePath value="${PA_PATH}/scripts/proactive.java.policy" />
+					</policyFile>
+
+<!-- 					<log4jpropertiesFile>
+						<absolutePath value="${USER_HOME}/${USER_LOG4J}" />
+					</log4jpropertiesFile>  -->
+					<jvmParameters>
+						<parameter value="-Dproactive.rmi.port=${USER_PORT}" />
+						<parameter value="-Dproactive.nolocal=true" />
+						<parameter value="-Dproactive.noprivate=true" />
+						<parameter value="-Dproactive.useIPaddress=true" />
+						<parameter value="-Djava.net.preferIPv4Stack=true" />
+
+						<parameter value="-Dproactive.communication.protocol=${USER_PROTO}" />
+						<parameter value="${USER_JVM_PARAMS}" />
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+
+
+			<!-- imade -->
+			<processDefinition id="ssh.imade">
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
+					closeStream="${USER_CLOSESTREAM}" fixedName="imade" list="[0-29]" padding="3" domain="kuis.kyoto-u.ac.jp">
+					<processReference refid="JVM" />
+
+					<commandPath value="${SSH_COMMAND}" />
+				</processList>
+			</processDefinition>
+
+			<!-- chiba -->
+			<processDefinition id="ssh.chiba.pm">
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
+					closeStream="${USER_CLOSESTREAM}" fixedName="chiba" list="[0-69]" padding="3" domain="intrigger.nii.ac.jp">
+					<processReference refid="JVM" />
+					<commandPath value="${SSH_COMMAND}" />
+				</processList>
+
+			</processDefinition>
+
+			<processDefinition id="ssh.chiba.c2d">
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
+					closeStream="${USER_CLOSESTREAM}" fixedName="chiba" list="[100-157]" padding="3" domain="intrigger.nii.ac.jp">
+					<processReference refid="JVM" />
+					<commandPath value="${SSH_COMMAND}" />
+				</processList>
+			</processDefinition>
+
+			<!-- hongo -->
+			<processDefinition id="ssh.hongo.pm">
+
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
+					closeStream="${USER_CLOSESTREAM}" fixedName="hongo" list="[000-069]" padding="3"
+					domain="logos.ic.i.u-tokyo.ac.jp">
+					<commandPath value="${SSH_COMMAND}" />
+					<processReference refid="JVM" />
+				</processList>
+
+			</processDefinition>
+
+			<processDefinition id="ssh.hongo.c2d">
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
+					closeStream="${USER_CLOSESTREAM}" fixedName="hongo" list="[100-113]" padding="3"
+					domain="logos.ic.i.u-tokyo.ac.jp">
+					<commandPath value="${SSH_COMMAND}" />
+
+					<processReference refid="JVM" />
+				</processList>
+
+			</processDefinition>
+
+
+			<!-- suzuk-->
+			<processDefinition id="ssh.suzuk">
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
+					closeStream="${USER_CLOSESTREAM}" fixedName="suzuk" list="[000-035]" padding="3" domain="suzukXXX">
+					<processReference refid="JVM" />
+				</processList>
+
+			</processDefinition>
+
+
+
+			<!-- okubo -->
+			<processDefinition id="ssh.okubo">
+				<processList class="org.objectweb.proactive.core.process.ssh.SSHProcessList"
+					closeStream="${USER_CLOSESTREAM}" fixedName="okubo" list="[0-13]" padding="3" domain="yama.info.waseda.ac.jp">
+					<commandPath value="${SSH_COMMAND}" />
+					<processReference refid="JVM" />
+				</processList>
+
+			</processDefinition>
+
+
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
